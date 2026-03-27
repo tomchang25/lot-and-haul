@@ -1,0 +1,10 @@
+**/.godot
+**/shader_cache
+**/assets
+**/addons
+**/script_templates
+
+**/*.uid
+**/*.tmp
+**/*.import
+

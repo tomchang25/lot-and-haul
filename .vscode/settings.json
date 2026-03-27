@@ -1,0 +1,32 @@
+{
+    "godotTools.editorPath.godot4": "e:\\Application\\godot\\Godot_v4.4.1-stable_win64\\Godot_v4.4.1-stable_win64.exe",
+    "files.exclude": {
+        "**/.godot": true,
+        "**/*.import": true,
+        "**/*.tmp": true,
+        "**/*.uid": true,
+        "**/shader_cache": true,
+        "**/*.svg": true,
+        "**/addons/**": true,
+        "**/arts/**": true,
+        "**/art/**": true,
+        "**/assets/**": true,
+        "**/asset/**": true,
+    },
+    // "tree-generator.exclude": {
+    //     "**/*.*": true,
+    // },
+    "godotTools.lsp.serverPort": 6005,
+    "editor.formatOnType": true,
+    "editor.formatOnSave": true,
+    "files.autoSave": "onFocusChange",
+    "[gdscript]": {
+        "editor.defaultFormatter": "DoHe.godot-format",
+        "editor.formatOnSave": true,
+        "editor.formatOnType": false, // Godot Format 不支援 formatOnType，建議關掉
+        "editor.formatOnPaste": false,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": true,
+        "editor.tabSize": 4
+    },
+}

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SpatialAudioEvent" format=3 uid="uid://d2s4krk5m4bxe"]
+
+[ext_resource type="Script" uid="uid://dk6ul5gi57s2y" path="res://common/audio/events/spatial_audio_event.gd" id="1_0qfyc"]
+[ext_resource type="AudioStream" uid="uid://djpwsguo5eb8n" path="res://common/audio/presets/assets/whoosh-001.wav" id="2_p7ul2"]
+[ext_resource type="AudioStream" uid="uid://jptgr84cedeo" path="res://common/audio/presets/assets/whoosh-002.wav" id="3_kvsu7"]
+[ext_resource type="AudioStream" uid="uid://1prpfquxb51j" path="res://common/audio/presets/assets/whoosh-003.wav" id="4_kvsu7"]
+
+[resource]
+script = ExtResource("1_0qfyc")
+limiter_key = &"minislash"
+max_per_window = 8
+window_sec = 0.5
+volume_db = -20.0
+bus_id = 1
+streams = Array[AudioStream]([ExtResource("2_p7ul2"), ExtResource("3_kvsu7"), ExtResource("4_kvsu7")])
+use_random_pitch = true
+metadata/_custom_type_script = "uid://dk6ul5gi57s2y"

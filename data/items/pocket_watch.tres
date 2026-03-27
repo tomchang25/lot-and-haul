@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://x4urbinwhp48"]
+
+[ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
+
+[resource]
+script = ExtResource("1_jyqit")
+item_name = "Pocket Watch"
+true_value = 900
+weight = 0.2
+grid_size = 1
+clues = ["watch", "pocket watch", "silver case", "Swiss movement", "1900s engraving"]

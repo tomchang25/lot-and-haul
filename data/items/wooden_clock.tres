@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://x4urbinwhp48"]
+
+[ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
+
+[resource]
+script = ExtResource("1_jyqit")
+item_name = "Wooden Clock"
+true_value = 200
+weight = 4.0
+grid_size = 2
+clues = ["clock", "wooden case", "antique", "hand-wound mechanism", "hairline crack"]

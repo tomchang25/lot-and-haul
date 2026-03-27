@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpatialAudioEvent" format=3 uid="uid://vp7463hsmyw0"]
+
+[ext_resource type="Script" uid="uid://dk6ul5gi57s2y" path="res://common/audio/events/spatial_audio_event.gd" id="1_87o2f"]
+[ext_resource type="AudioStream" uid="uid://i0bu7fodbyy0" path="res://common/audio/presets/assets/hit.wav" id="2_avtxn"]
+
+[resource]
+script = ExtResource("1_87o2f")
+limiter_key = &"damaged"
+max_per_window = 8
+window_sec = 0.5
+volume_db = -20.0
+bus_id = 1
+streams = Array[AudioStream]([ExtResource("2_avtxn")])
+use_random_pitch = true
+metadata/_custom_type_script = "uid://dk6ul5gi57s2y"

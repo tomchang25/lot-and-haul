@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://x4urbinwhp48"]
+
+[ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
+
+[resource]
+script = ExtResource("1_jyqit")
+item_name = "Sewing Machine"
+true_value = 480
+weight = 11.0
+grid_size = 3
+clues = ["sewing machine", "cast iron", "Singer brand", "treadle base", "1890s industrial"]

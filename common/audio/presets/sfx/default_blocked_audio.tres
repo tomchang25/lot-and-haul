@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SpatialAudioEvent" format=3 uid="uid://xsccf58mw7d5"]
+
+[ext_resource type="Script" uid="uid://dk6ul5gi57s2y" path="res://common/audio/events/spatial_audio_event.gd" id="1_imrk8"]
+[ext_resource type="AudioStream" uid="uid://dbw2agq5bt74q" path="res://common/audio/presets/assets/block.mp3" id="2_co4kv"]
+
+[resource]
+script = ExtResource("1_imrk8")
+limiter_key = &"blocked"
+max_per_window = 8
+window_sec = 0.5
+volume_db = -10.0
+bus_id = 1
+streams = Array[AudioStream]([ExtResource("2_co4kv")])
+use_random_pitch = true
+metadata/_custom_type_script = "uid://dk6ul5gi57s2y"
