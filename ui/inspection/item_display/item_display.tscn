@@ -1,0 +1,34 @@
+[gd_scene load_steps=2 format=3 uid="uid://bitemdtscn001"]
+
+[ext_resource type="Script" path="res://ui/inspection/item_display/item_display.gd" id="1_itemd"]
+
+[node name="ItemDisplay" type="PanelContainer"]
+custom_minimum_size = Vector2(190, 240)
+script = ExtResource("1_itemd")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SpriteRect" type="ColorRect" parent="VBox"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+color = Color(0.22, 0.22, 0.3, 1)
+
+[node name="NameLabel" type="Label" parent="VBox"]
+layout_mode = 2
+text = "—"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 14
+
+[node name="PriceLabel" type="Label" parent="VBox"]
+layout_mode = 2
+text = "?"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
+
+[node name="LevelLabel" type="Label" parent="VBox"]
+layout_mode = 2
+text = "Lvl 0"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
