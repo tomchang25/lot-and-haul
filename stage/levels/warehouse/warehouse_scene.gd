@@ -22,6 +22,7 @@ var _pulse_tween: Tween = null
 @onready var _stamina_hud: StaminaHUD = $HUD/StaminaHUD
 @onready var _action_popup: ActionPopup = $HUD/ActionPopup
 @onready var _start_btn: Button = $HUD/StartAuctionButton
+@onready var _list_review: ListReviewPopup = $ListReviewPopup
 
 
 func _ready() -> void:
@@ -32,6 +33,8 @@ func _ready() -> void:
     _action_popup.examine_requested.connect(_on_examine)
     _action_popup.cancelled.connect(_close_popup)
     _start_btn.pressed.connect(_on_start_auction_pressed)
+    _list_review.back_requested.connect(_on_list_review_back)
+    _list_review.auction_entered.connect(_on_auction_entered)
 
     _build_item_displays()
 
@@ -167,7 +170,17 @@ func _begin_exit_pulse() -> void:
 
 
 func _on_start_auction_pressed() -> void:
-    pass # TODO: transition to Block 03 (List Review)
+    _close_popup()
+    _list_review.populate()
+    _list_review.show()
+
+
+func _on_list_review_back() -> void:
+    _list_review.hide()
+
+
+func _on_auction_entered() -> void:
+    pass # TODO: transition to Block 04 (Auction)
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
