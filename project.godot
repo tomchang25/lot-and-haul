@@ -11,23 +11,25 @@ config_version=5
 [application]
 
 config/name="Lot and Haul"
+run/main_scene="res://stage/levels/warehouse/warehouse_scene.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
-run/main_scene="res://stage/warehouse/warehouse_scene.tscn"
 
 [autoload]
 
 AudioManager="*uid://bhhaho37wph5e"
-GameManager="*uid://blmyetrjsicyl"
 EventBus="*uid://d2nkmaq8dlf5g"
 KnowledgeManager="*uid://bqosi6h0xps2v"
+GameManager="*uid://blmyetrjsicyl"
+
+[debug]
+
+gdscript/warnings/integer_division=0
 
 [display]
 
-window/size/viewport_width=640
-window/size/viewport_height=360
-window/size/window_width_override=1280
-window/size/window_height_override=720
+window/size/viewport_width=1280
+window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 
 [file_customization]

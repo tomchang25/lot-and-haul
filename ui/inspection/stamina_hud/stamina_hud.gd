@@ -5,4 +5,4 @@ extends HBoxContainer
 
 
 func update_stamina(current: int, maximum: int) -> void:
-	_value_label.text = "%d / %d" % [current, maximum]
+    _value_label.text = "%d / %d" % [current, maximum]
