@@ -84,21 +84,65 @@ func _ready() -> void:
 
 func _init_auction() -> void:
     var true_value_sum := 0
+    var total_lo := 0
+    var total_hi := 0
+    var has_unknown := false
+
+    # 1. Calculate true value for hidden logic and sum up estimates
     for item: ItemData in GameManager.current_lot:
         true_value_sum += item.true_value
 
+        # Get inspection level for this item
+        var result: Dictionary = GameManager.inspection_results.get(
+            item,
+            { &"level": 0, &"clues_revealed": 0 },
+        )
+        var level: int = result[&"level"]
+
+        # Aggregate total range based on inspection levels
+        match level:
+            1:
+                total_lo += int(item.true_value * 0.4)
+                total_hi += int(item.true_value * 2.0)
+            2:
+                total_lo += int(item.true_value * 0.8)
+                total_hi += int(item.true_value * 1.3)
+            _:
+                has_unknown = true
+
+        # Create individual item label with its price range
+        var est_price_text = ClueEvaluator.get_price_range_label(item, level)
+        var lbl := Label.new()
+        lbl.text = "%s (%s)" % [item.item_name, est_price_text]
+        lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        lbl.add_theme_font_size_override(&"font_size", 15)
+        _lot_summary.add_child(lbl)
+
+    # 2. Add a separator and Total Estimate label at the bottom of the list
+    var separator := HSeparator.new()
+    _lot_summary.add_child(separator)
+
+    var total_lbl := Label.new()
+    total_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    total_lbl.add_theme_font_size_override(&"font_size", 16)
+    total_lbl.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18)) # Golden color
+
+    # Format the total text (consistent with ListReviewPopup logic)
+    if has_unknown and total_lo == 0 and total_hi == 0:
+        total_lbl.text = "Total Est: ?"
+    elif has_unknown:
+        total_lbl.text = "Total Est: $%d – $%d +" % [total_lo, total_hi]
+    else:
+        total_lbl.text = "Total Est: $%d – $%d" % [total_lo, total_hi]
+
+    _lot_summary.add_child(total_lbl)
+
+    # 3. Setup core auction price logic
     _rolled_price = roundi(true_value_sum * randf_range(0.6, 1.2))
     var opening_bid := roundi(true_value_sum * _OPENING_BID_FACTOR)
     _current_display_price = opening_bid
     _displayed_price = opening_bid
     _price_label.text = "$%d" % opening_bid
-
-    for item: ItemData in GameManager.current_lot:
-        var lbl := Label.new()
-        lbl.text = item.item_name
-        lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-        lbl.add_theme_font_size_override(&"font_size", 15)
-        _lot_summary.add_child(lbl)
 
 
 # ══ NPC tick ══════════════════════════════════════════════════════════════════
