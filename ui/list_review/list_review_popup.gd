@@ -35,7 +35,7 @@ func populate() -> void:
 
         var result: Dictionary = GameManager.inspection_results.get(
             item,
-            {&"level": 0, &"clues_revealed": 0},
+            { &"level": 0, &"clues_revealed": 0 },
         )
         var level: int = result[&"level"]
 
@@ -60,7 +60,6 @@ func populate() -> void:
 
     var opening_bid := int(true_value_sum * _OPENING_BID_FACTOR)
     _opening_bid_label.text = "Opening Bid:   $%d" % opening_bid
-
 
 # ── Row builder ────────────────────────────────────────────────────────────────
 
@@ -94,10 +93,12 @@ func _make_row(item: ItemData, level: int) -> HBoxContainer:
 
 func _status_text(level: int) -> String:
     match level:
-        1: return "Browsed"
-        2: return "Examined"
-        _: return "Uninspected"
-
+        1:
+            return "Browsed"
+        2:
+            return "Examined"
+        _:
+            return "Uninspected"
 
 # ── Button handlers ────────────────────────────────────────────────────────────
 
