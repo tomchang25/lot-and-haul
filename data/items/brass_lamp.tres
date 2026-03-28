@@ -8,4 +8,4 @@ item_name = "Brass Lamp"
 true_value = 400
 weight = 5.0
 grid_size = 2
-clues = ["lamp", "brass fixture", "antique", "1920s art deco", "fully functional"]
+clues = Array[String](["lamp", "brass fixture", "antique", "1920s art deco", "fully functional"])
