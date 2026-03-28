@@ -180,7 +180,7 @@ func _on_list_review_back() -> void:
 
 
 func _on_auction_entered() -> void:
-    get_tree().change_scene_to_file("res://stage/levels/auction/auction_scene.tscn")
+    GameManager.go_to_auction()
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 

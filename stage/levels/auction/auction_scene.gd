@@ -17,9 +17,6 @@ const _POPUP_HOLD_SEC := 0.8
 const _PRICE_TWEEN_SEC := 0.3
 const _COSMETIC_BUMP := 100
 
-const _CARGO_SCENE := "res://stage/levels/cargo/cargo_scene.tscn"
-const _APPRAISAL_SCENE := "res://stage/levels/appraisal/appraisal_scene.tscn"
-
 # ── Hidden logic state ─────────────────────────────────────────────────────────
 # _rolled_price must never be logged or exposed in any debug UI during playtesting.
 var _rolled_price: int = 0
@@ -212,13 +209,13 @@ func _resolve() -> void:
             &"paid_price": _current_display_price,
             &"won_items": GameManager.current_lot.duplicate(),
         }
-        get_tree().change_scene_to_file(_CARGO_SCENE)
+        GameManager.go_to_cargo()
     else:
         GameManager.lot_result = {
             &"paid_price": 0,
             &"won_items": [],
         }
-        get_tree().change_scene_to_file(_APPRAISAL_SCENE)
+        GameManager.go_to_appraisal()
 
 
 # ══ Player actions ═════════════════════════════════════════════════════════════
@@ -252,7 +249,7 @@ func _on_pass_pressed() -> void:
         &"paid_price": 0,
         &"won_items": [],
     }
-    get_tree().change_scene_to_file(_APPRAISAL_SCENE)
+    GameManager.go_to_appraisal()
 
 
 # ══ Display helpers ═══════════════════════════════════════════════════════════
