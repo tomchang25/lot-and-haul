@@ -2,7 +2,6 @@
 # Block 06 — Home Appraisal (stub).
 extends Control
 
-
 func _ready() -> void:
     set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 

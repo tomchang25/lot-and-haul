@@ -5,9 +5,13 @@
 extends Control
 
 # ── Constants ──────────────────────────────────────────────────────────────────
-const _OPENING_BID_FACTOR := 0.25
+const _OPENING_BID_FACTOR := 0.5
 const _NPC_NAMES: Array[String] = [
-    "Bidder 2", "Bidder 3", "Bidder 4", "Bidder 7", "Bidder 9",
+    "Bidder 2",
+    "Bidder 3",
+    "Bidder 4",
+    "Bidder 7",
+    "Bidder 9",
 ]
 const _POPUP_HOLD_SEC := 0.8
 const _PRICE_TWEEN_SEC := 0.3
@@ -20,15 +24,15 @@ const _APPRAISAL_SCENE := "res://stage/levels/appraisal/appraisal_scene.tscn"
 # _rolled_price must never be logged or exposed in any debug UI during playtesting.
 var _rolled_price: int = 0
 var _current_display_price: int = 0
-var _displayed_price: int = 0       # tracks the label's in-flight value for tweening
-var _last_bidder: String = "npc"    # "player" or "npc"
-var _in_reach: bool = false         # true once current_display_price >= rolled_price
+var _displayed_price: int = 0 # tracks the label's in-flight value for tweening
+var _last_bidder: String = "npc" # "player" or "npc"
+var _in_reach: bool = false # true once current_display_price >= rolled_price
 var _bid_enabled: bool = true
 var _shorten_next_npc_tick: bool = false
 
 # ── Timer / tween handles ──────────────────────────────────────────────────────
 var _npc_timer: Timer = null
-var _circle_fill: float = 0.0       # 0.0–1.0, snapshot kept across tween kills
+var _circle_fill: float = 0.0 # 0.0–1.0, snapshot kept across tween kills
 var _circle_tween: Tween = null
 var _popup_tween: Tween = null
 var _price_tween: Tween = null
@@ -44,7 +48,8 @@ var _npc_popup: Label = null
 
 # ══ Inner class: circle progress arc ══════════════════════════════════════════
 class _CircleProgress extends Control:
-    var fill: float = 0.0  # 0.0–1.0
+    var fill: float = 0.0 # 0.0–1.0
+
 
     func _draw() -> void:
         var centre := size / 2.0
@@ -63,6 +68,7 @@ class _CircleProgress extends Control:
                 8.0,
                 true,
             )
+
 
     func set_fill(v: float) -> void:
         fill = clampf(v, 0.0, 1.0)
@@ -104,9 +110,9 @@ func _start_npc_timer() -> void:
         _npc_timer.timeout.connect(_on_npc_tick)
         add_child(_npc_timer)
 
-    var interval := randf_range(0.5, 5.0)
-    if _shorten_next_npc_tick:
-        interval *= 0.7
+    var interval := randf_range(0.5, 3.0)
+    if _shorten_next_npc_tick or randf() < 0.25:
+        interval *= 0.5
         _shorten_next_npc_tick = false
     _npc_timer.start(interval)
 
