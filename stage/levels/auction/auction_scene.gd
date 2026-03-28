@@ -5,7 +5,7 @@
 extends Control
 
 # ── Constants ──────────────────────────────────────────────────────────────────
-const _OPENING_BID_FACTOR := 0.5
+const _OPENING_BID_FACTOR := 0.25
 const _NPC_NAMES: Array[String] = [
     "Bidder 2",
     "Bidder 3",
@@ -110,32 +110,56 @@ func _start_npc_timer() -> void:
         _npc_timer.timeout.connect(_on_npc_tick)
         add_child(_npc_timer)
 
-    var interval := randf_range(0.5, 3.0)
+    # Calculate progress toward the target rolled price
+    var progress := float(_current_display_price) / float(_rolled_price)
+
+    # Default slow-paced intervals (current logic)
+    var min_time := 1.0
+    var max_time := 3.0
+
+    # If below 75% threshold, significantly speed up the frequency
+    if progress < 0.75:
+        min_time = 0.5
+        max_time = 1.0
+
+    var interval := randf_range(min_time, max_time)
+
     if _shorten_next_npc_tick or randf() < 0.25:
         interval *= 0.5
         _shorten_next_npc_tick = false
+
     _npc_timer.start(interval)
 
 
 func _on_npc_tick() -> void:
-    # Increment price by a random step (min 100).
-    var step := maxi(roundi(randf_range(0.04, 0.09) * _rolled_price), 100)
+    # Calculate progress toward the target rolled price
+    var progress := float(_current_display_price) / float(_rolled_price)
+    var step_multiplier := 1.0
+
+    # If below 75% threshold, make the price jumps larger (e.g., 2.5x bigger)
+    if progress < 0.75:
+        step_multiplier = 1.5
+
+    # Increment price by a random step scaled by the multiplier
+    var base_step := maxi(roundi(randf_range(0.04, 0.09) * _rolled_price), 100)
+    var step := roundi(base_step * step_multiplier)
+
     _current_display_price += step
     _last_bidder = "npc"
 
-    # Display layer: update price, show popup, reset circle.
+    # Display layer: update price, show popup, reset circle
     _tween_price_to(_current_display_price)
     _show_npc_popup(_current_display_price)
     _reset_circle()
 
-    # Re-enable Bid button now that NPC has bid.
+    # Re-enable Bid button now that NPC has bid
     _bid_enabled = true
     _bid_button.disabled = false
 
-    # Termination check — runs once after each NPC tick.
+    # Termination check
     if _current_display_price >= _rolled_price:
         _in_reach = true
-        # NPC timer stops here; circle will complete and fire _resolve().
+        # NPC timer stops; circle will complete and fire _resolve()
     else:
         _start_npc_timer()
 
