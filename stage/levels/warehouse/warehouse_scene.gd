@@ -180,7 +180,7 @@ func _on_list_review_back() -> void:
 
 
 func _on_auction_entered() -> void:
-    pass # TODO: transition to Block 04 (Auction)
+    GameManager.go_to_auction()
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 

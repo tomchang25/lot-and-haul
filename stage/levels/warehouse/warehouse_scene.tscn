@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bbr8kx3k0jv3c" path="res://stage/levels/warehouse/warehouse_scene.gd" id="1_whscene"]
 [ext_resource type="PackedScene" uid="uid://bstamhudtscn1" path="res://ui/inspection/stamina_hud/stamina_hud.tscn" id="2_stamhud"]
 [ext_resource type="PackedScene" uid="uid://bactpoptscn01" path="res://ui/inspection/action_popup/action_popup.tscn" id="3_actpop"]
-[ext_resource type="PackedScene" uid="uid://blstreviewpop1" path="res://ui/list_review/list_review_popup.tscn" id="4_lstrv"]
+[ext_resource type="PackedScene" uid="uid://dbc6waemph2em" path="res://ui/list_review/list_review_popup.tscn" id="4_lstrv"]
 
 [node name="WarehouseScene" type="Control" unique_id=2043279360]
 layout_mode = 3
@@ -72,11 +72,6 @@ text = "Start Auction"
 visible = false
 layout_mode = 0
 
-[node name="ListReviewPopup" parent="." instance=ExtResource("4_lstrv")]
+[node name="ListReviewPopup" parent="." unique_id=1714813938 instance=ExtResource("4_lstrv")]
 visible = false
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
