@@ -7,14 +7,15 @@ The player watches a live bidding sequence and decides when — or whether — t
 ## Receives
 
 - `GameManager.current_lot` — all 4 items
+- `GameManager.inspection_results` — inspection levels per item (used for lot summary display)
 
 ---
 
 ## Produces
 
 - `GameManager.lot_result`
-  - `paid_price` (int) — `current_display_price` at the moment of resolution; 0 if passed
-  - `won_items` (Array[ItemData]) — all 4 items if won; empty array if passed
+  - `paid_price` (int) — `current_display_price` at the moment of resolution; 0 if passed or lost
+  - `won_items` (Array[ItemData]) — all 4 items if won; empty array if passed or lost
 
 ---
 
@@ -33,18 +34,24 @@ The Bid button, NPC bid popups, and circle progression are all display-layer eve
 ### On Entry
 - Calculate `rolled_price`:
   ```
-  rolled_price = sum of all item true_values * randf_range(0.6, 1.2)
+  rolled_price = roundi(sum of all item true_values * randf_range(0.6, 1.2))
   ```
-  Round to nearest int. Store privately. Never expose to UI directly.
-- Set `current_display_price` to a starting value equal to the value shown in Block 03 (List Review).
-  Round to nearest int.
+  Store privately. Never expose to UI directly.
+- Set `current_display_price` to the opening bid shown in Block 03 (sum of true values × 0.25), rounded to nearest int.
+- Set `_last_bidder` to `"npc"`.
 
 ### NPC Tick System
-- A timer fires every `npc_tick_interval` seconds, re-rolled each cycle: `randf_range(0.5, 5.0)`
+- A one-shot Timer fires at an interval determined by progress toward `rolled_price`:
+  - If `current_display_price / rolled_price >= 0.75`: interval = `randf_range(1.0, 3.0)`
+  - If `current_display_price / rolled_price < 0.75`: interval = `randf_range(0.5, 1.0)`
+  - Additionally, 25% of the time the interval is halved regardless of progress
+  - If `_shorten_next_npc_tick` is true, the interval is halved for one cycle only (set by player Bid)
 - On each tick:
-  - Increment `current_display_price` by a random step: `randf_range(0.04, 0.09) * rolled_price`, minimum step = 100, rounded to int
-  - Trigger NPC bid popup (see Display Layer)
-  - Reset circle progression to 0 (see Display Layer)
+  - Calculate step: base = `maxi(roundi(randf_range(0.04, 0.09) * rolled_price), 100)`; if progress < 0.75, multiply base by 1.5
+  - Increment `current_display_price` by step
+  - Set `_last_bidder = "npc"`
+  - Re-enable Bid and Pass buttons
+  - Trigger NPC bid popup, reset circle, tween price label
   - Check termination condition
 
 ### Termination Condition
@@ -60,19 +67,20 @@ The Bid button, NPC bid popups, and circle progression are all display-layer eve
   - Auction resolves as **won**
   - `paid_price` = `current_display_price`
   - `won_items` = all items in `current_lot`
-  - Advance to Block 05 (Cargo Loading)
+  - Call `GameManager.go_to_cargo()`
 - If the last bid was from an NPC:
   - Auction resolves as **lost**
   - `paid_price` = 0, `won_items` = empty array
-  - Advance to Block 06 (Home Appraisal) with nothing to show
+  - Call `GameManager.go_to_appraisal()`
 
 ### Player Actions
 - **Bid**: display-layer only; see Display Layer for effects. Does not affect `rolled_price`, step size, or termination condition.
-  - Disabled if the last bid was from the player — re-enabled after the next NPC tick
+  - Disabled if the last bid was from the player — Pass button is also disabled during this window
+  - Both re-enabled after the next NPC tick
 - **Pass**:
-  - Stops the NPC tick timer immediately
+  - Stops the NPC tick timer and kills the circle tween immediately
   - Sets `paid_price` = 0, `won_items` = empty array
-  - Advances to Block 06 (Home Appraisal) with nothing to show
+  - Calls `GameManager.go_to_appraisal()`
 
 ---
 
@@ -82,26 +90,26 @@ All of the following are visual and audio responses only. None of them affect ga
 
 ### Circle Progression
 - Fills continuously from 0 to 100% over `closing_interval` seconds, re-rolled each cycle: `randf_range(5.0, 8.0)`
+- Remaining duration is proportional to `1.0 - current_fill` so an interrupted fill doesn't restart from full duration
 - Resets to 0 whenever any bid occurs — NPC tick or player Bid
-- Purely atmospheric — circle completion has no effect on game logic
-- Conveys time pressure only; the auction does not close when it fills
+- In normal state: loops atmospherically on completion — no game effect
+- In **reach** state: completion triggers `_resolve()`
 
 ### NPC Bid Popup
-- On each NPC tick, show a brief label near the price (e.g. "Bidder 3 — $1,200")
-- NPC name randomised from a short fixed list
-- Tween in quickly, hold 0.8s, tween out
-- Displayed amount equals `current_display_price` after the step is applied
+- On each NPC tick, a new Label is appended to `_npc_history_list` (a VBoxContainer near the price)
+- Format: `"Bidder X — $1,200"`; NPC name picked randomly from a fixed list with no-repeat guard against the previous pick
+- Fade in over 0.15s → hold 3.0s → fade out over 0.5s → `queue_free()`
+- If the list exceeds 5 children, the oldest is freed immediately
 
 ### Player Presses Bid
-- `current_display_price` gets a small cosmetic bump: `+ 100` (fixed, same as minimum step)
-  - This bump is part of the normal upward crawl — it does not trigger a termination check
+- `current_display_price` gets a cosmetic bump: `+ 100` (fixed; does not trigger termination check)
+- A `"YOU — $X"` label is added to `_npc_history_list` in gold colour, auto-removed after 3s
 - Circle progression resets to 0 and begins filling again
-- Next NPC tick interval shortens for one cycle only: `npc_tick_interval * 0.7`
-  - Makes the NPC feel reactive
-- Play a short confirm sound
+- `_shorten_next_npc_tick = true` — next NPC tick interval halved for one cycle only (makes the NPC feel reactive)
+- TODO: play confirm sound via AudioManager
 
 ### Price Display
-- Central price label tweens to the new value on each change (player Bid or NPC tick)
+- Central price label tweens from its current in-flight value to the new value on each change (player Bid or NPC tick)
 - Tween duration: 0.3s
 - Large and prominent — this number is the focal point of the screen
 
@@ -109,11 +117,12 @@ All of the following are visual and audio responses only. None of them affect ga
 
 ## UI Layout
 
-- **Centre**: `current_display_price`, large
-- **Around the price**: circle progression
-- **Below price**: lot summary — item names only, no values
-- **Bottom**: two buttons — **Bid** and **Pass**
-- NPC bid popups appear near the price, not in a separate panel
+- **Centre**: `current_display_price`, large (font size 42)
+- **Around the price**: `_CircleProgress` inner class draws the arc directly via `_draw()`
+- **Right of price circle**: `_npc_history_list` — stacked bid labels (NPC and player)
+- **Below price**: lot summary — item name + estimated price range per item, total estimate at bottom
+- **Bottom**: two buttons — **Pass** and **Bid** (Pass on the left)
+- UI is fully code-built in `_build_ui()` — no companion `.tscn` file
 
 No negotiation. No counter-offer. No multiple rounds.
 
@@ -126,3 +135,21 @@ No negotiation. No counter-offer. No multiple rounds.
 - `rolled_price` must never be logged or exposed in any debug UI visible during playtesting
 - "Pass" must still route to Block 06, not terminate the run
 - Use four spaces instead of tabs to indent
+
+---
+
+## MVP Todolist
+
+*(No outstanding MVP items — block is implemented)*
+
+## Itch Demo Todolist
+
+- [ ] Audio: play confirm sound on player Bid via AudioManager (stub already in code)
+- [ ] Block 04b — Cleanup phase: after winning, before Cargo Loading, player receives 8 additional stamina to re-inspect won items and decide what to drop
+- [ ] Garage auction variant: player selects individual items from a list before entering bidding, one-on-one format
+- [ ] NPC aggression factor: some NPCs bid more aggressively (shorter tick interval, larger steps) — data-driven, no logic change needed
+
+## Post Demo Todolist
+
+- [ ] Auction house variant: per-item sequential bidding, harder pacing to control
+- [ ] Intel system: pre-run info (tip-offs, seller data) that narrows `rolled_price` range before the auction starts

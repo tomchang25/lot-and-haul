@@ -23,7 +23,7 @@ The player selects which items to bring home from the won lot.
 - Maximum total weight 20 kg
 
 ### UI — Checklist HUD
-- Display all won items in a 5-column-wide list (one row per item)
+- Display all won items in a list (one row per item)
 - Each row shows:
     - Toggle button (switch style, on/off)
     - Item name
@@ -52,3 +52,22 @@ The player selects which items to bring home from the won lot.
 - There is no drag-and-drop in this slice
 - Weight and slot counts must update live as the player toggles items
 - Do not show valuation ranges or true values on this screen — the player only knows what they inspected
+
+---
+
+## MVP Todolist
+
+*(No outstanding MVP items — block is specified)*
+
+## Itch Demo Todolist
+
+- [ ] On-site sell option: unselected items can be sold immediately at a low flat rate (placeholder price, no merchant logic yet)
+- [ ] Shipping option: unselected items can be shipped for a fee; condition revealed at Home Appraisal (damage chance)
+- [ ] Grid-based cargo layout (RE4 style): items occupy grid cells by `grid_size`, player arranges them spatially
+- [ ] Item rotation in grid
+
+## Post Demo Todolist
+
+- [ ] Drag-and-drop placement in grid
+- [ ] Multiple vehicles with different grid/weight configurations
+- [ ] Vehicle upgrade reflected in slot and weight limits

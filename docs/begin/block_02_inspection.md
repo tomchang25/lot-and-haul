@@ -14,7 +14,7 @@ The player interacts with items in the warehouse scene using limited stamina.
 
 - `GameManager.inspection_results` — Dictionary mapping each item to:
   - `level` (int): 0, 1, or 2
-  - `clues_revealed` (int): number of clues unlocked (derived from level and store seperatly)
+  - `clues_revealed` (int): number of clues unlocked (derived from level, stored separately)
     - level 0 → 0 clues
     - level 1 → 2 clues
     - level 2 → all clues (clues.size())
@@ -40,7 +40,7 @@ The player interacts with items in the warehouse scene using limited stamina.
 - Affordability:
   - Actions the player cannot afford are greyed out and unclickable
   - Browse is greyed out (disabled appearance) once the item is already at level 1 or higher
-  - Examine can still be selected on a level 1 item (upgrade path, costs rest 2 stamina)
+  - Examine can still be selected on a level 1 item (upgrade path, costs 2 stamina)
   - Applying an action that would not raise the level has no effect and should not be selectable
 - Popup dismissal:
   - ESC key
@@ -74,3 +74,23 @@ The player interacts with items in the warehouse scene using limited stamina.
 - Manual "done" / "end inspection" button
 - Item highlight on action menu open
 - Touch action
+
+---
+
+## MVP Todolist
+
+- [ ] `ItemRunContext` stub: create the resource class with `is_veiled` field (no logic yet — veiled display deferred to Itch Demo)
+- [ ] Populate `GameManager.item_contexts` alongside `current_lot` at run start
+
+## Itch Demo Todolist
+
+- [ ] Veiled item display: show "Large / Medium / Small item" instead of name and category when `is_veiled = true`
+- [ ] Lift veil on first inspect action, animate reveal
+- [ ] Touch action: costs 2 stamina, available in non-warehouse locations
+- [ ] Knowledge system integration: `KnowledgeManager.get_level()` returns real value, affects clue text and valuation range width
+- [ ] Cleanup phase stamina: after Auction, before Cargo, player gets 8 additional stamina to re-inspect items in the won lot (see Block 04b)
+
+## Post Demo Todolist
+
+- [ ] Xray action: costs 5 stamina, unlocks internal/hidden clue layer
+- [ ] Per-clue valuation display (replaces level-based range)
