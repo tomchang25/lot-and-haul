@@ -34,7 +34,6 @@ var _shorten_next_npc_tick: bool = false
 var _npc_timer: Timer = null
 var _circle_fill: float = 0.0 # 0.0–1.0, snapshot kept across tween kills
 var _circle_tween: Tween = null
-var _popup_tween: Tween = null
 var _price_tween: Tween = null
 
 # ── UI node references (assigned in _build_ui) ─────────────────────────────────
@@ -43,7 +42,10 @@ var _circle_node: _CircleProgress = null
 var _lot_summary: VBoxContainer = null
 var _bid_button: Button = null
 var _pass_button: Button = null
-var _npc_popup: Label = null
+# var _npc_popup: Label = null
+var _npc_history_list: VBoxContainer = null
+
+var _last_npc_index: int = -1 # Tracks the last NPC to prevent repeats
 
 
 # ══ Inner class: circle progress arc ══════════════════════════════════════════
@@ -155,6 +157,7 @@ func _on_npc_tick() -> void:
     # Re-enable Bid button now that NPC has bid
     _bid_enabled = true
     _bid_button.disabled = false
+    _pass_button.disabled = false
 
     # Termination check
     if _current_display_price >= _rolled_price:
@@ -226,10 +229,14 @@ func _on_bid_pressed() -> void:
     _last_bidder = "player"
     _bid_enabled = false
     _bid_button.disabled = true
+    _pass_button.disabled = true
 
-    # Cosmetic bump only — does NOT trigger a termination check.
     _current_display_price += _COSMETIC_BUMP
     _tween_price_to(_current_display_price)
+
+    # Add this to show the player's bid in the stack
+    _show_player_bid_in_stack(_current_display_price)
+
     _reset_circle()
     _shorten_next_npc_tick = true
     # TODO: play confirm sound via AudioManager
@@ -262,20 +269,47 @@ func _set_displayed_price(v: float) -> void:
     _price_label.text = "$%d" % _displayed_price
 
 
+# Helper to show player in the same list
+func _show_player_bid_in_stack(price: int) -> void:
+    var lbl := Label.new()
+    lbl.text = "YOU — $%d" % price
+    lbl.add_theme_font_size_override(&"font_size", 14)
+    lbl.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18)) # Golden color
+    _npc_history_list.add_child(lbl)
+
+    var tween := create_tween()
+    tween.tween_interval(3.0)
+    tween.tween_callback(lbl.queue_free)
+
+
 func _show_npc_popup(price: int) -> void:
-    var npc_name: String = _NPC_NAMES[randi() % _NPC_NAMES.size()]
-    _npc_popup.text = "%s — $%d" % [npc_name, price]
+    # Pick a new NPC index that is different from the last one
+    var new_index := randi() % _NPC_NAMES.size()
+    while new_index == _last_npc_index:
+        new_index = randi() % _NPC_NAMES.size()
 
-    if _popup_tween:
-        _popup_tween.kill()
-    _npc_popup.modulate.a = 0.0
-    _npc_popup.show()
+    _last_npc_index = new_index
+    var npc_name: String = _NPC_NAMES[new_index]
 
-    _popup_tween = create_tween()
-    _popup_tween.tween_property(_npc_popup, "modulate:a", 1.0, 0.15)
-    _popup_tween.tween_interval(_POPUP_HOLD_SEC)
-    _popup_tween.tween_property(_npc_popup, "modulate:a", 0.0, 0.2)
-    _popup_tween.tween_callback(_npc_popup.hide)
+    # Create a new Label for stacking
+    var new_bid_label := Label.new()
+    new_bid_label.text = "%s — $%d" % [npc_name, price]
+    new_bid_label.add_theme_font_size_override(&"font_size", 14)
+    new_bid_label.modulate.a = 0.0
+
+    # Add to the container
+    _npc_history_list.add_child(new_bid_label)
+
+    # Animation: Fade in, stay, then fade out and auto-remove
+    var tween: = create_tween()
+    tween.tween_property(new_bid_label, "modulate:a", 1.0, 0.15)
+    tween.tween_interval(3.0) # Keep history visible for longer
+    tween.tween_property(new_bid_label, "modulate:a", 0.0, 0.5)
+    tween.tween_callback(new_bid_label.queue_free) # Remove from memory after fade
+
+    # Optional: Limit the number of visible items to avoid clutter
+    if _npc_history_list.get_child_count() > 5:
+        _npc_history_list.get_child(0).queue_free()
 
 
 # ══ UI builder ════════════════════════════════════════════════════════════════
@@ -322,13 +356,11 @@ func _build_ui() -> void:
     price_area.add_child(_price_label)
 
     # NPC popup floats just outside the right edge of the price area
-    _npc_popup = Label.new()
-    _npc_popup.position = Vector2(228.0, 72.0)
-    _npc_popup.custom_minimum_size = Vector2(180.0, 0.0)
-    _npc_popup.add_theme_font_size_override(&"font_size", 14)
-    _npc_popup.modulate.a = 0.0
-    _npc_popup.hide()
-    price_area.add_child(_npc_popup)
+    _npc_history_list = VBoxContainer.new()
+    _npc_history_list.position = Vector2(228.0, 72.0)
+    _npc_history_list.custom_minimum_size = Vector2(180.0, 0.0)
+    _npc_history_list.add_theme_constant_override(&"separation", 2)
+    price_area.add_child(_npc_history_list)
 
     # Lot summary — item names only, no values
     _lot_summary = VBoxContainer.new()
