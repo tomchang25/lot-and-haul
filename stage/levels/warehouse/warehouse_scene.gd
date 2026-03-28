@@ -180,7 +180,7 @@ func _on_list_review_back() -> void:
 
 
 func _on_auction_entered() -> void:
-    pass # TODO: transition to Block 04 (Auction)
+    get_tree().change_scene_to_file("res://stage/levels/auction/auction_scene.tscn")
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 

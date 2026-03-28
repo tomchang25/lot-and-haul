@@ -7,6 +7,11 @@ var current_lot: Array[ItemData] = []
 # Written by the inspection block; read by all subsequent blocks.
 var inspection_results: Dictionary = { }
 
+# Written by Block 04 (Auction).
+# { "paid_price": int, "won_items": Array[ItemData] }
+# paid_price = 0 and won_items = [] when the player passes or loses.
+var lot_result: Dictionary = { }
+
 
 func _ready() -> void:
     if current_lot.is_empty():
