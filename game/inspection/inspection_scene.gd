@@ -29,7 +29,7 @@ var _item_displays: Array[ItemDisplay] = []
 
 var _pulse_tween: Tween = null
 
-# ── UI references ─────────────────────────────────────────────────────────────
+# ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _items_root: Control = $ItemsRoot
 @onready var _stamina_hud: StaminaHUD = $HUD/StaminaHUD

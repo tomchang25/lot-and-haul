@@ -29,6 +29,7 @@ var _in_reach: bool = false # true once current_display_price >= rolled_price
 var _bid_enabled: bool = true
 var _shorten_next_npc_tick: bool = false
 var _last_npc_index: int = -1 # tracks the last NPC to prevent repeats
+var _circle_node: _CircleProgress = null
 
 # ── Timer / tween handles ─────────────────────────────────────────────────────
 
@@ -37,15 +38,13 @@ var _circle_fill: float = 0.0 # 0.0–1.0, snapshot kept across tween kills
 var _circle_tween: Tween = null
 var _price_tween: Tween = null
 
-# ── UI references ─────────────────────────────────────────────────────────────
+# ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _price_label: Label = $RootVBox/Centre/Content/PriceArea/PriceLabel
 @onready var _lot_summary: VBoxContainer = $RootVBox/Centre/Content/LotSummary
 @onready var _npc_history_list: VBoxContainer = $RootVBox/Centre/Content/PriceArea/NpcHistoryList
 @onready var _bid_button: Button = $RootVBox/ButtonBar/BidButton
 @onready var _pass_button: Button = $RootVBox/ButtonBar/PassButton
-
-var _circle_node: _CircleProgress = null
 
 # ══ Inner class: circle progress arc ══════════════════════════════════════════
 
