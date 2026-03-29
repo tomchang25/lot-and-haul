@@ -7,15 +7,23 @@ extends PanelContainer
 
 signal toggled(pressed: bool, item: ItemData)
 
+# ── State ─────────────────────────────────────────────────────────────────────
+var item_data: ItemData = null
+
+# ── Node references ───────────────────────────────────────────────────────────
 @onready var _toggle: CheckButton = $HBox/ToggleContainer/Toggle
 @onready var _name_label: Label = $HBox/NameLabel
 @onready var _price_label: Label = $HBox/PriceLabel
 @onready var _weight_label: Label = $HBox/WeightLabel
 @onready var _size_label: Label = $HBox/SizeLabel
 
-var item_data: ItemData = null
+# ══ Signal handlers ════════════════════════════════════════════════════════════
 
-# ── Public API ────────────────────────────────────────────────────────────────
+
+func _on_toggle_changed(pressed: bool) -> void:
+    toggled.emit(pressed, item_data)
+
+# ══ Common API ════════════════════════════════════════════════════════════════
 
 
 # Bind item data and populate all labels. Call once after add_child().
@@ -36,9 +44,3 @@ func set_toggle_disabled(value: bool) -> void:
 
 func is_selected() -> bool:
     return _toggle.button_pressed
-
-# ── Signal handler ────────────────────────────────────────────────────────────
-
-
-func _on_toggle_changed(pressed: bool) -> void:
-    toggled.emit(pressed, item_data)
