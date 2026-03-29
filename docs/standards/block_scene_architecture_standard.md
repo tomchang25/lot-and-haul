@@ -61,19 +61,23 @@ class_name (if needed)
 signals
 enums
 
-@export / @export_group / @onready
-
 const
 preload constants
 
+@export / @export_group
+
 private variables
+
+@onready
 ```
 
 Rules:
 
 - `@tool` goes on the very first line when present, before `extends`.
-- Signals are declared before exports so they appear first in the class contract.
-- Enums follow signals, as they can be used as export type hints.
+- Signals are declared before constants so they appear first in the class contract.
+- Enums follow signals, as they can be used as export type hints and const initializers.
+- Constants and preloads come before `@export` so export default values can reference them.
+- `@onready` goes last because it is resolved after `_ready()` enters the scene tree.
 - `class_name` is only added when the script needs to be referenced by type elsewhere.
   Omit it for scene root scripts that are never typed directly.
 
@@ -93,18 +97,15 @@ Standard variable groups, in order:
 
 | Header | Contents |
 | --- | --- |
-| `# ── Exports ──...` | `@export` vars (if any) |
 | `# ── Constants ──...` | `const` and `preload` |
+| `# ── Exports ──...` | `@export` vars |
 | `# ── State ──...` | Runtime logic variables |
 | `# ── Timer / tween handles ──...` | `Timer`, `Tween` vars |
-| `# ── UI references ──...` | `@onready` node references bound to `.tscn` nodes |
-| `# ── Testbed configuration ──...` | Testbed `@export` vars (testbed scripts only) |
+| `# ── Node references ──...` | `@onready` node references bound to `.tscn` nodes |
 
 Rules:
 
 - Only include groups that have at least one variable.
-- `@onready` vars belong under `# ── UI references ──` when they reference scene nodes.
-  Place them under `# ── Exports ──` only if they are effectively part of the public API.
 - Do not create custom group names unless no standard label fits.
 
 ---
@@ -303,12 +304,16 @@ extends Control
 const MAX_SLOTS    := 6
 const ItemRowScene := preload("res://...")   # PascalCase — loaded type
 
+# ── Exports ───────────────────────────────────────────────────────────────────
+
+@export var _item_row_scene: PackedScene
+
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _items: Array[ItemData] = []
 var _selected: Dictionary = {}
 
-# ── UI references ─────────────────────────────────────────────────────────────
+# ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _slots_label: Label = $RootVBox/Header/SlotsLabel
 @onready var _list_container: VBoxContainer = $RootVBox/ListPanel/RowContainer
@@ -361,13 +366,13 @@ The exact dash count matters less than visual consistency — copy from an exist
 
 ---
 
-# 10. UI Node Source Rule
+# 10. Node Source Rule
 
-All persistent UI nodes in a block scene **must be defined in the `.tscn` file**.
-Reference them at the top of the script using `@onready` under `# ── UI references ──`.
+All persistent nodes in a block scene **must be defined in the `.tscn` file**.
+Reference them at the top of the script using `@onready` under `# ── Node references ──`.
 
 ```gdscript
-# ── UI references ─────────────────────────────────────────────────────────────
+# ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _reveal_btn: Button = $RootVBox/Footer/RevealButton
 @onready var _row_container: VBoxContainer = $RootVBox/ListCenter/RowContainer
