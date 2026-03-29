@@ -92,13 +92,14 @@ Standard variable groups, in order:
 | `# ── Constants ──...` | `const` and `preload` |
 | `# ── State ──...` | Runtime logic variables |
 | `# ── Timer / tween handles ──...` | `Timer`, `Tween` vars |
-| `# ── UI references ──...` | Node reference vars assigned in `_build_ui()` |
+| `# ── UI references ──...` | `@onready` node references bound to `.tscn` nodes |
 | `# ── Testbed configuration ──...` | Testbed `@export` vars (testbed scripts only) |
 
 Rules:
 
 - Only include groups that have at least one variable.
-- `@onready` vars do not get a separate header — they belong to `# ── Exports ──` if they are effectively public, or sit immediately before the function section if there are very few.
+- `@onready` vars belong under `# ── UI references ──` when they reference scene nodes.
+  Place them under `# ── Exports ──` only if they are effectively part of the public API.
 - Do not create custom group names unless no standard label fits.
 
 ---
@@ -128,7 +129,7 @@ Common API        (if the script has public functions)
 Feature section 1
 Feature section 2
 ...
-UI builder        (if the script builds UI in code)
+UI builder        (only when runtime node construction is required — see Section 10)
 ```
 
 ### Inner classes
@@ -210,6 +211,9 @@ Use descriptive domain names. Examples:
 
 Always the last section when present.
 Contains `_build_ui()` and any private builder helpers it calls.
+
+Only include this section when runtime node construction is genuinely required (see Section 10).
+Most block scenes should not have this section at all.
 
 ```gdscript
 # ══ UI builder ════════════════════════════════════════════════════════════════
@@ -301,15 +305,15 @@ var _selected: Dictionary = {}
 
 # ── UI references ─────────────────────────────────────────────────────────────
 
-var _slots_label: Label = null
-var _list_container: VBoxContainer = null
+@onready var _slots_label: Label = $RootVBox/Header/SlotsLabel
+@onready var _list_container: VBoxContainer = $RootVBox/ListPanel/RowContainer
 
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 func _ready() -> void:
     _items = GameManager.cargo_items
-    _build_ui()
+    _populate_rows()
     _refresh_ui()
 
 
@@ -329,20 +333,10 @@ func _recalc_totals() -> void:
 
 func _refresh_ui() -> void:
     ...
-
-
-# ══ UI builder ════════════════════════════════════════════════════════════════
-
-func _build_ui() -> void:
-    # ── Background ────────────────────────────────────────────────────────────
-    ...
-
-    # ── Title ─────────────────────────────────────────────────────────────────
-    ...
-
-    # ── Item list ─────────────────────────────────────────────────────────────
-    ...
 ```
+
+Note: `_build_ui()` is absent from this reference layout. It only appears when runtime node
+construction is required (see Section 10). Most block scenes will match this layout exactly.
 
 ---
 
@@ -358,3 +352,42 @@ Both formats should reach approximately **column 80** (including indent for inli
 
 Use a consistent character count per format rather than eyeballing it each time.
 The exact dash count matters less than visual consistency — copy from an existing header.
+
+---
+
+# 10. UI Node Source Rule
+
+All persistent UI nodes in a block scene **must be defined in the `.tscn` file**.
+Reference them at the top of the script using `@onready` under `# ── UI references ──`.
+
+```gdscript
+# ── UI references ─────────────────────────────────────────────────────────────
+
+@onready var _reveal_btn: Button = $RootVBox/Footer/RevealButton
+@onready var _row_container: VBoxContainer = $RootVBox/ListCenter/RowContainer
+```
+
+**Do not use `_build_ui()`** to construct persistent structural nodes in code.
+
+---
+
+## Permitted exceptions
+
+The following may still be created at runtime in code:
+
+| Case | Example | Reason |
+| --- | --- | --- |
+| Packed scene instances | `_row_scene.instantiate()` | Count unknown at edit time |
+| Ephemeral display nodes | NPC bid labels, empty-state labels | Created and destroyed during the scene's lifetime |
+| Custom-drawn controls | `_CircleProgress` inner class | Requires `_draw()` override — cannot be defined in `.tscn` |
+
+The key question: **does this node exist for the full lifetime of the scene?**
+
+- Yes → define it in `.tscn`, reference via `@onready`
+- No → create it in code at the call site
+
+## What counts as a packed scene exception
+
+A packed scene exception applies only to a **self-contained reusable component** with its own `.gd` / `.tscn` pair — for example `CargoItemRow`, `AppraisalItemRow`, `ItemDisplay`.
+
+Instantiating a bare `Label.new()` or `HSeparator.new()` into a dynamic list is permitted as an ephemeral node. It is not a packed scene and does not require its own `.tscn`.
