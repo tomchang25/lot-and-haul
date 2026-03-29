@@ -6,7 +6,7 @@
     "commitLanguage": "english",
     "commitFormat": "conventional",
     "useCustomInstructions": true,
-    "customInstructions": "Use one line to summarize the commit changes. Start with a verb in the present tense. Use the conventional commit format. For example: 'feat: add user authentication'.",
+    "customInstructions": "Use one line to summarize the commit changes. Start with a verb in the present tense and lowercase the first letter. Use the conventional commit format. For example: 'feat: add user authentication'.",
     "onlyStagedChanges": false,
     "autoCommit": false,
     "autoPush": false,
