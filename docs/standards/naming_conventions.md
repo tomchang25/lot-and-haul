@@ -1,6 +1,6 @@
-# Arise Naming Conventions
+# Lot & Haul Naming Conventions
 
-This document defines the naming conventions used in the Arise project.
+This document defines the naming conventions used in the Lot & Haul project.
 
 The goal is to keep the project:
 
@@ -18,20 +18,18 @@ All files use **snake_case**.
 Examples:
 
 ```
-movement_module.gd
-animation_module.gd
-damage_receiver_module.gd
-spawn_point.gd
-player_state_idle.gd
+cargo_scene.gd
+auction_scene.gd
+cargo_item_row.gd
+item_display.gd
+appraisal_testbed.gd
 ```
 
-Scene files should match their script names when possible.
-
-Example:
+Scene files match their script names.
 
 ```
-player.tscn
-player.gd
+cargo_scene.tscn
+cargo_scene.gd
 ```
 
 ---
@@ -43,15 +41,15 @@ Classes use **PascalCase**.
 Examples:
 
 ```
-Player
-Enemy
-MovementModule
-AnimationModule
-DetectionModule
-DamageReceiverModule
+CargoScene
+ItemData
+CargoItemRow
+AppraisalItemRow
+StaminaHud
 ```
 
-This follows the common Godot style.
+Only add `class_name` when the script needs to be referenced by type elsewhere.
+Omit it for scene root scripts that are never typed directly.
 
 ---
 
@@ -62,28 +60,23 @@ Variables use **snake_case**.
 Examples:
 
 ```
-current_target
-attack_range
-movement_speed
-animation_tree
-hitbox_node
+current_lot
+paid_price
+won_items
+reveal_index
+slots_used
+```
+
+Private variables use a leading underscore.
+
+```
+_rolled_price
+_selected
+_rows
+_bid_enabled
 ```
 
 Avoid abbreviations unless they are very common.
-
-Bad:
-
-```
-atk_rng
-spd
-```
-
-Good:
-
-```
-attack_range
-movement_speed
-```
 
 ---
 
@@ -94,22 +87,27 @@ Functions use **snake_case**.
 Examples:
 
 ```
-apply_damage()
-set_enabled()
-travel()
-set_blend_position()
-clear_targets()
+setup()
+reveal()
+get_selected_items()
 ```
 
-Internal/private helper functions use a leading underscore.
-
-Examples:
+Private functions use a leading underscore.
 
 ```
-_auto_wire()
-_cache_handles()
-_stop_runtime_state()
-_on_animation_finished()
+_build_ui()
+_recalc_totals()
+_refresh_ui()
+_init_auction()
+_populate_rows()
+```
+
+Signal callbacks use `_on_` prefix.
+
+```
+_on_bid_pressed()
+_on_reveal_pressed()
+_on_item_toggled()
 ```
 
 ---
@@ -121,24 +119,25 @@ Signals use **snake_case**.
 Examples:
 
 ```
-animation_finished
-health_changed
-target_detected
-attack_started
+item_toggled
+reveal_completed
+run_finished
 ```
 
 ---
 
 # 6. Constants
 
-Constants use **UPPER_SNAKE_CASE**.
+Constants use **UPPER_SNAKE_CASE** with no leading underscore.
 
 Examples:
 
 ```
-MAX_HEALTH
-DEFAULT_ATTACK_RANGE
-DASH_DURATION
+MAX_SLOTS
+MAX_WEIGHT
+OPENING_BID_FACTOR
+PRICE_TWEEN_SEC
+COSMETIC_BUMP
 ```
 
 ---
@@ -150,10 +149,10 @@ Enums use **PascalCase** for the enum name and **UPPER_SNAKE_CASE** for values.
 Example:
 
 ```gdscript
-enum AttackType {
-    MELEE,
-    PROJECTILE,
-    AREA
+enum InspectionAction {
+    BROWSE,
+    TOUCH,
+    EXAMINE,
 }
 ```
 
@@ -166,113 +165,12 @@ Node names in scenes use **PascalCase**.
 Examples:
 
 ```
-AnimationTree
-Sprite2D
-Hitbox
-Hurtbox
-HealthBar
-DetectionArea
-```
-
----
-
-# 9. Module Naming
-
-Gameplay modules follow this pattern:
-
-```
-<feature>_module.gd
-```
-
-Examples:
-
-```
-movement_module.gd
-animation_module.gd
-combat_module.gd
-detection_module.gd
-```
-
-Classes use:
-
-```
-<Feature>Module
-```
-
-Examples:
-
-```
-MovementModule
-AnimationModule
-CombatModule
-DetectionModule
-```
-
----
-
-# 10. Controller Naming
-
-Standalone runtime nodes that make ongoing decisions follow this pattern:
-
-```
-<feature>_controller.gd
-```
-
-Examples:
-
-```
-encounter_controller.gd
-open_map_encounter_controller.gd
-despawn_controller.gd
-```
-
-Classes use:
-
-```
-<Feature>Controller
-```
-
-Examples:
-
-```
-EncounterController
-OpenMapEncounterController
-DespawnController
-```
-
-Use **Controller** when the node:
-- Has its own lifecycle (starts, ticks, stops)
-- Makes active decisions each frame or in response to events
-- Coordinates one or more systems without being attached to a specific actor
-
-Do **not** use Controller for:
-- Modules attached to actors → use `<Feature>Module`
-- Passive data containers or registries → use a descriptive noun (`SpawnRegistry`, `EventBus`)
-- Global autoloads → use `<Feature>Manager` or a descriptive noun
-
----
-
-# 11. Actor Naming
-
-Actors use the actor name as the folder name.
-
-Example:
-
-```
-game/actors/player/
-game/actors/enemies/
-game/actors/summons/
-```
-
-Typical actor structure:
-
-```
-player/
-├ player.gd
-├ player.tscn
-├ state/
-├ data/
-└ art/
+RootVBox
+ItemPanel
+ColumnHeader
+SummaryContainer
+RevealButton
+ContinueButton
 ```
 
 ---
@@ -281,13 +179,14 @@ player/
 
 | Type | Style | Example |
 |---|---|---|
-| Files | snake_case | `movement_module.gd` |
-| Classes | PascalCase | `MovementModule` |
-| Variables | snake_case | `attack_range` |
-| Functions | snake_case | `apply_damage()` |
-| Signals | snake_case | `health_changed` |
-| Constants | UPPER_SNAKE_CASE | `MAX_HEALTH` |
-| Enums | PascalCase + UPPER_SNAKE_CASE | `AttackType.MELEE` |
-| Nodes | PascalCase | `HealthBar` |
-| Modules | `<feature>_module` | `MovementModule` |
-| Controllers | `<feature>_controller` | `EncounterController` |
+| Files | snake_case | `cargo_item_row.gd` |
+| Classes | PascalCase | `CargoItemRow` |
+| Variables | snake_case | `won_items` |
+| Private variables | _snake_case | `_rolled_price` |
+| Functions | snake_case | `setup()` |
+| Private functions | _snake_case | `_build_ui()` |
+| Signal callbacks | _on_snake_case | `_on_bid_pressed()` |
+| Signals | snake_case | `item_toggled` |
+| Constants | UPPER_SNAKE_CASE | `MAX_SLOTS` |
+| Enums | PascalCase + UPPER_SNAKE_CASE | `InspectionAction.BROWSE` |
+| Nodes | PascalCase | `RevealButton` |
