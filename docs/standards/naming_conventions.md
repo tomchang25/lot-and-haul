@@ -140,13 +140,22 @@ PRICE_TWEEN_SEC
 COSMETIC_BUMP
 ```
 
+**Exception — preloaded scenes and classes**: Following Godot convention, a constant that holds
+a preloaded `.gd` class or `.tscn` scene uses **PascalCase** instead of UPPER_SNAKE_CASE,
+because it represents a type rather than a value.
+
+```gdscript
+const ItemDisplayScene := preload("uid://bitemdtscn001")  # PascalCase — loaded type
+const MAX_SLOTS        := 6                               # UPPER_SNAKE_CASE — value
+```
+
 ---
 
 # 7. Enums
 
-Enums use **PascalCase** for the enum name and **UPPER_SNAKE_CASE** for values.
+Enum names use **PascalCase**. Enum members use **UPPER_SNAKE_CASE**.
 
-Example:
+Keep enum names singular — they represent a type.
 
 ```gdscript
 enum InspectionAction {
@@ -154,6 +163,22 @@ enum InspectionAction {
     TOUCH,
     EXAMINE,
 }
+```
+
+Write each member on its own line with a trailing comma. This keeps diffs clean and
+makes it easy to add documentation comments above individual members.
+
+```gdscript
+# Good
+enum Element {
+    EARTH,
+    WATER,
+    AIR,
+    FIRE,
+}
+
+# Bad
+enum Element { EARTH, WATER, AIR, FIRE }
 ```
 
 ---
@@ -188,5 +213,6 @@ ContinueButton
 | Signal callbacks | _on_snake_case | `_on_bid_pressed()` |
 | Signals | snake_case | `item_toggled` |
 | Constants | UPPER_SNAKE_CASE | `MAX_SLOTS` |
+| Preloaded types | PascalCase | `ItemDisplayScene` |
 | Enums | PascalCase + UPPER_SNAKE_CASE | `InspectionAction.BROWSE` |
 | Nodes | PascalCase | `RevealButton` |

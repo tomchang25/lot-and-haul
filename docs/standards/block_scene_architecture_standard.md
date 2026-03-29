@@ -51,13 +51,15 @@ Testbed variant:
 
 # 2. Declaration Order
 
-Declarations at the top of the file follow this order, matching GDScript convention:
+Declarations at the top of the file follow this order:
 
 ```
+@tool (if needed)
 extends
 class_name (if needed)
 
 signals
+enums
 
 @export / @export_group / @onready
 
@@ -67,10 +69,13 @@ preload constants
 private variables
 ```
 
-Signals are declared before exports so they appear first in the class contract.
+Rules:
 
-`class_name` is only added when the script needs to be referenced by type elsewhere.
-Omit it for scene root scripts that are never typed directly.
+- `@tool` goes on the very first line when present, before `extends`.
+- Signals are declared before exports so they appear first in the class contract.
+- Enums follow signals, as they can be used as export type hints.
+- `class_name` is only added when the script needs to be referenced by type elsewhere.
+  Omit it for scene root scripts that are never typed directly.
 
 ---
 
@@ -295,8 +300,8 @@ extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-const MAX_SLOTS := 6
-const ItemRowScene := preload("res://...")
+const MAX_SLOTS    := 6
+const ItemRowScene := preload("res://...")   # PascalCase — loaded type
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
