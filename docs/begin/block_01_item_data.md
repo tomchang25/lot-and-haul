@@ -71,5 +71,6 @@ Foundation for all other blocks. No dependencies.
 
 ## Later
 
+- [ ] `@tool` EditorScript: batch generate / update `ItemData` and `VeiledType` `.tres` files from a CSV source
 - [ ] Clue-driven valuation: each clue tag carries its own price range estimate (replaces level-based multipliers)
 - [ ] Fake / variant items: two items can share most clues but diverge on the final clue, causing a large valuation surprise at Home Appraisal
