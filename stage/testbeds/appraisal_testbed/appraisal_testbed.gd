@@ -3,13 +3,14 @@
 # appraisal scene directly, bypassing Blocks 01–05.
 #
 # Run this scene to test Home Appraisal in isolation.
-# Edit the @export arrays in the Inspector to change which items are carried
-# into appraisal and what price was paid at auction.
+# Edit the @export fields in the Inspector to configure fake state.
 extends Control
 
-const AppraisalScene := preload("res://stage/levels/appraisal/appraisal_scene.tscn")
+# ── Constants ─────────────────────────────────────────────────────────────────
 
-# ── Testbed configuration (edit in Inspector) ──────────────────────────────────
+const AppraisalScene := preload("res://game/appraisal/appraisal_scene.tscn")
+
+# ── Exports ───────────────────────────────────────────────────────────────────
 
 # Items the player loaded onto the truck. Drag .tres files here.
 # These become GameManager.cargo_items — the items whose true_value is revealed.
@@ -18,14 +19,14 @@ const AppraisalScene := preload("res://stage/levels/appraisal/appraisal_scene.ts
 # Simulated amount paid at auction (used in the profit / loss calculation).
 @export var paid_price: int = 1800
 
-# ── Lifecycle ─────────────────────────────────────────────────────────────────
+# ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
 func _ready() -> void:
     _inject_fake_state()
     _launch_appraisal_scene()
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# ══ Setup ═════════════════════════════════════════════════════════════════════
 
 
 func _inject_fake_state() -> void:
@@ -40,7 +41,7 @@ func _inject_fake_state() -> void:
     }
 
     # Clear any leftover run result from a previous session.
-    GameManager.run_result = {}
+    GameManager.run_result = { }
 
 
 func _launch_appraisal_scene() -> void:

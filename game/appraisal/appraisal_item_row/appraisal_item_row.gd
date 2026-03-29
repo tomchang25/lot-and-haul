@@ -1,16 +1,20 @@
-# appraisal_row.gd
+# appraisal_item_row.gd
 # One item row in the Block 06 Home Appraisal list.
 # Call setup() once after instantiation.
 # Call reveal() to flip the value from "???" to the true value with colour.
 class_name AppraisalItemRow
 extends HBoxContainer
 
-@onready var _name_lbl: Label = $NameLabel
-@onready var _value_lbl: Label = $ValueLabel
+# ── State ─────────────────────────────────────────────────────────────────────
 
 var _item: ItemData = null
 
-# ── Public API ────────────────────────────────────────────────────────────────
+# ── Node references ───────────────────────────────────────────────────────────
+
+@onready var _name_lbl: Label = $NameLabel
+@onready var _value_lbl: Label = $ValueLabel
+
+# ══ Common API ════════════════════════════════════════════════════════════════
 
 
 # Bind item data and populate the name. Call once after add_child().

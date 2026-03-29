@@ -1,11 +1,21 @@
 # appraisal_scene.gd
 # Block 06 — Home Appraisal
-# Reads:  GameManager.cargo_items, GameManager.lot_result.paid_price
+# Reads:  GameManager.cargo_items, GameManager.lot_result
 # Writes: GameManager.run_result
 extends Control
 
-# ── Exports ────────────────────────────────────────────────────────────────────
+# ── Exports ───────────────────────────────────────────────────────────────────
+
 @export var _row_scene: PackedScene
+
+# ── State ─────────────────────────────────────────────────────────────────────
+
+var _cargo_items: Array[ItemData] = []
+var _paid_price: int = 0
+var _reveal_index: int = 0
+var _rows: Array[AppraisalItemRow] = []
+
+# ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _row_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/RowContainer
 @onready var _summary_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/SummaryContainer
@@ -15,20 +25,15 @@ extends Control
 @onready var _reveal_btn: Button = $RootVBox/Footer/RevealButton
 @onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
 
-# ── State ──────────────────────────────────────────────────────────────────────
-var _cargo_items: Array[ItemData] = []
-var _paid_price: int = 0
-var _reveal_index: int = 0
-var _rows: Array[AppraisalItemRow] = []
+# ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
-# ══ Lifecycle ══════════════════════════════════════════════════════════════════
 func _ready() -> void:
-    _cargo_items = GameManager.cargo_items
-    _paid_price = GameManager.lot_result.get(&"paid_price", 0)
-
     _reveal_btn.pressed.connect(_on_reveal_pressed)
     _continue_btn.pressed.connect(_on_continue_pressed)
+
+    _cargo_items = GameManager.cargo_items
+    _paid_price = GameManager.lot_result.get(&"paid_price", 0)
 
     _populate_rows()
 
@@ -37,8 +42,27 @@ func _ready() -> void:
         _commit_result()
         _show_summary()
 
+# ══ Signal handlers ════════════════════════════════════════════════════════════
 
-# ══ Logic ══════════════════════════════════════════════════════════════════════
+
+func _on_reveal_pressed() -> void:
+    if _reveal_index >= _rows.size():
+        return
+
+    _rows[_reveal_index].reveal()
+    _reveal_index += 1
+
+    if _reveal_index >= _rows.size():
+        _commit_result()
+        _show_summary()
+
+
+func _on_continue_pressed() -> void:
+    GameManager.restart_run()
+
+# ══ Reveal sequence ════════════════════════════════════════════════════════════
+
+
 func _populate_rows() -> void:
     if _cargo_items.is_empty():
         var empty_lbl := Label.new()
@@ -88,20 +112,3 @@ func _show_summary() -> void:
     _summary_container.show()
     _continue_btn.show()
     _reveal_btn.hide()
-
-
-# ══ Signal handlers ════════════════════════════════════════════════════════════
-func _on_reveal_pressed() -> void:
-    if _reveal_index >= _rows.size():
-        return
-
-    _rows[_reveal_index].reveal()
-    _reveal_index += 1
-
-    if _reveal_index >= _rows.size():
-        _commit_result()
-        _show_summary()
-
-
-func _on_continue_pressed() -> void:
-    GameManager.restart_run()
