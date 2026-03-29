@@ -21,12 +21,12 @@ Each stage passes data forward through `GameManager`. No stage can reach back.
 | File | Stage |
 |---|---|
 | `block_01_item_data.md` | Item Data (foundation) |
-| `run_warehouse.md` | Warehouse Entry (atmosphere + run init) |
 | `block_02_inspection.md` | Inspection (stamina + clue system) |
 | `block_03_list_review.md` | List Review (bridge UI) |
 | `block_04_auction.md` | Auction Bid |
 | `block_05_cargo.md` | Cargo Loading |
 | `block_06_home_appraisal.md` | Home Appraisal + Final Settlement |
+| `run_warehouse.md` | Warehouse Entry (atmosphere + run init) |
 
 ---
 
@@ -54,3 +54,19 @@ back before handing control to the next stage.
 - Cargo limit: 6 items, 20 kg total
 - No shipping, no selling on-site, no drag-and-drop
 - No save system, no animations, no audio
+
+---
+
+## Documentation Structure
+
+Each block has its own markdown file with the following sections:
+
+- **Requirements** — what the block does and how it works
+- **Receives / Produces** — what it reads from and writes to `GameManager`
+- **Note** — design intent and constraints
+- **Todolist** — three tiers:
+    - `## Done` — completed items (archived periodically)
+    - `## Soon` — next actionable items
+    - `## Later` — backlog, long-term considerations
+
+Block files are the authoritative source for per-feature detail. This README covers only the overall loop, data flow, and project-wide constraints.

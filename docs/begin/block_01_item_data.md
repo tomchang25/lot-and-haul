@@ -6,64 +6,70 @@ Foundation for all other blocks. No dependencies.
 
 ## Requirements
 
+### ItemData
 - Define `ItemData` as a Godot `Resource`
 - Fields:
-    - item name
-    - true value (integer)
-    - weight (float, kg)
-    - grid size (int, reserved for future cargo grid — unused this slice)
-    - clues array (two strings: index 0 = browse description, index 1 = examine description)
-    - `category: String` — fine-grained type (e.g. "Bike", "Pocket Watch")
+    - `item_name: String`
+    - `true_value: int` — ground-truth market value; never shown directly to the player
+    - `weight: float` — kilograms; used for cargo weight limit checks
+    - `grid_size: int` — inventory grid cells (1-dimensional for now; reserved for future cargo grid)
     - `super_category: String` — broad type (e.g. "Vehicle", "Accessory")
-- Create 4 preset `.tres` files with the following values:
-
-    | Name | True Value | Weight | category | super_category |
-    |---|---|---|---|---|
-    | Old Bicycle | 1100 | 12.0 | Bike | Vehicle |
-    | Leather Handbag | 800 | 3.0 | Handbag | Accessory |
-    | Brass Lamp | 400 | 5.0 | Lamp | Furniture |
-    | Wooden Clock | 200 | 4.0 | Clock | Furniture |
-
-- Each preset must have two clue strings (browse-level and examine-level)
+    - `category: String` — fine-grained type (e.g. "Bike", "Pocket Watch")
+    - `clues: Array[String]` — ordered by discovery depth; index 0–3 correspond to inspection levels 2–5 (browsed / examined / researched / authenticated)
+    - `veiled_types: Array[VeiledType]` — candidate pool; one picked uniform-random when `ItemEntry` is generated
 - No logic in this file — pure data
+
+### ItemEntry
+- Runtime class (`game/_shared/item_entry.gd`); wraps one `ItemData` for the duration of a run
+- Fields:
+    - `item_data: ItemData`
+    - `resolved_veiled_type: VeiledType` — null if `inspection_level > 0`
+    - `inspection_level: int` — 0 (veiled) / 1 (untouched) / 2 (browsed) / 3 (examined) / 4 (researched) / 5 (authenticated)
+- `is_veiled() -> bool` — returns `inspection_level == 0`
+
+## Current Presets
+
+| Name | True Value | Weight | grid_size | category | super_category |
+|---|---|---|---|---|---|
+| Oil Painting | 2200 | 1.5 | 2 | Painting | Art |
+| Old Bicycle | 1100 | 12.0 | 4 | Bike | Vehicle |
+| Pocket Watch | 900 | 0.2 | 1 | Pocket Watch | Accessory |
+| Porcelain Vase | 1500 | 2.5 | 1 | Vase | Ceramics |
+| Sewing Machine | 480 | 11.0 | 3 | Sewing Machine | Appliance |
+| Typewriter | 650 | 8.0 | 3 | Typewriter | Equipment |
+| Vinyl Record Box | 350 | 6.0 | 2 | Vinyl Records | Media |
+| Wooden Clock | 200 | 4.0 | 2 | Clock | Furniture |
+| Brass Lamp | 400 | 5.0 | 2 | Lamp | Furniture |
+| Leather Handbag | 800 | 3.0 | 1 | Handbag | Accessory |
+
+## Current VeiledTypes
+
+| type_id | display_label | base_veiled_price |
+|---|---|---|
+| small_thing | small thing | 150 |
+| medium_thing | medium thing | 300 |
+| large_thing | large thing | 500 |
+| heavy_thing | heavy thing | 400 |
+| flat_package | flat package | 250 |
+| unknown_accessory | unknown accessory | 200 |
+| unknown_ceramics | unknown ceramics | 350 |
+| unknown_furniture | unknown furniture | 280 |
+| unknown_painting | unknown painting | 500 |
 
 ---
 
 ## Note
 
 - All other blocks depend on this being done first
-- `grid_size` field must exist even though it is not used in this slice
-- `category` and `super_category` fields must exist even though merchant filtering is not used in this slice
 - Do not add any methods or computed properties to `ItemData`
 
 ---
 
-## Finished Todolist
+## Done
 
-- [x] Add `category` and `super_category` fields to `ItemData`
-- [x] Update all existing `.tres` presets with category values
+## Soon
 
-## Itch Demo Todolist
-
-- [ ] Expand clues array to 4 entries (index 0–3), corresponding to inspection levels 2–5 (browsed / examined / researched / authenticated)
-- [ ] Add `veiled_types: Array[VeiledType]` field to `ItemData`
-    - Lists all possible veiled appearances this item can resolve to at run start
-    - One is picked at random (uniform) when `ItemEntry` is generated
-    - Define which item presets can spawn as veiled, and assign their candidate `VeiledType` arrays
-- [ ] Define `VeiledType` as a designer-authored Resource (`data/_definitions/veiled_type.gd`):
-    - `type_id: String` — identifier (e.g. `"unknown_book"`, `"medium_thing"`)
-    - `display_label: String` — atmosphere text shown to player (e.g. `"unknown book"`, `"medium thing"`)
-    - `base_veiled_price: int` — NPC base estimate used in rolled_price calculation when item is veiled
-    - Create `.tres` files under `data/veiled_types/`
-- [ ] Define `ItemEntry` as a code-generated runtime class (`game/warehouse/item_entry.gd`):
-    - `item_data: ItemData` — reference to the static preset
-    - `resolved_veiled_type: VeiledType` — the picked VeiledType (null if not veiled)
-    - `inspection_level: int` — 0 (veiled) / 1 (untouched) / 2 (browsed) / 3 (examined) / 4 (researched) / 5 (authenticated)
-    - Generated at run start; persists through the full run until appraisal settles
-    - `is_veiled()` — whether the item is currently hidden from the player -> inspection_level == 0
-    - Future: may persist into `SaveData` until sold at a shop
-
-## Post Demo Todolist
+## Later
 
 - [ ] Clue-driven valuation: each clue tag carries its own price range estimate (replaces level-based multipliers)
 - [ ] Fake / variant items: two items can share most clues but diverge on the final clue, causing a large valuation surprise at Home Appraisal
