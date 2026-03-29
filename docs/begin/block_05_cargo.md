@@ -7,6 +7,7 @@ The player selects which items to bring home from the won lot.
 ## Receives
 
 - `GameManager.lot_result.won_items` — items available to load
+- `GameManager.inspection_results` — inspection levels per item (used for estimate value range display)
 
 ---
 
@@ -19,7 +20,7 @@ The player selects which items to bring home from the won lot.
 ## Requirements
 
 ### Limits
-- Maximum 6 items
+- Maximum 6 total grid size
 - Maximum total weight 20 kg
 
 ### UI — Checklist HUD
@@ -27,8 +28,10 @@ The player selects which items to bring home from the won lot.
 - Each row shows:
     - Toggle button (switch style, on/off)
     - Item name
+    - Item estimate value range (from `ClueEvaluator.get_price_range_label()` at the item's inspection level)
     - Item weight
-- Header row shows current counts: slots used / 6, weight used / 20 kg
+    - Item grid size
+- Header row shows current counts: grid used / 6, weight used / 20 kg
 - Footer shows a confirm button: "Load Up"
 
 ### Toggle Behaviour
@@ -50,8 +53,9 @@ The player selects which items to bring home from the won lot.
 ## Note
 
 - There is no drag-and-drop in this slice
-- Weight and slot counts must update live as the player toggles items
-- Do not show valuation ranges or true values on this screen — the player only knows what they inspected
+- Grid and weight counts must update live as the player toggles items
+- Do not show true values on this screen
+- Use four spaces instead of tabs to indent
 
 ---
 

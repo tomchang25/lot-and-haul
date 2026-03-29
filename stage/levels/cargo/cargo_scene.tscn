@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://bcargoscn0001"]
 
-[ext_resource type="Script" uid="uid://bcargoscngd01" path="res://stage/levels/cargo/cargo_scene.gd" id="1_cargo"]
+[ext_resource type="Script" uid="uid://bcjbwusd6err1" path="res://stage/levels/cargo/cargo_scene.gd" id="1_cargo"]
 
-[node name="CargoScene" type="Control"]
+[node name="CargoScene" type="Control" unique_id=239928999]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
