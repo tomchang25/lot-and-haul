@@ -1,0 +1,110 @@
+# cargo_scene.gd
+# Block 05 — Cargo Loading
+# Reads:  GameManager.lot_result.won_items, GameManager.inspection_results
+# Writes: GameManager.cargo_items
+extends Control
+
+# ── Constants ─────────────────────────────────────────────────────────────────
+const MAX_SLOTS := 6
+const MAX_WEIGHT := 20.0
+
+const CargoItemRowScene := preload("uid://cargoitemrow1")
+
+# ── State ─────────────────────────────────────────────────────────────────────
+var _won_items: Array[ItemData] = []
+var _selected: Dictionary = { } # ItemData → bool
+var _slots_used: int = 0
+var _weight_used: float = 0.0
+var _rows: Dictionary = { } # ItemData → CargoItemRow
+
+# ── Node references ───────────────────────────────────────────────────────────
+@onready var _slots_label: Label = $RootVBox/Header/SlotsLabel
+@onready var _weight_label: Label = $RootVBox/Header/WeightLabel
+@onready var _row_container: VBoxContainer = $RootVBox/ListCenter/Panel/PanelVBox/RowContainer
+@onready var _load_up_button: Button = $RootVBox/Footer/LoadUpButton
+
+# ══ Lifecycle ═════════════════════════════════════════════════════════════════
+
+
+func _ready() -> void:
+    _load_up_button.pressed.connect(_on_load_up_pressed)
+    _won_items = GameManager.lot_result.get(&"won_items", [])
+    for item: ItemData in _won_items:
+        _selected[item] = false
+    _populate_rows()
+    _recalc_totals()
+    _refresh_ui()
+
+# ══ Signal handlers ════════════════════════════════════════════════════════════
+
+
+func _on_item_toggled(pressed: bool, item: ItemData) -> void:
+    _selected[item] = pressed
+    _recalc_totals()
+    _refresh_ui()
+
+
+func _on_load_up_pressed() -> void:
+    var cargo: Array[ItemData] = []
+    for item: ItemData in _won_items:
+        if _selected.get(item, false):
+            cargo.append(item)
+    GameManager.cargo_items = cargo
+    GameManager.go_to_appraisal()
+
+# ══ State helpers ══════════════════════════════════════════════════════════════
+
+
+func _recalc_totals() -> void:
+    _slots_used = 0
+    _weight_used = 0.0
+    for item: ItemData in _won_items:
+        if _selected.get(item, false):
+            _slots_used += item.grid_size
+            _weight_used += item.weight
+
+
+func _refresh_ui() -> void:
+    _slots_label.text = "Slots: %d / %d" % [_slots_used, MAX_SLOTS]
+    _weight_label.text = "Weight: %.1f / %.1f kg" % [_weight_used, MAX_WEIGHT]
+
+    var remaining_slots: int = MAX_SLOTS - _slots_used
+    var remaining_weight: float = MAX_WEIGHT - _weight_used
+
+    for item: ItemData in _won_items:
+        var row: CargoItemRow = _rows[item]
+        if _selected.get(item, false):
+            # Selected items can always be toggled off.
+            row.set_toggle_disabled(false)
+        else:
+            # Disable if loading this item would exceed either limit.
+            var over_slots: bool = item.grid_size > remaining_slots
+            var over_weight: bool = item.weight > remaining_weight
+            row.set_toggle_disabled(over_slots or over_weight)
+
+# ══ Row population ═════════════════════════════════════════════════════════════
+
+
+func _populate_rows() -> void:
+    if _won_items.is_empty():
+        var empty_lbl := Label.new()
+        empty_lbl.text = "No items to load."
+        empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        empty_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+        empty_lbl.add_theme_font_size_override(&"font_size", 16)
+        empty_lbl.custom_minimum_size = Vector2(0, 60)
+        _row_container.add_child(empty_lbl)
+        return
+
+    for item: ItemData in _won_items:
+        var result: Dictionary = GameManager.inspection_results.get(
+            item,
+            { &"level": 0, &"clues_revealed": 0 },
+        )
+        var level: int = result.get(&"level", 0)
+
+        var row: CargoItemRow = CargoItemRowScene.instantiate()
+        _row_container.add_child(row)
+        row.setup(item, level)
+        row.toggled.connect(_on_item_toggled)
+        _rows[item] = row

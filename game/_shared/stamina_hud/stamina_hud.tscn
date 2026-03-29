@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://bstamhudtscn1"]
+
+[ext_resource type="Script" uid="uid://dvbt3d7ledxfp" path="res://game/_shared/stamina_hud/stamina_hud.gd" id="1_stamhud"]
+
+[node name="StaminaHUD" type="HBoxContainer" unique_id=627406014]
+script = ExtResource("1_stamhud")
+
+[node name="IconLabel" type="Label" parent="." unique_id=620709002]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "SP "
+
+[node name="ValueLabel" type="Label" parent="." unique_id=1445832963]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "8 / 8"

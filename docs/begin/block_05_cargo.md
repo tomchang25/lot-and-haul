@@ -61,7 +61,7 @@ The player selects which items to bring home from the won lot.
 
 ## MVP Todolist
 
-*(No outstanding MVP items — block is specified)*
+- [x] feat: toggle cargo item row on click
 
 ## Itch Demo Todolist
 

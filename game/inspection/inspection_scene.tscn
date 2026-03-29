@@ -1,0 +1,77 @@
+[gd_scene format=3 uid="uid://bwhscenetscn1"]
+
+[ext_resource type="Script" uid="uid://bbr8kx3k0jv3c" path="res://game/inspection/inspection_scene.gd" id="1_idapx"]
+[ext_resource type="PackedScene" uid="uid://bstamhudtscn1" path="res://game/_shared/stamina_hud/stamina_hud.tscn" id="2_j573n"]
+[ext_resource type="PackedScene" uid="uid://bactpoptscn01" path="res://game/_shared/action_popup/action_popup.tscn" id="3_3483c"]
+[ext_resource type="PackedScene" uid="uid://dbc6waemph2em" path="res://game/_shared/list_review/list_review_popup.tscn" id="4_icrf5"]
+
+[node name="InspectionScene" type="Control" unique_id=2043279360]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_idapx")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1336947440]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.12, 0.11, 0.14, 1)
+
+[node name="ItemsRoot" type="Control" parent="." unique_id=1753038485]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HUD" type="Control" parent="." unique_id=586966451]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="StaminaHUD" parent="HUD" unique_id=1666666860 instance=ExtResource("2_j573n")]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -190.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = 44.0
+grow_horizontal = 0
+
+[node name="StartAuctionButton" type="Button" parent="HUD" unique_id=1061694818]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -110.0
+offset_top = -56.0
+offset_right = 110.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Start Auction"
+
+[node name="ActionPopup" parent="HUD" unique_id=615668654 instance=ExtResource("3_3483c")]
+visible = false
+layout_mode = 0
+
+[node name="ListReviewPopup" parent="." unique_id=796787196 instance=ExtResource("4_icrf5")]
+visible = false
+layout_mode = 1

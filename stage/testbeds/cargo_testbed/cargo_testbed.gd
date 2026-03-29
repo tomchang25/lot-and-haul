@@ -7,9 +7,10 @@
 # and what inspection level each one has.
 extends Control
 
-const CargoScene := preload("res://stage/levels/cargo/cargo_scene.tscn")
+# ── Constants ─────────────────────────────────────────────────────────────────
+const CargoScene := preload("res://game/cargo/cargo_scene.tscn")
 
-# ── Testbed configuration (edit in Inspector) ──────────────────────────────────
+# ── Exports ───────────────────────────────────────────────────────────────────
 
 # Items that the player "won" at auction. Drag .tres files here.
 @export var won_items: Array[ItemData] = []
@@ -22,14 +23,14 @@ const CargoScene := preload("res://stage/levels/cargo/cargo_scene.tscn")
 # Simulated amount paid at auction (shown in Block 06 settlement).
 @export var paid_price: int = 1800
 
-# ── Lifecycle ─────────────────────────────────────────────────────────────────
+# ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
 func _ready() -> void:
     _inject_fake_state()
     _launch_cargo_scene()
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# ══ Setup helpers ══════════════════════════════════════════════════════════════
 
 
 func _inject_fake_state() -> void:
