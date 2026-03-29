@@ -10,7 +10,7 @@
         "**/addons/**": true,
         "**/arts/**": true,
         "**/art/**": true,
-        "**/assets/**": true,
+        // "**/assets/**": true,
         "**/asset/**": true,
     },
     // "tree-generator.exclude": {
