@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="VeiledType" format=3 uid="uid://b0l3banegh5n6"]
+
+[ext_resource type="Script" uid="uid://bku4smrdbihvx" path="res://data/_definitions/veiled_type.gd" id="1_j2t4p"]
+
+[resource]
+script = ExtResource("1_j2t4p")
+type_id = "flat_package"
+display_label = "flat package"
+base_veiled_price = 250

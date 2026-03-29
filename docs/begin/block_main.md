@@ -14,9 +14,8 @@ Items that span multiple blocks or don't belong to a single block.
 
 - [ ] `ItemEntry` runtime class (`game/warehouse/item_entry.gd`):
     - `item_data: ItemData`
-    - `is_veiled: bool`
-    - `resolved_veiled_type: VeiledType` — null if not veiled
-    - `inspection_level: int` — 0 / 1 / 2
+    - `inspection_level: int` — 0 (veiled) / 1 (untouched) / 2 (browsed) / 3 (examined) / 4 (researched) / 5 (authenticated);
+    - `resolved_veiled_type: VeiledType` — null if `inspection_level > 0`
     - Generated at run start; lives until appraisal settles and `item_entries` is cleared
     - Future: may persist into `SaveData` until sold at a shop
 - [ ] `VeiledType` designer resource (`data/_definitions/veiled_type.gd`):

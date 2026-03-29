@@ -1,6 +1,9 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://x4urbinwhp48"]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dvso4qmhiph50"]
 
 [ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
+[ext_resource type="Script" uid="uid://bku4smrdbihvx" path="res://data/_definitions/veiled_type.gd" id="2_qly7y"]
+[ext_resource type="Resource" uid="uid://bo7p4vl0ihhox" path="res://data/veiled_types/medium_thing.tres" id="2_vt"]
+[ext_resource type="Resource" uid="uid://fat5jaqhhegk" path="res://data/veiled_types/heavy_thing.tres" id="3_vt"]
 
 [resource]
 script = ExtResource("1_jyqit")
@@ -8,4 +11,7 @@ item_name = "Typewriter"
 true_value = 650
 weight = 8.0
 grid_size = 3
-clues = ["typewriter", "mechanical", "Underwood brand", "1950s office", "keys functional"]
+super_category = "Equipment"
+category = "Typewriter"
+clues = Array[String](["typewriter", "mechanical", "Underwood brand", "1950s office", "keys functional"])
+veiled_types = Array[ExtResource("2_qly7y")]([ExtResource("2_vt"), ExtResource("3_vt")])

@@ -45,7 +45,7 @@ Foundation for all other blocks. No dependencies.
 
 ## Itch Demo Todolist
 
-- [ ] Expand clues array to support 4 levels (browse / touch / examine / xray) — currently fixed at 2
+- [ ] Expand clues array to 4 entries (index 0–3), corresponding to inspection levels 2–5 (browsed / examined / researched / authenticated)
 - [ ] Add `veiled_types: Array[VeiledType]` field to `ItemData`
     - Lists all possible veiled appearances this item can resolve to at run start
     - One is picked at random (uniform) when `ItemEntry` is generated
@@ -57,10 +57,10 @@ Foundation for all other blocks. No dependencies.
     - Create `.tres` files under `data/veiled_types/`
 - [ ] Define `ItemEntry` as a code-generated runtime class (`game/warehouse/item_entry.gd`):
     - `item_data: ItemData` — reference to the static preset
-    - `is_veiled: bool` — whether the item is currently hidden from the player
     - `resolved_veiled_type: VeiledType` — the picked VeiledType (null if not veiled)
-    - `inspection_level: int` — 0 / 1 / 2, replaces `inspection_results` Dictionary entry
+    - `inspection_level: int` — 0 (veiled) / 1 (untouched) / 2 (browsed) / 3 (examined) / 4 (researched) / 5 (authenticated)
     - Generated at run start; persists through the full run until appraisal settles
+    - `is_veiled()` — whether the item is currently hidden from the player -> inspection_level == 0
     - Future: may persist into `SaveData` until sold at a shop
 
 ## Post Demo Todolist

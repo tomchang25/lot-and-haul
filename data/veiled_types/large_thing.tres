@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="VeiledType" format=3 uid="uid://csoed07vgc7xn"]
+
+[ext_resource type="Script" uid="uid://bku4smrdbihvx" path="res://data/_definitions/veiled_type.gd" id="1_vtdef"]
+
+[resource]
+script = ExtResource("1_vtdef")
+type_id = "large_thing"
+display_label = "large thing"
+base_veiled_price = 500

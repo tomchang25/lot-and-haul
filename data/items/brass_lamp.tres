@@ -1,6 +1,9 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://x4urbinwhp48"]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://br7mwfhlyfwxv"]
 
 [ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
+[ext_resource type="Script" uid="uid://bku4smrdbihvx" path="res://data/_definitions/veiled_type.gd" id="2_1658c"]
+[ext_resource type="Resource" uid="uid://dneonoc68vn4j" path="res://data/veiled_types/unknown_furniture.tres" id="2_vt"]
+[ext_resource type="Resource" uid="uid://bo7p4vl0ihhox" path="res://data/veiled_types/medium_thing.tres" id="3_vt"]
 
 [resource]
 script = ExtResource("1_jyqit")
@@ -8,4 +11,7 @@ item_name = "Brass Lamp"
 true_value = 400
 weight = 5.0
 grid_size = 2
+super_category = "Furniture"
+category = "Lamp"
 clues = Array[String](["lamp", "brass fixture", "antique", "1920s art deco", "fully functional"])
+veiled_types = Array[ExtResource("2_1658c")]([ExtResource("2_vt"), ExtResource("3_vt")])
