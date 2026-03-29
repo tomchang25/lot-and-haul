@@ -5,19 +5,21 @@
 extends Control
 
 # ── Constants ──────────────────────────────────────────────────────────────────
-const _MAX_GRID := 6
+const _MAX_SLOTS := 6
 const _MAX_WEIGHT := 20.0
+
+const CargoItemRowScene := preload("res://stage/levels/cargo/cargo_item_row/cargo_item_row.tscn")
 
 # ── State ──────────────────────────────────────────────────────────────────────
 var _won_items: Array[ItemData] = []
-var _selected: Dictionary = {}  # ItemData → bool
-var _grid_used: int = 0
+var _selected: Dictionary = { } # ItemData → bool
+var _slots_used: int = 0
 var _weight_used: float = 0.0
 
 # ── UI references ──────────────────────────────────────────────────────────────
-var _grid_label: Label = null
+var _slots_label: Label = null
 var _weight_label: Label = null
-var _row_toggles: Dictionary = {}  # ItemData → CheckButton
+var _rows: Dictionary = { } # ItemData → CargoItemRow
 
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
@@ -32,29 +34,31 @@ func _ready() -> void:
 
 # ══ State helpers ══════════════════════════════════════════════════════════════
 func _recalc_totals() -> void:
-    _grid_used = 0
+    _slots_used = 0
     _weight_used = 0.0
     for item: ItemData in _won_items:
         if _selected.get(item, false):
-            _grid_used += item.grid_size
+            _slots_used += item.grid_size
             _weight_used += item.weight
 
 
 func _refresh_ui() -> void:
-    _grid_label.text = "Grid: %d / %d" % [_grid_used, _MAX_GRID]
+    _slots_label.text = "Slots: %d / %d" % [_slots_used, _MAX_SLOTS]
     _weight_label.text = "Weight: %.1f / %.1f kg" % [_weight_used, _MAX_WEIGHT]
 
-    var remaining_grid: int = _MAX_GRID - _grid_used
+    var remaining_slots: int = _MAX_SLOTS - _slots_used
     var remaining_weight: float = _MAX_WEIGHT - _weight_used
 
     for item: ItemData in _won_items:
-        var toggle: CheckButton = _row_toggles[item]
+        var row: CargoItemRow = _rows[item]
         if _selected.get(item, false):
             # Selected items can always be toggled off.
-            toggle.disabled = false
+            row.set_toggle_disabled(false)
         else:
             # Disable if loading this item would exceed either limit.
-            toggle.disabled = (item.grid_size > remaining_grid) or (item.weight > remaining_weight)
+            var over_slots: bool = item.grid_size > remaining_slots
+            var over_weight: bool = item.weight > remaining_weight
+            row.set_toggle_disabled(over_slots or over_weight)
 
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
@@ -105,9 +109,9 @@ func _build_ui() -> void:
     header.custom_minimum_size = Vector2(0, 36)
     root_vbox.add_child(header)
 
-    _grid_label = Label.new()
-    _grid_label.add_theme_font_size_override(&"font_size", 18)
-    header.add_child(_grid_label)
+    _slots_label = Label.new()
+    _slots_label.add_theme_font_size_override(&"font_size", 18)
+    header.add_child(_slots_label)
 
     _weight_label = Label.new()
     _weight_label.add_theme_font_size_override(&"font_size", 18)
@@ -128,9 +132,7 @@ func _build_ui() -> void:
 
     # Column header row
     panel_vbox.add_child(_make_column_header())
-
-    var sep := HSeparator.new()
-    panel_vbox.add_child(sep)
+    panel_vbox.add_child(HSeparator.new())
 
     # Item rows
     if _won_items.is_empty():
@@ -143,7 +145,17 @@ func _build_ui() -> void:
         panel_vbox.add_child(empty_lbl)
     else:
         for item: ItemData in _won_items:
-            panel_vbox.add_child(_make_item_row(item))
+            var result: Dictionary = GameManager.inspection_results.get(
+                item,
+                { &"level": 0, &"clues_revealed": 0 },
+            )
+            var level: int = result.get(&"level", 0)
+
+            var row: CargoItemRow = CargoItemRowScene.instantiate()
+            panel_vbox.add_child(row)
+            row.setup(item, level)
+            row.toggled.connect(_on_item_toggled)
+            _rows[item] = row
 
     # ── Footer (confirm button) ────────────────────────────────────────────────
     var footer := HBoxContainer.new()
@@ -164,7 +176,6 @@ func _make_column_header() -> HBoxContainer:
     row.custom_minimum_size = Vector2(0, 36)
     row.add_theme_constant_override(&"separation", 0)
 
-    # Spacer aligned with toggle buttons
     var toggle_spacer := Control.new()
     toggle_spacer.custom_minimum_size = Vector2(80, 0)
     row.add_child(toggle_spacer)
@@ -203,63 +214,5 @@ func _make_column_header() -> HBoxContainer:
     grid_hdr.add_theme_font_size_override(&"font_size", 14)
     grid_hdr.add_theme_color_override(&"font_color", Color(0.7, 0.7, 0.7))
     row.add_child(grid_hdr)
-
-    return row
-
-
-func _make_item_row(item: ItemData) -> HBoxContainer:
-    var result: Dictionary = GameManager.inspection_results.get(
-        item,
-        { &"level": 0, &"clues_revealed": 0 },
-    )
-    var level: int = result.get(&"level", 0)
-
-    var row := HBoxContainer.new()
-    row.custom_minimum_size = Vector2(0, 48)
-    row.add_theme_constant_override(&"separation", 0)
-
-    # Toggle (switch style)
-    var toggle := CheckButton.new()
-    toggle.custom_minimum_size = Vector2(80, 0)
-    toggle.button_pressed = false
-    toggle.toggled.connect(_on_item_toggled.bind(item))
-    row.add_child(toggle)
-    _row_toggles[item] = toggle
-
-    # Item name
-    var name_lbl := Label.new()
-    name_lbl.text = item.item_name
-    name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-    name_lbl.add_theme_font_size_override(&"font_size", 17)
-    row.add_child(name_lbl)
-
-    # Estimate value range (no true values shown)
-    var price_lbl := Label.new()
-    price_lbl.text = ClueEvaluator.get_price_range_label(item, level)
-    price_lbl.custom_minimum_size = Vector2(160, 0)
-    price_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    price_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-    price_lbl.add_theme_font_size_override(&"font_size", 16)
-    price_lbl.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
-    row.add_child(price_lbl)
-
-    # Weight
-    var weight_lbl := Label.new()
-    weight_lbl.text = "%.1f kg" % item.weight
-    weight_lbl.custom_minimum_size = Vector2(100, 0)
-    weight_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    weight_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-    weight_lbl.add_theme_font_size_override(&"font_size", 16)
-    row.add_child(weight_lbl)
-
-    # Grid size
-    var grid_lbl := Label.new()
-    grid_lbl.text = "%d" % item.grid_size
-    grid_lbl.custom_minimum_size = Vector2(80, 0)
-    grid_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    grid_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-    grid_lbl.add_theme_font_size_override(&"font_size", 16)
-    row.add_child(grid_lbl)
 
     return row
