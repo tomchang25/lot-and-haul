@@ -18,6 +18,10 @@ var inspection_results: Dictionary = { }
 # paid_price = 0 and won_items = [] when the player passes or loses.
 var lot_result: Dictionary = { }
 
+# Written by Block 05 (Cargo Loading).
+# The subset of won_items the player chose to bring home.
+var cargo_items: Array[ItemData] = []
+
 
 func _ready() -> void:
     if current_lot.is_empty():
