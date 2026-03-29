@@ -317,6 +317,7 @@ var _selected: Dictionary = {}
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 func _ready() -> void:
+    _confirm_button.pressed.connect(_on_confirm_pressed)
     _items = GameManager.cargo_items
     _populate_rows()
     _refresh_ui()
@@ -373,6 +374,25 @@ Reference them at the top of the script using `@onready` under `# ── UI refe
 ```
 
 **Do not use `_build_ui()`** to construct persistent structural nodes in code.
+
+---
+
+## Signal connections
+
+Connect signals between a scene's own nodes in `_ready()`, not in the `.tscn`.
+This keeps the full connection surface visible in code without IDE dependency for wiring.
+
+Connections go at the top of `_ready()`, before any logic or node setup:
+
+```gdscript
+func _ready() -> void:
+    _pass_button.pressed.connect(_on_pass_pressed)
+    _bid_button.pressed.connect(_on_bid_pressed)
+    # ... rest of setup
+```
+
+This applies to all signal connections — buttons, custom signals from child nodes, and
+connections to autoloads.
 
 ---
 
