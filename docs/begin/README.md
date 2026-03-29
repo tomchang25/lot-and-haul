@@ -9,7 +9,7 @@ reveal the true value of everything they hauled.
 ## Core Loop
 
 ```
-Inspection → List Review → Auction Bid → Cargo Loading → Home Appraisal
+Warehouse Entry → Inspection → List Review → Auction Bid → Cargo Loading → Home Appraisal
 ```
 
 Each stage passes data forward through `GameManager`. No stage can reach back.
@@ -21,6 +21,7 @@ Each stage passes data forward through `GameManager`. No stage can reach back.
 | File | Stage |
 |---|---|
 | `block_01_item_data.md` | Item Data (foundation) |
+| `run_warehouse.md` | Warehouse Entry (atmosphere + run init) |
 | `block_02_inspection.md` | Inspection (stamina + clue system) |
 | `block_03_list_review.md` | List Review (bridge UI) |
 | `block_04_auction.md` | Auction Bid |
@@ -33,10 +34,10 @@ Each stage passes data forward through `GameManager`. No stage can reach back.
 
 ```
 GameManager (autoload)
-    current_lot: Array[ItemData]        set by scene, read by InspectionManager
-    inspection_results: Dictionary      written by InspectionManager
-    lot_result: LotResult               written by AuctionManager
-    cargo_items: Array[ItemData]        written by CargoManager
+    item_entries: Array[ItemEntry]      generated at run start (replaces current_lot + inspection_results)
+    lot_result: Dictionary              written by Block 04 (Auction)
+    cargo_items: Array[ItemEntry]       written by Block 05 (Cargo Loading)
+    run_result: Dictionary              written by Block 06 (Home Appraisal)
 ```
 
 Blocks execute in order. Each block reads from `GameManager` and writes its result

@@ -6,14 +6,14 @@ The player selects which items to bring home from the won lot.
 
 ## Receives
 
-- `GameManager.lot_result.won_items` — items available to load
-- `GameManager.inspection_results` — inspection levels per item (used for estimate value range display)
+- `GameManager.lot_result.won_entries` — `ItemEntry` objects available to load
+- `GameManager.item_entries` — used to retrieve `inspection_level` per entry for estimate display
 
 ---
 
 ## Produces
 
-- `GameManager.cargo_items` — the subset of items the player chose to bring
+- `GameManager.cargo_items` — the subset of `ItemEntry` objects the player chose to bring
 
 ---
 
@@ -24,25 +24,25 @@ The player selects which items to bring home from the won lot.
 - Maximum total weight 20 kg
 
 ### UI — Checklist HUD
-- Display all won items in a list (one row per item)
+- Display all won entries in a list (one row per entry)
 - Each row shows:
     - Toggle button (switch style, on/off)
     - Item name
-    - Item estimate value range (from `ClueEvaluator.get_price_range_label()` at the item's inspection level)
+    - Item estimate value range (from `ClueEvaluator.get_price_range_label()` at the entry's `inspection_level`)
     - Item weight
     - Item grid size
 - Header row shows current counts: grid used / 6, weight used / 20 kg
 - Footer shows a confirm button: "Load Up"
 
 ### Toggle Behaviour
-- Toggling an item on adds it to the selection
-- Toggling an item off removes it
-- If adding an item would exceed either limit, the toggle is disabled and unclickable
-- Already-selected items can always be toggled off regardless of limits
+- Toggling an entry on adds it to the selection
+- Toggling an entry off removes it
+- If adding an entry would exceed either limit, the toggle is disabled and unclickable
+- Already-selected entries can always be toggled off regardless of limits
 
 ### Confirming
 - "Load Up" is always clickable (player may confirm with zero items selected)
-- On confirm, write selected items to `GameManager.cargo_items`
+- On confirm, write selected entries to `GameManager.cargo_items`
 - Advance to Block 06
 
 ### Unselected Items
@@ -53,22 +53,24 @@ The player selects which items to bring home from the won lot.
 ## Note
 
 - There is no drag-and-drop in this slice
-- Grid and weight counts must update live as the player toggles items
+- Grid and weight counts must update live as the player toggles entries
 - Do not show true values on this screen
 - Use four spaces instead of tabs to indent
 
 ---
 
-## MVP Todolist
+## Finished Todolist
 
-- [x] feat: toggle cargo item row on click
+*(All updates archive)*
 
 ## Itch Demo Todolist
 
-- [ ] On-site sell option: unselected items can be sold immediately at a low flat rate (placeholder price, no merchant logic yet)
-- [ ] Shipping option: unselected items can be shipped for a fee; condition revealed at Home Appraisal (damage chance)
-- [ ] Grid-based cargo layout (RE4 style): items occupy grid cells by `grid_size`, player arranges them spatially
-- [ ] Item rotation in grid
+- [ ] Switch from `Array[ItemData]` to `Array[ItemEntry]` throughout — rows now receive an `ItemEntry`
+- [ ] Veiled entry display: show `resolved_veiled_type.display_label` when `is_veiled = true`
+- [ ] On-site sell option: unselected entries can be sold immediately at a low flat rate (placeholder price, no merchant logic yet)
+- [ ] Shipping option: unselected entries can be shipped for a fee; condition revealed at Home Appraisal (damage chance)
+- [ ] Grid-based cargo layout (RE4 style): entries occupy grid cells by `grid_size`, player arranges them spatially
+- [ ] Entry rotation in grid
 
 ## Post Demo Todolist
 

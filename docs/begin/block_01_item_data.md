@@ -38,19 +38,30 @@ Foundation for all other blocks. No dependencies.
 
 ---
 
-## MVP Todolist
+## Finished Todolist
 
-- [ ] Add `category` and `super_category` fields to `ItemData`
-- [ ] Update all existing `.tres` presets with category values
+- [x] Add `category` and `super_category` fields to `ItemData`
+- [x] Update all existing `.tres` presets with category values
 
 ## Itch Demo Todolist
 
 - [ ] Expand clues array to support 4 levels (browse / touch / examine / xray) — currently fixed at 2
-- [ ] Add `ItemRunContext` resource (per-run generated state separate from static `ItemData`):
-    - `is_veiled: bool` — whether the item appears as unknown size/type at run start
-    - veiled items display only as "Large / Medium / Small item", no name or category shown
-    - veil is lifted after first inspect action
-- [ ] Define which item presets spawn as veiled by default
+- [ ] Add `veiled_types: Array[VeiledType]` field to `ItemData`
+    - Lists all possible veiled appearances this item can resolve to at run start
+    - One is picked at random (uniform) when `ItemEntry` is generated
+    - Define which item presets can spawn as veiled, and assign their candidate `VeiledType` arrays
+- [ ] Define `VeiledType` as a designer-authored Resource (`data/_definitions/veiled_type.gd`):
+    - `type_id: String` — identifier (e.g. `"unknown_book"`, `"medium_thing"`)
+    - `display_label: String` — atmosphere text shown to player (e.g. `"unknown book"`, `"medium thing"`)
+    - `base_veiled_price: int` — NPC base estimate used in rolled_price calculation when item is veiled
+    - Create `.tres` files under `data/veiled_types/`
+- [ ] Define `ItemEntry` as a code-generated runtime class (`game/warehouse/item_entry.gd`):
+    - `item_data: ItemData` — reference to the static preset
+    - `is_veiled: bool` — whether the item is currently hidden from the player
+    - `resolved_veiled_type: VeiledType` — the picked VeiledType (null if not veiled)
+    - `inspection_level: int` — 0 / 1 / 2, replaces `inspection_results` Dictionary entry
+    - Generated at run start; persists through the full run until appraisal settles
+    - Future: may persist into `SaveData` until sold at a shop
 
 ## Post Demo Todolist
 

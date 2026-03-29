@@ -6,8 +6,7 @@ A static popup summary screen between Inspection and Auction. No interaction bey
 
 ## Receives
 
-- `GameManager.current_lot` — item list
-- `GameManager.inspection_results` — inspection levels per item
+- `GameManager.item_entries` — entries with current `inspection_level` per item
 
 ---
 
@@ -40,13 +39,13 @@ Nothing. Read-only bridge between Block 02 and Block 04.
 
 ---
 
-## MVP Todolist
+## Finished Todolist
 
-*(No outstanding MVP items — block is implemented)*
+*(All updates archive)*
 
 ## Itch Demo Todolist
 
-- [ ] Show veiled items as "Unknown Item (Large / Medium / Small)" when `is_veiled` was never lifted
+- [ ] Show veiled items as `resolved_veiled_type.display_label` when `is_veiled` was never lifted
 - [ ] Reflect knowledge-adjusted valuation ranges (once KnowledgeManager returns real values)
 
 ## Post Demo Todolist

@@ -6,18 +6,13 @@ The player interacts with items in the warehouse scene using limited stamina.
 
 ## Receives
 
-- `GameManager.current_lot` — the 4 items placed in the scene
+- `GameManager.item_entries` — the 4 `ItemEntry` objects generated at run start
 
 ---
 
 ## Produces
 
-- `GameManager.inspection_results` — Dictionary mapping each item to:
-  - `level` (int): 0, 1, or 2
-  - `clues_revealed` (int): number of clues unlocked (derived from level, stored separately)
-    - level 0 → 0 clues
-    - level 1 → 2 clues
-    - level 2 → all clues (clues.size())
+- `GameManager.item_entries` — updated in-place: `inspection_level` written per entry
 
 ---
 
@@ -31,28 +26,28 @@ The player interacts with items in the warehouse scene using limited stamina.
 
 ### Actions
 - Two actions available (warehouse restriction — no touch):
-  - **Browse**: costs 1 stamina, sets inspection level to 1
-  - **Examine**: costs 3 stamina, sets inspection level to 2
+    - **Browse**: costs 1 stamina, sets inspection level to 1
+    - **Examine**: costs 3 stamina, sets inspection level to 2
 - Clicking an item opens an action popup below the item containing three buttons:
-  - Browse
-  - Examine
-  - Cancel
+    - Browse
+    - Examine
+    - Cancel
 - Affordability:
-  - Actions the player cannot afford are greyed out and unclickable
-  - Browse is greyed out (disabled appearance) once the item is already at level 1 or higher
-  - Examine can still be selected on a level 1 item (upgrade path, costs 2 stamina)
-  - Applying an action that would not raise the level has no effect and should not be selectable
+    - Actions the player cannot afford are greyed out and unclickable
+    - Browse is greyed out (disabled appearance) once the item is already at level 1 or higher
+    - Examine can still be selected on a level 1 item (upgrade path, costs 2 stamina)
+    - Applying an action that would not raise the level has no effect and should not be selectable
 - Popup dismissal:
-  - ESC key
-  - Cancel button
-  - Left-clicking anywhere outside the popup (including on another item — closes current popup and opens the new one)
+    - ESC key
+    - Cancel button
+    - Left-clicking anywhere outside the popup (including on another item — closes current popup and opens the new one)
 
 ### Item Display (per item in scene)
 - Sprite representing the item
 - Estimated price range label:
-  - Level 0: `?`
-  - Level 1: range calculated from true_value (see ClueEvaluator)
-  - Level 2: narrower range calculated from true_value (see ClueEvaluator)
+    - Level 0: `?`
+    - Level 1: range calculated from true_value (see ClueEvaluator)
+    - Level 2: narrower range calculated from true_value (see ClueEvaluator)
 - Inspection level indicator: shows current level (0 / 1 / 2)
 - On level change: small tween animation on the level indicator (e.g. scale pop or color flash)
 
@@ -77,15 +72,15 @@ The player interacts with items in the warehouse scene using limited stamina.
 
 ---
 
-## MVP Todolist
+## Finished Todolist
 
-- [ ] `ItemRunContext` stub: create the resource class with `is_veiled` field (no logic yet — veiled display deferred to Itch Demo)
-- [ ] Populate `GameManager.item_contexts` alongside `current_lot` at run start
+*(All updates archive)*
 
 ## Itch Demo Todolist
 
-- [ ] Veiled item display: show "Large / Medium / Small item" instead of name and category when `is_veiled = true`
-- [ ] Lift veil on first inspect action, animate reveal
+- [ ] Veiled item display: show `resolved_veiled_type.display_label` instead of item name and category when `is_veiled = true`
+- [ ] Lift veil: veil is lifted on first inspect action (Browse or Examine) — no dedicated unveil action in warehouse; the `unveil` action exists in the action popup but is disabled in warehouse context, available in cleanup and non-warehouse locations
+- [ ] Valuation range for veiled items: show `?` regardless of inspection level while still veiled
 - [ ] Touch action: costs 2 stamina, available in non-warehouse locations
 - [ ] Knowledge system integration: `KnowledgeManager.get_level()` returns real value, affects clue text and valuation range width
 - [ ] Cleanup phase stamina: after Auction, before Cargo, player gets 8 additional stamina to re-inspect items in the won lot (see Block 04b)
