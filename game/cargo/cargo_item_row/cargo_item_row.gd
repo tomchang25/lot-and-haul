@@ -17,6 +17,17 @@ var item_data: ItemData = null
 @onready var _weight_label: Label = $HBox/WeightLabel
 @onready var _size_label: Label = $HBox/SizeLabel
 
+# ══ Lifecycle ═════════════════════════════════════════════════════════════════
+
+
+func _gui_input(event: InputEvent) -> void:
+    if event is InputEventMouseButton \
+    and event.button_index == MOUSE_BUTTON_LEFT \
+    and event.pressed \
+    and not _toggle.disabled:
+        _toggle.button_pressed = !_toggle.button_pressed
+        accept_event()
+
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
