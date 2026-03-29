@@ -10,3 +10,72 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_auction")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.1, 0.1, 0.12, 1.0)
+
+[node name="RootVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Centre" type="CenterContainer" parent="RootVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Content" type="VBoxContainer" parent="RootVBox/Centre"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="PriceArea" type="Control" parent="RootVBox/Centre/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(220, 220)
+
+[node name="PriceLabel" type="Label" parent="RootVBox/Centre/Content/PriceArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 42
+text = "$0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NpcHistoryList" type="VBoxContainer" parent="RootVBox/Centre/Content/PriceArea"]
+layout_mode = 0
+offset_left = 228.0
+offset_top = 72.0
+custom_minimum_size = Vector2(180, 0)
+theme_override_constants/separation = 2
+
+[node name="LotSummary" type="VBoxContainer" parent="RootVBox/Centre/Content"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ButtonBar" type="HBoxContainer" parent="RootVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 64)
+alignment = 1
+theme_override_constants/separation = 24
+
+[node name="PassButton" type="Button" parent="RootVBox/ButtonBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(120, 40)
+text = "Pass"
+
+[node name="BidButton" type="Button" parent="RootVBox/ButtonBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(120, 40)
+text = "Bid"

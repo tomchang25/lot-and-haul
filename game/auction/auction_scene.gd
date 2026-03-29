@@ -39,12 +39,13 @@ var _price_tween: Tween = null
 
 # ── UI references ─────────────────────────────────────────────────────────────
 
-var _price_label: Label = null
+@onready var _price_label: Label = $RootVBox/Centre/Content/PriceArea/PriceLabel
+@onready var _lot_summary: VBoxContainer = $RootVBox/Centre/Content/LotSummary
+@onready var _npc_history_list: VBoxContainer = $RootVBox/Centre/Content/PriceArea/NpcHistoryList
+@onready var _bid_button: Button = $RootVBox/ButtonBar/BidButton
+@onready var _pass_button: Button = $RootVBox/ButtonBar/PassButton
+
 var _circle_node: _CircleProgress = null
-var _lot_summary: VBoxContainer = null
-var _bid_button: Button = null
-var _pass_button: Button = null
-var _npc_history_list: VBoxContainer = null
 
 # ══ Inner class: circle progress arc ══════════════════════════════════════════
 
@@ -80,7 +81,16 @@ class _CircleProgress extends Control:
 
 
 func _ready() -> void:
-    _build_ui()
+    var price_area: Control = $RootVBox/Centre/Content/PriceArea
+    _circle_node = _CircleProgress.new()
+    _circle_node.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    price_area.add_child(_circle_node)
+    # Move circle behind PriceLabel so the label renders on top.
+    price_area.move_child(_circle_node, 0)
+
+    _pass_button.pressed.connect(_on_pass_pressed)
+    _bid_button.pressed.connect(_on_bid_pressed)
+
     _init_auction()
     _start_npc_timer()
     _start_circle(0.0)
@@ -360,76 +370,3 @@ func _show_npc_popup(price: int) -> void:
     # Optional: Limit the number of visible items to avoid clutter
     if _npc_history_list.get_child_count() > 5:
         _npc_history_list.get_child(0).queue_free()
-
-# ══ UI builder ════════════════════════════════════════════════════════════════
-
-
-func _build_ui() -> void:
-    set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-
-    # ── Background ────────────────────────────────────────────────────────────
-    var bg := ColorRect.new()
-    bg.color = Color(0.1, 0.1, 0.12, 1.0)
-    bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    add_child(bg)
-
-    # ── Root layout ───────────────────────────────────────────────────────────
-    var root_vbox := VBoxContainer.new()
-    root_vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    add_child(root_vbox)
-
-    var centre := CenterContainer.new()
-    centre.size_flags_vertical = Control.SIZE_EXPAND_FILL
-    root_vbox.add_child(centre)
-
-    var content := VBoxContainer.new()
-    content.add_theme_constant_override(&"separation", 20)
-    centre.add_child(content)
-
-    # ── Price area ────────────────────────────────────────────────────────────
-    var price_area := Control.new()
-    price_area.custom_minimum_size = Vector2(220.0, 220.0)
-    content.add_child(price_area)
-
-    _circle_node = _CircleProgress.new()
-    _circle_node.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    price_area.add_child(_circle_node)
-
-    _price_label = Label.new()
-    _price_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-    _price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    _price_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-    _price_label.add_theme_font_size_override(&"font_size", 42)
-    _price_label.text = "$0"
-    price_area.add_child(_price_label)
-
-    _npc_history_list = VBoxContainer.new()
-    _npc_history_list.position = Vector2(228.0, 72.0)
-    _npc_history_list.custom_minimum_size = Vector2(180.0, 0.0)
-    _npc_history_list.add_theme_constant_override(&"separation", 2)
-    price_area.add_child(_npc_history_list)
-
-    # ── Lot summary ───────────────────────────────────────────────────────────
-    _lot_summary = VBoxContainer.new()
-    _lot_summary.add_theme_constant_override(&"separation", 4)
-    content.add_child(_lot_summary)
-
-    # ── Button bar ────────────────────────────────────────────────────────────
-    var button_bar := HBoxContainer.new()
-    button_bar.alignment = BoxContainer.ALIGNMENT_CENTER
-    button_bar.add_theme_constant_override(&"separation", 24)
-    button_bar.custom_minimum_size = Vector2(0.0, 64.0)
-    root_vbox.add_child(button_bar)
-
-    _pass_button = Button.new()
-    _pass_button.text = "Pass"
-    _pass_button.custom_minimum_size = Vector2(120.0, 40.0)
-    _pass_button.pressed.connect(_on_pass_pressed)
-    button_bar.add_child(_pass_button)
-
-    _bid_button = Button.new()
-    _bid_button.text = "Bid"
-    _bid_button.custom_minimum_size = Vector2(120.0, 40.0)
-    _bid_button.pressed.connect(_on_bid_pressed)
-    button_bar.add_child(_bid_button)
