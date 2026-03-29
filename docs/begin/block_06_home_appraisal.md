@@ -46,14 +46,13 @@ The player returns home and learns the true value of everything they brought bac
 - True values are revealed here for the first time — this is the payoff moment
 - Do not apply damage, fakes, or surprise events to items in this slice
 - Pawn shop sell rate is placeholder (100% of true value) in MVP; real rate applied in Itch Demo
+- Use four spaces instead of tabs to indent
 
 ---
 
 ## MVP Todolist
 
-- [ ] Replace "Run Again" button with "Continue" that routes to Block 07 (Hub)
-- [ ] Write `GameManager.run_result` with `sell_value`, `paid_price`, `net`
-- [ ] Pawn shop rate placeholder: sell value = sum of true values (no discount yet)
+- [ ] A single "Continue" button advances to Block 07 (Hub)
 
 ## Itch Demo Todolist
 
