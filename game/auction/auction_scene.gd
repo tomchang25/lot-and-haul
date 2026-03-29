@@ -4,20 +4,22 @@
 # Writes: GameManager.lot_result { "paid_price": int, "won_items": Array[ItemData] }
 extends Control
 
-# ── Constants ──────────────────────────────────────────────────────────────────
-const _OPENING_BID_FACTOR := 0.25
-const _NPC_NAMES: Array[String] = [
+# ── Constants ─────────────────────────────────────────────────────────────────
+
+const OPENING_BID_FACTOR := 0.25
+const NPC_NAMES: Array[String] = [
     "Bidder 2",
     "Bidder 3",
     "Bidder 4",
     "Bidder 7",
     "Bidder 9",
 ]
-const _POPUP_HOLD_SEC := 0.8
-const _PRICE_TWEEN_SEC := 0.3
-const _COSMETIC_BUMP := 100
+const POPUP_HOLD_SEC := 0.8
+const PRICE_TWEEN_SEC := 0.3
+const COSMETIC_BUMP := 100
 
-# ── Hidden logic state ─────────────────────────────────────────────────────────
+# ── State ─────────────────────────────────────────────────────────────────────
+
 # _rolled_price must never be logged or exposed in any debug UI during playtesting.
 var _rolled_price: int = 0
 var _current_display_price: int = 0
@@ -26,26 +28,27 @@ var _last_bidder: String = "npc" # "player" or "npc"
 var _in_reach: bool = false # true once current_display_price >= rolled_price
 var _bid_enabled: bool = true
 var _shorten_next_npc_tick: bool = false
+var _last_npc_index: int = -1 # tracks the last NPC to prevent repeats
 
-# ── Timer / tween handles ──────────────────────────────────────────────────────
+# ── Timer / tween handles ─────────────────────────────────────────────────────
+
 var _npc_timer: Timer = null
 var _circle_fill: float = 0.0 # 0.0–1.0, snapshot kept across tween kills
 var _circle_tween: Tween = null
 var _price_tween: Tween = null
 
-# ── UI node references (assigned in _build_ui) ─────────────────────────────────
+# ── UI references ─────────────────────────────────────────────────────────────
+
 var _price_label: Label = null
 var _circle_node: _CircleProgress = null
 var _lot_summary: VBoxContainer = null
 var _bid_button: Button = null
 var _pass_button: Button = null
-# var _npc_popup: Label = null
 var _npc_history_list: VBoxContainer = null
 
-var _last_npc_index: int = -1 # Tracks the last NPC to prevent repeats
-
-
 # ══ Inner class: circle progress arc ══════════════════════════════════════════
+
+
 class _CircleProgress extends Control:
     var fill: float = 0.0 # 0.0–1.0
 
@@ -73,13 +76,92 @@ class _CircleProgress extends Control:
         fill = clampf(v, 0.0, 1.0)
         queue_redraw()
 
-
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
+
+
 func _ready() -> void:
     _build_ui()
     _init_auction()
     _start_npc_timer()
     _start_circle(0.0)
+
+# ══ Signal handlers ════════════════════════════════════════════════════════════
+
+
+func _on_npc_tick() -> void:
+    # Calculate progress toward the target rolled price
+    var progress := float(_current_display_price) / float(_rolled_price)
+    var step_multiplier := 1.0
+
+    # If below 75% threshold, make the price jumps larger (e.g., 2.5x bigger)
+    if progress < 0.75:
+        step_multiplier = 1.5
+
+    # Increment price by a random step scaled by the multiplier
+    var base_step := maxi(roundi(randf_range(0.04, 0.09) * _rolled_price), 100)
+    var step := roundi(base_step * step_multiplier)
+
+    _current_display_price += step
+    _last_bidder = "npc"
+
+    # Display layer: update price, show popup, reset circle
+    _tween_price_to(_current_display_price)
+    _show_npc_popup(_current_display_price)
+    _reset_circle()
+
+    # Re-enable Bid button now that NPC has bid
+    _bid_enabled = true
+    _bid_button.disabled = false
+    _pass_button.disabled = false
+
+    # Termination check
+    if _current_display_price >= _rolled_price:
+        _in_reach = true
+        # NPC timer stops; circle will complete and fire _resolve()
+    else:
+        _start_npc_timer()
+
+
+func _on_circle_completed() -> void:
+    if _in_reach:
+        _resolve()
+    else:
+        # Purely atmospheric in normal state — loop.
+        _start_circle(0.0)
+
+
+func _on_bid_pressed() -> void:
+    if not _bid_enabled:
+        return
+
+    _last_bidder = "player"
+    _bid_enabled = false
+    _bid_button.disabled = true
+    _pass_button.disabled = true
+
+    _current_display_price += COSMETIC_BUMP
+    _tween_price_to(_current_display_price)
+
+    _show_player_bid_in_stack(_current_display_price)
+
+    _reset_circle()
+    _shorten_next_npc_tick = true
+    # TODO: play confirm sound via AudioManager
+
+
+func _on_pass_pressed() -> void:
+    if _npc_timer:
+        _npc_timer.stop()
+    if _circle_tween:
+        _circle_tween.kill()
+
+    GameManager.lot_result = {
+        &"paid_price": 0,
+        &"won_items": [],
+    }
+    GameManager.go_to_appraisal()
+
+# ══ Auction setup ═════════════════════════════════════════════════════════════
 
 
 func _init_auction() -> void:
@@ -139,13 +221,14 @@ func _init_auction() -> void:
 
     # 3. Setup core auction price logic
     _rolled_price = roundi(true_value_sum * randf_range(0.6, 1.2))
-    var opening_bid := roundi(true_value_sum * _OPENING_BID_FACTOR)
+    var opening_bid := roundi(true_value_sum * OPENING_BID_FACTOR)
     _current_display_price = opening_bid
     _displayed_price = opening_bid
     _price_label.text = "$%d" % opening_bid
 
-
 # ══ NPC tick ══════════════════════════════════════════════════════════════════
+
+
 func _start_npc_timer() -> void:
     if _npc_timer == null:
         _npc_timer = Timer.new()
@@ -173,42 +256,9 @@ func _start_npc_timer() -> void:
 
     _npc_timer.start(interval)
 
-
-func _on_npc_tick() -> void:
-    # Calculate progress toward the target rolled price
-    var progress := float(_current_display_price) / float(_rolled_price)
-    var step_multiplier := 1.0
-
-    # If below 75% threshold, make the price jumps larger (e.g., 2.5x bigger)
-    if progress < 0.75:
-        step_multiplier = 1.5
-
-    # Increment price by a random step scaled by the multiplier
-    var base_step := maxi(roundi(randf_range(0.04, 0.09) * _rolled_price), 100)
-    var step := roundi(base_step * step_multiplier)
-
-    _current_display_price += step
-    _last_bidder = "npc"
-
-    # Display layer: update price, show popup, reset circle
-    _tween_price_to(_current_display_price)
-    _show_npc_popup(_current_display_price)
-    _reset_circle()
-
-    # Re-enable Bid button now that NPC has bid
-    _bid_enabled = true
-    _bid_button.disabled = false
-    _pass_button.disabled = false
-
-    # Termination check
-    if _current_display_price >= _rolled_price:
-        _in_reach = true
-        # NPC timer stops; circle will complete and fire _resolve()
-    else:
-        _start_npc_timer()
+# ══ Circle animation ══════════════════════════════════════════════════════════
 
 
-# ══ Circle progression ════════════════════════════════════════════════════════
 func _start_circle(from_fill: float) -> void:
     if _circle_tween:
         _circle_tween.kill()
@@ -234,16 +284,9 @@ func _set_circle_fill(v: float) -> void:
 func _reset_circle() -> void:
     _start_circle(0.0)
 
-
-func _on_circle_completed() -> void:
-    if _in_reach:
-        _resolve()
-    else:
-        # Purely atmospheric in normal state — loop.
-        _start_circle(0.0)
-
-
 # ══ Resolution ════════════════════════════════════════════════════════════════
+
+
 func _resolve() -> void:
     _bid_button.disabled = true
     _pass_button.disabled = true
@@ -261,48 +304,15 @@ func _resolve() -> void:
         }
         GameManager.go_to_appraisal()
 
-
-# ══ Player actions ═════════════════════════════════════════════════════════════
-func _on_bid_pressed() -> void:
-    if not _bid_enabled:
-        return
-
-    _last_bidder = "player"
-    _bid_enabled = false
-    _bid_button.disabled = true
-    _pass_button.disabled = true
-
-    _current_display_price += _COSMETIC_BUMP
-    _tween_price_to(_current_display_price)
-
-    # Add this to show the player's bid in the stack
-    _show_player_bid_in_stack(_current_display_price)
-
-    _reset_circle()
-    _shorten_next_npc_tick = true
-    # TODO: play confirm sound via AudioManager
+# ══ Display helpers ════════════════════════════════════════════════════════════
 
 
-func _on_pass_pressed() -> void:
-    if _npc_timer:
-        _npc_timer.stop()
-    if _circle_tween:
-        _circle_tween.kill()
-
-    GameManager.lot_result = {
-        &"paid_price": 0,
-        &"won_items": [],
-    }
-    GameManager.go_to_appraisal()
-
-
-# ══ Display helpers ═══════════════════════════════════════════════════════════
 func _tween_price_to(target: int) -> void:
     if _price_tween:
         _price_tween.kill()
     var start := _displayed_price
     _price_tween = create_tween()
-    _price_tween.tween_method(_set_displayed_price, float(start), float(target), _PRICE_TWEEN_SEC)
+    _price_tween.tween_method(_set_displayed_price, float(start), float(target), PRICE_TWEEN_SEC)
 
 
 func _set_displayed_price(v: float) -> void:
@@ -310,7 +320,6 @@ func _set_displayed_price(v: float) -> void:
     _price_label.text = "$%d" % _displayed_price
 
 
-# Helper to show player in the same list
 func _show_player_bid_in_stack(price: int) -> void:
     var lbl := Label.new()
     lbl.text = "YOU — $%d" % price
@@ -325,12 +334,12 @@ func _show_player_bid_in_stack(price: int) -> void:
 
 func _show_npc_popup(price: int) -> void:
     # Pick a new NPC index that is different from the last one
-    var new_index := randi() % _NPC_NAMES.size()
+    var new_index := randi() % NPC_NAMES.size()
     while new_index == _last_npc_index:
-        new_index = randi() % _NPC_NAMES.size()
+        new_index = randi() % NPC_NAMES.size()
 
     _last_npc_index = new_index
-    var npc_name: String = _NPC_NAMES[new_index]
+    var npc_name: String = NPC_NAMES[new_index]
 
     # Create a new Label for stacking
     var new_bid_label := Label.new()
@@ -342,7 +351,7 @@ func _show_npc_popup(price: int) -> void:
     _npc_history_list.add_child(new_bid_label)
 
     # Animation: Fade in, stay, then fade out and auto-remove
-    var tween: = create_tween()
+    var tween := create_tween()
     tween.tween_property(new_bid_label, "modulate:a", 1.0, 0.15)
     tween.tween_interval(3.0) # Keep history visible for longer
     tween.tween_property(new_bid_label, "modulate:a", 0.0, 0.5)
@@ -352,34 +361,33 @@ func _show_npc_popup(price: int) -> void:
     if _npc_history_list.get_child_count() > 5:
         _npc_history_list.get_child(0).queue_free()
 
-
 # ══ UI builder ════════════════════════════════════════════════════════════════
+
+
 func _build_ui() -> void:
     set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
-    # Background
+    # ── Background ────────────────────────────────────────────────────────────
     var bg := ColorRect.new()
     bg.color = Color(0.1, 0.1, 0.12, 1.0)
     bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
     add_child(bg)
 
-    # Root vbox fills the screen: [centre_area | button_bar]
+    # ── Root layout ───────────────────────────────────────────────────────────
     var root_vbox := VBoxContainer.new()
     root_vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     add_child(root_vbox)
 
-    # Centre area expands to fill remaining vertical space
     var centre := CenterContainer.new()
     centre.size_flags_vertical = Control.SIZE_EXPAND_FILL
     root_vbox.add_child(centre)
 
-    # Content column: price area + lot summary
     var content := VBoxContainer.new()
     content.add_theme_constant_override(&"separation", 20)
     centre.add_child(content)
 
-    # Price area: circle drawn behind, price label on top
+    # ── Price area ────────────────────────────────────────────────────────────
     var price_area := Control.new()
     price_area.custom_minimum_size = Vector2(220.0, 220.0)
     content.add_child(price_area)
@@ -396,19 +404,18 @@ func _build_ui() -> void:
     _price_label.text = "$0"
     price_area.add_child(_price_label)
 
-    # NPC popup floats just outside the right edge of the price area
     _npc_history_list = VBoxContainer.new()
     _npc_history_list.position = Vector2(228.0, 72.0)
     _npc_history_list.custom_minimum_size = Vector2(180.0, 0.0)
     _npc_history_list.add_theme_constant_override(&"separation", 2)
     price_area.add_child(_npc_history_list)
 
-    # Lot summary — item names only, no values
+    # ── Lot summary ───────────────────────────────────────────────────────────
     _lot_summary = VBoxContainer.new()
     _lot_summary.add_theme_constant_override(&"separation", 4)
     content.add_child(_lot_summary)
 
-    # Button bar pinned to the bottom of the screen
+    # ── Button bar ────────────────────────────────────────────────────────────
     var button_bar := HBoxContainer.new()
     button_bar.alignment = BoxContainer.ALIGNMENT_CENTER
     button_bar.add_theme_constant_override(&"separation", 24)
