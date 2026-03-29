@@ -8,7 +8,7 @@ extends Control
 const _MAX_SLOTS := 6
 const _MAX_WEIGHT := 20.0
 
-const CargoItemRowScene := preload("res://stage/levels/cargo/cargo_item_row/cargo_item_row.tscn")
+@export var _cago_item_row_scene: PackedScene
 
 # ── State ──────────────────────────────────────────────────────────────────────
 var _won_items: Array[ItemData] = []
@@ -151,7 +151,7 @@ func _build_ui() -> void:
             )
             var level: int = result.get(&"level", 0)
 
-            var row: CargoItemRow = CargoItemRowScene.instantiate()
+            var row: CargoItemRow = _cago_item_row_scene.instantiate()
             panel_vbox.add_child(row)
             row.setup(item, level)
             row.toggled.connect(_on_item_toggled)

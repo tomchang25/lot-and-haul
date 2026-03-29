@@ -6,11 +6,12 @@ class_name CargoItemRow
 extends PanelContainer
 
 signal toggled(pressed: bool, item: ItemData)
-@export var _toggle: CheckButton
-@export var _name_lbl: Label
-@export var _price_lbl: Label
-@export var _weight_lbl: Label
-@export var _size_lbl: Label
+
+@onready var _toggle: CheckButton = $HBox/ToggleContainer/Toggle
+@onready var _name_label: Label = $HBox/NameLabel
+@onready var _price_label: Label = $HBox/PriceLabel
+@onready var _weight_label: Label = $HBox/WeightLabel
+@onready var _size_label: Label = $HBox/SizeLabel
 
 var item_data: ItemData = null
 
@@ -20,10 +21,10 @@ var item_data: ItemData = null
 # Bind item data and populate all labels. Call once after add_child().
 func setup(item: ItemData, inspection_level: int) -> void:
     item_data = item
-    _name_lbl.text = item.item_name
-    _price_lbl.text = ClueEvaluator.get_price_range_label(item, inspection_level)
-    _weight_lbl.text = "%.1f kg" % item.weight
-    _size_lbl.text = "%d" % item.grid_size
+    _name_label.text = item.item_name
+    _price_label.text = ClueEvaluator.get_price_range_label(item, inspection_level)
+    _weight_label.text = "%.1f kg" % item.weight
+    _size_label.text = "%d" % item.grid_size
     _toggle.toggled.connect(_on_toggle_changed)
 
 

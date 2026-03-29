@@ -9,15 +9,10 @@ content_margin_right = 0.0
 content_margin_bottom = 0.0
 bg_color = Color(0.18, 0.18, 0.2, 1)
 
-[node name="CargoItemRow" type="PanelContainer" unique_id=972357506 node_paths=PackedStringArray("_toggle", "_name_lbl", "_price_lbl", "_weight_lbl", "_size_lbl")]
+[node name="CargoItemRow" type="PanelContainer" unique_id=972357506]
 custom_minimum_size = Vector2(0, 48)
 theme_override_styles/panel = SubResource("StyleBoxFlat_1")
 script = ExtResource("1_cargorow")
-_toggle = NodePath("HBox/ToggleContainer/Toggle")
-_name_lbl = NodePath("HBox/NameLabel")
-_price_lbl = NodePath("HBox/PriceLabel")
-_weight_lbl = NodePath("HBox/WeightLabel")
-_size_lbl = NodePath("HBox/SizeLabel")
 
 [node name="HBox" type="HBoxContainer" parent="." unique_id=200000001]
 layout_mode = 2

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bcargoscn0001"]
 
 [ext_resource type="Script" uid="uid://bcjbwusd6err1" path="res://stage/levels/cargo/cargo_scene.gd" id="1_cargo"]
+[ext_resource type="PackedScene" uid="uid://cargoitemrow1" path="res://stage/levels/cargo/cargo_item_row/cargo_item_row.tscn" id="2_wfoyb"]
 
 [node name="CargoScene" type="Control" unique_id=239928999]
 layout_mode = 3
@@ -10,3 +11,4 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_cargo")
+_cago_item_row_scene = ExtResource("2_wfoyb")
