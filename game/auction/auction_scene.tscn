@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bauctionscn01"]
 
-[ext_resource type="Script" uid="uid://bauctionscngd1" path="res://stage/levels/auction/auction_scene.gd" id="1_auction"]
+[ext_resource type="Script" uid="uid://cuw7v0qpqfq4l" path="res://game/auction/auction_scene.gd" id="1_auction"]
 
 [node name="AuctionScene" type="Control"]
 layout_mode = 3

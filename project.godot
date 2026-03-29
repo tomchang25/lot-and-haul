@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Lot and Haul"
-run/main_scene="res://stage/levels/warehouse/warehouse_scene.tscn"
+run/main_scene="res://game/inspection/inspection_scene.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -20,7 +20,7 @@ config/icon="res://icon.svg"
 AudioManager="*uid://bhhaho37wph5e"
 EventBus="*uid://d2nkmaq8dlf5g"
 KnowledgeManager="*uid://bqosi6h0xps2v"
-GameManager="*uid://blmyetrjsicyl"
+GameManager="*uid://bnj3y0a2848to"
 
 [debug]
 
@@ -39,8 +39,7 @@ folder_colors={
 "res://data/": "teal",
 "res://game/": "orange",
 "res://global/": "yellow",
-"res://stage/": "green",
-"res://ui/": "pink"
+"res://stage/": "green"
 }
 
 [physics]

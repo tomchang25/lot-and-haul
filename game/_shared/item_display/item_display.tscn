@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bitemdtscn001"]
 
-[ext_resource type="Script" uid="uid://dycr8irb242ij" path="res://ui/inspection/item_display/item_display.gd" id="1_itemd"]
+[ext_resource type="Script" uid="uid://dycr8irb242ij" path="res://game/_shared/item_display/item_display.gd" id="1_itemd"]
 
 [node name="ItemDisplay" type="PanelContainer" unique_id=1471444043]
 custom_minimum_size = Vector2(190, 240)

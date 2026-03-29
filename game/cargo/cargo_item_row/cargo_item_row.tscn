@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cargoitemrow1"]
 
-[ext_resource type="Script" uid="uid://bww83qq2w4y0x" path="res://stage/levels/cargo/cargo_item_row/cargo_item_row.gd" id="1_cargorow"]
+[ext_resource type="Script" uid="uid://bww83qq2w4y0x" path="res://game/cargo/cargo_item_row/cargo_item_row.gd" id="1_cargorow"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
 content_margin_left = 0.0

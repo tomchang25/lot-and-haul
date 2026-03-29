@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dsgsj2f826clw"]
 
-[ext_resource type="Script" uid="uid://vpkwojtrrnv6" path="res://stage/levels/appraisal/appraisal_scene.gd" id="1_appraisal"]
-[ext_resource type="PackedScene" uid="uid://bl7bfpyi10cid" path="res://stage/levels/appraisal/appraisal_item_row/appraisal_item_row.tscn" id="2_row"]
+[ext_resource type="Script" uid="uid://vpkwojtrrnv6" path="res://game/appraisal/appraisal_scene.gd" id="1_appraisal"]
+[ext_resource type="PackedScene" uid="uid://bl7bfpyi10cid" path="res://game/appraisal/appraisal_item_row/appraisal_item_row.tscn" id="2_row"]
 
 [node name="AppraisalScene" type="Control" unique_id=708244230]
 layout_mode = 3

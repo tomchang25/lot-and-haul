@@ -1,10 +1,6 @@
 extends Node
 
-const SCENE_AUCTION := "res://stage/levels/auction/auction_scene.tscn"
-const SCENE_CARGO := "res://stage/levels/cargo/cargo_scene.tscn"
-const SCENE_WAREHOUSE := "res://stage/levels/warehouse/warehouse_scene.tscn"
-const SCENE_APPRAISAL := "res://stage/levels/appraisal/appraisal_scene.tscn"
-# const SCENE_HOME := "res://stage/levels/home/home_scene.tscn"
+@export var scenes: SceneRegistry
 
 # Current lot of 4 items placed in the warehouse scene (set before inspection begins).
 var current_lot: Array[ItemData] = []
@@ -33,18 +29,18 @@ func _ready() -> void:
 
 
 func go_to_auction() -> void:
-    get_tree().change_scene_to_file(SCENE_AUCTION)
+    get_tree().change_scene_to_packed(scenes.auction)
 
 
 func go_to_cargo() -> void:
-    get_tree().change_scene_to_file(SCENE_CARGO)
-
-# func go_to_home() -> void:
-#     get_tree().change_scene_to_file(SCENE_HOME)
+    get_tree().change_scene_to_packed(scenes.cargo)
 
 
 func go_to_appraisal() -> void:
-    get_tree().change_scene_to_file(SCENE_APPRAISAL)
+    get_tree().change_scene_to_packed(scenes.appraisal)
+
+# func go_to_home() -> void:
+#     get_tree().change_scene_to_packed(scenes.home)
 
 
 func restart_run() -> void:
@@ -52,11 +48,13 @@ func restart_run() -> void:
     lot_result = { }
     cargo_items.clear()
     run_result = { }
-    get_tree().change_scene_to_file(SCENE_WAREHOUSE)
+    _init_default_lot()
+    get_tree().change_scene_to_packed(scenes.inspection)
 
 
 # Populates the lot with the first four items for the vertical slice.
 func _init_default_lot() -> void:
+    current_lot.clear()
     var paths: Array[String] = [
         "res://data/items/brass_lamp.tres",
         "res://data/items/pocket_watch.tres",

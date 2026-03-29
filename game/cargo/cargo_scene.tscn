@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bcargoscn0001"]
 
-[ext_resource type="Script" uid="uid://bcjbwusd6err1" path="res://stage/levels/cargo/cargo_scene.gd" id="1_cargo"]
-[ext_resource type="PackedScene" uid="uid://cargoitemrow1" path="res://stage/levels/cargo/cargo_item_row/cargo_item_row.tscn" id="2_wfoyb"]
+[ext_resource type="Script" uid="uid://bcjbwusd6err1" path="res://game/cargo/cargo_scene.gd" id="1_cargo"]
+[ext_resource type="PackedScene" uid="uid://cargoitemrow1" path="res://game/cargo/cargo_item_row/cargo_item_row.tscn" id="2_wfoyb"]
 
 [node name="CargoScene" type="Control" unique_id=239928999]
 layout_mode = 3

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bl7bfpyi10cid"]
 
-[ext_resource type="Script" uid="uid://wmw3et1vek2a" path="res://stage/levels/appraisal/appraisal_item_row/appraisal_item_row.gd" id="1_row"]
+[ext_resource type="Script" uid="uid://wmw3et1vek2a" path="res://game/appraisal/appraisal_item_row/appraisal_item_row.gd" id="1_row"]
 
 [node name="AppraisalRow" type="HBoxContainer" unique_id=1173174031]
 custom_minimum_size = Vector2(0, 48)

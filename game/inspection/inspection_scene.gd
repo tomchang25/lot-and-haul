@@ -4,8 +4,6 @@ const MAX_STAMINA := 8
 const _BROWSE_COST := 1
 const _EXAMINE_COST_BASE := 3
 
-const ItemDisplayScene := preload("res://ui/inspection/item_display/item_display.tscn")
-
 # 2×2 grid layout constants (screen-space, assumes ~1152×648 default viewport)
 const _ITEM_COLS := 2
 const _ITEM_SIZE := Vector2(200.0, 250.0)
@@ -17,6 +15,8 @@ var _stamina := MAX_STAMINA
 var _active_item: ItemDisplay = null
 var _item_displays: Array[ItemDisplay] = []
 var _pulse_tween: Tween = null
+
+const ItemDisplayScene := preload("uid://bitemdtscn001")
 
 @onready var _items_root: Control = $ItemsRoot
 @onready var _stamina_hud: StaminaHUD = $HUD/StaminaHUD
