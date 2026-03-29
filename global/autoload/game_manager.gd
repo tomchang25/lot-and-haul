@@ -22,6 +22,10 @@ var lot_result: Dictionary = { }
 # The subset of won_items the player chose to bring home.
 var cargo_items: Array[ItemData] = []
 
+# Written by Block 06 (Home Appraisal).
+# { "sell_value": int, "paid_price": int, "net": int }
+var run_result: Dictionary = { }
+
 
 func _ready() -> void:
     if current_lot.is_empty():
@@ -46,6 +50,8 @@ func go_to_appraisal() -> void:
 func restart_run() -> void:
     inspection_results.clear()
     lot_result = { }
+    cargo_items.clear()
+    run_result = { }
     get_tree().change_scene_to_file(SCENE_WAREHOUSE)
 
 
