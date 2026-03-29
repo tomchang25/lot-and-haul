@@ -41,9 +41,6 @@ var _pulse_tween: Tween = null
 
 
 func _ready() -> void:
-    _stamina_hud.update_stamina(_stamina, MAX_STAMINA)
-    _action_popup.hide()
-
     _action_popup.browse_requested.connect(_on_browse)
     _action_popup.examine_requested.connect(_on_examine)
     _action_popup.cancelled.connect(_on_popup_cancelled)
@@ -51,6 +48,8 @@ func _ready() -> void:
     _list_review.back_requested.connect(_on_list_review_back)
     _list_review.auction_entered.connect(_on_auction_entered)
 
+    _stamina_hud.update_stamina(_stamina, MAX_STAMINA)
+    _action_popup.hide()
     _populate_item_displays()
 
 

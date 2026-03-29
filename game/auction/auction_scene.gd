@@ -81,15 +81,14 @@ class _CircleProgress extends Control:
 
 
 func _ready() -> void:
+    _pass_button.pressed.connect(_on_pass_pressed)
+    _bid_button.pressed.connect(_on_bid_pressed)
+
     var price_area: Control = $RootVBox/Centre/Content/PriceArea
     _circle_node = _CircleProgress.new()
     _circle_node.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
     price_area.add_child(_circle_node)
-    # Move circle behind PriceLabel so the label renders on top.
     price_area.move_child(_circle_node, 0)
-
-    _pass_button.pressed.connect(_on_pass_pressed)
-    _bid_button.pressed.connect(_on_bid_pressed)
 
     _init_auction()
     _start_npc_timer()
