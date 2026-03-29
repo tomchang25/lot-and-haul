@@ -1,8 +1,9 @@
-[gd_scene format=3 uid="uid://bappraisalscn1"]
+[gd_scene format=3 uid="uid://dsgsj2f826clw"]
 
-[ext_resource type="Script" uid="uid://bappraisalgd01" path="res://stage/levels/appraisal/appraisal_scene.gd" id="1_appraisal"]
+[ext_resource type="Script" uid="uid://vpkwojtrrnv6" path="res://stage/levels/appraisal/appraisal_scene.gd" id="1_appraisal"]
+[ext_resource type="PackedScene" uid="uid://bl7bfpyi10cid" path="res://stage/levels/appraisal/appraisal_item_row/appraisal_item_row.tscn" id="2_row"]
 
-[node name="AppraisalScene" type="Control"]
+[node name="AppraisalScene" type="Control" unique_id=708244230]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,3 +11,115 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_appraisal")
+_row_scene = ExtResource("2_row")
+
+[node name="Background" type="ColorRect" parent="." unique_id=172726597]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.1, 0.1, 0.12, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="." unique_id=2101566182]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="RootVBox" unique_id=935298121]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Home Appraisal"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ListCenter" type="CenterContainer" parent="RootVBox" unique_id=2131226200]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="OuterVBox" type="VBoxContainer" parent="RootVBox/ListCenter" unique_id=777929070]
+custom_minimum_size = Vector2(760, 0)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ItemPanel" type="PanelContainer" parent="RootVBox/ListCenter/OuterVBox" unique_id=439126609]
+layout_mode = 2
+
+[node name="PanelVBox" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel" unique_id=452491116]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="ColumnHeader" type="HBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=1435525678]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="ItemHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=2045196239]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Item"
+vertical_alignment = 1
+
+[node name="ValueHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=1055929539]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "True Value"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeaderSeparator" type="HSeparator" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=1661921171]
+layout_mode = 2
+
+[node name="RowContainer" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=357132903]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="SummaryContainer" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox" unique_id=1846196658]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SummarySeparator" type="HSeparator" parent="RootVBox/ListCenter/OuterVBox/SummaryContainer" unique_id=1822759979]
+layout_mode = 2
+
+[node name="SellValueLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/SummaryContainer" unique_id=174167266]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="PaidLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/SummaryContainer" unique_id=1955275326]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="NetLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/SummaryContainer" unique_id=335078978]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=84919131]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="RevealButton" type="Button" parent="RootVBox/Footer" unique_id=1005702364]
+custom_minimum_size = Vector2(160, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Reveal Next"
+
+[node name="ContinueButton" type="Button" parent="RootVBox/Footer" unique_id=1969516138]
+visible = false
+custom_minimum_size = Vector2(160, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Continue"
