@@ -7,8 +7,6 @@ extends Control
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 const MAX_STAMINA := 8
-const BROWSE_COST := 1
-const EXAMINE_COST_BASE := 3
 
 const ITEM_COLS := 2
 const ITEM_SIZE := Vector2(200.0, 250.0)
@@ -84,15 +82,14 @@ func _on_browse() -> void:
     if _active_item == null:
         return
     var entry: ItemEntry = _entry_for_display[_active_item]
-    _spend_stamina(_active_item, entry, 2, BROWSE_COST)
+    _spend_stamina(_active_item, entry, 2, InspectionRules.browse_cost())
 
 
 func _on_examine() -> void:
     if _active_item == null:
         return
     var entry: ItemEntry = _entry_for_display[_active_item]
-    var cost := 2 if entry.inspection_level == 2 else EXAMINE_COST_BASE
-    _spend_stamina(_active_item, entry, 3, cost)
+    _spend_stamina(_active_item, entry, 3, InspectionRules.examine_cost(entry.inspection_level))
 
 
 func _on_start_auction_pressed() -> void:

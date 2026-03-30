@@ -56,7 +56,7 @@ func _make_row(item: ItemData, level: int) -> HBoxContainer:
     row.add_child(name_lbl)
 
     var status_lbl := Label.new()
-    status_lbl.text = _status_text(level)
+    status_lbl.text = InspectionRules.level_label(level)
     status_lbl.custom_minimum_size = Vector2(100.0, 0.0)
     status_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     status_lbl.add_theme_font_size_override(&"font_size", 13)
@@ -70,16 +70,6 @@ func _make_row(item: ItemData, level: int) -> HBoxContainer:
     row.add_child(price_lbl)
 
     return row
-
-
-func _status_text(level: int) -> String:
-    match level:
-        1:
-            return "Browsed"
-        2:
-            return "Examined"
-        _:
-            return "Uninspected"
 
 # ── Button handlers ────────────────────────────────────────────────────────────
 
