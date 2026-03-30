@@ -46,14 +46,13 @@ func populate() -> void:
 
 
 func _make_row(entry: ItemEntry) -> HBoxContainer:
-    var item := entry.item_data
     var level := entry.inspection_level
 
     var row := HBoxContainer.new()
     row.add_theme_constant_override(&"separation", 8)
 
     var name_lbl := Label.new()
-    name_lbl.text = item.item_name
+    name_lbl.text = InspectionRules.get_display_name(entry)
     name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     name_lbl.add_theme_font_size_override(&"font_size", 14)
     row.add_child(name_lbl)

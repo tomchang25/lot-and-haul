@@ -24,11 +24,7 @@ func refresh_display() -> void:
 
 
 func _apply_level() -> void:
-    if _entry.is_veiled():
-        _name_label.text = _entry.resolved_veiled_type.display_label
-    else:
-        _name_label.text = _entry.item_data.item_name
-
+    _name_label.text = InspectionRules.get_display_name(_entry)
     _price_label.text = ClueEvaluator.get_price_range_label(_entry)
     _level_label.text = InspectionRules.level_label(_entry.inspection_level)
 

@@ -19,7 +19,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0, 0, 0, 0.6)
+color = Color(0, 0, 0, 1)
 
 [node name="Panel" type="PanelContainer" parent="." unique_id=1369218410]
 layout_mode = 1

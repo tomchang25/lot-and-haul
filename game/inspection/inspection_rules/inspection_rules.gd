@@ -15,6 +15,17 @@ extends RefCounted
 
 # ── Stamina costs ─────────────────────────────────────────────────────────────
 
+# Inspection level definitions
+enum Level {
+    VEILED = 0,
+    UNTOUCHED = 1,
+    BROWSED = 2,
+    EXAMINED = 3,
+    RESEARCHED = 4,
+    AUTHENTICATED = 5,
+}
+
+# Stamina costs
 const BROWSE_COST := 1
 const EXAMINE_COST_LOW := 2 # upgrading from level 2 → 3
 const EXAMINE_COST_HIGH := 3 # upgrading from level 1 → 3
@@ -27,7 +38,7 @@ static func browse_cost() -> int:
 
 
 static func examine_cost(current_level: int) -> int:
-    return EXAMINE_COST_LOW if current_level == 2 else EXAMINE_COST_HIGH
+    return EXAMINE_COST_LOW if current_level == Level.BROWSED else EXAMINE_COST_HIGH
 
 # ── Inspection block eligibility (levels 1–3 only) ────────────────────────────
 
@@ -35,44 +46,51 @@ static func examine_cost(current_level: int) -> int:
 static func can_browse(current_level: int, stamina: int) -> bool:
     # Level 0 (veiled) locks all inspection actions.
     # Browse is redundant at 2+ since examine covers the same range.
-    return current_level == 1 and stamina >= BROWSE_COST
+    return current_level == Level.UNTOUCHED and stamina >= BROWSE_COST
 
 
 static func can_examine(current_level: int, stamina: int) -> bool:
     # Level 0 (veiled) locks all inspection actions.
-    return current_level >= 1 and current_level < 3 \
+    return current_level >= Level.UNTOUCHED and current_level < Level.EXAMINED \
     and stamina >= examine_cost(current_level)
 
 # ── Cleanup block eligibility (levels 0, 3–5) ─────────────────────────────────
 
 
 static func can_unveil(current_level: int) -> bool:
-    return current_level == 0
+    return current_level == Level.VEILED
 
 
 static func can_research(current_level: int) -> bool:
-    return current_level == 3
+    return current_level == Level.EXAMINED
 
 
 static func can_authenticate(current_level: int) -> bool:
-    return current_level == 4
+    return current_level == Level.RESEARCHED
 
 # ── Display helpers ───────────────────────────────────────────────────────────
 
 
+# Centralized logic for the item's display name (formerly in UI)
+static func get_display_name(entry: ItemEntry) -> String:
+    if entry.inspection_level == Level.VEILED:
+        return entry.resolved_veiled_type.display_label
+    return entry.item_data.item_name
+
+
 static func level_label(level: int) -> String:
     match level:
-        0:
+        Level.VEILED:
             return "Veiled"
-        1:
+        Level.UNTOUCHED:
             return "Untouched"
-        2:
+        Level.BROWSED:
             return "Browsed"
-        3:
+        Level.EXAMINED:
             return "Examined"
-        4:
+        Level.RESEARCHED:
             return "Researched"
-        5:
+        Level.AUTHENTICATED:
             return "Authenticated"
         _:
             return "Unknown"

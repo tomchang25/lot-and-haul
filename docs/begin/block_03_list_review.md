@@ -41,13 +41,12 @@ Nothing. Read-only bridge between Block 02 and Block 04.
 
 ## Finished Todolist
 
-*(All updates archive)*
+- [x] Show veiled items as `resolved_veiled_type.display_label` when `is_veiled` was never lifted
 
 ## Itch Demo Todolist
 
-- [ ] Show veiled items as `resolved_veiled_type.display_label` when `is_veiled` was never lifted
-- [ ] Reflect knowledge-adjusted valuation ranges (once KnowledgeManager returns real values)
 
 ## Post Demo Todolist
 
+- [ ] Reflect knowledge-adjusted valuation ranges (once KnowledgeManager returns real values)
 - [ ] Per-clue estimate breakdown on hover/expand
