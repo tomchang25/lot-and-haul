@@ -5,5 +5,5 @@
 [resource]
 script = ExtResource("1_j2t4p")
 type_id = "flat_package"
-display_label = "flat package"
+display_label = "Flat Package"
 base_veiled_price = 250

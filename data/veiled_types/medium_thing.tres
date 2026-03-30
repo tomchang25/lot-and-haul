@@ -5,5 +5,5 @@
 [resource]
 script = ExtResource("1_vtdef")
 type_id = "medium_thing"
-display_label = "medium thing"
+display_label = "Medium Thing"
 base_veiled_price = 300

@@ -47,7 +47,7 @@ func _init_run() -> void:
             push_error("warehouse_entry: failed to load item at %s" % path)
             continue
 
-        var entry := ItemEntry.create(item, 0.2)
+        var entry := ItemEntry.create(item, 0.4)
         GameManager.item_entries.append(entry)
 
     # Generate lot_data.

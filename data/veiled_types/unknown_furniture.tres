@@ -5,5 +5,5 @@
 [resource]
 script = ExtResource("1_vtdef")
 type_id = "unknown_furniture"
-display_label = "unknown furniture"
+display_label = "Unknown Furniture"
 base_veiled_price = 280
