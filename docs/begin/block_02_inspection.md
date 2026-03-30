@@ -79,13 +79,13 @@ The player interacts with items in the warehouse scene using limited stamina.
 ## Itch Demo Todolist
 
 - [ ] Veiled item display: show `resolved_veiled_type.display_label` instead of item name and category when `is_veiled = true`
+- [ ] Disable all inspect actions when `is_veiled = true`
 - [ ] Lift veil: veil is lifted on first inspect action (Browse or Examine) — no dedicated unveil action in warehouse; the `unveil` action exists in the action popup but is disabled in warehouse context, available in cleanup and non-warehouse locations
-- [ ] Valuation range for veiled items: show `?` regardless of inspection level while still veiled
-- [ ] Touch action: costs 2 stamina, available in non-warehouse locations
-- [ ] Knowledge system integration: `KnowledgeManager.get_level()` returns real value, affects clue text and valuation range width
-- [ ] Cleanup phase stamina: after Auction, before Cargo, player gets 8 additional stamina to re-inspect items in the won lot (see Block 04b)
+- [ ] Centralize control inspect action options
+- [ ] Generalize and parameter for fit Cleanup phase (see Block 04b)
 
 ## Post Demo Todolist
 
+- [ ] Knowledge system integration: `KnowledgeManager.get_level()` returns real value, affects clue text and valuation range width
 - [ ] Xray action: costs 5 stamina, unlocks internal/hidden clue layer
-- [ ] Per-clue valuation display (replaces level-based range)
+- [ ] Per-clue impact inspection level and valuation display (replaces level-based range)

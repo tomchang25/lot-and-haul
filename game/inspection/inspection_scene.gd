@@ -26,7 +26,7 @@ var _active_item: ItemDisplay = null
 var _item_displays: Array[ItemDisplay] = []
 
 # Maps each ItemDisplay to its corresponding ItemEntry for fast level access.
-var _entry_for_display: Dictionary = {}
+var _entry_for_display: Dictionary = { }
 
 # ── Timer / tween handles ─────────────────────────────────────────────────────
 
@@ -84,21 +84,15 @@ func _on_browse() -> void:
     if _active_item == null:
         return
     var entry: ItemEntry = _entry_for_display[_active_item]
-    if entry.inspection_level >= 1:
-        _close_popup()
-        return
-    _spend_stamina(_active_item, entry, 1, BROWSE_COST)
+    _spend_stamina(_active_item, entry, 2, BROWSE_COST)
 
 
 func _on_examine() -> void:
     if _active_item == null:
         return
     var entry: ItemEntry = _entry_for_display[_active_item]
-    if entry.inspection_level >= 2:
-        _close_popup()
-        return
-    var cost := 2 if entry.inspection_level == 1 else EXAMINE_COST_BASE
-    _spend_stamina(_active_item, entry, 2, cost)
+    var cost := 2 if entry.inspection_level == 2 else EXAMINE_COST_BASE
+    _spend_stamina(_active_item, entry, 3, cost)
 
 
 func _on_start_auction_pressed() -> void:

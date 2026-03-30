@@ -11,18 +11,17 @@ var item_entries: Array[ItemEntry] = []
 var lot_data: LotData = null
 
 # Written by Block 04 (Auction).
-# { "paid_price": int, "won_items": Array[ItemData] }
+# { "paid_price": int, "won_items": Array[ItemEntry] }
 # paid_price = 0 and won_items = [] when the player passes or loses.
-var lot_result: Dictionary = {}
+var lot_result: Dictionary = { }
 
 # Written by Block 05 (Cargo Loading).
 # The subset of won_items the player chose to bring home.
-var cargo_items: Array[ItemData] = []
+var cargo_items: Array[ItemEntry] = []
 
 # Written by Block 06 (Home Appraisal).
 # { "sell_value": int, "paid_price": int, "net": int }
-var run_result: Dictionary = {}
-
+var run_result: Dictionary = { }
 
 # ── Scene transitions ─────────────────────────────────────────────────────────
 
@@ -45,14 +44,3 @@ func go_to_cargo() -> void:
 
 func go_to_appraisal() -> void:
     get_tree().change_scene_to_packed(scenes.appraisal)
-
-
-# ── Helpers ───────────────────────────────────────────────────────────────────
-
-
-# Returns the ItemEntry whose item_data matches item, or null if not found.
-func get_entry_for(item: ItemData) -> ItemEntry:
-    for entry: ItemEntry in item_entries:
-        if entry.item_data == item:
-            return entry
-    return null

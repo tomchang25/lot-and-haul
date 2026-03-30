@@ -17,8 +17,10 @@ const ITEM_PATHS: Array[String] = [
 
 # ── Node references ───────────────────────────────────────────────────────────
 
-@onready var _closed_view: Control = $ClosedView
-@onready var _open_view: Control = $OpenView
+const ClosedTexture := preload("res://assets/warehouse_closed.png")
+const OpenTexture := preload("res://assets/warehouse_open.png")
+
+@onready var _texture_rect: TextureRect = $TextureRect
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -34,9 +36,9 @@ func _init_run() -> void:
     # Clear all previous run state.
     GameManager.item_entries.clear()
     GameManager.lot_data = null
-    GameManager.lot_result = {}
+    GameManager.lot_result = { }
     GameManager.cargo_items.clear()
-    GameManager.run_result = {}
+    GameManager.run_result = { }
 
     # Generate one ItemEntry per item preset.
     for path: String in ITEM_PATHS:
@@ -44,26 +46,24 @@ func _init_run() -> void:
         if item == null:
             push_error("warehouse_entry: failed to load item at %s" % path)
             continue
-        var entry := ItemEntry.new()
-        entry.item_data = item
-        entry.is_veiled = false          # MVP: always false
-        entry.resolved_veiled_type = null # MVP: always null
-        entry.inspection_level = 0
+
+        var entry := ItemEntry.create(item, 0.2)
         GameManager.item_entries.append(entry)
 
     # Generate lot_data.
     var ld := LotData.new()
-    ld.aggressive_factor = 1.0  # MVP: fixed
+    ld.aggressive_factor = 1.0 # MVP: fixed
     GameManager.lot_data = ld
 
 # ══ Door animation ════════════════════════════════════════════════════════════
 
 
 func _play_door_animation() -> void:
-    _open_view.modulate.a = 0.0
+    _texture_rect.texture = ClosedTexture
     var tween := create_tween()
-    tween.tween_interval(0.5)
-    tween.tween_property(_closed_view, "modulate:a", 0.0, 0.6)
-    tween.tween_property(_open_view, "modulate:a", 1.0, 0.6)
-    tween.tween_interval(0.3)
+    tween.tween_interval(0.2)
+    tween.tween_property(_texture_rect, "modulate:a", 0.0, 0.4)
+    tween.tween_callback(func() -> void: _texture_rect.texture = OpenTexture)
+    tween.tween_property(_texture_rect, "modulate:a", 1.0, 0.4)
+    tween.tween_interval(0.2)
     tween.tween_callback(GameManager.go_to_inspection)

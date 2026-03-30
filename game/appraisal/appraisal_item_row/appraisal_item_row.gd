@@ -7,7 +7,7 @@ extends HBoxContainer
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _item: ItemData = null
+var _entry: ItemEntry = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -17,17 +17,17 @@ var _item: ItemData = null
 # ══ Common API ════════════════════════════════════════════════════════════════
 
 
-# Bind item data and populate the name. Call once after add_child().
-func setup(item: ItemData) -> void:
-    _item = item
-    _name_lbl.text = item.item_name
+# Bind entry and populate the name. Call once after add_child().
+func setup(entry: ItemEntry) -> void:
+    _entry = entry
+    _name_lbl.text = entry.item_data.item_name
     _value_lbl.text = "???"
     _value_lbl.add_theme_color_override(&"font_color", Color(0.6, 0.6, 0.6))
 
 
 # Flip the value label to the true value with a green tint.
 func reveal() -> void:
-    if _item == null:
+    if _entry == null:
         return
-    _value_lbl.text = "$%d" % _item.true_value
+    _value_lbl.text = "$%d" % _entry.item_data.true_value
     _value_lbl.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
