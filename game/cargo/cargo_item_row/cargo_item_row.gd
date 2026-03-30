@@ -42,7 +42,7 @@ func setup(p_entry: ItemEntry) -> void:
     entry = p_entry
     var item: ItemData = entry.item_data
     _name_label.text = item.item_name
-    _price_label.text = ClueEvaluator.get_price_range_label(item, entry.inspection_level)
+    _price_label.text = ClueEvaluator.get_price_range_label(entry)
     _weight_label.text = "%.1f kg" % item.weight
     _size_label.text = "%d" % item.grid_size
     _toggle.toggled.connect(_on_toggle_changed)

@@ -180,7 +180,7 @@ func _init_auction() -> void:
         true_value_sum += item.true_value
 
         var lbl := Label.new()
-        lbl.text = "%s (%s)" % [item.item_name, ClueEvaluator.get_price_range_label(item, entry.inspection_level)]
+        lbl.text = "%s (%s)" % [item.item_name, ClueEvaluator.get_price_range_label(entry)]
         lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         lbl.add_theme_font_size_override(&"font_size", 15)
         _lot_summary.add_child(lbl)

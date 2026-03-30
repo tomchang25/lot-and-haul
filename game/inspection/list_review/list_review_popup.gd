@@ -29,7 +29,7 @@ func populate() -> void:
 
     for entry: ItemEntry in GameManager.item_entries:
         true_value_sum += entry.item_data.true_value
-        _item_list.add_child(_make_row(entry.item_data, entry.inspection_level))
+        _item_list.add_child(_make_row(entry))
 
     var estimate := ClueEvaluator.get_lot_estimate(GameManager.item_entries)
     if estimate.has_unknown and estimate.lo == 0 and estimate.hi == 0:
@@ -45,7 +45,10 @@ func populate() -> void:
 # ── Row builder ────────────────────────────────────────────────────────────────
 
 
-func _make_row(item: ItemData, level: int) -> HBoxContainer:
+func _make_row(entry: ItemEntry) -> HBoxContainer:
+    var item := entry.item_data
+    var level := entry.inspection_level
+
     var row := HBoxContainer.new()
     row.add_theme_constant_override(&"separation", 8)
 
@@ -63,7 +66,7 @@ func _make_row(item: ItemData, level: int) -> HBoxContainer:
     row.add_child(status_lbl)
 
     var price_lbl := Label.new()
-    price_lbl.text = ClueEvaluator.get_price_range_label(item, level)
+    price_lbl.text = ClueEvaluator.get_price_range_label(entry)
     price_lbl.custom_minimum_size = Vector2(130.0, 0.0)
     price_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
     price_lbl.add_theme_font_size_override(&"font_size", 13)

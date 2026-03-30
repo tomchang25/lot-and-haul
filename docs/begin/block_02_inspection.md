@@ -12,7 +12,7 @@ The player interacts with items in the warehouse scene using limited stamina.
 
 ## Produces
 
-- `GameManager.item_entries` — updated in-place: `inspection_level` written per entry
+- `GameManager.item_entries` — updated in-place: `inspection_level` written per entry via `ItemDisplay.refresh_display()`
 
 ---
 
@@ -25,18 +25,18 @@ The player interacts with items in the warehouse scene using limited stamina.
 - Exit transition: "Start Auction" button frame pulses/glows, no scene cut delay
 
 ### Actions
-- Two actions available (warehouse restriction — no touch):
-    - **Browse**: costs 1 stamina, sets inspection level to 1
-    - **Examine**: costs 3 stamina, sets inspection level to 2
+- Two actions available in warehouse context (see Block 02a for action rules):
+    - **Browse**: costs 1 stamina, sets inspection level to 2
+    - **Examine**: costs 3 stamina (or 2 if upgrading from level 2), sets inspection level to 3
 - Clicking an item opens an action popup below the item containing three buttons:
     - Browse
     - Examine
     - Cancel
 - Affordability:
     - Actions the player cannot afford are greyed out and unclickable
-    - Browse is greyed out (disabled appearance) once the item is already at level 1 or higher
-    - Examine can still be selected on a level 1 item (upgrade path, costs 2 stamina)
-    - Applying an action that would not raise the level has no effect and should not be selectable
+    - Browse is only available at level 1 (untouched); disabled at level 0 (veiled) and level 2+
+    - Examine is available at level 1 or 2; costs 2 SP when upgrading from level 2
+    - Level 0 (veiled) locks all inspection actions
 - Popup dismissal:
     - ESC key
     - Cancel button
@@ -44,23 +44,74 @@ The player interacts with items in the warehouse scene using limited stamina.
 
 ### Item Display (per item in scene)
 - Sprite representing the item
+- Name label:
+    - Veiled: shows `resolved_veiled_type.display_label`
+    - Unveiled: shows `item_data.item_name`
 - Estimated price range label:
-    - Level 0: `?`
-    - Level 1: range calculated from true_value (see ClueEvaluator)
-    - Level 2: narrower range calculated from true_value (see ClueEvaluator)
-- Inspection level indicator: shows current level (0 / 1 / 2)
-- On level change: small tween animation on the level indicator (e.g. scale pop or color flash)
+    - Level 0 (veiled): `?`
+    - Level 1 (untouched): range calculated from true_value (see ClueEvaluator)
+    - Level 2 (browsed): range calculated from true_value (see ClueEvaluator)
+    - Level 3 (examined): narrower range calculated from true_value (see ClueEvaluator)
+- Inspection level indicator: shows current level label (see Block 02a)
+- On level change: small tween animation on the level indicator (color flash)
 
 ### Valuation Range (ClueEvaluator)
 - Calculated at display time, not stored
-- Level 0: `?`
-- Level 1 (browse): `[true_value × 0.4, true_value × 2.0]`
-- Level 2 (examine): `[true_value × 0.8, true_value × 1.3]`
+- Accepts `ItemEntry`; returns `"?"` if veiled or level out of range
+- Level 0 (veiled): `?`
+- Level 1 (untouched): `[true_value × 0.4, true_value × 2.0]`
+- Level 2 (browsed): `[true_value × 0.6, true_value × 1.5]`
+- Level 3 (examined): `[true_value × 0.8, true_value × 1.3]`
 - Knowledge level fixed at 0 — KnowledgeManager autoload must exist but always returns 0
+
 
 ### Scene
 - 4 items placed statically in the scene
 - No testbed required — integrate directly into warehouse scene
+
+---
+
+## Block 02a — Action Rules & Display (`InspectionRules`, `ActionPopup`)
+
+Centralised policy for all inspection-related actions. Stateless; all methods are static.
+
+### Level Semantics
+
+| Level | Label         | Context              |
+|-------|---------------|----------------------|
+| 0     | Veiled        | Identity hidden      |
+| 1     | Untouched     | Known, uninspected   |
+| 2     | Browsed       | Surface look         |
+| 3     | Examined      | Close  inspection    |
+| 4     | Researched    | Cleanup only         |
+| 5     | Authenticated | Cleanup only         |
+
+### Stamina Costs
+
+| Action       | Cost                                  |
+|--------------|---------------------------------------|
+| Browse       | 1 SP                                  |
+| Examine      | 3 SP (from level 1), 2 SP (from level 2) |
+
+### Eligibility (warehouse)
+
+| Action  | Allowed when                          |
+|---------|---------------------------------------|
+| Browse  | `level == 1` and stamina ≥ 1          |
+| Examine | `level >= 1 and level < 3` and stamina ≥ cost |
+
+### Eligibility (cleanup only)
+
+| Action       | Allowed when    |
+|--------------|-----------------|
+| Unveil       | `level == 0`    |
+| Research     | `level == 3`    |
+| Authenticate | `level == 4`    |
+
+### ActionPopup
+- Buttons reflect eligibility computed by `InspectionRules`
+- Examine button label shows current SP cost dynamically
+- Greyed-out buttons: `modulate.a = 0.45`, disabled
 
 ---
 
@@ -72,17 +123,21 @@ The player interacts with items in the warehouse scene using limited stamina.
 
 ---
 
-## Finished Todolist
+## Done
 
-*(All updates archive)*
+- [x] Centralize inspect action options into `InspectionRules` (`game/_shared/inspection_rules.gd`)
+- [x] `ActionPopup` delegates all cost and eligibility checks to `InspectionRules`
+- [x] `inspection_scene.gd` removes local cost constants; uses `InspectionRules.browse_cost()` and `InspectionRules.examine_cost()`
+- [x] Level label centralised in `InspectionRules.level_label()`; `ListReviewPopup` uses it instead of local `_status_text()`
+- [x] Veiled item display: shows `resolved_veiled_type.display_label` instead of item name when `is_veiled() == true`
+- [x] `ItemDisplay` refactored to accept `ItemEntry` instead of `(ItemData, int)`
+- [x] `ClueEvaluator.get_price_range_label()` refactored to accept `ItemEntry` instead of `(ItemData, int)`
+- [x] `ItemDisplay.set_level()` renamed to `refresh_display()`; `entry.inspection_level` write responsibility moved to caller
 
-## Itch Demo Todolist
+## Soon
 
-- [ ] Veiled item display: show `resolved_veiled_type.display_label` instead of item name and category when `is_veiled = true`
-- [ ] Disable all inspect actions when `is_veiled = true`
-- [ ] Lift veil: veil is lifted on first inspect action (Browse or Examine) — no dedicated unveil action in warehouse; the `unveil` action exists in the action popup but is disabled in warehouse context, available in cleanup and non-warehouse locations
-- [ ] Centralize control inspect action options
-- [ ] Generalize and parameter for fit Cleanup phase (see Block 04b)
+- [ ] Veil lifted on first inspect action (Browse or Examine) — no dedicated unveil in warehouse; action is disabled in warehouse context, available in cleanup only
+- [ ] Generalize and parameterize for Cleanup phase (see Block 04b)
 
 ## Post Demo Todolist
 

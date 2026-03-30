@@ -1,7 +1,7 @@
 # inspection_scene.gd
 # Block 02 — Inspection phase; player spends stamina to browse or examine lot items.
 # Reads:  GameManager.item_entries
-# Writes: ItemEntry.inspection_level (on each entry)
+# Writes: ItemEntry.inspection_level (via ItemDisplay.set_level)
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -23,7 +23,7 @@ var _stamina := MAX_STAMINA
 var _active_item: ItemDisplay = null
 var _item_displays: Array[ItemDisplay] = []
 
-# Maps each ItemDisplay to its corresponding ItemEntry for fast level access.
+# Maps each ItemDisplay to its corresponding ItemEntry for popup refresh.
 var _entry_for_display: Dictionary = { }
 
 # ── Timer / tween handles ─────────────────────────────────────────────────────
@@ -123,7 +123,7 @@ func _populate_item_displays() -> void:
         display.custom_minimum_size = ITEM_SIZE
         _items_root.add_child(display)
 
-        display.setup(entry.item_data, entry.inspection_level)
+        display.setup(entry)
         display.clicked.connect(_on_item_clicked)
         _item_displays.append(display)
         _entry_for_display[display] = entry
@@ -149,13 +149,15 @@ func _close_popup() -> void:
 # ══ Stamina ═══════════════════════════════════════════════════════════════════
 
 
+# entry.inspection_level is written by display.set_level; no separate write needed.
 func _spend_stamina(display: ItemDisplay, entry: ItemEntry, target_level: int, cost: int) -> void:
     if _stamina < cost:
         return
 
     _stamina -= cost
     entry.inspection_level = target_level
-    display.set_level(target_level)
+
+    display.refresh_display()
     _stamina_hud.update_stamina(_stamina, MAX_STAMINA)
     _close_popup()
 

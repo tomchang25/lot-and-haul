@@ -16,12 +16,14 @@ const RANGES: Array = [
 ]
 
 
-# Returns a price range label like "$40 – $200" based on the item's true value and the given level.
-static func get_price_range_label(item: ItemData, level: int) -> String:
-    if level < 1 or level >= RANGES.size():
+# Returns a price range label like "$40 – $200" based on the entry's true value and inspection level.
+static func get_price_range_label(entry: ItemEntry) -> String:
+    var level := entry.inspection_level
+    if entry.is_veiled() or level >= RANGES.size():
         return "?"
-    var lo := int(item.true_value * RANGES[level][0])
-    var hi := int(item.true_value * RANGES[level][1])
+
+    var lo := int(entry.item_data.true_value * RANGES[level][0])
+    var hi := int(entry.item_data.true_value * RANGES[level][1])
     return "$%d – $%d" % [lo, hi]
 
 
@@ -38,17 +40,3 @@ static func get_lot_estimate(entries: Array[ItemEntry]) -> Dictionary:
         total_lo += int(entry.item_data.true_value * RANGES[level][0])
         total_hi += int(entry.item_data.true_value * RANGES[level][1])
     return { "lo": total_lo, "hi": total_hi, "has_unknown": has_unknown }
-
-
-# Returns how many clues from item.clues are revealed at the given level.
-# Level 0 → 0, Level 1 → 2, Level 2 → all clues.
-static func get_clues_revealed(item: ItemData, level: int) -> int:
-    match level:
-        1:
-            return 1
-        2:
-            return item.clues.size() if item.clues.size() < 2 else 2
-        3:
-            return item.clues.size()
-        _:
-            return 0
