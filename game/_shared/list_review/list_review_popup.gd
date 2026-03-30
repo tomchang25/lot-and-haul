@@ -25,38 +25,19 @@ func populate() -> void:
     for child in _item_list.get_children():
         child.queue_free()
 
-    var total_lo := 0
-    var total_hi := 0
-    var has_unknown := false
     var true_value_sum := 0
 
-    for item: ItemData in GameManager.current_lot:
-        true_value_sum += item.true_value
+    for entry: ItemEntry in GameManager.item_entries:
+        true_value_sum += entry.item_data.true_value
+        _item_list.add_child(_make_row(entry.item_data, entry.inspection_level))
 
-        var result: Dictionary = GameManager.inspection_results.get(
-            item,
-            { &"level": 0, &"clues_revealed": 0 },
-        )
-        var level: int = result[&"level"]
-
-        _item_list.add_child(_make_row(item, level))
-
-        match level:
-            1:
-                total_lo += int(item.true_value * 0.4)
-                total_hi += int(item.true_value * 2.0)
-            2:
-                total_lo += int(item.true_value * 0.8)
-                total_hi += int(item.true_value * 1.3)
-            _:
-                has_unknown = true
-
-    if has_unknown and total_lo == 0 and total_hi == 0:
+    var estimate := ClueEvaluator.get_lot_estimate(GameManager.item_entries)
+    if estimate.has_unknown and estimate.lo == 0 and estimate.hi == 0:
         _total_label.text = "Total Estimate:   ?"
-    elif has_unknown:
-        _total_label.text = "Total Estimate:   $%d – $%d +" % [total_lo, total_hi]
+    elif estimate.has_unknown:
+        _total_label.text = "Total Estimate:   $%d – $%d +" % [estimate.lo, estimate.hi]
     else:
-        _total_label.text = "Total Estimate:   $%d – $%d" % [total_lo, total_hi]
+        _total_label.text = "Total Estimate:   $%d – $%d" % [estimate.lo, estimate.hi]
 
     var opening_bid := int(true_value_sum * _OPENING_BID_FACTOR)
     _opening_bid_label.text = "Opening Bid:   $%d" % opening_bid

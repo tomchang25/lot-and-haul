@@ -10,7 +10,7 @@ extends Control
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _cargo_items: Array[ItemData] = []
+var _cargo_items: Array[ItemEntry] = []
 var _paid_price: int = 0
 var _reveal_index: int = 0
 var _rows: Array[AppraisalItemRow] = []
@@ -58,7 +58,7 @@ func _on_reveal_pressed() -> void:
 
 
 func _on_continue_pressed() -> void:
-    GameManager.restart_run()
+    GameManager.go_to_warehouse_entry()
 
 # ══ Reveal sequence ════════════════════════════════════════════════════════════
 
@@ -74,18 +74,18 @@ func _populate_rows() -> void:
         _row_container.add_child(empty_lbl)
         return
 
-    for item: ItemData in _cargo_items:
+    for entry: ItemEntry in _cargo_items:
         _row_container.add_child(HSeparator.new())
         var row: AppraisalItemRow = _row_scene.instantiate()
         _row_container.add_child(row)
-        row.setup(item)
+        row.setup(entry)
         _rows.append(row)
 
 
 func _commit_result() -> void:
     var sell_value: int = 0
-    for item: ItemData in _cargo_items:
-        sell_value += item.true_value
+    for entry: ItemEntry in _cargo_items:
+        sell_value += entry.item_data.true_value
     GameManager.run_result = {
         &"sell_value": sell_value,
         &"paid_price": _paid_price,

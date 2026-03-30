@@ -5,10 +5,10 @@
 class_name CargoItemRow
 extends PanelContainer
 
-signal toggled(pressed: bool, item: ItemData)
+signal toggled(pressed: bool, entry: ItemEntry)
 
 # ── State ─────────────────────────────────────────────────────────────────────
-var item_data: ItemData = null
+var entry: ItemEntry = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 @onready var _toggle: CheckButton = $HBox/ToggleContainer/Toggle
@@ -32,16 +32,17 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _on_toggle_changed(pressed: bool) -> void:
-    toggled.emit(pressed, item_data)
+    toggled.emit(pressed, entry)
 
 # ══ Common API ════════════════════════════════════════════════════════════════
 
 
-# Bind item data and populate all labels. Call once after add_child().
-func setup(item: ItemData, inspection_level: int) -> void:
-    item_data = item
+# Bind entry and populate all labels. Call once after add_child().
+func setup(p_entry: ItemEntry) -> void:
+    entry = p_entry
+    var item: ItemData = entry.item_data
     _name_label.text = item.item_name
-    _price_label.text = ClueEvaluator.get_price_range_label(item, inspection_level)
+    _price_label.text = ClueEvaluator.get_price_range_label(item, entry.inspection_level)
     _weight_label.text = "%.1f kg" % item.weight
     _size_label.text = "%d" % item.grid_size
     _toggle.toggled.connect(_on_toggle_changed)

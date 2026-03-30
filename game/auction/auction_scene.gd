@@ -1,7 +1,7 @@
 # auction_scene.gd
 # Block 04 — The player watches a live bidding sequence and decides when to drop out.
-# Reads:  GameManager.current_lot
-# Writes: GameManager.lot_result { "paid_price": int, "won_items": Array[ItemData] }
+# Reads:  GameManager.item_entries
+# Writes: GameManager.lot_result { "paid_price": int, "won_items": Array[ItemEntry] }
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -165,7 +165,7 @@ func _on_pass_pressed() -> void:
 
     GameManager.lot_result = {
         &"paid_price": 0,
-        &"won_items": [],
+        &"won_items": [] as Array[ItemEntry],
     }
     GameManager.go_to_appraisal()
 
@@ -174,60 +174,36 @@ func _on_pass_pressed() -> void:
 
 func _init_auction() -> void:
     var true_value_sum := 0
-    var total_lo := 0
-    var total_hi := 0
-    var has_unknown := false
-
-    # 1. Calculate true value for hidden logic and sum up estimates
-    for item: ItemData in GameManager.current_lot:
+    # Calculate true value for hidden logic and sum up estimates
+    for entry: ItemEntry in GameManager.item_entries:
+        var item: ItemData = entry.item_data
         true_value_sum += item.true_value
 
-        # Get inspection level for this item
-        var result: Dictionary = GameManager.inspection_results.get(
-            item,
-            { &"level": 0, &"clues_revealed": 0 },
-        )
-        var level: int = result[&"level"]
-
-        # Aggregate total range based on inspection levels
-        match level:
-            1:
-                total_lo += int(item.true_value * 0.4)
-                total_hi += int(item.true_value * 2.0)
-            2:
-                total_lo += int(item.true_value * 0.8)
-                total_hi += int(item.true_value * 1.3)
-            _:
-                has_unknown = true
-
-        # Create individual item label with its price range
-        var est_price_text = ClueEvaluator.get_price_range_label(item, level)
         var lbl := Label.new()
-        lbl.text = "%s (%s)" % [item.item_name, est_price_text]
+        lbl.text = "%s (%s)" % [item.item_name, ClueEvaluator.get_price_range_label(item, entry.inspection_level)]
         lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         lbl.add_theme_font_size_override(&"font_size", 15)
         _lot_summary.add_child(lbl)
 
-    # 2. Add a separator and Total Estimate label at the bottom of the list
-    var separator := HSeparator.new()
-    _lot_summary.add_child(separator)
+    _lot_summary.add_child(HSeparator.new())
 
+    var estimate := ClueEvaluator.get_lot_estimate(GameManager.item_entries)
     var total_lbl := Label.new()
     total_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     total_lbl.add_theme_font_size_override(&"font_size", 16)
-    total_lbl.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18)) # Golden color
+    total_lbl.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
 
     # Format the total text (consistent with ListReviewPopup logic)
-    if has_unknown and total_lo == 0 and total_hi == 0:
+    if estimate.has_unknown and estimate.lo == 0 and estimate.hi == 0:
         total_lbl.text = "Total Est: ?"
-    elif has_unknown:
-        total_lbl.text = "Total Est: $%d – $%d +" % [total_lo, total_hi]
+    elif estimate.has_unknown:
+        total_lbl.text = "Total Est: $%d – $%d +" % [estimate.lo, estimate.hi]
     else:
-        total_lbl.text = "Total Est: $%d – $%d" % [total_lo, total_hi]
+        total_lbl.text = "Total Est: $%d – $%d" % [estimate.lo, estimate.hi]
 
     _lot_summary.add_child(total_lbl)
 
-    # 3. Setup core auction price logic
+    # Setup core auction price logic
     _rolled_price = roundi(true_value_sum * randf_range(0.6, 1.2))
     var opening_bid := roundi(true_value_sum * OPENING_BID_FACTOR)
     _current_display_price = opening_bid
@@ -275,7 +251,7 @@ func _start_circle(from_fill: float) -> void:
     _circle_node.set_fill(from_fill)
 
     # Re-roll closing interval each cycle.
-    var closing_interval := randf_range(5.0, 8.0)
+    var closing_interval := randf_range(3.0, 5.0)
     var remaining := 1.0 - from_fill
     var duration := closing_interval * remaining
 
@@ -300,15 +276,16 @@ func _resolve() -> void:
     _pass_button.disabled = true
 
     if _last_bidder == "player":
+        var won: Array[ItemEntry] = GameManager.item_entries.duplicate()
         GameManager.lot_result = {
             &"paid_price": _current_display_price,
-            &"won_items": GameManager.current_lot.duplicate(),
+            &"won_items": won,
         }
         GameManager.go_to_cargo()
     else:
         GameManager.lot_result = {
             &"paid_price": 0,
-            &"won_items": [],
+            &"won_items": [] as Array[ItemEntry],
         }
         GameManager.go_to_appraisal()
 

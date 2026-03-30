@@ -6,8 +6,8 @@ signal examine_requested
 signal cancelled
 
 const _BROWSE_COST := 1
-const _EXAMINE_COST_FROM_0 := 3
-const _EXAMINE_COST_FROM_1 := 2
+const _EXAMINE_COST_FROM_1 := 3
+const _EXAMINE_COST_FROM_2 := 2
 
 @onready var _browse_btn: Button = $VBox/BrowseButton
 @onready var _examine_btn: Button = $VBox/ExamineButton
@@ -21,14 +21,14 @@ func _ready() -> void:
 
 # Update button enabled/greyed state based on current item level and stamina.
 func refresh(item_level: int, stamina: int) -> void:
-    # Browse: disabled when item is already level 1+ or player can't afford
-    var browse_ok := item_level < 1 and stamina >= _BROWSE_COST
+    # Browse: disabled when item is already level 2+ or player can't afford
+    var browse_ok := item_level < 2 and stamina >= _BROWSE_COST
     _browse_btn.disabled = not browse_ok
     _browse_btn.modulate.a = 1.0 if browse_ok else 0.45
 
-    # Examine: upgrade from level 1 costs 2 SP; from level 0 costs 3 SP
-    var examine_cost := _EXAMINE_COST_FROM_1 if item_level == 1 else _EXAMINE_COST_FROM_0
-    var examine_ok := item_level < 2 and stamina >= examine_cost
+    # Examine: upgrade from level 2 costs 2 SP; from level 1 costs 3 SP
+    var examine_cost := _EXAMINE_COST_FROM_2 if item_level == 2 else _EXAMINE_COST_FROM_1
+    var examine_ok := item_level < 3 and stamina >= examine_cost
     _examine_btn.disabled = not examine_ok
     _examine_btn.modulate.a = 1.0 if examine_ok else 0.45
     _examine_btn.text = "Examine (%d SP)" % examine_cost

@@ -1,6 +1,6 @@
 # cargo_scene.gd
 # Block 05 — Cargo Loading
-# Reads:  GameManager.lot_result.won_items, GameManager.inspection_results
+# Reads:  GameManager.lot_result.won_items
 # Writes: GameManager.cargo_items
 extends Control
 
@@ -11,11 +11,11 @@ const MAX_WEIGHT := 20.0
 const CargoItemRowScene := preload("uid://cargoitemrow1")
 
 # ── State ─────────────────────────────────────────────────────────────────────
-var _won_items: Array[ItemData] = []
-var _selected: Dictionary = { } # ItemData → bool
+var _won_items: Array[ItemEntry] = []
+var _selected: Dictionary = { } # ItemEntry → bool
 var _slots_used: int = 0
 var _weight_used: float = 0.0
-var _rows: Dictionary = { } # ItemData → CargoItemRow
+var _rows: Dictionary = { } # ItemEntry → CargoItemRow
 
 # ── Node references ───────────────────────────────────────────────────────────
 @onready var _slots_label: Label = $RootVBox/Header/SlotsLabel
@@ -28,9 +28,9 @@ var _rows: Dictionary = { } # ItemData → CargoItemRow
 
 func _ready() -> void:
     _load_up_button.pressed.connect(_on_load_up_pressed)
-    _won_items = GameManager.lot_result.get(&"won_items", [])
-    for item: ItemData in _won_items:
-        _selected[item] = false
+    _won_items = GameManager.lot_result.get(&"won_items", [] as Array[ItemEntry])
+    for entry: ItemEntry in _won_items:
+        _selected[entry] = false
     _populate_rows()
     _recalc_totals()
     _refresh_ui()
@@ -38,17 +38,17 @@ func _ready() -> void:
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
-func _on_item_toggled(pressed: bool, item: ItemData) -> void:
-    _selected[item] = pressed
+func _on_item_toggled(pressed: bool, entry: ItemEntry) -> void:
+    _selected[entry] = pressed
     _recalc_totals()
     _refresh_ui()
 
 
 func _on_load_up_pressed() -> void:
-    var cargo: Array[ItemData] = []
-    for item: ItemData in _won_items:
-        if _selected.get(item, false):
-            cargo.append(item)
+    var cargo: Array[ItemEntry] = []
+    for entry: ItemEntry in _won_items:
+        if _selected.get(entry, false):
+            cargo.append(entry)
     GameManager.cargo_items = cargo
     GameManager.go_to_appraisal()
 
@@ -58,10 +58,10 @@ func _on_load_up_pressed() -> void:
 func _recalc_totals() -> void:
     _slots_used = 0
     _weight_used = 0.0
-    for item: ItemData in _won_items:
-        if _selected.get(item, false):
-            _slots_used += item.grid_size
-            _weight_used += item.weight
+    for entry: ItemEntry in _won_items:
+        if _selected.get(entry, false):
+            _slots_used += entry.item_data.grid_size
+            _weight_used += entry.item_data.weight
 
 
 func _refresh_ui() -> void:
@@ -71,15 +71,15 @@ func _refresh_ui() -> void:
     var remaining_slots: int = MAX_SLOTS - _slots_used
     var remaining_weight: float = MAX_WEIGHT - _weight_used
 
-    for item: ItemData in _won_items:
-        var row: CargoItemRow = _rows[item]
-        if _selected.get(item, false):
+    for entry: ItemEntry in _won_items:
+        var row: CargoItemRow = _rows[entry]
+        if _selected.get(entry, false):
             # Selected items can always be toggled off.
             row.set_toggle_disabled(false)
         else:
             # Disable if loading this item would exceed either limit.
-            var over_slots: bool = item.grid_size > remaining_slots
-            var over_weight: bool = item.weight > remaining_weight
+            var over_slots: bool = entry.item_data.grid_size > remaining_slots
+            var over_weight: bool = entry.item_data.weight > remaining_weight
             row.set_toggle_disabled(over_slots or over_weight)
 
 # ══ Row population ═════════════════════════════════════════════════════════════
@@ -96,15 +96,9 @@ func _populate_rows() -> void:
         _row_container.add_child(empty_lbl)
         return
 
-    for item: ItemData in _won_items:
-        var result: Dictionary = GameManager.inspection_results.get(
-            item,
-            { &"level": 0, &"clues_revealed": 0 },
-        )
-        var level: int = result.get(&"level", 0)
-
+    for entry: ItemEntry in _won_items:
         var row: CargoItemRow = CargoItemRowScene.instantiate()
         _row_container.add_child(row)
-        row.setup(item, level)
+        row.setup(entry)
         row.toggled.connect(_on_item_toggled)
-        _rows[item] = row
+        _rows[entry] = row

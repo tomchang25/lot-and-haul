@@ -4,22 +4,40 @@
 class_name ClueEvaluator
 extends RefCounted
 
-# Returns the estimated price-range string to display on an item card.
 # Level 0 → "?"
-# Level 1 → wide range  [×0.4, ×2.0]
-# Level 2 → narrow range [×0.8, ×1.3]
+# Level 1 → wide range    [×0.4, ×2.0]
+# Level 2 → medium range  [×0.6, ×1.5]
+# Level 3 → narrow range  [×0.8, ×1.3]
+const RANGES: Array = [
+    [],
+    [0.4, 2.0],
+    [0.6, 1.5],
+    [0.8, 1.3],
+]
+
+
+# Returns a price range label like "$40 – $200" based on the item's true value and the given level.
 static func get_price_range_label(item: ItemData, level: int) -> String:
-    match level:
-        1:
-            var lo := int(item.true_value * 0.4)
-            var hi := int(item.true_value * 2.0)
-            return "$%d – $%d" % [lo, hi]
-        2:
-            var lo := int(item.true_value * 0.8)
-            var hi := int(item.true_value * 1.3)
-            return "$%d – $%d" % [lo, hi]
-        _:
-            return "?"
+    if level < 1 or level >= RANGES.size():
+        return "?"
+    var lo := int(item.true_value * RANGES[level][0])
+    var hi := int(item.true_value * RANGES[level][1])
+    return "$%d – $%d" % [lo, hi]
+
+
+# Returns lo/hi sum across all entries, plus whether any entry is unidentified.
+static func get_lot_estimate(entries: Array[ItemEntry]) -> Dictionary:
+    var total_lo := 0
+    var total_hi := 0
+    var has_unknown := false
+    for entry: ItemEntry in entries:
+        var level := entry.inspection_level
+        if level < 1 or level >= RANGES.size():
+            has_unknown = true
+            continue
+        total_lo += int(entry.item_data.true_value * RANGES[level][0])
+        total_hi += int(entry.item_data.true_value * RANGES[level][1])
+    return { "lo": total_lo, "hi": total_hi, "has_unknown": has_unknown }
 
 
 # Returns how many clues from item.clues are revealed at the given level.
@@ -27,8 +45,10 @@ static func get_price_range_label(item: ItemData, level: int) -> String:
 static func get_clues_revealed(item: ItemData, level: int) -> int:
     match level:
         1:
-            return 2
+            return 1
         2:
+            return item.clues.size() if item.clues.size() < 2 else 2
+        3:
             return item.clues.size()
         _:
             return 0
