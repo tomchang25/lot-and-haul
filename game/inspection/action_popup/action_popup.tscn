@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bactpoptscn01"]
 
-[ext_resource type="Script" uid="uid://bhb5838knlltx" path="res://game/_shared/action_popup/action_popup.gd" id="1_actpop"]
+[ext_resource type="Script" uid="uid://bhb5838knlltx" path="res://game/inspection/action_popup/action_popup.gd" id="1_actpop"]
 
 [node name="ActionPopup" type="PanelContainer" unique_id=77789669]
 custom_minimum_size = Vector2(170, 0)

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dbc6waemph2em"]
 
-[ext_resource type="Script" uid="uid://hjl5qq820j5" path="res://game/_shared/list_review/list_review_popup.gd" id="1_lstrv"]
+[ext_resource type="Script" uid="uid://hjl5qq820j5" path="res://game/inspection/list_review/list_review_popup.gd" id="1_lstrv"]
 
 [node name="ListReviewPopup" type="Control" unique_id=796787196]
 layout_mode = 3
