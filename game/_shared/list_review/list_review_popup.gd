@@ -30,15 +30,11 @@ func populate() -> void:
     var has_unknown := false
     var true_value_sum := 0
 
-    for item: ItemData in GameManager.current_lot:
+    for entry: ItemEntry in GameManager.item_entries:
+        var item: ItemData = entry.item_data
+        var level: int = entry.inspection_level
+
         true_value_sum += item.true_value
-
-        var result: Dictionary = GameManager.inspection_results.get(
-            item,
-            { &"level": 0, &"clues_revealed": 0 },
-        )
-        var level: int = result[&"level"]
-
         _item_list.add_child(_make_row(item, level))
 
         match level:

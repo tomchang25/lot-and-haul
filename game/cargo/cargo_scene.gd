@@ -1,6 +1,6 @@
 # cargo_scene.gd
 # Block 05 — Cargo Loading
-# Reads:  GameManager.lot_result.won_items, GameManager.inspection_results
+# Reads:  GameManager.lot_result.won_items, GameManager.item_entries (for inspection levels)
 # Writes: GameManager.cargo_items
 extends Control
 
@@ -97,11 +97,8 @@ func _populate_rows() -> void:
         return
 
     for item: ItemData in _won_items:
-        var result: Dictionary = GameManager.inspection_results.get(
-            item,
-            { &"level": 0, &"clues_revealed": 0 },
-        )
-        var level: int = result.get(&"level", 0)
+        var entry: ItemEntry = GameManager.get_entry_for(item)
+        var level: int = entry.inspection_level if entry else 0
 
         var row: CargoItemRow = CargoItemRowScene.instantiate()
         _row_container.add_child(row)

@@ -58,7 +58,7 @@ func _on_reveal_pressed() -> void:
 
 
 func _on_continue_pressed() -> void:
-    GameManager.restart_run()
+    GameManager.go_to_warehouse_entry()
 
 # ══ Reveal sequence ════════════════════════════════════════════════════════════
 

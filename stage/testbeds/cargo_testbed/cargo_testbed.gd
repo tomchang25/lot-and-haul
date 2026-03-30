@@ -16,7 +16,7 @@ const CargoScene := preload("res://game/cargo/cargo_scene.tscn")
 @export var won_items: Array[ItemData] = []
 
 # Inspection level per item, matched by index.
-# 0 = uninspected, 1 = browsed, 2 = examined.
+# 0 = untouched, 1 = browsed, 2 = examined.
 # If shorter than won_items, remaining items default to 0.
 @export var inspection_levels: Array[int] = []
 
@@ -34,19 +34,13 @@ func _ready() -> void:
 
 
 func _inject_fake_state() -> void:
-    # Populate current_lot so cargo_scene can reference item identity.
-    GameManager.current_lot.clear()
-    for item in won_items:
-        GameManager.current_lot.append(item)
-
-    # Build inspection_results from the configured levels.
-    GameManager.inspection_results.clear()
-    for i in won_items.size():
-        var level: int = inspection_levels[i] if i < inspection_levels.size() else 0
-        GameManager.inspection_results[won_items[i]] = {
-            &"level": level,
-            &"clues_revealed": ClueEvaluator.get_clues_revealed(won_items[i], level),
-        }
+    # Build item_entries from the configured items and inspection levels.
+    GameManager.item_entries.clear()
+    for i: int in won_items.size():
+        var entry := ItemEntry.new()
+        entry.item_data = won_items[i]
+        entry.inspection_level = inspection_levels[i] if i < inspection_levels.size() else 0
+        GameManager.item_entries.append(entry)
 
     # Simulate a won auction result.
     GameManager.lot_result = {

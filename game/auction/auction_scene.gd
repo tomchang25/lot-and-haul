@@ -1,6 +1,6 @@
 # auction_scene.gd
 # Block 04 — The player watches a live bidding sequence and decides when to drop out.
-# Reads:  GameManager.current_lot
+# Reads:  GameManager.item_entries
 # Writes: GameManager.lot_result { "paid_price": int, "won_items": Array[ItemData] }
 extends Control
 
@@ -179,15 +179,11 @@ func _init_auction() -> void:
     var has_unknown := false
 
     # 1. Calculate true value for hidden logic and sum up estimates
-    for item: ItemData in GameManager.current_lot:
-        true_value_sum += item.true_value
+    for entry: ItemEntry in GameManager.item_entries:
+        var item: ItemData = entry.item_data
+        var level: int = entry.inspection_level
 
-        # Get inspection level for this item
-        var result: Dictionary = GameManager.inspection_results.get(
-            item,
-            { &"level": 0, &"clues_revealed": 0 },
-        )
-        var level: int = result[&"level"]
+        true_value_sum += item.true_value
 
         # Aggregate total range based on inspection levels
         match level:
@@ -300,9 +296,12 @@ func _resolve() -> void:
     _pass_button.disabled = true
 
     if _last_bidder == "player":
+        var all_items: Array[ItemData] = []
+        for entry: ItemEntry in GameManager.item_entries:
+            all_items.append(entry.item_data)
         GameManager.lot_result = {
             &"paid_price": _current_display_price,
-            &"won_items": GameManager.current_lot.duplicate(),
+            &"won_items": all_items,
         }
         GameManager.go_to_cargo()
     else:

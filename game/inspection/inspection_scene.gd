@@ -1,7 +1,7 @@
 # inspection_scene.gd
 # Block 02 — Inspection phase; player spends stamina to browse or examine lot items.
-# Reads:  GameManager.current_lot, GameManager.inspection_results
-# Writes: GameManager.inspection_results
+# Reads:  GameManager.item_entries
+# Writes: ItemEntry.inspection_level (on each entry)
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -24,6 +24,9 @@ const ItemDisplayScene := preload("uid://bitemdtscn001")
 var _stamina := MAX_STAMINA
 var _active_item: ItemDisplay = null
 var _item_displays: Array[ItemDisplay] = []
+
+# Maps each ItemDisplay to its corresponding ItemEntry for fast level access.
+var _entry_for_display: Dictionary = {}
 
 # ── Timer / tween handles ─────────────────────────────────────────────────────
 
@@ -80,22 +83,22 @@ func _on_popup_cancelled() -> void:
 func _on_browse() -> void:
     if _active_item == null:
         return
-    var result := _get_result(_active_item.item_data)
-    if result[&"level"] >= 1:
+    var entry: ItemEntry = _entry_for_display[_active_item]
+    if entry.inspection_level >= 1:
         _close_popup()
         return
-    _spend_stamina(_active_item, 1, BROWSE_COST)
+    _spend_stamina(_active_item, entry, 1, BROWSE_COST)
 
 
 func _on_examine() -> void:
     if _active_item == null:
         return
-    var result := _get_result(_active_item.item_data)
-    if result[&"level"] >= 2:
+    var entry: ItemEntry = _entry_for_display[_active_item]
+    if entry.inspection_level >= 2:
         _close_popup()
         return
-    var cost := 2 if result[&"level"] == 1 else EXAMINE_COST_BASE
-    _spend_stamina(_active_item, 2, cost)
+    var cost := 2 if entry.inspection_level == 1 else EXAMINE_COST_BASE
+    _spend_stamina(_active_item, entry, 2, cost)
 
 
 func _on_start_auction_pressed() -> void:
@@ -115,8 +118,8 @@ func _on_auction_entered() -> void:
 
 
 func _populate_item_displays() -> void:
-    for i in GameManager.current_lot.size():
-        var item: ItemData = GameManager.current_lot[i]
+    for i: int in GameManager.item_entries.size():
+        var entry: ItemEntry = GameManager.item_entries[i]
 
         var display: ItemDisplay = ItemDisplayScene.instantiate()
         var col := i % ITEM_COLS
@@ -129,18 +132,18 @@ func _populate_item_displays() -> void:
         display.custom_minimum_size = ITEM_SIZE
         _items_root.add_child(display)
 
-        var result := _get_result(item)
-        display.setup(item, result[&"level"])
+        display.setup(entry.item_data, entry.inspection_level)
         display.clicked.connect(_on_item_clicked)
         _item_displays.append(display)
+        _entry_for_display[display] = entry
 
 # ══ Popup ═════════════════════════════════════════════════════════════════════
 
 
 func _open_popup(display: ItemDisplay) -> void:
     _active_item = display
-    var result := _get_result(display.item_data)
-    _action_popup.refresh(result[&"level"], _stamina)
+    var entry: ItemEntry = _entry_for_display[display]
+    _action_popup.refresh(entry.inspection_level, _stamina)
 
     # Position popup directly below the item card
     var rect := display.get_global_rect()
@@ -155,17 +158,12 @@ func _close_popup() -> void:
 # ══ Stamina ═══════════════════════════════════════════════════════════════════
 
 
-func _spend_stamina(display: ItemDisplay, target_level: int, cost: int) -> void:
+func _spend_stamina(display: ItemDisplay, entry: ItemEntry, target_level: int, cost: int) -> void:
     if _stamina < cost:
         return
 
     _stamina -= cost
-
-    var item := display.item_data
-    GameManager.inspection_results[item] = {
-        &"level": target_level,
-        &"clues_revealed": ClueEvaluator.get_clues_revealed(item, target_level),
-    }
+    entry.inspection_level = target_level
     display.set_level(target_level)
     _stamina_hud.update_stamina(_stamina, MAX_STAMINA)
     _close_popup()
@@ -192,9 +190,3 @@ func _begin_exit_pulse() -> void:
         Color.WHITE,
         0.5,
     ).set_ease(Tween.EASE_IN_OUT)
-
-# ══ Inspection logic ══════════════════════════════════════════════════════════
-
-
-func _get_result(item: ItemData) -> Dictionary:
-    return GameManager.inspection_results.get(item, { &"level": 0, &"clues_revealed": 0 })

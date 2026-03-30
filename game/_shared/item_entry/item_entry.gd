@@ -6,11 +6,13 @@ extends RefCounted
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var item_data: ItemData = null
+
+# Whether the item is wrapped in an opaque veil. MVP: always false.
+var is_veiled: bool = false
+
+# The veiled type shown when is_veiled is true. MVP: always null.
 var resolved_veiled_type: VeiledType = null
-var inspection_level: int = 0 # 0 veiled / 1 untouched / 2 browsed / 3 examined / 4 researched / 5 authenticated
 
-# ══ Computed properties ═══════════════════════════════════════════════════════
-
-
-func is_veiled() -> bool:
-    return inspection_level == 0
+# How far the player has investigated this item.
+# 0 = untouched / 1 = browsed / 2 = examined / 3 = researched / 4 = authenticated
+var inspection_level: int = 0
