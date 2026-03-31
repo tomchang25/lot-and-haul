@@ -1,12 +1,14 @@
 # auction_scene.gd
 # Block 04 — The player watches a live bidding sequence and decides when to drop out.
-# Reads:  GameManager.item_entries
+# Reads:  GameManager.item_entries, GameManager.lot_data
 # Writes: GameManager.lot_result { "paid_price": int, "won_items": Array[ItemEntry] }
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-const OPENING_BID_FACTOR := 0.25
+const OPENING_BID_MIN_FACTOR := 0.05
+const OPENING_BID_MAX_FACTOR := 0.10
+
 const NPC_NAMES: Array[String] = [
     "Bidder 2",
     "Bidder 3",
@@ -16,7 +18,11 @@ const NPC_NAMES: Array[String] = [
 ]
 const POPUP_HOLD_SEC := 0.8
 const PRICE_TWEEN_SEC := 0.3
-const COSMETIC_BUMP := 100
+
+# Step size as a fraction of the current display price.
+const STEP_RATIO := 0.075
+# Minimum step in currency units — applies to both NPC steps and player bump.
+const MIN_STEP := 100
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
@@ -45,6 +51,10 @@ var _price_tween: Tween = null
 @onready var _npc_history_list: VBoxContainer = $RootVBox/Centre/Content/PriceArea/NpcHistoryList
 @onready var _bid_button: Button = $RootVBox/ButtonBar/BidButton
 @onready var _pass_button: Button = $RootVBox/ButtonBar/PassButton
+
+# ── Debug ─────────────────────────────────────────────────────────────────────
+
+var _debug_label: Label = null
 
 # ══ Inner class: circle progress arc ══════════════════════════════════════════
 
@@ -101,13 +111,23 @@ func _on_npc_tick() -> void:
     var progress := float(_current_display_price) / float(_rolled_price)
     var step_multiplier := 1.0
 
-    # If below 75% threshold, make the price jumps larger (e.g., 2.5x bigger)
-    if progress < 0.75:
+    if progress < 0.5:
+        # High boost for early progress
+        step_multiplier = 2.0
+    elif progress < 0.75:
+        # Moderate boost
         step_multiplier = 1.5
+    elif progress < 0.9:
+        # Slight boost as it nears completion
+        step_multiplier = 1.2
+    else:
+        # Default or final stage (progress >= 0.9)
+        step_multiplier = 1.0
 
-    # Increment price by a random step scaled by the multiplier
-    var base_step := maxi(roundi(randf_range(0.04, 0.09) * _rolled_price), 100)
-    var step := roundi(base_step * step_multiplier)
+    if randf() < 0.1:
+        step_multiplier *= 4.0
+
+    var step := maxi(roundi(_current_display_price * STEP_RATIO * step_multiplier), MIN_STEP)
 
     _current_display_price += step
     _last_bidder = "npc"
@@ -147,7 +167,7 @@ func _on_bid_pressed() -> void:
     _bid_button.disabled = true
     _pass_button.disabled = true
 
-    _current_display_price += COSMETIC_BUMP
+    _current_display_price += MIN_STEP
     _tween_price_to(_current_display_price)
 
     _show_player_bid_in_stack(_current_display_price)
@@ -173,14 +193,51 @@ func _on_pass_pressed() -> void:
 
 
 func _init_auction() -> void:
-    var true_value_sum := 0
-    # Calculate true value for hidden logic and sum up estimates
-    for entry: ItemEntry in GameManager.item_entries:
-        var item: ItemData = entry.item_data
-        true_value_sum += item.true_value
+    var lot: LotData = GameManager.lot_data
+    var aggressive_factor := lot.aggressive_factor if lot != null else 0.5
+    var demand_factor := lot.demand_factor if lot != null else 0.5
 
+    # rolled_price = veiled_total + unveiled_total
+    # aggressive_factor (0.0–1.0): veiled → fraction of base_veiled_price
+    #                               unveiled → biases the lerp multiplier via aggressive_lerp_min/max
+    # demand_factor (0.0–1.0): lerp weight between unveiled base_price and total_true_value
+    var untouched_lo: float = ClueEvaluator.RANGES[InspectionRules.Level.UNTOUCHED][0]
+    var aggressive_lerp := lerpf(lot.aggressive_lerp_min, lot.aggressive_lerp_max, aggressive_factor)
+
+    var veiled_total: int = 0
+    var unveiled_base: float = 0.0
+    var unveiled_true: float = 0.0
+
+    for entry: ItemEntry in GameManager.item_entries:
+        if entry.is_veiled():
+            veiled_total += roundi(
+                entry.resolved_veiled_type.base_veiled_price * aggressive_factor,
+            )
+        else:
+            unveiled_base += entry.item_data.true_value * untouched_lo
+            unveiled_true += entry.item_data.true_value
+
+    var unveiled_total := roundi(
+        lerpf(unveiled_base, unveiled_true, demand_factor * aggressive_lerp),
+    )
+    _rolled_price = veiled_total + unveiled_total
+
+    # Opening bid is a fixed fraction of rolled_price; no extra multiplier.
+    var opening_bid := maxi(
+        roundi(_rolled_price * randf_range(OPENING_BID_MIN_FACTOR, OPENING_BID_MAX_FACTOR)),
+        MIN_STEP,
+    )
+    _current_display_price = opening_bid
+    _displayed_price = opening_bid
+    _price_label.text = "$%d" % opening_bid
+
+    # Lot summary — uses centralized display helpers.
+    for entry: ItemEntry in GameManager.item_entries:
         var lbl := Label.new()
-        lbl.text = "%s (%s)" % [item.item_name, ClueEvaluator.get_price_range_label(entry)]
+        lbl.text = "%s (%s)" % [
+            InspectionRules.get_display_name(entry),
+            ClueEvaluator.get_price_range_label(entry),
+        ]
         lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         lbl.add_theme_font_size_override(&"font_size", 15)
         _lot_summary.add_child(lbl)
@@ -193,7 +250,6 @@ func _init_auction() -> void:
     total_lbl.add_theme_font_size_override(&"font_size", 16)
     total_lbl.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
 
-    # Format the total text (consistent with ListReviewPopup logic)
     if estimate.has_unknown and estimate.lo == 0 and estimate.hi == 0:
         total_lbl.text = "Total Est: ?"
     elif estimate.has_unknown:
@@ -203,12 +259,7 @@ func _init_auction() -> void:
 
     _lot_summary.add_child(total_lbl)
 
-    # Setup core auction price logic
-    _rolled_price = roundi(true_value_sum * randf_range(0.6, 1.2))
-    var opening_bid := roundi(true_value_sum * OPENING_BID_FACTOR)
-    _current_display_price = opening_bid
-    _displayed_price = opening_bid
-    _price_label.text = "$%d" % opening_bid
+    _init_debug_overlay(veiled_total, unveiled_total)
 
 # ══ NPC tick ══════════════════════════════════════════════════════════════════
 
@@ -224,13 +275,22 @@ func _start_npc_timer() -> void:
     var progress := float(_current_display_price) / float(_rolled_price)
 
     # Default slow-paced intervals (current logic)
-    var min_time := 1.0
-    var max_time := 3.0
+    var min_time = 0.5
+    var max_time = 1.5
 
-    # If below 75% threshold, significantly speed up the frequency
-    if progress < 0.75:
+    if progress < 0.5:
+        # Rapid frequency for early progress
+        min_time = 0.2
+        max_time = 0.5
+    elif progress < 1.0:
+        # Linear interpolation between 0.5 and 1.0 progress
+        # Smoothly transitions from (0.2, 0.5) to (0.5, 1.5)
+        min_time = remap(progress, 0.5, 1.0, 0.2, 0.5)
+        max_time = remap(progress, 0.5, 1.0, 0.5, 1.5)
+    else:
+        # Default slow pace once completed or at final stage
         min_time = 0.5
-        max_time = 1.0
+        max_time = 1.5
 
     var interval := randf_range(min_time, max_time)
 
@@ -309,7 +369,7 @@ func _show_player_bid_in_stack(price: int) -> void:
     var lbl := Label.new()
     lbl.text = "YOU — $%d" % price
     lbl.add_theme_font_size_override(&"font_size", 14)
-    lbl.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18)) # Golden color
+    lbl.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
     _npc_history_list.add_child(lbl)
 
     var tween := create_tween()
@@ -338,10 +398,45 @@ func _show_npc_popup(price: int) -> void:
     # Animation: Fade in, stay, then fade out and auto-remove
     var tween := create_tween()
     tween.tween_property(new_bid_label, "modulate:a", 1.0, 0.15)
-    tween.tween_interval(3.0) # Keep history visible for longer
+    tween.tween_interval(3.0)
     tween.tween_property(new_bid_label, "modulate:a", 0.0, 0.5)
-    tween.tween_callback(new_bid_label.queue_free) # Remove from memory after fade
+    tween.tween_callback(new_bid_label.queue_free)
 
     # Optional: Limit the number of visible items to avoid clutter
     if _npc_history_list.get_child_count() > 5:
         _npc_history_list.get_child(0).queue_free()
+# ══ Debug overlay ══════════════════════════════════════════════════════════════
+# Visible in debug builds only. Never ship with _rolled_price exposed.
+
+
+func _init_debug_overlay(veiled_total: int, unveiled_total: int) -> void:
+    if not OS.is_debug_build():
+        return
+
+    var total_true_value := 0
+    for entry: ItemEntry in GameManager.item_entries:
+        if not entry.is_veiled():
+            total_true_value += entry.item_data.true_value
+
+    var lot: LotData = GameManager.lot_data
+
+    _debug_label = Label.new()
+    _debug_label.add_theme_font_size_override(&"font_size", 13)
+    _debug_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
+    _debug_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+    _debug_label.offset_bottom = -8.0
+    _debug_label.offset_left = 8.0
+    _debug_label.text = (
+        "[DBG] rolled=$%d  (veiled=$%d  unveiled=$%d)  true=$%d\n"
+        + "      agg=%.2f  demand=%.2f  lerp_range=[%.2f, %.2f]"
+    ) % [
+        _rolled_price,
+        veiled_total,
+        unveiled_total,
+        total_true_value,
+        lot.aggressive_factor if lot != null else 0.5,
+        lot.demand_factor if lot != null else 0.5,
+        lot.aggressive_lerp_min if lot != null else 0.8,
+        lot.aggressive_lerp_max if lot != null else 1.2,
+    ]
+    add_child(_debug_label)

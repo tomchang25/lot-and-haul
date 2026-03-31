@@ -29,9 +29,8 @@ func _ready() -> void:
     _init_run()
     _play_door_animation()
 
+
 # ══ Run initialisation ════════════════════════════════════════════════════════
-
-
 func _init_run() -> void:
     # Clear all previous run state.
     GameManager.item_entries.clear()
@@ -51,8 +50,9 @@ func _init_run() -> void:
         GameManager.item_entries.append(entry)
 
     # Generate lot_data.
-    var ld := LotData.new()
-    ld.aggressive_factor = 1.0 # MVP: fixed
+    var ld := LotData.create()
+    ld.aggressive_factor = randf_range(0.1, 0.9)
+    ld.demand_factor = randf_range(0.1, 0.9)
     GameManager.lot_data = ld
 
 # ══ Door animation ════════════════════════════════════════════════════════════

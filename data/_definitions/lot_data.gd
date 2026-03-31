@@ -6,8 +6,33 @@ extends Resource
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-# Scales NPC bidding aggression in Block 04. MVP: fixed at 1.0.
-@export var aggressive_factor: float = 1.0
+# Controls where NPCs estimate item value on the UNTOUCHED price range. Range: 0.0–1.0. Default: 0.5.
+# 0.0 = NPCs estimate toward range minimum (unveiled) or worthless (veiled).
+# 1.0 = NPCs estimate toward range maximum (unveiled) or full base_veiled_price (veiled).
+# Set per-location; will interact with modification and npc knowledge system post-demo.
+@export var aggressive_factor: float = 0.5
+
+# Bounds for the aggressive_lerp multiplier applied to demand_factor * aggressive_lerp.
+# Narrows or widens NPC estimate variance per location.
+# Easy location example : 0.7–1.05 (rarely overbid, safe for beginners)
+# Hard location example : 0.6–1.40 (player must judge whether the lot is overpriced)
+# Upper bound caps rolled_price growth; 1.4 is the recommended ceiling.
+@export var aggressive_lerp_min: float = 0.8
+@export var aggressive_lerp_max: float = 1.2
+
+# Lerp weight between unveiled base_price and total_true_value. Range: 0.0–1.0. Default: 0.5.
+# Represents irrational or enthusiasm-driven demand (rookies, collectors, hype).
+# Set per-location; will interact with modification system post-demo.
+@export var demand_factor: float = 0.5
 
 # Post Demo only; placeholder field, ignored for now.
-@export var knowledge_factor: float = 1.0
+@export var knowledge_factor: float = 0.5
+
+# ══ Factory ═══════════════════════════════════════════════════════════════════
+
+
+static func create(p_aggressive: float = 0.5, p_demand: float = 0.5) -> LotData:
+    var d := LotData.new()
+    d.aggressive_factor = p_aggressive
+    d.demand_factor = p_demand
+    return d
