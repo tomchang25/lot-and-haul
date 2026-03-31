@@ -6,4 +6,4 @@
 script = ExtResource("1_vtdef")
 type_id = "unknown_ceramics"
 display_label = "Unknown Ceramics"
-base_veiled_price = 350
+base_veiled_price = 1250

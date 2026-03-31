@@ -6,4 +6,4 @@
 script = ExtResource("1_vtdef")
 type_id = "flat_package"
 display_label = "Flat Package"
-base_veiled_price = 250
+base_veiled_price = 1000
