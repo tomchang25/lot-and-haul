@@ -23,9 +23,6 @@ var cargo_items: Array[ItemEntry] = []
 # { "onsite_proceeds": int, "sell_value": int, "paid_price": int, "net": int }
 var run_result: Dictionary = { }
 
-# Written by Block 05 (Cargo Loading). The total amount earned by selling items onsite instead of taking them home.
-var onsite_proceeds: int = 0
-
 # ── Scene transitions ─────────────────────────────────────────────────────────
 
 
@@ -47,3 +44,15 @@ func go_to_cargo() -> void:
 
 func go_to_appraisal() -> void:
     get_tree().change_scene_to_packed(scenes.appraisal)
+
+# ── Run lifecycle ─────────────────────────────────────────────────────────────
+
+
+# Call after run_result is written and the player confirms settlement.
+# Clears all per-run state so the next run starts clean.
+func clear_run_state() -> void:
+    item_entries.clear()
+    lot_data = null
+    lot_result.clear()
+    cargo_items.clear()
+    run_result.clear()

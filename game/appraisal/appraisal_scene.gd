@@ -21,6 +21,7 @@ var _rows: Array[AppraisalItemRow] = []
 @onready var _summary_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/SummaryContainer
 @onready var _sell_value_label: Label = $RootVBox/ListCenter/OuterVBox/SummaryContainer/SellValueLabel
 @onready var _paid_label: Label = $RootVBox/ListCenter/OuterVBox/SummaryContainer/PaidLabel
+@onready var _onsite_label: Label = $RootVBox/ListCenter/OuterVBox/SummaryContainer/OnsiteLabel
 @onready var _net_label: Label = $RootVBox/ListCenter/OuterVBox/SummaryContainer/NetLabel
 @onready var _reveal_btn: Button = $RootVBox/Footer/RevealButton
 @onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
@@ -58,6 +59,7 @@ func _on_reveal_pressed() -> void:
 
 
 func _on_continue_pressed() -> void:
+    GameManager.clear_run_state()
     GameManager.go_to_warehouse_entry()
 
 # ══ Reveal sequence ════════════════════════════════════════════════════════════
@@ -86,20 +88,27 @@ func _commit_result() -> void:
     var sell_value: int = 0
     for entry: ItemEntry in _cargo_items:
         sell_value += entry.item_data.true_value
-    GameManager.run_result = {
-        &"sell_value": sell_value,
-        &"paid_price": _paid_price,
-        &"net": sell_value - _paid_price,
-    }
+    var onsite: int = GameManager.run_result.get(&"onsite_proceeds", 0)
+
+    GameManager.run_result.merge(
+        {
+            &"sell_value": sell_value,
+            &"paid_price": _paid_price,
+            &"net": sell_value + onsite - _paid_price,
+        },
+        true,
+    )
 
 
 func _show_summary() -> void:
     var r: Dictionary = GameManager.run_result
     var sell_value: int = r.get(&"sell_value", 0)
     var paid_price: int = r.get(&"paid_price", 0)
+    var onsite: int = r.get(&"onsite_proceeds", 0)
     var net: int = r.get(&"net", 0)
 
     _sell_value_label.text = "Total Sell Value:   $%d" % sell_value
+    _onsite_label.text = "Sold On-site:   $%d" % onsite
     _paid_label.text = "Amount Paid:   $%d" % paid_price
 
     if net >= 0:

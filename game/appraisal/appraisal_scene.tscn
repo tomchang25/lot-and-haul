@@ -95,6 +95,11 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 18
 horizontal_alignment = 1
 
+[node name="OnsiteLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/SummaryContainer" unique_id=200000099]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
 [node name="PaidLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/SummaryContainer" unique_id=1955275326]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
