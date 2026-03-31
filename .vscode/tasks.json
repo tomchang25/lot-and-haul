@@ -6,7 +6,7 @@
             "type": "shell",
             "command": "python",
             "args": [
-                "${workspaceFolder}/tools/init_db.py",
+                "${workspaceFolder}/dev/tools/init_db.py",
                 "--godot-root",
                 "${workspaceFolder}"
             ],
@@ -22,7 +22,7 @@
             "type": "shell",
             "command": "python",
             "args": [
-                "${workspaceFolder}/tools/export_tres.py",
+                "${workspaceFolder}/dev/tools/export_tres.py",
                 "--godot-root",
                 "${workspaceFolder}"
             ],
@@ -38,7 +38,7 @@
             "type": "shell",
             "command": "python",
             "args": [
-                "${workspaceFolder}/tools/export_tres.py",
+                "${workspaceFolder}/dev/tools/export_tres.py",
                 "--godot-root",
                 "${workspaceFolder}",
                 "--dry-run"
