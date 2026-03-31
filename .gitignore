@@ -5,6 +5,7 @@
 **/assets
 **/addons
 **/script_templates
+**/dev
 
 **/*.uid
 **/*.tmp
