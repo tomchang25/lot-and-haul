@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://c7v4tifyn8jp4"]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://iu5ti1jmcbqa"]
 
 [ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
 [ext_resource type="Script" uid="uid://bku4smrdbihvx" path="res://data/_definitions/veiled_type.gd" id="2_vtscript"]
@@ -7,11 +7,11 @@
 
 [resource]
 script = ExtResource("1_jyqit")
-item_name = "Pocket Watch"
-true_value = 900
-weight = 0.2
+item_name = "Pocket Radio"
+true_value = 300
+weight = 0.5
 grid_size = 1
-super_category = "Accessory"
-category = "Pocket Watch"
-clues = Array[String](["watch", "pocket watch", "silver case", "Swiss movement", "1900s engraving"])
+super_category = "Media"
+category = "Radio"
+clues = Array[String](["radio", "transistor", "AM/FM", "1960s Japanese", "original box"])
 veiled_types = Array[ExtResource("2_vtscript")]([ExtResource("2_vt"), ExtResource("3_vt")])
