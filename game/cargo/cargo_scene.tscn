@@ -32,6 +32,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="ConfirmPopup" type="AcceptDialog" parent="." unique_id=500000001]
+title = "Load Up?"
+ok_button_text = "Confirm"
+
 [node name="Title" type="Label" parent="RootVBox" unique_id=100000003]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 64)

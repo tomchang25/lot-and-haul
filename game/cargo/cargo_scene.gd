@@ -1,12 +1,13 @@
 # cargo_scene.gd
 # Block 05 — Cargo Loading
 # Reads:  GameManager.lot_result.won_items
-# Writes: GameManager.cargo_items
+# Writes: GameManager.cargo_items, GameManager.onsite_proceeds
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 const MAX_SLOTS := 6
 const MAX_WEIGHT := 20.0
+const ONSITE_SELL_PRICE := 50 # flat rate per unloaded item; no merchant logic yet
 
 const CargoItemRowScene := preload("uid://cargoitemrow1")
 
@@ -22,12 +23,14 @@ var _rows: Dictionary = { } # ItemEntry → CargoItemRow
 @onready var _weight_label: Label = $RootVBox/Header/WeightLabel
 @onready var _row_container: VBoxContainer = $RootVBox/ListCenter/Panel/PanelVBox/RowContainer
 @onready var _load_up_button: Button = $RootVBox/Footer/LoadUpButton
+@onready var _confirm_popup: AcceptDialog = $ConfirmPopup
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
 func _ready() -> void:
     _load_up_button.pressed.connect(_on_load_up_pressed)
+    _confirm_popup.confirmed.connect(_on_confirm_popup_confirmed)
     _won_items = GameManager.lot_result.get(&"won_items", [] as Array[ItemEntry])
     for entry: ItemEntry in _won_items:
         _selected[entry] = false
@@ -45,11 +48,20 @@ func _on_item_toggled(pressed: bool, entry: ItemEntry) -> void:
 
 
 func _on_load_up_pressed() -> void:
+    _confirm_popup.dialog_text = _build_summary_text()
+    _confirm_popup.popup_centered()
+
+
+func _on_confirm_popup_confirmed() -> void:
     var cargo: Array[ItemEntry] = []
+    var sell_count: int = 0
     for entry: ItemEntry in _won_items:
         if _selected.get(entry, false):
             cargo.append(entry)
+        else:
+            sell_count += 1
     GameManager.cargo_items = cargo
+    GameManager.run_result[&"onsite_proceeds"] = sell_count * ONSITE_SELL_PRICE
     GameManager.go_to_appraisal()
 
 # ══ State helpers ══════════════════════════════════════════════════════════════
@@ -74,13 +86,31 @@ func _refresh_ui() -> void:
     for entry: ItemEntry in _won_items:
         var row: CargoItemRow = _rows[entry]
         if _selected.get(entry, false):
-            # Selected items can always be toggled off.
             row.set_toggle_disabled(false)
         else:
-            # Disable if loading this item would exceed either limit.
             var over_slots: bool = entry.item_data.grid_size > remaining_slots
             var over_weight: bool = entry.item_data.weight > remaining_weight
             row.set_toggle_disabled(over_slots or over_weight)
+
+
+func _build_summary_text() -> String:
+    var loading: Array[String] = []
+    var selling: Array[String] = []
+    for entry: ItemEntry in _won_items:
+        var label: String = entry.resolved_veiled_type.display_label \
+        if entry.is_veiled() else entry.item_data.item_name
+        if _selected.get(entry, false):
+            loading.append("  " + label)
+        else:
+            selling.append("  " + label)
+
+    var lines: Array[String] = []
+    lines.append("Loading (%d):" % loading.size())
+    lines.append_array(loading if not loading.is_empty() else ["  (none)"])
+    lines.append("")
+    lines.append("Selling to merchant (%d)  →  $%d:" % [selling.size(), selling.size() * ONSITE_SELL_PRICE])
+    lines.append_array(selling if not selling.is_empty() else ["  (none)"])
+    return "\n".join(lines)
 
 # ══ Row population ═════════════════════════════════════════════════════════════
 
@@ -101,4 +131,5 @@ func _populate_rows() -> void:
         _row_container.add_child(row)
         row.setup(entry)
         row.toggled.connect(_on_item_toggled)
+
         _rows[entry] = row

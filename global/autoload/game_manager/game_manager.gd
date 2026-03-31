@@ -19,9 +19,12 @@ var lot_result: Dictionary = { }
 # The subset of won_items the player chose to bring home.
 var cargo_items: Array[ItemEntry] = []
 
-# Written by Block 06 (Home Appraisal).
-# { "sell_value": int, "paid_price": int, "net": int }
+# Written by Block 05 (Cargo Loading) and Block 06 (Home Appraisal).
+# { "onsite_proceeds": int, "sell_value": int, "paid_price": int, "net": int }
 var run_result: Dictionary = { }
+
+# Written by Block 05 (Cargo Loading). The total amount earned by selling items onsite instead of taking them home.
+var onsite_proceeds: int = 0
 
 # ── Scene transitions ─────────────────────────────────────────────────────────
 
