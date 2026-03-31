@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bhrcdr20fytuy"]
 
 [ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
-[ext_resource type="Script" uid="uid://bku4smrdbihvx" path="res://data/_definitions/veiled_type.gd" id="2_vtscript"]
 [ext_resource type="Resource" uid="uid://csoed07vgc7xn" path="res://data/veiled_types/large_thing.tres" id="2_vt"]
+[ext_resource type="Script" uid="uid://bku4smrdbihvx" path="res://data/_definitions/veiled_type.gd" id="2_vtscript"]
 [ext_resource type="Resource" uid="uid://bo7p4vl0ihhox" path="res://data/veiled_types/medium_thing.tres" id="3_vt"]
 
 [resource]
