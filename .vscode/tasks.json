@@ -1,0 +1,54 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "DB: Init & Seed from .tres",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/tools/init_db.py",
+                "--godot-root",
+                "${workspaceFolder}"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "DB: Export .tres from DB",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/tools/export_tres.py",
+                "--godot-root",
+                "${workspaceFolder}"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "DB: Dry-run Export (no file writes)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/tools/export_tres.py",
+                "--godot-root",
+                "${workspaceFolder}",
+                "--dry-run"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
