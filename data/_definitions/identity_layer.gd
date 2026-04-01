@@ -1,12 +1,14 @@
 # identity_layer.gd
-# Designer-authored resource. Replaces VeiledType.
-# Represents one rung in an item's identity chain.
+# Designer-authored resource. Represents one rung in an item's identity chain.
 # Place reusable standalone .tres files under data/identity_layers/
 class_name IdentityLayer
 extends Resource
 
+# Internal identifier. Matches the .tres filename stem and DB layer_id.
+@export var layer_id: String = ""
+
 # The name shown to the player when this layer is the active read.
-@export var display_label: String = ""
+@export var display_name: String = ""
 
 # Base market value at this layer of understanding.
 # Used as the anchor for price estimates at inspection and auction.

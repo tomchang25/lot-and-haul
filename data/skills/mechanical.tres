@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://skill_mechanical"]
+
+[ext_resource type="Script" uid="uid://skill_data_script" path="res://data/_definitions/skill_data.gd" id="1_skilldef"]
+
+[resource]
+script = ExtResource("1_skilldef")
+skill_id = "mechanical"
+display_name = "Mechanical"
+max_level = 5

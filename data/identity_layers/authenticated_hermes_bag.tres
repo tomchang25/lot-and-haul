@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://e460np8ae03v"]
+
+[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="1_ilay"]
+
+[resource]
+script = ExtResource("1_ilay")
+layer_id = "authenticated_hermes_bag"
+display_name = "Authenticated Vintage Hermès Bag"
+base_value = 3800

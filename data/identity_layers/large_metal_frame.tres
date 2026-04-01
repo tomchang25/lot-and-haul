@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://hoxj0ilng2vm"]
+
+[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="1_ilay"]
+[ext_resource type="Script" uid="uid://c23t4blqmaaj4" path="res://data/_definitions/layer_unlock_action.gd" id="2_unlock"]
+
+[sub_resource type="Resource" id="unlock"]
+script = ExtResource("2_unlock")
+context = 0
+
+[resource]
+script = ExtResource("1_ilay")
+layer_id = "large_metal_frame"
+display_name = "Large Metal Frame"
+base_value = 50
+unlock_action = SubResource("unlock")

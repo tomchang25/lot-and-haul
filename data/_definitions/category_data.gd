@@ -5,11 +5,14 @@
 class_name CategoryData
 extends Resource
 
+# Internal identifier. Matches the .tres filename stem and DB category_id.
+@export var category_id: String = ""
+
 # Broad item type (e.g. "Fine Art", "Vehicle").
 @export var super_category: String = ""
 
-# Fine-grained item type (e.g. "Painting", "Pocket Watch").
-@export var category: String = ""
+# Fine-grained item type shown to the player (e.g. "Painting", "Pocket Watch").
+@export var display_name: String = ""
 
 # Weight in kilograms.
 @export var weight: float = 0.0
