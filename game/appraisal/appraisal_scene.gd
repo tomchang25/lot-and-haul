@@ -34,7 +34,7 @@ func _ready() -> void:
     _continue_btn.pressed.connect(_on_continue_pressed)
 
     _cargo_items = GameManager.run_record.cargo_items
-    _paid_price = GameManager.run_record.lot_result.get(&"paid_price", 0)
+    _paid_price = GameManager.run_record.paid_price
 
     _populate_rows()
 
@@ -88,10 +88,11 @@ func _commit_result() -> void:
     var sell_value: int = 0
     for entry: ItemEntry in _cargo_items:
         sell_value += entry.item_data.true_value
-        
+
     GameManager.run_record.sell_value = sell_value
     GameManager.run_record.paid_price = _paid_price
     GameManager.run_record.net = sell_value + GameManager.run_record.onsite_proceeds - _paid_price
+
 
 func _show_summary() -> void:
     var sell_value: int = GameManager.run_record.sell_value

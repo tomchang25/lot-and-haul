@@ -1,10 +1,5 @@
 extends Node
 
-enum ItemContext {
-    LOT,
-    CARGO,
-}
-
 @export var scenes: SceneRegistry
 
 # Full state for the current run. Null between runs.
@@ -39,15 +34,3 @@ func go_to_appraisal() -> void:
 # Clears all per-run state so the next run starts clean.
 func clear_run_state() -> void:
     run_record = null
-
-# ── Item access ───────────────────────────────────────────────────────────────
-
-
-func get_items(context: ItemContext) -> Array[ItemEntry]:
-    match context:
-        ItemContext.LOT:
-            return run_record.lot_entry.item_entries
-        ItemContext.CARGO:
-            return run_record.cargo_items
-        _:
-            return []

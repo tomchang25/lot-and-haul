@@ -1,14 +1,18 @@
+# run_record.gd
+# Runtime record for a single warehouse run.
 class_name RunRecord
 extends RefCounted
 
-# ── Lot phase ─────────────────────────────────────────────────────────────────
-var lot_entry: LotEntry # rolled factors + item_entries
-var lot_result: Dictionary = { } # { "paid_price": int, "won_items": Array[ItemEntry] }
+# ── State ─────────────────────────────────────────────────────────────────────
 
-# ── Cargo phase ───────────────────────────────────────────────────────────────
+var lot_entry: LotEntry # rolled factors + item_entries
+
+var lot_items: Array[ItemEntry]:
+    get:
+        return lot_entry.item_entries if lot_entry else []
+var won_items: Array[ItemEntry] = []
 var cargo_items: Array[ItemEntry] = []
 
-# ── Appraisal phase ───────────────────────────────────────────────────────────
 var onsite_proceeds: int = 0
 var sell_value: int = 0
 var paid_price: int = 0

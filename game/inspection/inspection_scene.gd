@@ -112,7 +112,7 @@ func _populate_item_displays() -> void:
     for child in _items_grid.get_children():
         child.queue_free()
 
-    var item_entries: Array[ItemEntry] = GameManager.get_items(GameManager.ItemContext.LOT)
+    var item_entries: Array[ItemEntry] = GameManager.run_record.lot_items
     for i: int in item_entries.size():
         var entry: ItemEntry = item_entries[i]
 

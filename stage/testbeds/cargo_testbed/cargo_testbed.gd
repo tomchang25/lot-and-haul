@@ -47,10 +47,8 @@ func _inject_fake_state() -> void:
     var entries: Array[ItemEntry] = GameManager.run_record.lot_entry.item_entries
 
     # Simulate a won auction result using the built entries.
-    GameManager.run_record.lot_result = {
-        &"paid_price": paid_price,
-        &"won_items": entries.duplicate(),
-    }
+    GameManager.run_record.paid_price = paid_price
+    GameManager.run_record.won_items = entries.duplicate()
 
     # Clear any leftover cargo from a previous run.
     GameManager.run_record.cargo_items.clear()

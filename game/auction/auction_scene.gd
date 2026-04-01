@@ -183,10 +183,9 @@ func _on_pass_pressed() -> void:
     if _circle_tween:
         _circle_tween.kill()
 
-    GameManager.run_record.lot_result = {
-        &"paid_price": 0,
-        &"won_items": [] as Array[ItemEntry],
-    }
+    GameManager.run_record.paid_price = 0
+    GameManager.run_record.won_items = [] as Array[ItemEntry]
+
     GameManager.go_to_appraisal()
 
 # ══ Auction setup ═════════════════════════════════════════════════════════════
@@ -194,6 +193,7 @@ func _on_pass_pressed() -> void:
 
 func _init_auction() -> void:
     var lot: LotEntry = GameManager.run_record.lot_entry
+    var lot_items: Array[ItemEntry] = GameManager.run_record.lot_items
     var aggressive_factor := lot.aggressive_factor if lot != null else 0.5
     var demand_factor := lot.demand_factor if lot != null else 0.5
 
@@ -208,7 +208,7 @@ func _init_auction() -> void:
     var unveiled_base: float = 0.0
     var unveiled_true: float = 0.0
 
-    for entry: ItemEntry in GameManager.get_items(GameManager.ItemContext.LOT):
+    for entry: ItemEntry in lot_items:
         if entry.is_veiled():
             veiled_total += roundi(
                 entry.resolved_veiled_type.base_veiled_price * aggressive_factor,
@@ -232,7 +232,7 @@ func _init_auction() -> void:
     _price_label.text = "$%d" % opening_bid
 
     # Lot summary — uses centralized display helpers.
-    for entry: ItemEntry in GameManager.get_items(GameManager.ItemContext.LOT):
+    for entry: ItemEntry in lot_items:
         var lbl := Label.new()
         lbl.text = "%s (%s)" % [
             InspectionRules.get_display_name(entry),
@@ -244,7 +244,7 @@ func _init_auction() -> void:
 
     _lot_summary.add_child(HSeparator.new())
 
-    var estimate := ClueEvaluator.get_lot_estimate(GameManager.get_items(GameManager.ItemContext.LOT))
+    var estimate := ClueEvaluator.get_lot_estimate(lot_items)
     var total_lbl := Label.new()
     total_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     total_lbl.add_theme_font_size_override(&"font_size", 16)
@@ -336,17 +336,13 @@ func _resolve() -> void:
     _pass_button.disabled = true
 
     if _last_bidder == "player":
-        var won: Array[ItemEntry] = GameManager.get_items(GameManager.ItemContext.LOT).duplicate()
-        GameManager.run_record.lot_result = {
-            &"paid_price": _current_display_price,
-            &"won_items": won,
-        }
+        GameManager.run_record.paid_price = _current_display_price
+        GameManager.run_record.won_items = GameManager.run_record.lot_items.duplicate()
+
         GameManager.go_to_cargo()
     else:
-        GameManager.run_record.lot_result = {
-            &"paid_price": 0,
-            &"won_items": [] as Array[ItemEntry],
-        }
+        GameManager.run_record.paid_price = 0
+        GameManager.run_record.won_items = [] as Array[ItemEntry]
 
         GameManager.go_to_appraisal()
 
@@ -417,7 +413,7 @@ func _init_debug_overlay(veiled_total: int, unveiled_total: int) -> void:
     var lot: LotEntry = run.lot_entry
 
     var total_true_value := 0
-    for entry: ItemEntry in GameManager.get_items(GameManager.ItemContext.LOT):
+    for entry: ItemEntry in GameManager.run_record.lot_items:
         if not entry.is_veiled():
             total_true_value += entry.item_data.true_value
 

@@ -26,7 +26,7 @@ func populate() -> void:
         child.queue_free()
 
     var true_value_sum := 0
-    var item_entries: Array[ItemEntry] = GameManager.get_items(GameManager.ItemContext.LOT)
+    var item_entries: Array[ItemEntry] = GameManager.run_record.lot_items
     for entry: ItemEntry in item_entries:
         true_value_sum += entry.item_data.true_value
         _item_list.add_child(_make_row(entry))
