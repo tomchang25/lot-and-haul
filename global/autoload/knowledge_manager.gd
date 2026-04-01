@@ -1,6 +1,6 @@
 extends Node
 
-# Returns the player's current knowledge level for valuation range calculations.
-# Always 0 for this vertical slice — upgrade logic is out of scope for Block 02.
-func get_level() -> int:
+# Flat skill registry. Returns the player's current level for the given skill.
+# Always 0 for this slice — full skill progression is deferred.
+func get_level(skill_id: String) -> int:
     return 0

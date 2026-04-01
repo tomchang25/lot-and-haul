@@ -7,30 +7,37 @@ extends RefCounted
 
 var item_data: ItemData = null
 
-# The veiled type shown when is_veiled is true.
-var resolved_veiled_type: VeiledType = null
-
-# How far the player has investigated this item.
-# 0 veiled / 1 untouched / 2 browsed / 3 examined / 4 researched / 5 authenticated
-var inspection_level: int = 0
+# How far the player has advanced the identity chain this run.
+# 0 = base layer (always visible); max = identity_layers.size() - 1.
+var layer_index: int = 0
 
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
 
+# Returns the layer currently visible to the player.
+func active_layer() -> IdentityLayer:
+    return item_data.identity_layers[layer_index]
+
+
+# Returns the unlock_action for advancing beyond the current layer.
+# Null if already at the final layer.
+func current_unlock_action() -> LayerUnlockAction:
+    return item_data.identity_layers[layer_index].unlock_action
+
+
+# True if the item is at the base layer — inspection was not performed.
 func is_veiled() -> bool:
-    return inspection_level == 0
+    return layer_index == 0
+
+
+# True if no further layers exist.
+func is_at_final_layer() -> bool:
+    return layer_index == item_data.identity_layers.size() - 1
 
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
 
-static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
+static func create(data: ItemData) -> ItemEntry:
     var entry := ItemEntry.new()
     entry.item_data = data
-
-    var is_veiled_bool := randf() < veil_chance and not data.veiled_types.is_empty()
-    if is_veiled_bool:
-        entry.resolved_veiled_type = data.veiled_types[randi() % data.veiled_types.size()]
-    else:
-        entry.inspection_level = 1
-
     return entry

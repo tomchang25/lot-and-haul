@@ -25,29 +25,26 @@ func populate() -> void:
     for child in _item_list.get_children():
         child.queue_free()
 
-    var true_value_sum := 0
+    var layer0_total := 0
     var item_entries: Array[ItemEntry] = GameManager.run_record.lot_items
     for entry: ItemEntry in item_entries:
-        true_value_sum += entry.item_data.true_value
+        if not entry.item_data.identity_layers.is_empty():
+            layer0_total += entry.item_data.identity_layers[0].base_value
         _item_list.add_child(_make_row(entry))
 
     var estimate := ClueEvaluator.get_lot_estimate(item_entries)
-    if estimate.has_unknown and estimate.lo == 0 and estimate.hi == 0:
-        _total_label.text = "Total Estimate:   ?"
-    elif estimate.has_unknown:
-        _total_label.text = "Total Estimate:   $%d – $%d +" % [estimate.lo, estimate.hi]
+    if estimate.lo == estimate.hi:
+        _total_label.text = "Total Estimate:   $%d" % estimate.lo
     else:
         _total_label.text = "Total Estimate:   $%d – $%d" % [estimate.lo, estimate.hi]
 
-    var opening_bid := int(true_value_sum * _OPENING_BID_FACTOR)
+    var opening_bid := int(layer0_total * _OPENING_BID_FACTOR)
     _opening_bid_label.text = "Opening Bid:   $%d" % opening_bid
 
 # ── Row builder ────────────────────────────────────────────────────────────────
 
 
 func _make_row(entry: ItemEntry) -> HBoxContainer:
-    var level := entry.inspection_level
-
     var row := HBoxContainer.new()
     row.add_theme_constant_override(&"separation", 8)
 
@@ -58,7 +55,7 @@ func _make_row(entry: ItemEntry) -> HBoxContainer:
     row.add_child(name_lbl)
 
     var status_lbl := Label.new()
-    status_lbl.text = InspectionRules.level_label(level)
+    status_lbl.text = InspectionRules.level_label(entry)
     status_lbl.custom_minimum_size = Vector2(100.0, 0.0)
     status_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     status_lbl.add_theme_font_size_override(&"font_size", 13)

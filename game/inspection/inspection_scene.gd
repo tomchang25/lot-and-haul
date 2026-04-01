@@ -1,7 +1,7 @@
 # inspection_scene.gd
-# Block 02 — Inspection phase; player spends stamina to browse or examine lot items.
+# Block 02 — Inspection phase; player spends stamina to advance item identity layers.
 # Reads:  GameManager.item_entries
-# Writes: ItemEntry.inspection_level (via ItemDisplay.set_level)
+# Writes: ItemEntry.layer_index
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -42,8 +42,7 @@ var _pulse_tween: Tween = null
 
 
 func _ready() -> void:
-    _action_popup.browse_requested.connect(_on_browse)
-    _action_popup.examine_requested.connect(_on_examine)
+    _action_popup.advance_requested.connect(_on_advance)
     _action_popup.cancelled.connect(_on_popup_cancelled)
     _start_btn.pressed.connect(_on_start_auction_pressed)
     _list_review.back_requested.connect(_on_list_review_back)
@@ -78,18 +77,11 @@ func _on_popup_cancelled() -> void:
     _close_popup()
 
 
-func _on_browse() -> void:
+func _on_advance() -> void:
     if _active_item == null:
         return
     var entry: ItemEntry = _entry_for_display[_active_item]
-    _spend_stamina(_active_item, entry, 2, InspectionRules.browse_cost())
-
-
-func _on_examine() -> void:
-    if _active_item == null:
-        return
-    var entry: ItemEntry = _entry_for_display[_active_item]
-    _spend_stamina(_active_item, entry, 3, InspectionRules.examine_cost(entry.inspection_level))
+    _advance_layer(_active_item, entry)
 
 
 func _on_start_auction_pressed() -> void:
@@ -131,7 +123,7 @@ func _populate_item_displays() -> void:
 func _open_popup(display: ItemDisplay) -> void:
     _active_item = display
     var entry: ItemEntry = _entry_for_display[display]
-    _action_popup.refresh(entry.inspection_level, _stamina)
+    _action_popup.refresh(entry, _stamina)
 
     # Position popup directly below the item card
     var rect := display.get_global_rect()
@@ -143,16 +135,16 @@ func _close_popup() -> void:
     _action_popup.hide()
     _active_item = null
 
-# ══ Stamina ═══════════════════════════════════════════════════════════════════
+# ══ Layer advance ══════════════════════════════════════════════════════════════
 
 
-# entry.inspection_level is written by display.set_level; no separate write needed.
-func _spend_stamina(display: ItemDisplay, entry: ItemEntry, target_level: int, cost: int) -> void:
-    if _stamina < cost:
+func _advance_layer(display: ItemDisplay, entry: ItemEntry) -> void:
+    var action := entry.current_unlock_action()
+    if action == null or _stamina < action.stamina_cost:
         return
 
-    _stamina -= cost
-    entry.inspection_level = target_level
+    _stamina -= action.stamina_cost
+    entry.layer_index += 1
 
     display.refresh_display()
     _stamina_hud.update_stamina(_stamina, MAX_STAMINA)

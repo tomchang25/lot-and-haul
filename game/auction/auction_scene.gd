@@ -196,31 +196,24 @@ func _init_auction() -> void:
     var lot_items: Array[ItemEntry] = GameManager.run_record.lot_items
     var aggressive_factor := lot.aggressive_factor if lot != null else 0.5
     var demand_factor := lot.demand_factor if lot != null else 0.5
-
-    # rolled_price = veiled_total + unveiled_total
-    # aggressive_factor (0.0–1.0): veiled → fraction of base_veiled_price
-    #                               unveiled → biases the lerp multiplier via aggressive_lerp_min/max
-    # demand_factor (0.0–1.0): lerp weight between unveiled base_price and total_true_value
-    var untouched_lo: float = ClueEvaluator.RANGES[InspectionRules.Level.UNTOUCHED][0]
     var aggressive_lerp := lerpf(lot.lot_data.aggressive_lerp_min, lot.lot_data.aggressive_lerp_max, aggressive_factor)
 
-    var veiled_total: int = 0
-    var unveiled_base: float = 0.0
-    var unveiled_true: float = 0.0
+    # rolled_price = sum of per-item lerps between layer 0 base_value and
+    # the player's discovered layer base_value, weighted by demand and aggression.
+    # Full NPC skill resolution is deferred to the auction + knowledge system overhaul.
+    var total_lo: float = 0.0
+    var total_hi: float = 0.0
 
     for entry: ItemEntry in lot_items:
-        if entry.is_veiled():
-            veiled_total += roundi(
-                entry.resolved_veiled_type.base_veiled_price * aggressive_factor,
-            )
-        else:
-            unveiled_base += entry.item_data.true_value * untouched_lo
-            unveiled_true += entry.item_data.true_value
+        if entry.item_data.identity_layers.is_empty():
+            continue
+        var layer0_value := float(entry.item_data.identity_layers[0].base_value)
+        var active_value := float(entry.active_layer().base_value)
+        total_lo += layer0_value
+        total_hi += active_value
 
-    var unveiled_total := roundi(
-        lerpf(unveiled_base, unveiled_true, demand_factor * aggressive_lerp),
-    )
-    _rolled_price = veiled_total + unveiled_total
+    _rolled_price = roundi(lerpf(total_lo, total_hi, demand_factor * aggressive_lerp))
+    _rolled_price = maxi(_rolled_price, MIN_STEP)
 
     # Opening bid is a fixed fraction of rolled_price; no extra multiplier.
     var opening_bid := maxi(
@@ -250,16 +243,14 @@ func _init_auction() -> void:
     total_lbl.add_theme_font_size_override(&"font_size", 16)
     total_lbl.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
 
-    if estimate.has_unknown and estimate.lo == 0 and estimate.hi == 0:
-        total_lbl.text = "Total Est: ?"
-    elif estimate.has_unknown:
-        total_lbl.text = "Total Est: $%d – $%d +" % [estimate.lo, estimate.hi]
+    if estimate.lo == estimate.hi:
+        total_lbl.text = "Total Est: $%d" % estimate.lo
     else:
         total_lbl.text = "Total Est: $%d – $%d" % [estimate.lo, estimate.hi]
 
     _lot_summary.add_child(total_lbl)
 
-    _init_debug_overlay(veiled_total, unveiled_total)
+    _init_debug_overlay(total_lo, total_hi)
 
 # ══ NPC tick ══════════════════════════════════════════════════════════════════
 
@@ -402,20 +393,21 @@ func _show_npc_popup(price: int) -> void:
     # Optional: Limit the number of visible items to avoid clutter
     if _npc_history_list.get_child_count() > 5:
         _npc_history_list.get_child(0).queue_free()
+
 # ══ Debug overlay ══════════════════════════════════════════════════════════════
 # Visible in debug builds only. Never ship with _rolled_price exposed.
 
 
-func _init_debug_overlay(veiled_total: int, unveiled_total: int) -> void:
+func _init_debug_overlay(total_lo: float, total_hi: float) -> void:
     if not OS.is_debug_build():
         return
     var run: RunRecord = GameManager.run_record
     var lot: LotEntry = run.lot_entry
 
-    var total_true_value := 0
+    var true_total := 0
     for entry: ItemEntry in GameManager.run_record.lot_items:
-        if not entry.is_veiled():
-            total_true_value += entry.item_data.true_value
+        if not entry.item_data.identity_layers.is_empty():
+            true_total += entry.item_data.identity_layers.back().base_value
 
     _debug_label = Label.new()
     _debug_label.add_theme_font_size_override(&"font_size", 13)
@@ -424,13 +416,13 @@ func _init_debug_overlay(veiled_total: int, unveiled_total: int) -> void:
     _debug_label.offset_bottom = -8.0
     _debug_label.offset_left = 8.0
     _debug_label.text = (
-        "[DBG] rolled=$%d  (veiled=$%d  unveiled=$%d)  true=$%d\n"
+        "[DBG] rolled=$%d  (lo=$%d  hi=$%d)  true_total=$%d\n"
         + "      agg=%.2f  demand=%.2f  lerp_range=[%.2f, %.2f]"
     ) % [
         _rolled_price,
-        veiled_total,
-        unveiled_total,
-        total_true_value,
+        roundi(total_lo),
+        roundi(total_hi),
+        true_total,
         lot.aggressive_factor,
         lot.demand_factor,
         lot.lot_data.aggressive_lerp_min,

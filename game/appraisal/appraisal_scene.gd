@@ -85,9 +85,15 @@ func _populate_rows() -> void:
 
 
 func _commit_result() -> void:
+    # Layer 0 items auto-advance to layer 1 before settlement.
+    # Layer 0 does not persist into appraisal.
+    for entry: ItemEntry in _cargo_items:
+        if entry.is_veiled() and not entry.is_at_final_layer():
+            entry.layer_index = 1
+
     var sell_value: int = 0
     for entry: ItemEntry in _cargo_items:
-        sell_value += entry.item_data.true_value
+        sell_value += entry.active_layer().base_value
 
     GameManager.run_record.sell_value = sell_value
     GameManager.run_record.paid_price = _paid_price

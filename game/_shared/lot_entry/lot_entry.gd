@@ -15,7 +15,7 @@ var lot_data: LotData = null
 var aggressive_factor: float = 0.5
 
 # Rolled from lot_data.demand_factor_range.
-# Lerp weight between unveiled base_price and total_true_value.
+# Lerp weight between layer 0 base_value and player-discovered layer base_value.
 var demand_factor: float = 0.5
 
 # Rolled from lot_data.knowledge_factor_range. Placeholder — ignored until post-demo.
@@ -40,6 +40,6 @@ static func create(data: LotData) -> LotEntry:
     entry.knowledge_factor = randf_range(data.knowledge_factor_min, data.knowledge_factor_max)
 
     for item: ItemData in data.item_pool:
-        entry.item_entries.append(ItemEntry.create(item, data.veiled_chance))
+        entry.item_entries.append(ItemEntry.create(item))
 
     return entry
