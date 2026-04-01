@@ -31,7 +31,7 @@ var _rows: Dictionary = { } # ItemEntry → CargoItemRow
 func _ready() -> void:
     _load_up_button.pressed.connect(_on_load_up_pressed)
     _confirm_popup.confirmed.connect(_on_confirm_popup_confirmed)
-    _won_items = GameManager.lot_result.get(&"won_items", [] as Array[ItemEntry])
+    _won_items = GameManager.run_record.lot_result.get(&"won_items", [] as Array[ItemEntry])
     for entry: ItemEntry in _won_items:
         _selected[entry] = false
     _populate_rows()
@@ -60,8 +60,8 @@ func _on_confirm_popup_confirmed() -> void:
             cargo.append(entry)
         else:
             sell_count += 1
-    GameManager.cargo_items = cargo
-    GameManager.run_result[&"onsite_proceeds"] = sell_count * ONSITE_SELL_PRICE
+    GameManager.run_record.cargo_items = cargo
+    GameManager.run_record.onsite_proceeds = sell_count * ONSITE_SELL_PRICE
     GameManager.go_to_appraisal()
 
 # ══ State helpers ══════════════════════════════════════════════════════════════

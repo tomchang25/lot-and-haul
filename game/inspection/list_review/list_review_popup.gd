@@ -26,12 +26,12 @@ func populate() -> void:
         child.queue_free()
 
     var true_value_sum := 0
-
-    for entry: ItemEntry in GameManager.item_entries:
+    var item_entries: Array[ItemEntry] = GameManager.get_items(GameManager.ItemContext.LOT)
+    for entry: ItemEntry in item_entries:
         true_value_sum += entry.item_data.true_value
         _item_list.add_child(_make_row(entry))
 
-    var estimate := ClueEvaluator.get_lot_estimate(GameManager.item_entries)
+    var estimate := ClueEvaluator.get_lot_estimate(item_entries)
     if estimate.has_unknown and estimate.lo == 0 and estimate.hi == 0:
         _total_label.text = "Total Estimate:   ?"
     elif estimate.has_unknown:

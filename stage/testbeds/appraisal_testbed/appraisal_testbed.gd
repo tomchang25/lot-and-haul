@@ -30,18 +30,19 @@ func _ready() -> void:
 
 
 func _inject_fake_state() -> void:
+    const WAREHOUSE_LOTDATA = preload("uid://l8xrnjwietdt")
+
+    var lot := LotEntry.create(WAREHOUSE_LOTDATA)
+    GameManager.run_record = RunRecord.create(lot)
+
     # Populate cargo_items so appraisal_scene can iterate and reveal values.
-    GameManager.cargo_items.clear()
+    GameManager.run_record.cargo_items.clear()
     for item: ItemData in cargo_items:
-        GameManager.cargo_items.append(item)
+        var entry := ItemEntry.create(item)
+        GameManager.run_record.cargo_items.append(entry)
 
     # Simulate the lot result written by Block 04.
-    GameManager.lot_result = {
-        &"paid_price": paid_price,
-    }
-
-    # Clear any leftover run result from a previous session.
-    GameManager.run_result = { }
+    GameManager.run_record.paid_price = paid_price
 
 
 func _launch_appraisal_scene() -> void:

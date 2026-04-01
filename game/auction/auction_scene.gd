@@ -183,7 +183,7 @@ func _on_pass_pressed() -> void:
     if _circle_tween:
         _circle_tween.kill()
 
-    GameManager.lot_result = {
+    GameManager.run_record.lot_result = {
         &"paid_price": 0,
         &"won_items": [] as Array[ItemEntry],
     }
@@ -193,7 +193,7 @@ func _on_pass_pressed() -> void:
 
 
 func _init_auction() -> void:
-    var lot: LotData = GameManager.lot_data
+    var lot: LotEntry = GameManager.run_record.lot_entry
     var aggressive_factor := lot.aggressive_factor if lot != null else 0.5
     var demand_factor := lot.demand_factor if lot != null else 0.5
 
@@ -202,13 +202,13 @@ func _init_auction() -> void:
     #                               unveiled → biases the lerp multiplier via aggressive_lerp_min/max
     # demand_factor (0.0–1.0): lerp weight between unveiled base_price and total_true_value
     var untouched_lo: float = ClueEvaluator.RANGES[InspectionRules.Level.UNTOUCHED][0]
-    var aggressive_lerp := lerpf(lot.aggressive_lerp_min, lot.aggressive_lerp_max, aggressive_factor)
+    var aggressive_lerp := lerpf(lot.lot_data.aggressive_lerp_min, lot.lot_data.aggressive_lerp_max, aggressive_factor)
 
     var veiled_total: int = 0
     var unveiled_base: float = 0.0
     var unveiled_true: float = 0.0
 
-    for entry: ItemEntry in GameManager.item_entries:
+    for entry: ItemEntry in GameManager.get_items(GameManager.ItemContext.LOT):
         if entry.is_veiled():
             veiled_total += roundi(
                 entry.resolved_veiled_type.base_veiled_price * aggressive_factor,
@@ -232,7 +232,7 @@ func _init_auction() -> void:
     _price_label.text = "$%d" % opening_bid
 
     # Lot summary — uses centralized display helpers.
-    for entry: ItemEntry in GameManager.item_entries:
+    for entry: ItemEntry in GameManager.get_items(GameManager.ItemContext.LOT):
         var lbl := Label.new()
         lbl.text = "%s (%s)" % [
             InspectionRules.get_display_name(entry),
@@ -244,7 +244,7 @@ func _init_auction() -> void:
 
     _lot_summary.add_child(HSeparator.new())
 
-    var estimate := ClueEvaluator.get_lot_estimate(GameManager.item_entries)
+    var estimate := ClueEvaluator.get_lot_estimate(GameManager.get_items(GameManager.ItemContext.LOT))
     var total_lbl := Label.new()
     total_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     total_lbl.add_theme_font_size_override(&"font_size", 16)
@@ -336,17 +336,18 @@ func _resolve() -> void:
     _pass_button.disabled = true
 
     if _last_bidder == "player":
-        var won: Array[ItemEntry] = GameManager.item_entries.duplicate()
-        GameManager.lot_result = {
+        var won: Array[ItemEntry] = GameManager.get_items(GameManager.ItemContext.LOT).duplicate()
+        GameManager.run_record.lot_result = {
             &"paid_price": _current_display_price,
             &"won_items": won,
         }
         GameManager.go_to_cargo()
     else:
-        GameManager.lot_result = {
+        GameManager.run_record.lot_result = {
             &"paid_price": 0,
             &"won_items": [] as Array[ItemEntry],
         }
+
         GameManager.go_to_appraisal()
 
 # ══ Display helpers ════════════════════════════════════════════════════════════
@@ -412,13 +413,13 @@ func _show_npc_popup(price: int) -> void:
 func _init_debug_overlay(veiled_total: int, unveiled_total: int) -> void:
     if not OS.is_debug_build():
         return
+    var run: RunRecord = GameManager.run_record
+    var lot: LotEntry = run.lot_entry
 
     var total_true_value := 0
-    for entry: ItemEntry in GameManager.item_entries:
+    for entry: ItemEntry in GameManager.get_items(GameManager.ItemContext.LOT):
         if not entry.is_veiled():
             total_true_value += entry.item_data.true_value
-
-    var lot: LotData = GameManager.lot_data
 
     _debug_label = Label.new()
     _debug_label.add_theme_font_size_override(&"font_size", 13)
@@ -434,9 +435,9 @@ func _init_debug_overlay(veiled_total: int, unveiled_total: int) -> void:
         veiled_total,
         unveiled_total,
         total_true_value,
-        lot.aggressive_factor if lot != null else 0.5,
-        lot.demand_factor if lot != null else 0.5,
-        lot.aggressive_lerp_min if lot != null else 0.8,
-        lot.aggressive_lerp_max if lot != null else 1.2,
+        lot.aggressive_factor,
+        lot.demand_factor,
+        lot.lot_data.aggressive_lerp_min,
+        lot.lot_data.aggressive_lerp_max,
     ]
     add_child(_debug_label)

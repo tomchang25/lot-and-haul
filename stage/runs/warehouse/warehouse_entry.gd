@@ -16,9 +16,11 @@ const ITEM_PATHS: Array[String] = [
 ]
 
 # ── Node references ───────────────────────────────────────────────────────────
-
+const WarehouseLotData = preload("uid://l8xrnjwietdt")
 const ClosedTexture := preload("res://assets/warehouse_closed.png")
 const OpenTexture := preload("res://assets/warehouse_open.png")
+
+@export var lot_data: LotData = WarehouseLotData
 
 @onready var _texture_rect: TextureRect = $TextureRect
 
@@ -32,28 +34,8 @@ func _ready() -> void:
 
 # ══ Run initialisation ════════════════════════════════════════════════════════
 func _init_run() -> void:
-    # Clear all previous run state.
-    GameManager.item_entries.clear()
-    GameManager.lot_data = null
-    GameManager.lot_result = { }
-    GameManager.cargo_items.clear()
-    GameManager.run_result = { }
-
-    # Generate one ItemEntry per item preset.
-    for path: String in ITEM_PATHS:
-        var item := load(path) as ItemData
-        if item == null:
-            push_error("warehouse_entry: failed to load item at %s" % path)
-            continue
-
-        var entry := ItemEntry.create(item, 0.4)
-        GameManager.item_entries.append(entry)
-
-    # Generate lot_data.
-    var ld := LotData.create()
-    ld.aggressive_factor = randf_range(0.1, 0.9)
-    ld.demand_factor = randf_range(0.1, 0.9)
-    GameManager.lot_data = ld
+    var lot_entry := LotEntry.create(lot_data)
+    GameManager.run_record = RunRecord.create(lot_entry)
 
 # ══ Door animation ════════════════════════════════════════════════════════════
 

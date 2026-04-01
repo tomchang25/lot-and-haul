@@ -33,8 +33,8 @@ func _ready() -> void:
     _reveal_btn.pressed.connect(_on_reveal_pressed)
     _continue_btn.pressed.connect(_on_continue_pressed)
 
-    _cargo_items = GameManager.cargo_items
-    _paid_price = GameManager.lot_result.get(&"paid_price", 0)
+    _cargo_items = GameManager.run_record.cargo_items
+    _paid_price = GameManager.run_record.lot_result.get(&"paid_price", 0)
 
     _populate_rows()
 
@@ -88,24 +88,16 @@ func _commit_result() -> void:
     var sell_value: int = 0
     for entry: ItemEntry in _cargo_items:
         sell_value += entry.item_data.true_value
-    var onsite: int = GameManager.run_result.get(&"onsite_proceeds", 0)
-
-    GameManager.run_result.merge(
-        {
-            &"sell_value": sell_value,
-            &"paid_price": _paid_price,
-            &"net": sell_value + onsite - _paid_price,
-        },
-        true,
-    )
-
+        
+    GameManager.run_record.sell_value = sell_value
+    GameManager.run_record.paid_price = _paid_price
+    GameManager.run_record.net = sell_value + GameManager.run_record.onsite_proceeds - _paid_price
 
 func _show_summary() -> void:
-    var r: Dictionary = GameManager.run_result
-    var sell_value: int = r.get(&"sell_value", 0)
-    var paid_price: int = r.get(&"paid_price", 0)
-    var onsite: int = r.get(&"onsite_proceeds", 0)
-    var net: int = r.get(&"net", 0)
+    var sell_value: int = GameManager.run_record.sell_value
+    var paid_price: int = GameManager.run_record.paid_price
+    var onsite: int = GameManager.run_record.onsite_proceeds
+    var net: int = GameManager.run_record.net
 
     _sell_value_label.text = "Total Sell Value:   $%d" % sell_value
     _onsite_label.text = "Sold On-site:   $%d" % onsite

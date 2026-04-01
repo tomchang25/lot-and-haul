@@ -32,7 +32,7 @@ var _pulse_tween: Tween = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
-@onready var _items_root: Control = $ItemsRoot
+@onready var _items_grid: GridContainer = $Panel/MarginContainer/ScrollContainer/ItemsGrid
 @onready var _stamina_hud: StaminaHUD = $HUD/StaminaHUD
 @onready var _action_popup: ActionPopup = $HUD/ActionPopup
 @onready var _start_btn: Button = $HUD/StartAuctionButton
@@ -109,19 +109,16 @@ func _on_auction_entered() -> void:
 
 
 func _populate_item_displays() -> void:
-    for i: int in GameManager.item_entries.size():
-        var entry: ItemEntry = GameManager.item_entries[i]
+    for child in _items_grid.get_children():
+        child.queue_free()
+
+    var item_entries: Array[ItemEntry] = GameManager.get_items(GameManager.ItemContext.LOT)
+    for i: int in item_entries.size():
+        var entry: ItemEntry = item_entries[i]
 
         var display: ItemDisplay = ItemDisplayScene.instantiate()
-        var col := i % ITEM_COLS
-        var row := i / ITEM_COLS
-
-        display.position = GRID_ORIGIN + Vector2(
-            col * (ITEM_SIZE.x + ITEM_GAP.x),
-            row * (ITEM_SIZE.y + ITEM_GAP.y),
-        )
         display.custom_minimum_size = ITEM_SIZE
-        _items_root.add_child(display)
+        _items_grid.add_child(display)
 
         display.setup(entry)
         display.clicked.connect(_on_item_clicked)

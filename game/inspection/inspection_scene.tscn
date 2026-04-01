@@ -24,14 +24,52 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.12, 0.11, 0.14, 1)
 
-[node name="ItemsRoot" type="Control" parent="." unique_id=1753038485]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+[node name="Panel" type="Panel" parent="." unique_id=2124736920]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Background" type="ColorRect" parent="Panel" unique_id=1763066689]
+layout_mode = 0
+offset_left = 144.0
+offset_top = 64.0
+offset_right = 1136.0
+offset_bottom = 656.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 mouse_filter = 2
+color = Color(0.1232, 0.14, 0.13272001, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel" unique_id=513747538]
+custom_minimum_size = Vector2(1000, 600)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 120.0
+offset_top = 40.0
+offset_right = 1120.0
+offset_bottom = 640.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 20
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/MarginContainer" unique_id=1247062307]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="ItemsGrid" type="GridContainer" parent="Panel/MarginContainer/ScrollContainer" unique_id=1410177201]
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_constants/h_separation = 32
+theme_override_constants/v_separation = 28
+columns = 4
 
 [node name="HUD" type="Control" parent="." unique_id=586966451]
 layout_mode = 1

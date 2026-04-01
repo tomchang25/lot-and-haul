@@ -39,28 +39,21 @@ func _ready() -> void:
 
 
 func _inject_fake_state() -> void:
-    GameManager.item_entries.clear()
+    const WAREHOUSE_LOTDATA = preload("uid://l8xrnjwietdt")
 
-    var entries: Array[ItemEntry] = []
-    for i: int in won_items.size():
-        var level: int = inspection_levels[i] if i < inspection_levels.size() else 1
-        var chance: float = veil_chances[i] if i < veil_chances.size() else 0.0
-        var entry: ItemEntry = ItemEntry.create(won_items[i], chance if level == 0 else 0.0)
-        # Override inspection_level after factory in case veil roll didn't fire.
-        if level > 0:
-            entry.inspection_level = level
-        entries.append(entry)
+    var lot := LotEntry.create(WAREHOUSE_LOTDATA)
+    GameManager.run_record = RunRecord.create(lot)
 
-    GameManager.item_entries = entries
+    var entries: Array[ItemEntry] = GameManager.run_record.lot_entry.item_entries
 
     # Simulate a won auction result using the built entries.
-    GameManager.lot_result = {
+    GameManager.run_record.lot_result = {
         &"paid_price": paid_price,
         &"won_items": entries.duplicate(),
     }
 
     # Clear any leftover cargo from a previous run.
-    GameManager.cargo_items.clear()
+    GameManager.run_record.cargo_items.clear()
 
 
 func _launch_cargo_scene() -> void:
