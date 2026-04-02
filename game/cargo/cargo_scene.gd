@@ -65,7 +65,8 @@ func _on_confirm_popup_confirmed() -> void:
 
     GameManager.run_record.cargo_items = cargo
     GameManager.run_record.onsite_proceeds = sell_count * ONSITE_SELL_PRICE
-    GameManager.go_to_appraisal()
+
+    GameManager.go_to_run_review()
 
 # ══ State helpers ══════════════════════════════════════════════════════════════
 

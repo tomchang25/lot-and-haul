@@ -4,8 +4,9 @@
 [ext_resource type="PackedScene" uid="uid://bauctionscn01" path="res://game/auction/auction_scene.tscn" id="2_ea43q"]
 [ext_resource type="PackedScene" uid="uid://bcargoscn0001" path="res://game/cargo/cargo_scene.tscn" id="3_yimu3"]
 [ext_resource type="PackedScene" uid="uid://bwhscenetscn1" path="res://game/inspection/inspection_scene.tscn" id="4_inspect"]
-[ext_resource type="PackedScene" uid="uid://dsgsj2f826clw" path="res://game/appraisal/appraisal_scene.tscn" id="5_31m1u"]
+[ext_resource type="PackedScene" uid="uid://dsgsj2f826clw" path="res://game/reveal/reveal_scene.tscn" id="5_31m1u"]
 [ext_resource type="Script" uid="uid://bvxr6q4cplcj8" path="res://global/autoload/game_manager/scene_registry.gd" id="5_ea43q"]
+[ext_resource type="PackedScene" uid="uid://cysp2gm1hjmca" path="res://game/run_review/run_review_scene.tscn" id="6_f47ts"]
 [ext_resource type="PackedScene" uid="uid://bwrhentry001" path="res://stage/runs/warehouse/warehouse_entry.tscn" id="6_warehse"]
 
 [sub_resource type="Resource" id="Resource_yimu3"]
@@ -13,8 +14,9 @@ script = ExtResource("5_ea43q")
 warehouse_entry = ExtResource("6_warehse")
 inspection = ExtResource("4_inspect")
 auction = ExtResource("2_ea43q")
+reveal = ExtResource("5_31m1u")
 cargo = ExtResource("3_yimu3")
-appraisal = ExtResource("5_31m1u")
+run_review = ExtResource("6_f47ts")
 metadata/_custom_type_script = "uid://bvxr6q4cplcj8"
 
 [node name="GameManager" type="Node2D" unique_id=1537594909]

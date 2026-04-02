@@ -1,14 +1,16 @@
-# appraisal_item_row.gd
-# One item row in the Block 06 Home Appraisal list.
+# reveal_item_row.gd
+# One item row in the Block 05a Reveal list.
 # Call setup() once after instantiation.
-# Call reveal() to show the item's final-layer identity and value.
-class_name AppraisalItemRow
+# Call reveal() to show the item's layer 1 identity and value.
+class_name RevealItemRow
 extends HBoxContainer
 
 # ── State ─────────────────────────────────────────────────────────────────────
+
 var _entry: ItemEntry = null
 
 # ── Node references ───────────────────────────────────────────────────────────
+
 @onready var _name_lbl: Label = $NameLabel
 @onready var _value_lbl: Label = $ValueLabel
 
@@ -18,14 +20,8 @@ var _entry: ItemEntry = null
 # Bind entry and populate the name. Call once after add_child().
 func setup(entry: ItemEntry) -> void:
     _entry = entry
-
-    if _entry.is_veiled():
-        _name_lbl.text = entry.display_name
-        _value_lbl.text = "???"
-    else:
-        _name_lbl.text = entry.display_name
-        _value_lbl.text = "$%d" % entry.price_estimate
-
+    _name_lbl.text = entry.display_name
+    _value_lbl.text = "???" if entry.is_veiled() else "$%d" % entry.price_estimate
     _value_lbl.add_theme_color_override(&"font_color", Color(0.6, 0.6, 0.6))
 
 

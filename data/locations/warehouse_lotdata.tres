@@ -9,7 +9,5 @@
 
 [resource]
 script = ExtResource("2_4e20k")
-knowledge_factor_min = 0.5
-knowledge_factor_max = 0.5
 item_pool = Array[ExtResource("1_d6tw8")]([ExtResource("2_fwesy"), ExtResource("3_1xxat"), ExtResource("4_e5l1t"), ExtResource("5_dj2iy")])
 metadata/_custom_type_script = "uid://oh0e8qcjnmcs"

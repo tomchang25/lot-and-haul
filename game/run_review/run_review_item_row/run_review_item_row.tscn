@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://run_review_item_row"]
+
+[ext_resource type="Script" path="res://game/run_review/run_review_item_row/run_review_item_row.gd" id="1_rrir"]
+
+[node name="RunReviewItemRow" type="HBoxContainer" unique_id=1000000001]
+custom_minimum_size = Vector2(0, 48)
+theme_override_constants/separation = 0
+script = ExtResource("1_rrir")
+
+[node name="NameLabel" type="Label" parent="." unique_id=1000000002]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+vertical_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="." unique_id=1000000003]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -1,8 +1,10 @@
-# appraisal_scene.gd
-# Block 06 — Home Appraisal
-# Reads:  GameManager.cargo_items, GameManager.lot_result
-# Writes: GameManager.run_result
+# run_review_scene.gd
+# Block 06 — Run Review
+# Reads:  GameManager.run_record.cargo_items, GameManager.run_record.paid_price,
+#         GameManager.run_record.onsite_proceeds
+# Writes: GameManager.run_record.sell_value, GameManager.run_record.net
 extends Control
+
 
 # ── Exports ───────────────────────────────────────────────────────────────────
 
@@ -12,103 +14,65 @@ extends Control
 
 var _cargo_items: Array[ItemEntry] = []
 var _paid_price: int = 0
-var _reveal_index: int = 0
-var _rows: Array[AppraisalItemRow] = []
 
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _row_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/RowContainer
-@onready var _summary_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/SummaryContainer
 @onready var _sell_value_label: Label = $RootVBox/ListCenter/OuterVBox/SummaryContainer/SellValueLabel
-@onready var _paid_label: Label = $RootVBox/ListCenter/OuterVBox/SummaryContainer/PaidLabel
 @onready var _onsite_label: Label = $RootVBox/ListCenter/OuterVBox/SummaryContainer/OnsiteLabel
+@onready var _paid_label: Label = $RootVBox/ListCenter/OuterVBox/SummaryContainer/PaidLabel
 @onready var _net_label: Label = $RootVBox/ListCenter/OuterVBox/SummaryContainer/NetLabel
-@onready var _reveal_btn: Button = $RootVBox/Footer/RevealButton
 @onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
 func _ready() -> void:
-    _reveal_btn.pressed.connect(_on_reveal_pressed)
     _continue_btn.pressed.connect(_on_continue_pressed)
 
     _cargo_items = GameManager.run_record.cargo_items
     _paid_price = GameManager.run_record.paid_price
 
     _populate_rows()
-
-    if _cargo_items.is_empty():
-        _reveal_btn.hide()
-        _commit_result()
-        _show_summary()
+    _commit_result()
+    _show_summary()
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
-
-
-func _on_reveal_pressed() -> void:
-    if _reveal_index >= _rows.size():
-        return
-
-    _rows[_reveal_index].reveal()
-    _reveal_index += 1
-
-    if _reveal_index >= _rows.size():
-        _commit_result()
-        _show_summary()
 
 
 func _on_continue_pressed() -> void:
     GameManager.clear_run_state()
     GameManager.go_to_warehouse_entry()
 
-# ══ Reveal sequence ════════════════════════════════════════════════════════════
+# ══ Rows ══════════════════════════════════════════════════════════════════════
 
 
 func _populate_rows() -> void:
-    if _cargo_items.is_empty():
-        var empty_lbl := Label.new()
-        empty_lbl.text = "You walked away empty-handed."
-        empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-        empty_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-        empty_lbl.add_theme_font_size_override(&"font_size", 16)
-        empty_lbl.custom_minimum_size = Vector2(0, 60)
-        _row_container.add_child(empty_lbl)
-        return
-
     for entry: ItemEntry in _cargo_items:
-        _row_container.add_child(HSeparator.new())
-        var row: AppraisalItemRow = _row_scene.instantiate()
+        var row: RunReviewItemRow = _row_scene.instantiate()
         _row_container.add_child(row)
         row.setup(entry)
-        _rows.append(row)
+
+# ══ Result ════════════════════════════════════════════════════════════════════
 
 
 func _commit_result() -> void:
-    # Layer 0 items auto-advance to layer 1 before settlement.
-    # Layer 0 does not persist into appraisal.
-    for entry: ItemEntry in _cargo_items:
-        if entry.is_veiled() and not entry.is_at_final_layer():
-            entry.layer_index = 1
-
     var sell_value: int = 0
     for entry: ItemEntry in _cargo_items:
         sell_value += entry.active_layer().base_value
 
     GameManager.run_record.sell_value = sell_value
-    GameManager.run_record.paid_price = _paid_price
     GameManager.run_record.net = sell_value + GameManager.run_record.onsite_proceeds - _paid_price
 
 
 func _show_summary() -> void:
     var sell_value: int = GameManager.run_record.sell_value
-    var paid_price: int = GameManager.run_record.paid_price
     var onsite: int = GameManager.run_record.onsite_proceeds
     var net: int = GameManager.run_record.net
 
     _sell_value_label.text = "Total Sell Value:   $%d" % sell_value
     _onsite_label.text = "Sold On-site:   $%d" % onsite
-    _paid_label.text = "Amount Paid:   $%d" % paid_price
+    _paid_label.text = "Amount Paid:   $%d" % _paid_price
 
     if net >= 0:
         _net_label.text = "Profit:   +$%d" % net
@@ -116,7 +80,3 @@ func _show_summary() -> void:
     else:
         _net_label.text = "Loss:   -$%d" % (-net)
         _net_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
-
-    _summary_container.show()
-    _continue_btn.show()
-    _reveal_btn.hide()

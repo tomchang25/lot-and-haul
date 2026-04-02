@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://bl7bfpyi10cid"]
 
-[ext_resource type="Script" uid="uid://wmw3et1vek2a" path="res://game/appraisal/appraisal_item_row/appraisal_item_row.gd" id="1_row"]
+[ext_resource type="Script" uid="uid://wmw3et1vek2a" path="res://game/reveal/reveal_item_row/reveal_item_row.gd" id="1_b40xs"]
 
-[node name="AppraisalRow" type="HBoxContainer" unique_id=1173174031]
+[node name="RevealItemRow" type="HBoxContainer" unique_id=1173174031]
 custom_minimum_size = Vector2(0, 48)
 theme_override_constants/separation = 0
-script = ExtResource("1_row")
+script = ExtResource("1_b40xs")
 
 [node name="NameLabel" type="Label" parent="." unique_id=1513710616]
 layout_mode = 2
