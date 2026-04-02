@@ -8,22 +8,24 @@ func get_level(skill_id: String) -> int:
 
 # True if the player can advance the entry to the next identity layer.
 # Checks stamina cost and skill prerequisite via KnowledgeManager.
-func can_advance(entry: ItemEntry, stamina: int) -> bool:
+func can_advance(entry: ItemEntry, stamina: int, context: LayerUnlockAction.ActionContext) -> bool:
     var action: LayerUnlockAction = entry.current_unlock_action()
     if action == null:
-        return false
-
-    if stamina < action.stamina_cost:
         return false
 
     if entry.is_at_final_layer():
         return false
 
-    # TODO: check current lot instead hardcoded disable when auction context
-    if action.context != LayerUnlockAction.ActionContext.AUCTION:
+    if action.context == LayerUnlockAction.ActionContext.AUTO:
+        return false
+
+    if action.context != context:
+        return false
+
+    if stamina < action.stamina_cost:
         return false
 
     if not action.required_skill:
         return true
-        
-    return KnowledgeManager.get_level(action.required_skill.skill_id) >= action.required_level
+
+    return get_level(action.required_skill.skill_id) >= action.required_level

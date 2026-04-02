@@ -16,10 +16,10 @@ func _ready() -> void:
 # Update button state based on the entry's current unlock action and available stamina.
 func refresh(entry: ItemEntry, stamina: int) -> void:
     var action := entry.current_unlock_action()
-    var can_do := KnowledgeManager.can_advance(entry, stamina)
+    var can_do := KnowledgeManager.can_advance(entry, stamina, LayerUnlockAction.ActionContext.AUCTION)
 
     if action == null:
-        _advance_button.text = "Done"
+        _advance_button.text = "Max Level"
         _advance_button.disabled = true
         _advance_button.modulate.a = 0.45
         return

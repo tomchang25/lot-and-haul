@@ -183,26 +183,15 @@ func _init_auction() -> void:
     var lot: LotEntry = GameManager.run_record.lot_entry
     var lot_items: Array[ItemEntry] = GameManager.run_record.lot_items
 
-    # rolled_price = npc_estimate lerped toward player_estimate,
-    # weighted by demand and aggression.
-    # Full NPC skill resolution is deferred to the auction + knowledge system overhaul.
-    var npc_estimate := lot.get_npc_estimate()
-    var player_estimate := lot.get_player_estimate()
-    var aggressive_lerp := lerpf(
-        lot.lot_data.aggressive_lerp_min,
-        lot.lot_data.aggressive_lerp_max,
-        lot.aggressive_factor,
-    )
-    _rolled_price = roundi(lerpf(npc_estimate, player_estimate, lot.demand_factor * aggressive_lerp))
-    _rolled_price = max(_rolled_price, MIN_STEP)
+    _rolled_price = max(lot.get_rolled_price(), MIN_STEP)
 
-    var opening_bid: = max(lot.get_opening_bid(), MIN_STEP)
+    var opening_bid := max(lot.get_opening_bid(), MIN_STEP)
     _current_display_price = opening_bid
     _displayed_price = opening_bid
     _price_label.text = "$%d" % opening_bid
 
     _build_lot_summary(lot_items)
-    _init_debug_overlay(npc_estimate, player_estimate)
+    _init_debug_overlay()
 
 
 func _build_lot_summary(lot_items: Array[ItemEntry]) -> void:
@@ -363,7 +352,7 @@ func _show_npc_popup(price: int) -> void:
 # Visible in debug builds only. Never ship with _rolled_price exposed.
 
 
-func _init_debug_overlay(npc_estimate: float, player_estimate: float) -> void:
+func _init_debug_overlay() -> void:
     if not OS.is_debug_build():
         return
     var lot: LotEntry = GameManager.run_record.lot_entry
@@ -380,15 +369,13 @@ func _init_debug_overlay(npc_estimate: float, player_estimate: float) -> void:
     _debug_label.offset_bottom = -8.0
     _debug_label.offset_left = 8.0
     _debug_label.text = (
-        "[DBG] rolled=$%d  (npc=$%d  player=$%d  true=$%d)\n"
-        + "      agg=%.2f  demand=%.2f  lerp_range=[%.2f, %.2f]"
+        "[DBG] rolled=$%d  (true=$%d)\n"
+        + "      agg=%.2f  variant=%.2f  lerp_range=[%.2f, %.2f]"
     ) % [
         _rolled_price,
-        roundi(npc_estimate),
-        roundi(player_estimate),
         true_value,
         lot.aggressive_factor,
-        lot.demand_factor,
+        lot.price_variance,
         lot.lot_data.aggressive_lerp_min,
         lot.lot_data.aggressive_lerp_max,
     ]

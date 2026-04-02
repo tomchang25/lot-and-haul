@@ -20,20 +20,13 @@ extends Resource
 @export var aggressive_lerp_min: float = 0.8
 @export var aggressive_lerp_max: float = 1.2
 
-# ── Demand ────────────────────────────────────────────────────────────────────
+# ── Knowledge ─────────────────────────────────────────────────────
+# ── NPC knowledge (placeholder) ───────────────────────────────────────────────
 
-# Range from which demand_factor is rolled at run start.
-# Represents irrational or enthusiasm-driven demand (rookies, collectors, hype).
-# Lerp weight between unveiled base_price and total_true_value.
-@export var demand_factor_min: float = 0.3
-@export var demand_factor_max: float = 0.7
-
-# ── Knowledge (post-demo) ─────────────────────────────────────────────────────
-
-# Range from which knowledge_factor is rolled at run start.
-# Placeholder — ignored until the knowledge system is implemented.
-@export var knowledge_factor_min: float = 0.4
-@export var knowledge_factor_max: float = 0.6
+# Probability that the NPC sees one layer deeper than the item's starting layer.
+# Applied repeatedly — each tick has this chance to advance one more layer.
+# Placeholder for full NPC knowledge system. 0.0 = sees only starting layer.
+@export var npc_layer_sight_chance: float = 0.5
 
 # ── Auction ───────────────────────────────────────────────────────────────────
 
@@ -49,3 +42,14 @@ extends Resource
 # Item presets available in this lot. Runtime selection and ordering is handled by LotEntry.
 # TODO: replace with weighted pool once item randomization is implemented.
 @export var item_pool: Array[ItemData] = []
+
+# ── Price estimation ──────────────────────────────────────────────────────────
+# Multiplier bounds applied to npc_estimate when rolling the final price.
+# rolled_price is clamped to [npc_estimate * price_floor, npc_estimate * price_ceiling].
+@export var price_floor_factor: float = 0.6
+@export var price_ceiling_factor: float = 1.4
+
+# Per-run price noise. Rolled close to 1.0 — adds slight variance across runs
+# without systematic bias. Not tied to demand or NPC knowledge.
+@export var price_variance_min: float = 0.85
+@export var price_variance_max: float = 1.15

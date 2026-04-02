@@ -14,15 +14,14 @@ var lot_data: LotData = null
 # Controls where NPCs estimate item value: 0.0 = low end, 1.0 = high end.
 var aggressive_factor: float = 0.5
 
-# Rolled from lot_data.demand_factor_range.
-# Lerp weight between layer 0 base_value and player-discovered layer base_value.
-var demand_factor: float = 0.5
-
-# Rolled from lot_data.knowledge_factor_range. Placeholder — ignored until post-demo.
-var knowledge_factor: float = 0.5
+var price_variance: float = 1.0
 
 # One entry per item in this lot. Generated from lot_data.item_pool at creation.
 var item_entries: Array[ItemEntry] = []
+
+# Cached NPC estimate rolled once at creation.
+# Both get_opening_bid() and auction rolled_price derive from this value.
+var npc_estimate: int = 0
 
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
@@ -36,11 +35,13 @@ static func create(data: LotData) -> LotEntry:
     entry.lot_data = data
 
     entry.aggressive_factor = randf_range(data.aggressive_factor_min, data.aggressive_factor_max)
-    entry.demand_factor = randf_range(data.demand_factor_min, data.demand_factor_max)
-    entry.knowledge_factor = randf_range(data.knowledge_factor_min, data.knowledge_factor_max)
+    entry.price_variance = randf_range(data.price_variance_min, data.price_variance_max)
 
     for item: ItemData in data.item_pool:
-        entry.item_entries.append(ItemEntry.create(item))
+        entry.item_entries.append(ItemEntry.create(item, data.veiled_chance))
+
+    # Cache after item_entries are populated — get_npc_estimate() reads them.
+    entry.npc_estimate = entry.roll_npc_estimate()
 
     return entry
 
@@ -57,24 +58,39 @@ func get_player_estimate() -> int:
     return total
 
 
-# Sum of each item's layer 0 base_value.
-# Represents the NPC's baseline valuation — used as the rolled_price anchor.
+# Returns the cached NPC estimate. Stable across calls.
 func get_npc_estimate() -> int:
-    var total := 0
-    for entry: ItemEntry in item_entries:
-        if not entry.item_data.identity_layers.is_empty():
-            if entry.is_veiled():
-                total += entry.item_data.identity_layers[0].base_value
-            else:
-                var base_layer = 1
-                while base_layer < entry.item_data.identity_layers.size() - 1 and randf() < 0.1:
-                    base_layer += 1
-
-                total += entry.item_data.identity_layers[base_layer].base_value
-    return total
+    return npc_estimate
 
 
 # Opening bid shown in the pre-auction review and used as the auction starting price.
 # Derived from npc_estimate so both blocks always agree.
 func get_opening_bid() -> int:
     return roundi(get_npc_estimate() * lot_data.opening_bid_factor)
+
+
+# Called once during create(). Rolls randf() per item — never call again after caching.
+func roll_npc_estimate() -> int:
+    var total := 0
+    for entry: ItemEntry in item_entries:
+        if entry.item_data.identity_layers.is_empty():
+            continue
+
+        var base_layer := entry.layer_index
+        while base_layer < entry.item_data.identity_layers.size() - 1 and randf() < lot_data.npc_layer_sight_chance ** (entry.layer_index + 1):
+            base_layer += 1
+        total += entry.item_data.identity_layers[base_layer].base_value
+
+    return total
+
+
+func get_rolled_price() -> int:
+    var aggressive_lerp := lerpf(
+        lot_data.aggressive_lerp_min,
+        lot_data.aggressive_lerp_max,
+        aggressive_factor,
+    )
+    var raw: float = npc_estimate * aggressive_lerp * price_variance
+    var floor_val := npc_estimate * lot_data.price_floor_factor
+    var ceil_val := npc_estimate * lot_data.price_ceiling_factor
+    return roundi(clampf(raw, floor_val, ceil_val))

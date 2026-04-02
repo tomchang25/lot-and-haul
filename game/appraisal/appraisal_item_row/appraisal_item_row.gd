@@ -18,8 +18,14 @@ var _entry: ItemEntry = null
 # Bind entry and populate the name. Call once after add_child().
 func setup(entry: ItemEntry) -> void:
     _entry = entry
-    _name_lbl.text = entry.display_name
-    _value_lbl.text = "???"
+
+    if _entry.is_veiled():
+        _name_lbl.text = entry.display_name
+        _value_lbl.text = "???"
+    else:
+        _name_lbl.text = entry.display_name
+        _value_lbl.text = "$%d" % entry.price_estimate
+
     _value_lbl.add_theme_color_override(&"font_color", Color(0.6, 0.6, 0.6))
 
 
@@ -27,6 +33,9 @@ func setup(entry: ItemEntry) -> void:
 func reveal() -> void:
     if _entry == null:
         return
+
+    if _entry.is_veiled():
+        _entry.layer_index = 1
 
     _name_lbl.text = _entry.display_name
     _value_lbl.text = "$%d" % _entry.price_estimate
