@@ -99,15 +99,15 @@ grow_horizontal = 2
 grow_vertical = 0
 alignment = 1
 
-[node name="StartAuctionButton" type="Button" parent="HUD/Footer" unique_id=1061694818]
-custom_minimum_size = Vector2(120, 0)
-layout_mode = 2
-text = "Start Auction"
-
 [node name="PassButton" type="Button" parent="HUD/Footer" unique_id=1473063044]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Pass"
+
+[node name="StartAuctionButton" type="Button" parent="HUD/Footer" unique_id=1061694818]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Start Auction"
 
 [node name="ListReviewPopup" parent="." unique_id=796787196 instance=ExtResource("4_icrf5")]
 visible = false
@@ -130,3 +130,8 @@ offset_top = 12.0
 offset_right = -12.0
 offset_bottom = 44.0
 grow_horizontal = 0
+
+[node name="ConfirmPopup" type="AcceptDialog" parent="." unique_id=46946476]
+oversampling_override = 1.0
+title = "Load Up?"
+ok_button_text = "Confirm"

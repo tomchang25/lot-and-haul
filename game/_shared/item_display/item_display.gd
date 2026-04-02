@@ -25,7 +25,7 @@ func refresh_display() -> void:
 
 func _apply_layer() -> void:
     _name_label.text = _entry.display_name
-    _price_label.text = "$%d" % _entry.price_estimate
+    _price_label.text = "$%d" % _entry.active_layer().base_value
     _level_label.text = _entry.level_label
 
 

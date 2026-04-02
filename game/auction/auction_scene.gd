@@ -197,10 +197,10 @@ func _init_auction() -> void:
 func _build_lot_summary(lot_items: Array[ItemEntry]) -> void:
     var total_estimate := 0
     for entry: ItemEntry in lot_items:
-        total_estimate += entry.price_estimate
+        total_estimate += entry.active_layer().base_value
 
         var label := Label.new()
-        label.text = "%s ($%d)" % [entry.display_name, entry.price_estimate]
+        label.text = "%s ($%d)" % [entry.display_name, entry.active_layer().base_value]
         label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         label.add_theme_font_size_override(&"font_size", 15)
         _lot_summary.add_child(label)

@@ -69,7 +69,7 @@ func _make_row(entry: ItemEntry) -> HBoxContainer:
     row.add_child(status_label)
 
     var price_label := Label.new()
-    price_label.text = "$%d" % entry.price_estimate
+    price_label.text = "$%d" % entry.active_layer().base_value
     price_label.custom_minimum_size = Vector2(130.0, 0.0)
     price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
     price_label.add_theme_font_size_override(&"font_size", 13)

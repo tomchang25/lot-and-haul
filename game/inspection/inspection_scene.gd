@@ -38,6 +38,7 @@ var _pulse_tween: Tween = null
 @onready var _start_btn: Button = $HUD/Footer/StartAuctionButton
 @onready var _pass_btn: Button = $HUD/Footer/PassButton
 @onready var _list_review: ListReviewPopup = $ListReviewPopup
+@onready var _confirm_popup: AcceptDialog = $ConfirmPopup
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -49,6 +50,7 @@ func _ready() -> void:
     _pass_btn.pressed.connect(_on_pass_pressed)
     _list_review.back_requested.connect(_on_list_review_back)
     _list_review.auction_entered.connect(_on_auction_entered)
+    _confirm_popup.confirmed.connect(_on_confirm_popup_confirmed)
 
     _stamina_hud.update_stamina(_stamina, MAX_STAMINA)
     _action_popup.hide()
@@ -93,10 +95,8 @@ func _on_start_auction_pressed() -> void:
 
 
 func _on_pass_pressed() -> void:
-    _close_popup()
-    if _pulse_tween:
-        _pulse_tween.kill()
-    GameManager.go_to_run_review()
+    _confirm_popup.dialog_text = "Skip inspection and go to run review?\nAny remaining stamina will be lost."
+    _confirm_popup.popup_centered()
 
 
 func _on_list_review_back() -> void:
@@ -105,6 +105,13 @@ func _on_list_review_back() -> void:
 
 func _on_auction_entered() -> void:
     GameManager.go_to_auction()
+
+
+func _on_confirm_popup_confirmed() -> void:
+    _close_popup()
+    if _pulse_tween:
+        _pulse_tween.kill()
+    GameManager.go_to_run_review()
 
 # ══ Item display ══════════════════════════════════════════════════════════════
 

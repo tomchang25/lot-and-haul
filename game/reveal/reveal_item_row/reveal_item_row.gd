@@ -13,6 +13,7 @@ var _entry: ItemEntry = null
 
 @onready var _name_lbl: Label = $NameLabel
 @onready var _value_lbl: Label = $ValueLabel
+@onready var _cond_lbl: Label = $ConditionLabel
 
 # ══ Common API ════════════════════════════════════════════════════════════════
 
@@ -21,7 +22,11 @@ var _entry: ItemEntry = null
 func setup(entry: ItemEntry) -> void:
     _entry = entry
     _name_lbl.text = entry.display_name
-    _value_lbl.text = "???" if entry.is_veiled() else "$%d" % entry.price_estimate
+
+    _cond_lbl.text = "---"
+    _cond_lbl.modulate = Color(0.5, 0.5, 0.5)
+
+    _value_lbl.text = "???" if entry.is_veiled() else "$%d" % entry.active_layer().base_value
     _value_lbl.add_theme_color_override(&"font_color", Color(0.6, 0.6, 0.6))
 
 
@@ -34,5 +39,15 @@ func reveal() -> void:
         _entry.layer_index = 1
 
     _name_lbl.text = _entry.display_name
+
+    _cond_lbl.text = _entry.condition_label
+
+    if _entry.condition >= 0.8:
+        _cond_lbl.modulate = Color.GOLD
+    elif _entry.condition >= 0.6:
+        _cond_lbl.modulate = Color.GREEN_YELLOW
+    else:
+        _cond_lbl.modulate = Color.LIGHT_CORAL
+
     _value_lbl.text = "$%d" % _entry.price_estimate
     _value_lbl.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))

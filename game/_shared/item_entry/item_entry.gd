@@ -23,9 +23,27 @@ var level_label: String:
     get:
         return "???" if is_veiled() else "Level %d" % layer_index
 
+var condition_label: String:
+    get:
+        var cond_percent := int(condition * 100)
+        var mult := get_condition_multiplier()
+        return "%d%% (x%.2f)" % [cond_percent, mult]
+
+
+func get_condition_multiplier() -> float:
+    if condition <= 0.6:
+        return remap(condition, 0.0, 0.6, 0.5, 1.0)
+    elif condition <= 0.8:
+        return remap(condition, 0.6, 0.8, 1.0, 2.0)
+    else:
+        return remap(condition, 0.8, 1.0, 2.0, 4.0)
+
+
 var price_estimate: int:
     get:
-        return active_layer().base_value
+        var base := active_layer().base_value
+        var multiplier := get_condition_multiplier()
+        return int(base * multiplier)
 
 
 # Returns the layer currently visible to the player.
@@ -54,6 +72,8 @@ func is_at_final_layer() -> bool:
 static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
     var entry := ItemEntry.new()
     entry.item_data = data
+
+    entry.condition = randf()
 
     # Layer 0 = veiled. If veil doesn't apply, auto-advance to layer 1.
     var start_veiled := randf() < veil_chance
