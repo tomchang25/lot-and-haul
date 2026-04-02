@@ -25,6 +25,7 @@ GameManager="*uid://bnj3y0a2848to"
 [debug]
 
 gdscript/warnings/integer_division=0
+gdscript/warnings/inference_on_variant=0
 
 [display]
 

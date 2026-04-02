@@ -5,7 +5,7 @@ signal clicked(display: ItemDisplay)
 
 var _entry: ItemEntry = null
 
-@onready var _sprite_rect: ColorRect = $VBox/SpriteRect
+# @onready var _sprite_rect: ColorRect = $VBox/SpriteRect
 @onready var _name_label: Label = $VBox/NameLabel
 @onready var _price_label: Label = $VBox/PriceLabel
 @onready var _level_label: Label = $VBox/LevelLabel
@@ -14,19 +14,19 @@ var _entry: ItemEntry = null
 # Call after instantiation to bind entry and set initial display state.
 func setup(entry: ItemEntry) -> void:
     _entry = entry
-    _apply_level()
+    _apply_layer()
 
 
-# Called after entry.inspection_level has been updated to sync the display and play the pop animation.
+# Called after entry.layer_index has been updated to sync the display and play the pop animation.
 func refresh_display() -> void:
-    _apply_level()
+    _apply_layer()
     _animate_level_pop()
 
 
-func _apply_level() -> void:
-    _name_label.text = InspectionRules.get_display_name(_entry)
-    _price_label.text = ClueEvaluator.get_price_range_label(_entry)
-    _level_label.text = InspectionRules.level_label(_entry.inspection_level)
+func _apply_layer() -> void:
+    _name_label.text = _entry.display_name
+    _price_label.text = "$%d" % _entry.price_estimate
+    _level_label.text = _entry.level_label
 
 
 func _animate_level_pop() -> void:

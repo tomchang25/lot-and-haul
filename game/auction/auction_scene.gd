@@ -1,13 +1,10 @@
 # auction_scene.gd
 # Block 04 — The player watches a live bidding sequence and decides when to drop out.
-# Reads:  GameManager.item_entries, GameManager.lot_data
-# Writes: GameManager.lot_result { "paid_price": int, "won_items": Array[ItemEntry] }
+# Reads:  GameManager.run_record.lot_entry, GameManager.run_record.lot_items
+# Writes: GameManager.run_record.paid_price, GameManager.run_record.won_items
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
-
-const OPENING_BID_MIN_FACTOR := 0.05
-const OPENING_BID_MAX_FACTOR := 0.10
 
 const NPC_NAMES: Array[String] = [
     "Bidder 2",
@@ -36,6 +33,7 @@ var _bid_enabled: bool = true
 var _shorten_next_npc_tick: bool = false
 var _last_npc_index: int = -1 # tracks the last NPC to prevent repeats
 var _circle_node: _CircleProgress = null
+var _debug_label: Label = null # debug builds only; never exposes _rolled_price in release
 
 # ── Timer / tween handles ─────────────────────────────────────────────────────
 
@@ -52,10 +50,6 @@ var _price_tween: Tween = null
 @onready var _bid_button: Button = $RootVBox/ButtonBar/BidButton
 @onready var _pass_button: Button = $RootVBox/ButtonBar/PassButton
 
-# ── Debug ─────────────────────────────────────────────────────────────────────
-
-var _debug_label: Label = null
-
 # ══ Inner class: circle progress arc ══════════════════════════════════════════
 
 
@@ -68,7 +62,7 @@ class _CircleProgress extends Control:
         var radius := minf(size.x, size.y) / 2.0 - 6.0
         # Background track
         draw_arc(centre, radius, 0.0, TAU, 64, Color(0.25, 0.25, 0.25, 1.0), 8.0, true)
-        # Filled arc, starting from 12 o'clock (−π/2)
+        # Filled arc, starting from 12 o'clock (-PI/2)
         if fill > 0.001:
             draw_arc(
                 centre,
@@ -107,32 +101,26 @@ func _ready() -> void:
 
 
 func _on_npc_tick() -> void:
-    # Calculate progress toward the target rolled price
     var progress := float(_current_display_price) / float(_rolled_price)
     var step_multiplier := 1.0
 
     if progress < 0.5:
-        # High boost for early progress
         step_multiplier = 2.0
     elif progress < 0.75:
-        # Moderate boost
         step_multiplier = 1.5
     elif progress < 0.9:
-        # Slight boost as it nears completion
         step_multiplier = 1.2
     else:
-        # Default or final stage (progress >= 0.9)
         step_multiplier = 1.0
 
     if randf() < 0.1:
         step_multiplier *= 4.0
 
-    var step := maxi(roundi(_current_display_price * STEP_RATIO * step_multiplier), MIN_STEP)
+    var step := max(roundi(_current_display_price * STEP_RATIO * step_multiplier), MIN_STEP)
 
     _current_display_price += step
     _last_bidder = "npc"
 
-    # Display layer: update price, show popup, reset circle
     _tween_price_to(_current_display_price)
     _show_npc_popup(_current_display_price)
     _reset_circle()
@@ -154,7 +142,7 @@ func _on_circle_completed() -> void:
     if _in_reach:
         _resolve()
     else:
-        # Purely atmospheric in normal state — loop.
+        # Purely atmospheric in normal state -- loop.
         _start_circle(0.0)
 
 
@@ -194,74 +182,50 @@ func _on_pass_pressed() -> void:
 func _init_auction() -> void:
     var lot: LotEntry = GameManager.run_record.lot_entry
     var lot_items: Array[ItemEntry] = GameManager.run_record.lot_items
-    var aggressive_factor := lot.aggressive_factor if lot != null else 0.5
-    var demand_factor := lot.demand_factor if lot != null else 0.5
 
-    # rolled_price = veiled_total + unveiled_total
-    # aggressive_factor (0.0–1.0): veiled → fraction of base_veiled_price
-    #                               unveiled → biases the lerp multiplier via aggressive_lerp_min/max
-    # demand_factor (0.0–1.0): lerp weight between unveiled base_price and total_true_value
-    var untouched_lo: float = ClueEvaluator.RANGES[InspectionRules.Level.UNTOUCHED][0]
-    var aggressive_lerp := lerpf(lot.lot_data.aggressive_lerp_min, lot.lot_data.aggressive_lerp_max, aggressive_factor)
-
-    var veiled_total: int = 0
-    var unveiled_base: float = 0.0
-    var unveiled_true: float = 0.0
-
-    for entry: ItemEntry in lot_items:
-        if entry.is_veiled():
-            veiled_total += roundi(
-                entry.resolved_veiled_type.base_veiled_price * aggressive_factor,
-            )
-        else:
-            unveiled_base += entry.item_data.true_value * untouched_lo
-            unveiled_true += entry.item_data.true_value
-
-    var unveiled_total := roundi(
-        lerpf(unveiled_base, unveiled_true, demand_factor * aggressive_lerp),
+    # rolled_price = npc_estimate lerped toward player_estimate,
+    # weighted by demand and aggression.
+    # Full NPC skill resolution is deferred to the auction + knowledge system overhaul.
+    var npc_estimate := lot.get_npc_estimate()
+    var player_estimate := lot.get_player_estimate()
+    var aggressive_lerp := lerpf(
+        lot.lot_data.aggressive_lerp_min,
+        lot.lot_data.aggressive_lerp_max,
+        lot.aggressive_factor,
     )
-    _rolled_price = veiled_total + unveiled_total
+    _rolled_price = roundi(lerpf(npc_estimate, player_estimate, lot.demand_factor * aggressive_lerp))
+    _rolled_price = max(_rolled_price, MIN_STEP)
 
-    # Opening bid is a fixed fraction of rolled_price; no extra multiplier.
-    var opening_bid := maxi(
-        roundi(_rolled_price * randf_range(OPENING_BID_MIN_FACTOR, OPENING_BID_MAX_FACTOR)),
-        MIN_STEP,
-    )
+    var opening_bid: = max(lot.get_opening_bid(), MIN_STEP)
     _current_display_price = opening_bid
     _displayed_price = opening_bid
     _price_label.text = "$%d" % opening_bid
 
-    # Lot summary — uses centralized display helpers.
+    _build_lot_summary(lot_items)
+    _init_debug_overlay(npc_estimate, player_estimate)
+
+
+func _build_lot_summary(lot_items: Array[ItemEntry]) -> void:
+    var total_estimate := 0
     for entry: ItemEntry in lot_items:
-        var lbl := Label.new()
-        lbl.text = "%s (%s)" % [
-            InspectionRules.get_display_name(entry),
-            ClueEvaluator.get_price_range_label(entry),
-        ]
-        lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-        lbl.add_theme_font_size_override(&"font_size", 15)
-        _lot_summary.add_child(lbl)
+        total_estimate += entry.price_estimate
+
+        var label := Label.new()
+        label.text = "%s ($%d)" % [entry.display_name, entry.price_estimate]
+        label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        label.add_theme_font_size_override(&"font_size", 15)
+        _lot_summary.add_child(label)
 
     _lot_summary.add_child(HSeparator.new())
 
-    var estimate := ClueEvaluator.get_lot_estimate(lot_items)
-    var total_lbl := Label.new()
-    total_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    total_lbl.add_theme_font_size_override(&"font_size", 16)
-    total_lbl.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
+    var total_label := Label.new()
+    total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    total_label.add_theme_font_size_override(&"font_size", 16)
+    total_label.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
+    total_label.text = "Total Est: $%d" % total_estimate
+    _lot_summary.add_child(total_label)
 
-    if estimate.has_unknown and estimate.lo == 0 and estimate.hi == 0:
-        total_lbl.text = "Total Est: ?"
-    elif estimate.has_unknown:
-        total_lbl.text = "Total Est: $%d – $%d +" % [estimate.lo, estimate.hi]
-    else:
-        total_lbl.text = "Total Est: $%d – $%d" % [estimate.lo, estimate.hi]
-
-    _lot_summary.add_child(total_lbl)
-
-    _init_debug_overlay(veiled_total, unveiled_total)
-
-# ══ NPC tick ══════════════════════════════════════════════════════════════════
+# ══ NPC logic ═════════════════════════════════════════════════════════════════
 
 
 func _start_npc_timer() -> void:
@@ -271,24 +235,21 @@ func _start_npc_timer() -> void:
         _npc_timer.timeout.connect(_on_npc_tick)
         add_child(_npc_timer)
 
-    # Calculate progress toward the target rolled price
     var progress := float(_current_display_price) / float(_rolled_price)
 
-    # Default slow-paced intervals (current logic)
-    var min_time = 0.5
-    var max_time = 1.5
+    var min_time: float
+    var max_time: float
 
     if progress < 0.5:
         # Rapid frequency for early progress
         min_time = 0.2
         max_time = 0.5
     elif progress < 1.0:
-        # Linear interpolation between 0.5 and 1.0 progress
-        # Smoothly transitions from (0.2, 0.5) to (0.5, 1.5)
+        # Smoothly interpolate cadence as price approaches rolled_price
         min_time = remap(progress, 0.5, 1.0, 0.2, 0.5)
         max_time = remap(progress, 0.5, 1.0, 0.5, 1.5)
     else:
-        # Default slow pace once completed or at final stage
+        # Default slow pace at or beyond rolled_price
         min_time = 0.5
         max_time = 1.5
 
@@ -363,19 +324,18 @@ func _set_displayed_price(v: float) -> void:
 
 
 func _show_player_bid_in_stack(price: int) -> void:
-    var lbl := Label.new()
-    lbl.text = "YOU — $%d" % price
-    lbl.add_theme_font_size_override(&"font_size", 14)
-    lbl.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
-    _npc_history_list.add_child(lbl)
+    var label := Label.new()
+    label.text = "YOU -- $%d" % price
+    label.add_theme_font_size_override(&"font_size", 14)
+    label.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
+    _npc_history_list.add_child(label)
 
     var tween := create_tween()
     tween.tween_interval(3.0)
-    tween.tween_callback(lbl.queue_free)
+    tween.tween_callback(label.queue_free)
 
 
 func _show_npc_popup(price: int) -> void:
-    # Pick a new NPC index that is different from the last one
     var new_index := randi() % NPC_NAMES.size()
     while new_index == _last_npc_index:
         new_index = randi() % NPC_NAMES.size()
@@ -383,39 +343,35 @@ func _show_npc_popup(price: int) -> void:
     _last_npc_index = new_index
     var npc_name: String = NPC_NAMES[new_index]
 
-    # Create a new Label for stacking
     var new_bid_label := Label.new()
-    new_bid_label.text = "%s — $%d" % [npc_name, price]
+    new_bid_label.text = "%s -- $%d" % [npc_name, price]
     new_bid_label.add_theme_font_size_override(&"font_size", 14)
     new_bid_label.modulate.a = 0.0
 
-    # Add to the container
     _npc_history_list.add_child(new_bid_label)
 
-    # Animation: Fade in, stay, then fade out and auto-remove
     var tween := create_tween()
     tween.tween_property(new_bid_label, "modulate:a", 1.0, 0.15)
     tween.tween_interval(3.0)
     tween.tween_property(new_bid_label, "modulate:a", 0.0, 0.5)
     tween.tween_callback(new_bid_label.queue_free)
 
-    # Optional: Limit the number of visible items to avoid clutter
     if _npc_history_list.get_child_count() > 5:
         _npc_history_list.get_child(0).queue_free()
+
 # ══ Debug overlay ══════════════════════════════════════════════════════════════
 # Visible in debug builds only. Never ship with _rolled_price exposed.
 
 
-func _init_debug_overlay(veiled_total: int, unveiled_total: int) -> void:
+func _init_debug_overlay(npc_estimate: float, player_estimate: float) -> void:
     if not OS.is_debug_build():
         return
-    var run: RunRecord = GameManager.run_record
-    var lot: LotEntry = run.lot_entry
+    var lot: LotEntry = GameManager.run_record.lot_entry
 
-    var total_true_value := 0
+    var true_value := 0
     for entry: ItemEntry in GameManager.run_record.lot_items:
-        if not entry.is_veiled():
-            total_true_value += entry.item_data.true_value
+        if not entry.item_data.identity_layers.is_empty():
+            true_value += entry.item_data.identity_layers.back().base_value
 
     _debug_label = Label.new()
     _debug_label.add_theme_font_size_override(&"font_size", 13)
@@ -424,13 +380,13 @@ func _init_debug_overlay(veiled_total: int, unveiled_total: int) -> void:
     _debug_label.offset_bottom = -8.0
     _debug_label.offset_left = 8.0
     _debug_label.text = (
-        "[DBG] rolled=$%d  (veiled=$%d  unveiled=$%d)  true=$%d\n"
+        "[DBG] rolled=$%d  (npc=$%d  player=$%d  true=$%d)\n"
         + "      agg=%.2f  demand=%.2f  lerp_range=[%.2f, %.2f]"
     ) % [
         _rolled_price,
-        veiled_total,
-        unveiled_total,
-        total_true_value,
+        roundi(npc_estimate),
+        roundi(player_estimate),
+        true_value,
         lot.aggressive_factor,
         lot.demand_factor,
         lot.lot_data.aggressive_lerp_min,

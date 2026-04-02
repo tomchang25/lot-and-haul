@@ -1,34 +1,17 @@
 # item_data.gd
-# Static data resource representing a single auctionable item.
+# Designer-authored resource representing a single auctionable item.
 # Contains only intrinsic item properties — no inspection logic or action rules.
-# Clue tags are ordered by discovery depth: earlier tags are revealed by lighter
-# inspection actions, later tags require deeper investigation.
-# Reveal counts per action are defined externally in InspectionActionData (Block 02).
 class_name ItemData
 extends Resource
 
-# Display name shown in UI
-@export var item_name: String = ""
+# Internal identifier. Never displayed to the player.
+@export var item_id: String = ""
 
-# Ground-truth market value in currency units; never shown directly to the player
-@export var true_value: int = 0
+# Physical classification. Holds super_category, category, weight, grid_size.
+@export var category_data: CategoryData = null
 
-# Weight in kilograms; used for cargo weight limit checks
-@export var weight: float = 0.0
-
-# Number of inventory grid cells this item occupies (1-dimensional for now)
-@export var grid_size: int = 1
-
-# Broad item type (e.g. "Accessory", "Vehicle")
-@export var super_category: String = ""
-
-# Fine-grained item type (e.g. "Pocket Watch", "Bike")
-@export var category: String = ""
-
-# Ordered list of descriptive tags representing this item's characteristics.
-# Sequence implies information depth: index 0 is the most surface-level clue,
-# higher indices require more thorough inspection to uncover.
-# Examples: "antique", "1870s", "brass", "functional", "rare", "damaged"
-@export var clues: Array[String] = []
-
-@export var veiled_types: Array[VeiledType] = []
+# Ordered chain from least to most specific identity.
+# Layer 0 is always the starting state — no action needed to see it.
+# Each layer's unlock_action describes how to advance from that layer to the next.
+# The final layer has a null unlock_action.
+@export var identity_layers: Array[IdentityLayer] = []

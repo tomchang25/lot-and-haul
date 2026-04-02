@@ -1,39 +1,39 @@
 class_name ActionPopup
 extends PanelContainer
 
-signal browse_requested
-signal examine_requested
+signal advance_requested
 signal cancelled
 
-@onready var _browse_btn: Button = $VBox/BrowseButton
-@onready var _examine_btn: Button = $VBox/ExamineButton
+@onready var _advance_button: Button = $VBox/AdvanceButton
+@onready var _cancel_button: Button = $VBox/CancelButton
 
 
 func _ready() -> void:
-    $VBox/BrowseButton.pressed.connect(_on_browse_pressed)
-    $VBox/ExamineButton.pressed.connect(_on_examine_pressed)
-    $VBox/CancelButton.pressed.connect(_on_cancel_pressed)
+    _advance_button.pressed.connect(_on_advance_pressed)
+    _cancel_button.pressed.connect(_on_cancel_pressed)
 
 
-# Update button enabled/greyed state based on current item level and stamina.
-func refresh(item_level: int, stamina: int) -> void:
-    var browse_ok := InspectionRules.can_browse(item_level, stamina)
-    _browse_btn.disabled = not browse_ok
-    _browse_btn.modulate.a = 1.0 if browse_ok else 0.45
+# Update button state based on the entry's current unlock action and available stamina.
+func refresh(entry: ItemEntry, stamina: int) -> void:
+    var action := entry.current_unlock_action()
+    var can_do := KnowledgeManager.can_advance(entry, stamina)
 
-    var examine_cost := InspectionRules.examine_cost(item_level)
-    var examine_ok := InspectionRules.can_examine(item_level, stamina)
-    _examine_btn.disabled = not examine_ok
-    _examine_btn.modulate.a = 1.0 if examine_ok else 0.45
-    _examine_btn.text = "Examine (%d SP)" % examine_cost
+    if action == null:
+        _advance_button.text = "Done"
+        _advance_button.disabled = true
+        _advance_button.modulate.a = 0.45
+        return
+
+    _advance_button.disabled = not can_do
+    if can_do:
+        _advance_button.text = "Inspect (%d SP)" % action.stamina_cost
+    else:
+        _advance_button.text = "Inspect (Requirments not met)"
+    _advance_button.modulate.a = 1.0 if can_do else 0.45
 
 
-func _on_browse_pressed() -> void:
-    browse_requested.emit()
-
-
-func _on_examine_pressed() -> void:
-    examine_requested.emit()
+func _on_advance_pressed() -> void:
+    advance_requested.emit()
 
 
 func _on_cancel_pressed() -> void:

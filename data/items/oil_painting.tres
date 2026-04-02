@@ -1,17 +1,13 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://b3yb21g5uai0n"]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://c73lwa3suzp3"]
 
 [ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
-[ext_resource type="Resource" uid="uid://c8enxk4fda28m" path="res://data/veiled_types/unknown_painting.tres" id="2_vt"]
-[ext_resource type="Script" uid="uid://bku4smrdbihvx" path="res://data/_definitions/veiled_type.gd" id="2_vtscript"]
-[ext_resource type="Resource" uid="uid://b0l3banegh5n6" path="res://data/veiled_types/flat_package.tres" id="3_vt"]
+[ext_resource type="Resource" uid="uid://1mz36hgxhgf8" path="res://data/categories/painting.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://dibattx48e6o" path="res://data/identity_layers/framed_canvas.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://dtb81stcx8th" path="res://data/identity_layers/landscape_oil_painting.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://d8helrjtmsxd" path="res://data/identity_layers/signed_masters_study.tres" id="5_layer"]
 
 [resource]
 script = ExtResource("1_jyqit")
-item_name = "Oil Painting"
-true_value = 2200
-weight = 1.5
-grid_size = 2
-super_category = "Art"
-category = "Painting"
-clues = Array[String](["painting", "oil on canvas", "landscape", "signed verso", "19th century"])
-veiled_types = Array[ExtResource("2_vtscript")]([ExtResource("2_vt"), ExtResource("3_vt")])
+item_id = "oil_painting"
+category_data = ExtResource("2_cat")
+identity_layers = [ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer")]

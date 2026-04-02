@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cuw7v0qpqfq4l" path="res://game/auction/auction_scene.gd" id="1_auction"]
 
-[node name="AuctionScene" type="Control"]
+[node name="AuctionScene" type="Control" unique_id=1003257590]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,7 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_auction")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=1119407891]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,9 +19,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.1, 0.1, 0.12, 1.0)
+color = Color(0.1, 0.1, 0.12, 1)
 
-[node name="RootVBox" type="VBoxContainer" parent="."]
+[node name="RootVBox" type="VBoxContainer" parent="." unique_id=443503367]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -29,19 +29,19 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Centre" type="CenterContainer" parent="RootVBox"]
+[node name="Centre" type="CenterContainer" parent="RootVBox" unique_id=123679080]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Content" type="VBoxContainer" parent="RootVBox/Centre"]
+[node name="Content" type="VBoxContainer" parent="RootVBox/Centre" unique_id=537269785]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="PriceArea" type="Control" parent="RootVBox/Centre/Content"]
-layout_mode = 2
+[node name="PriceArea" type="Control" parent="RootVBox/Centre/Content" unique_id=1031152805]
 custom_minimum_size = Vector2(220, 220)
+layout_mode = 2
 
-[node name="PriceLabel" type="Label" parent="RootVBox/Centre/Content/PriceArea"]
+[node name="PriceLabel" type="Label" parent="RootVBox/Centre/Content/PriceArea" unique_id=1865850917]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -53,29 +53,31 @@ text = "$0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NpcHistoryList" type="VBoxContainer" parent="RootVBox/Centre/Content/PriceArea"]
-layout_mode = 0
-offset_left = 228.0
-offset_top = 72.0
+[node name="NpcHistoryList" type="VBoxContainer" parent="RootVBox/Centre/Content/PriceArea" unique_id=21420429]
 custom_minimum_size = Vector2(180, 0)
+layout_mode = 0
+offset_left = 267.0
+offset_top = 12.0
+offset_right = 447.0
+offset_bottom = 12.0
 theme_override_constants/separation = 2
 
-[node name="LotSummary" type="VBoxContainer" parent="RootVBox/Centre/Content"]
+[node name="LotSummary" type="VBoxContainer" parent="RootVBox/Centre/Content" unique_id=570709590]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="ButtonBar" type="HBoxContainer" parent="RootVBox"]
-layout_mode = 2
+[node name="ButtonBar" type="HBoxContainer" parent="RootVBox" unique_id=889198096]
 custom_minimum_size = Vector2(0, 64)
-alignment = 1
-theme_override_constants/separation = 24
-
-[node name="PassButton" type="Button" parent="RootVBox/ButtonBar"]
 layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="PassButton" type="Button" parent="RootVBox/ButtonBar" unique_id=451666721]
 custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
 text = "Pass"
 
-[node name="BidButton" type="Button" parent="RootVBox/ButtonBar"]
-layout_mode = 2
+[node name="BidButton" type="Button" parent="RootVBox/ButtonBar" unique_id=702685876]
 custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
 text = "Bid"

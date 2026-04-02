@@ -40,11 +40,11 @@ func _on_toggle_changed(pressed: bool) -> void:
 # Bind entry and populate all labels. Call once after add_child().
 func setup(p_entry: ItemEntry) -> void:
     entry = p_entry
-    var item: ItemData = entry.item_data
-    _name_label.text = InspectionRules.get_display_name(entry)
-    _price_label.text = ClueEvaluator.get_price_range_label(entry)
-    _weight_label.text = "%.1f kg" % item.weight
-    _size_label.text = "%d" % item.grid_size
+
+    _name_label.text = entry.display_name
+    _price_label.text = "$%d" % entry.price_estimate
+    _weight_label.text = "%.1f kg" % entry.item_data.category_data.weight
+    _size_label.text = "%d" % entry.item_data.category_data.grid_size
     _toggle.toggled.connect(_on_toggle_changed)
 
 
