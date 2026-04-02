@@ -4,6 +4,14 @@
 class_name ItemData
 extends Resource
 
+enum Rarity {
+    COMMON,
+    UNCOMMON,
+    RARE,
+    EPIC,
+    LEGENDARY,
+}
+
 # Internal identifier. Never displayed to the player.
 @export var item_id: String = ""
 
@@ -15,3 +23,5 @@ extends Resource
 # Each layer's unlock_action describes how to advance from that layer to the next.
 # The final layer has a null unlock_action.
 @export var identity_layers: Array[IdentityLayer] = []
+
+@export var rarity: Rarity = Rarity.COMMON

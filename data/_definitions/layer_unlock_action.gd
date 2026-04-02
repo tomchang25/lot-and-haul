@@ -29,3 +29,5 @@ enum ActionContext {
 # Minimum level in required_skill to perform this action.
 # Ignored when required_skill is null.
 @export var required_level: int = 0
+
+@export var required_condition: float = 0.0

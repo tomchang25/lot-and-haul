@@ -11,6 +11,8 @@ var item_data: ItemData = null
 # 0 = base layer (always visible); max = identity_layers.size() - 1.
 var layer_index: int = 0
 
+var condition: float = 1.0
+
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
 var display_name: String:
