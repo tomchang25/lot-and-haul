@@ -1,9 +1,8 @@
-[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://skill_appraisal"]
+[gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://dj6el5pvhgstm"]
 
-[ext_resource type="Script" uid="uid://skill_data_script" path="res://data/_definitions/skill_data.gd" id="1_skilldef"]
+[ext_resource type="Script" uid="uid://bbu2d2yj7k7i4" path="res://data/_definitions/skill_data.gd" id="1_skilldef"]
 
 [resource]
 script = ExtResource("1_skilldef")
 skill_id = "appraisal"
 display_name = "Appraisal"
-max_level = 5

@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://hao2t4fn65lu"]
 
 [ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="1_ilay"]
-[ext_resource type="Resource" path="res://data/skills/authentication.tres" id="2_to8xp"]
+[ext_resource type="Resource" uid="uid://c6gc6nxk2jb1f" path="res://data/skills/authentication.tres" id="2_to8xp"]
 [ext_resource type="Script" uid="uid://c23t4blqmaaj4" path="res://data/_definitions/layer_unlock_action.gd" id="3_mf7br"]
 
 [sub_resource type="Resource" id="Resource_to8xp"]
