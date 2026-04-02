@@ -43,3 +43,38 @@ static func create(data: LotData) -> LotEntry:
         entry.item_entries.append(ItemEntry.create(item))
 
     return entry
+
+# ══ Estimates ═════════════════════════════════════════════════════════════════
+
+
+# Sum of each item's active (player-discovered) layer base_value.
+# Represents the player's current inspection knowledge of this lot.
+func get_player_estimate() -> int:
+    var total := 0
+    for entry: ItemEntry in item_entries:
+        if not entry.item_data.identity_layers.is_empty():
+            total += entry.active_layer().base_value
+    return total
+
+
+# Sum of each item's layer 0 base_value.
+# Represents the NPC's baseline valuation — used as the rolled_price anchor.
+func get_npc_estimate() -> int:
+    var total := 0
+    for entry: ItemEntry in item_entries:
+        if not entry.item_data.identity_layers.is_empty():
+            if entry.is_veiled():
+                total += entry.item_data.identity_layers[0].base_value
+            else:
+                var base_layer = 1
+                while base_layer < entry.item_data.identity_layers.size() - 1 and randf() < 0.1:
+                    base_layer += 1
+
+                total += entry.item_data.identity_layers[base_layer].base_value
+    return total
+
+
+# Opening bid shown in the pre-auction review and used as the auction starting price.
+# Derived from npc_estimate so both blocks always agree.
+func get_opening_bid() -> int:
+    return roundi(get_npc_estimate() * lot_data.opening_bid_factor)

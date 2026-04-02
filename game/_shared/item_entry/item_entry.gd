@@ -13,6 +13,18 @@ var layer_index: int = 0
 
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
+var display_name: String:
+    get:
+        return active_layer().display_name
+
+var level_label: String:
+    get:
+        return "???" if is_veiled() else "Level %d" % layer_index
+
+var price_estimate: int:
+    get:
+        return active_layer().base_value
+
 
 # Returns the layer currently visible to the player.
 func active_layer() -> IdentityLayer:
@@ -37,7 +49,12 @@ func is_at_final_layer() -> bool:
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
 
-static func create(data: ItemData) -> ItemEntry:
+static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
     var entry := ItemEntry.new()
     entry.item_data = data
+
+    # Layer 0 = veiled. If veil doesn't apply, auto-advance to layer 1.
+    var start_veiled := randf() < veil_chance
+    entry.layer_index = 0 if start_veiled else 1
+
     return entry

@@ -16,7 +16,7 @@ const ITEM_PATHS: Array[String] = [
 ]
 
 # ── Node references ───────────────────────────────────────────────────────────
-const WarehouseLotData = preload("uid://l8xrnjwietdt")
+const WarehouseLotData = preload("res://data/locations/warehouse_lotdata.tres")
 const ClosedTexture := preload("res://assets/warehouse_closed.png")
 const OpenTexture := preload("res://assets/warehouse_open.png")
 

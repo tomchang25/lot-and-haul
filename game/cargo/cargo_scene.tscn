@@ -2,9 +2,6 @@
 
 [ext_resource type="Script" uid="uid://bcjbwusd6err1" path="res://game/cargo/cargo_scene.gd" id="1_cargo"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
-bg_color = Color(0.1, 0.1, 0.12, 1.0)
-
 [node name="CargoScene" type="Control" unique_id=239928999]
 layout_mode = 3
 anchors_preset = 15
@@ -21,8 +18,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.1, 0.1, 0.12, 1.0)
 mouse_filter = 2
+color = Color(0.1, 0.1, 0.12, 1)
 
 [node name="RootVBox" type="VBoxContainer" parent="." unique_id=100000002]
 layout_mode = 1
@@ -32,23 +29,19 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ConfirmPopup" type="AcceptDialog" parent="." unique_id=500000001]
-title = "Load Up?"
-ok_button_text = "Confirm"
-
 [node name="Title" type="Label" parent="RootVBox" unique_id=100000003]
-layout_mode = 2
 custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "Cargo Loading"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Header" type="HBoxContainer" parent="RootVBox" unique_id=100000004]
-layout_mode = 2
 custom_minimum_size = Vector2(0, 36)
-alignment = 1
+layout_mode = 2
 theme_override_constants/separation = 48
+alignment = 1
 
 [node name="SlotsLabel" type="Label" parent="RootVBox/Header" unique_id=100000005]
 layout_mode = 2
@@ -73,13 +66,13 @@ layout_mode = 2
 theme_override_constants/separation = 0
 
 [node name="ColumnHeader" type="HBoxContainer" parent="RootVBox/ListCenter/Panel/PanelVBox" unique_id=100000010]
-layout_mode = 2
 custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
 theme_override_constants/separation = 0
 
 [node name="ToggleSpacer" type="Control" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=100000011]
-layout_mode = 2
 custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
 
 [node name="NameHeader" type="Label" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=100000012]
 layout_mode = 2
@@ -90,8 +83,8 @@ text = "Item"
 vertical_alignment = 1
 
 [node name="PriceHeader" type="Label" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=100000013]
-layout_mode = 2
 custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 14
 text = "Est. Value"
@@ -99,8 +92,8 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="WeightHeader" type="Label" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=100000014]
-layout_mode = 2
 custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 14
 text = "Weight"
@@ -108,8 +101,8 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="SizeHeader" type="Label" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=100000015]
-layout_mode = 2
 custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 14
 text = "Size"
@@ -124,12 +117,17 @@ layout_mode = 2
 theme_override_constants/separation = 0
 
 [node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=100000018]
-layout_mode = 2
 custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
 alignment = 1
 
 [node name="LoadUpButton" type="Button" parent="RootVBox/Footer" unique_id=100000019]
-layout_mode = 2
 custom_minimum_size = Vector2(160, 44)
+layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Load Up"
+
+[node name="ConfirmPopup" type="AcceptDialog" parent="." unique_id=500000001]
+oversampling_override = 1.0
+title = "Load Up?"
+ok_button_text = "Confirm"

@@ -18,7 +18,7 @@ var _entry: ItemEntry = null
 # Bind entry and populate the name. Call once after add_child().
 func setup(entry: ItemEntry) -> void:
     _entry = entry
-    _name_lbl.text = InspectionRules.get_display_name(entry)
+    _name_lbl.text = entry.display_name
     _value_lbl.text = "???"
     _value_lbl.add_theme_color_override(&"font_color", Color(0.6, 0.6, 0.6))
 
@@ -27,7 +27,7 @@ func setup(entry: ItemEntry) -> void:
 func reveal() -> void:
     if _entry == null:
         return
-    var final_layer := _entry.item_data.identity_layers.back()
-    _name_lbl.text = final_layer.display_label
-    _value_lbl.text = "$%d" % final_layer.base_value
+
+    _name_lbl.text = _entry.display_name
+    _value_lbl.text = "$%d" % _entry.price_estimate
     _value_lbl.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))

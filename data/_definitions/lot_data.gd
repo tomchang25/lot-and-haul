@@ -35,6 +35,12 @@ extends Resource
 @export var knowledge_factor_min: float = 0.4
 @export var knowledge_factor_max: float = 0.6
 
+# ── Auction ───────────────────────────────────────────────────────────────────
+
+# Fraction of npc_estimate used as the opening bid.
+# Shared by the pre-auction review (Block 03) and the auction itself (Block 04).
+@export var opening_bid_factor: float = 0.25
+
 # ── Item pool ─────────────────────────────────────────────────────────────────
 
 # Chance (0.0–1.0) that any item in this lot spawns veiled.

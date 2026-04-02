@@ -1,6 +1,29 @@
 extends Node
 
 # Flat skill registry. Returns the player's current level for the given skill.
-# Always 0 for this slice — full skill progression is deferred.
+# Always 1 for this slice — full skill progression is deferred.
 func get_level(skill_id: String) -> int:
-    return 0
+    return 1
+
+
+# True if the player can advance the entry to the next identity layer.
+# Checks stamina cost and skill prerequisite via KnowledgeManager.
+func can_advance(entry: ItemEntry, stamina: int) -> bool:
+    var action: LayerUnlockAction = entry.current_unlock_action()
+    if action == null:
+        return false
+
+    if stamina < action.stamina_cost:
+        return false
+
+    if entry.is_at_final_layer():
+        return false
+
+    # TODO: check current lot instead hardcoded disable when auction context
+    if action.context != LayerUnlockAction.ActionContext.AUCTION:
+        return false
+
+    if not action.required_skill:
+        return true
+        
+    return KnowledgeManager.get_level(action.required_skill.skill_id) >= action.required_level

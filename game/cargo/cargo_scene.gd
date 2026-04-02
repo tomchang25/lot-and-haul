@@ -75,8 +75,8 @@ func _recalc_totals() -> void:
     _weight_used = 0.0
     for entry: ItemEntry in _won_items:
         if _selected.get(entry, false):
-            _slots_used += entry.item_data.grid_size
-            _weight_used += entry.item_data.weight
+            _slots_used += entry.item_data.category_data.grid_size
+            _weight_used += entry.item_data.category_data.weight
 
 
 func _refresh_ui() -> void:
@@ -91,8 +91,8 @@ func _refresh_ui() -> void:
         if _selected.get(entry, false):
             row.set_toggle_disabled(false)
         else:
-            var over_slots: bool = entry.item_data.grid_size > remaining_slots
-            var over_weight: bool = entry.item_data.weight > remaining_weight
+            var over_slots: bool = entry.item_data.category_data.grid_size > remaining_slots
+            var over_weight: bool = entry.item_data.category_data.weight > remaining_weight
             row.set_toggle_disabled(over_slots or over_weight)
 
 
@@ -100,8 +100,7 @@ func _build_summary_text() -> String:
     var loading: Array[String] = []
     var selling: Array[String] = []
     for entry: ItemEntry in _won_items:
-        var label: String = entry.resolved_veiled_type.display_label \
-        if entry.is_veiled() else entry.item_data.item_name
+        var label: String = entry.display_name
         if _selected.get(entry, false):
             loading.append("  " + label)
         else:

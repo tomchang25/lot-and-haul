@@ -5,7 +5,7 @@ signal clicked(display: ItemDisplay)
 
 var _entry: ItemEntry = null
 
-@onready var _sprite_rect: ColorRect = $VBox/SpriteRect
+# @onready var _sprite_rect: ColorRect = $VBox/SpriteRect
 @onready var _name_label: Label = $VBox/NameLabel
 @onready var _price_label: Label = $VBox/PriceLabel
 @onready var _level_label: Label = $VBox/LevelLabel
@@ -24,9 +24,9 @@ func refresh_display() -> void:
 
 
 func _apply_layer() -> void:
-    _name_label.text = InspectionRules.get_display_name(_entry)
-    _price_label.text = ClueEvaluator.get_price_range_label(_entry)
-    _level_label.text = InspectionRules.level_label(_entry)
+    _name_label.text = _entry.display_name
+    _price_label.text = "$%d" % _entry.price_estimate
+    _level_label.text = _entry.level_label
 
 
 func _animate_level_pop() -> void:
