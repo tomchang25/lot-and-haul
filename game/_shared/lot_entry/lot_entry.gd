@@ -38,7 +38,7 @@ static func create(data: LotData) -> LotEntry:
     entry.price_variance = randf_range(data.price_variance_min, data.price_variance_max)
 
     var item_count := randi_range(data.item_count_min, data.item_count_max)
-    print("item_count: %d" % item_count)
+
     for i in range(item_count):
         var item := _draw_item(data)
         if item != null:
