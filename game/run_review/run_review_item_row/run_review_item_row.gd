@@ -6,24 +6,29 @@ extends HBoxContainer
 
 # ── Node references ───────────────────────────────────────────────────────────
 
-@onready var _name_lbl: Label = $NameLabel
-@onready var _value_lbl: Label = $ValueLabel
-@onready var _cond_lbl: Label = $ConditionLabel
+@onready var _name_label: Label = $NameLabel
+@onready var _level_label: Label = $LevelLabel
+@onready var _condition_label: Label = $ConditionLabel
+@onready var _value_label: Label = $ValueLabel
 
 # ══ API ═══════════════════════════════════════════════════════════════════════
 
 
 func setup(entry: ItemEntry) -> void:
-    _name_lbl.text = entry.display_name
+    _name_label.text = entry.display_name
 
-    _cond_lbl.text = entry.condition_label
+    _level_label.text = entry.potential_inspect_label
+
+    # Run review always shows full condition detail regardless of inspect level.
+    _condition_label.text = entry.condition_label
     if entry.condition >= 0.8:
-        _cond_lbl.modulate = Color.GOLD
+        _condition_label.modulate = Color.GOLD
     elif entry.condition >= 0.6:
-        _cond_lbl.modulate = Color.GREEN_YELLOW
+        _condition_label.modulate = Color.GREEN_YELLOW
+    elif entry.condition >= 0.3:
+        _condition_label.modulate = Color.WHITE
     else:
-        _cond_lbl.modulate = Color.LIGHT_CORAL
+        _condition_label.modulate = Color.LIGHT_CORAL
 
-    var value: int = entry.price_estimate
-    _value_lbl.text = "$%d" % value
-    _value_lbl.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
+    _value_label.text = "%d" % [entry.active_layer().base_value * entry.get_condition_multiplier()]
+    _value_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))

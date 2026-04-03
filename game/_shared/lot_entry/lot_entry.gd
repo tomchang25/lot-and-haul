@@ -45,18 +45,6 @@ static func create(data: LotData) -> LotEntry:
 
     return entry
 
-# ══ Estimates ═════════════════════════════════════════════════════════════════
-
-
-# Sum of each item's active (player-discovered) layer base_value.
-# Represents the player's current inspection knowledge of this lot.
-func get_player_estimate() -> int:
-    var total := 0
-    for entry: ItemEntry in item_entries:
-        if not entry.item_data.identity_layers.is_empty():
-            total += entry.active_layer().base_value
-    return total
-
 
 # Returns the cached NPC estimate. Stable across calls.
 func get_npc_estimate() -> int:
@@ -76,10 +64,10 @@ func roll_npc_estimate() -> int:
         if entry.item_data.identity_layers.is_empty():
             continue
 
-        var base_layer := entry.layer_index
-        while base_layer < entry.item_data.identity_layers.size() - 1 and randf() < lot_data.npc_layer_sight_chance ** (entry.layer_index + 1):
-            base_layer += 1
-        total += entry.item_data.identity_layers[base_layer].base_value
+        var npc_layer := entry.layer_index
+        while npc_layer < entry.item_data.identity_layers.size() - 1 and randf() < lot_data.npc_layer_sight_chance ** (npc_layer - entry.layer_index + 1):
+            npc_layer += 1
+        total += entry.item_data.identity_layers[npc_layer].base_value
 
     return total
 

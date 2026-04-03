@@ -13,6 +13,10 @@ var layer_index: int = 0
 
 var condition: float = 1.0
 
+var potential_inspect_level: int = 0
+
+var condition_inspect_level: int = 0
+
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
 var display_name: String:
@@ -23,11 +27,56 @@ var level_label: String:
     get:
         return "???" if is_veiled() else "Level %d" % layer_index
 
+# Raw condition label used by reveal and run review (true value, no inspect gate).
 var condition_label: String:
     get:
         var cond_percent := int(condition * 100)
         var mult := get_condition_multiplier()
         return "%d%% (x%.2f)" % [cond_percent, mult]
+
+var potential_inspect_label: String:
+    get:
+        if is_veiled():
+            return "Veiled"
+        match potential_inspect_level:
+            0:
+                return "??? / ???"
+            1:
+                return "%d / ???" % layer_index
+            _:
+                return "%d / %d" % [layer_index, item_data.identity_layers.size() - 1]
+
+var condition_inspect_label: String:
+    get:
+        if is_veiled():
+            return ""
+
+        match condition_inspect_level:
+            0:
+                return "???"
+            1:
+                return "Poor" if condition < 0.3 else "Common"
+            2:
+                if condition < 0.3:
+                    return "Poor"
+                elif condition < 0.6:
+                    return "Fair"
+                elif condition < 0.8:
+                    return "Good"
+                else:
+                    return "Excellent"
+            _:
+                return "?????????"
+
+
+func is_condition_inspectable() -> bool:
+    if is_veiled() or condition_inspect_level >= 2:
+        return false
+
+    if condition_inspect_level == 1 and condition < 0.3:
+        return false
+
+    return true
 
 
 func get_condition_multiplier() -> float:
@@ -39,11 +88,39 @@ func get_condition_multiplier() -> float:
         return remap(condition, 0.8, 1.0, 2.0, 4.0)
 
 
+# Returns the condition multiplier the player can infer from their current inspect level.
+# level 0 → neutral 1.0 (unknown)
+# level 1 → midpoint of the visible band (Poor: 0.75, Common: 1.5)
+# level 2 → true multiplier
+func get_known_condition_multiplier() -> float:
+    match condition_inspect_level:
+        0:
+            return 1.0
+        1:
+            return 0.5 if condition < 0.3 else 1.0
+        2:
+            if condition < 0.3:
+                return 0.5
+            elif condition < 0.6:
+                return 0.75
+            elif condition < 0.8:
+                return 1.5
+            else:
+                return 3.0
+        _:
+            return get_condition_multiplier()
+
+# Estimate based solely on what the player currently knows.
+# Veiled items return 0 — caller should check is_veiled() and display "???" via price_estimate_label.
 var price_estimate: int:
     get:
-        var base := active_layer().base_value
-        var multiplier := get_condition_multiplier()
-        return int(base * multiplier)
+        if is_veiled():
+            return 0
+        return int(active_layer().base_value * get_known_condition_multiplier())
+
+var price_estimate_label: String:
+    get:
+        return "???" if is_veiled() else "$%d" % price_estimate
 
 
 # Returns the layer currently visible to the player.
@@ -75,7 +152,7 @@ static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
 
     entry.condition = randf()
 
-    # Layer 0 = veiled. If veil doesn't apply, auto-advance to layer 1.
+    # Layer 0 = veiled. If veil does not apply, auto-advance to layer 1.
     var start_veiled := randf() < veil_chance
     entry.layer_index = 0 if start_veiled else 1
 

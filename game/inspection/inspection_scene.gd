@@ -44,7 +44,8 @@ var _pulse_tween: Tween = null
 
 
 func _ready() -> void:
-    _action_popup.advance_requested.connect(_on_advance)
+    _action_popup.potential_inspect_requested.connect(_on_potential_inspect)
+    _action_popup.condition_inspect_requested.connect(_on_condition_inspect)
     _action_popup.cancelled.connect(_on_popup_cancelled)
     _start_btn.pressed.connect(_on_start_auction_pressed)
     _pass_btn.pressed.connect(_on_pass_pressed)
@@ -81,11 +82,30 @@ func _on_popup_cancelled() -> void:
     _close_popup()
 
 
-func _on_advance() -> void:
+func _on_potential_inspect() -> void:
     if _active_item == null:
         return
     var entry: ItemEntry = _entry_for_display[_active_item]
-    _advance_layer(_active_item, entry)
+    if _stamina < ActionPopup.POTENTIAL_COST:
+        return
+    _stamina -= ActionPopup.POTENTIAL_COST
+    entry.potential_inspect_level += 1
+    _active_item.refresh_display("potential")
+    _stamina_hud.update_stamina(_stamina, MAX_STAMINA)
+    _action_popup.refresh(entry, _stamina)
+
+
+func _on_condition_inspect() -> void:
+    if _active_item == null:
+        return
+    var entry: ItemEntry = _entry_for_display[_active_item]
+    if _stamina < ActionPopup.CONDITION_COST:
+        return
+    _stamina -= ActionPopup.CONDITION_COST
+    entry.condition_inspect_level += 1
+    _active_item.refresh_display("condition")
+    _stamina_hud.update_stamina(_stamina, MAX_STAMINA)
+    _action_popup.refresh(entry, _stamina)
 
 
 func _on_start_auction_pressed() -> void:
@@ -151,24 +171,6 @@ func _open_popup(display: ItemDisplay) -> void:
 func _close_popup() -> void:
     _action_popup.hide()
     _active_item = null
-
-# ══ Layer advance ══════════════════════════════════════════════════════════════
-
-
-func _advance_layer(display: ItemDisplay, entry: ItemEntry) -> void:
-    var action := entry.current_unlock_action()
-    if action == null or _stamina < action.stamina_cost:
-        return
-
-    _stamina -= action.stamina_cost
-    entry.layer_index += 1
-
-    display.refresh_display()
-    _stamina_hud.update_stamina(_stamina, MAX_STAMINA)
-    _close_popup()
-
-    if _stamina <= 0:
-        _begin_exit_pulse()
 
 # ══ Exit pulse ════════════════════════════════════════════════════════════════
 

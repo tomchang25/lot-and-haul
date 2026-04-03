@@ -142,7 +142,7 @@ func _on_circle_completed() -> void:
     if _in_reach:
         _resolve()
     else:
-        # Purely atmospheric in normal state -- loop.
+        # Purely atmospheric in normal state — loop.
         _start_circle(0.0)
 
 
@@ -196,11 +196,15 @@ func _init_auction() -> void:
 
 func _build_lot_summary(lot_items: Array[ItemEntry]) -> void:
     var total_estimate := 0
+    var has_veiled: bool = false
     for entry: ItemEntry in lot_items:
-        total_estimate += entry.active_layer().base_value
+        if entry.is_veiled():
+            has_veiled = true
+
+        total_estimate += entry.price_estimate
 
         var label := Label.new()
-        label.text = "%s ($%d)" % [entry.display_name, entry.active_layer().base_value]
+        label.text = "%s (%s)" % [entry.display_name, entry.price_estimate_label]
         label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         label.add_theme_font_size_override(&"font_size", 15)
         _lot_summary.add_child(label)
@@ -211,7 +215,7 @@ func _build_lot_summary(lot_items: Array[ItemEntry]) -> void:
     total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     total_label.add_theme_font_size_override(&"font_size", 16)
     total_label.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
-    total_label.text = "Total Est: $%d" % total_estimate
+    total_label.text = "Total Est: $%d%s" % [total_estimate, "+" if has_veiled else ""]
     _lot_summary.add_child(total_label)
 
 # ══ NPC logic ═════════════════════════════════════════════════════════════════

@@ -6,14 +6,18 @@
 custom_minimum_size = Vector2(170, 0)
 script = ExtResource("1_actpop")
 
-[node name="VBox" type="VBoxContainer" parent="." unique_id=1271847277]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=660494512]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 0
 
-[node name="AdvanceButton" type="Button" parent="VBox" unique_id=2098776471]
+[node name="PotentialButton" type="Button" parent="HBoxContainer" unique_id=1573260649]
 layout_mode = 2
-text = "Browse (1 SP)"
+text = "Potential (1 SP)"
 
-[node name="CancelButton" type="Button" parent="VBox" unique_id=1844633136]
+[node name="ConditionButton" type="Button" parent="HBoxContainer" unique_id=2098776471]
+layout_mode = 2
+text = "Condition (1 SP)"
+
+[node name="CancelButton" type="Button" parent="HBoxContainer" unique_id=1844633136]
 layout_mode = 2
 text = "Cancel"

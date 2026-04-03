@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dycr8irb242ij" path="res://game/_shared/item_display/item_display.gd" id="1_itemd"]
 
 [node name="ItemDisplay" type="PanelContainer" unique_id=1471444043]
-custom_minimum_size = Vector2(190, 240)
+custom_minimum_size = Vector2(190, 260)
 script = ExtResource("1_itemd")
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=1188569334]
@@ -28,7 +28,13 @@ theme_override_font_sizes/font_size = 13
 text = "?"
 horizontal_alignment = 1
 
-[node name="LevelLabel" type="Label" parent="VBox" unique_id=677516799]
+[node name="PotentialDisplay" type="Label" parent="VBox" unique_id=677516799]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Lvl 0"
+horizontal_alignment = 1
+
+[node name="ConditionDisplay" type="Label" parent="VBox" unique_id=330209496]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "Lvl 0"
