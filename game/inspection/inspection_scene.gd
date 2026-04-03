@@ -165,7 +165,6 @@ func _open_popup(display: ItemDisplay) -> void:
     var rect := display.get_global_rect()
     _action_popup.position = Vector2(rect.position.x, rect.position.y + rect.size.y + 6.0)
     _action_popup.show()
-    print(_action_popup.global_position)
 
 
 func _close_popup() -> void:
