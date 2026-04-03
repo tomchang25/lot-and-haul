@@ -37,13 +37,52 @@ static func create(data: LotData) -> LotEntry:
     entry.aggressive_factor = randf_range(data.aggressive_factor_min, data.aggressive_factor_max)
     entry.price_variance = randf_range(data.price_variance_min, data.price_variance_max)
 
-    for item: ItemData in data.item_pool:
-        entry.item_entries.append(ItemEntry.create(item, data.veiled_chance))
+    var use_weighted := not data.rarity_weights.is_empty() and not data.category_weights.is_empty()
+    if use_weighted:
+        var item_count := randi_range(data.item_count_min, data.item_count_max)
+        for _i in range(item_count):
+            var item := _draw_item(data)
+            if item != null:
+                entry.item_entries.append(ItemEntry.create(item, data.veiled_chance))
+    else:
+        # Legacy path: iterate item_pool directly (deprecated).
+        for item: ItemData in data.item_pool:
+            entry.item_entries.append(ItemEntry.create(item, data.veiled_chance))
 
     # Cache after item_entries are populated — get_npc_estimate() reads them.
     entry.npc_estimate = entry.roll_npc_estimate()
 
     return entry
+
+
+# Rolls one item using rarity_weights then category_weights, then picks a
+# random matching item from ItemRegistry. Returns null if no match is found.
+static func _draw_item(data: LotData) -> ItemData:
+    # Roll rarity
+    var rarity_keys: Array = data.rarity_weights.keys()
+    var rarity_values: Array[int] = []
+    for k in rarity_keys:
+        rarity_values.append(data.rarity_weights[k])
+    var rarity_idx := RandomUtils.pick_weighted_index(rarity_values)
+    if rarity_idx < 0:
+        return null
+    var rarity: ItemData.Rarity = rarity_keys[rarity_idx] as ItemData.Rarity
+
+    # Roll category
+    var cat_keys: Array = data.category_weights.keys()
+    var cat_values: Array[int] = []
+    for k in cat_keys:
+        cat_values.append(data.category_weights[k])
+    var cat_idx := RandomUtils.pick_weighted_index(cat_values)
+    if cat_idx < 0:
+        return null
+    var category_id: String = cat_keys[cat_idx]
+
+    # Pick a random item matching both rarity and category
+    var candidates: Array[ItemData] = ItemRegistry.get_items(rarity, category_id)
+    if candidates.is_empty():
+        return null
+    return candidates[randi() % candidates.size()]
 
 
 # Returns the cached NPC estimate. Stable across calls.
