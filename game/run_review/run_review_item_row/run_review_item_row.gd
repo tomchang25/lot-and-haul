@@ -21,14 +21,7 @@ func setup(entry: ItemEntry) -> void:
 
     # Run review always shows full condition detail regardless of inspect level.
     _condition_label.text = entry.condition_label
-    if entry.condition >= 0.8:
-        _condition_label.modulate = Color.GOLD
-    elif entry.condition >= 0.6:
-        _condition_label.modulate = Color.GREEN_YELLOW
-    elif entry.condition >= 0.3:
-        _condition_label.modulate = Color.WHITE
-    else:
-        _condition_label.modulate = Color.LIGHT_CORAL
+    _condition_label.modulate = entry.condition_color
 
-    _value_label.text = "%d" % [entry.active_layer().base_value * entry.get_condition_multiplier()]
-    _value_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
+    _value_label.text = entry.current_value_label
+    _value_label.add_theme_color_override(&"font_color", ItemEntry.PRICE_COLOR)

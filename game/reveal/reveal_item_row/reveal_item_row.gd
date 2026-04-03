@@ -25,9 +25,9 @@ func setup(entry: ItemEntry) -> void:
     _name_label.text = entry.display_name
     _level_label.text = entry.potential_inspect_label
     _condition_label.text = entry.condition_inspect_label
-    _condition_label.modulate = Color(0.5, 0.5, 0.5)
+    _condition_label.modulate = _entry.condition_inspect_color
     _value_label.text = "???"
-    _value_label.add_theme_color_override(&"font_color", Color(0.6, 0.6, 0.6))
+    _value_label.add_theme_color_override(&"font_color", _entry.price_color)
 
 
 # Reveal the item's identity, condition, and estimate.
@@ -47,14 +47,7 @@ func reveal() -> void:
     _level_label.text = _entry.potential_inspect_label
 
     _condition_label.text = _entry.condition_inspect_label
-    if _entry.condition >= 0.8:
-        _condition_label.modulate = Color.GOLD
-    elif _entry.condition >= 0.6:
-        _condition_label.modulate = Color.GREEN_YELLOW
-    elif _entry.condition >= 0.3:
-        _condition_label.modulate = Color.WHITE
-    else:
-        _condition_label.modulate = Color.LIGHT_CORAL
+    _condition_label.modulate = _entry.condition_inspect_color
 
     _value_label.text = _entry.price_estimate_label
-    _value_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
+    _value_label.add_theme_color_override(&"font_color", ItemEntry.PRICE_COLOR)

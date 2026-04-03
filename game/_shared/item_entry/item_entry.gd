@@ -122,6 +122,50 @@ var price_estimate_label: String:
     get:
         return "???" if is_veiled() else "$%d" % price_estimate
 
+## Current resale value at the player's present layer and true condition.
+## This is NOT the final value — further unlock actions and repairs may improve it.
+var current_value: int:
+    get:
+        return int(active_layer().base_value * get_condition_multiplier())
+
+var current_value_label: String:
+    get:
+        return "$%d" % current_value
+
+# ── Display colors ────────────────────────────────────────────────────────────
+
+## The tint to apply to any condition label, based on the true condition value.
+## Use this in reveal, run review, or any "full truth" context.
+var condition_color: Color:
+    get:
+        if condition >= 0.8:
+            return Color.GOLD
+        elif condition >= 0.6:
+            return Color.GREEN_YELLOW
+        elif condition >= 0.3:
+            return Color.WHITE
+        else:
+            return Color.LIGHT_CORAL
+
+## The tint to apply based on what the player *currently knows*.
+## Unknown (level 0) → neutral grey. Known → same as condition_color.
+var condition_inspect_color: Color:
+    get:
+        if condition_inspect_level == 0 or is_veiled():
+            return Color(0.5, 0.5, 0.5)
+        return condition_color
+
+## Standard green used for any confirmed price / value label.
+const PRICE_COLOR := Color(0.4, 1.0, 0.5)
+
+## Grey used for unknown / placeholder price labels.
+const PRICE_UNKNOWN_COLOR := Color(0.6, 0.6, 0.6)
+
+## Returns the correct color for price_estimate_label.
+var price_color: Color:
+    get:
+        return PRICE_UNKNOWN_COLOR if is_veiled() else PRICE_COLOR
+
 
 # Returns the layer currently visible to the player.
 func active_layer() -> IdentityLayer:

@@ -81,6 +81,7 @@ func _make_row(entry: ItemEntry) -> HBoxContainer:
     condition_label.text = entry.condition_inspect_label
     condition_label.custom_minimum_size = Vector2(100.0, 0.0)
     condition_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    condition_label.modulate = entry.condition_inspect_color
     condition_label.add_theme_font_size_override(&"font_size", 13)
     row.add_child(condition_label)
 
@@ -89,6 +90,7 @@ func _make_row(entry: ItemEntry) -> HBoxContainer:
     price_label.text = entry.price_estimate_label
     price_label.custom_minimum_size = Vector2(100.0, 0.0)
     price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+    price_label.add_theme_color_override(&"font_color", entry.price_color)
     price_label.add_theme_font_size_override(&"font_size", 13)
     row.add_child(price_label)
 
