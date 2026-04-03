@@ -18,9 +18,9 @@ enum ActionContext {
 
 @export var context: ActionContext = ActionContext.HOME
 
-# Stamina cost to perform this action.
+# Time take to perform this action.
 # Ignored when context is AUTO.
-@export var stamina_cost: int = 0
+@export var time_cost: int = 0
 
 # Skill required before this action is available.
 # Null means no skill prerequisite.

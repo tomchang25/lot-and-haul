@@ -38,7 +38,9 @@ def _build_layer_tres(
     layer_uid: str,
     display_name: str,
     base_value: int,
-    unlock: dict | None,  # {context, stamina_cost, skill_id, required_level} | None
+    unlock: (
+        dict | None
+    ),  # {context, time_cost, skill_id, required_level, required_condition} | None
     skill_uid_map: dict[str, str],  # skill_id → uid
 ) -> str:
     lines = [
@@ -53,6 +55,7 @@ def _build_layer_tres(
             f'[ext_resource type="Script" uid="{_LAYER_UNLOCK_SCRIPT_UID}" '
             f'path="res://data/_definitions/layer_unlock_action.gd" id="2_unlock"]'
         )
+
         skill_tag: str | None = None
         if unlock.get("skill_id"):
             sid = unlock["skill_id"]
@@ -70,13 +73,16 @@ def _build_layer_tres(
             '[sub_resource type="Resource" id="unlock"]',
             'script = ExtResource("2_unlock")',
             f'context = {unlock["context"]}',
-            f'stamina_cost = {unlock["stamina_cost"]}',
+            f'time_cost = {unlock["time_cost"]}',
         ]
         if skill_tag:
             lines += [
                 f"required_skill = {skill_ref}",
                 f'required_level = {unlock["required_level"]}',
             ]
+        required_condition = unlock.get("required_condition", 0.0)
+        if required_condition != 0.0:
+            lines.append(f"required_condition = {float(required_condition)}")
         lines.append("")
 
     unlock_ref = 'SubResource("unlock")' if unlock is not None else "null"
@@ -93,7 +99,7 @@ def _build_layer_tres(
     return "\n".join(lines)
 
 
-# ── CategoryData .tres builder ───────────────────────────────────────────────
+# ── CategoryData .tres builder ────────────────────────────────────────────────
 
 
 def _build_category_tres(
@@ -130,6 +136,7 @@ def _build_item_tres(
     item_uid: str,
     category_uid: str | None,
     category_id: str | None,
+    rarity: int,
     layers: list[dict],  # [{layer_id, layer_uid, display_name, base_value}]
 ) -> str:
     lines = [
@@ -162,6 +169,7 @@ def _build_item_tres(
         f'item_id = "{item_id}"',
         f"category_data = {cat_ref}",
         f"identity_layers = [{layer_refs}]",
+        f"rarity = {rarity}",
         "",
     ]
 
@@ -222,7 +230,7 @@ def export_identity_layers(
 
         unlock_row = cur.execute(
             """
-            SELECT context, stamina_cost, skill_id, required_level
+            SELECT context, time_cost, skill_id, required_level, required_condition
             FROM layer_unlock_actions WHERE layer_id = ?
             """,
             (layer_id,),
@@ -232,9 +240,10 @@ def export_identity_layers(
         if unlock_row:
             unlock = {
                 "context": unlock_row[0],
-                "stamina_cost": unlock_row[1],
+                "time_cost": unlock_row[1],
                 "skill_id": unlock_row[2],
                 "required_level": unlock_row[3],
+                "required_condition": unlock_row[4],
             }
 
         content = _build_layer_tres(
@@ -247,7 +256,8 @@ def export_identity_layers(
         else:
             out.write_text(content, encoding="utf-8")
             cur.execute(
-                "UPDATE identity_layers SET uid = ? WHERE layer_id = ?", (uid, layer_id)
+                "UPDATE identity_layers SET uid = ? WHERE layer_id = ?",
+                (uid, layer_id),
             )
             print(f"  layer → {out.name}")
 
@@ -263,14 +273,14 @@ def export_items(
     cur = conn.cursor()
     items = cur.execute(
         """
-        SELECT i.item_id, i.uid, c.uid, c.category_id
+        SELECT i.item_id, i.uid, i.rarity, c.uid, c.category_id
         FROM items i
         LEFT JOIN categories c ON c.category_id = i.category_id
         ORDER BY i.item_id
         """
     ).fetchall()
 
-    for item_id, item_uid, category_uid, category_id in items:
+    for item_id, item_uid, rarity, category_uid, category_id in items:
         item_uid = item_uid or _new_uid()
 
         layer_rows = cur.execute(
@@ -294,7 +304,9 @@ def export_items(
             for r in layer_rows
         ]
 
-        content = _build_item_tres(item_id, item_uid, category_uid, category_id, layers)
+        content = _build_item_tres(
+            item_id, item_uid, category_uid, category_id, rarity, layers
+        )
         out = item_dir / f"{item_id}.tres"
 
         if dry_run:

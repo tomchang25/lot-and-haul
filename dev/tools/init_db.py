@@ -43,16 +43,19 @@ CREATE TABLE IF NOT EXISTS identity_layers (
 -- 1:1 with identity_layers; absent on the final layer of any chain.
 -- context: 0=AUTO  1=AUCTION  2=HOME
 CREATE TABLE IF NOT EXISTS layer_unlock_actions (
-    layer_id       TEXT    PRIMARY KEY REFERENCES identity_layers(layer_id) ON DELETE CASCADE,
-    context        INTEGER NOT NULL DEFAULT 2,
-    stamina_cost   INTEGER NOT NULL DEFAULT 0,
-    skill_id       TEXT    REFERENCES skills(skill_id),
-    required_level INTEGER NOT NULL DEFAULT 0
+    layer_id           TEXT    PRIMARY KEY REFERENCES identity_layers(layer_id) ON DELETE CASCADE,
+    context            INTEGER NOT NULL DEFAULT 2,
+    time_cost       INTEGER NOT NULL DEFAULT 0,
+    skill_id           TEXT    REFERENCES skills(skill_id),
+    required_level     INTEGER NOT NULL DEFAULT 0,
+    required_condition REAL    NOT NULL DEFAULT 0.0
 );
 
+-- rarity: 0=COMMON  1=UNCOMMON  2=RARE  3=EPIC  4=LEGENDARY
 CREATE TABLE IF NOT EXISTS items (
-    item_id     TEXT PRIMARY KEY,
-    category_id TEXT REFERENCES categories(category_id),
+    item_id     TEXT    PRIMARY KEY,
+    category_id TEXT    REFERENCES categories(category_id),
+    rarity      INTEGER NOT NULL DEFAULT 0,
     uid         TEXT
 );
 
@@ -184,7 +187,6 @@ def seed_identity_layers(
         subs = _sub_resources(text)
         ext_res = _ext_resources(text)
 
-        # layer fields are either top-level or inside the single [resource] block
         layer_id = _field(text, "layer_id") or f.stem
         name = _field(text, "display_name") or ""
         value = int(_field(text, "base_value") or 0)
@@ -221,20 +223,23 @@ def seed_identity_layers(
             cur.execute(
                 """
                 INSERT INTO layer_unlock_actions
-                    (layer_id, context, stamina_cost, skill_id, required_level)
-                VALUES (?, ?, ?, ?, ?)
+                    (layer_id, context, time_cost, skill_id, required_level,
+                     required_condition)
+                VALUES (?, ?, ?, ?, ?, ?)
                 ON CONFLICT(layer_id) DO UPDATE SET
-                    context        = excluded.context,
-                    stamina_cost   = excluded.stamina_cost,
-                    skill_id       = excluded.skill_id,
-                    required_level = excluded.required_level
+                    context            = excluded.context,
+                    time_cost       = excluded.time_cost,
+                    skill_id           = excluded.skill_id,
+                    required_level     = excluded.required_level,
+                    required_condition = excluded.required_condition
                 """,
                 (
                     layer_id,
                     int(unlock_fields.get("context", 2)),
-                    int(unlock_fields.get("stamina_cost", 0)),
+                    int(unlock_fields.get("time_cost", 0)),
                     skill_id,
                     int(unlock_fields.get("required_level", 0)),
+                    float(unlock_fields.get("required_condition", 0.0)),
                 ),
             )
 
@@ -261,15 +266,19 @@ def seed_items(
             cat_uid = ext_res.get(cat_m.group(1), {}).get("uid")
             category_id = category_uid_map.get(cat_uid or "")
 
+        # rarity: stored as integer enum value in the .tres
+        rarity = int(_field(text, "rarity") or 0)
+
         cur.execute(
             """
-            INSERT INTO items (item_id, category_id, uid)
-            VALUES (?, ?, ?)
+            INSERT INTO items (item_id, category_id, rarity, uid)
+            VALUES (?, ?, ?, ?)
             ON CONFLICT(item_id) DO UPDATE SET
                 category_id = excluded.category_id,
+                rarity      = excluded.rarity,
                 uid         = excluded.uid
             """,
-            (item_id, category_id, uid),
+            (item_id, category_id, rarity, uid),
         )
 
         # identity_layers array → junction rows
@@ -278,13 +287,11 @@ def seed_items(
             cur.execute(
                 "DELETE FROM item_identity_layers WHERE item_id = ?", (item_id,)
             )
-            # Each entry is ExtResource("tag") pointing to a standalone layer .tres
             for order, tag_m in enumerate(
                 re.finditer(r'ExtResource\("([^"]+)"\)', il_m.group(1))
             ):
                 layer_uid = ext_res.get(tag_m.group(1), {}).get("uid")
                 if layer_uid:
-                    # resolve uid → layer_id from DB
                     row = cur.execute(
                         "SELECT layer_id FROM identity_layers WHERE uid = ?",
                         (layer_uid,),
