@@ -39,9 +39,19 @@ extends Resource
 # Chance (0.0–1.0) that any item in this lot spawns veiled.
 @export var veiled_chance: float = 0.4
 
-# Item presets available in this lot. Runtime selection and ordering is handled by LotEntry.
-# TODO: replace with weighted pool once item randomization is implemented.
-@export var item_pool: Array[ItemData] = []
+# Number of items drawn for this lot. Actual count is randi_range(min, max).
+@export var item_count_min: int = 3
+@export var item_count_max: int = 5
+
+# Weighted rarity table for item draws.
+# Key: ItemData.Rarity (int enum value), Value: weight (int).
+# Example: { 0: 60, 1: 25, 2: 10, 3: 4, 4: 1 }
+@export var rarity_weights: Dictionary = { }
+
+# Weighted category table for item draws.
+# Key: category_id (String), Value: weight (int).
+# Example: { "bicycle": 1, "handbag": 1, "oil_lamp": 1, "painting": 1 }
+@export var category_weights: Dictionary = { }
 
 # ── Price estimation ──────────────────────────────────────────────────────────
 # Multiplier bounds applied to npc_estimate when rolling the final price.

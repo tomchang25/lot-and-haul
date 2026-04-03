@@ -1,13 +1,20 @@
 [gd_resource type="Resource" script_class="LotData" format=3 uid="uid://l8xrnjwietdt"]
 
-[ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_d6tw8"]
 [ext_resource type="Script" uid="uid://oh0e8qcjnmcs" path="res://data/_definitions/lot_data.gd" id="2_4e20k"]
-[ext_resource type="Resource" uid="uid://ler7ib2dy6mw" path="res://data/items/brass_lamp.tres" id="2_fwesy"]
-[ext_resource type="Resource" uid="uid://8j4judo82fof" path="res://data/items/leather_handbag.tres" id="3_1xxat"]
-[ext_resource type="Resource" uid="uid://c73lwa3su0p3" path="res://data/items/oil_painting.tres" id="4_e5l1t"]
-[ext_resource type="Resource" uid="uid://mlrvnx3pgp8f" path="res://data/items/old_bicycle.tres" id="5_dj2iy"]
 
 [resource]
 script = ExtResource("2_4e20k")
-item_pool = Array[ExtResource("1_d6tw8")]([ExtResource("2_fwesy"), ExtResource("3_1xxat"), ExtResource("4_e5l1t"), ExtResource("5_dj2iy")])
+rarity_weights = {
+0: 80,
+1: 10,
+2: 5,
+3: 2,
+4: 1
+}
+category_weights = {
+"bicycle": 1,
+"handbag": 1,
+"oil_lamp": 1,
+"painting": 1
+}
 metadata/_custom_type_script = "uid://oh0e8qcjnmcs"
