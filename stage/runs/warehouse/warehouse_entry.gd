@@ -36,6 +36,7 @@ func _ready() -> void:
 func _init_run() -> void:
     var lot_entry := LotEntry.create(lot_data)
     GameManager.run_record = RunRecord.create(lot_entry)
+    GameManager.run_record.actions_remaining = GameManager.run_record.lot_entry.lot_data.action_quota
 
 # ══ Door animation ════════════════════════════════════════════════════════════
 

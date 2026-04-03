@@ -53,3 +53,6 @@ extends Resource
 # without systematic bias. Not tied to demand or NPC knowledge.
 @export var price_variance_min: float = 0.85
 @export var price_variance_max: float = 1.15
+
+# ── Action limits ─────────────────────────────────────────────────────────────
+@export var action_quota: int = 6 # per-lot action limit

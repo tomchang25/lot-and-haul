@@ -18,10 +18,20 @@ var sell_value: int = 0
 var paid_price: int = 0
 var net: int = 0
 
+var stamina: int = 0
+var max_stamina: int = 30
+
+var actions_remaining: int = 0 # resets each lot from LotData.action_quota
+
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
 
 static func create(entry: LotEntry) -> RunRecord:
     var r := RunRecord.new()
     r.lot_entry = entry
+
+    # TODO: get this value from car config if implemented
+    r.max_stamina = 30
+    r.stamina = r.max_stamina
+
     return r

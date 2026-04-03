@@ -6,8 +6,6 @@ extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-const MAX_STAMINA := 8
-
 const ITEM_COLS := 2
 const ITEM_SIZE := Vector2(200.0, 250.0)
 const ITEM_GAP := Vector2(32.0, 28.0)
@@ -19,7 +17,6 @@ const ItemDisplayScene := preload("uid://bitemdtscn001")
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _stamina := MAX_STAMINA
 var _active_item: ItemDisplay = null
 var _item_displays: Array[ItemDisplay] = []
 
@@ -33,12 +30,13 @@ var _pulse_tween: Tween = null
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _items_grid: GridContainer = $HUD/Panel/MarginContainer/ScrollContainer/ItemsGrid
-@onready var _stamina_hud: StaminaHUD = $StaminaHUD
 @onready var _action_popup: ActionPopup = $ActionPopup
 @onready var _start_btn: Button = $HUD/Footer/StartAuctionButton
 @onready var _pass_btn: Button = $HUD/Footer/PassButton
 @onready var _list_review: ListReviewPopup = $ListReviewPopup
 @onready var _confirm_popup: AcceptDialog = $ConfirmPopup
+
+@onready var _stamina_hud: StaminaHUD = $StaminaHUD
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -53,7 +51,9 @@ func _ready() -> void:
     _list_review.auction_entered.connect(_on_auction_entered)
     _confirm_popup.confirmed.connect(_on_confirm_popup_confirmed)
 
-    _stamina_hud.update_stamina(_stamina, MAX_STAMINA)
+    _stamina_hud.update_stamina(GameManager.run_record.stamina, GameManager.run_record.max_stamina)
+    _stamina_hud.update_actions(GameManager.run_record.actions_remaining)
+
     _action_popup.hide()
     _populate_item_displays()
 
@@ -86,26 +86,38 @@ func _on_potential_inspect() -> void:
     if _active_item == null:
         return
     var entry: ItemEntry = _entry_for_display[_active_item]
-    if _stamina < ActionPopup.POTENTIAL_COST:
+    if GameManager.run_record.stamina < ActionPopup.POTENTIAL_COST:
         return
-    _stamina -= ActionPopup.POTENTIAL_COST
+    if GameManager.run_record.actions_remaining < 0:
+        return
+
+    GameManager.run_record.stamina -= ActionPopup.POTENTIAL_COST
+    GameManager.run_record.actions_remaining -= 1
+
     entry.potential_inspect_level += 1
     _active_item.refresh_display("potential")
-    _stamina_hud.update_stamina(_stamina, MAX_STAMINA)
-    _action_popup.refresh(entry, _stamina)
+    _stamina_hud.update_stamina(GameManager.run_record.stamina, GameManager.run_record.max_stamina)
+    _stamina_hud.update_actions(GameManager.run_record.actions_remaining)
+    _action_popup.refresh(entry)
 
 
 func _on_condition_inspect() -> void:
     if _active_item == null:
         return
     var entry: ItemEntry = _entry_for_display[_active_item]
-    if _stamina < ActionPopup.CONDITION_COST:
+    if GameManager.run_record.stamina < ActionPopup.CONDITION_COST:
         return
-    _stamina -= ActionPopup.CONDITION_COST
+    if GameManager.run_record.actions_remaining < 0:
+        return
+
+    GameManager.run_record.stamina -= ActionPopup.CONDITION_COST
+    GameManager.run_record.actions_remaining -= 1
+
     entry.condition_inspect_level += 1
     _active_item.refresh_display("condition")
-    _stamina_hud.update_stamina(_stamina, MAX_STAMINA)
-    _action_popup.refresh(entry, _stamina)
+    _stamina_hud.update_stamina(GameManager.run_record.stamina, GameManager.run_record.max_stamina)
+    _stamina_hud.update_actions(GameManager.run_record.actions_remaining)
+    _action_popup.refresh(entry)
 
 
 func _on_start_auction_pressed() -> void:
@@ -159,7 +171,7 @@ func _populate_item_displays() -> void:
 func _open_popup(display: ItemDisplay) -> void:
     _active_item = display
     var entry: ItemEntry = _entry_for_display[display]
-    _action_popup.refresh(entry, _stamina)
+    _action_popup.refresh(entry)
 
     # Position popup directly below the item card
     var rect := display.get_global_rect()

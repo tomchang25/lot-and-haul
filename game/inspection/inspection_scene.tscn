@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bwhscenetscn1"]
 
 [ext_resource type="Script" uid="uid://bbr8kx3k0jv3c" path="res://game/inspection/inspection_scene.gd" id="1_idapx"]
-[ext_resource type="PackedScene" uid="uid://bstamhudtscn1" path="res://game/_shared/stamina_hud/stamina_hud.tscn" id="2_j573n"]
+[ext_resource type="PackedScene" uid="uid://bstamhudtscn1" path="res://game/inspection/stamina_hud/stamina_hud.tscn" id="2_j573n"]
 [ext_resource type="PackedScene" uid="uid://bactpoptscn01" path="res://game/inspection/action_popup/action_popup.tscn" id="3_3483c"]
 [ext_resource type="PackedScene" uid="uid://dbc6waemph2em" path="res://game/inspection/list_review/list_review_popup.tscn" id="4_icrf5"]
 
