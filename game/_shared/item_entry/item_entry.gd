@@ -38,13 +38,14 @@ var potential_inspect_label: String:
     get:
         if is_veiled():
             return "Veiled"
-        match potential_inspect_level:
-            0:
-                return "??? / ???"
-            1:
-                return "%d / ???" % layer_index
-            _:
-                return "%d / %d" % [layer_index, item_data.identity_layers.size() - 1]
+        if potential_inspect_level == 0:
+            return "??? / ???"
+
+        # level >= 1: reveal both current and max immediately
+        var current := layer_index
+        var max_layer := item_data.identity_layers.size() - 1
+        var rating := _get_potential_rating()
+        return "Lv %d / %d  [%s]" % [current, max_layer, rating]
 
 var condition_inspect_label: String:
     get:
@@ -109,6 +110,31 @@ func get_known_condition_multiplier() -> float:
                 return 3.0
         _:
             return get_condition_multiplier()
+
+
+func _get_potential_rating() -> String:
+    # Already at final layer — no upside
+    if is_at_final_layer():
+        return "Maxed"
+
+    var current_val := active_layer().base_value
+    if current_val <= 0:
+        return "Probably Junk"
+
+    # Find the best possible final layer value (upside ceiling)
+    var best_val := 0
+    for i in range(layer_index + 1, item_data.identity_layers.size()):
+        var v := item_data.identity_layers[i].base_value
+        if v > best_val:
+            best_val = v
+
+    var ratio := float(best_val) / float(current_val)
+    if ratio >= 4.0:
+        return "Potentially Valuable"
+    elif ratio >= 1.5:
+        return "Some Upside"
+    else:
+        return "Probably Junk"
 
 # Estimate based solely on what the player currently knows.
 # Veiled items return 0 — caller should check is_veiled() and display "???" via price_estimate_label.
