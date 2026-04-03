@@ -39,10 +39,6 @@ extends Resource
 # Chance (0.0–1.0) that any item in this lot spawns veiled.
 @export var veiled_chance: float = 0.4
 
-# DEPRECATED: direct item list — use category_weights / rarity_weights instead.
-# Kept for legacy .tres files; LotEntry ignores this when weight tables are non-empty.
-@export var item_pool: Array[ItemData] = []
-
 # Number of items drawn for this lot. Actual count is randi_range(min, max).
 @export var item_count_min: int = 3
 @export var item_count_max: int = 5

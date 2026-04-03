@@ -37,16 +37,11 @@ static func create(data: LotData) -> LotEntry:
     entry.aggressive_factor = randf_range(data.aggressive_factor_min, data.aggressive_factor_max)
     entry.price_variance = randf_range(data.price_variance_min, data.price_variance_max)
 
-    var use_weighted := not data.rarity_weights.is_empty() and not data.category_weights.is_empty()
-    if use_weighted:
-        var item_count := randi_range(data.item_count_min, data.item_count_max)
-        for i in range(item_count):
-            var item := _draw_item(data)
-            if item != null:
-                entry.item_entries.append(ItemEntry.create(item, data.veiled_chance))
-    else:
-        # Legacy path: iterate item_pool directly (deprecated).
-        for item: ItemData in data.item_pool:
+    var item_count := randi_range(data.item_count_min, data.item_count_max)
+    print("item_count: %d" % item_count)
+    for i in range(item_count):
+        var item := _draw_item(data)
+        if item != null:
             entry.item_entries.append(ItemEntry.create(item, data.veiled_chance))
 
     # Cache after item_entries are populated — get_npc_estimate() reads them.
@@ -65,6 +60,7 @@ static func _draw_item(data: LotData) -> ItemData:
         rarity_values.append(data.rarity_weights[k])
     var rarity_idx := RandomUtils.pick_weighted_index(rarity_values)
     if rarity_idx < 0:
+        push_warning("Rarity roll failed")
         return null
     var rarity: ItemData.Rarity = rarity_keys[rarity_idx] as ItemData.Rarity
 
@@ -75,12 +71,14 @@ static func _draw_item(data: LotData) -> ItemData:
         cat_values.append(data.category_weights[k])
     var cat_idx := RandomUtils.pick_weighted_index(cat_values)
     if cat_idx < 0:
+        push_warning("Category roll failed")
         return null
     var category_id: String = cat_keys[cat_idx]
 
     # Pick a random item matching both rarity and category
     var candidates: Array[ItemData] = ItemRegistry.get_items(rarity, category_id)
     if candidates.is_empty():
+        push_warning("No items found for %s %s" % [rarity, category_id])
         return null
     return candidates[randi() % candidates.size()]
 
