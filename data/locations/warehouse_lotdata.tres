@@ -10,8 +10,6 @@
 [resource]
 script = ExtResource("2_4e20k")
 item_pool = Array[ExtResource("1_d6tw8")]([ExtResource("2_fwesy"), ExtResource("3_1xxat"), ExtResource("4_e5l1t"), ExtResource("5_dj2iy")])
-item_count_min = 3
-item_count_max = 5
 rarity_weights = {
 0: 60,
 1: 25,

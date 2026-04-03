@@ -40,7 +40,7 @@ static func create(data: LotData) -> LotEntry:
     var use_weighted := not data.rarity_weights.is_empty() and not data.category_weights.is_empty()
     if use_weighted:
         var item_count := randi_range(data.item_count_min, data.item_count_max)
-        for _i in range(item_count):
+        for i in range(item_count):
             var item := _draw_item(data)
             if item != null:
                 entry.item_entries.append(ItemEntry.create(item, data.veiled_chance))
