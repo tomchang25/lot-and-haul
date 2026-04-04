@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://blotcardscn01"]
+
+[ext_resource type="Script" path="res://game/location_browse/lot_card/lot_card.gd" id="1_lotcard"]
+
+[node name="LotCard" type="VBoxContainer" unique_id=100000001]
+alignment = 1
+script = ExtResource("1_lotcard")
+
+[node name="IndexLabel" type="Label" parent="." unique_id=100000002]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Lot 1 / 1"
+horizontal_alignment = 1
+
+[node name="ItemCountLabel" type="Label" parent="." unique_id=100000003]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "? items"
+horizontal_alignment = 1
+
+[node name="RarityLabel" type="Label" parent="." unique_id=100000004]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Rarity: —"
+horizontal_alignment = 1
+
+[node name="CategoryLabel" type="Label" parent="." unique_id=100000005]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Categories: —"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="." unique_id=100000006]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="ButtonBar" type="HBoxContainer" parent="." unique_id=100000007]
+layout_mode = 2
+alignment = 1
+
+[node name="EnterButton" type="Button" parent="ButtonBar" unique_id=100000008]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Enter"
+
+[node name="PassButton" type="Button" parent="ButtonBar" unique_id=100000009]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Pass"

@@ -40,9 +40,11 @@ func _ready() -> void:
 
 func _inject_fake_state() -> void:
     const WAREHOUSE_LOTDATA = preload("uid://l8xrnjwietdt")
+    const WAREHOUSE_LOCATION = preload("res://data/locations/warehouse_location.tres")
 
     var lot := LotEntry.create(WAREHOUSE_LOTDATA)
-    GameManager.run_record = RunRecord.create(lot)
+    GameManager.run_record = RunRecord.create(WAREHOUSE_LOCATION)
+    GameManager.run_record.set_lot(lot)
 
     var entries: Array[ItemEntry] = GameManager.run_record.lot_entry.item_entries
 

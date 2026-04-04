@@ -174,7 +174,7 @@ func _on_pass_pressed() -> void:
     GameManager.run_record.paid_price = 0
     GameManager.run_record.won_items = [] as Array[ItemEntry]
 
-    GameManager.go_to_run_review()
+    GameManager.go_to_location_browse()
 
 # ══ Auction setup ═════════════════════════════════════════════════════════════
 
@@ -293,12 +293,12 @@ func _resolve() -> void:
         GameManager.run_record.paid_price = _current_display_price
         GameManager.run_record.won_items = GameManager.run_record.lot_items.duplicate()
 
-        GameManager.go_to_reveal()
+        GameManager.go_to_location_browse()
     else:
         GameManager.run_record.paid_price = 0
         GameManager.run_record.won_items = [] as Array[ItemEntry]
 
-        GameManager.go_to_run_review()
+        GameManager.go_to_location_browse()
 
 # ══ Display helpers ════════════════════════════════════════════════════════════
 
