@@ -1,14 +1,14 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://c73lwa3su0p3"]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://g0gqf2kuz70h"]
 
 [ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
-[ext_resource type="Resource" uid="uid://1m036hgxhgf8" path="res://data/categories/painting.tres" id="2_cat"]
-[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="2_np4jq"]
-[ext_resource type="Resource" uid="uid://dibattx48e6o" path="res://data/identity_layers/framed_canvas.tres" id="3_layer"]
-[ext_resource type="Resource" uid="uid://dtb81stcx8th" path="res://data/identity_layers/landscape_oil_painting.tres" id="4_layer"]
-[ext_resource type="Resource" uid="uid://d8helrjtmsxd" path="res://data/identity_layers/signed_masters_study.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://fbn6rj2lmvx1" path="res://data/categories/painting.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://y47gmp47kucp" path="res://data/identity_layers/framed_canvas.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://yz4pnakr1hn2" path="res://data/identity_layers/landscape_oil_painting.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://ogd8dhn80pur" path="res://data/identity_layers/signed_masters_study.tres" id="5_layer"]
 
 [resource]
 script = ExtResource("1_jyqit")
 item_id = "oil_painting"
 category_data = ExtResource("2_cat")
-identity_layers = Array[ExtResource("2_np4jq")]([ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer")])
+identity_layers = [ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer")]
+rarity = 0

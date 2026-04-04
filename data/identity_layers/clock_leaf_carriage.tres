@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://q6u8qz5x689r"]
+
+[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="1_ilay"]
+[resource]
+script = ExtResource("1_ilay")
+layer_id = "clock_leaf_carriage"
+display_name = "French Carriage Clock"
+base_value = 1400
+unlock_action = null

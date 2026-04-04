@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CategoryData" format=3 uid="uid://7yttkgravmxs"]
+[gd_resource type="Resource" script_class="CategoryData" format=3 uid="uid://gziz0yoxva5e"]
 
 [ext_resource type="Script" uid="uid://c7fq6wupmgchg" path="res://data/_definitions/category_data.gd" id="1_catdef"]
 
@@ -8,4 +8,4 @@ category_id = "bicycle"
 super_category = "Vehicle"
 display_name = "Bicycle"
 weight = 12.0
-grid_size = 4
+grid_size = 6

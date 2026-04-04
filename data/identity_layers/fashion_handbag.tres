@@ -1,20 +1,9 @@
-[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://hao2t4fn65lu"]
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://ewgr7jpslr8j"]
 
 [ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="1_ilay"]
-[ext_resource type="Resource" uid="uid://c6gc6nxk2jb1f" path="res://data/skills/authentication.tres" id="2_to8xp"]
-[ext_resource type="Script" uid="uid://c23t4blqmaaj4" path="res://data/_definitions/layer_unlock_action.gd" id="3_mf7br"]
-
-[sub_resource type="Resource" id="Resource_to8xp"]
-script = ExtResource("3_mf7br")
-context = 1
-stamina_cost = 3
-required_skill = ExtResource("2_to8xp")
-required_level = 1
-metadata/_custom_type_script = "uid://c23t4blqmaaj4"
-
 [resource]
 script = ExtResource("1_ilay")
 layer_id = "fashion_handbag"
 display_name = "Fashion Handbag"
 base_value = 560
-unlock_action = SubResource("Resource_to8xp")
+unlock_action = null

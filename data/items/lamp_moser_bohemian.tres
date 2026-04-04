@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://grk1g1at78yj"]
+
+[ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
+[ext_resource type="Resource" uid="uid://zpy5u71fjnxh" path="res://data/categories/oil_lamp.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://i4mxmpoghinu" path="res://data/identity_layers/lamp_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://8vnd79kgssxz" path="res://data/identity_layers/lamp_glass_body.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://o18yjp7j5fai" path="res://data/identity_layers/lamp_ornate_base.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://7oluums6ky6g" path="res://data/identity_layers/lamp_leaf_moser.tres" id="6_layer"]
+
+[resource]
+script = ExtResource("1_jyqit")
+item_id = "lamp_moser_bohemian"
+category_data = ExtResource("2_cat")
+identity_layers = [ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer"), ExtResource("6_layer")]
+rarity = 2

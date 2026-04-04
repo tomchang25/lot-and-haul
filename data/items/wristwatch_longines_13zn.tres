@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://f46127g79bzc"]
+
+[ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
+[ext_resource type="Resource" uid="uid://pfnq3e68u761" path="res://data/categories/wristwatch.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://h2ga310yhq4a" path="res://data/identity_layers/watch_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://9k4pxesip4r0" path="res://data/identity_layers/watch_case_check.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://anfz9k3mz2i6" path="res://data/identity_layers/watch_maker_stamped.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://v3yqkblladww" path="res://data/identity_layers/watch_longines_leaf.tres" id="6_layer"]
+
+[resource]
+script = ExtResource("1_jyqit")
+item_id = "wristwatch_longines_13zn"
+category_data = ExtResource("2_cat")
+identity_layers = [ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer"), ExtResource("6_layer")]
+rarity = 2

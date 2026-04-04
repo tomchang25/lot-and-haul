@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://sc7mx7rzklwd"]
+
+[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="1_ilay"]
+[resource]
+script = ExtResource("1_ilay")
+layer_id = "lamp_leaf_baccarat"
+display_name = "Baccarat Crystal Lamp"
+base_value = 1600
+unlock_action = null

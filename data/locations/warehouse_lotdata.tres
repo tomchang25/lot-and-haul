@@ -4,6 +4,8 @@
 
 [resource]
 script = ExtResource("2_4e20k")
+item_count_min = 4
+item_count_max = 8
 rarity_weights = {
 0: 80,
 1: 10,
@@ -12,10 +14,13 @@ rarity_weights = {
 4: 1
 }
 category_weights = {
+"automobile": 1,
+"bicycle": 1,
 "clock": 1,
+"handbag": 1,
+"motorcycle": 1,
 "oil_lamp": 1,
-"porcelain_figurine": 1,
-"poster": 1,
-"vase": 1
+"vase": 1,
+"wristwatch": 1
 }
 metadata/_custom_type_script = "uid://oh0e8qcjnmcs"

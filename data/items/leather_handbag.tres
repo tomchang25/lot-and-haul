@@ -1,14 +1,14 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://8j4judo82fof"]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://tvuswy4rrb9i"]
 
 [ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
-[ext_resource type="Resource" uid="uid://w8w4rvfjxcs4" path="res://data/categories/handbag.tres" id="2_cat"]
-[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="2_fycck"]
-[ext_resource type="Resource" uid="uid://q3ll80cpdfal" path="res://data/identity_layers/fabric_bundle.tres" id="3_layer"]
-[ext_resource type="Resource" uid="uid://hao2t4fn65lu" path="res://data/identity_layers/fashion_handbag.tres" id="4_layer"]
-[ext_resource type="Resource" uid="uid://e460np8ae03v" path="res://data/identity_layers/authenticated_hermes_bag.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://rl8iihglrokc" path="res://data/categories/handbag.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://74e7glhikhpe" path="res://data/identity_layers/fabric_bundle.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://ewgr7jpslr8j" path="res://data/identity_layers/fashion_handbag.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://8zje8cgf376d" path="res://data/identity_layers/authenticated_hermes_bag.tres" id="5_layer"]
 
 [resource]
 script = ExtResource("1_jyqit")
 item_id = "leather_handbag"
 category_data = ExtResource("2_cat")
-identity_layers = Array[ExtResource("2_fycck")]([ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer")])
+identity_layers = [ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer")]
+rarity = 0

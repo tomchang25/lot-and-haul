@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://d8helrjtmsxd"]
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://ogd8dhn80pur"]
 
 [ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="1_ilay"]
-
 [resource]
 script = ExtResource("1_ilay")
 layer_id = "signed_masters_study"
 display_name = "Signed 19th-C. Masters Study"
 base_value = 2200
+unlock_action = null

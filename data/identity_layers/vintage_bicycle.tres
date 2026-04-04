@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://tbhej481whkd"]
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://b7wsrvjtdxgv"]
 
 [ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="1_ilay"]
 [ext_resource type="Script" uid="uid://c23t4blqmaaj4" path="res://data/_definitions/layer_unlock_action.gd" id="2_unlock"]
@@ -6,7 +6,7 @@
 [sub_resource type="Resource" id="unlock"]
 script = ExtResource("2_unlock")
 context = 1
-stamina_cost = 1
+time_cost = 1
 
 [resource]
 script = ExtResource("1_ilay")

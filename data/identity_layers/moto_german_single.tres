@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://vvp53h5mz7ak"]
+
+[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="1_ilay"]
+[ext_resource type="Script" uid="uid://c23t4blqmaaj4" path="res://data/_definitions/layer_unlock_action.gd" id="2_unlock"]
+[ext_resource type="Resource" uid="uid://cahj4rukt047g" path="res://data/skills/mechanical.tres" id="3_skill"]
+
+[sub_resource type="Resource" id="unlock"]
+script = ExtResource("2_unlock")
+context = 1
+time_cost = 3
+required_skill = ExtResource("3_skill")
+required_level = 2
+
+[resource]
+script = ExtResource("1_ilay")
+layer_id = "moto_german_single"
+display_name = "Prewar German Single"
+base_value = 900
+unlock_action = SubResource("unlock")

@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://6bqmbmpla5yt"]
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://7wy238wg7ov5"]
 
 [ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="1_ilay"]
-
 [resource]
 script = ExtResource("1_ilay")
 layer_id = "raleigh_sports_roadster"
 display_name = "1970s Raleigh Sports Roadster"
 base_value = 1100
+unlock_action = null

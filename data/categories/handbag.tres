@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CategoryData" format=3 uid="uid://w8w4rvfjxcs4"]
+[gd_resource type="Resource" script_class="CategoryData" format=3 uid="uid://rl8iihglrokc"]
 
 [ext_resource type="Script" uid="uid://c7fq6wupmgchg" path="res://data/_definitions/category_data.gd" id="1_catdef"]
 
@@ -8,4 +8,4 @@ category_id = "handbag"
 super_category = "Fashion"
 display_name = "Handbag"
 weight = 0.5
-grid_size = 1
+grid_size = 2

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://ujuriw7ss6co"]
+
+[ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
+[ext_resource type="Resource" uid="uid://xsvf9yfqbj60" path="res://data/categories/automobile.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://5kvqa14o1d3t" path="res://data/identity_layers/auto_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://4fbk5ant7wqb" path="res://data/identity_layers/auto_body_check.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://gaiwfk1xdf86" path="res://data/identity_layers/auto_american_coupe.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://yxsx92274t0v" path="res://data/identity_layers/auto_vin_research.tres" id="6_layer"]
+[ext_resource type="Resource" uid="uid://qiqwn9e41adk" path="res://data/identity_layers/auto_duesenberg_leaf.tres" id="7_layer"]
+
+[resource]
+script = ExtResource("1_jyqit")
+item_id = "automobile_duesenberg_j"
+category_data = ExtResource("2_cat")
+identity_layers = [ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer"), ExtResource("6_layer"), ExtResource("7_layer")]
+rarity = 4

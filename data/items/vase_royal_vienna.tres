@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://igmtnhqc5ha1"]
+
+[ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
+[ext_resource type="Resource" uid="uid://cfull15ife51" path="res://data/categories/vase.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://fap1gs39km79" path="res://data/identity_layers/vase_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://r4verfvq9kfo" path="res://data/identity_layers/vase_porcelain_body.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://y2od09egp9nr" path="res://data/identity_layers/vase_cobalt_gilding.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://xhj9c8ak0mfv" path="res://data/identity_layers/vase_factory_mark.tres" id="6_layer"]
+[ext_resource type="Resource" uid="uid://o8tg4uwyxcj0" path="res://data/identity_layers/vase_archive_provenance.tres" id="7_layer"]
+[ext_resource type="Resource" uid="uid://f6xxnwj25lbu" path="res://data/identity_layers/vase_leaf_royal_vienna.tres" id="8_layer"]
+
+[resource]
+script = ExtResource("1_jyqit")
+item_id = "vase_royal_vienna"
+category_data = ExtResource("2_cat")
+identity_layers = [ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer"), ExtResource("6_layer"), ExtResource("7_layer"), ExtResource("8_layer")]
+rarity = 4
