@@ -58,7 +58,7 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="Panel" type="PanelContainer" parent="RootVBox/ListCenter" unique_id=100000008]
-custom_minimum_size = Vector2(760, 0)
+custom_minimum_size = Vector2(1080, 0)
 layout_mode = 2
 
 [node name="PanelVBox" type="VBoxContainer" parent="RootVBox/ListCenter/Panel" unique_id=100000009]
@@ -80,6 +80,24 @@ size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 14
 text = "Item"
+vertical_alignment = 1
+
+[node name="LevelHeaderLabel" type="Label" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=193401869]
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Level"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ConditionHeaderLabel" type="Label" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=702626778]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Condition"
+horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="PriceHeader" type="Label" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=100000013]

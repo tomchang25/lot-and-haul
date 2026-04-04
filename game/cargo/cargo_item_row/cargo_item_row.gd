@@ -13,6 +13,8 @@ var entry: ItemEntry = null
 # ── Node references ───────────────────────────────────────────────────────────
 @onready var _toggle: CheckButton = $HBox/ToggleContainer/Toggle
 @onready var _name_label: Label = $HBox/NameLabel
+@onready var _level_label: Label = $HBox/LevelLabel
+@onready var _condition_label: Label = $HBox/ConditionLabel
 @onready var _price_label: Label = $HBox/PriceLabel
 @onready var _weight_label: Label = $HBox/WeightLabel
 @onready var _size_label: Label = $HBox/SizeLabel
@@ -40,12 +42,15 @@ func _on_toggle_changed(pressed: bool) -> void:
 # Bind entry and populate all labels. Call once after add_child().
 func setup(p_entry: ItemEntry) -> void:
     entry = p_entry
+    _toggle.toggled.connect(_on_toggle_changed)
 
     _name_label.text = entry.display_name
-    _price_label.text = "$%d" % entry.price_estimate
+    _level_label.text = entry.potential_inspect_label
+    _condition_label.text = entry.condition_inspect_label
+    _condition_label.modulate = entry.condition_inspect_color
+    _price_label.text = entry.price_estimate_label
     _weight_label.text = "%.1f kg" % entry.item_data.category_data.weight
     _size_label.text = "%d" % entry.item_data.category_data.grid_size
-    _toggle.toggled.connect(_on_toggle_changed)
 
 
 # Enable or disable the toggle. Selected rows are never disabled — the

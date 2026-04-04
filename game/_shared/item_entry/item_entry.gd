@@ -44,7 +44,7 @@ var potential_inspect_label: String:
         # level >= 1: reveal both current and max immediately
         var current := layer_index
         var max_layer := item_data.identity_layers.size() - 1
-        var rating := _get_potential_rating()
+        var rating := get_potential_rating()
         return "Lv %d / %d  [%s]" % [current, max_layer, rating]
 
 var condition_inspect_label: String:
@@ -112,7 +112,7 @@ func get_known_condition_multiplier() -> float:
             return get_condition_multiplier()
 
 
-func _get_potential_rating() -> String:
+func get_potential_rating() -> String:
     # Already at final layer — no upside
     if is_at_final_layer():
         return "Maxed"
