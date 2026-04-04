@@ -5,16 +5,6 @@
 # No player input required.
 extends Control
 
-# ── Constants ─────────────────────────────────────────────────────────────────
-
-# Fixed lot for the vertical slice. Replace with dynamic selection post-MVP.
-const ITEM_PATHS: Array[String] = [
-    "res://data/items/brass_lamp.tres",
-    "res://data/items/pocket_watch.tres",
-    "res://data/items/oil_painting.tres",
-    "res://data/items/wooden_clock.tres",
-]
-
 # ── Node references ───────────────────────────────────────────────────────────
 const WarehouseLotData = preload("res://data/locations/warehouse_lotdata.tres")
 const ClosedTexture := preload("res://assets/warehouse_closed.png")

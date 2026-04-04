@@ -1,0 +1,176 @@
+# ── grid_size reference ──────────────────────────────────────
+# Represents the physical footprint in the cargo inventory grid.
+#
+#   1  — keychain, coin, small figurine
+#   2  — oil lamp, pocket watch, small vase
+#   3  — handbag, rifle, typewriter
+#   4  — bicycle wheel, large painting, sewing machine
+#   6  — bicycle, grandfather clock, chest of drawers
+#   8  — large industrial machine, upright piano, engine block
+#
+# Use any int from 1 to 8. Pick the value that best matches the
+# category's real-world physical footprint.
+# ─────────────────────────────────────────────────────────────
+
+# ────────────────────────────────────────────────────────────
+# IDENTITY LAYERS
+# Each layer is a reusable node. Multiple items may reference the same layer_id.
+# A layer_id appears ONCE in this list; items reference it by name.
+#
+# unlock_action: describes how the player advances PAST this layer.
+#
+#   context:
+#     0 = AUTO  — triggers automatically when the item arrives home.
+#                 Use ONLY on layer[0]. The veil is always lifted for free.
+#     1 = HOME  — the player works on the item in the home workshop.
+#                 Used on layer[1] and above. Always costs time.
+#
+#   time_cost:   int 1–5. How long the HOME action takes. Ignored when context=0.
+#                1 = quick look / wipe down
+#                2 = close inspection
+#                3 = moderate research
+#                4 = specialist tools or reference materials
+#                5 = archival research or expert consultation
+#
+#   required_skill:  skill_id string. Omit entirely if no skill is needed.
+#                    Valid values: "appraisal", "authentication", "mechanical"
+#   required_level:  int 1–5. Include only when required_skill is present.
+#   required_condition: float 0.0–1.0. Minimum item condition to attempt this action.
+#                       Omit entirely if 0.
+#
+# Final layer rule: the last layer in ANY item's chain MUST have unlock_action: null.
+#
+# KEY RULE — layer position is determined by the item, not the layer:
+#   A layer_id may sit at layer[2] in one item and at layer[3] in another.
+#   The layer definition is shared; only the item's layer_ids list sets the order.
+# ────────────────────────────────────────────────────────────
+identity_layers:
+  # ── Shared trunk ─────────────────────────────────────────
+  # All four items start here. Player cannot distinguish them until they diverge.
+
+  - layer_id: lamp_shaped_object
+    display_name: Lamp-Shaped Object
+    base_value: 80
+    unlock_action:
+      context: 0 # AUTO — veil lifted on arrival home
+
+  - layer_id: antique_oil_lamp
+    display_name: Antique Oil Lamp
+    base_value: 220
+    unlock_action:
+      context: 1 # HOME
+      time_cost: 2
+
+  # ── Items A and B: fork at layer[2] ──────────────────────
+  # Both share lamp_shaped_object and antique_oil_lamp.
+  # They diverge here into their own leaf layers.
+
+  - layer_id: signed_duplex_burner_lamp
+    display_name: Signed Duplex Burner Lamp
+    base_value: 950
+    unlock_action: null # FINAL — Item A leaf
+
+  - layer_id: viennese_iron_chandelier
+    display_name: Viennese Iron Chandelier
+    base_value: 1400
+    unlock_action: null # FINAL — Item B leaf
+
+  # ── Items C and D: cross-chain shared mid-layer ───────────
+  #
+  # ornate_lamp_body sits at layer[2] in Item C and layer[3] in Item D.
+  # When the player reaches "Ornate Lamp Body" they see the same display_name
+  # regardless of which item they have. They cannot tell whether:
+  #   - they hold Item C and are one step from the truth, or
+  #   - they hold Item D and still have two steps to go.
+  #
+  # Item C chain: lamp_shaped_object → antique_oil_lamp → ornate_lamp_body → french_empire_lamp
+  # Item D chain: lamp_shaped_object → antique_oil_lamp → gilded_lamp_base → ornate_lamp_body → authenticated_meissen_lamp
+
+  - layer_id: gilded_lamp_base # only Item D passes through this layer
+    display_name: Gilded Lamp Base
+    base_value: 380
+    unlock_action:
+      context: 1 # HOME
+      time_cost: 2
+
+  - layer_id: ornate_lamp_body # shared mid-layer: C[2] and D[3]
+    display_name: Ornate Lamp Body
+    base_value: 700
+    unlock_action:
+      context: 1 # HOME
+      time_cost: 3
+      required_skill: appraisal
+      required_level: 1
+
+  - layer_id: french_empire_lamp
+    display_name: French Empire Ormolu Lamp
+    base_value: 2400
+    unlock_action: null # FINAL — Item C leaf
+
+  - layer_id: authenticated_meissen_lamp
+    display_name: Authenticated Meissen Porcelain Lamp
+    base_value: 5800
+    unlock_action: null # FINAL — Item D leaf
+
+# ────────────────────────────────────────────────────────────
+# ITEMS
+#
+# layer_ids: ordered list of layer_id references, vague → specific.
+#   layer[0]  = always the veil layer. unlock_action.context must be 0 (AUTO).
+#   layer[-1] = always the final layer. unlock_action must be null.
+#   Minimum 2 layers. Typical range: 3–5.
+#
+# rarity:
+#   0 = COMMON      (2–3 layers, final value   50–300)
+#   1 = UNCOMMON    (3 layers,   final value  300–800)
+#   2 = RARE        (3–4 layers, final value  800–2000)
+#   3 = EPIC        (4–5 layers, final value 2000–8000)
+#   4 = LEGENDARY   (5 layers,   final value 8000+, usually requires skill)
+# ────────────────────────────────────────────────────────────
+items:
+  # ── Pattern A/B: standard fork ───────────────────────────
+  # Share layer[0,1]. Diverge at layer[2].
+  # Player cannot distinguish A from B until they complete HOME work at layer[1].
+
+  - item_id: brass_duplex_lamp
+    category_id: oil_lamp
+    rarity: 2 # RARE
+    layer_ids:
+      - lamp_shaped_object # [0] context=0 AUTO
+      - antique_oil_lamp # [1] context=1 HOME time_cost=2
+      - signed_duplex_burner_lamp # [2] FINAL
+
+  - item_id: viennese_chandelier
+    category_id: oil_lamp
+    rarity: 3 # EPIC
+    layer_ids:
+      - lamp_shaped_object # [0] shared with Item A
+      - antique_oil_lamp # [1] shared with Item A
+      - viennese_iron_chandelier # [2] FINAL — diverges from A here
+
+  # ── Pattern C/D: cross-chain shared mid-layer ────────────
+  # Item C is 4 layers deep. ornate_lamp_body is its layer[2].
+  # Item D is 5 layers deep. ornate_lamp_body is its layer[3].
+  #
+  # A player who reaches "Ornate Lamp Body" on an unknown item has no way to
+  # know which item they hold — the name gives nothing away about chain depth.
+  # Only completing the appraisal skill check will reveal which path they are on.
+
+  - item_id: french_empire_lamp
+    category_id: oil_lamp
+    rarity: 3 # EPIC
+    layer_ids:
+      - lamp_shaped_object # [0] context=0 AUTO
+      - antique_oil_lamp # [1] HOME time_cost=2
+      - ornate_lamp_body # [2] HOME appraisal lv1, time_cost=3
+      - french_empire_lamp # [3] FINAL
+
+  - item_id: meissen_porcelain_lamp
+    category_id: oil_lamp
+    rarity: 4 # LEGENDARY
+    layer_ids:
+      - lamp_shaped_object # [0] context=0 AUTO
+      - antique_oil_lamp # [1] HOME time_cost=2
+      - gilded_lamp_base # [2] HOME time_cost=2  ← extra step only Item D has
+      - ornate_lamp_body # [3] HOME appraisal lv1, time_cost=3  ← same layer as C[2]
+      - authenticated_meissen_lamp # [4] FINAL

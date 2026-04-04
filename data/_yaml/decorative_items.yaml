@@ -1,0 +1,586 @@
+categories:
+  - category_id: oil_lamp
+    super_category: Decorative
+    display_name: Oil Lamp
+    weight: 3.0
+    grid_size: 2
+
+  - category_id: clock
+    super_category: Decorative
+    display_name: Clock
+    weight: 4.0
+    grid_size: 3
+
+  - category_id: porcelain_figurine
+    super_category: Decorative
+    display_name: Porcelain Figurine
+    weight: 0.8
+    grid_size: 1
+
+  - category_id: vase
+    super_category: Decorative
+    display_name: Vase
+    weight: 2.0
+    grid_size: 2
+
+  - category_id: poster
+    super_category: Decorative
+    display_name: Poster
+    weight: 0.2
+    grid_size: 3
+
+identity_layers:
+
+  - layer_id: lamp_veil
+    display_name: Lamp-Shaped Object
+    base_value: 5
+    unlock_action:
+      context: 0
+
+  - layer_id: lamp_glass_base
+    display_name: Glass-and-Metal Lamp, Hand-Painted Shade
+    base_value: 40
+    unlock_action:
+      context: 1
+      time_cost: 1
+
+  - layer_id: lamp_ornate_brass
+    display_name: Ornate Brass Oil Lamp, Floral Mounts
+    base_value: 140
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: lamp_hinks_verified
+    display_name: Hinks & Son Duplex Burner Lamp, Birmingham c.1875
+    base_value: 520
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: appraisal
+      required_level: 1
+
+  - layer_id: lamp_royal_worcester_leaf
+    display_name: Authenticated Royal Worcester Porcelain Lamp, c.1882
+    base_value: 2200
+    unlock_action: null
+
+  - layer_id: lamp_cut_crystal_body
+    display_name: Cut-Crystal Font, Gilt-Bronze Fittings
+    base_value: 180
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: lamp_baccarat_mid
+    display_name: Signed Baccarat Crystal Font, Partial Label Present
+    base_value: 600
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: authentication
+      required_level: 2
+
+  - layer_id: lamp_baccarat_leaf
+    display_name: Authenticated Baccarat Crystal Colza Lamp, c.1860
+    base_value: 3800
+    unlock_action: null
+
+  - layer_id: lamp_common_painted
+    display_name: Painted Milk-Glass Lamp, Turned Brass Column
+    base_value: 55
+    unlock_action:
+      context: 1
+      time_cost: 1
+
+  - layer_id: lamp_common_leaf
+    display_name: Late Victorian Pressed-Glass Parlour Lamp, c.1895 — Reproduction
+    base_value: 90
+    unlock_action: null
+
+  - layer_id: lamp_bohemian_mid
+    display_name: Bohemian Enamelled Glass Lamp, Ruby Overlay
+    base_value: 320
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: appraisal
+      required_level: 2
+
+  - layer_id: lamp_moser_leaf
+    display_name: Authenticated Moser Glassworks Ruby-Overlay Lamp, Karlsbad c.1888
+    base_value: 4900
+    unlock_action: null
+
+  - layer_id: clock_veil
+    display_name: Boxed Timekeeping Device
+    base_value: 8
+    unlock_action:
+      context: 0
+
+  - layer_id: clock_wood_case
+    display_name: Wooden-Cased Mantel Clock, Pendulum Present
+    base_value: 55
+    unlock_action:
+      context: 1
+      time_cost: 1
+
+  - layer_id: clock_ebonised_case
+    display_name: Ebonised Case, Ormolu Mounts, Roman Numeral Dial
+    base_value: 180
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: clock_ansonia_mid
+    display_name: Ansonia Clock Co. Movement, Paper Label Partially Legible
+    base_value: 420
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: mechanical
+      required_level: 1
+
+  - layer_id: clock_ansonia_leaf
+    display_name: Ansonia "Crystal Palace" Mantel Clock, New York c.1904
+    base_value: 1100
+    unlock_action: null
+
+  - layer_id: clock_bracket_mid
+    display_name: Bracket Clock, Fusee Movement, Verge Escapement
+    base_value: 550
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: mechanical
+      required_level: 2
+
+  - layer_id: clock_bracket_leaf
+    display_name: Thomas Cole Bracket Clock, Fretwork Case, London c.1855
+    base_value: 3200
+    unlock_action: null
+
+  - layer_id: clock_common_mid
+    display_name: Pressed-Oak Case, Spring-Wound Movement
+    base_value: 65
+    unlock_action:
+      context: 1
+      time_cost: 1
+
+  - layer_id: clock_common_leaf
+    display_name: Edwardian Mantel Clock, Mass-Produced Oak Case, c.1910
+    base_value: 95
+    unlock_action: null
+
+  - layer_id: clock_carriage_mid
+    display_name: Gilt-Brass Carriage Clock, Bevelled Glass Panels
+    base_value: 390
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: appraisal
+      required_level: 1
+
+  - layer_id: clock_carriage_deep
+    display_name: Repeating Carriage Clock, Gorge Case, Enamel Panels
+    base_value: 1400
+    unlock_action:
+      context: 1
+      time_cost: 4
+      required_skill: authentication
+      required_level: 2
+
+  - layer_id: clock_drocourt_leaf
+    display_name: Authenticated Drocourt Repeating Carriage Clock, Paris c.1878
+    base_value: 6500
+    unlock_action: null
+
+  - layer_id: figurine_veil
+    display_name: Small Ceramic Object
+    base_value: 4
+    unlock_action:
+      context: 0
+
+  - layer_id: figurine_white_glazed
+    display_name: White-Glazed Ceramic Figurine, Hand-Painted Details
+    base_value: 30
+    unlock_action:
+      context: 1
+      time_cost: 1
+
+  - layer_id: figurine_common_leaf
+    display_name: Staffordshire-Style Spill Vase, Mid-Victorian Reproduction
+    base_value: 55
+    unlock_action: null
+
+  - layer_id: figurine_pastoral_mid
+    display_name: Pastoral Figurine Pair, Soft-Paste Porcelain, Gilded Base
+    base_value: 140
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: figurine_meissen_pre
+    display_name: Crossed-Swords Mark Present, Porcelain Consistent with Meissen
+    base_value: 700
+    unlock_action:
+      context: 1
+      time_cost: 4
+      required_skill: authentication
+      required_level: 2
+
+  - layer_id: figurine_meissen_leaf
+    display_name: Authenticated Meissen Porcelain Shepherd & Shepherdess Pair, c.1760
+    base_value: 5800
+    unlock_action: null
+
+  - layer_id: figurine_bisque_mid
+    display_name: Unglazed Bisque Porcelain, Moulded Lace Detailing
+    base_value: 110
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: figurine_conta_leaf
+    display_name: Conta & Boehme Bisque Figurine, Possneck c.1880
+    base_value: 480
+    unlock_action: null
+
+  - layer_id: figurine_stoneware_mid
+    display_name: Stoneware Figurine, Salt-Glazed Finish, Agricultural Subject
+    base_value: 90
+    unlock_action:
+      context: 1
+      time_cost: 2
+      required_skill: appraisal
+      required_level: 1
+
+  - layer_id: figurine_martin_brothers_leaf
+    display_name: Martin Brothers Stoneware Bird Jar, Southall c.1903
+    base_value: 9500
+    unlock_action: null
+
+  - layer_id: vase_veil
+    display_name: Vessel-Shaped Object
+    base_value: 6
+    unlock_action:
+      context: 0
+
+  - layer_id: vase_glazed_body
+    display_name: Glazed Ceramic Vase, Floral Motif
+    base_value: 35
+    unlock_action:
+      context: 1
+      time_cost: 1
+
+  - layer_id: vase_common_leaf
+    display_name: Late Victorian Transfer-Print Vase, Commercial Earthenware
+    base_value: 60
+    unlock_action: null
+
+  - layer_id: vase_art_nouveau_mid
+    display_name: Sinuous Organic Form, Iridescent Glaze, Unsigned
+    base_value: 260
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: vase_loetz_confirmed
+    display_name: Loetz Witwe Iridescent Glass Vase, Klostermühle c.1902
+    base_value: 1800
+    unlock_action: null
+
+  - layer_id: vase_celadon_mid
+    display_name: Celadon-Glazed Vase, Incised Dragon Decoration
+    base_value: 190
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: appraisal
+      required_level: 1
+
+  - layer_id: vase_celadon_deep
+    display_name: Longquan Celadon Vase, Song-Dynasty Form, Provenance Documentation
+    base_value: 1100
+    unlock_action:
+      context: 1
+      time_cost: 4
+      required_skill: authentication
+      required_level: 3
+
+  - layer_id: vase_song_leaf
+    display_name: Authenticated Southern Song Longquan Celadon Mallet Vase, c.1200
+    base_value: 14000
+    unlock_action: null
+
+  - layer_id: vase_blue_white_mid
+    display_name: Blue-and-White Porcelain Vase, Hand-Painted Landscape
+    base_value: 150
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: vase_blue_white_leaf
+    display_name: Delft Faience Vase, De Porceleyne Fles, c.1890
+    base_value: 640
+    unlock_action: null
+
+  - layer_id: poster_veil
+    display_name: Rolled Paper Item
+    base_value: 3
+    unlock_action:
+      context: 0
+
+  - layer_id: poster_lithograph_base
+    display_name: Colour Lithograph, Large Format, Some Foxing
+    base_value: 25
+    unlock_action:
+      context: 1
+      time_cost: 1
+
+  - layer_id: poster_common_leaf
+    display_name: 1970s Offset-Print Music Festival Poster, Commercial Reprint
+    base_value: 45
+    unlock_action: null
+
+  - layer_id: poster_travel_mid
+    display_name: Travel Destination Imagery, Art Deco Typography, Stone Lithograph
+    base_value: 130
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: poster_cassandre_leaf
+    display_name: A.M. Cassandre "Nord Express" Original Stone Lithograph, Paris 1927
+    base_value: 7200
+    unlock_action: null
+
+  - layer_id: poster_exhibition_mid
+    display_name: Exhibition Poster, Modernist Geometric Design, Unattributed
+    base_value: 85
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: poster_bauhaus_confirmed
+    display_name: Bauhaus Ausstellung Weimar, Original Letterpress Print, 1923
+    base_value: 2400
+    unlock_action: null
+
+  - layer_id: poster_circus_mid
+    display_name: Circus or Variety Show Imagery, Bold Primary Colours
+    base_value: 70
+    unlock_action:
+      context: 1
+      time_cost: 1
+
+  - layer_id: poster_circus_leaf
+    display_name: Barnum & Bailey Circus Chromolithograph, Strobridge & Co., c.1896
+    base_value: 380
+    unlock_action: null
+
+  - layer_id: poster_film_mid
+    display_name: Film or Theatre Imagery, Hand-Lettered Title Partially Legible
+    base_value: 95
+    unlock_action:
+      context: 1
+      time_cost: 2
+      required_skill: appraisal
+      required_level: 1
+
+  - layer_id: poster_film_deep
+    display_name: Pre-War European Cinema Poster, Country of Origin Uncertain
+    base_value: 440
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: authentication
+      required_level: 2
+
+  - layer_id: poster_metropolis_leaf
+    display_name: Authenticated Fritz Lang "Metropolis" Belgian Release Poster, 1927
+    base_value: 11000
+    unlock_action: null
+
+items:
+
+  - item_id: lamp_hinks_duplex
+    category_id: oil_lamp
+    rarity: 2
+    layer_ids:
+      - lamp_veil
+      - lamp_glass_base
+      - lamp_ornate_brass
+      - lamp_hinks_verified
+      - lamp_royal_worcester_leaf
+
+  - item_id: lamp_baccarat_colza
+    category_id: oil_lamp
+    rarity: 3
+    layer_ids:
+      - lamp_veil
+      - lamp_glass_base
+      - lamp_cut_crystal_body
+      - lamp_baccarat_mid
+      - lamp_baccarat_leaf
+
+  - item_id: lamp_parlour_repro
+    category_id: oil_lamp
+    rarity: 0
+    layer_ids:
+      - lamp_veil
+      - lamp_common_painted
+      - lamp_common_leaf
+
+  - item_id: lamp_moser_ruby
+    category_id: oil_lamp
+    rarity: 4
+    layer_ids:
+      - lamp_veil
+      - lamp_glass_base
+      - lamp_ornate_brass
+      - lamp_bohemian_mid
+      - lamp_moser_leaf
+
+  - item_id: clock_ansonia_crystal
+    category_id: clock
+    rarity: 2
+    layer_ids:
+      - clock_veil
+      - clock_wood_case
+      - clock_ebonised_case
+      - clock_ansonia_mid
+      - clock_ansonia_leaf
+
+  - item_id: clock_thomas_cole_bracket
+    category_id: clock
+    rarity: 3
+    layer_ids:
+      - clock_veil
+      - clock_wood_case
+      - clock_bracket_mid
+      - clock_bracket_leaf
+
+  - item_id: clock_edwardian_mantel
+    category_id: clock
+    rarity: 0
+    layer_ids:
+      - clock_veil
+      - clock_common_mid
+      - clock_common_leaf
+
+  - item_id: clock_drocourt_repeating
+    category_id: clock
+    rarity: 4
+    layer_ids:
+      - clock_veil
+      - clock_wood_case
+      - clock_carriage_mid
+      - clock_carriage_deep
+      - clock_drocourt_leaf
+
+  - item_id: figurine_staffordshire_repro
+    category_id: porcelain_figurine
+    rarity: 0
+    layer_ids:
+      - figurine_veil
+      - figurine_white_glazed
+      - figurine_common_leaf
+
+  - item_id: figurine_conta_boehme_bisque
+    category_id: porcelain_figurine
+    rarity: 1
+    layer_ids:
+      - figurine_veil
+      - figurine_white_glazed
+      - figurine_bisque_mid
+      - figurine_conta_leaf
+
+  - item_id: figurine_meissen_shepherd
+    category_id: porcelain_figurine
+    rarity: 4
+    layer_ids:
+      - figurine_veil
+      - figurine_white_glazed
+      - figurine_pastoral_mid
+      - figurine_meissen_pre
+      - figurine_meissen_leaf
+
+  - item_id: figurine_martin_brothers_bird
+    category_id: porcelain_figurine
+    rarity: 4
+    layer_ids:
+      - figurine_veil
+      - figurine_stoneware_mid
+      - figurine_martin_brothers_leaf
+
+  - item_id: vase_victorian_transfer
+    category_id: vase
+    rarity: 0
+    layer_ids:
+      - vase_veil
+      - vase_glazed_body
+      - vase_common_leaf
+
+  - item_id: vase_loetz_iridescent
+    category_id: vase
+    rarity: 2
+    layer_ids:
+      - vase_veil
+      - vase_glazed_body
+      - vase_art_nouveau_mid
+      - vase_loetz_confirmed
+
+  - item_id: vase_delft_blue_white
+    category_id: vase
+    rarity: 1
+    layer_ids:
+      - vase_veil
+      - vase_glazed_body
+      - vase_blue_white_mid
+      - vase_blue_white_leaf
+
+  - item_id: vase_song_celadon
+    category_id: vase
+    rarity: 4
+    layer_ids:
+      - vase_veil
+      - vase_celadon_mid
+      - vase_celadon_deep
+      - vase_song_leaf
+
+  - item_id: poster_festival_reprint
+    category_id: poster
+    rarity: 0
+    layer_ids:
+      - poster_veil
+      - poster_lithograph_base
+      - poster_common_leaf
+
+  - item_id: poster_cassandre_nord_express
+    category_id: poster
+    rarity: 4
+    layer_ids:
+      - poster_veil
+      - poster_lithograph_base
+      - poster_travel_mid
+      - poster_cassandre_leaf
+
+  - item_id: poster_bauhaus_ausstellung
+    category_id: poster
+    rarity: 3
+    layer_ids:
+      - poster_veil
+      - poster_lithograph_base
+      - poster_exhibition_mid
+      - poster_bauhaus_confirmed
+
+  - item_id: poster_metropolis_belgian
+    category_id: poster
+    rarity: 4
+    layer_ids:
+      - poster_veil
+      - poster_lithograph_base
+      - poster_film_mid
+      - poster_film_deep
+      - poster_metropolis_leaf

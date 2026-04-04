@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CategoryData" format=3 uid="uid://5mndjqa3mjq0"]
+
+[ext_resource type="Script" uid="uid://c7fq6wupmgchg" path="res://data/_definitions/category_data.gd" id="1_catdef"]
+
+[resource]
+script = ExtResource("1_catdef")
+category_id = "clock"
+super_category = "Decorative"
+display_name = "Clock"
+weight = 4.0
+grid_size = 3

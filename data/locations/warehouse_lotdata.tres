@@ -12,9 +12,10 @@ rarity_weights = {
 4: 1
 }
 category_weights = {
-"bicycle": 1,
-"handbag": 1,
+"clock": 1,
 "oil_lamp": 1,
-"painting": 1
+"porcelain_figurine": 1,
+"poster": 1,
+"vase": 1
 }
 metadata/_custom_type_script = "uid://oh0e8qcjnmcs"

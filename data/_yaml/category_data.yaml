@@ -1,0 +1,104 @@
+# ============================================================
+# Lot & Haul — Item Data Authoring Example
+# dev/tools/data_source/oil_lamp_items.yaml
+#
+# Pipeline: this file → init_db.py → lot_haul.db → export_tres.py → .tres
+#
+# Seed order: categories → identity_layers → items
+# ============================================================
+
+# ────────────────────────────────────────────────────────────
+# CATEGORIES
+# One entry per fine-grained physical type.
+# All items sharing the same category_id point to this record.
+# ────────────────────────────────────────────────────────────
+# categories:
+
+#   - category_id: oil_lamp          # snake_case, unique, matches .tres filename stem
+#     super_category: Decorative     # Broad group shown in lot overview
+#     display_name: Oil Lamp         # Fine-grained label shown to player
+#     weight: 3.0                    # kilograms (float)
+#     grid_size: 2                   # inventory grid cells. See grid_size reference below.
+
+super_categories:
+  - Vehicle
+  - Fashion
+  - Decorative
+  - Fine Art
+
+categories:
+  # ── Vehicle (3) ───────────────────────────────────────
+  - category_id: bicycle
+    super_category: Vehicle
+    display_name: Bicycle
+    weight: 12.0
+    grid_size: 6
+
+  - category_id: motorcycle
+    super_category: Vehicle
+    display_name: Motorcycle
+    weight: 180.0
+    grid_size: 8
+
+  - category_id: automobile
+    super_category: Vehicle
+    display_name: Automobile
+    weight: 1200.0
+    grid_size: 8
+
+  # ── Fashion (2) ───────────────────────────────────────
+  - category_id: handbag
+    super_category: Fashion
+    display_name: Handbag
+    weight: 0.5
+    grid_size: 2
+
+  - category_id: wristwatch
+    super_category: Fashion
+    display_name: Wristwatch
+    weight: 0.1
+    grid_size: 1
+
+  # ── Decorative (5) ────────────────────────────────────
+  - category_id: oil_lamp
+    super_category: Decorative
+    display_name: Oil Lamp
+    weight: 3.0
+    grid_size: 2
+
+  - category_id: clock
+    super_category: Decorative
+    display_name: Clock
+    weight: 4.0
+    grid_size: 3
+
+  - category_id: porcelain_figurine
+    super_category: Decorative
+    display_name: Porcelain Figurine
+    weight: 0.8
+    grid_size: 1
+
+  - category_id: vase
+    super_category: Decorative
+    display_name: Vase
+    weight: 2.0
+    grid_size: 2
+
+  - category_id: poster
+    super_category: Decorative
+    display_name: Poster
+    weight: 0.2
+    grid_size: 3
+
+  # ── Fine Art (2) ──────────────────────────────────────
+  - category_id: painting
+    super_category: Fine Art
+    display_name: Painting
+    weight: 1.5
+    grid_size: 3
+
+  - category_id: sculpture
+    super_category: Fine Art
+    display_name: Sculpture
+    weight: 8.0
+    grid_size: 3

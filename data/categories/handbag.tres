@@ -8,3 +8,4 @@ category_id = "handbag"
 super_category = "Fashion"
 display_name = "Handbag"
 weight = 0.5
+grid_size = 1
