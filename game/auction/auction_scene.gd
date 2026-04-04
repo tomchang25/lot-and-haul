@@ -19,7 +19,7 @@ const PRICE_TWEEN_SEC := 0.3
 # Step size as a fraction of the current display price.
 const STEP_RATIO := 0.075
 # Minimum step in currency units — applies to both NPC steps and player bump.
-const MIN_STEP := 100
+const MIN_STEP := 20
 
 # ── State ─────────────────────────────────────────────────────────────────────
 

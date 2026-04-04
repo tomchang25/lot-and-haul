@@ -5,6 +5,8 @@
 class_name LotEntry
 extends RefCounted
 
+const MAX_ATTEMPTS := 10
+
 # ── State ─────────────────────────────────────────────────────────────────────
 
 # Source data this entry was rolled from.
@@ -41,6 +43,7 @@ static func create(data: LotData) -> LotEntry:
 
     for i in range(item_count):
         var item := _draw_item(data)
+
         if item != null:
             entry.item_entries.append(ItemEntry.create(item, data.veiled_chance))
 
@@ -53,34 +56,37 @@ static func create(data: LotData) -> LotEntry:
 # Rolls one item using rarity_weights then category_weights, then picks a
 # random matching item from ItemRegistry. Returns null if no match is found.
 static func _draw_item(data: LotData) -> ItemData:
-    # Roll rarity
-    var rarity_keys: Array = data.rarity_weights.keys()
-    var rarity_values: Array[int] = []
-    for k in rarity_keys:
-        rarity_values.append(data.rarity_weights[k])
-    var rarity_idx := RandomUtils.pick_weighted_index(rarity_values)
-    if rarity_idx < 0:
-        push_warning("Rarity roll failed")
-        return null
-    var rarity: ItemData.Rarity = rarity_keys[rarity_idx] as ItemData.Rarity
+    for attempt in range(MAX_ATTEMPTS):
+        # Roll rarity
+        var rarity_keys: Array = data.rarity_weights.keys()
+        var rarity_values: Array[int] = []
+        for k in rarity_keys:
+            rarity_values.append(data.rarity_weights[k])
+        var rarity_idx := RandomUtils.pick_weighted_index(rarity_values)
+        if rarity_idx < 0:
+            push_warning("Rarity roll failed")
+            return null
+        var rarity: ItemData.Rarity = rarity_keys[rarity_idx] as ItemData.Rarity
 
-    # Roll category
-    var cat_keys: Array = data.category_weights.keys()
-    var cat_values: Array[int] = []
-    for k in cat_keys:
-        cat_values.append(data.category_weights[k])
-    var cat_idx := RandomUtils.pick_weighted_index(cat_values)
-    if cat_idx < 0:
-        push_warning("Category roll failed")
-        return null
-    var category_id: String = cat_keys[cat_idx]
+        # Roll category
+        var cat_keys: Array = data.category_weights.keys()
+        var cat_values: Array[int] = []
+        for k in cat_keys:
+            cat_values.append(data.category_weights[k])
+        var cat_idx := RandomUtils.pick_weighted_index(cat_values)
+        if cat_idx < 0:
+            push_warning("Category roll failed")
+            return null
+        var category_id: String = cat_keys[cat_idx]
 
-    # Pick a random item matching both rarity and category
-    var candidates: Array[ItemData] = ItemRegistry.get_items(rarity, category_id)
-    if candidates.is_empty():
-        push_warning("No items found for %s %s" % [rarity, category_id])
-        return null
-    return candidates[randi() % candidates.size()]
+        # Pick a random item matching both rarity and category
+        var candidates: Array[ItemData] = ItemRegistry.get_items(rarity, category_id)
+        if candidates.is_empty():
+            continue
+        return candidates[randi() % candidates.size()]
+
+    push_warning("_draw_item: no candidates found after %d attempts" % MAX_ATTEMPTS)
+    return null
 
 
 # Returns the cached NPC estimate. Stable across calls.
