@@ -1,0 +1,193 @@
+categories:
+  - category_id: bicycle
+    super_category: Vehicle
+    display_name: Bicycle
+    weight: 12.0
+    grid_size: 6
+  - category_id: motorcycle
+    super_category: Vehicle
+    display_name: Motorcycle
+    weight: 180.0
+    grid_size: 8
+  - category_id: automobile
+    super_category: Vehicle
+    display_name: Automobile
+    weight: 1200.0
+    grid_size: 8
+
+identity_layers:
+  - layer_id: bike_veil
+    display_name: Metal Frame Object
+    base_value: 15
+    unlock_action:
+      context: 0
+
+  - layer_id: bike_frame_inspected
+    display_name: Vintage Bicycle Frame
+    base_value: 60
+    unlock_action:
+      context: 1
+      time_cost: 1
+
+  - layer_id: bike_marque_identified
+    display_name: Prewar English Roadster
+    base_value: 220
+    unlock_action:
+      context: 1
+      time_cost: 2
+      required_skill: appraisal
+      required_level: 1
+
+  - layer_id: bike_raleigh_leaf
+    display_name: Raleigh Roadster, c.1938
+    base_value: 780
+    unlock_action: null
+
+  - layer_id: bike_penny_leaf
+    display_name: Penny-Farthing, c.1885
+    base_value: 3200
+    unlock_action: null
+
+  - layer_id: moto_veil
+    display_name: Large Metal Object
+    base_value: 40
+    unlock_action:
+      context: 0
+
+  - layer_id: moto_engine_check
+    display_name: Old Motorcycle
+    base_value: 180
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: moto_british_twin
+    display_name: British Parallel Twin
+    base_value: 650
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: mechanical
+      required_level: 1
+
+  - layer_id: moto_triumph_leaf
+    display_name: Triumph Bonneville T120
+    base_value: 2800
+    unlock_action: null
+
+  - layer_id: moto_number_matched
+    display_name: Numbers-Matched Bonneville
+    base_value: 7400
+    unlock_action: null
+
+  - layer_id: moto_german_single
+    display_name: Prewar German Single
+    base_value: 900
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: mechanical
+      required_level: 2
+
+  - layer_id: moto_zundapp_leaf
+    display_name: Zündapp K800, c.1936
+    base_value: 11500
+    unlock_action: null
+
+  - layer_id: auto_veil
+    display_name: Vehicle Shell
+    base_value: 80
+    unlock_action:
+      context: 0
+
+  - layer_id: auto_body_check
+    display_name: Vintage Automobile
+    base_value: 400
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: auto_american_coupe
+    display_name: Prewar American Coupe
+    base_value: 1600
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: appraisal
+      required_level: 1
+
+  - layer_id: auto_ford_leaf
+    display_name: Ford Model A Coupe, 1930
+    base_value: 5500
+    unlock_action: null
+
+  - layer_id: auto_vin_research
+    display_name: Low-Production Coupe
+    base_value: 3800
+    unlock_action:
+      context: 1
+      time_cost: 4
+      required_skill: authentication
+      required_level: 2
+
+  - layer_id: auto_duesenberg_leaf
+    display_name: Duesenberg Model J, 1930
+    base_value: 18000
+    unlock_action: null
+
+items:
+  - item_id: bicycle_raleigh_roadster
+    category_id: bicycle
+    rarity: 2
+    layer_ids:
+      - bike_veil
+      - bike_frame_inspected
+      - bike_marque_identified
+      - bike_raleigh_leaf
+
+  - item_id: bicycle_penny_farthing
+    category_id: bicycle
+    rarity: 3
+    layer_ids:
+      - bike_veil
+      - bike_frame_inspected
+      - bike_marque_identified
+      - bike_penny_leaf
+
+  - item_id: motorcycle_triumph_bonneville
+    category_id: motorcycle
+    rarity: 3
+    layer_ids:
+      - moto_veil
+      - moto_engine_check
+      - moto_british_twin
+      - moto_triumph_leaf
+      - moto_number_matched
+
+  - item_id: motorcycle_zundapp_k800
+    category_id: motorcycle
+    rarity: 4
+    layer_ids:
+      - moto_veil
+      - moto_engine_check
+      - moto_german_single
+      - moto_zundapp_leaf
+
+  - item_id: automobile_ford_model_a
+    category_id: automobile
+    rarity: 2
+    layer_ids:
+      - auto_veil
+      - auto_body_check
+      - auto_american_coupe
+      - auto_ford_leaf
+
+  - item_id: automobile_duesenberg_j
+    category_id: automobile
+    rarity: 4
+    layer_ids:
+      - auto_veil
+      - auto_body_check
+      - auto_american_coupe
+      - auto_vin_research
+      - auto_duesenberg_leaf

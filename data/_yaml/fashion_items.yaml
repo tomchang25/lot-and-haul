@@ -1,0 +1,135 @@
+categories:
+  - category_id: handbag
+    super_category: Fashion
+    display_name: Handbag
+    weight: 0.5
+    grid_size: 2
+  - category_id: wristwatch
+    super_category: Fashion
+    display_name: Wristwatch
+    weight: 0.1
+    grid_size: 1
+
+identity_layers:
+  - layer_id: bag_veil
+    display_name: Fabric Pouch
+    base_value: 10
+    unlock_action:
+      context: 0
+
+  - layer_id: bag_exterior_check
+    display_name: Structured Leather Bag
+    base_value: 55
+    unlock_action:
+      context: 1
+      time_cost: 1
+
+  - layer_id: bag_hardware_check
+    display_name: Designer-Style Handbag
+    base_value: 180
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: bag_hermes_leaf
+    display_name: Hermès Birkin 30, c.2005
+    base_value: 4800
+    unlock_action: null
+
+  - layer_id: bag_replica_leaf
+    display_name: High-Grade Replica Bag
+    base_value: 220
+    unlock_action: null
+
+  - layer_id: bag_serial_research
+    display_name: Authenticated Luxury Bag
+    base_value: 1200
+    unlock_action:
+      context: 1
+      time_cost: 4
+      required_skill: authentication
+      required_level: 2
+
+  - layer_id: bag_chanel_leaf
+    display_name: Chanel Classic Flap, 1990s
+    base_value: 3600
+    unlock_action: null
+
+  - layer_id: watch_veil
+    display_name: Small Metal Object
+    base_value: 8
+    unlock_action:
+      context: 0
+
+  - layer_id: watch_case_check
+    display_name: Old Wristwatch
+    base_value: 45
+    unlock_action:
+      context: 1
+      time_cost: 1
+
+  - layer_id: watch_movement_open
+    display_name: Manual-Wind Dress Watch
+    base_value: 200
+    unlock_action:
+      context: 1
+      time_cost: 2
+      required_skill: mechanical
+      required_level: 1
+
+  - layer_id: watch_rolex_leaf
+    display_name: Rolex Submariner, c.1969
+    base_value: 9500
+    unlock_action: null
+
+  - layer_id: watch_maker_stamped
+    display_name: Swiss Pocket Conversion
+    base_value: 380
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: appraisal
+      required_level: 1
+
+  - layer_id: watch_longines_leaf
+    display_name: Longines 13ZN, c.1948
+    base_value: 1100
+    unlock_action: null
+
+items:
+  - item_id: handbag_hermes_birkin
+    category_id: handbag
+    rarity: 3
+    layer_ids:
+      - bag_veil
+      - bag_exterior_check
+      - bag_hardware_check
+      - bag_hermes_leaf
+
+  - item_id: handbag_chanel_classic_flap
+    category_id: handbag
+    rarity: 3
+    layer_ids:
+      - bag_veil
+      - bag_exterior_check
+      - bag_hardware_check
+      - bag_serial_research
+      - bag_chanel_leaf
+
+  - item_id: wristwatch_rolex_submariner
+    category_id: wristwatch
+    rarity: 4
+    layer_ids:
+      - watch_veil
+      - watch_case_check
+      - watch_movement_open
+      - watch_rolex_leaf
+
+  - item_id: wristwatch_longines_13zn
+    category_id: wristwatch
+    rarity: 2
+    layer_ids:
+      - watch_veil
+      - watch_case_check
+      - watch_maker_stamped
+      - watch_longines_leaf
