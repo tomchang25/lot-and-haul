@@ -23,7 +23,7 @@ func can_advance(entry: ItemEntry, context: LayerUnlockAction.ActionContext) -> 
         return false
 
     # TODO: Remove it when implemented. Advance to the next layer requires time in home instead stamina in auction.
-    # if GameManager.run_record.stamina < action.stamina_cost:
+    # if RunManager.run_record.stamina < action.stamina_cost:
     #     return false
 
     if not action.required_skill:

@@ -60,8 +60,8 @@ func _on_cancel_pressed() -> void:
 
 
 func _is_potential_action_disabled() -> bool:
-    return GameManager.run_record.stamina < POTENTIAL_COST or GameManager.run_record.actions_remaining <= 0
+    return RunManager.run_record.stamina < POTENTIAL_COST or RunManager.run_record.actions_remaining <= 0
 
 
 func _is_condition_action_disabled() -> bool:
-    return GameManager.run_record.stamina < CONDITION_COST or GameManager.run_record.actions_remaining <= 0
+    return RunManager.run_record.stamina < CONDITION_COST or RunManager.run_record.actions_remaining <= 0
