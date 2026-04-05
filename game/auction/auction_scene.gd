@@ -101,6 +101,9 @@ func _ready() -> void:
 
 
 func _on_npc_tick() -> void:
+    if _in_reach:
+        return
+
     var progress := float(_current_display_price) / float(_rolled_price)
     var step_multiplier := 1.0
 
@@ -161,6 +164,10 @@ func _on_bid_pressed() -> void:
     _show_player_bid_in_stack(_current_display_price)
 
     _reset_circle()
+
+    if _current_display_price >= _rolled_price:
+        _in_reach = true
+
     _shorten_next_npc_tick = true
     # TODO: play confirm sound via AudioManager
 
@@ -171,10 +178,7 @@ func _on_pass_pressed() -> void:
     if _circle_tween:
         _circle_tween.kill()
 
-    GameManager.run_record.paid_price = 0
-    GameManager.run_record.won_items = [] as Array[ItemEntry]
-
-    GameManager.go_to_run_review()
+    GameManager.go_to_reveal()
 
 # ══ Auction setup ═════════════════════════════════════════════════════════════
 
@@ -289,16 +293,15 @@ func _resolve() -> void:
     _bid_button.disabled = true
     _pass_button.disabled = true
 
+    var record = GameManager.run_record
     if _last_bidder == "player":
-        GameManager.run_record.paid_price = _current_display_price
-        GameManager.run_record.won_items = GameManager.run_record.lot_items.duplicate()
+        var current_wins: Array[ItemEntry] = record.lot_items.duplicate()
 
-        GameManager.go_to_reveal()
-    else:
-        GameManager.run_record.paid_price = 0
-        GameManager.run_record.won_items = [] as Array[ItemEntry]
+        GameManager.run_record.last_lot_won_items = current_wins
+        GameManager.run_record.paid_price += _current_display_price
+        GameManager.run_record.won_items += current_wins
 
-        GameManager.go_to_run_review()
+    GameManager.go_to_reveal()
 
 # ══ Display helpers ════════════════════════════════════════════════════════════
 

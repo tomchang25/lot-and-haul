@@ -18,9 +18,6 @@ category_weights = {
 "bicycle": 1,
 "clock": 1,
 "handbag": 1,
-"motorcycle": 1,
-"oil_lamp": 1,
-"vase": 1,
-"wristwatch": 1
+"motorcycle": 1
 }
 metadata/_custom_type_script = "uid://oh0e8qcjnmcs"
