@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://blotcardscn01"]
 
-[ext_resource type="Script" path="res://game/location_browse/lot_card/lot_card.gd" id="1_lotcard"]
+[ext_resource type="Script" uid="uid://bscj2uyxr07x8" path="res://game/location_browse/lot_card/lot_card.gd" id="1_lotcard"]
 
 [node name="LotCard" type="VBoxContainer" unique_id=100000001]
 alignment = 1
@@ -38,14 +38,14 @@ layout_mode = 2
 layout_mode = 2
 alignment = 1
 
-[node name="EnterButton" type="Button" parent="ButtonBar" unique_id=100000008]
-custom_minimum_size = Vector2(120, 40)
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Enter"
-
 [node name="PassButton" type="Button" parent="ButtonBar" unique_id=100000009]
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Pass"
+
+[node name="EnterButton" type="Button" parent="ButtonBar" unique_id=100000008]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Enter"

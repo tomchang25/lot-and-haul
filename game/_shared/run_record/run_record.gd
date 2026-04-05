@@ -8,8 +8,8 @@ extends RefCounted
 var lot_entry: LotEntry # null until set_lot() is called
 
 var lot_items: Array[ItemEntry]:
-	get:
-		return lot_entry.item_entries if lot_entry else []
+    get:
+        return lot_entry.item_entries if lot_entry else []
 var won_items: Array[ItemEntry] = []
 var cargo_items: Array[ItemEntry] = []
 
@@ -38,19 +38,19 @@ var browse_index: int = 0
 
 
 static func create(location: LocationData) -> RunRecord:
-	var r := RunRecord.new()
-	r.location_data = location
+    var r := RunRecord.new()
+    r.location_data = location
 
-	# TODO: get this value from car config if implemented
-	r.max_stamina = 30
-	r.stamina = r.max_stamina
+    # TODO: get this value from car config if implemented
+    r.max_stamina = 30
+    r.stamina = r.max_stamina
 
-	return r
+    return r
 
 # ══ Lot management ════════════════════════════════════════════════════════════
 
 
 # Sets the active lot entry and resets the per-lot action counter.
 func set_lot(entry: LotEntry) -> void:
-	lot_entry = entry
-	actions_remaining = entry.lot_data.action_quota
+    lot_entry = entry
+    actions_remaining = entry.lot_data.action_quota

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://blocbrowse001"]
 
-[ext_resource type="Script" path="res://game/location_browse/location_browse_scene.gd" id="1_lbscene"]
+[ext_resource type="Script" uid="uid://cri6a03kxrr3g" path="res://game/location_browse/location_browse_scene.gd" id="1_lbscene"]
 
 [node name="LocationBrowseScene" type="Control" unique_id=200000001]
 layout_mode = 3
@@ -43,9 +43,8 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="CargoPanel" type="VBoxContainer" parent="RootVBox" unique_id=200000006]
-visible = false
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_vertical = 10
 alignment = 1
 
 [node name="CargoReadyLabel" type="Label" parent="RootVBox/CargoPanel" unique_id=200000007]

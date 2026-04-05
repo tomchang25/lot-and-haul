@@ -1,12 +1,10 @@
 [gd_resource type="Resource" script_class="LocationData" format=3 uid="uid://cy7warehsloc1"]
 
-[ext_resource type="Script" path="res://data/_definitions/location_data.gd" id="1_locdata"]
+[ext_resource type="Script" uid="uid://ck3bwjgjrgnlf" path="res://data/_definitions/location_data.gd" id="1_locdata"]
 [ext_resource type="Script" uid="uid://oh0e8qcjnmcs" path="res://data/_definitions/lot_data.gd" id="2_lotscript"]
 [ext_resource type="Resource" uid="uid://l8xrnjwietdt" path="res://data/locations/warehouse_lotdata.tres" id="3_lotdata"]
 
 [resource]
 script = ExtResource("1_locdata")
 lot_pool = Array[ExtResource("2_lotscript")]([ExtResource("3_lotdata")])
-lot_number = 3
-maintenance_cost = 0
 metadata/_custom_type_script = "uid://cy7warehsloc1"
