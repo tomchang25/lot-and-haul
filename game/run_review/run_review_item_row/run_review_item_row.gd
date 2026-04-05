@@ -23,5 +23,5 @@ func setup(entry: ItemEntry) -> void:
     _condition_label.text = entry.condition_label
     _condition_label.modulate = entry.condition_color
 
-    _value_label.text = entry.current_value_label
+    _value_label.text = entry.sell_price_label
     _value_label.add_theme_color_override(&"font_color", ItemEntry.PRICE_COLOR)

@@ -48,7 +48,7 @@ func setup(p_entry: ItemEntry) -> void:
     _level_label.text = entry.potential_inspect_label
     _condition_label.text = entry.condition_inspect_label
     _condition_label.modulate = entry.condition_inspect_color
-    _price_label.text = entry.price_estimate_label
+    _price_label.text = entry.player_estimate_label
     _weight_label.text = "%.1f kg" % entry.item_data.category_data.weight
     _size_label.text = "%d" % entry.item_data.category_data.grid_size
 
