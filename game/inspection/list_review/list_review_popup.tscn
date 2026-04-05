@@ -22,6 +22,7 @@ mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
 [node name="Panel" type="PanelContainer" parent="." unique_id=1369218410]
+custom_minimum_size = Vector2(960, 0)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -65,11 +66,13 @@ layout_mode = 2
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Total Estimate:   ?"
+horizontal_alignment = 1
 
 [node name="OpeningBidLabel" type="Label" parent="Panel/VBox" unique_id=1878405586]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Opening Bid:   $0"
+horizontal_alignment = 1
 
 [node name="HSep3" type="HSeparator" parent="Panel/VBox" unique_id=473706660]
 layout_mode = 2

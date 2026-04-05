@@ -21,7 +21,7 @@ const _BASE_EXP: Dictionary = {
 
 func add_exp(category_id: String, rarity: ItemData.Rarity, action: KnowledgeAction) -> void:
     var base: int = _BASE_EXP[action]
-    var rarity_mult: int = rarity + 1  # COMMON=0→1, UNCOMMON=1→2, …, LEGENDARY=4→5
+    var rarity_mult: int = rarity + 1 # COMMON=0→1, UNCOMMON=1→2, …, LEGENDARY=4→5
     var gain: int = base * rarity_mult
     if not SaveManager.exp.has(category_id):
         SaveManager.exp[category_id] = 0
@@ -45,8 +45,8 @@ func get_category_level(category_id: String) -> int:
 
 
 func get_super_category_level(super_category: String) -> int:
-    var seen: Dictionary = {}
-    for item: ItemData in ItemRegistry._items:
+    var seen: Dictionary = { }
+    for item: ItemData in ItemRegistry.get_all_items():
         if item.category_data == null:
             continue
         if item.category_data.super_category == super_category:
@@ -57,34 +57,39 @@ func get_super_category_level(super_category: String) -> int:
     return total
 
 
-func get_price_range(super_category: String) -> Vector2:
+func get_price_range(super_category: String, rarity: ItemData.Rarity) -> Vector2:
     var level: int = get_super_category_level(super_category)
 
-    if level < 20:
-        return Vector2(1.0, 1.0)
-
+    var threshold: int
     var min_full_w: float
     var max_full_w: float
-    var next_tier: int
 
-    if level < 50:
-        min_full_w = 0.50
-        max_full_w = 1.00
-        next_tier = 50
-    elif level < 100:
-        min_full_w = 0.67
-        max_full_w = 2.00
-        next_tier = 100
-    elif level < 200:
-        min_full_w = 0.75
-        max_full_w = 3.00
-        next_tier = 200
-    else:
-        min_full_w = 0.80
-        max_full_w = 4.00
-        next_tier = 0  # Legendary — no next threshold
+    match rarity:
+        ItemData.Rarity.COMMON:
+            return Vector2(1.0, 1.0)
+        ItemData.Rarity.UNCOMMON:
+            threshold = 20
+            min_full_w = 0.50
+            max_full_w = 1.00
+        ItemData.Rarity.RARE:
+            threshold = 50
+            min_full_w = 0.67
+            max_full_w = 2.00
+        ItemData.Rarity.EPIC:
+            threshold = 100
+            min_full_w = 0.75
+            max_full_w = 3.00
+        ItemData.Rarity.LEGENDARY:
+            threshold = 200
+            min_full_w = 0.80
+            max_full_w = 4.00
+        _:
+            return Vector2(1.0, 1.0)
 
-    var progress: float = 0.0 if next_tier == 0 else float(level) / float(next_tier)
+    var progress: float = minf(float(level) / float(threshold), 1.0)
+    if progress >= 1.0:
+        return Vector2(1.0, 1.0)
+
     var effective_min_w: float = min_full_w * (1.0 - progress)
     var effective_max_w: float = max_full_w * (1.0 - progress)
 

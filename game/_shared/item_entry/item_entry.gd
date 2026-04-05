@@ -17,9 +17,9 @@ var potential_inspect_level: int = 0
 
 var condition_inspect_level: int = 0
 
-var knowledge_min: float = 1.0
-
-var knowledge_max: float = 1.0
+# Random pick from [knowledge_min, knowledge_max] at lot draw.
+# Used as the multiplier on player_estimate_max.
+var knowledge_factor: float = 1.0
 
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
@@ -143,34 +143,29 @@ func get_potential_rating() -> String:
 
 var player_estimate_min: int:
     get:
-        var layer_min: int = active_layer().base_value
-        var layer_max: int = active_layer().base_value
-
-        if potential_inspect_level >= 1:
-            var best: int = active_layer().base_value
-            for i in range(layer_index + 1, item_data.identity_layers.size()):
-                var v: int = item_data.identity_layers[i].base_value
-                if v > best:
-                    best = v
-            layer_max = best
+        if is_veiled():
+            return 0
 
         var cond_mult: float = get_known_condition_multiplier()
-        return int(layer_min * cond_mult * knowledge_min)
+
+        return int(active_layer().base_value * cond_mult)
 
 var player_estimate_max: int:
     get:
-        var layer_max: int = active_layer().base_value
+        if is_veiled():
+            return 0
 
+        if potential_inspect_level == 0:
+            return player_estimate_min
+
+        var layer_max: int = active_layer().base_value
         if potential_inspect_level >= 1:
-            var best: int = active_layer().base_value
             for i in range(layer_index + 1, item_data.identity_layers.size()):
                 var v: int = item_data.identity_layers[i].base_value
-                if v > best:
-                    best = v
-            layer_max = best
-
+                if v > layer_max:
+                    layer_max = v
         var cond_mult: float = get_known_condition_multiplier()
-        return int(layer_max * cond_mult * knowledge_max)
+        return int(layer_max * cond_mult * knowledge_factor)
 
 var player_estimate_label: String:
     get:
@@ -178,7 +173,7 @@ var player_estimate_label: String:
             return "???"
         if player_estimate_min == player_estimate_max:
             return "$%d" % player_estimate_min
-        return "$%d \u2013 $%d" % [player_estimate_min, player_estimate_max]
+        return "$%d - $%d" % [player_estimate_min, player_estimate_max]
 
 var sell_price: int:
     get:
@@ -186,8 +181,8 @@ var sell_price: int:
             item_data.identity_layers[-1].base_value
             * get_condition_multiplier()
             * (1.0 + 0.01 * KnowledgeManager.get_super_category_level(
-                item_data.category_data.super_category
-            ))
+                    item_data.category_data.super_category,
+                ) ),
         )
 
 var sell_price_label: String:
@@ -262,8 +257,7 @@ static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
     var start_veiled := randf() < veil_chance
     entry.layer_index = 0 if start_veiled else 1
 
-    var price_range: Vector2 = KnowledgeManager.get_price_range(data.category_data.super_category)
-    entry.knowledge_min = price_range.x
-    entry.knowledge_max = price_range.y
+    var price_range: Vector2 = KnowledgeManager.get_price_range(data.category_data.super_category, data.rarity)
+    entry.knowledge_factor = randf_range(price_range.x, price_range.y)
 
     return entry

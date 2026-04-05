@@ -199,13 +199,15 @@ func _init_auction() -> void:
 
 
 func _build_lot_summary(lot_items: Array[ItemEntry]) -> void:
-    var total_estimate := 0
+    var total_min := 0
+    var total_max := 0
     var has_veiled: bool = false
     for entry: ItemEntry in lot_items:
         if entry.is_veiled():
             has_veiled = true
-
-        total_estimate += entry.player_estimate_min
+        else:
+            total_min += entry.player_estimate_min
+            total_max += entry.player_estimate_max
 
         var label := Label.new()
         label.text = "%s (%s)" % [entry.display_name, entry.player_estimate_label]
@@ -219,7 +221,16 @@ func _build_lot_summary(lot_items: Array[ItemEntry]) -> void:
     total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     total_label.add_theme_font_size_override(&"font_size", 16)
     total_label.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
-    total_label.text = "Total Est: $%d%s" % [total_estimate, "+" if has_veiled else ""]
+
+    var total_text: String
+    if total_min == total_max:
+        total_text = "Total Est: $%d" % total_min
+    else:
+        total_text = "Total Est: $%d – $%d" % [total_min, total_max]
+    if has_veiled:
+        total_text += "+"
+    total_label.text = total_text
+
     _lot_summary.add_child(total_label)
 
 # ══ NPC logic ═════════════════════════════════════════════════════════════════
