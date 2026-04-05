@@ -21,10 +21,11 @@ from pathlib import Path
 
 _UID_CHARS = string.ascii_lowercase + string.digits
 
-_ITEM_DATA_SCRIPT_UID       = "uid://bhqs42afjqbgi"
-_IDENTITY_LAYER_SCRIPT_UID  = "uid://btknl1cvjqdvh"
-_LAYER_UNLOCK_SCRIPT_UID    = "uid://c23t4blqmaaj4"
-_CATEGORY_DATA_SCRIPT_UID   = "uid://c7fq6wupmgchg"
+_ITEM_DATA_SCRIPT_UID           = "uid://bhqs42afjqbgi"
+_IDENTITY_LAYER_SCRIPT_UID      = "uid://btknl1cvjqdvh"
+_LAYER_UNLOCK_SCRIPT_UID        = "uid://c23t4blqmaaj4"
+_CATEGORY_DATA_SCRIPT_UID       = "uid://c7fq6wupmgchg"
+_SUPER_CATEGORY_DATA_SCRIPT_UID = "uid://cqvpnhf3yr8jx"
 
 
 def _new_uid() -> str:
@@ -96,10 +97,31 @@ def _build_layer_tres(
     return "\n".join(lines)
 
 
+def _build_super_category_tres(
+    super_category_id: str,
+    super_category_uid: str,
+    display_name: str,
+) -> str:
+    lines = [
+        f'[gd_resource type="Resource" script_class="SuperCategoryData" format=3 uid="{super_category_uid}"]',
+        "",
+        f'[ext_resource type="Script" uid="{_SUPER_CATEGORY_DATA_SCRIPT_UID}" '
+        f'path="res://data/_definitions/super_category_data.gd" id="1_superdef"]',
+        "",
+        "[resource]",
+        'script = ExtResource("1_superdef")',
+        f'super_category_id = "{super_category_id}"',
+        f'display_name = "{display_name}"',
+        "",
+    ]
+    return "\n".join(lines)
+
+
 def _build_category_tres(
     category_id: str,
     category_uid: str,
-    super_category: str,
+    super_category_id: str,
+    super_category_uid: str,
     display_name: str,
     weight: float,
     grid_size: int,
@@ -109,11 +131,13 @@ def _build_category_tres(
         "",
         f'[ext_resource type="Script" uid="{_CATEGORY_DATA_SCRIPT_UID}" '
         f'path="res://data/_definitions/category_data.gd" id="1_catdef"]',
+        f'[ext_resource type="Resource" uid="{super_category_uid}" '
+        f'path="res://data/super_categories/{super_category_id}.tres" id="2_super"]',
         "",
         "[resource]",
         'script = ExtResource("1_catdef")',
         f'category_id = "{category_id}"',
-        f'super_category = "{super_category}"',
+        'super_category = ExtResource("2_super")',
         f'display_name = "{display_name}"',
         f"weight = {float(weight)}",
         f"grid_size = {grid_size}",
@@ -169,8 +193,43 @@ def _build_item_tres(
 # ── Exporters ─────────────────────────────────────────────────────────────────
 
 
+def export_super_categories(
+    conn: sqlite3.Connection, super_categories_dir: Path, dry_run: bool
+) -> dict[str, str]:
+    """Export SuperCategoryData .tres files. Returns {super_category_id: uid}."""
+    cur  = conn.cursor()
+    rows = cur.execute(
+        "SELECT super_category_id, display_name, uid "
+        "FROM super_categories ORDER BY super_category_id"
+    ).fetchall()
+
+    uid_map: dict[str, str] = {}
+    for super_category_id, display_name, uid in rows:
+        uid = uid or _new_uid()
+        uid_map[super_category_id] = uid
+        content = _build_super_category_tres(super_category_id, uid, display_name)
+        out = super_categories_dir / f"{super_category_id}.tres"
+        if dry_run:
+            print(f"  [dry] would write {out}")
+        else:
+            out.write_text(content, encoding="utf-8")
+            cur.execute(
+                "UPDATE super_categories SET uid = ? WHERE super_category_id = ?",
+                (uid, super_category_id),
+            )
+            print(f"  super_category → {out.name}")
+
+    if not dry_run:
+        conn.commit()
+
+    return uid_map
+
+
 def export_categories(
-    conn: sqlite3.Connection, categories_dir: Path, dry_run: bool
+    conn: sqlite3.Connection,
+    categories_dir: Path,
+    super_category_uid_map: dict[str, str],
+    dry_run: bool,
 ) -> None:
     cur  = conn.cursor()
     rows = cur.execute(
@@ -179,9 +238,11 @@ def export_categories(
     ).fetchall()
 
     for category_id, super_category, display_name, weight, grid_size, uid in rows:
-        uid     = uid or _new_uid()
+        uid = uid or _new_uid()
+        super_category_uid = super_category_uid_map.get(super_category, "")
         content = _build_category_tres(
-            category_id, uid, super_category, display_name, weight, grid_size
+            category_id, uid, super_category, super_category_uid,
+            display_name, weight, grid_size,
         )
         out = categories_dir / f"{category_id}.tres"
         if dry_run:
@@ -300,11 +361,12 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
-    root          = Path(args.godot_root)
-    categories_dir = root / "data" / "categories"
-    layers_dir    = root / "data" / "identity_layers"
-    item_dir      = root / "data" / "items"
-    db_path       = root / "data" / "_db" / "lot_haul.db"
+    root                  = Path(args.godot_root)
+    super_categories_dir  = root / "data" / "super_categories"
+    categories_dir        = root / "data" / "categories"
+    layers_dir            = root / "data" / "identity_layers"
+    item_dir              = root / "data" / "items"
+    db_path               = root / "data" / "_db" / "lot_haul.db"
 
     if not db_path.exists():
         sys.exit(f"DB not found: {db_path}\nRun init.py first.")
@@ -319,8 +381,11 @@ def main() -> None:
         )
     }
 
+    print("Exporting super_categories...")
+    super_category_uid_map = export_super_categories(conn, super_categories_dir, args.dry_run)
+
     print("Exporting categories...")
-    export_categories(conn, categories_dir, args.dry_run)
+    export_categories(conn, categories_dir, super_category_uid_map, args.dry_run)
 
     print("Exporting identity_layers...")
     export_identity_layers(conn, layers_dir, args.dry_run, skill_uid_map)

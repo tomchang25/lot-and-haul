@@ -1,11 +1,12 @@
 [gd_resource type="Resource" script_class="CategoryData" format=3 uid="uid://7pg062tfy2o7"]
 
 [ext_resource type="Script" uid="uid://c7fq6wupmgchg" path="res://data/_definitions/category_data.gd" id="1_catdef"]
+[ext_resource type="Resource" uid="uid://d4rk9wpy2bmc5" path="res://data/super_categories/decorative.tres" id="2_super"]
 
 [resource]
 script = ExtResource("1_catdef")
 category_id = "poster"
-super_category = "Decorative"
+super_category = ExtResource("2_super")
 display_name = "Poster"
 weight = 0.2
 grid_size = 3

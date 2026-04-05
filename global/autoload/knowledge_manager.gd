@@ -44,21 +44,15 @@ func get_category_level(category_id: String) -> int:
         return 0
 
 
-func get_super_category_level(super_category: String) -> int:
-    var seen: Dictionary = { }
-    for item: ItemData in ItemRegistry.get_all_items():
-        if item.category_data == null:
-            continue
-        if item.category_data.super_category == super_category:
-            seen[item.category_data.category_id] = true
+func get_super_category_level(super_category_id: String) -> int:
     var total: int = 0
-    for cat_id: String in seen.keys():
+    for cat_id: String in ItemRegistry.get_categories_for_super(super_category_id):
         total += get_category_level(cat_id)
     return total
 
 
-func get_price_range(super_category: String, rarity: ItemData.Rarity) -> Vector2:
-    var level: int = get_super_category_level(super_category)
+func get_price_range(super_category_id: String, rarity: ItemData.Rarity) -> Vector2:
+    var level: int = get_super_category_level(super_category_id)
 
     var threshold: int
     var min_full_w: float

@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="SuperCategoryData" format=3 uid="uid://bvhi2ksn9pqwt"]
+
+[ext_resource type="Script" uid="uid://cqvpnhf3yr8jx" path="res://data/_definitions/super_category_data.gd" id="1_superdef"]
+
+[resource]
+script = ExtResource("1_superdef")
+super_category_id = "vehicle"
+display_name = "Vehicle"

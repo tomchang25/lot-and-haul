@@ -181,7 +181,7 @@ var sell_price: int:
             item_data.identity_layers[-1].base_value
             * get_condition_multiplier()
             * (1.0 + 0.01 * KnowledgeManager.get_super_category_level(
-                    item_data.category_data.super_category,
+                    item_data.category_data.super_category.super_category_id,
                 ) ),
         )
 
@@ -257,7 +257,7 @@ static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
     var start_veiled := randf() < veil_chance
     entry.layer_index = 0 if start_veiled else 1
 
-    var price_range: Vector2 = KnowledgeManager.get_price_range(data.category_data.super_category, data.rarity)
+    var price_range: Vector2 = KnowledgeManager.get_price_range(data.category_data.super_category.super_category_id, data.rarity)
     entry.knowledge_factor = randf_range(price_range.x, price_range.y)
 
     return entry

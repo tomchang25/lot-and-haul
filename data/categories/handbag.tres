@@ -1,11 +1,12 @@
 [gd_resource type="Resource" script_class="CategoryData" format=3 uid="uid://rl8iihglrokc"]
 
 [ext_resource type="Script" uid="uid://c7fq6wupmgchg" path="res://data/_definitions/category_data.gd" id="1_catdef"]
+[ext_resource type="Resource" uid="uid://cfa3x1mz7ndve" path="res://data/super_categories/fashion.tres" id="2_super"]
 
 [resource]
 script = ExtResource("1_catdef")
 category_id = "handbag"
-super_category = "Fashion"
+super_category = ExtResource("2_super")
 display_name = "Handbag"
 weight = 0.5
 grid_size = 2
