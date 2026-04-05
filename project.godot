@@ -21,9 +21,9 @@ AudioManager="*uid://bhhaho37wph5e"
 EventBus="*uid://d2nkmaq8dlf5g"
 KnowledgeManager="*uid://bqosi6h0xps2v"
 GameManager="*uid://bnj3y0a2848to"
-RunManager="*res://global/autoload/run_manager.gd"
-SaveManager="*res://global/autoload/save_manager.gd"
 ItemRegistry="*uid://cog8cvjixi27d"
+RunManager="*uid://bioy5igkmc115"
+SaveManager="*uid://bi0oymqq1g433"
 
 [debug]
 

@@ -3,11 +3,11 @@ extends Node
 const SAVE_PATH := "user://save.json"
 
 # Per-category EXP store. Keys are category IDs (String), values are int.
-var exp: Dictionary = {}
+var exp: Dictionary = { }
 
 
 func save() -> void:
-    var data := {"exp": exp}
+    var data := { "exp": exp }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
     if file == null:
         push_error("SaveManager: failed to open %s for writing" % SAVE_PATH)
