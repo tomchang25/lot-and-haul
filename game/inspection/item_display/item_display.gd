@@ -30,7 +30,7 @@ func refresh_display(changed: String = "") -> void:
 
 func _apply_layer() -> void:
     _name_label.text = _entry.display_name
-    _price_label.text = _entry.price_estimate_label
+    _price_label.text = _entry.player_estimate_label
     _potential_display.text = _entry.potential_inspect_label
     _condition_display.text = _entry.condition_inspect_label
 

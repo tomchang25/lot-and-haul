@@ -58,7 +58,7 @@ func _populate_rows() -> void:
 func _commit_result() -> void:
     var sell_value: int = 0
     for entry: ItemEntry in _cargo_items:
-        sell_value += entry.current_value
+        sell_value += entry.sell_price
 
     RunManager.run_record.sell_value = sell_value
     RunManager.run_record.net = sell_value + RunManager.run_record.onsite_proceeds - _paid_price

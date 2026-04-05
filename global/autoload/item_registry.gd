@@ -36,3 +36,7 @@ func get_items(rarity: ItemData.Rarity, category_id: String) -> Array[ItemData]:
         if item.rarity == rarity and item.category_data != null and item.category_data.category_id == category_id:
             result.append(item)
     return result
+
+
+func get_all_items() -> Array[ItemData]:
+    return _items

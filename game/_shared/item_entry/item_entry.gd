@@ -17,6 +17,10 @@ var potential_inspect_level: int = 0
 
 var condition_inspect_level: int = 0
 
+# Random pick from [knowledge_min, knowledge_max] at lot draw.
+# Used as the multiplier on player_estimate_max.
+var knowledge_factor: float = 1.0
+
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
 var display_name: String:
@@ -136,27 +140,54 @@ func get_potential_rating() -> String:
     else:
         return "Probably Junk"
 
-# Estimate based solely on what the player currently knows.
-# Veiled items return 0 — caller should check is_veiled() and display "???" via price_estimate_label.
-var price_estimate: int:
+
+var player_estimate_min: int:
     get:
         if is_veiled():
             return 0
-        return int(active_layer().base_value * get_known_condition_multiplier())
 
-var price_estimate_label: String:
-    get:
-        return "???" if is_veiled() else "$%d" % price_estimate
+        var cond_mult: float = get_known_condition_multiplier()
 
-## Current resale value at the player's present layer and true condition.
-## This is NOT the final value — further unlock actions and repairs may improve it.
-var current_value: int:
-    get:
-        return int(active_layer().base_value * get_condition_multiplier())
+        return int(active_layer().base_value * cond_mult)
 
-var current_value_label: String:
+var player_estimate_max: int:
     get:
-        return "$%d" % current_value
+        if is_veiled():
+            return 0
+
+        if potential_inspect_level == 0:
+            return player_estimate_min
+
+        var layer_max: int = active_layer().base_value
+        if potential_inspect_level >= 1:
+            for i in range(layer_index + 1, item_data.identity_layers.size()):
+                var v: int = item_data.identity_layers[i].base_value
+                if v > layer_max:
+                    layer_max = v
+        var cond_mult: float = get_known_condition_multiplier()
+        return int(layer_max * cond_mult * knowledge_factor)
+
+var player_estimate_label: String:
+    get:
+        if is_veiled():
+            return "???"
+        if player_estimate_min == player_estimate_max:
+            return "$%d" % player_estimate_min
+        return "$%d - $%d" % [player_estimate_min, player_estimate_max]
+
+var sell_price: int:
+    get:
+        return int(
+            item_data.identity_layers[-1].base_value
+            * get_condition_multiplier()
+            * (1.0 + 0.01 * KnowledgeManager.get_super_category_level(
+                    item_data.category_data.super_category,
+                ) ),
+        )
+
+var sell_price_label: String:
+    get:
+        return "$%d" % sell_price
 
 # ── Display colors ────────────────────────────────────────────────────────────
 
@@ -187,7 +218,7 @@ const PRICE_COLOR := Color(0.4, 1.0, 0.5)
 ## Grey used for unknown / placeholder price labels.
 const PRICE_UNKNOWN_COLOR := Color(0.6, 0.6, 0.6)
 
-## Returns the correct color for price_estimate_label.
+## Returns the correct color for price labels.
 var price_color: Color:
     get:
         return PRICE_UNKNOWN_COLOR if is_veiled() else PRICE_COLOR
@@ -225,5 +256,8 @@ static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
     # Layer 0 = veiled. If veil does not apply, auto-advance to layer 1.
     var start_veiled := randf() < veil_chance
     entry.layer_index = 0 if start_veiled else 1
+
+    var price_range: Vector2 = KnowledgeManager.get_price_range(data.category_data.super_category, data.rarity)
+    entry.knowledge_factor = randf_range(price_range.x, price_range.y)
 
     return entry
