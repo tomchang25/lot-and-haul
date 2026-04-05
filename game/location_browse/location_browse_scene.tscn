@@ -37,9 +37,14 @@ text = "Storage Unit"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="LotCardContainer" type="Control" parent="RootVBox" unique_id=200000005]
+[node name="ScrollContainer" type="ScrollContainer" parent="RootVBox" unique_id=1965203958]
 custom_minimum_size = Vector2(0, 320)
 layout_mode = 2
+
+[node name="LotCardContainer" type="HBoxContainer" parent="RootVBox/ScrollContainer" unique_id=649655757]
+custom_minimum_size = Vector2(0, 320)
+layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="CargoPanel" type="VBoxContainer" parent="RootVBox" unique_id=200000006]

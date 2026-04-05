@@ -127,11 +127,26 @@ text = "Size"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="ScrollHeader" type="Label" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=184576491]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Separator" type="HSeparator" parent="RootVBox/ListCenter/Panel/PanelVBox" unique_id=100000016]
 layout_mode = 2
 
-[node name="RowContainer" type="VBoxContainer" parent="RootVBox/ListCenter/Panel/PanelVBox" unique_id=100000017]
+[node name="ScrollContainer" type="ScrollContainer" parent="RootVBox/ListCenter/Panel/PanelVBox" unique_id=1918648586]
+custom_minimum_size = Vector2(0, 320)
 layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="RowContainer" type="VBoxContainer" parent="RootVBox/ListCenter/Panel/PanelVBox/ScrollContainer" unique_id=100000017]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
 [node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=100000018]

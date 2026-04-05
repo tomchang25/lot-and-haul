@@ -21,7 +21,7 @@ var _rows: Dictionary = { } # ItemEntry → CargoItemRow
 # ── Node references ───────────────────────────────────────────────────────────
 @onready var _slots_label: Label = $RootVBox/Header/SlotsLabel
 @onready var _weight_label: Label = $RootVBox/Header/WeightLabel
-@onready var _row_container: VBoxContainer = $RootVBox/ListCenter/Panel/PanelVBox/RowContainer
+@onready var _row_container: VBoxContainer = $RootVBox/ListCenter/Panel/PanelVBox/ScrollContainer/RowContainer
 @onready var _load_up_button: Button = $RootVBox/Footer/LoadUpButton
 @onready var _confirm_popup: AcceptDialog = $ConfirmPopup
 

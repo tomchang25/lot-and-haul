@@ -33,6 +33,13 @@ func setup(lot_data: LotData, index: int, total: int) -> void:
     _rarity_label.text = "Rarity: %s" % _rarity_range_text(lot_data.rarity_weights)
     _category_label.text = "Categories: %s" % _category_text(lot_data.category_weights)
 
+
+func set_active(active: bool) -> void:
+    _enter_button.visible = active
+    _pass_button.visible = active
+
+    modulate = Color(1, 1, 1, 1) if active else Color(0.5, 0.5, 0.5, 1)
+
 # ══ Display helpers ════════════════════════════════════════════════════════════
 
 

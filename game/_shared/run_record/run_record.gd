@@ -12,6 +12,7 @@ var lot_items: Array[ItemEntry]:
         return lot_entry.item_entries if lot_entry else []
 var won_items: Array[ItemEntry] = []
 var cargo_items: Array[ItemEntry] = []
+var last_lot_won_items: Array[ItemEntry] = []
 
 var onsite_proceeds: int = 0
 var sell_value: int = 0
@@ -54,3 +55,4 @@ static func create(location: LocationData) -> RunRecord:
 func set_lot(entry: LotEntry) -> void:
     lot_entry = entry
     actions_remaining = entry.lot_data.action_quota
+    last_lot_won_items.clear()
