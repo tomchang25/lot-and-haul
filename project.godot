@@ -22,6 +22,8 @@ EventBus="*uid://d2nkmaq8dlf5g"
 KnowledgeManager="*uid://bqosi6h0xps2v"
 GameManager="*uid://bnj3y0a2848to"
 ItemRegistry="*uid://cog8cvjixi27d"
+RunManager="*uid://bioy5igkmc115"
+SaveManager="*uid://bi0oymqq1g433"
 
 [debug]
 

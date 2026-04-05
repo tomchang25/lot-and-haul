@@ -25,7 +25,7 @@ func _ready() -> void:
 
 
 func _inject_fake_state() -> void:
-    GameManager.run_record = RunRecord.create(location_data)
+    RunManager.run_record = RunRecord.create(location_data)
 
 
 func _launch_location_browse_scene() -> void:

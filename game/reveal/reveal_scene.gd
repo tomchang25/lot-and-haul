@@ -1,7 +1,7 @@
 # reveal_scene.gd
 # Block 05a — Reveal won items before cargo loading.
 # Auto-advances layer 0 items to layer 1 on reveal. Player steps through each item.
-# Reads:  GameManager.run_record.won_items
+# Reads:  RunManager.run_record.won_items
 # Writes: (none — mutates ItemEntry.layer_index in place)
 extends Control
 
@@ -28,7 +28,7 @@ func _ready() -> void:
     _reveal_btn.pressed.connect(_on_reveal_pressed)
     _continue_btn.pressed.connect(_on_continue_pressed)
 
-    _won_items = GameManager.run_record.last_lot_won_items
+    _won_items = RunManager.run_record.last_lot_won_items
     _continue_btn.hide()
 
     if _won_items.is_empty():

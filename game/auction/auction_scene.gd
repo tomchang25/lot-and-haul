@@ -1,7 +1,7 @@
 # auction_scene.gd
 # Block 04 — The player watches a live bidding sequence and decides when to drop out.
-# Reads:  GameManager.run_record.lot_entry, GameManager.run_record.lot_items
-# Writes: GameManager.run_record.paid_price, GameManager.run_record.won_items
+# Reads:  RunManager.run_record.lot_entry, RunManager.run_record.lot_items
+# Writes: RunManager.run_record.paid_price, RunManager.run_record.won_items
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -184,8 +184,8 @@ func _on_pass_pressed() -> void:
 
 
 func _init_auction() -> void:
-    var lot: LotEntry = GameManager.run_record.lot_entry
-    var lot_items: Array[ItemEntry] = GameManager.run_record.lot_items
+    var lot: LotEntry = RunManager.run_record.lot_entry
+    var lot_items: Array[ItemEntry] = RunManager.run_record.lot_items
 
     _rolled_price = max(lot.get_rolled_price(), MIN_STEP)
 
@@ -293,13 +293,13 @@ func _resolve() -> void:
     _bid_button.disabled = true
     _pass_button.disabled = true
 
-    var record = GameManager.run_record
+    var record = RunManager.run_record
     if _last_bidder == "player":
         var current_wins: Array[ItemEntry] = record.lot_items.duplicate()
 
-        GameManager.run_record.last_lot_won_items = current_wins
-        GameManager.run_record.paid_price += _current_display_price
-        GameManager.run_record.won_items += current_wins
+        RunManager.run_record.last_lot_won_items = current_wins
+        RunManager.run_record.paid_price += _current_display_price
+        RunManager.run_record.won_items += current_wins
 
     GameManager.go_to_reveal()
 
@@ -362,10 +362,10 @@ func _show_npc_popup(price: int) -> void:
 func _init_debug_overlay() -> void:
     if not OS.is_debug_build():
         return
-    var lot: LotEntry = GameManager.run_record.lot_entry
+    var lot: LotEntry = RunManager.run_record.lot_entry
 
     var true_value := 0
-    for entry: ItemEntry in GameManager.run_record.lot_items:
+    for entry: ItemEntry in RunManager.run_record.lot_items:
         if not entry.item_data.identity_layers.is_empty():
             true_value += entry.item_data.identity_layers.back().base_value
 

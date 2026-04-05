@@ -51,8 +51,8 @@ func _ready() -> void:
     _list_review.auction_entered.connect(_on_auction_entered)
     _confirm_popup.confirmed.connect(_on_confirm_popup_confirmed)
 
-    _stamina_hud.update_stamina(GameManager.run_record.stamina, GameManager.run_record.max_stamina)
-    _stamina_hud.update_actions(GameManager.run_record.actions_remaining)
+    _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
+    _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
 
     _action_popup.hide()
     _populate_item_displays()
@@ -86,18 +86,18 @@ func _on_potential_inspect() -> void:
     if _active_item == null:
         return
     var entry: ItemEntry = _entry_for_display[_active_item]
-    if GameManager.run_record.stamina < ActionPopup.POTENTIAL_COST:
+    if RunManager.run_record.stamina < ActionPopup.POTENTIAL_COST:
         return
-    if GameManager.run_record.actions_remaining < 0:
+    if RunManager.run_record.actions_remaining < 0:
         return
 
-    GameManager.run_record.stamina -= ActionPopup.POTENTIAL_COST
-    GameManager.run_record.actions_remaining -= 1
+    RunManager.run_record.stamina -= ActionPopup.POTENTIAL_COST
+    RunManager.run_record.actions_remaining -= 1
 
     entry.potential_inspect_level += 1
     _active_item.refresh_display("potential")
-    _stamina_hud.update_stamina(GameManager.run_record.stamina, GameManager.run_record.max_stamina)
-    _stamina_hud.update_actions(GameManager.run_record.actions_remaining)
+    _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
+    _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
     _action_popup.refresh(entry)
 
 
@@ -105,18 +105,18 @@ func _on_condition_inspect() -> void:
     if _active_item == null:
         return
     var entry: ItemEntry = _entry_for_display[_active_item]
-    if GameManager.run_record.stamina < ActionPopup.CONDITION_COST:
+    if RunManager.run_record.stamina < ActionPopup.CONDITION_COST:
         return
-    if GameManager.run_record.actions_remaining < 0:
+    if RunManager.run_record.actions_remaining < 0:
         return
 
-    GameManager.run_record.stamina -= ActionPopup.CONDITION_COST
-    GameManager.run_record.actions_remaining -= 1
+    RunManager.run_record.stamina -= ActionPopup.CONDITION_COST
+    RunManager.run_record.actions_remaining -= 1
 
     entry.condition_inspect_level += 1
     _active_item.refresh_display("condition")
-    _stamina_hud.update_stamina(GameManager.run_record.stamina, GameManager.run_record.max_stamina)
-    _stamina_hud.update_actions(GameManager.run_record.actions_remaining)
+    _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
+    _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
     _action_popup.refresh(entry)
 
 
@@ -152,7 +152,7 @@ func _populate_item_displays() -> void:
     for child in _items_grid.get_children():
         child.queue_free()
 
-    var item_entries: Array[ItemEntry] = GameManager.run_record.lot_items
+    var item_entries: Array[ItemEntry] = RunManager.run_record.lot_items
     for i: int in item_entries.size():
         var entry: ItemEntry = item_entries[i]
 

@@ -1,8 +1,8 @@
 # run_review_scene.gd
 # Block 06 — Run Review
-# Reads:  GameManager.run_record.cargo_items, GameManager.run_record.paid_price,
-#         GameManager.run_record.onsite_proceeds
-# Writes: GameManager.run_record.sell_value, GameManager.run_record.net
+# Reads:  RunManager.run_record.cargo_items, RunManager.run_record.paid_price,
+#         RunManager.run_record.onsite_proceeds
+# Writes: RunManager.run_record.sell_value, RunManager.run_record.net
 extends Control
 
 # ── Exports ───────────────────────────────────────────────────────────────────
@@ -29,8 +29,8 @@ var _paid_price: int = 0
 func _ready() -> void:
     _continue_btn.pressed.connect(_on_continue_pressed)
 
-    _cargo_items = GameManager.run_record.cargo_items
-    _paid_price = GameManager.run_record.paid_price
+    _cargo_items = RunManager.run_record.cargo_items
+    _paid_price = RunManager.run_record.paid_price
 
     _populate_rows()
     _commit_result()
@@ -40,7 +40,7 @@ func _ready() -> void:
 
 
 func _on_continue_pressed() -> void:
-    GameManager.clear_run_state()
+    RunManager.clear_run_state()
     GameManager.go_to_warehouse_entry()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
@@ -60,14 +60,14 @@ func _commit_result() -> void:
     for entry: ItemEntry in _cargo_items:
         sell_value += entry.current_value
 
-    GameManager.run_record.sell_value = sell_value
-    GameManager.run_record.net = sell_value + GameManager.run_record.onsite_proceeds - _paid_price
+    RunManager.run_record.sell_value = sell_value
+    RunManager.run_record.net = sell_value + RunManager.run_record.onsite_proceeds - _paid_price
 
 
 func _show_summary() -> void:
-    var sell_value: int = GameManager.run_record.sell_value
-    var onsite: int = GameManager.run_record.onsite_proceeds
-    var net: int = GameManager.run_record.net
+    var sell_value: int = RunManager.run_record.sell_value
+    var onsite: int = RunManager.run_record.onsite_proceeds
+    var net: int = RunManager.run_record.net
 
     _sell_value_label.text = "Total Sell Value:   $%d" % sell_value
     _onsite_label.text = "Sold On-site:   $%d" % onsite

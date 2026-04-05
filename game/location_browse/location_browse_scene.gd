@@ -31,7 +31,7 @@ func _ready() -> void:
     _skip_button.pressed.connect(_on_skip_pressed)
     _cargo_button.pressed.connect(_on_cargo_pressed)
 
-    var record: RunRecord = GameManager.run_record
+    var record: RunRecord = RunManager.run_record
     if record.browse_lots.is_empty():
         record.browse_lots = _sample_lots(record.location_data)
         record.browse_index = 0
@@ -43,7 +43,7 @@ func _ready() -> void:
 
 
 func _build_all_cards() -> void:
-    var record: RunRecord = GameManager.run_record
+    var record: RunRecord = RunManager.run_record
     var total: int = record.browse_lots.size()
 
     for i in total:
@@ -57,7 +57,7 @@ func _build_all_cards() -> void:
 
 
 func _refresh_view() -> void:
-    var record: RunRecord = GameManager.run_record
+    var record: RunRecord = RunManager.run_record
 
     if record.browse_index >= record.browse_lots.size():
         _show_cargo_state()
@@ -79,7 +79,7 @@ func _show_cargo_state() -> void:
 
 
 func _on_enter_pressed() -> void:
-    var record: RunRecord = GameManager.run_record
+    var record: RunRecord = RunManager.run_record
     var lot_data: LotData = record.browse_lots[record.browse_index]
     var entry := LotEntry.create(lot_data)
     record.set_lot(entry)
@@ -88,7 +88,7 @@ func _on_enter_pressed() -> void:
 
 
 func _on_pass_pressed() -> void:
-    GameManager.run_record.browse_index += 1
+    RunManager.run_record.browse_index += 1
     _refresh_view()
 
 
