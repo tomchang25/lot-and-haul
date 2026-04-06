@@ -32,16 +32,27 @@ func populate() -> void:
     var lot: LotEntry = RunManager.run_record.lot_entry
     var lot_items: Array[ItemEntry] = RunManager.run_record.lot_items
 
-    var total_value := 0
+    var total_min := 0
+    var total_max := 0
     var has_veiled: bool = false
     for entry: ItemEntry in lot_items:
         if entry.is_veiled():
             has_veiled = true
+        else:
+            total_min += entry.player_estimate_min
+            total_max += entry.player_estimate_max
 
-        total_value += entry.player_estimate_min
         _item_list.add_child(_make_row(entry))
 
-    _total_label.text = "Total Estimate:   $%d%s" % [total_value, "+" if has_veiled else ""]
+    var total_text: String
+    if total_min == total_max:
+        total_text = "Total Est: $%d" % total_min
+    else:
+        total_text = "Total Est: $%d – $%d" % [total_min, total_max]
+    if has_veiled:
+        total_text += "+"
+    _total_label.text = total_text
+
     _opening_bid_label.text = "Opening Bid:   $%d" % lot.get_opening_bid()
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
