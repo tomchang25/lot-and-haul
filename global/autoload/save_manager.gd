@@ -2,15 +2,15 @@ extends Node
 
 const SAVE_PATH := "user://save.json"
 
-# Per-category mastery store. Keys are category IDs (String), values are int.
-var mastery: Dictionary = {}
+# Per-category points store. Keys are category IDs (String), values are int.
+var category_points: Dictionary = {}
 var gold: int = 0
 var active_car_id: String = "van_basic"
 
 
 func save() -> void:
     var data := {
-        "mastery": mastery,
+        "category_points": category_points,
         "gold": gold,
         "active_car_id": active_car_id,
     }
@@ -33,8 +33,8 @@ func load() -> void:
     if parsed == null or not parsed is Dictionary:
         push_error("SaveManager: invalid save data in %s" % SAVE_PATH)
         return
-    if parsed.has("mastery") and parsed["mastery"] is Dictionary:
-        mastery = parsed["mastery"]
+    if parsed.has("category_points") and parsed["category_points"] is Dictionary:
+        category_points = parsed["category_points"]
     if parsed.has("gold") and parsed["gold"] is float:
         gold = int(parsed["gold"])
     if parsed.has("active_car_id") and parsed["active_car_id"] is String:
