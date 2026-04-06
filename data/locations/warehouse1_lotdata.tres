@@ -14,8 +14,8 @@ rarity_weights = {
 4: 5
 }
 super_category_weights = {
-"vehicle": 1,
-"fashion": 1
+"fashion": 1,
+"vehicle": 1
 }
 category_weights = {
 "automobile": 1,
