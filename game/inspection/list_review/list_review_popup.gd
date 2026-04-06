@@ -39,8 +39,8 @@ func populate() -> void:
         if entry.is_veiled():
             has_veiled = true
         else:
-            total_min += entry.player_estimate_min
-            total_max += entry.player_estimate_max
+            total_min += entry.current_price_min
+            total_max += entry.current_price_max
 
         _item_list.add_child(_make_row(entry))
 
@@ -98,7 +98,7 @@ func _make_row(entry: ItemEntry) -> HBoxContainer:
 
     # ── Estimate ──────────────────────────────────────────────────────────────
     var price_label := Label.new()
-    price_label.text = entry.player_estimate_label
+    price_label.text = entry.current_price_label
     price_label.custom_minimum_size = Vector2(100.0, 0.0)
     price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
     price_label.add_theme_color_override(&"font_color", entry.price_color)

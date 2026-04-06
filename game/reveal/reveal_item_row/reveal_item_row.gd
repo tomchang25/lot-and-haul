@@ -49,5 +49,5 @@ func reveal() -> void:
     _condition_label.text = _entry.condition_inspect_label
     _condition_label.modulate = _entry.condition_inspect_color
 
-    _value_label.text = _entry.player_estimate_label
+    _value_label.text = _entry.current_price_label
     _value_label.add_theme_color_override(&"font_color", ItemEntry.PRICE_COLOR)
