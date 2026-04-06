@@ -3,15 +3,15 @@ extends Node
 const SAVE_PATH := "user://save.json"
 
 # Per-category points store. Keys are category IDs (String), values are int.
-var category_points: Dictionary = {}
-var gold: int = 0
+var category_points: Dictionary = { }
+var cash: int = 0
 var active_car_id: String = "van_basic"
 
 
 func save() -> void:
     var data := {
         "category_points": category_points,
-        "gold": gold,
+        "cash": cash,
         "active_car_id": active_car_id,
     }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -35,8 +35,8 @@ func load() -> void:
         return
     if parsed.has("category_points") and parsed["category_points"] is Dictionary:
         category_points = parsed["category_points"]
-    if parsed.has("gold") and parsed["gold"] is float:
-        gold = int(parsed["gold"])
+    if parsed.has("cash") and parsed["cash"] is float:
+        cash = int(parsed["cash"])
     if parsed.has("active_car_id") and parsed["active_car_id"] is String:
         active_car_id = parsed["active_car_id"]
 

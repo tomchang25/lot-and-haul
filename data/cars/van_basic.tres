@@ -6,7 +6,7 @@
 script = ExtResource("1_carconfig")
 car_id = "van_basic"
 display_name = "Basic Van"
-max_slots = 6
-max_weight = 20.0
-stamina_cap = 30
+max_slots = 8
+max_weight = 100.0
+stamina_cap = 20
 travel_cost = 0
