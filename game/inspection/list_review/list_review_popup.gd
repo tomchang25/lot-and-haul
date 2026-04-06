@@ -8,11 +8,19 @@ extends Control
 signal auction_entered
 signal back_requested
 
+const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
+const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
+
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _item_list: VBoxContainer = $Panel/VBox/ScrollContainer/ItemList
 @onready var _total_label: Label = $Panel/VBox/TotalEstimateLabel
 @onready var _opening_bid_label: Label = $Panel/VBox/OpeningBidLabel
+
+# ── State ─────────────────────────────────────────────────────────────────────
+
+var _ctx: ItemViewContext = null
+var _tooltip: ItemRowTooltip = null
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -20,6 +28,10 @@ signal back_requested
 func _ready() -> void:
     $Panel/VBox/Buttons/BackButton.pressed.connect(_on_back_pressed)
     $Panel/VBox/Buttons/EnterAuctionButton.pressed.connect(_on_enter_auction_pressed)
+
+    _ctx = ItemViewContext.for_list_review()
+    _tooltip = ItemRowTooltipScene.instantiate()
+    add_child(_tooltip)
 
 # ══ Common API ════════════════════════════════════════════════════════════════
 
@@ -42,7 +54,11 @@ func populate() -> void:
             total_min += entry.current_price_min
             total_max += entry.current_price_max
 
-        _item_list.add_child(_make_row(entry))
+        var row: ItemRow = ItemRowScene.instantiate()
+        _item_list.add_child(row)
+        row.setup(entry, _ctx)
+        row.tooltip_requested.connect(_on_row_tooltip_requested)
+        row.tooltip_dismissed.connect(_tooltip.hide_tooltip)
 
     var total_text: String
     if total_min == total_max:
@@ -65,44 +81,10 @@ func _on_back_pressed() -> void:
 func _on_enter_auction_pressed() -> void:
     auction_entered.emit()
 
-# ══ UI builder ════════════════════════════════════════════════════════════════
 
-
-func _make_row(entry: ItemEntry) -> HBoxContainer:
-    var row := HBoxContainer.new()
-    row.add_theme_constant_override(&"separation", 8)
-
-    # ── Name ──────────────────────────────────────────────────────────────────
-    var name_label := Label.new()
-    name_label.text = entry.display_name
-    name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    name_label.add_theme_font_size_override(&"font_size", 14)
-    row.add_child(name_label)
-
-    # ── Level (Potential) ─────────────────────────────────────────────────────
-    var level_label := Label.new()
-    level_label.text = entry.potential_inspect_label
-    level_label.custom_minimum_size = Vector2(80.0, 0.0)
-    level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    level_label.add_theme_font_size_override(&"font_size", 13)
-    row.add_child(level_label)
-
-    # ── Condition ─────────────────────────────────────────────────────────────
-    var condition_label := Label.new()
-    condition_label.text = entry.condition_inspect_label
-    condition_label.custom_minimum_size = Vector2(100.0, 0.0)
-    condition_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    condition_label.modulate = entry.condition_inspect_color
-    condition_label.add_theme_font_size_override(&"font_size", 13)
-    row.add_child(condition_label)
-
-    # ── Estimate ──────────────────────────────────────────────────────────────
-    var price_label := Label.new()
-    price_label.text = entry.current_price_label
-    price_label.custom_minimum_size = Vector2(100.0, 0.0)
-    price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-    price_label.add_theme_color_override(&"font_color", entry.price_color)
-    price_label.add_theme_font_size_override(&"font_size", 13)
-    row.add_child(price_label)
-
-    return row
+func _on_row_tooltip_requested(
+        entry: ItemEntry,
+        ctx: ItemViewContext,
+        anchor: Rect2,
+) -> void:
+    _tooltip.show_for(entry, ctx, anchor)

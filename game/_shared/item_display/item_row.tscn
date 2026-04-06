@@ -1,11 +1,11 @@
-[gd_scene format=3 uid="uid://cq26r52kyw10h"]
+[gd_scene format=3 uid="uid://brx8agwvlpi3f"]
 
-[ext_resource type="Script" uid="uid://cegvhy87v810v" path="res://game/run_review/run_review_item_row/run_review_item_row.gd" id="1_rrir"]
+[ext_resource type="Script" uid="uid://bq288jpve02e7" path="res://game/_shared/item_display/item_row.gd" id="1_itemrow"]
 
-[node name="RunReviewItemRow" type="HBoxContainer" unique_id=1000000001]
+[node name="ItemRow" type="HBoxContainer" unique_id=1000000001]
 custom_minimum_size = Vector2(0, 48)
 theme_override_constants/separation = 0
-script = ExtResource("1_rrir")
+script = ExtResource("1_itemrow")
 
 [node name="NameLabel" type="Label" parent="." unique_id=1000000002]
 layout_mode = 2
@@ -13,21 +13,21 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 16
 vertical_alignment = 1
 
-[node name="LevelLabel" type="Label" parent="." unique_id=708792151]
-custom_minimum_size = Vector2(160, 0)
+[node name="BaseValueLabel" type="Label" parent="." unique_id=1000000003]
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ConditionLabel" type="Label" parent="." unique_id=2010141161]
-custom_minimum_size = Vector2(160, 0)
+[node name="ConditionMultLabel" type="Label" parent="." unique_id=1000000004]
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ValueLabel" type="Label" parent="." unique_id=1000000003]
+[node name="EstimateLabel" type="Label" parent="." unique_id=1000000005]
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16

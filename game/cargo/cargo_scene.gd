@@ -7,14 +7,18 @@ extends Control
 # ── Constants ─────────────────────────────────────────────────────────────────
 const ONSITE_SELL_PRICE := 50 # flat rate per unloaded item; no merchant logic yet
 
-const CargoItemRowScene := preload("uid://cargoitemrow1")
+const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
+const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 
 # ── State ─────────────────────────────────────────────────────────────────────
 var _won_items: Array[ItemEntry] = []
 var _selected: Dictionary = { } # ItemEntry → bool
 var _slots_used: int = 0
 var _weight_used: float = 0.0
-var _rows: Dictionary = { } # ItemEntry → CargoItemRow
+var _rows: Dictionary = { } # ItemEntry → ItemRow
+var _checkboxes: Dictionary = { } # ItemEntry → CheckBox
+var _ctx: ItemViewContext = null
+var _tooltip: ItemRowTooltip = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 @onready var _slots_label: Label = $RootVBox/Header/SlotsLabel
@@ -27,6 +31,10 @@ var _rows: Dictionary = { } # ItemEntry → CargoItemRow
 
 
 func _ready() -> void:
+    _ctx = ItemViewContext.for_cargo()
+    _tooltip = ItemRowTooltipScene.instantiate()
+    add_child(_tooltip)
+
     _load_up_button.pressed.connect(_on_load_up_pressed)
     _confirm_popup.confirmed.connect(_on_confirm_popup_confirmed)
     _won_items = RunManager.run_record.won_items
@@ -66,6 +74,14 @@ func _on_confirm_popup_confirmed() -> void:
 
     GameManager.go_to_run_review()
 
+
+func _on_row_tooltip_requested(
+        entry: ItemEntry,
+        ctx: ItemViewContext,
+        anchor: Rect2,
+) -> void:
+    _tooltip.show_for(entry, ctx, anchor)
+
 # ══ State helpers ══════════════════════════════════════════════════════════════
 
 
@@ -88,13 +104,13 @@ func _refresh_ui() -> void:
     var remaining_weight: float = max_weight - _weight_used
 
     for entry: ItemEntry in _won_items:
-        var row: CargoItemRow = _rows[entry]
+        var checkbox: CheckBox = _checkboxes[entry]
         if _selected.get(entry, false):
-            row.set_toggle_disabled(false)
+            checkbox.disabled = false
         else:
             var over_slots: bool = entry.item_data.category_data.grid_size > remaining_slots
             var over_weight: bool = entry.item_data.category_data.weight > remaining_weight
-            row.set_toggle_disabled(over_slots or over_weight)
+            checkbox.disabled = over_slots or over_weight
 
 
 func _build_summary_text() -> String:
@@ -130,9 +146,22 @@ func _populate_rows() -> void:
         return
 
     for entry: ItemEntry in _won_items:
-        var row: CargoItemRow = CargoItemRowScene.instantiate()
-        _row_container.add_child(row)
-        row.setup(entry)
-        row.toggled.connect(_on_item_toggled)
+        var wrapper := HBoxContainer.new()
+        _row_container.add_child(wrapper)
+        wrapper.add_theme_constant_override(&"separation", 0)
 
+        var checkbox := CheckBox.new()
+        wrapper.add_child(checkbox)
+        checkbox.custom_minimum_size = Vector2(80, 0)
+        checkbox.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+        checkbox.toggled.connect(_on_item_toggled.bind(entry))
+
+        var row: ItemRow = ItemRowScene.instantiate()
+        wrapper.add_child(row)
+        row.setup(entry, _ctx)
+        row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        row.tooltip_requested.connect(_on_row_tooltip_requested)
+        row.tooltip_dismissed.connect(_tooltip.hide_tooltip)
+
+        _checkboxes[entry] = checkbox
         _rows[entry] = row

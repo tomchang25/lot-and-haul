@@ -13,15 +13,17 @@ const ITEM_GAP := Vector2(32.0, 28.0)
 # Top-left corner of the grid — centred horizontally, leaving room for the HUD row
 const GRID_ORIGIN := Vector2(376.0, 90.0)
 
-const ItemDisplayScene := preload("uid://bitemdtscn001")
+const ItemCardScene := preload("uid://bw23cjkf40y5r")
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _active_item: ItemDisplay = null
-var _item_displays: Array[ItemDisplay] = []
+var _active_item: ItemCard = null
+var _item_displays: Array[ItemCard] = []
 
-# Maps each ItemDisplay to its corresponding ItemEntry for popup refresh.
+# Maps each ItemCard to its corresponding ItemEntry for popup refresh.
 var _entry_for_display: Dictionary = { }
+
+var _ctx: ItemViewContext = null
 
 # ── Timer / tween handles ─────────────────────────────────────────────────────
 
@@ -42,6 +44,8 @@ var _pulse_tween: Tween = null
 
 
 func _ready() -> void:
+    _ctx = ItemViewContext.for_inspection()
+
     _action_popup.potential_inspect_requested.connect(_on_potential_inspect)
     _action_popup.condition_inspect_requested.connect(_on_condition_inspect)
     _action_popup.cancelled.connect(_on_popup_cancelled)
@@ -74,7 +78,7 @@ func _unhandled_input(event: InputEvent) -> void:
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
-func _on_item_clicked(display: ItemDisplay) -> void:
+func _on_item_clicked(display: ItemCard) -> void:
     _open_popup(display)
 
 
@@ -95,7 +99,7 @@ func _on_potential_inspect() -> void:
     RunManager.run_record.actions_remaining -= 1
 
     entry.potential_inspect_level += 1
-    _active_item.refresh_display("potential")
+    _active_item.refresh(&"potential")
     _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
     _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
     _action_popup.refresh(entry)
@@ -114,7 +118,7 @@ func _on_condition_inspect() -> void:
     RunManager.run_record.actions_remaining -= 1
 
     entry.condition_inspect_level += 1
-    _active_item.refresh_display("condition")
+    _active_item.refresh(&"condition")
     _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
     _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
     _action_popup.refresh(entry)
@@ -156,11 +160,11 @@ func _populate_item_displays() -> void:
     for i: int in item_entries.size():
         var entry: ItemEntry = item_entries[i]
 
-        var display: ItemDisplay = ItemDisplayScene.instantiate()
+        var display: ItemCard = ItemCardScene.instantiate()
         display.custom_minimum_size = ITEM_SIZE
         _items_grid.add_child(display)
 
-        display.setup(entry)
+        display.setup(entry, _ctx)
         display.clicked.connect(_on_item_clicked)
         _item_displays.append(display)
         _entry_for_display[display] = entry
@@ -168,7 +172,7 @@ func _populate_item_displays() -> void:
 # ══ Popup ═════════════════════════════════════════════════════════════════════
 
 
-func _open_popup(display: ItemDisplay) -> void:
+func _open_popup(display: ItemCard) -> void:
     _active_item = display
     var entry: ItemEntry = _entry_for_display[display]
     _action_popup.refresh(entry)

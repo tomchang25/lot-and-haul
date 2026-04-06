@@ -5,14 +5,15 @@
 # Writes: RunManager.run_record.sell_value, RunManager.run_record.net
 extends Control
 
-# ── Exports ───────────────────────────────────────────────────────────────────
-
-@export var _row_scene: PackedScene
+const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
+const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _cargo_items: Array[ItemEntry] = []
 var _paid_price: int = 0
+var _ctx: ItemViewContext = null
+var _tooltip: ItemRowTooltip = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -27,6 +28,10 @@ var _paid_price: int = 0
 
 
 func _ready() -> void:
+    _ctx = ItemViewContext.for_run_review()
+    _tooltip = ItemRowTooltipScene.instantiate()
+    add_child(_tooltip)
+
     _continue_btn.pressed.connect(_on_continue_pressed)
 
     _cargo_items = RunManager.run_record.cargo_items
@@ -48,9 +53,11 @@ func _on_continue_pressed() -> void:
 
 func _populate_rows() -> void:
     for entry: ItemEntry in _cargo_items:
-        var row: RunReviewItemRow = _row_scene.instantiate()
+        var row: ItemRow = ItemRowScene.instantiate()
         _row_container.add_child(row)
-        row.setup(entry)
+        row.setup(entry, _ctx)
+        row.tooltip_requested.connect(_on_row_tooltip_requested)
+        row.tooltip_dismissed.connect(_tooltip.hide_tooltip)
 
 # ══ Result ════════════════════════════════════════════════════════════════════
 
@@ -79,3 +86,11 @@ func _show_summary() -> void:
     else:
         _net_label.text = "Loss:   -$%d" % (-net)
         _net_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
+
+
+func _on_row_tooltip_requested(
+        entry: ItemEntry,
+        ctx: ItemViewContext,
+        anchor: Rect2,
+) -> void:
+    _tooltip.show_for(entry, ctx, anchor)

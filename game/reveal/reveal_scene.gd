@@ -5,15 +5,16 @@
 # Writes: (none — mutates ItemEntry.layer_index in place)
 extends Control
 
-# ── Exports ───────────────────────────────────────────────────────────────────
-
-@export var _row_scene: PackedScene
+const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
+const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _won_items: Array[ItemEntry] = []
 var _reveal_index: int = 0
-var _rows: Array[RevealItemRow] = []
+var _rows: Array[ItemRow] = []
+var _ctx: ItemViewContext = null
+var _tooltip: ItemRowTooltip = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -25,6 +26,10 @@ var _rows: Array[RevealItemRow] = []
 
 
 func _ready() -> void:
+    _ctx = ItemViewContext.for_reveal()
+    _tooltip = ItemRowTooltipScene.instantiate()
+    add_child(_tooltip)
+
     _reveal_btn.pressed.connect(_on_reveal_pressed)
     _continue_btn.pressed.connect(_on_continue_pressed)
 
@@ -44,7 +49,13 @@ func _on_reveal_pressed() -> void:
     if _reveal_index >= _rows.size():
         return
 
-    _rows[_reveal_index].reveal()
+    var entry: ItemEntry = _won_items[_reveal_index]
+    if entry.is_veiled():
+        entry.layer_index = 1
+    entry.condition_inspect_level = 2
+    entry.potential_inspect_level = 2
+    _rows[_reveal_index].refresh()
+
     _reveal_index += 1
 
     if _reveal_index >= _rows.size():
@@ -61,7 +72,17 @@ func _on_continue_pressed() -> void:
 func _populate_rows() -> void:
     for entry: ItemEntry in _won_items:
         _row_container.add_child(HSeparator.new())
-        var row: RevealItemRow = _row_scene.instantiate()
+        var row: ItemRow = ItemRowScene.instantiate()
         _row_container.add_child(row)
-        row.setup(entry)
+        row.setup(entry, _ctx)
+        row.tooltip_requested.connect(_on_row_tooltip_requested)
+        row.tooltip_dismissed.connect(_tooltip.hide_tooltip)
         _rows.append(row)
+
+
+func _on_row_tooltip_requested(
+        entry: ItemEntry,
+        ctx: ItemViewContext,
+        anchor: Rect2,
+) -> void:
+    _tooltip.show_for(entry, ctx, anchor)

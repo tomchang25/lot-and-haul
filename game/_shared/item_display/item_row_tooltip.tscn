@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://3kvnpn7pek5i"]
+
+[ext_resource type="Script" uid="uid://co3dfe6cemp2b" path="res://game/_shared/item_display/item_row_tooltip.gd" id="1_tooltip"]
+
+[node name="ItemRowTooltip" type="PanelContainer" unique_id=1000000001]
+visible = false
+z_index = 10
+script = ExtResource("1_tooltip")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=1000000002]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PotentialLabel" type="Label" parent="VBox" unique_id=1000000003]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+
+[node name="PotentialPriceLabel" type="Label" parent="VBox" unique_id=1000000004]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+
+[node name="ConditionLabel" type="Label" parent="VBox" unique_id=1000000005]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
