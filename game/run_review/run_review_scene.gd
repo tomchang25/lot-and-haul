@@ -5,14 +5,15 @@
 # Writes: RunManager.run_record.sell_value, RunManager.run_record.net
 extends Control
 
-# ── Exports ───────────────────────────────────────────────────────────────────
-
-@export var _row_scene: PackedScene
+const ItemRowScene := preload("uid://itemrow_tscn01")
+const ItemRowTooltipScene := preload("uid://itemttiptscn1")
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _cargo_items: Array[ItemEntry] = []
 var _paid_price: int = 0
+var _ctx: ItemViewContext = null
+var _tooltip: ItemRowTooltip = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -27,55 +28,68 @@ var _paid_price: int = 0
 
 
 func _ready() -> void:
-    _continue_btn.pressed.connect(_on_continue_pressed)
+	_ctx = ItemViewContext.for_run_review()
+	_tooltip = ItemRowTooltipScene.instantiate()
+	add_child(_tooltip)
 
-    _cargo_items = RunManager.run_record.cargo_items
-    _paid_price = RunManager.run_record.paid_price
+	_continue_btn.pressed.connect(_on_continue_pressed)
 
-    _populate_rows()
-    _commit_result()
-    _show_summary()
+	_cargo_items = RunManager.run_record.cargo_items
+	_paid_price = RunManager.run_record.paid_price
+
+	_populate_rows()
+	_commit_result()
+	_show_summary()
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
 func _on_continue_pressed() -> void:
-    RunManager.clear_run_state()
-    GameManager.go_to_warehouse_entry()
+	RunManager.clear_run_state()
+	GameManager.go_to_warehouse_entry()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 
 
 func _populate_rows() -> void:
-    for entry: ItemEntry in _cargo_items:
-        var row: RunReviewItemRow = _row_scene.instantiate()
-        _row_container.add_child(row)
-        row.setup(entry)
+	for entry: ItemEntry in _cargo_items:
+		var row: ItemRow = ItemRowScene.instantiate()
+		row.setup(entry, _ctx)
+		row.tooltip_requested.connect(_on_row_tooltip_requested)
+		row.tooltip_dismissed.connect(_tooltip.hide_tooltip)
+		_row_container.add_child(row)
 
 # ══ Result ════════════════════════════════════════════════════════════════════
 
 
 func _commit_result() -> void:
-    var sell_value: int = 0
-    for entry: ItemEntry in _cargo_items:
-        sell_value += entry.sell_price
+	var sell_value: int = 0
+	for entry: ItemEntry in _cargo_items:
+		sell_value += entry.sell_price
 
-    RunManager.run_record.sell_value = sell_value
-    RunManager.run_record.net = sell_value + RunManager.run_record.onsite_proceeds - _paid_price
+	RunManager.run_record.sell_value = sell_value
+	RunManager.run_record.net = sell_value + RunManager.run_record.onsite_proceeds - _paid_price
 
 
 func _show_summary() -> void:
-    var sell_value: int = RunManager.run_record.sell_value
-    var onsite: int = RunManager.run_record.onsite_proceeds
-    var net: int = RunManager.run_record.net
+	var sell_value: int = RunManager.run_record.sell_value
+	var onsite: int = RunManager.run_record.onsite_proceeds
+	var net: int = RunManager.run_record.net
 
-    _sell_value_label.text = "Total Sell Value:   $%d" % sell_value
-    _onsite_label.text = "Sold On-site:   $%d" % onsite
-    _paid_label.text = "Amount Paid:   $%d" % _paid_price
+	_sell_value_label.text = "Total Sell Value:   $%d" % sell_value
+	_onsite_label.text = "Sold On-site:   $%d" % onsite
+	_paid_label.text = "Amount Paid:   $%d" % _paid_price
 
-    if net >= 0:
-        _net_label.text = "Profit:   +$%d" % net
-        _net_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
-    else:
-        _net_label.text = "Loss:   -$%d" % (-net)
-        _net_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
+	if net >= 0:
+		_net_label.text = "Profit:   +$%d" % net
+		_net_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
+	else:
+		_net_label.text = "Loss:   -$%d" % (-net)
+		_net_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
+
+
+func _on_row_tooltip_requested(
+		entry: ItemEntry,
+		ctx: ItemViewContext,
+		anchor: Rect2) -> void:
+	_tooltip.show_for(entry, ctx, anchor)

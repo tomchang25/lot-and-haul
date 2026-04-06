@@ -43,14 +43,35 @@ var potential_inspect_label: String:
     get:
         if is_veiled():
             return "Veiled"
-        if potential_inspect_level == 0:
-            return "??? / ???"
+        match potential_inspect_level:
+            0:
+                return "? / ?"
+            1, 2:
+                var current := layer_index
+                var max_layer := item_data.identity_layers.size() - 1
+                return "Lv %d / %d  [%s]" % [current, max_layer, get_potential_rating()]
+            _:
+                push_warning("potential_inspect_level out of range: %d" % potential_inspect_level)
+                return "? / ?"
 
-        # level >= 1: reveal both current and max immediately
-        var current := layer_index
-        var max_layer := item_data.identity_layers.size() - 1
-        var rating := get_potential_rating()
-        return "Lv %d / %d  [%s]" % [current, max_layer, rating]
+var should_show_potential_price: bool:
+    get:
+        return not is_veiled() and potential_inspect_level >= 2
+
+var condition_mult_label: String:
+    get:
+        if is_veiled():
+            return "×?"
+        match condition_inspect_level:
+            0:
+                return "×?"
+            1:
+                return "×0.50" if condition < 0.3 else "×2.00"
+            2:
+                return "×%.2f" % get_condition_multiplier()
+            _:
+                push_warning("condition_inspect_level out of range: %d" % condition_inspect_level)
+                return "×?"
 
 var condition_inspect_label: String:
     get:
@@ -239,6 +260,75 @@ const PRICE_UNKNOWN_COLOR := Color(0.6, 0.6, 0.6)
 var price_color: Color:
     get:
         return PRICE_UNKNOWN_COLOR if is_veiled() else PRICE_COLOR
+
+
+# ── Context-aware helpers ─────────────────────────────────────────────────────
+# These are the only display functions that ItemRow, ItemCard, and ItemRowTooltip
+# call. No UI component branches on stage directly.
+
+func condition_label_for(ctx: ItemViewContext) -> String:
+    match ctx.condition_mode:
+        ItemViewContext.ConditionMode.FORCE_TRUE_VALUE:
+            return condition_label
+        ItemViewContext.ConditionMode.FORCE_INSPECT_MAX:
+            if condition < 0.3:
+                return "Poor"
+            elif condition < 0.6:
+                return "Fair"
+            elif condition < 0.8:
+                return "Good"
+            else:
+                return "Excellent"
+        ItemViewContext.ConditionMode.RESPECT_INSPECT_LEVEL:
+            return condition_inspect_label
+        _:
+            push_warning("Unknown ConditionMode: %d" % ctx.condition_mode)
+            return condition_inspect_label
+
+
+func condition_color_for(ctx: ItemViewContext) -> Color:
+    if ctx.condition_mode == ItemViewContext.ConditionMode.RESPECT_INSPECT_LEVEL:
+        return condition_inspect_color
+    return condition_color
+
+
+func condition_mult_label_for(ctx: ItemViewContext) -> String:
+    match ctx.condition_mode:
+        ItemViewContext.ConditionMode.FORCE_TRUE_VALUE, \
+        ItemViewContext.ConditionMode.FORCE_INSPECT_MAX:
+            return "×%.2f" % get_condition_multiplier()
+        ItemViewContext.ConditionMode.RESPECT_INSPECT_LEVEL:
+            return condition_mult_label
+        _:
+            push_warning("Unknown ConditionMode: %d" % ctx.condition_mode)
+            return condition_mult_label
+
+
+func potential_label_for(ctx: ItemViewContext) -> String:
+    if ctx.potential_mode == ItemViewContext.PotentialMode.FORCE_FULL:
+        if is_veiled():
+            return "Veiled"
+        var current := layer_index
+        var max_layer := item_data.identity_layers.size() - 1
+        return "Lv %d / %d  [%s]" % [current, max_layer, get_potential_rating()]
+    return potential_inspect_label
+
+
+func should_show_potential_price_for(ctx: ItemViewContext) -> bool:
+    if ctx.potential_mode == ItemViewContext.PotentialMode.FORCE_FULL:
+        return not is_veiled()
+    return should_show_potential_price
+
+
+func price_label_for(ctx: ItemViewContext) -> String:
+    match ctx.price_mode:
+        ItemViewContext.PriceMode.SELL_PRICE:
+            return sell_price_label
+        ItemViewContext.PriceMode.CURRENT_ESTIMATE:
+            return current_price_label
+        _:
+            push_warning("Unknown PriceMode: %d" % ctx.price_mode)
+            return current_price_label
 
 
 # Returns the layer currently visible to the player.

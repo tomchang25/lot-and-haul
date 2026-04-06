@@ -25,13 +25,16 @@ func _ready() -> void:
 # Update button state based on the entry's current unlock action and available stamina.
 func refresh(entry: ItemEntry) -> void:
     # Potential button
-    var p_maxed := entry.potential_inspect_level >= 1 or entry.is_veiled()
+    var p_maxed := entry.potential_inspect_level >= 2 or entry.is_veiled()
     _potential_button.disabled = p_maxed or _is_potential_action_disabled()
-    _potential_button.text = "Inspect Potential (%d SP)" % POTENTIAL_COST
     if entry.is_veiled():
         _potential_button.text = "Veiled"
     elif entry.potential_inspect_level >= 2:
         _potential_button.text = "Potential: Max"
+    elif entry.potential_inspect_level == 1:
+        _potential_button.text = "Inspect Potential Lv2 (%d SP)" % POTENTIAL_COST
+    else:
+        _potential_button.text = "Inspect Potential (%d SP)" % POTENTIAL_COST
 
     # Condition button
     var c_locked := not entry.is_condition_inspectable()

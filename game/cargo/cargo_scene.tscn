@@ -83,11 +83,11 @@ text = "Item"
 vertical_alignment = 1
 
 [node name="LevelHeaderLabel" type="Label" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=193401869]
-custom_minimum_size = Vector2(240, 0)
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 14
-text = "Level"
+text = "Base Value"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -105,33 +105,7 @@ custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 14
-text = "Est. Value"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="WeightHeader" type="Label" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=100000014]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 14
-text = "Weight"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="SizeHeader" type="Label" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=100000015]
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 14
-text = "Size"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ScrollHeader" type="Label" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=184576491]
-custom_minimum_size = Vector2(10, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 14
+text = "Estimate"
 horizontal_alignment = 1
 vertical_alignment = 1
 

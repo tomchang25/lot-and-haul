@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://itemcard_tscn1"]
+
+[ext_resource type="Script" uid="uid://itemcard_scr01" path="res://game/_shared/item_display/item_card.gd" id="1_itemcard"]
+
+[node name="ItemCard" type="PanelContainer" unique_id=1471444043]
+custom_minimum_size = Vector2(190, 260)
+script = ExtResource("1_itemcard")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=1188569334]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SpriteRect" type="ColorRect" parent="VBox" unique_id=1447237142]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.22, 0.22, 0.3, 1)
+
+[node name="NameLabel" type="Label" parent="VBox" unique_id=1741335459]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "—"
+horizontal_alignment = 1
+
+[node name="PotentialLabel" type="Label" parent="VBox" unique_id=677516799]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "? / ?"
+horizontal_alignment = 1
+
+[node name="PotentialPriceRow" type="HBoxContainer" parent="VBox" unique_id=1000000010]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PotentialPriceLabel" type="Label" parent="VBox/PotentialPriceRow" unique_id=1000000011]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+
+[node name="ConditionLabel" type="Label" parent="VBox" unique_id=330209496]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "???"
+horizontal_alignment = 1
+
+[node name="ConditionMultLabel" type="Label" parent="VBox" unique_id=1000000012]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "×?"
+horizontal_alignment = 1
+
+[node name="PriceLabel" type="Label" parent="VBox" unique_id=259042000]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "?"
+horizontal_alignment = 1
