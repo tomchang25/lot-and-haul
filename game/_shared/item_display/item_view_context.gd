@@ -52,8 +52,6 @@ static func for_list_review() -> ItemViewContext:
 static func for_reveal() -> ItemViewContext:
     var ctx := ItemViewContext.new()
     ctx.stage = Stage.REVEAL
-    ctx.condition_mode = ConditionMode.FORCE_INSPECT_MAX
-    ctx.potential_mode = PotentialMode.FORCE_FULL
     return ctx
 
 

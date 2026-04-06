@@ -1,6 +1,7 @@
 # reveal_scene.gd
 # Block 05a — Reveal won items before cargo loading.
-# Auto-advances layer 0 items to layer 1 on reveal. Player steps through each item.
+# Auto-advances layer 0 items to layer 1 on reveal.
+# One button press reveals ALL items at once instead of one-at-a-time.
 # Reads:  RunManager.run_record.won_items
 # Writes: (none — mutates ItemEntry.layer_index in place)
 extends Control
@@ -11,7 +12,6 @@ const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _won_items: Array[ItemEntry] = []
-var _reveal_index: int = 0
 var _rows: Array[ItemRow] = []
 var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
@@ -46,21 +46,16 @@ func _ready() -> void:
 
 
 func _on_reveal_pressed() -> void:
-    if _reveal_index >= _rows.size():
-        return
+    for i in _won_items.size():
+        var entry: ItemEntry = _won_items[i]
+        if entry.is_veiled():
+            entry.layer_index = 1
+        entry.condition_inspect_level = 2
+        entry.potential_inspect_level = 2
+        _rows[i].refresh()
 
-    var entry: ItemEntry = _won_items[_reveal_index]
-    if entry.is_veiled():
-        entry.layer_index = 1
-    entry.condition_inspect_level = 2
-    entry.potential_inspect_level = 2
-    _rows[_reveal_index].refresh()
-
-    _reveal_index += 1
-
-    if _reveal_index >= _rows.size():
-        _reveal_btn.hide()
-        _continue_btn.show()
+    _reveal_btn.hide()
+    _continue_btn.show()
 
 
 func _on_continue_pressed() -> void:
