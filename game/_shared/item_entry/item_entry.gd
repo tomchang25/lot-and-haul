@@ -17,9 +17,10 @@ var potential_inspect_level: int = 0
 
 var condition_inspect_level: int = 0
 
-# Random pick from [knowledge_min, knowledge_max] at lot draw.
-# Used as the multiplier on player_estimate_max.
-var knowledge_factor: float = 1.0
+# Per-layer price bounds rolled once at lot draw.
+# Index matches identity_layers; deeper layers have wider gaps.
+var knowledge_min: Array[float] = []
+var knowledge_max: Array[float] = []
 
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
@@ -141,44 +142,60 @@ func get_potential_rating() -> String:
         return "Probably Junk"
 
 
-var player_estimate_min: int:
+var current_price_min: int:
     get:
         if is_veiled():
             return 0
-
         var cond_mult: float = get_known_condition_multiplier()
+        return int(active_layer().base_value * cond_mult * knowledge_min[layer_index])
 
-        return int(active_layer().base_value * cond_mult)
-
-var player_estimate_max: int:
+var current_price_max: int:
     get:
         if is_veiled():
             return 0
-
-        if potential_inspect_level == 0:
-            return player_estimate_min
-
-        var layer_max: int = active_layer().base_value
-        if potential_inspect_level >= 1:
-            for i in range(layer_index + 1, item_data.identity_layers.size()):
-                var v: int = item_data.identity_layers[i].base_value
-                if v > layer_max:
-                    layer_max = v
         var cond_mult: float = get_known_condition_multiplier()
-        return int(layer_max * cond_mult * knowledge_factor)
+        return int(active_layer().base_value * cond_mult * knowledge_max[layer_index])
 
-var player_estimate_label: String:
+var current_price_label: String:
     get:
         if is_veiled():
             return "???"
-        if player_estimate_min == player_estimate_max:
-            return "$%d" % player_estimate_min
-        return "$%d - $%d" % [player_estimate_min, player_estimate_max]
+        if current_price_min == current_price_max:
+            return "$%d" % current_price_min
+        return "$%d - $%d" % [current_price_min, current_price_max]
+
+var potential_price_min: int:
+    get:
+        if is_veiled() or knowledge_min.is_empty():
+            return 0
+        var result: int = int(item_data.identity_layers[0].base_value * knowledge_min[0])
+        for i in range(1, item_data.identity_layers.size()):
+            var v: int = int(item_data.identity_layers[i].base_value * knowledge_min[i])
+            if v < result:
+                result = v
+        return result
+
+var potential_price_max: int:
+    get:
+        if is_veiled() or knowledge_max.is_empty():
+            return 0
+        var result: int = 0
+        for i in range(item_data.identity_layers.size()):
+            var v: int = int(item_data.identity_layers[i].base_value * knowledge_max[i])
+            if v > result:
+                result = v
+        return result
+
+var potential_price_label: String:
+    get:
+        if is_veiled():
+            return "???"
+        return "$%d - $%d" % [potential_price_min, potential_price_max]
 
 var sell_price: int:
     get:
         return int(
-            item_data.identity_layers[-1].base_value
+            active_layer().base_value
             * get_condition_multiplier()
             * (1.0 + 0.01 * KnowledgeManager.get_mastery_rank(
                     item_data.category_data.super_category.super_category_id,
@@ -257,7 +274,14 @@ static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
     var start_veiled := randf() < veil_chance
     entry.layer_index = 0 if start_veiled else 1
 
-    var price_range: Vector2 = KnowledgeManager.get_price_range(data.category_data.super_category.super_category_id, data.rarity)
-    entry.knowledge_factor = randf_range(price_range.x, price_range.y)
+    var super_cat_id: String = data.category_data.super_category.super_category_id
+    var layers_count: int = data.identity_layers.size()
+    entry.knowledge_min.resize(layers_count)
+    entry.knowledge_max.resize(layers_count)
+    for i in range(layers_count):
+        var depth: int = maxi(0, i - entry.layer_index)
+        var price_range: Vector2 = KnowledgeManager.get_price_range(super_cat_id, data.rarity, depth)
+        entry.knowledge_min[i] = price_range.x
+        entry.knowledge_max[i] = price_range.y
 
     return entry

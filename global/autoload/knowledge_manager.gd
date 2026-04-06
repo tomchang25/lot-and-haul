@@ -51,7 +51,7 @@ func get_mastery_rank(super_category_id: String) -> int:
     return total
 
 
-func get_price_range(super_category_id: String, rarity: ItemData.Rarity) -> Vector2:
+func get_price_range(super_category_id: String, rarity: ItemData.Rarity, layer_depth: int = 0) -> Vector2:
     var rank: int = get_mastery_rank(super_category_id)
 
     var threshold: int
@@ -80,7 +80,8 @@ func get_price_range(super_category_id: String, rarity: ItemData.Rarity) -> Vect
         _:
             return Vector2(1.0, 1.0)
 
-    var progress: float = minf(float(rank) / float(threshold), 1.0)
+    var effective_threshold: int = threshold * (1 + layer_depth)
+    var progress: float = minf(float(rank) / float(effective_threshold), 1.0)
     if progress >= 1.0:
         return Vector2(1.0, 1.0)
 

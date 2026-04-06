@@ -206,11 +206,11 @@ func _build_lot_summary(lot_items: Array[ItemEntry]) -> void:
         if entry.is_veiled():
             has_veiled = true
         else:
-            total_min += entry.player_estimate_min
-            total_max += entry.player_estimate_max
+            total_min += entry.current_price_min
+            total_max += entry.current_price_max
 
         var label := Label.new()
-        label.text = "%s (%s)" % [entry.display_name, entry.player_estimate_label]
+        label.text = "%s (%s)" % [entry.display_name, entry.current_price_label]
         label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         label.add_theme_font_size_override(&"font_size", 15)
         _lot_summary.add_child(label)
