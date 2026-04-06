@@ -13,6 +13,9 @@ rarity_weights = {
 3: 10,
 4: 5
 }
+super_category_weights = {
+"decorative": 1
+}
 category_weights = {
 "oil_lamp": 1,
 "vase": 1,

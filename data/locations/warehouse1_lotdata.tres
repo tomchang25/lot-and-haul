@@ -13,6 +13,10 @@ rarity_weights = {
 3: 10,
 4: 5
 }
+super_category_weights = {
+"vehicle": 1,
+"fashion": 1
+}
 category_weights = {
 "automobile": 1,
 "bicycle": 1,
