@@ -5,9 +5,13 @@ extends Node
 
 var _items: Array[ItemData] = []
 
+# Maps super_category_id (String) → Array[String] of category_id.
+var _super_category_to_categories: Dictionary = {}
+
 
 func _ready() -> void:
     _load_all_items()
+    _build_super_category_index()
 
 
 func _load_all_items() -> void:
@@ -28,6 +32,19 @@ func _load_all_items() -> void:
     dir.list_dir_end()
 
 
+func _build_super_category_index() -> void:
+    for item: ItemData in _items:
+        if item.category_data == null or item.category_data.super_category == null:
+            continue
+        var sc_id: String = item.category_data.super_category.super_category_id
+        var cat_id: String = item.category_data.category_id
+        if not _super_category_to_categories.has(sc_id):
+            _super_category_to_categories[sc_id] = []
+        var cats: Array = _super_category_to_categories[sc_id]
+        if not cats.has(cat_id):
+            cats.append(cat_id)
+
+
 # Returns all items matching the given rarity and category_id.
 # Returns an empty array if none match.
 func get_items(rarity: ItemData.Rarity, category_id: String) -> Array[ItemData]:
@@ -35,6 +52,16 @@ func get_items(rarity: ItemData.Rarity, category_id: String) -> Array[ItemData]:
     for item: ItemData in _items:
         if item.rarity == rarity and item.category_data != null and item.category_data.category_id == category_id:
             result.append(item)
+    return result
+
+
+# Returns the list of category_ids that belong to the given super_category_id.
+# Returns an empty array if the super_category_id is not found.
+func get_categories_for_super(super_category_id: String) -> Array[String]:
+    var result: Array[String] = []
+    if _super_category_to_categories.has(super_category_id):
+        for cat_id in _super_category_to_categories[super_category_id]:
+            result.append(cat_id)
     return result
 
 

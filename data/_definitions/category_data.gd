@@ -8,8 +8,8 @@ extends Resource
 # Internal identifier. Matches the .tres filename stem and DB category_id.
 @export var category_id: String = ""
 
-# Broad item type (e.g. "Fine Art", "Vehicle").
-@export var super_category: String = ""
+# Broad item type. References a SuperCategoryData resource.
+@export var super_category: SuperCategoryData = null
 
 # Fine-grained item type shown to the player (e.g. "Painting", "Pocket Watch").
 @export var display_name: String = ""

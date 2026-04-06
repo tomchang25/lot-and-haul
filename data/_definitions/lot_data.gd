@@ -48,6 +48,13 @@ extends Resource
 # Example: { 0: 60, 1: 25, 2: 10, 3: 4, 4: 1 }
 @export var rarity_weights: Dictionary = { }
 
+# Weighted super-category table for item draws.
+# Key: super_category_id (String), Value: weight (int).
+# When non-empty, a super-category is rolled first, then a category is chosen
+# uniformly from its members. Falls through to category_weights if empty.
+# Example: { "vehicle": 2, "fine_art": 1 }
+@export var super_category_weights: Dictionary = { }
+
 # Weighted category table for item draws.
 # Key: category_id (String), Value: weight (int).
 # Example: { "bicycle": 1, "handbag": 1, "oil_lamp": 1, "painting": 1 }

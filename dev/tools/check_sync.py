@@ -74,7 +74,54 @@ class Row:
 # ── Checkers ──────────────────────────────────────────────────────────────────
 
 
-def check_categories(conn: sqlite3.Connection, categories_dir: Path) -> list[Row]:
+def check_super_categories(conn: sqlite3.Connection, super_categories_dir: Path) -> list[Row]:
+    rows: list[Row] = []
+    cur  = conn.cursor()
+
+    db_sc = {
+        r[0]: {"display_name": r[1], "uid": r[2]}
+        for r in cur.execute(
+            "SELECT super_category_id, display_name, uid FROM super_categories"
+        )
+    }
+    tres_sc: set[str] = set()
+
+    for f in sorted(super_categories_dir.glob("*.tres")):
+        text             = f.read_text(encoding="utf-8")
+        super_cat_id     = _field(text, "super_category_id") or f.stem
+        tres_sc.add(super_cat_id)
+
+        if super_cat_id not in db_sc:
+            rows.append(Row("super_categories", super_cat_id, "only_tres",
+                            ["exists on disk, missing from DB"]))
+            continue
+
+        db    = db_sc[super_cat_id]
+        diffs: list[str] = []
+        tres_name = _field(text, "display_name") or ""
+        tres_uid  = _header_uid(text) or ""
+
+        if tres_name != db["display_name"]:
+            diffs.append(f"display_name: tres={tres_name!r}  db={db['display_name']!r}")
+        if db["uid"] and tres_uid and tres_uid != db["uid"]:
+            diffs.append(f"uid: tres={tres_uid!r}  db={db['uid']!r}")
+
+        rows.append(Row("super_categories", super_cat_id,
+                        "mismatch" if diffs else "ok", diffs))
+
+    for sc_id in db_sc:
+        if sc_id not in tres_sc:
+            rows.append(Row("super_categories", sc_id, "only_db",
+                            ["exists in DB, no .tres file on disk"]))
+
+    return rows
+
+
+def check_categories(
+    conn: sqlite3.Connection,
+    categories_dir: Path,
+    super_category_uid_map: dict[str, str],
+) -> list[Row]:
     rows: list[Row] = []
     cur  = conn.cursor()
 
@@ -98,13 +145,23 @@ def check_categories(conn: sqlite3.Connection, categories_dir: Path) -> list[Row
 
         db = db_cats[category_id]
         diffs: list[str] = []
-        tres_super = _field(text, "super_category") or ""
-        tres_name  = _field(text, "display_name") or ""
-        tres_w     = float(_field(text, "weight") or 0.0)
-        tres_gs    = int(_field(text, "grid_size") or 1)
+
+        # Resolve super_category from the ExtResource reference.
+        ext_res = _ext_resources(text)
+        tres_super: str | None = None
+        sc_m = re.search(r'super_category\s*=\s*ExtResource\("([^"]+)"\)', text)
+        if sc_m:
+            sc_uid    = ext_res.get(sc_m.group(1), {}).get("uid")
+            tres_super = super_category_uid_map.get(sc_uid or "")
+
+        tres_name = _field(text, "display_name") or ""
+        tres_w    = float(_field(text, "weight") or 0.0)
+        tres_gs   = int(_field(text, "grid_size") or 1)
 
         if tres_super != db["super_category"]:
-            diffs.append(f"super_category: tres={tres_super!r}  db={db['super_category']!r}")
+            diffs.append(
+                f"super_category: tres={tres_super!r}  db={db['super_category']!r}"
+            )
         if tres_name != db["display_name"]:
             diffs.append(f"display_name: tres={tres_name!r}  db={db['display_name']!r}")
         if abs(tres_w - db["weight"]) > 0.001:
@@ -381,11 +438,12 @@ def main() -> None:
                         help="Print plain text instead of HTML")
     args = parser.parse_args()
 
-    root          = Path(args.godot_root)
-    categories_dir = root / "data" / "categories"
-    layers_dir    = root / "data" / "identity_layers"
-    item_dir      = root / "data" / "items"
-    db_path       = root / "data" / "_db" / "lot_haul.db"
+    root                 = Path(args.godot_root)
+    super_categories_dir = root / "data" / "super_categories"
+    categories_dir       = root / "data" / "categories"
+    layers_dir           = root / "data" / "identity_layers"
+    item_dir             = root / "data" / "items"
+    db_path              = root / "data" / "_db" / "lot_haul.db"
 
     if not db_path.exists():
         sys.exit(f"DB not found: {db_path}\nRun init.py first.")
@@ -393,6 +451,7 @@ def main() -> None:
     conn = sqlite3.connect(db_path)
     conn.execute("PRAGMA foreign_keys = ON")
 
+    # uid → category_id (used by check_items)
     category_uid_map: dict[str, str] = {
         row[1]: row[0]
         for row in conn.execute(
@@ -400,8 +459,17 @@ def main() -> None:
         )
     }
 
+    # uid → super_category_id (used by check_categories)
+    super_category_uid_map: dict[str, str] = {
+        row[1]: row[0]
+        for row in conn.execute(
+            "SELECT super_category_id, uid FROM super_categories WHERE uid IS NOT NULL"
+        )
+    }
+
     all_rows: list[Row] = []
-    all_rows += check_categories(conn, categories_dir)
+    all_rows += check_super_categories(conn, super_categories_dir)
+    all_rows += check_categories(conn, categories_dir, super_category_uid_map)
     all_rows += check_identity_layers(conn, layers_dir)
     all_rows += check_items(conn, item_dir, category_uid_map)
     conn.close()

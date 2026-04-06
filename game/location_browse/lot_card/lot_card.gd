@@ -12,6 +12,7 @@ signal pass_pressed
 @onready var _index_label: Label = $IndexLabel
 @onready var _item_count_label: Label = $ItemCountLabel
 @onready var _rarity_label: Label = $RarityLabel
+@onready var _super_category_label: Label = $SuperCategoryLabel
 @onready var _category_label: Label = $CategoryLabel
 @onready var _enter_button: Button = $ButtonBar/EnterButton
 @onready var _pass_button: Button = $ButtonBar/PassButton
@@ -31,7 +32,31 @@ func setup(lot_data: LotData, index: int, total: int) -> void:
     _index_label.text = "Lot %d / %d" % [index + 1, total]
     _item_count_label.text = "%d–%d items" % [lot_data.item_count_min, lot_data.item_count_max]
     _rarity_label.text = "Rarity: %s" % _rarity_range_text(lot_data.rarity_weights)
-    _category_label.text = "Categories: %s" % _category_text(lot_data.category_weights)
+
+    # Super Category row
+    if lot_data.super_category_weights.is_empty():
+        _super_category_label.visible = false
+    else:
+        _super_category_label.visible = true
+        _super_category_label.text = "Super Category: %s" % _category_text(lot_data.super_category_weights)
+
+    # Build the set of category IDs already covered by super-category weights.
+    var covered: Dictionary = { }
+    for sc_id in lot_data.super_category_weights.keys():
+        for cat_id in ItemRegistry.get_categories_for_super(sc_id):
+            covered[cat_id] = true
+
+    # Extra Category row — only categories NOT covered by any super-category.
+    var extra_weights: Dictionary = { }
+    for cat_id in lot_data.category_weights.keys():
+        if not covered.has(cat_id):
+            extra_weights[cat_id] = lot_data.category_weights[cat_id]
+
+    if extra_weights.is_empty():
+        _category_label.visible = false
+    else:
+        _category_label.visible = true
+        _category_label.text = "Extra Category: %s" % _category_text(extra_weights)
 
 
 func set_active(active: bool) -> void:

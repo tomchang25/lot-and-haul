@@ -24,10 +24,16 @@ theme_override_font_sizes/font_size = 16
 text = "Rarity: —"
 horizontal_alignment = 1
 
-[node name="CategoryLabel" type="Label" parent="." unique_id=100000005]
+[node name="SuperCategoryLabel" type="Label" parent="." unique_id=366465724]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Categories: —"
+horizontal_alignment = 1
+
+[node name="CategoryLabel" type="Label" parent="." unique_id=100000005]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Extra Category: —"
 horizontal_alignment = 1
 
 [node name="Spacer" type="Control" parent="." unique_id=100000006]

@@ -53,8 +53,10 @@ static func create(data: LotData) -> LotEntry:
     return entry
 
 
-# Rolls one item using rarity_weights then category_weights, then picks a
-# random matching item from ItemRegistry. Returns null if no match is found.
+# Rolls one item using rarity_weights then category, then picks a random
+# matching item from ItemRegistry. Returns null if no match is found.
+# If super_category_weights is non-empty, rolls a super-category first, then
+# picks uniformly from its member categories. Falls through to category_weights.
 static func _draw_item(data: LotData) -> ItemData:
     for attempt in range(MAX_ATTEMPTS):
         # Roll rarity
@@ -69,15 +71,32 @@ static func _draw_item(data: LotData) -> ItemData:
         var rarity: ItemData.Rarity = rarity_keys[rarity_idx] as ItemData.Rarity
 
         # Roll category
-        var cat_keys: Array = data.category_weights.keys()
-        var cat_values: Array[int] = []
-        for k in cat_keys:
-            cat_values.append(data.category_weights[k])
-        var cat_idx := RandomUtils.pick_weighted_index(cat_values)
-        if cat_idx < 0:
-            push_warning("Category roll failed")
-            return null
-        var category_id: String = cat_keys[cat_idx]
+        var category_id: String = ""
+        if not data.super_category_weights.is_empty():
+            # Roll super-category, then pick a member category uniformly.
+            var sc_keys: Array = data.super_category_weights.keys()
+            var sc_values: Array[int] = []
+            for k in sc_keys:
+                sc_values.append(data.super_category_weights[k])
+            var sc_idx := RandomUtils.pick_weighted_index(sc_values)
+            if sc_idx < 0:
+                push_warning("Super-category roll failed")
+                return null
+            var super_category_id: String = sc_keys[sc_idx]
+            var member_cats: Array[String] = ItemRegistry.get_categories_for_super(super_category_id)
+            if member_cats.is_empty():
+                continue
+            category_id = member_cats[randi() % member_cats.size()]
+        else:
+            var cat_keys: Array = data.category_weights.keys()
+            var cat_values: Array[int] = []
+            for k in cat_keys:
+                cat_values.append(data.category_weights[k])
+            var cat_idx := RandomUtils.pick_weighted_index(cat_values)
+            if cat_idx < 0:
+                push_warning("Category roll failed")
+                return null
+            category_id = cat_keys[cat_idx]
 
         # Pick a random item matching both rarity and category
         var candidates: Array[ItemData] = ItemRegistry.get_items(rarity, category_id)
