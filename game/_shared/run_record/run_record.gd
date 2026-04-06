@@ -21,6 +21,7 @@ var net: int = 0
 
 var stamina: int = 0
 var max_stamina: int = 30
+var car_config: CarConfig = null
 
 var actions_remaining: int = 0 # resets each lot from LotData.action_quota
 
@@ -38,12 +39,11 @@ var browse_index: int = 0
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
 
-static func create(location: LocationData) -> RunRecord:
+static func create(location: LocationData, car: CarConfig) -> RunRecord:
     var r := RunRecord.new()
     r.location_data = location
-
-    # TODO: get this value from car config if implemented
-    r.max_stamina = 30
+    r.car_config = car
+    r.max_stamina = car.stamina_cap
     r.stamina = r.max_stamina
 
     return r

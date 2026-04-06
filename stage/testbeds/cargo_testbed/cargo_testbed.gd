@@ -43,7 +43,7 @@ func _inject_fake_state() -> void:
     const WAREHOUSE_LOCATION = preload("res://data/locations/warehouse_location.tres")
 
     var lot := LotEntry.create(WAREHOUSE_LOTDATA)
-    RunManager.run_record = RunRecord.create(WAREHOUSE_LOCATION)
+    RunManager.run_record = RunRecord.create(WAREHOUSE_LOCATION, SaveManager.load_active_car())
     RunManager.run_record.set_lot(lot)
 
     var entries: Array[ItemEntry] = RunManager.run_record.lot_entry.item_entries

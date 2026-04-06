@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CarConfig" format=3 uid="uid://bvanbasic0001"]
+
+[ext_resource type="Script" path="res://data/_definitions/car_config.gd" id="1_carconfig"]
+
+[resource]
+script = ExtResource("1_carconfig")
+car_id = "van_basic"
+display_name = "Basic Van"
+max_slots = 8
+max_weight = 100.0
+stamina_cap = 20
+travel_cost = 0

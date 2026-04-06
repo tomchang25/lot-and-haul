@@ -9,7 +9,7 @@ enum KnowledgeAction {
     SELL,
 }
 
-const _BASE_EXP: Dictionary = {
+const _BASE_MASTERY: Dictionary = {
     KnowledgeAction.POTENTIAL_INSPECT: 2,
     KnowledgeAction.CONDITION_INSPECT: 2,
     KnowledgeAction.REVEAL: 1,
@@ -19,40 +19,40 @@ const _BASE_EXP: Dictionary = {
 }
 
 
-func add_exp(category_id: String, rarity: ItemData.Rarity, action: KnowledgeAction) -> void:
-    var base: int = _BASE_EXP[action]
+func add_category_points(category_id: String, rarity: ItemData.Rarity, action: KnowledgeAction) -> void:
+    var base: int = _BASE_MASTERY[action]
     var rarity_mult: int = rarity + 1 # COMMON=0→1, UNCOMMON=1→2, …, LEGENDARY=4→5
     var gain: int = base * rarity_mult
-    if not SaveManager.exp.has(category_id):
-        SaveManager.exp[category_id] = 0
-    SaveManager.exp[category_id] += gain
+    if not SaveManager.category_points.has(category_id):
+        SaveManager.category_points[category_id] = 0
+    SaveManager.category_points[category_id] += gain
 
 
-func get_category_level(category_id: String) -> int:
-    var exp_val: int = SaveManager.exp.get(category_id, 0)
-    if exp_val >= 25600:
+func get_category_rank(category_id: String) -> int:
+    var points: int = SaveManager.category_points.get(category_id, 0)
+    if points >= 25600:
         return 5
-    elif exp_val >= 6400:
+    elif points >= 6400:
         return 4
-    elif exp_val >= 1600:
+    elif points >= 1600:
         return 3
-    elif exp_val >= 400:
+    elif points >= 400:
         return 2
-    elif exp_val >= 100:
+    elif points >= 100:
         return 1
     else:
         return 0
 
 
-func get_super_category_level(super_category_id: String) -> int:
+func get_mastery_rank(super_category_id: String) -> int:
     var total: int = 0
     for cat_id: String in ItemRegistry.get_categories_for_super(super_category_id):
-        total += get_category_level(cat_id)
+        total += get_category_rank(cat_id)
     return total
 
 
 func get_price_range(super_category_id: String, rarity: ItemData.Rarity) -> Vector2:
-    var level: int = get_super_category_level(super_category_id)
+    var rank: int = get_mastery_rank(super_category_id)
 
     var threshold: int
     var min_full_w: float
@@ -80,17 +80,17 @@ func get_price_range(super_category_id: String, rarity: ItemData.Rarity) -> Vect
         _:
             return Vector2(1.0, 1.0)
 
-    var progress: float = minf(float(level) / float(threshold), 1.0)
+    var progress: float = minf(float(rank) / float(threshold), 1.0)
     if progress >= 1.0:
         return Vector2(1.0, 1.0)
 
     var effective_min_w: float = min_full_w * (1.0 - progress)
     var effective_max_w: float = max_full_w * (1.0 - progress)
 
-    var knowledge_min: float = randf_range(1.0 - effective_min_w, 1.0)
-    var knowledge_max: float = randf_range(1.0, 1.0 + effective_max_w)
+    var rank_min: float = randf_range(1.0 - effective_min_w, 1.0)
+    var rank_max: float = randf_range(1.0, 1.0 + effective_max_w)
 
-    return Vector2(knowledge_min, knowledge_max)
+    return Vector2(rank_min, rank_max)
 
 
 # Flat skill registry. Returns the player's current level for the given skill.
