@@ -2,12 +2,18 @@ extends Node
 
 const SAVE_PATH := "user://save.json"
 
-# Per-category EXP store. Keys are category IDs (String), values are int.
-var exp: Dictionary = { }
+# Per-category mastery store. Keys are category IDs (String), values are int.
+var mastery: Dictionary = {}
+var gold: int = 0
+var active_car_id: String = "van_basic"
 
 
 func save() -> void:
-    var data := { "exp": exp }
+    var data := {
+        "mastery": mastery,
+        "gold": gold,
+        "active_car_id": active_car_id,
+    }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
     if file == null:
         push_error("SaveManager: failed to open %s for writing" % SAVE_PATH)
@@ -27,5 +33,17 @@ func load() -> void:
     if parsed == null or not parsed is Dictionary:
         push_error("SaveManager: invalid save data in %s" % SAVE_PATH)
         return
-    if parsed.has("exp") and parsed["exp"] is Dictionary:
-        exp = parsed["exp"]
+    if parsed.has("mastery") and parsed["mastery"] is Dictionary:
+        mastery = parsed["mastery"]
+    if parsed.has("gold") and parsed["gold"] is float:
+        gold = int(parsed["gold"])
+    if parsed.has("active_car_id") and parsed["active_car_id"] is String:
+        active_car_id = parsed["active_car_id"]
+
+
+func load_active_car() -> CarConfig:
+    var path := "res://data/cars/%s.tres" % active_car_id
+    if not ResourceLoader.exists(path):
+        push_error("SaveManager: car resource not found at %s" % path)
+        return null
+    return ResourceLoader.load(path) as CarConfig

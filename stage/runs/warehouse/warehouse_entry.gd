@@ -25,7 +25,7 @@ func _ready() -> void:
 
 
 func _init_run() -> void:
-    RunManager.run_record = RunRecord.create(location_data)
+    RunManager.run_record = RunRecord.create(location_data, SaveManager.load_active_car())
 
 # ══ Door animation ════════════════════════════════════════════════════════════
 

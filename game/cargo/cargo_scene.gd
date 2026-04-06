@@ -5,8 +5,6 @@
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
-const MAX_SLOTS := 6
-const MAX_WEIGHT := 20.0
 const ONSITE_SELL_PRICE := 50 # flat rate per unloaded item; no merchant logic yet
 
 const CargoItemRowScene := preload("uid://cargoitemrow1")
@@ -81,11 +79,13 @@ func _recalc_totals() -> void:
 
 
 func _refresh_ui() -> void:
-    _slots_label.text = "Slots: %d / %d" % [_slots_used, MAX_SLOTS]
-    _weight_label.text = "Weight: %.1f / %.1f kg" % [_weight_used, MAX_WEIGHT]
+    var max_slots: int = RunManager.run_record.car_config.max_slots
+    var max_weight: float = RunManager.run_record.car_config.max_weight
+    _slots_label.text = "Slots: %d / %d" % [_slots_used, max_slots]
+    _weight_label.text = "Weight: %.1f / %.1f kg" % [_weight_used, max_weight]
 
-    var remaining_slots: int = MAX_SLOTS - _slots_used
-    var remaining_weight: float = MAX_WEIGHT - _weight_used
+    var remaining_slots: int = max_slots - _slots_used
+    var remaining_weight: float = max_weight - _weight_used
 
     for entry: ItemEntry in _won_items:
         var row: CargoItemRow = _rows[entry]

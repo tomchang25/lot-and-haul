@@ -25,7 +25,7 @@ func _ready() -> void:
 
 
 func _inject_fake_state() -> void:
-    RunManager.run_record = RunRecord.create(location_data)
+    RunManager.run_record = RunRecord.create(location_data, SaveManager.load_active_car())
 
 
 func _launch_location_browse_scene() -> void:

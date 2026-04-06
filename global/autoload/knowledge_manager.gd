@@ -9,7 +9,7 @@ enum KnowledgeAction {
     SELL,
 }
 
-const _BASE_EXP: Dictionary = {
+const _BASE_MASTERY: Dictionary = {
     KnowledgeAction.POTENTIAL_INSPECT: 2,
     KnowledgeAction.CONDITION_INSPECT: 2,
     KnowledgeAction.REVEAL: 1,
@@ -20,16 +20,16 @@ const _BASE_EXP: Dictionary = {
 
 
 func add_exp(category_id: String, rarity: ItemData.Rarity, action: KnowledgeAction) -> void:
-    var base: int = _BASE_EXP[action]
+    var base: int = _BASE_MASTERY[action]
     var rarity_mult: int = rarity + 1 # COMMON=0→1, UNCOMMON=1→2, …, LEGENDARY=4→5
     var gain: int = base * rarity_mult
-    if not SaveManager.exp.has(category_id):
-        SaveManager.exp[category_id] = 0
-    SaveManager.exp[category_id] += gain
+    if not SaveManager.mastery.has(category_id):
+        SaveManager.mastery[category_id] = 0
+    SaveManager.mastery[category_id] += gain
 
 
 func get_category_level(category_id: String) -> int:
-    var exp_val: int = SaveManager.exp.get(category_id, 0)
+    var exp_val: int = SaveManager.mastery.get(category_id, 0)
     if exp_val >= 25600:
         return 5
     elif exp_val >= 6400:
