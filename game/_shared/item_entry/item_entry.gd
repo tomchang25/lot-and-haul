@@ -66,9 +66,9 @@ var condition_mult_label: String:
             0:
                 return "×?"
             1:
-                return "×0.50" if condition < 0.3 else "×1.00"
+                return "~×0.50" if condition < 0.3 else "~×1.00"
             2:
-                return "×%.2f" % get_known_condition_multiplier()
+                return "~×%.2f" % get_known_condition_multiplier()
             _:
                 push_warning("condition_inspect_level out of range: %d" % condition_inspect_level)
                 return "×?"
@@ -297,7 +297,7 @@ func condition_mult_label_for(ctx: ItemViewContext) -> String:
         ItemViewContext.ConditionMode.FORCE_TRUE_VALUE:
             return "×%.2f" % get_condition_multiplier()
         ItemViewContext.ConditionMode.FORCE_INSPECT_MAX:
-            return "×%.2f" % get_condition_multiplier()
+            return condition_mult_label
         ItemViewContext.ConditionMode.RESPECT_INSPECT_LEVEL:
             return condition_mult_label
         _:
