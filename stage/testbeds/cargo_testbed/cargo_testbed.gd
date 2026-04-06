@@ -48,6 +48,11 @@ func _inject_fake_state() -> void:
 
     var entries: Array[ItemEntry] = RunManager.run_record.lot_entry.item_entries
 
+    for entry in entries:
+        entry.condition_inspect_level = 2
+        entry.potential_inspect_level = 2
+        entry.layer_index = 1
+
     # Simulate a won auction result using the built entries.
     RunManager.run_record.paid_price = paid_price
     RunManager.run_record.won_items = entries.duplicate()

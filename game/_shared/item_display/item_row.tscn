@@ -2,32 +2,37 @@
 
 [ext_resource type="Script" uid="uid://bq288jpve02e7" path="res://game/_shared/item_display/item_row.gd" id="1_itemrow"]
 
-[node name="ItemRow" type="HBoxContainer" unique_id=1000000001]
+[node name="ItemRow" type="PanelContainer" unique_id=901414141]
 custom_minimum_size = Vector2(0, 48)
-theme_override_constants/separation = 0
+offset_right = 401.0
+offset_bottom = 48.0
 script = ExtResource("1_itemrow")
 
-[node name="NameLabel" type="Label" parent="." unique_id=1000000002]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1729974819]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="NameLabel" type="Label" parent="HBoxContainer" unique_id=1000000002]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 16
 vertical_alignment = 1
 
-[node name="BaseValueLabel" type="Label" parent="." unique_id=1000000003]
+[node name="BaseValueLabel" type="Label" parent="HBoxContainer" unique_id=1000000003]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ConditionMultLabel" type="Label" parent="." unique_id=1000000004]
+[node name="ConditionMultLabel" type="Label" parent="HBoxContainer" unique_id=1000000004]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="EstimateLabel" type="Label" parent="." unique_id=1000000005]
+[node name="EstimateLabel" type="Label" parent="HBoxContainer" unique_id=1000000005]
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16

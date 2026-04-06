@@ -57,7 +57,7 @@ size_flags_vertical = 3
 [node name="ItemList" type="VBoxContainer" parent="Panel/VBox/ScrollContainer" unique_id=245830925]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 2
 
 [node name="HSep2" type="HSeparator" parent="Panel/VBox" unique_id=808621132]
 layout_mode = 2

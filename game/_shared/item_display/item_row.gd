@@ -3,18 +3,47 @@
 # Collapsed state: Name | Base value | Condition mult | Estimate
 # Hover: emits tooltip_requested for the parent scene to position and show.
 class_name ItemRow
-extends HBoxContainer
+extends PanelContainer
 
 signal tooltip_requested(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2)
 signal tooltip_dismissed
+signal row_pressed(entry: ItemEntry)
+
+enum CargoState {
+    NONE, # not in cargo stage — no override applied
+    SELECTED, # loaded into cargo → white
+    AVAILABLE, # can still be toggled → grey
+    BLOCKED, # would exceed capacity → near-black
+}
 
 var _entry: ItemEntry = null
 var _ctx: ItemViewContext = null
+var _cargo_state: CargoState = CargoState.NONE
 
-@onready var _name_label: Label = $NameLabel
-@onready var _base_value_label: Label = $BaseValueLabel
-@onready var _condition_mult_label: Label = $ConditionMultLabel
-@onready var _estimate_label: Label = $EstimateLabel
+# Built once on demand and reused across all rows.
+static var _style_selected: StyleBoxFlat = null
+static var _style_available: StyleBoxFlat = null
+static var _style_blocked: StyleBoxFlat = null
+
+
+static func _ensure_styles() -> void:
+    if _style_selected != null:
+        return
+
+    _style_selected = StyleBoxFlat.new()
+    _style_selected.bg_color = Color(1.0, 1.0, 1.0, 0.15) # white tint
+
+    _style_available = StyleBoxFlat.new()
+    _style_available.bg_color = Color(0.5, 0.5, 0.5, 0.15) # grey tint
+
+    _style_blocked = StyleBoxFlat.new()
+    _style_blocked.bg_color = Color(0.08, 0.08, 0.08, 0.9) # near-black
+
+
+@onready var _name_label: Label = $HBoxContainer/NameLabel
+@onready var _base_value_label: Label = $HBoxContainer/BaseValueLabel
+@onready var _condition_mult_label: Label = $HBoxContainer/ConditionMultLabel
+@onready var _estimate_label: Label = $HBoxContainer/EstimateLabel
 
 
 func _ready() -> void:
@@ -36,7 +65,41 @@ func refresh() -> void:
     _refresh()
 
 
+# Called by cargo_scene each time selection state changes.
+# Applies background colour and enables/disables click handling.
+func set_cargo_state(state: CargoState) -> void:
+    _cargo_state = state
+    _ensure_styles()
+
+    match state:
+        CargoState.SELECTED:
+            add_theme_stylebox_override(&"panel", _style_selected)
+            mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+        CargoState.AVAILABLE:
+            add_theme_stylebox_override(&"panel", _style_available)
+            mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+        CargoState.BLOCKED:
+            add_theme_stylebox_override(&"panel", _style_blocked)
+            mouse_default_cursor_shape = Control.CURSOR_ARROW
+        CargoState.NONE:
+            remove_theme_stylebox_override(&"panel")
+            mouse_default_cursor_shape = Control.CURSOR_ARROW
+
+
+func _gui_input(event: InputEvent) -> void:
+    if _cargo_state == CargoState.NONE or _cargo_state == CargoState.BLOCKED:
+        return
+    if event is InputEventMouseButton \
+    and event.button_index == MOUSE_BUTTON_LEFT \
+    and event.pressed:
+        row_pressed.emit(_entry)
+        accept_event()
+
+
 func _refresh() -> void:
+    if _entry == null:
+        return
+
     _name_label.text = _entry.display_name
 
     if _entry.is_veiled():
