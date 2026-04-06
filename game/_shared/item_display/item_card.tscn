@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://itemcard_tscn1"]
+[gd_scene format=3 uid="uid://bw23cjkf40y5r"]
 
-[ext_resource type="Script" uid="uid://itemcard_scr01" path="res://game/_shared/item_display/item_card.gd" id="1_itemcard"]
+[ext_resource type="Script" uid="uid://b4llo0b5lh841" path="res://game/_shared/item_display/item_card.gd" id="1_itemcard"]
 
 [node name="ItemCard" type="PanelContainer" unique_id=1471444043]
 custom_minimum_size = Vector2(190, 260)

@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://itemrow_tscn01"]
+[gd_scene format=3 uid="uid://brx8agwvlpi3f"]
 
-[ext_resource type="Script" uid="uid://itemrow_scr001" path="res://game/_shared/item_display/item_row.gd" id="1_itemrow"]
+[ext_resource type="Script" uid="uid://bq288jpve02e7" path="res://game/_shared/item_display/item_row.gd" id="1_itemrow"]
 
 [node name="ItemRow" type="HBoxContainer" unique_id=1000000001]
 custom_minimum_size = Vector2(0, 48)

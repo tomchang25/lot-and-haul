@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://itemttiptscn1"]
+[gd_scene format=3 uid="uid://3kvnpn7pek5i"]
 
-[ext_resource type="Script" uid="uid://itemttipscr01" path="res://game/_shared/item_display/item_row_tooltip.gd" id="1_tooltip"]
+[ext_resource type="Script" uid="uid://co3dfe6cemp2b" path="res://game/_shared/item_display/item_row_tooltip.gd" id="1_tooltip"]
 
 [node name="ItemRowTooltip" type="PanelContainer" unique_id=1000000001]
 visible = false

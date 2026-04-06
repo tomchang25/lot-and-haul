@@ -6,27 +6,27 @@ class_name ItemViewContext
 extends RefCounted
 
 enum Stage {
-	INSPECTION,
-	LIST_REVIEW,
-	REVEAL,
-	CARGO,
-	RUN_REVIEW,
+    INSPECTION,
+    LIST_REVIEW,
+    REVEAL,
+    CARGO,
+    RUN_REVIEW,
 }
 
 enum ConditionMode {
-	RESPECT_INSPECT_LEVEL,
-	FORCE_INSPECT_MAX,
-	FORCE_TRUE_VALUE,
+    RESPECT_INSPECT_LEVEL,
+    FORCE_INSPECT_MAX,
+    FORCE_TRUE_VALUE,
 }
 
 enum PotentialMode {
-	RESPECT_INSPECT_LEVEL,
-	FORCE_FULL,
+    RESPECT_INSPECT_LEVEL,
+    FORCE_FULL,
 }
 
 enum PriceMode {
-	CURRENT_ESTIMATE,
-	SELL_PRICE,
+    CURRENT_ESTIMATE,
+    SELL_PRICE,
 }
 
 var stage: Stage
@@ -36,38 +36,39 @@ var price_mode: PriceMode = PriceMode.CURRENT_ESTIMATE
 
 # ── Factories ─────────────────────────────────────────────────────────────────
 
+
 static func for_inspection() -> ItemViewContext:
-	var ctx := ItemViewContext.new()
-	ctx.stage = Stage.INSPECTION
-	return ctx
+    var ctx := ItemViewContext.new()
+    ctx.stage = Stage.INSPECTION
+    return ctx
 
 
 static func for_list_review() -> ItemViewContext:
-	var ctx := ItemViewContext.new()
-	ctx.stage = Stage.LIST_REVIEW
-	return ctx
+    var ctx := ItemViewContext.new()
+    ctx.stage = Stage.LIST_REVIEW
+    return ctx
 
 
 static func for_reveal() -> ItemViewContext:
-	var ctx := ItemViewContext.new()
-	ctx.stage = Stage.REVEAL
-	ctx.condition_mode = ConditionMode.FORCE_INSPECT_MAX
-	ctx.potential_mode = PotentialMode.FORCE_FULL
-	return ctx
+    var ctx := ItemViewContext.new()
+    ctx.stage = Stage.REVEAL
+    ctx.condition_mode = ConditionMode.FORCE_INSPECT_MAX
+    ctx.potential_mode = PotentialMode.FORCE_FULL
+    return ctx
 
 
 static func for_cargo() -> ItemViewContext:
-	var ctx := ItemViewContext.new()
-	ctx.stage = Stage.CARGO
-	ctx.condition_mode = ConditionMode.FORCE_INSPECT_MAX
-	ctx.potential_mode = PotentialMode.FORCE_FULL
-	return ctx
+    var ctx := ItemViewContext.new()
+    ctx.stage = Stage.CARGO
+    ctx.condition_mode = ConditionMode.FORCE_INSPECT_MAX
+    ctx.potential_mode = PotentialMode.FORCE_FULL
+    return ctx
 
 
 static func for_run_review() -> ItemViewContext:
-	var ctx := ItemViewContext.new()
-	ctx.stage = Stage.RUN_REVIEW
-	ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
-	ctx.potential_mode = PotentialMode.FORCE_FULL
-	ctx.price_mode = PriceMode.SELL_PRICE
-	return ctx
+    var ctx := ItemViewContext.new()
+    ctx.stage = Stage.RUN_REVIEW
+    ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
+    ctx.potential_mode = PotentialMode.FORCE_FULL
+    ctx.price_mode = PriceMode.SELL_PRICE
+    return ctx

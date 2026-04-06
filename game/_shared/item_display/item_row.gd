@@ -18,38 +18,38 @@ var _ctx: ItemViewContext = null
 
 
 func _ready() -> void:
-	mouse_entered.connect(_on_mouse_entered)
-	mouse_exited.connect(_on_mouse_exited)
+    mouse_entered.connect(_on_mouse_entered)
+    mouse_exited.connect(_on_mouse_exited)
 
 
 func setup(entry: ItemEntry, ctx: ItemViewContext) -> void:
-	_entry = entry
-	_ctx = ctx
-	_refresh()
+    _entry = entry
+    _ctx = ctx
+    _refresh()
 
 
 func refresh() -> void:
-	_refresh()
+    _refresh()
 
 
 func _refresh() -> void:
-	_name_label.text = _entry.display_name
+    _name_label.text = _entry.display_name
 
-	if _entry.is_veiled():
-		_base_value_label.text = "???"
-	else:
-		_base_value_label.text = "$%d" % _entry.active_layer().base_value
+    if _entry.is_veiled():
+        _base_value_label.text = "???"
+    else:
+        _base_value_label.text = "$%d" % _entry.active_layer().base_value
 
-	_condition_mult_label.text = _entry.condition_mult_label_for(_ctx)
-	_condition_mult_label.modulate = _entry.condition_color_for(_ctx)
+    _condition_mult_label.text = _entry.condition_mult_label_for(_ctx)
+    _condition_mult_label.modulate = _entry.condition_color_for(_ctx)
 
-	_estimate_label.text = _entry.price_label_for(_ctx)
-	_estimate_label.add_theme_color_override(&"font_color", _entry.price_color)
+    _estimate_label.text = _entry.price_label_for(_ctx)
+    _estimate_label.add_theme_color_override(&"font_color", _entry.price_color)
 
 
 func _on_mouse_entered() -> void:
-	tooltip_requested.emit(_entry, _ctx, get_global_rect())
+    tooltip_requested.emit(_entry, _ctx, get_global_rect())
 
 
 func _on_mouse_exited() -> void:
-	tooltip_dismissed.emit()
+    tooltip_dismissed.emit()

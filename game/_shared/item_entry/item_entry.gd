@@ -66,9 +66,9 @@ var condition_mult_label: String:
             0:
                 return "×?"
             1:
-                return "×0.50" if condition < 0.3 else "×2.00"
+                return "×0.50" if condition < 0.3 else "×1.00"
             2:
-                return "×%.2f" % get_condition_multiplier()
+                return "×%.2f" % get_known_condition_multiplier()
             _:
                 push_warning("condition_inspect_level out of range: %d" % condition_inspect_level)
                 return "×?"
@@ -129,13 +129,13 @@ func get_known_condition_multiplier() -> float:
             if condition < 0.3:
                 return 0.5
             elif condition < 0.6:
-                return 0.75
+                return 1.0
             elif condition < 0.8:
                 return 1.5
             else:
                 return 3.0
         _:
-            return get_condition_multiplier()
+            return 0
 
 
 func get_potential_rating() -> String:
@@ -261,10 +261,10 @@ var price_color: Color:
     get:
         return PRICE_UNKNOWN_COLOR if is_veiled() else PRICE_COLOR
 
-
 # ── Context-aware helpers ─────────────────────────────────────────────────────
 # These are the only display functions that ItemRow, ItemCard, and ItemRowTooltip
 # call. No UI component branches on stage directly.
+
 
 func condition_label_for(ctx: ItemViewContext) -> String:
     match ctx.condition_mode:
@@ -294,7 +294,8 @@ func condition_color_for(ctx: ItemViewContext) -> Color:
 
 func condition_mult_label_for(ctx: ItemViewContext) -> String:
     match ctx.condition_mode:
-        ItemViewContext.ConditionMode.FORCE_TRUE_VALUE, \
+        ItemViewContext.ConditionMode.FORCE_TRUE_VALUE:
+            return "×%.2f" % get_condition_multiplier()
         ItemViewContext.ConditionMode.FORCE_INSPECT_MAX:
             return "×%.2f" % get_condition_multiplier()
         ItemViewContext.ConditionMode.RESPECT_INSPECT_LEVEL:
