@@ -44,7 +44,7 @@ func _refresh() -> void:
     else:
         _base_value_label.text = "$%d" % _entry.active_layer().base_value
 
-    _condition_mult_label.text = _entry.condition_mult_label_for(_ctx)
+    _condition_mult_label.text = _entry.condition_label_for(_ctx)
     _condition_mult_label.modulate = _entry.condition_color_for(_ctx)
 
     _estimate_label.text = _entry.price_label_for(_ctx)

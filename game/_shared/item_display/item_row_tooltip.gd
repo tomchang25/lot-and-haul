@@ -22,8 +22,8 @@ func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
         _potential_label.hide()
 
     # Potential price range
-    if entry.should_show_potential_price_for(ctx):
-        _potential_price_label.text = "Range: %s" % entry.potential_price_label
+    if not entry.is_veiled() and entry.should_show_potential_price_for(ctx):
+        _potential_price_label.text = "Potential Range: %s" % entry.potential_price_label
         _potential_price_label.show()
         has_content = true
     else:
@@ -31,8 +31,9 @@ func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
 
     # Condition detail
     var cond_text := entry.condition_label_for(ctx)
-    if cond_text != "???":
-        _condition_label.text = cond_text
+    var cond_mult_text := entry.condition_mult_label_for(ctx)
+    if not entry.is_veiled() and cond_text != "???":
+        _condition_label.text = "%s (%s)" % [cond_text, cond_mult_text]
         _condition_label.modulate = entry.condition_color_for(ctx)
         _condition_label.show()
         has_content = true
@@ -40,6 +41,7 @@ func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
         _condition_label.hide()
 
     if not has_content:
+        hide()
         return
 
     # Position below the row; flip above if clipped by viewport bottom

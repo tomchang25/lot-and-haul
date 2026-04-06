@@ -36,8 +36,8 @@ var level_label: String:
 var condition_label: String:
     get:
         var cond_percent := int(condition * 100)
-        var mult := get_condition_multiplier()
-        return "%d%% (x%.2f)" % [cond_percent, mult]
+
+        return "%d%%" % [cond_percent]
 
 var potential_inspect_label: String:
     get:
