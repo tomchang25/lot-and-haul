@@ -162,10 +162,11 @@ func _populate_item_displays() -> void:
 
         var display: ItemCard = ItemCardScene.instantiate()
         display.custom_minimum_size = ITEM_SIZE
-        _items_grid.add_child(display)
-
         display.setup(entry, _ctx)
+
         display.clicked.connect(_on_item_clicked)
+
+        _items_grid.add_child(display)
         _item_displays.append(display)
         _entry_for_display[display] = entry
 

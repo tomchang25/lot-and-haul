@@ -18,10 +18,16 @@ var _ctx: ItemViewContext = null
 @onready var _price_label: Label = $VBox/PriceLabel
 
 
+func _ready() -> void:
+    _apply()
+
+
 func setup(entry: ItemEntry, ctx: ItemViewContext) -> void:
     _entry = entry
     _ctx = ctx
-    _apply()
+
+    if is_node_ready():
+        _apply()
 
 
 func refresh(changed: StringName = &"") -> void:

@@ -73,10 +73,12 @@ func _populate_rows() -> void:
     for entry: ItemEntry in _won_items:
         _row_container.add_child(HSeparator.new())
         var row: ItemRow = ItemRowScene.instantiate()
-        _row_container.add_child(row)
         row.setup(entry, _ctx)
+
         row.tooltip_requested.connect(_on_row_tooltip_requested)
         row.tooltip_dismissed.connect(_tooltip.hide_tooltip)
+
+        _row_container.add_child(row)
         _rows.append(row)
 
 

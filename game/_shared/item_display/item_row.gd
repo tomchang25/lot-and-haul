@@ -21,11 +21,15 @@ func _ready() -> void:
     mouse_entered.connect(_on_mouse_entered)
     mouse_exited.connect(_on_mouse_exited)
 
+    _refresh()
+
 
 func setup(entry: ItemEntry, ctx: ItemViewContext) -> void:
     _entry = entry
     _ctx = ctx
-    _refresh()
+
+    if is_node_ready():
+        _refresh()
 
 
 func refresh() -> void:

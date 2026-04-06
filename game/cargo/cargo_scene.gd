@@ -147,21 +147,23 @@ func _populate_rows() -> void:
 
     for entry: ItemEntry in _won_items:
         var wrapper := HBoxContainer.new()
-        _row_container.add_child(wrapper)
         wrapper.add_theme_constant_override(&"separation", 0)
 
         var checkbox := CheckBox.new()
-        wrapper.add_child(checkbox)
         checkbox.custom_minimum_size = Vector2(80, 0)
         checkbox.size_flags_vertical = Control.SIZE_SHRINK_CENTER
         checkbox.toggled.connect(_on_item_toggled.bind(entry))
+        wrapper.add_child(checkbox)
 
         var row: ItemRow = ItemRowScene.instantiate()
-        wrapper.add_child(row)
         row.setup(entry, _ctx)
         row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
         row.tooltip_requested.connect(_on_row_tooltip_requested)
         row.tooltip_dismissed.connect(_tooltip.hide_tooltip)
+
+        _row_container.add_child(wrapper)
+        wrapper.add_child(row)
 
         _checkboxes[entry] = checkbox
         _rows[entry] = row

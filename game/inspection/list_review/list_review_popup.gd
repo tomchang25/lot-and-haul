@@ -55,10 +55,12 @@ func populate() -> void:
             total_max += entry.current_price_max
 
         var row: ItemRow = ItemRowScene.instantiate()
-        _item_list.add_child(row)
         row.setup(entry, _ctx)
+
         row.tooltip_requested.connect(_on_row_tooltip_requested)
         row.tooltip_dismissed.connect(_tooltip.hide_tooltip)
+
+        _item_list.add_child(row)
 
     var total_text: String
     if total_min == total_max:
