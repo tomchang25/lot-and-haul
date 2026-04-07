@@ -87,6 +87,7 @@ _active_item
 Avoid abbreviations unless they are very common.
 
 Never shorten node-reference variable names. Write the full semantic word.
+
 ```gdscript
 _name_label       # ok
 _name_lbl         # NEVER
@@ -244,19 +245,25 @@ ListReviewPopup
 
 ---
 
+# 9. Indentation
+
+All GDScript files use **4 spaces** per indent level. Tabs are not used.
+
+---
+
 # Summary
 
-| Type | Style | Example |
-|---|---|---|
-| Files | snake_case | `item_row.gd` |
-| Classes | PascalCase | `ItemRow` |
-| Variables | snake_case | `won_items` |
-| Private variables | _snake_case | `_rolled_price` |
-| Functions | snake_case | `setup()` |
-| Private functions | _snake_case | `_populate_rows()` |
-| Signal callbacks | _on_snake_case | `_on_reveal_pressed()` |
-| Signals | snake_case | `tooltip_requested` |
-| Constants | UPPER_SNAKE_CASE | `ITEM_COLS` |
-| Preloaded types | PascalCase | `ItemRowScene` |
-| Enums | PascalCase + UPPER_SNAKE_CASE | `CargoState.SELECTED` |
-| Nodes | PascalCase | `RevealButton` |
+| Type              | Style                         | Example                |
+| ----------------- | ----------------------------- | ---------------------- |
+| Files             | snake_case                    | `item_row.gd`          |
+| Classes           | PascalCase                    | `ItemRow`              |
+| Variables         | snake_case                    | `won_items`            |
+| Private variables | \_snake_case                  | `_rolled_price`        |
+| Functions         | snake_case                    | `setup()`              |
+| Private functions | \_snake_case                  | `_populate_rows()`     |
+| Signal callbacks  | \_on_snake_case               | `_on_reveal_pressed()` |
+| Signals           | snake_case                    | `tooltip_requested`    |
+| Constants         | UPPER_SNAKE_CASE              | `ITEM_COLS`            |
+| Preloaded types   | PascalCase                    | `ItemRowScene`         |
+| Enums             | PascalCase + UPPER_SNAKE_CASE | `CargoState.SELECTED`  |
+| Nodes             | PascalCase                    | `RevealButton`         |
