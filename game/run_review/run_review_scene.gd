@@ -2,7 +2,8 @@
 # Block 06 — Run Review
 # Reads:  RunManager.run_record.cargo_items, RunManager.run_record.paid_price,
 #         RunManager.run_record.onsite_proceeds
-# Writes: RunManager.run_record.sell_value, RunManager.run_record.net
+# Writes: RunManager.run_record.sell_value, RunManager.run_record.net,
+#         SaveManager.cash, SaveManager.storage_items
 extends Control
 
 const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
@@ -45,8 +46,12 @@ func _ready() -> void:
 
 
 func _on_continue_pressed() -> void:
+    SaveManager.cash += RunManager.run_record.net
+    for entry: ItemEntry in RunManager.run_record.cargo_items:
+        SaveManager.storage_items.append(entry)
+    SaveManager.save()
     RunManager.clear_run_state()
-    GameManager.go_to_warehouse_entry()
+    GameManager.go_to_hub()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 

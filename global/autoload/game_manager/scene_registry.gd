@@ -8,3 +8,6 @@ extends Resource
 @export var reveal: PackedScene
 @export var cargo: PackedScene
 @export var run_review: PackedScene
+@export var hub: PackedScene
+@export var home: PackedScene
+@export var pawn_shop: PackedScene
