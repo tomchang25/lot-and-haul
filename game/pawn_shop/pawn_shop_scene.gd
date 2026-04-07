@@ -124,7 +124,7 @@ func _populate_rows() -> void:
 		_price_rows[entry] = price_row
 
 		var wrapper := VBoxContainer.new()
-		wrapper.theme_override_constants/separation = 0
+		wrapper.add_theme_constant_override("separation", 0)
 		wrapper.add_child(row)
 		wrapper.add_child(price_row)
 		_row_container.add_child(wrapper)
@@ -183,11 +183,11 @@ func _build_sell_summary() -> String:
 func _make_price_row(entry: ItemEntry) -> HBoxContainer:
 	var price_row := HBoxContainer.new()
 	price_row.visible = false
-	price_row.theme_override_constants/separation = 12
+	price_row.add_theme_constant_override("separation", 12)
 
 	var ask_label := Label.new()
 	ask_label.text = "Ask: "
-	ask_label.theme_override_font_sizes/font_size = 14
+	ask_label.add_theme_font_size_override("font_size", 14)
 	price_row.add_child(ask_label)
 
 	var slider := HSlider.new()
@@ -201,7 +201,7 @@ func _make_price_row(entry: ItemEntry) -> HBoxContainer:
 
 	var value_label := Label.new()
 	value_label.custom_minimum_size = Vector2(100, 0)
-	value_label.theme_override_font_sizes/font_size = 14
+	value_label.add_theme_font_size_override("font_size", 14)
 	value_label.text = "$%d" % entry.sell_price
 	price_row.add_child(value_label)
 
