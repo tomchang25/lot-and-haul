@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://bpawnshop0001"]
 
-[ext_resource type="Script" uid="uid://bpawnshpgdsc" path="res://game/pawn_shop/pawn_shop_scene.gd" id="1_pawnshpgd"]
+[ext_resource type="Script" uid="uid://c6r3bp5irpdsl" path="res://game/pawn_shop/pawn_shop_scene.gd" id="1_pawnshpgd"]
 
-[node name="PawnShopScene" type="Control" unique_id=3000000001]
+[node name="PawnShopScene" type="Control" unique_id=-1294967295]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,7 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_pawnshpgd")
 
-[node name="Background" type="ColorRect" parent="." unique_id=3000000002]
+[node name="Background" type="ColorRect" parent="." unique_id=-1294967294]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -20,14 +20,15 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.1, 0.1, 0.12, 1)
 
-[node name="RootVBox" type="VBoxContainer" parent="." unique_id=3000000003]
+[node name="RootVBox" type="VBoxContainer" parent="." unique_id=-1294967293]
 layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TitleLabel" type="Label" parent="RootVBox" unique_id=3000000004]
+[node name="TitleLabel" type="Label" parent="RootVBox" unique_id=-1294967292]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
@@ -35,29 +36,29 @@ text = "Pawn Shop"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ListCenter" type="CenterContainer" parent="RootVBox" unique_id=3000000005]
+[node name="ListCenter" type="CenterContainer" parent="RootVBox" unique_id=-1294967291]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="OuterVBox" type="VBoxContainer" parent="RootVBox/ListCenter" unique_id=3000000006]
-custom_minimum_size = Vector2(960, 0)
+[node name="OuterVBox" type="VBoxContainer" parent="RootVBox/ListCenter" unique_id=-1294967290]
+custom_minimum_size = Vector2(960, 480)
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="ItemPanel" type="PanelContainer" parent="RootVBox/ListCenter/OuterVBox" unique_id=3000000007]
+[node name="ItemPanel" type="PanelContainer" parent="RootVBox/ListCenter/OuterVBox" unique_id=-1294967289]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="PanelVBox" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel" unique_id=3000000008]
+[node name="PanelVBox" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel" unique_id=-1294967288]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="ColumnHeader" type="HBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=3000000009]
+[node name="ColumnHeader" type="HBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=-1294967287]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="ItemHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=3000000010]
+[node name="ItemHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=-1294967286]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
@@ -65,7 +66,7 @@ theme_override_font_sizes/font_size = 14
 text = "Item"
 vertical_alignment = 1
 
-[node name="LevelHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=3000000011]
+[node name="LevelHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=-1294967285]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
@@ -74,7 +75,7 @@ text = "Base Value"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ConditionHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=3000000012]
+[node name="ConditionHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=-1294967284]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
@@ -83,7 +84,7 @@ text = "Condition"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ValueHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=3000000013]
+[node name="ValueHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=-1294967283]
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
@@ -92,44 +93,43 @@ text = "Sell Price"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HeaderSeparator" type="HSeparator" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=3000000014]
+[node name="HeaderSeparator" type="HSeparator" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=-1294967282]
 layout_mode = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=3000000015]
+[node name="ScrollContainer" type="ScrollContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=-1294967281]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="RowContainer" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer" unique_id=3000000016]
+[node name="RowContainer" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer" unique_id=-1294967280]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
-[node name="EmptyLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox" unique_id=3000000017]
+[node name="EmptyLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox" unique_id=-1294967279]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "No items in storage."
 horizontal_alignment = 1
-visible = false
 
-[node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=3000000018]
+[node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=-1294967278]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 theme_override_constants/separation = 24
 alignment = 1
 
-[node name="SellButton" type="Button" parent="RootVBox/Footer" unique_id=3000000019]
+[node name="SellButton" type="Button" parent="RootVBox/Footer" unique_id=-1294967277]
 custom_minimum_size = Vector2(180, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Sell Selected"
 disabled = true
+text = "Sell Selected"
 
-[node name="BackButton" type="Button" parent="RootVBox/Footer" unique_id=3000000020]
+[node name="BackButton" type="Button" parent="RootVBox/Footer" unique_id=-1294967276]
 custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Back"
 
-[node name="SellConfirm" type="ConfirmationDialog" parent="." unique_id=3000000021]
+[node name="SellConfirm" type="ConfirmationDialog" parent="." unique_id=-1294967275]
 title = "Confirm Sale"
-dialog_text = ""

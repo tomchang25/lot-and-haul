@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Lot and Haul"
-run/main_scene="res://stage/runs/warehouse/warehouse_entry.tscn"
+run/main_scene="uid://bhubscene0001"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 

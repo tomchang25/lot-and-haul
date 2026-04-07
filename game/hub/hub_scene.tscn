@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bhubscene0001"]
 
-[ext_resource type="Script" uid="uid://bhubscenegdsc" path="res://game/hub/hub_scene.gd" id="1_hubgd"]
+[ext_resource type="Script" uid="uid://cpdf8haohlsir" path="res://game/hub/hub_scene.gd" id="1_hubgd"]
 
 [node name="HubScene" type="Control" unique_id=1000000001]
 layout_mode = 3
@@ -22,6 +22,7 @@ color = Color(0.1, 0.1, 0.12, 1)
 
 [node name="RootVBox" type="VBoxContainer" parent="." unique_id=1000000003]
 layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
@@ -39,8 +40,8 @@ vertical_alignment = 1
 
 [node name="InfoContainer" type="VBoxContainer" parent="RootVBox" unique_id=1000000005]
 layout_mode = 2
-theme_override_constants/separation = 8
 size_flags_horizontal = 4
+theme_override_constants/separation = 8
 
 [node name="BalanceLabel" type="Label" parent="RootVBox/InfoContainer" unique_id=1000000006]
 layout_mode = 2
@@ -56,8 +57,8 @@ horizontal_alignment = 1
 
 [node name="ButtonsVBox" type="VBoxContainer" parent="RootVBox" unique_id=1000000008]
 layout_mode = 2
-theme_override_constants/separation = 12
 size_flags_horizontal = 4
+theme_override_constants/separation = 12
 alignment = 1
 
 [node name="NextRunButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000009]

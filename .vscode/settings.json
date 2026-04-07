@@ -20,6 +20,7 @@
     "editor.formatOnType": true,
     "editor.formatOnSave": true,
     "files.autoSave": "onFocusChange",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "[gdscript]": {
         "editor.defaultFormatter": "DoHe.godot-format",
         "editor.formatOnSave": true,

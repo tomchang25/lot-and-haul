@@ -27,7 +27,9 @@ func _ready() -> void:
     _knowledge_btn.pressed.connect(_on_knowledge_pressed)
 
     _next_run_popup.confirmed.connect(_on_next_run_confirmed)
-
+    
+    SaveManager.load()
+    
     _refresh_display()
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════

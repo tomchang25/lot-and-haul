@@ -120,6 +120,7 @@ func _populate_rows() -> void:
     if SaveManager.storage_items.is_empty():
         _empty_label.visible = true
         return
+
     _empty_label.visible = false
     for entry: ItemEntry in SaveManager.storage_items:
         var row: ItemRow = ItemRowScene.instantiate()
