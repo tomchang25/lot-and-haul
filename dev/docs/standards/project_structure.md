@@ -1,8 +1,8 @@
-# Lot & Haul Project Structure
+# Project Structure
 
-This document defines the main folder structure used in the Lot & Haul project.
+This document defines the main folder structure used in this project.
 
-Its purpose is to define **where different types of content belong** in the project.
+Its purpose is to define **where different types of content belong**.
 
 ---
 
@@ -40,9 +40,9 @@ Use this folder for **reusable logic that is not tied to a specific block or gam
 Subfolders are organized by responsibility:
 
 ```
-common/audio      → AudioBus, AudioEvent, MusicAudioEvent, SpatialAudioEvent, default audio presets
-common/framework  → engine-style infrastructure (StateMachine, State)
-common/utils      → generic helper utilities (e.g. RandomUtils)
+common/audio      → audio bus wrappers and event types
+common/framework  → engine-style infrastructure (StateMachine, State, etc.)
+common/utils      → generic helper utilities
 ```
 
 The key question for placement: **could this be reused in a different project or block without modification?**
@@ -65,44 +65,20 @@ The key question for placement: **who writes this data?**
 
 ```
 data/
-  _db/              → SQLite database files (dev tooling output)
+  _db/              → database files (dev tooling output)
   _definitions/     → Resource .gd class definitions (the schema)
-  _yaml/            → YAML source files used as AI generation output and DB import input
-  cars/             → CarConfig .tres files
-  categories/       → CategoryData .tres files
-  identity_layers/  → IdentityLayer .tres files
-  items/            → ItemData .tres files
-  locations/        → LocationData .tres files
-  lots/             → LotData .tres files
-  skills/           → SkillData .tres files
-  super_categories/ → SuperCategoryData .tres files
+  _yaml/            → YAML source files for data pipeline input
+  [content-type]/   → .tres asset files organized by content type
 ```
 
 ### \_definitions/
 
 All Resource `.gd` class files belong here, regardless of which block uses them.
 
-Current definitions:
-
-| File                     | Class               | Purpose                                                                             |
-| ------------------------ | ------------------- | ----------------------------------------------------------------------------------- |
-| `category_data.gd`       | `CategoryData`      | Fine-grained item type; holds weight, grid_size, super_category ref                 |
-| `identity_layer.gd`      | `IdentityLayer`     | One rung in an item's identity chain; holds display_name, base_value, unlock_action |
-| `item_data.gd`           | `ItemData`          | Auctionable item; holds category_data, identity_layers, rarity                      |
-| `layer_unlock_action.gd` | `LayerUnlockAction` | Describes how to advance past a layer (context, time_cost, skill req)               |
-| `location_data.gd`       | `LocationData`      | Visitable storage location; holds lot_pool, lot_number, maintenance_cost            |
-| `lot_data.gd`            | `LotData`           | Storage lot config; holds item pool, rarity weights, NPC aggression ranges          |
-| `skill_data.gd`          | `SkillData`         | Learnable player skill; holds skill_id, display_name, max_level                     |
-| `super_category_data.gd` | `SuperCategoryData` | Broad classification grouping categories                                            |
-
 Rules:
 
 - Place a `.gd` here if it exists to be filled by a designer and instantiated as a `.tres`.
 - Both base classes and subclasses belong here — inheritance is a code relationship, not a placement rule.
-
-### \_yaml/
-
-YAML source files used as input to the `yaml_to_db.py` pipeline. Organized by content domain (e.g. `category_data.yaml`, `vehicle_items.yaml`, `decorative_items.yaml`).
 
 ### .tres asset files
 
@@ -114,9 +90,8 @@ Code-generated runtime objects are not designer content and do not belong in `da
 
 Examples of what stays in the owning block folder:
 
-- `run_record.gd` — produced at run start; lives in `game/_shared/run_record/`
-- `lot_entry.gd` — created and consumed at lot draw time; lives in `game/_shared/lot_entry/`
-- `item_entry.gd` — per-item runtime context; lives in `game/_shared/item_entry/`
+- Runtime context objects (e.g. `run_record.gd`) → `game/_shared/` or `game/[feature]/`
+- Per-entity runtime state created during play → owning block folder
 
 ---
 
@@ -126,7 +101,7 @@ Use this folder for **development-only content** that is not part of the shipped
 
 ```
 dev/
-  docs/     → project documentation (see below)
+  docs/     → project documentation
   tools/    → standalone scripts for data authoring and tooling
 ```
 
@@ -136,29 +111,15 @@ Project documentation organized by purpose.
 
 ```
 dev/docs/
-  begin/        → block design documents (block_01 through block_07, block_main, README)
+  begin/        → block design documents
   skills/       → GDScript technique references
   standards/    → architecture and naming standards (this file lives here)
-  conventional_commits.md
-  semantic_versioning.md
 ```
 
 ### dev/tools/
 
 Standalone scripts used during development to generate or manage data assets.
-
-```
-dev/tools/
-  examples/           → example YAML files illustrating the item data schema
-  init.py             → initializes the SQLite database (schema + seed data)
-  yaml_to_db.py       → imports YAML item/category/layer data into lot_haul.db
-  db_to_tres.py       → writes .tres files from lot_haul.db
-  tres_to_db.py       → seeds lot_haul.db from existing .tres files
-  check_sync.py       → compares .tres files on disk against the DB; outputs HTML report
-  ai_generation_prompt.md → system prompt for AI-assisted YAML item generation
-```
-
-VS Code tasks are defined in `.vscode/tasks.json` to run these tools from the editor (DB: Init, YAML → DB, DB → .tres, .tres → DB, Check sync).
+Organize tools by function. Register common tasks in `.vscode/tasks.json` for editor access.
 
 ---
 
@@ -172,28 +133,16 @@ This includes block scene roots, UI components, and logic scripts that belong to
 
 ```
 game/
-  _shared/          → components used by more than one block
-  auction/          → Block 04 — Auction
-  cargo/            → Block 05 — Cargo Loading
-  inspection/       → Block 02 — Inspection
-  location_browse/  → Block 03 — Location Browse (lot selection)
-  reveal/           → Block 05a — Reveal (won items, post-auction)
-  run_review/       → Block 06 — Run Review (settlement)
+  _shared/        → components used by more than one block
+  [feature]/      → one folder per block or feature
 ```
 
 ### game/\_shared/
 
 Contains UI components and logic helpers that are referenced by more than one block.
 
-```
-game/_shared/
-  item_display/     → ItemRow, ItemRowTooltip, ItemViewContext — shared list display components
-  item_entry/       → ItemEntry runtime class — central per-item run context
-  lot_entry/        → LotEntry runtime class — per-lot context including NPC estimate
-  run_record/       → RunRecord runtime class — full state for one warehouse run
-```
-
-Rule: a component moves to `_shared/` only when a second block actually needs it. Do not pre-emptively place things here.
+Rule: a component moves to `_shared/` only when a second block actually needs it.
+Do not pre-emptively place things here.
 
 ### game/[feature]/
 
@@ -230,33 +179,13 @@ Use this folder for **project-wide global systems** configured as autoloads.
 
 ```
 global/
-  autoload/
-    audio_manager/        → AudioManager (pooled SFX + music playback)
-    game_manager/         → GameManager + SceneRegistry (scene transitions)
-    event_bus.gd          → EventBus
-    item_registry.gd      → ItemRegistry (loads all ItemData at startup)
-    knowledge_manager.gd  → KnowledgeManager (price ranges, mastery rank, skill level)
-    run_manager.gd        → RunManager (holds active RunRecord)
-    save_manager.gd       → SaveManager (JSON persistence: cash, category_points, active_car)
-  theme/
-    main_theme.tres
+  autoload/     → one subfolder or file per autoloaded system
+  theme/        → shared theme resources
 ```
-
-`game_manager/` is a folder because it bundles `game_manager.gd`, `game_manager.tscn`, and `scene_registry.gd` together.
 
 Only scripts that must be globally accessible at all times belong here.
 
-Current autoloads registered in `project.godot`:
-
-| Autoload           | Script                                           |
-| ------------------ | ------------------------------------------------ |
-| `AudioManager`     | `global/autoload/audio_manager/`                 |
-| `EventBus`         | `global/autoload/event_bus.gd`                   |
-| `KnowledgeManager` | `global/autoload/knowledge_manager.gd`           |
-| `GameManager`      | `global/autoload/game_manager/game_manager.tscn` |
-| `ItemRegistry`     | `global/autoload/item_registry.gd`               |
-| `RunManager`       | `global/autoload/run_manager.gd`                 |
-| `SaveManager`      | `global/autoload/save_manager.gd`                |
+For the current list of registered autoloads, see `project.godot`.
 
 ---
 
@@ -275,31 +204,19 @@ stage/
 
 ### stage/testbeds/
 
-Each testbed is a self-contained scene that injects fake `RunManager` state and launches one block scene directly, bypassing earlier blocks.
+Each testbed is a self-contained scene that injects fake run state and launches one block scene directly, bypassing earlier blocks.
 
 ```
 stage/testbeds/
-  cargo_testbed/
-    cargo_testbed.gd
-    cargo_testbed.tscn
-  appraisal_testbed/
-    appraisal_testbed.gd
-    appraisal_testbed.tscn
-  location_browse_testbed/
-    location_browse_testbed.gd
-    location_browse_testbed.tscn
+  [block_name]_testbed/
+    [block_name]_testbed.gd
+    [block_name]_testbed.tscn
 ```
 
 ### stage/runs/
 
 Run scenes define the full playable flow for a milestone or demo build.
-
-```
-stage/runs/
-  warehouse/    → warehouse_entry scene (current main scene)
-```
-
-The main scene is `stage/runs/warehouse/warehouse_entry.tscn`, registered in `project.godot`.
+The main scene for the current build is registered in `project.godot`.
 
 ---
 
@@ -310,7 +227,7 @@ The main scene is `stage/runs/warehouse/warehouse_entry.tscn`, registered in `pr
 | Reusable framework or engine utilities                  | `common/`                            |
 | Designer-authored Resource class definitions (`.gd`)    | `data/_definitions/`                 |
 | Designer-authored asset files (`.tres`)                 | `data/<type>/`                       |
-| YAML source files for item data pipeline                | `data/_yaml/`                        |
+| YAML source files for data pipeline                     | `data/_yaml/`                        |
 | Database files (dev tooling output)                     | `data/_db/`                          |
 | Code-generated runtime data structures                  | `game/_shared/` or `game/[feature]/` |
 | Block scene roots, UI components, block logic           | `game/[feature]/`                    |

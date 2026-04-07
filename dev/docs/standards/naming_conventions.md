@@ -1,6 +1,6 @@
-# Lot & Haul Naming Conventions
+# GDScript Naming Conventions
 
-This document defines the naming conventions used in the Lot & Haul project.
+This document defines the naming conventions used in this project.
 
 The goal is to keep the project:
 
@@ -18,11 +18,9 @@ All files use **snake_case**.
 Examples:
 
 ```
-cargo_scene.gd
-auction_scene.gd
+player_controller.gd
 item_entry.gd
 item_row.gd
-item_view_context.gd
 run_record.gd
 location_browse_scene.gd
 ```
@@ -43,13 +41,11 @@ Classes use **PascalCase**.
 Examples:
 
 ```
-CargoScene
+PlayerController
 ItemData
 ItemEntry
 ItemRow
-ItemViewContext
 RunRecord
-LotEntry
 StaminaHUD
 ```
 
@@ -65,11 +61,10 @@ Variables use **snake_case**.
 Examples:
 
 ```
-current_lot
+current_slot
 paid_price
 won_items
 layer_index
-cargo_items
 browse_index
 ```
 
@@ -131,7 +126,7 @@ Signal callbacks use `_on_` prefix.
 
 ```
 _on_bid_pressed()
-_on_reveal_pressed()
+_on_confirm_pressed()
 _on_item_clicked()
 _on_row_tooltip_requested()
 _on_continue_pressed()
@@ -147,7 +142,7 @@ Examples:
 
 ```
 item_toggled
-reveal_completed
+action_completed
 run_finished
 tooltip_requested
 tooltip_dismissed
@@ -177,10 +172,10 @@ a preloaded `.gd` class or `.tscn` scene uses **PascalCase** instead of UPPER_SN
 because it represents a type rather than a value.
 
 ```gdscript
-const ItemRowScene    := preload("uid://brx8agwvlpi3f")   # PascalCase — loaded type
-const CargoScene      := preload("res://game/cargo/cargo_scene.tscn")  # PascalCase — loaded type
-const MAX_SLOTS       := 6                                # UPPER_SNAKE_CASE — value
-const ITEM_COLS       := 2                                # UPPER_SNAKE_CASE — value
+const ItemRowScene := preload("uid://...")          # PascalCase — loaded type
+const DialogScene  := preload("res://ui/dialog.tscn") # PascalCase — loaded type
+const MAX_SLOTS    := 6                              # UPPER_SNAKE_CASE — value
+const ITEM_COLS    := 2                              # UPPER_SNAKE_CASE — value
 ```
 
 ---
@@ -192,15 +187,14 @@ Enum names use **PascalCase**. Enum members use **UPPER_SNAKE_CASE**.
 Keep enum names singular — they represent a type.
 
 ```gdscript
-enum Stage {
-    INSPECTION,
-    LIST_REVIEW,
-    REVEAL,
-    CARGO,
-    RUN_REVIEW,
+enum Phase {
+    SETUP,
+    ACTIVE,
+    RESOLVE,
+    COMPLETE,
 }
 
-enum CargoState {
+enum SelectionState {
     NONE,
     SELECTED,
     AVAILABLE,
@@ -236,11 +230,10 @@ RootVBox
 ItemPanel
 RowContainer
 SummaryContainer
-RevealButton
+ConfirmButton
 ContinueButton
-StaminaHUD
+StatusHUD
 ActionPopup
-ListReviewPopup
 ```
 
 ---
@@ -253,17 +246,17 @@ All GDScript files use **4 spaces** per indent level. Tabs are not used.
 
 # Summary
 
-| Type              | Style                         | Example                |
-| ----------------- | ----------------------------- | ---------------------- |
-| Files             | snake_case                    | `item_row.gd`          |
-| Classes           | PascalCase                    | `ItemRow`              |
-| Variables         | snake_case                    | `won_items`            |
-| Private variables | \_snake_case                  | `_rolled_price`        |
-| Functions         | snake_case                    | `setup()`              |
-| Private functions | \_snake_case                  | `_populate_rows()`     |
-| Signal callbacks  | \_on_snake_case               | `_on_reveal_pressed()` |
-| Signals           | snake_case                    | `tooltip_requested`    |
-| Constants         | UPPER_SNAKE_CASE              | `ITEM_COLS`            |
-| Preloaded types   | PascalCase                    | `ItemRowScene`         |
-| Enums             | PascalCase + UPPER_SNAKE_CASE | `CargoState.SELECTED`  |
-| Nodes             | PascalCase                    | `RevealButton`         |
+| Type              | Style                         | Example                   |
+| ----------------- | ----------------------------- | ------------------------- |
+| Files             | snake_case                    | `item_row.gd`             |
+| Classes           | PascalCase                    | `ItemRow`                 |
+| Variables         | snake_case                    | `won_items`               |
+| Private variables | \_snake_case                  | `_rolled_price`           |
+| Functions         | snake_case                    | `setup()`                 |
+| Private functions | \_snake_case                  | `_populate_rows()`        |
+| Signal callbacks  | \_on_snake_case               | `_on_confirm_pressed()`   |
+| Signals           | snake_case                    | `tooltip_requested`       |
+| Constants         | UPPER_SNAKE_CASE              | `ITEM_COLS`               |
+| Preloaded types   | PascalCase                    | `ItemRowScene`            |
+| Enums             | PascalCase + UPPER_SNAKE_CASE | `SelectionState.SELECTED` |
+| Nodes             | PascalCase                    | `ConfirmButton`           |

@@ -1,16 +1,16 @@
 # Block Scene Architecture Standard
 
-This document defines the structural rules for block scene scripts in the **Lot & Haul** project.
+This document defines the structural rules for block scene scripts.
 
 Applies to:
 
-- Block scene roots (`game/[feature]/`)
-- Testbed scenes (`stage/testbeds/*/`)
-- Reusable UI component scripts (`game/_shared/*/`)
+- Block scene root scripts
+- Testbed scenes
+- Reusable UI component scripts
 
 Does **not** apply to:
 
-- `GameManager`, `RunManager`, and other autoloads
+- Autoloads and global managers
 - Resource definitions under `data/`
 - Common framework scripts
 
@@ -25,36 +25,17 @@ Format:
 ```gdscript
 # script_name.gd
 # Block XX — One-line description of this block's responsibility.
-# Reads:  RunManager.run_record.field_name
-# Writes: RunManager.run_record.field_name
+# Reads:  StateManager.state.field_name
+# Writes: StateManager.state.field_name
 ```
 
 Rules:
 
 - The first line is the filename.
 - The second line is the block number and a single-sentence description.
-- `Reads` and `Writes` list every `RunManager.run_record` field this script touches.
+- `Reads` and `Writes` list every managed state field this script touches.
 - If the script reads nothing, omit the `Reads` line.
 - If the script writes nothing, omit the `Writes` line.
-
-Real examples from the codebase:
-
-```gdscript
-# reveal_scene.gd
-# Block 05a — Reveal won items before cargo loading.
-# Auto-advances layer 0 items to layer 1 on reveal.
-# One button press reveals ALL items at once instead of one-at-a-time.
-# Reads:  RunManager.run_record.won_items
-# Writes: (none — mutates ItemEntry.layer_index in place)
-```
-
-```gdscript
-# run_review_scene.gd
-# Block 06 — Run Review
-# Reads:  RunManager.run_record.cargo_items, RunManager.run_record.paid_price,
-#         RunManager.run_record.onsite_proceeds
-# Writes: RunManager.run_record.sell_value, RunManager.run_record.net
-```
 
 Testbed variant:
 
@@ -154,7 +135,7 @@ Common API        (if the script has public functions)
 Feature section 1
 Feature section 2
 ...
-UI builder        (only when runtime node construction is required — see Section 10)
+UI builder        (only when runtime node construction is required — see Section 11)
 ```
 
 ### Inner classes
@@ -190,10 +171,10 @@ No public functions. No logic helpers.
 ```gdscript
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
-func _on_reveal_pressed() -> void:
+func _on_confirm_pressed() -> void:
     ...
 
-func _on_continue_pressed() -> void:
+func _on_cancel_pressed() -> void:
     ...
 ```
 
@@ -205,7 +186,7 @@ Used when the script exposes a surface that other scripts call.
 ```gdscript
 # ══ Common API ════════════════════════════════════════════════════════════════
 
-func setup(entry: ItemEntry, ctx: ItemViewContext) -> void:
+func setup(entry: EntryType, ctx: ContextType) -> void:
     ...
 
 func refresh() -> void:
@@ -232,25 +213,14 @@ func _show_summary() -> void:
     ...
 ```
 
-Use descriptive domain names. Examples from the codebase:
-
-```
-# ══ Rows ══════════════════════════════════════════════════════════════════════
-# ══ Result ════════════════════════════════════════════════════════════════════
-# ══ Reveal sequence ═══════════════════════════════════════════════════════════
-# ══ Setup helpers ══════════════════════════════════════════════════════════════
-# ══ NPC logic ═════════════════════════════════════════════════════════════════
-# ══ Display helpers ═══════════════════════════════════════════════════════════
-# ══ Lot management ════════════════════════════════════════════════════════════
-# ══ Factory ═══════════════════════════════════════════════════════════════════
-```
+Use descriptive domain names that reflect the feature, not the project's current block list.
 
 ### UI builder
 
 Always the last section when present.
 Contains `_build_ui()` and any private builder helpers it calls.
 
-Only include this section when runtime node construction is genuinely required (see Section 10).
+Only include this section when runtime node construction is genuinely required (see Section 11).
 Most block scenes should not have this section at all.
 
 ```gdscript
@@ -319,24 +289,23 @@ Exception: `_on_xxx` signal callbacks always go in `# ══ Signal handlers ═
 
 ---
 
-# 8. Reading GameManager vs RunManager
+# 8. State Manager Separation
 
-Block scenes read run-time state from `RunManager.run_record`, not from `GameManager`.
+Block scenes read run-time state from the **run state manager**, not from the **scene transition manager**.
 
-`GameManager` is responsible for **scene transitions only** (via `go_to_*()` methods).
-`RunManager.run_record` holds all per-run state: items, stamina, paid price, cargo, etc.
+The scene transition manager is responsible for scene transitions only.
+The run state manager holds all per-run state.
 
 ```gdscript
-# ✅ Correct
-_cargo_items = RunManager.run_record.cargo_items
-_paid_price  = RunManager.run_record.paid_price
-GameManager.go_to_location_browse()
+# ✅ Correct — read state from the state manager
+_items = RunManager.run_record.items
+SceneManager.go_to_next_block()
 
-# ❌ Incorrect — GameManager does not hold run state
-_cargo_items = GameManager.cargo_items
+# ❌ Incorrect — scene transition manager does not hold run state
+_items = SceneManager.items
 ```
 
-The file header `Reads` / `Writes` annotations should reference `RunManager.run_record.*` fields accordingly.
+The file header `Reads` / `Writes` annotations should reference the run state manager's fields accordingly.
 
 ---
 
@@ -345,8 +314,8 @@ The file header `Reads` / `Writes` annotations should reference `RunManager.run_
 ```gdscript
 # script_name.gd
 # Block XX — Description.
-# Reads:  RunManager.run_record.field_a
-# Writes: RunManager.run_record.field_b
+# Reads:  RunManager.state.field_a
+# Writes: RunManager.state.field_b
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -357,35 +326,27 @@ const ItemRowScene := preload("uid://...")   # PascalCase — loaded type
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _items: Array[ItemEntry] = []
-var _ctx: ItemViewContext = null
-var _tooltip: ItemRowTooltip = null
+var _ctx: ContextType = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
-@onready var _row_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/RowContainer
+@onready var _row_container: VBoxContainer = $RootVBox/Panel/RowContainer
 @onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
 
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 func _ready() -> void:
-    _ctx = ItemViewContext.for_cargo()
-    _tooltip = ItemRowTooltipScene.instantiate()
-    add_child(_tooltip)
-
     _continue_btn.pressed.connect(_on_continue_pressed)
 
-    _items = RunManager.run_record.cargo_items
+    _items = RunManager.state.items
     _populate_rows()
 
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 func _on_continue_pressed() -> void:
-    GameManager.go_to_run_review()
-
-func _on_row_tooltip_requested(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
-    _tooltip.show_for(entry, ctx, anchor)
+    SceneManager.go_to_next_block()
 
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
@@ -394,8 +355,6 @@ func _populate_rows() -> void:
     for entry: ItemEntry in _items:
         var row: ItemRow = ItemRowScene.instantiate()
         row.setup(entry, _ctx)
-        row.tooltip_requested.connect(_on_row_tooltip_requested)
-        row.tooltip_dismissed.connect(_tooltip.hide_tooltip)
         _row_container.add_child(row)
 ```
 
@@ -427,8 +386,8 @@ Reference them at the top of the script using `@onready` under `# ── Node re
 ```gdscript
 # ── Node references ───────────────────────────────────────────────────────────
 
-@onready var _reveal_btn: Button = $RootVBox/Footer/RevealButton
-@onready var _row_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/RowContainer
+@onready var _confirm_button: Button = $RootVBox/Footer/ConfirmButton
+@onready var _row_container: VBoxContainer = $RootVBox/Panel/RowContainer
 ```
 
 **Do not use `_build_ui()`** to construct persistent structural nodes in code.
@@ -444,8 +403,8 @@ Connections go at the top of `_ready()`, before any logic or node setup:
 
 ```gdscript
 func _ready() -> void:
-    _reveal_btn.pressed.connect(_on_reveal_pressed)
-    _continue_btn.pressed.connect(_on_continue_pressed)
+    _confirm_button.pressed.connect(_on_confirm_pressed)
+    _cancel_button.pressed.connect(_on_cancel_pressed)
     # ... rest of setup
 ```
 
@@ -465,12 +424,4 @@ The following may still be created at runtime in code:
 | Custom-drawn controls   | Inner class with `_draw()` override                         | Requires `_draw()` override — cannot be defined in `.tscn` |
 
 The key question: **does this node exist for the full lifetime of the scene?**
-
-- Yes → define it in `.tscn`, reference via `@onready`
-- No → create it in code at the call site
-
-## What counts as a packed scene exception
-
-A packed scene exception applies only to a **self-contained reusable component** with its own `.gd` / `.tscn` pair — for example `ItemRow`, `ItemRowTooltip`.
-
-Instantiating a bare `Label.new()` or `HSeparator.new()` into a dynamic list is permitted as an ephemeral node. It is not a packed scene and does not require its own `.tscn`.
+If yes → define it in `.tscn`. If no → creating it in code is acceptable.
