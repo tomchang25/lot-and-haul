@@ -4,6 +4,8 @@
 # Writes: SaveManager.storage_items, SaveManager.cash
 extends Control
 
+# ── Constants ─────────────────────────────────────────────────────────────────
+
 const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 
@@ -183,10 +185,10 @@ func _make_price_row(entry: ItemEntry) -> HBoxContainer:
 	price_row.visible = false
 	price_row.theme_override_constants/separation = 12
 
-	var ask_lbl := Label.new()
-	ask_lbl.text = "Ask: "
-	ask_lbl.theme_override_font_sizes/font_size = 14
-	price_row.add_child(ask_lbl)
+	var ask_label := Label.new()
+	ask_label.text = "Ask: "
+	ask_label.theme_override_font_sizes/font_size = 14
+	price_row.add_child(ask_label)
 
 	var slider := HSlider.new()
 	slider.min_value = 0.0
@@ -197,13 +199,13 @@ func _make_price_row(entry: ItemEntry) -> HBoxContainer:
 	slider.custom_minimum_size = Vector2(200, 0)
 	price_row.add_child(slider)
 
-	var val_lbl := Label.new()
-	val_lbl.custom_minimum_size = Vector2(100, 0)
-	val_lbl.theme_override_font_sizes/font_size = 14
-	val_lbl.text = "$%d" % entry.sell_price
-	price_row.add_child(val_lbl)
+	var value_label := Label.new()
+	value_label.custom_minimum_size = Vector2(100, 0)
+	value_label.theme_override_font_sizes/font_size = 14
+	value_label.text = "$%d" % entry.sell_price
+	price_row.add_child(value_label)
 
-	_price_labels[entry] = val_lbl
+	_price_labels[entry] = value_label
 
 	var captured_entry: ItemEntry = entry
 	slider.value_changed.connect(func(v: float) -> void:

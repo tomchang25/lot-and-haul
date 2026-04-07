@@ -4,6 +4,8 @@
 # Writes: SaveManager.storage_items (layer_index), SaveManager.cash, SaveManager.category_points
 extends Control
 
+# ── Constants ─────────────────────────────────────────────────────────────────
+
 const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 
@@ -111,7 +113,7 @@ func _on_research_confirmed() -> void:
         return
     _do_market_research(entry)
 
-# ══ Row population ═════════════════════════════════════════════════════════════
+# ══ Rows ══════════════════════════════════════════════════════════════════════
 
 
 func _populate_rows() -> void:
