@@ -1,15 +1,15 @@
 [gd_scene format=3 uid="uid://bhomescene001"]
 
-[ext_resource type="Script" uid="uid://u48bbtcw2fm4" path="res://game/home/home_scene.gd" id="1_homegd"]
+[ext_resource type="Script" uid="uid://u48bbtcw2fm4" path="res://game/storage/storage_scene.gd" id="1_uoidr"]
 
-[node name="HomeScene" type="Control" unique_id=2000000001]
+[node name="StorageScene" type="Control" unique_id=2000000001]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_homegd")
+script = ExtResource("1_uoidr")
 
 [node name="Background" type="ColorRect" parent="." unique_id=2000000002]
 layout_mode = 0
@@ -28,36 +28,25 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Header" type="HBoxContainer" parent="RootVBox" unique_id=2000000004]
+[node name="TitleLabel" type="Label" parent="RootVBox" unique_id=2041367181]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="TitleLabel" type="Label" parent="RootVBox/Header" unique_id=2000000005]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 28
 text = "Storage"
+horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="BackButton" type="Button" parent="RootVBox/Header" unique_id=2000000006]
-custom_minimum_size = Vector2(100, 40)
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "Back"
 
 [node name="ListCenter" type="CenterContainer" parent="RootVBox" unique_id=2000000007]
 layout_mode = 2
 size_flags_vertical = 3
 
 [node name="OuterVBox" type="VBoxContainer" parent="RootVBox/ListCenter" unique_id=2000000008]
-custom_minimum_size = Vector2(960, 400)
+custom_minimum_size = Vector2(960, 0)
 layout_mode = 2
 theme_override_constants/separation = 16
 
 [node name="ItemPanel" type="PanelContainer" parent="RootVBox/ListCenter/OuterVBox" unique_id=2000000009]
 layout_mode = 2
-size_flags_vertical = 3
 
 [node name="PanelVBox" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel" unique_id=2000000010]
 layout_mode = 2
@@ -107,8 +96,8 @@ vertical_alignment = 1
 layout_mode = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=2000000017]
+custom_minimum_size = Vector2(0, 320)
 layout_mode = 2
-size_flags_vertical = 3
 
 [node name="RowContainer" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer" unique_id=2000000018]
 layout_mode = 2
@@ -121,6 +110,18 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "No items in storage."
 horizontal_alignment = 1
+
+[node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=1460250735]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="BackButton" type="Button" parent="RootVBox/Footer" unique_id=2000000006]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Back"
 
 [node name="ActionPopup" type="Window" parent="." unique_id=2000000020]
 oversampling_override = 1.0

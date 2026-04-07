@@ -30,6 +30,8 @@ var _rows: Dictionary = { } # ItemEntry → ItemRow
 @onready var _empty_label: Label = $RootVBox/ListCenter/OuterVBox/EmptyLabel
 @onready var _sell_confirm: ConfirmationDialog = $SellConfirm
 
+@onready var _scroll_container: ScrollContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer
+
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
@@ -102,8 +104,11 @@ func _populate_rows() -> void:
     if SaveManager.storage_items.is_empty():
         _empty_label.visible = true
         _sell_btn.disabled = true
+        _scroll_container.visible = false
         return
+
     _empty_label.visible = false
+    _scroll_container.visible = true
 
     for entry: ItemEntry in SaveManager.storage_items:
         _selected[entry] = false

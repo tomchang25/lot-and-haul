@@ -28,7 +28,7 @@ var _selected_entry: ItemEntry = null
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _row_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer/RowContainer
-@onready var _back_btn: Button = $RootVBox/Header/BackButton
+@onready var _back_btn: Button = $RootVBox/Footer/BackButton
 @onready var _empty_label: Label = $RootVBox/ListCenter/OuterVBox/EmptyLabel
 
 @onready var _action_popup: Window = $ActionPopup
@@ -39,6 +39,8 @@ var _selected_entry: ItemEntry = null
 
 @onready var _unlock_confirm: ConfirmationDialog = $UnlockConfirm
 @onready var _research_confirm: ConfirmationDialog = $ResearchConfirm
+
+@onready var _scroll_container: ScrollContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -119,9 +121,12 @@ func _on_research_confirmed() -> void:
 func _populate_rows() -> void:
     if SaveManager.storage_items.is_empty():
         _empty_label.visible = true
+        _scroll_container.visible = false
         return
 
     _empty_label.visible = false
+    _scroll_container.visible = true
+
     for entry: ItemEntry in SaveManager.storage_items:
         var row: ItemRow = ItemRowScene.instantiate()
         row.setup(entry, _ctx)
@@ -134,7 +139,6 @@ func _populate_rows() -> void:
 
         _row_container.add_child(row)
         _rows[entry] = row
-
 # ══ Action popup ══════════════════════════════════════════════════════════════
 
 

@@ -47,7 +47,6 @@ theme_override_constants/separation = 16
 
 [node name="ItemPanel" type="PanelContainer" parent="RootVBox/ListCenter/OuterVBox" unique_id=-1294967289]
 layout_mode = 2
-size_flags_vertical = 3
 
 [node name="PanelVBox" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel" unique_id=-1294967288]
 layout_mode = 2
@@ -97,8 +96,8 @@ vertical_alignment = 1
 layout_mode = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=-1294967281]
+custom_minimum_size = Vector2(0, 320)
 layout_mode = 2
-size_flags_vertical = 3
 
 [node name="RowContainer" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer" unique_id=-1294967280]
 layout_mode = 2

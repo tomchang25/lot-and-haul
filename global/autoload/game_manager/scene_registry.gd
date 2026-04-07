@@ -9,5 +9,5 @@ extends Resource
 @export var cargo: PackedScene
 @export var run_review: PackedScene
 @export var hub: PackedScene
-@export var home: PackedScene
+@export var storage: PackedScene
 @export var pawn_shop: PackedScene

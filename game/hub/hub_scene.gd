@@ -44,7 +44,7 @@ func _on_next_run_confirmed() -> void:
 
 
 func _on_storage_pressed() -> void:
-    GameManager.go_to_home()
+    GameManager.go_to_storage()
 
 
 func _on_pawn_shop_pressed() -> void:

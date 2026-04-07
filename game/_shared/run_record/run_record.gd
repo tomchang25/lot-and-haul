@@ -15,7 +15,6 @@ var cargo_items: Array[ItemEntry] = []
 var last_lot_won_items: Array[ItemEntry] = []
 
 var onsite_proceeds: int = 0
-var sell_value: int = 0
 var paid_price: int = 0
 var net: int = 0
 

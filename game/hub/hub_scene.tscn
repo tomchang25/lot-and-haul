@@ -97,11 +97,15 @@ theme_override_font_sizes/font_size = 18
 text = "Knowledge"
 
 [node name="NextRunPopup" type="ConfirmationDialog" parent="." unique_id=1000000014]
+oversampling_override = 1.0
 title = "Start Next Run?"
+size = Vector2i(216, 100)
 dialog_text = "Head out on another run?"
 
 [node name="VanPopup" type="AcceptDialog" parent="." unique_id=1000000015]
+oversampling_override = 1.0
 title = "Van"
+size = Vector2i(229, 100)
 dialog_text = "Van upgrades coming soon."
 
 [node name="KnowledgePopup" type="AcceptDialog" parent="." unique_id=1000000016]

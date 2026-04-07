@@ -37,8 +37,8 @@ func go_to_hub() -> void:
     get_tree().change_scene_to_packed(scenes.hub)
 
 
-func go_to_home() -> void:
-    get_tree().change_scene_to_packed(scenes.home)
+func go_to_storage() -> void:
+    get_tree().change_scene_to_packed(scenes.storage)
 
 
 func go_to_pawn_shop() -> void:
