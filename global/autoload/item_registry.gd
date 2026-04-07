@@ -67,3 +67,10 @@ func get_categories_for_super(super_category_id: String) -> Array[String]:
 
 func get_all_items() -> Array[ItemData]:
     return _items
+
+
+func get_item(item_id: String) -> ItemData:
+    for item: ItemData in _items:
+        if item.item_id == item_id:
+            return item
+    return null

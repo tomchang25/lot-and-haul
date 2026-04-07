@@ -1,0 +1,66 @@
+# hub_scene.gd
+# Hub — Entry point between runs.
+# Reads: SaveManager.cash, SaveManager.storage_items
+extends Control
+
+# ── Node references ───────────────────────────────────────────────────────────
+
+@onready var _balance_label: Label = $RootVBox/InfoContainer/BalanceLabel
+@onready var _storage_count_label: Label = $RootVBox/InfoContainer/StorageCountLabel
+@onready var _next_run_popup: ConfirmationDialog = $NextRunPopup
+@onready var _van_popup: AcceptDialog = $VanPopup
+@onready var _knowledge_popup: AcceptDialog = $KnowledgePopup
+@onready var _next_run_btn: Button = $RootVBox/ButtonsVBox/NextRunButton
+@onready var _storage_btn: Button = $RootVBox/ButtonsVBox/StorageButton
+@onready var _pawn_shop_btn: Button = $RootVBox/ButtonsVBox/PawnShopButton
+@onready var _van_btn: Button = $RootVBox/ButtonsVBox/VanButton
+@onready var _knowledge_btn: Button = $RootVBox/ButtonsVBox/KnowledgeButton
+
+# ══ Lifecycle ═════════════════════════════════════════════════════════════════
+
+
+func _ready() -> void:
+    _next_run_btn.pressed.connect(_on_next_run_pressed)
+    _storage_btn.pressed.connect(_on_storage_pressed)
+    _pawn_shop_btn.pressed.connect(_on_pawn_shop_pressed)
+    _van_btn.pressed.connect(_on_van_pressed)
+    _knowledge_btn.pressed.connect(_on_knowledge_pressed)
+
+    _next_run_popup.confirmed.connect(_on_next_run_confirmed)
+    
+    SaveManager.load()
+    
+    _refresh_display()
+
+# ══ Signal handlers ════════════════════════════════════════════════════════════
+
+
+func _on_next_run_pressed() -> void:
+    _next_run_popup.popup_centered()
+
+
+func _on_next_run_confirmed() -> void:
+    GameManager.go_to_warehouse_entry()
+
+
+func _on_storage_pressed() -> void:
+    GameManager.go_to_storage()
+
+
+func _on_pawn_shop_pressed() -> void:
+    GameManager.go_to_pawn_shop()
+
+
+func _on_van_pressed() -> void:
+    _van_popup.popup_centered()
+
+
+func _on_knowledge_pressed() -> void:
+    _knowledge_popup.popup_centered()
+
+# ══ Display ═══════════════════════════════════════════════════════════════════
+
+
+func _refresh_display() -> void:
+    _balance_label.text = "Balance:   $%d" % SaveManager.cash
+    _storage_count_label.text = "Storage:   %d items" % SaveManager.storage_items.size()

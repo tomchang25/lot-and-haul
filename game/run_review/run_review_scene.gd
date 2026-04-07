@@ -2,7 +2,8 @@
 # Block 06 — Run Review
 # Reads:  RunManager.run_record.cargo_items, RunManager.run_record.paid_price,
 #         RunManager.run_record.onsite_proceeds
-# Writes: RunManager.run_record.sell_value, RunManager.run_record.net
+# Writes: RunManager.run_record.sell_value, RunManager.run_record.net,
+#         SaveManager.cash, SaveManager.storage_items
 extends Control
 
 const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
@@ -18,7 +19,6 @@ var _tooltip: ItemRowTooltip = null
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _row_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/RowContainer
-@onready var _sell_value_label: Label = $RootVBox/ListCenter/OuterVBox/SummaryContainer/SellValueLabel
 @onready var _onsite_label: Label = $RootVBox/ListCenter/OuterVBox/SummaryContainer/OnsiteLabel
 @onready var _paid_label: Label = $RootVBox/ListCenter/OuterVBox/SummaryContainer/PaidLabel
 @onready var _net_label: Label = $RootVBox/ListCenter/OuterVBox/SummaryContainer/NetLabel
@@ -45,8 +45,12 @@ func _ready() -> void:
 
 
 func _on_continue_pressed() -> void:
+    SaveManager.cash += RunManager.run_record.net
+    for entry: ItemEntry in RunManager.run_record.cargo_items:
+        SaveManager.storage_items.append(entry)
+    SaveManager.save()
     RunManager.clear_run_state()
-    GameManager.go_to_warehouse_entry()
+    GameManager.go_to_hub()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 
@@ -65,20 +69,13 @@ func _populate_rows() -> void:
 
 
 func _commit_result() -> void:
-    var sell_value: int = 0
-    for entry: ItemEntry in _cargo_items:
-        sell_value += entry.sell_price
-
-    RunManager.run_record.sell_value = sell_value
-    RunManager.run_record.net = sell_value + RunManager.run_record.onsite_proceeds - _paid_price
+    RunManager.run_record.net = RunManager.run_record.onsite_proceeds - _paid_price
 
 
 func _show_summary() -> void:
-    var sell_value: int = RunManager.run_record.sell_value
     var onsite: int = RunManager.run_record.onsite_proceeds
     var net: int = RunManager.run_record.net
 
-    _sell_value_label.text = "Total Sell Value:   $%d" % sell_value
     _onsite_label.text = "Sold On-site:   $%d" % onsite
     _paid_label.text = "Amount Paid:   $%d" % _paid_price
 

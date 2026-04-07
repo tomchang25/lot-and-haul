@@ -9,6 +9,9 @@
 [ext_resource type="PackedScene" uid="uid://cysp2gm1hjmca" path="res://game/run_review/run_review_scene.tscn" id="6_f47ts"]
 [ext_resource type="PackedScene" uid="uid://bwrhentry001" path="res://stage/runs/warehouse/warehouse_entry.tscn" id="6_warehse"]
 [ext_resource type="PackedScene" uid="uid://blocbrowse001" path="res://game/location_browse/location_browse_scene.tscn" id="7_locbrw"]
+[ext_resource type="PackedScene" uid="uid://bhubscene0001" path="res://game/hub/hub_scene.tscn" id="8_hub01"]
+[ext_resource type="PackedScene" uid="uid://bhomescene001" path="res://game/storage/storage_scene.tscn" id="9_home01"]
+[ext_resource type="PackedScene" uid="uid://bpawnshop0001" path="res://game/pawn_shop/pawn_shop_scene.tscn" id="10_pawn1"]
 
 [sub_resource type="Resource" id="Resource_yimu3"]
 script = ExtResource("5_ea43q")
@@ -19,6 +22,9 @@ auction = ExtResource("2_ea43q")
 reveal = ExtResource("5_31m1u")
 cargo = ExtResource("3_yimu3")
 run_review = ExtResource("6_f47ts")
+hub = ExtResource("8_hub01")
+storage = ExtResource("9_home01")
+pawn_shop = ExtResource("10_pawn1")
 metadata/_custom_type_script = "uid://bvxr6q4cplcj8"
 
 [node name="GameManager" type="Node2D" unique_id=1537594909]

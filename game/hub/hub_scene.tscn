@@ -1,0 +1,113 @@
+[gd_scene format=3 uid="uid://bhubscene0001"]
+
+[ext_resource type="Script" uid="uid://cpdf8haohlsir" path="res://game/hub/hub_scene.gd" id="1_hubgd"]
+
+[node name="HubScene" type="Control" unique_id=1000000001]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hubgd")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1000000002]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.1, 0.1, 0.12, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="." unique_id=1000000003]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="RootVBox" unique_id=1000000004]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Hub"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InfoContainer" type="VBoxContainer" parent="RootVBox" unique_id=1000000005]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 8
+
+[node name="BalanceLabel" type="Label" parent="RootVBox/InfoContainer" unique_id=1000000006]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Balance:   $0"
+horizontal_alignment = 1
+
+[node name="StorageCountLabel" type="Label" parent="RootVBox/InfoContainer" unique_id=1000000007]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Storage:   0 items"
+horizontal_alignment = 1
+
+[node name="ButtonsVBox" type="VBoxContainer" parent="RootVBox" unique_id=1000000008]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="NextRunButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000009]
+custom_minimum_size = Vector2(240, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 18
+text = "Next Run"
+
+[node name="StorageButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000010]
+custom_minimum_size = Vector2(240, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 18
+text = "Storage"
+
+[node name="PawnShopButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000011]
+custom_minimum_size = Vector2(240, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 18
+text = "Pawn Shop"
+
+[node name="VanButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000012]
+custom_minimum_size = Vector2(240, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 18
+text = "Van"
+
+[node name="KnowledgeButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000013]
+custom_minimum_size = Vector2(240, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 18
+text = "Knowledge"
+
+[node name="NextRunPopup" type="ConfirmationDialog" parent="." unique_id=1000000014]
+oversampling_override = 1.0
+title = "Start Next Run?"
+size = Vector2i(216, 100)
+dialog_text = "Head out on another run?"
+
+[node name="VanPopup" type="AcceptDialog" parent="." unique_id=1000000015]
+oversampling_override = 1.0
+title = "Van"
+size = Vector2i(229, 100)
+dialog_text = "Van upgrades coming soon."
+
+[node name="KnowledgePopup" type="AcceptDialog" parent="." unique_id=1000000016]
+title = "Knowledge"
+dialog_text = "Knowledge tree coming soon."
