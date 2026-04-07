@@ -4,6 +4,8 @@
 # Writes: SaveManager.storage_items (layer_index), SaveManager.cash, SaveManager.category_points
 extends Control
 
+# ── Constants ─────────────────────────────────────────────────────────────────
+
 const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 
@@ -20,7 +22,7 @@ const RESEARCH_COST: Dictionary = {
 
 var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
-var _rows: Dictionary = {}          # ItemEntry → ItemRow
+var _rows: Dictionary = { } # ItemEntry → ItemRow
 var _selected_entry: ItemEntry = null
 
 # ── Node references ───────────────────────────────────────────────────────────
@@ -111,7 +113,7 @@ func _on_research_confirmed() -> void:
         return
     _do_market_research(entry)
 
-# ══ Row population ═════════════════════════════════════════════════════════════
+# ══ Rows ══════════════════════════════════════════════════════════════════════
 
 
 func _populate_rows() -> void:
@@ -176,7 +178,9 @@ func _do_market_research(entry: ItemEntry) -> void:
     for i in range(layers_count):
         var depth: int = maxi(0, i - entry.layer_index)
         var price_range: Vector2 = KnowledgeManager.get_price_range(
-            super_cat_id, entry.item_data.rarity, depth
+            super_cat_id,
+            entry.item_data.rarity,
+            depth,
         )
         new_min[i] = price_range.x
         new_max[i] = price_range.y

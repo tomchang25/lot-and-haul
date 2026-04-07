@@ -10,9 +10,6 @@ extends Control
 @onready var _next_run_popup: ConfirmationDialog = $NextRunPopup
 @onready var _van_popup: AcceptDialog = $VanPopup
 @onready var _knowledge_popup: AcceptDialog = $KnowledgePopup
-
-# ── Buttons ───────────────────────────────────────────────────────────────────
-
 @onready var _next_run_btn: Button = $RootVBox/ButtonsVBox/NextRunButton
 @onready var _storage_btn: Button = $RootVBox/ButtonsVBox/StorageButton
 @onready var _pawn_shop_btn: Button = $RootVBox/ButtonsVBox/PawnShopButton
