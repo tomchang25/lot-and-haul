@@ -1,6 +1,7 @@
 # item_row.gd
 # Generalised item row used by list_review, reveal, cargo, and run_review.
 # Collapsed state: Name | Base value | Condition mult | Estimate
+#   + Weight | Grid   (cargo stage only, gated by ctx.show_cargo_stats)
 # Hover: emits tooltip_requested for the parent scene to position and show.
 class_name ItemRow
 extends PanelContainer
@@ -44,6 +45,8 @@ static func _ensure_styles() -> void:
 @onready var _base_value_label: Label = $HBoxContainer/BaseValueLabel
 @onready var _condition_mult_label: Label = $HBoxContainer/ConditionMultLabel
 @onready var _estimate_label: Label = $HBoxContainer/EstimateLabel
+@onready var _weight_label: Label = $HBoxContainer/WeightLabel
+@onready var _grid_label: Label = $HBoxContainer/GridLabel
 
 
 func _ready() -> void:
@@ -112,6 +115,15 @@ func _refresh() -> void:
 
     _estimate_label.text = _entry.price_label_for(_ctx)
     _estimate_label.add_theme_color_override(&"font_color", _entry.price_color)
+
+    # ── Cargo stats (weight / grid) ───────────────────────────────────────────
+    var show_cargo: bool = _ctx != null and _ctx.show_cargo_stats
+    _weight_label.visible = show_cargo
+    _grid_label.visible = show_cargo
+
+    if show_cargo and _entry.item_data != null and _entry.item_data.category_data != null:
+        _weight_label.text = "%.1f kg" % _entry.item_data.category_data.weight
+        _grid_label.text = "%d" % _entry.item_data.category_data.grid_size
 
 
 func _on_mouse_entered() -> void:

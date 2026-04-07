@@ -80,7 +80,7 @@ func _show_summary() -> void:
     _paid_label.text = "Amount Paid:   $%d" % _paid_price
 
     if net >= 0:
-        _net_label.text = "Profit:   +$%d" % net
+        _net_label.text = "Gain:   +$%d" % net
         _net_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
     else:
         _net_label.text = "Loss:   -$%d" % (-net)

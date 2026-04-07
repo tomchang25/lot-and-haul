@@ -1,6 +1,5 @@
 # item_card.gd
 # Generalised item card for the inspection grid.
-# Replaces ItemDisplay.
 class_name ItemCard
 extends PanelContainer
 
@@ -10,6 +9,8 @@ var _entry: ItemEntry = null
 var _ctx: ItemViewContext = null
 
 @onready var _name_label: Label = $VBox/NameLabel
+@onready var _super_category_label: Label = $VBox/SuperCategoryLabel
+@onready var _category_label: Label = $VBox/CategoryLabel
 @onready var _potential_label: Label = $VBox/PotentialLabel
 @onready var _potential_price_row: Control = $VBox/PotentialPriceRow
 @onready var _potential_price_label: Label = $VBox/PotentialPriceRow/PotentialPriceLabel
@@ -41,6 +42,22 @@ func refresh(changed: StringName = &"") -> void:
 
 func _apply() -> void:
     _name_label.text = _entry.display_name
+
+    # ── Category identity ─────────────────────────────────────────────────────
+    if _entry.item_data != null and _entry.item_data.category_data != null:
+        var cat := _entry.item_data.category_data
+        if cat.super_category != null:
+            _super_category_label.text = cat.super_category.display_name
+            _super_category_label.visible = true
+        else:
+            _super_category_label.hide()
+        _category_label.text = cat.display_name
+        _category_label.visible = true
+    else:
+        _super_category_label.hide()
+        _category_label.hide()
+
+    # ── Inspection data ───────────────────────────────────────────────────────
     _potential_label.text = _entry.potential_label_for(_ctx)
 
     if _entry.should_show_potential_price_for(_ctx):

@@ -131,7 +131,7 @@ func _on_start_auction_pressed() -> void:
 
 
 func _on_pass_pressed() -> void:
-    _confirm_popup.dialog_text = "Skip inspection and go to run review?\nAny remaining stamina will be lost."
+    _confirm_popup.dialog_text = "Skip inspection and go back to lot browse?\n"
     _confirm_popup.popup_centered()
 
 
@@ -147,7 +147,7 @@ func _on_confirm_popup_confirmed() -> void:
     _close_popup()
     if _pulse_tween:
         _pulse_tween.kill()
-    GameManager.go_to_run_review()
+    GameManager.go_to_location_browse()
 
 # ══ Item display ══════════════════════════════════════════════════════════════
 

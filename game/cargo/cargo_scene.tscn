@@ -109,6 +109,24 @@ text = "Estimate"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="WeightHeader" type="Label" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=100000020]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Weight"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GridHeader" type="Label" parent="RootVBox/ListCenter/Panel/PanelVBox/ColumnHeader" unique_id=100000021]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Grid"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Separator" type="HSeparator" parent="RootVBox/ListCenter/Panel/PanelVBox" unique_id=100000016]
 layout_mode = 2
 
