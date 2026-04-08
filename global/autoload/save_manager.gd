@@ -10,6 +10,12 @@ var active_car_id: String = "van_basic"
 # Array of Dictionary on disk; deserialized to Array[ItemEntry] on load.
 var storage_items: Array = []
 
+var current_day: int = 0
+var max_concurrent_actions: int = 2
+var next_entry_id: int = 0 # monotonically increasing; never reset
+var active_actions: Array = [] # Array of plain Dictionaries
+var unlocked_perks: Array[String] = []
+
 
 func save() -> void:
     var serialized_items: Array = []
@@ -21,6 +27,11 @@ func save() -> void:
         "cash": cash,
         "active_car_id": active_car_id,
         "storage_items": serialized_items,
+        "current_day": current_day,
+        "max_concurrent_actions": max_concurrent_actions,
+        "next_entry_id": next_entry_id,
+        "active_actions": active_actions,
+        "unlocked_perks": unlocked_perks,
     }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
     if file == null:
@@ -55,6 +66,22 @@ func load() -> void:
             var entry: ItemEntry = _deserialize_item(d)
             if entry != null:
                 storage_items.append(entry)
+    if parsed.has("current_day") and parsed["current_day"] is float:
+        current_day = int(parsed["current_day"])
+    if parsed.has("max_concurrent_actions") and parsed["max_concurrent_actions"] is float:
+        max_concurrent_actions = int(parsed["max_concurrent_actions"])
+    if parsed.has("next_entry_id") and parsed["next_entry_id"] is float:
+        next_entry_id = int(parsed["next_entry_id"])
+    if parsed.has("active_actions") and parsed["active_actions"] is Array:
+        active_actions = []
+        for d: Variant in parsed["active_actions"]:
+            if d is Dictionary:
+                active_actions.append(d)
+    if parsed.has("unlocked_perks") and parsed["unlocked_perks"] is Array:
+        unlocked_perks = []
+        for s: Variant in parsed["unlocked_perks"]:
+            if s is String:
+                unlocked_perks.append(s)
 
 
 func load_active_car() -> CarConfig:
@@ -63,6 +90,21 @@ func load_active_car() -> CarConfig:
         push_error("SaveManager: car resource not found at %s" % path)
         return null
     return ResourceLoader.load(path) as CarConfig
+
+
+# Assigns a unique id to entry, appends it to storage_items, and saves.
+# Always call this instead of appending to storage_items directly.
+func register_storage_item(entry: ItemEntry) -> void:
+    entry.id = next_entry_id
+    next_entry_id += 1
+    storage_items.append(entry)
+
+
+func register_storage_items(entries: Array[ItemEntry]) -> void:
+    for entry: ItemEntry in entries:
+        register_storage_item(entry)
+
+    save()
 
 
 func _serialize_item(entry: ItemEntry) -> Dictionary:
@@ -74,6 +116,7 @@ func _serialize_item(entry: ItemEntry) -> Dictionary:
         kmax.append(v)
     return {
         "item_id": entry.item_data.item_id,
+        "id": entry.id,
         "layer_index": entry.layer_index,
         "condition": entry.condition,
         "potential_inspect_level": entry.potential_inspect_level,
@@ -102,4 +145,6 @@ func _deserialize_item(d: Dictionary) -> ItemEntry:
         entry.knowledge_min[i] = float(km[i])
     for i in range(kmax.size()):
         entry.knowledge_max[i] = float(kmax[i])
+    if d.has("id"):
+        entry.id = int(d["id"])
     return entry
