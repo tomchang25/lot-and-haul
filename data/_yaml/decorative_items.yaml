@@ -1,22 +1,3 @@
-categories:
-  - category_id: oil_lamp
-    super_category: Decorative
-    display_name: Oil Lamp
-    weight: 3.0
-    grid_size: 2
-
-  - category_id: clock
-    super_category: Decorative
-    display_name: Clock
-    weight: 4.0
-    grid_size: 3
-
-  - category_id: vase
-    super_category: Decorative
-    display_name: Vase
-    weight: 2.0
-    grid_size: 2
-
 identity_layers:
   - layer_id: lamp_veil
     display_name: Lamp-Shaped Object

@@ -21,11 +21,11 @@ from pathlib import Path
 
 _UID_CHARS = string.ascii_lowercase + string.digits
 
-_ITEM_DATA_SCRIPT_UID           = "uid://bhqs42afjqbgi"
-_IDENTITY_LAYER_SCRIPT_UID      = "uid://btknl1cvjqdvh"
-_LAYER_UNLOCK_SCRIPT_UID        = "uid://c23t4blqmaaj4"
-_CATEGORY_DATA_SCRIPT_UID       = "uid://c7fq6wupmgchg"
-_SUPER_CATEGORY_DATA_SCRIPT_UID = "uid://cqvpnhf3yr8jx"
+_ITEM_DATA_SCRIPT_UID = "uid://bhqs42afjqbgi"
+_IDENTITY_LAYER_SCRIPT_UID = "uid://btknl1cvjqdvh"
+_LAYER_UNLOCK_SCRIPT_UID = "uid://c23t4blqmaaj4"
+_CATEGORY_DATA_SCRIPT_UID = "uid://c7fq6wupmgchg"
+_SUPER_CATEGORY_DATA_SCRIPT_UID = "uid://d4gdoi2l561vy"
 
 
 def _new_uid() -> str:
@@ -58,7 +58,7 @@ def _build_layer_tres(
 
         skill_tag: str | None = None
         if unlock.get("skill_id"):
-            sid  = unlock["skill_id"]
+            sid = unlock["skill_id"]
             suid = skill_uid_map.get(sid)
             if suid:
                 lines.append(
@@ -174,7 +174,7 @@ def _build_item_tres(
             f'path="res://data/identity_layers/{layer["layer_id"]}.tres" id="{tag}"]'
         )
 
-    cat_ref    = 'ExtResource("2_cat")' if (category_uid and category_id) else "null"
+    cat_ref = 'ExtResource("2_cat")' if (category_uid and category_id) else "null"
     layer_refs = ", ".join(f'ExtResource("{3 + i}_layer")' for i in range(len(layers)))
 
     lines += [
@@ -197,7 +197,7 @@ def export_super_categories(
     conn: sqlite3.Connection, super_categories_dir: Path, dry_run: bool
 ) -> dict[str, str]:
     """Export SuperCategoryData .tres files. Returns {super_category_id: uid}."""
-    cur  = conn.cursor()
+    cur = conn.cursor()
     rows = cur.execute(
         "SELECT super_category_id, display_name, uid "
         "FROM super_categories ORDER BY super_category_id"
@@ -231,7 +231,7 @@ def export_categories(
     super_category_uid_map: dict[str, str],
     dry_run: bool,
 ) -> None:
-    cur  = conn.cursor()
+    cur = conn.cursor()
     rows = cur.execute(
         "SELECT category_id, super_category, display_name, weight, shape_id, uid "
         "FROM categories ORDER BY category_id"
@@ -239,10 +239,16 @@ def export_categories(
 
     for category_id, super_category, display_name, weight, shape_id, uid in rows:
         uid = uid or _new_uid()
-        super_category_uid = super_category_uid_map.get(super_category, "")
+        super_category_id = super_category.lower().replace(" ", "_")
+        super_category_uid = super_category_uid_map.get(super_category_id, "")
         content = _build_category_tres(
-            category_id, uid, super_category, super_category_uid,
-            display_name, weight, shape_id,
+            category_id,
+            uid,
+            super_category_id,
+            super_category_uid,
+            display_name,
+            weight,
+            shape_id,
         )
         out = categories_dir / f"{category_id}.tres"
         if dry_run:
@@ -250,7 +256,8 @@ def export_categories(
         else:
             out.write_text(content, encoding="utf-8")
             cur.execute(
-                "UPDATE categories SET uid = ? WHERE category_id = ?", (uid, category_id)
+                "UPDATE categories SET uid = ? WHERE category_id = ?",
+                (uid, category_id),
             )
             print(f"  category → {out.name}")
 
@@ -264,13 +271,13 @@ def export_identity_layers(
     dry_run: bool,
     skill_uid_map: dict[str, str],
 ) -> None:
-    cur  = conn.cursor()
+    cur = conn.cursor()
     rows = cur.execute(
         "SELECT layer_id, display_name, base_value, uid FROM identity_layers ORDER BY layer_id"
     ).fetchall()
 
     for layer_id, display_name, base_value, uid in rows:
-        uid        = uid or _new_uid()
+        uid = uid or _new_uid()
         unlock_row = cur.execute(
             "SELECT context, time_cost, skill_id, required_level, required_condition "
             "FROM layer_unlock_actions WHERE layer_id = ?",
@@ -280,10 +287,10 @@ def export_identity_layers(
         unlock: dict | None = None
         if unlock_row:
             unlock = {
-                "context":            unlock_row[0],
-                "time_cost":          unlock_row[1],
-                "skill_id":           unlock_row[2],
-                "required_level":     unlock_row[3],
+                "context": unlock_row[0],
+                "time_cost": unlock_row[1],
+                "skill_id": unlock_row[2],
+                "required_level": unlock_row[3],
                 "required_condition": unlock_row[4],
             }
 
@@ -304,10 +311,8 @@ def export_identity_layers(
         conn.commit()
 
 
-def export_items(
-    conn: sqlite3.Connection, item_dir: Path, dry_run: bool
-) -> None:
-    cur   = conn.cursor()
+def export_items(conn: sqlite3.Connection, item_dir: Path, dry_run: bool) -> None:
+    cur = conn.cursor()
     items = cur.execute(
         """
         SELECT i.item_id, i.uid, i.rarity, c.uid, c.category_id
@@ -318,7 +323,7 @@ def export_items(
     ).fetchall()
 
     for item_id, item_uid, rarity, category_uid, category_id in items:
-        item_uid   = item_uid or _new_uid()
+        item_uid = item_uid or _new_uid()
         layer_rows = cur.execute(
             """
             SELECT il.layer_id, il.uid, il.display_name, il.base_value
@@ -331,7 +336,12 @@ def export_items(
         ).fetchall()
 
         layers = [
-            {"layer_id": r[0], "layer_uid": r[1], "display_name": r[2], "base_value": r[3]}
+            {
+                "layer_id": r[0],
+                "layer_uid": r[1],
+                "display_name": r[2],
+                "base_value": r[3],
+            }
             for r in layer_rows
         ]
 
@@ -361,12 +371,15 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
-    root                  = Path(args.godot_root)
-    super_categories_dir  = root / "data" / "super_categories"
-    categories_dir        = root / "data" / "categories"
-    layers_dir            = root / "data" / "identity_layers"
-    item_dir              = root / "data" / "items"
-    db_path               = root / "data" / "_db" / "lot_haul.db"
+    root = Path(args.godot_root)
+    super_categories_dir = root / "data" / "super_categories"
+    categories_dir = root / "data" / "categories"
+    layers_dir = root / "data" / "identity_layers"
+    item_dir = root / "data" / "items"
+    db_path = root / "data" / "_db" / "lot_haul.db"
+
+    for d in (super_categories_dir, categories_dir, layers_dir, item_dir):
+        d.mkdir(parents=True, exist_ok=True)
 
     if not db_path.exists():
         sys.exit(f"DB not found: {db_path}\nRun init.py first.")
@@ -382,7 +395,9 @@ def main() -> None:
     }
 
     print("Exporting super_categories...")
-    super_category_uid_map = export_super_categories(conn, super_categories_dir, args.dry_run)
+    super_category_uid_map = export_super_categories(
+        conn, super_categories_dir, args.dry_run
+    )
 
     print("Exporting categories...")
     export_categories(conn, categories_dir, super_category_uid_map, args.dry_run)

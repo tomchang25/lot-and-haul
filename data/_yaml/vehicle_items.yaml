@@ -1,20 +1,3 @@
-categories:
-  - category_id: bicycle
-    super_category: Vehicle
-    display_name: Bicycle
-    weight: 12.0
-    grid_size: 6
-  - category_id: motorcycle
-    super_category: Vehicle
-    display_name: Motorcycle
-    weight: 180.0
-    grid_size: 8
-  - category_id: automobile
-    super_category: Vehicle
-    display_name: Automobile
-    weight: 1200.0
-    grid_size: 8
-
 identity_layers:
   - layer_id: bike_veil
     display_name: Metal Frame Object

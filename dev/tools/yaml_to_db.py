@@ -55,13 +55,37 @@ def ensure_skills(cur: sqlite3.Cursor, layers: list[dict], dry_run: bool) -> Non
             print(f"  skill: {sid}")
 
 
+def import_super_categories(
+    cur: sqlite3.Cursor, super_categories: list, dry_run: bool
+) -> int:
+    count = 0
+    for entry in super_categories:
+        display_name = str(entry)
+        super_category_id = display_name.lower().replace(" ", "_")
+        if dry_run:
+            print(f"  [dry] super_category: {super_category_id}")
+        else:
+            cur.execute(
+                """
+                INSERT INTO super_categories (super_category_id, display_name)
+                VALUES (?, ?)
+                ON CONFLICT(super_category_id) DO UPDATE SET
+                    display_name = excluded.display_name
+                """,
+                (super_category_id, display_name),
+            )
+            print(f"  super_category: {super_category_id}")
+        count += 1
+    return count
+
+
 def import_categories(
     cur: sqlite3.Cursor, categories: list[dict], dry_run: bool
 ) -> int:
     count = 0
     for cat in categories:
         cat_id = cat["category_id"]
-        super_cat = cat["super_category"]
+        super_cat = cat["super_category"].lower().replace(" ", "_")
         disp = cat["display_name"]
         weight = float(cat.get("weight", 0.0))
         shape_id = str(cat.get("shape_id", "s1x1"))
@@ -203,6 +227,7 @@ def _validate(data: dict) -> list[str]:
     known_cat_ids: set[str] = {c["category_id"] for c in data.get("categories", [])}
 
     for cat in data.get("categories", []):
+        print(cat)
         cid = cat.get("category_id", "?")
         shape_id = cat.get("shape_id")
         if shape_id is None:
@@ -285,18 +310,43 @@ def _validate(data: dict) -> list[str]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--godot-root", required=True)
-    parser.add_argument("--yaml", required=True, help="Path to the YAML file")
+    parser.add_argument(
+        "--yaml-dir",
+        default=None,
+        help="Directory containing YAML files (default: <godot-root>/data/_yaml)",
+    )
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
-    yaml_path = Path(args.yaml)
-    if not yaml_path.exists():
-        sys.exit(f"YAML file not found: {yaml_path}")
+    root = Path(args.godot_root)
+    yaml_dir = Path(args.yaml_dir) if args.yaml_dir else root / "data" / "_yaml"
 
-    data = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
+    if not yaml_dir.is_dir():
+        sys.exit(f"YAML directory not found: {yaml_dir}")
 
+    yaml_files = sorted(yaml_dir.glob("*.yaml"))
+    if not yaml_files:
+        sys.exit(f"No .yaml files found in: {yaml_dir}")
+
+    # ── Merge all files into one dataset ──────────────────────────────────────
+    merged: dict[str, list] = {
+        "super_categories": [],
+        "categories": [],
+        "identity_layers": [],
+        "items": [],
+    }
+
+    for yaml_path in yaml_files:
+        data = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
+        if not data:
+            continue
+        print(f"Loading {yaml_path.name}...")
+        for key in merged:
+            merged[key].extend(data.get(key, []))
+
+    # ── Validate merged dataset ────────────────────────────────────────────────
     print("Validating...")
-    errors = _validate(data)
+    errors = _validate(merged)
     if errors:
         print(f"  {len(errors)} error(s) found — aborting:")
         for e in errors:
@@ -304,7 +354,7 @@ def main() -> None:
         sys.exit(1)
     print("  OK")
 
-    db_path = Path(args.godot_root) / "data" / "_db" / "lot_haul.db"
+    db_path = root / "data" / "_db" / "lot_haul.db"
     if not db_path.exists():
         sys.exit(f"DB not found: {db_path}\nRun init.py first.")
 
@@ -312,9 +362,13 @@ def main() -> None:
     conn.execute("PRAGMA foreign_keys = ON")
     cur = conn.cursor()
 
-    categories = data.get("categories", [])
-    layers = data.get("identity_layers", [])
-    items = data.get("items", [])
+    super_categories = merged["super_categories"]
+    categories = merged["categories"]
+    layers = merged["identity_layers"]
+    items = merged["items"]
+
+    print(f"Importing super_categories ({len(super_categories)})...")
+    import_super_categories(cur, super_categories, args.dry_run)
 
     print(f"Importing categories ({len(categories)})...")
     import_categories(cur, categories, args.dry_run)
@@ -332,7 +386,7 @@ def main() -> None:
         conn.commit()
 
     conn.close()
-    total = len(categories) + len(layers) + len(items)
+    total = len(super_categories) + len(categories) + len(layers) + len(items)
     tag = "[dry run] " if args.dry_run else ""
     print(f"\n{tag}Done — {total} records processed.")
 

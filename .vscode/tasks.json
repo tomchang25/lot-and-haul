@@ -150,8 +150,8 @@
         {
             "id": "yamlFile",
             "type": "promptString",
-            "description": "Path to YAML file (absolute or relative to workspace)",
-            "default": "${workspaceFolder}/data/_yaml/decorative_items.yaml"
+            "description": "Path to YAML dir (absolute or relative to workspace)",
+            "default": "${workspaceFolder}/data/_yaml"
         }
     ]
 }
