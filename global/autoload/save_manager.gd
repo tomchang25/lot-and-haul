@@ -12,8 +12,8 @@ var storage_items: Array = []
 
 var current_day: int = 0
 var max_concurrent_actions: int = 2
-var next_entry_id: int = 0        # monotonically increasing; never reset
-var active_actions: Array = []    # Array of plain Dictionaries
+var next_entry_id: int = 0 # monotonically increasing; never reset
+var active_actions: Array = [] # Array of plain Dictionaries
 var unlocked_perks: Array[String] = []
 
 
@@ -98,6 +98,12 @@ func register_storage_item(entry: ItemEntry) -> void:
     entry.id = next_entry_id
     next_entry_id += 1
     storage_items.append(entry)
+
+
+func register_storage_items(entries: Array[ItemEntry]) -> void:
+    for entry: ItemEntry in entries:
+        register_storage_item(entry)
+
     save()
 
 

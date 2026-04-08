@@ -18,8 +18,7 @@ const _BASE_MASTERY: Dictionary = {
     KnowledgeAction.SELL: 3,
 }
 
-
-var _perk_registry: Dictionary = {}   # perk_id → PerkData
+var _perk_registry: Dictionary = { } # perk_id → PerkData
 
 
 func _ready() -> void:

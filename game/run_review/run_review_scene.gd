@@ -46,8 +46,7 @@ func _ready() -> void:
 
 func _on_continue_pressed() -> void:
     SaveManager.cash += RunManager.run_record.net
-    for entry: ItemEntry in RunManager.run_record.cargo_items:
-        SaveManager.register_storage_item(entry)
+    SaveManager.register_storage_items(RunManager.run_record.cargo_items)
     RunManager.clear_run_state()
     GameManager.go_to_hub()
 

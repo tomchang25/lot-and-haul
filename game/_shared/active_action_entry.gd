@@ -10,7 +10,7 @@ enum ActionType {
 }
 
 var action_type: ActionType = ActionType.MARKET_RESEARCH
-var item_id: int = -1          # matches ItemEntry.id of the target item
+var item_id: int = -1 # matches ItemEntry.id of the target item
 var days_remaining: int = 0
 
 

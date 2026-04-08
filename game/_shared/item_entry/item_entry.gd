@@ -18,7 +18,7 @@ var potential_inspect_level: int = 0
 var condition_inspect_level: int = 0
 
 # Unique persistent ID assigned when this entry enters storage.
-# -1 = not yet in storage. Assigned by SaveManager.register_storage_item();
+# -1 = not yet in storage. Assigned by SaveManager
 # never assigned inside create() and never reassigned.
 var id: int = -1
 
