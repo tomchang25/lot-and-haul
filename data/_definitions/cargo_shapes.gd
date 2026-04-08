@@ -24,3 +24,25 @@ static func get_cells(shape_id: String) -> Array[Vector2i]:
     var cells: Array[Vector2i] = []
     cells.assign(SHAPES[shape_id])
     return cells
+
+
+## Rotates cells by n × 90° clockwise and re-normalises to (0, 0) origin.
+## n is taken mod 4, so any int is safe.
+static func rotate_cells(cells: Array[Vector2i], n: int) -> Array[Vector2i]:
+    var result: Array[Vector2i] = []
+    result.assign(cells)
+    for _i in (n % 4):
+        # 90° CW: (x, y) → (y, −x)
+        var rotated: Array[Vector2i] = []
+        for c: Vector2i in result:
+            rotated.append(Vector2i(c.y, -c.x))
+        # re-normalise so min x and y are both 0
+        var min_x := rotated[0].x
+        var min_y := rotated[0].y
+        for c: Vector2i in rotated:
+            if c.x < min_x: min_x = c.x
+            if c.y < min_y: min_y = c.y
+        result.clear()
+        for c: Vector2i in rotated:
+            result.append(c - Vector2i(min_x, min_y))
+    return result
