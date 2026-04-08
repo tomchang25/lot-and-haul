@@ -17,6 +17,8 @@ var _ctx: ItemViewContext = null
 @onready var _condition_label: Label = $VBox/ConditionLabel
 @onready var _condition_mult_label: Label = $VBox/ConditionMultLabel
 @onready var _price_label: Label = $VBox/PriceLabel
+@onready var _weight_label: Label = $VBox/WeightLabel
+@onready var _grid_label:   Label = $VBox/GridLabel
 
 
 func _ready() -> void:
@@ -71,6 +73,22 @@ func _apply() -> void:
     _condition_mult_label.text = _entry.condition_mult_label_for(_ctx)
     _price_label.text = _entry.price_label_for(_ctx)
     _price_label.add_theme_color_override(&"font_color", _entry.price_color)
+
+    # ── Cargo stats ───────────────────────────────────────────────────────────
+    if _entry.item_data != null and _entry.item_data.category_data != null:
+        var cat := _entry.item_data.category_data
+        var cell_count: int = cat.get_cells().size()
+        _weight_label.text = "%.1f kg" % cat.weight
+        _grid_label.text   = "%d slot%s  (%s)" % [
+            cell_count,
+            "s" if cell_count != 1 else "",
+            cat.shape_id,
+        ]
+        _weight_label.show()
+        _grid_label.show()
+    else:
+        _weight_label.hide()
+        _grid_label.hide()
 
 
 func _animate_pop(target: Label) -> void:

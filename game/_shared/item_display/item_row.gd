@@ -123,7 +123,8 @@ func _refresh() -> void:
 
     if show_cargo and _entry.item_data != null and _entry.item_data.category_data != null:
         _weight_label.text = "%.1f kg" % _entry.item_data.category_data.weight
-        _grid_label.text = "%d" % _entry.item_data.category_data.get_cells().size()
+        var cat := _entry.item_data.category_data
+        _grid_label.text = "%d  %s" % [cat.get_cells().size(), cat.shape_id]
 
 
 func _on_mouse_entered() -> void:

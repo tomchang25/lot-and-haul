@@ -70,3 +70,17 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "?"
 horizontal_alignment = 1
+
+[node name="WeightLabel" type="Label" parent="VBox" unique_id=1000000030]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.65, 0.65, 1)
+theme_override_font_sizes/font_size = 11
+text = "—"
+horizontal_alignment = 1
+
+[node name="GridLabel" type="Label" parent="VBox" unique_id=1000000031]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.65, 0.65, 1)
+theme_override_font_sizes/font_size = 11
+text = "—"
+horizontal_alignment = 1
