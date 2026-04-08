@@ -5,7 +5,6 @@ extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-const DayPassPopupScene: PackedScene = preload("res://game/hub/day_pass_popup.tscn")
 const DAILY_BASE_COST: int = 100
 
 # ── Node references ───────────────────────────────────────────────────────────
@@ -22,10 +21,7 @@ const DAILY_BASE_COST: int = 100
 @onready var _knowledge_btn: Button = $RootVBox/ButtonsVBox/KnowledgeButton
 @onready var _day_pass_btn: Button = $RootVBox/ButtonsVBox/DayPassButton
 @onready var _day_pass_confirm: ConfirmationDialog = $DayPassConfirm
-
-# ── State ─────────────────────────────────────────────────────────────────────
-
-var _day_pass_popup: DayPassPopup = null
+@onready var _day_pass_popup: DayPassPopup = $DayPassPopup
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -41,8 +37,6 @@ func _ready() -> void:
     _next_run_popup.confirmed.connect(_on_next_run_confirmed)
     _day_pass_confirm.confirmed.connect(_on_day_pass_confirmed)
 
-    _day_pass_popup = DayPassPopupScene.instantiate()
-    add_child(_day_pass_popup)
     _day_pass_popup.dismissed.connect(_refresh_display)
 
     SaveManager.load()
