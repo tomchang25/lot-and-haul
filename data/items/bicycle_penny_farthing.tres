@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://d37alfhtjcg0"]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://zt8efhgvylu9"]
 
 [ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
-[ext_resource type="Resource" uid="uid://gziz0yoxva5e" path="res://data/categories/bicycle.tres" id="2_cat"]
-[ext_resource type="Resource" uid="uid://hy16trp6t3ja" path="res://data/identity_layers/bike_veil.tres" id="3_layer"]
-[ext_resource type="Resource" uid="uid://d0lwtjga8eti" path="res://data/identity_layers/bike_frame_inspected.tres" id="4_layer"]
-[ext_resource type="Resource" uid="uid://8rxfp3ej46jf" path="res://data/identity_layers/bike_marque_identified.tres" id="5_layer"]
-[ext_resource type="Resource" uid="uid://32inpiiyfvgu" path="res://data/identity_layers/bike_penny_leaf.tres" id="6_layer"]
+[ext_resource type="Resource" uid="uid://t3w3ibfvsmgf" path="res://data/categories/bicycle.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://xfgfcgbl3ipm" path="res://data/identity_layers/bike_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://2yt6359wkd0r" path="res://data/identity_layers/bike_frame_inspected.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://g00qu7vwatsr" path="res://data/identity_layers/bike_marque_identified.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://kxrqjm9pqve8" path="res://data/identity_layers/bike_penny_leaf.tres" id="6_layer"]
 
 [resource]
 script = ExtResource("1_jyqit")

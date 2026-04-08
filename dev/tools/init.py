@@ -24,12 +24,18 @@ CREATE TABLE IF NOT EXISTS skills (
     uid          TEXT
 );
 
+CREATE TABLE IF NOT EXISTS super_categories (
+    super_category_id TEXT    PRIMARY KEY,
+    display_name      TEXT    NOT NULL,
+    uid               TEXT
+);
+
 CREATE TABLE IF NOT EXISTS categories (
     category_id    TEXT    PRIMARY KEY,
     super_category TEXT    NOT NULL,
     display_name   TEXT    NOT NULL,
     weight         REAL    NOT NULL DEFAULT 0.0,
-    grid_size      INTEGER NOT NULL DEFAULT 1,
+    shape_id       TEXT    NOT NULL DEFAULT 's1x1',
     uid            TEXT
 );
 
@@ -71,24 +77,52 @@ CREATE TABLE IF NOT EXISTS item_identity_layers (
 
 _SEED_SKILL = ("appraisal", "Appraisal", 5)
 
-_SEED_CATEGORY = ("oil_lamp", "Decorative", "Oil Lamp", 3.0, 2)
+_SEED_SUPER_CATEGORIES = [
+    ("decorative", "Decorative"),
+    ("fashion", "Fashion"),
+    ("fine_art", "Fine Art"),
+    ("vehicle", "Vehicle"),
+]
+
+
+_SEED_CATEGORY = ("oil_lamp", "Decorative", "Oil Lamp", 3.0, "s1x2")
 
 _SEED_LAYERS = [
     # (layer_id, display_name, base_value, unlock_context, time_cost, skill_id, req_level)
-    ("lamp_shaped_object",       "Lamp-Shaped Object",            80,  0, 0, None, 0),
-    ("antique_oil_lamp",         "Antique Oil Lamp",              220, 1, 2, None, 0),
-    ("signed_duplex_burner_lamp","Signed Duplex Burner Lamp",     950, None, None, None, 0),
+    ("lamp_shaped_object", "Lamp-Shaped Object", 80, 0, 0, None, 0),
+    ("antique_oil_lamp", "Antique Oil Lamp", 220, 1, 2, None, 0),
+    (
+        "signed_duplex_burner_lamp",
+        "Signed Duplex Burner Lamp",
+        950,
+        None,
+        None,
+        None,
+        0,
+    ),
 ]
 
 _SEED_ITEM = ("brass_lamp", "oil_lamp", 2)
 
-_SEED_ITEM_LAYERS = ["lamp_shaped_object", "antique_oil_lamp", "signed_duplex_burner_lamp"]
+_SEED_ITEM_LAYERS = [
+    "lamp_shaped_object",
+    "antique_oil_lamp",
+    "signed_duplex_burner_lamp",
+]
 
 
 # ── Seeder ────────────────────────────────────────────────────────────────────
 
+
 def _seed(conn: sqlite3.Connection) -> None:
     cur = conn.cursor()
+
+    # super_categories
+    for sc_id, sc_name in _SEED_SUPER_CATEGORIES:
+        cur.execute(
+            "INSERT OR IGNORE INTO super_categories (super_category_id, display_name) VALUES (?,?)",
+            (sc_id, sc_name),
+        )
 
     # skill
     skill_id, display_name, max_level = _SEED_SKILL
@@ -98,11 +132,11 @@ def _seed(conn: sqlite3.Connection) -> None:
     )
 
     # category
-    cat_id, super_cat, cat_name, weight, grid_size = _SEED_CATEGORY
+    cat_id, super_cat, cat_name, weight, shape_id = _SEED_CATEGORY
     cur.execute(
         "INSERT OR IGNORE INTO categories "
-        "(category_id, super_category, display_name, weight, grid_size) VALUES (?,?,?,?,?)",
-        (cat_id, super_cat, cat_name, weight, grid_size),
+        "(category_id, super_category, display_name, weight, shape_id) VALUES (?,?,?,?,?)",
+        (cat_id, super_cat, cat_name, weight, shape_id),
     )
 
     # layers
@@ -136,6 +170,7 @@ def _seed(conn: sqlite3.Connection) -> None:
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
+
 
 def main() -> None:
     parser = argparse.ArgumentParser()

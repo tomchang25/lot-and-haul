@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://v3yqkblladww"]
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://ewphhcx61rs1"]
 
 [ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="1_ilay"]
 [resource]

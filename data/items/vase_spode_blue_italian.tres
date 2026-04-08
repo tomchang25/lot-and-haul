@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://3kfdfcm6gmoh"]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://offel4hegrwf"]
 
 [ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
-[ext_resource type="Resource" uid="uid://cfull15ife51" path="res://data/categories/vase.tres" id="2_cat"]
-[ext_resource type="Resource" uid="uid://fap1gs39km79" path="res://data/identity_layers/vase_veil.tres" id="3_layer"]
-[ext_resource type="Resource" uid="uid://rd1lxx0tjoev" path="res://data/identity_layers/vase_ceramic_body.tres" id="4_layer"]
-[ext_resource type="Resource" uid="uid://kiygwn0ueo36" path="res://data/identity_layers/vase_painted_surface.tres" id="5_layer"]
-[ext_resource type="Resource" uid="uid://ivn0ori62dzr" path="res://data/identity_layers/vase_transfer_pattern.tres" id="6_layer"]
-[ext_resource type="Resource" uid="uid://j02buvvsc24o" path="res://data/identity_layers/vase_leaf_spode.tres" id="7_layer"]
+[ext_resource type="Resource" uid="uid://1nvn6k6zlags" path="res://data/categories/vase.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://1gdxt1oxiqug" path="res://data/identity_layers/vase_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://lo39tfvxzz9y" path="res://data/identity_layers/vase_ceramic_body.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://2jzpy8qia30v" path="res://data/identity_layers/vase_painted_surface.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://ifvjqfpvmedm" path="res://data/identity_layers/vase_transfer_pattern.tres" id="6_layer"]
+[ext_resource type="Resource" uid="uid://vzenaodqcc44" path="res://data/identity_layers/vase_leaf_spode.tres" id="7_layer"]
 
 [resource]
 script = ExtResource("1_jyqit")

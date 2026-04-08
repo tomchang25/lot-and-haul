@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="CategoryData" format=3 uid="uid://abin79ue6nzw"]
+[gd_resource type="Resource" script_class="CategoryData" format=3 uid="uid://er2amkvveppd"]
 
 [ext_resource type="Script" uid="uid://c7fq6wupmgchg" path="res://data/_definitions/category_data.gd" id="1_catdef"]
 [ext_resource type="Resource" uid="uid://pnkw2rum7e7t" path="res://data/super_categories/fine_art.tres" id="2_super"]
 
 [resource]
 script = ExtResource("1_catdef")
-category_id = "painting"
+category_id = "sculpture"
 super_category = ExtResource("2_super")
-display_name = "Painting"
-weight = 1.5
+display_name = "Sculpture"
+weight = 8.0
 shape_id = "s1x3"

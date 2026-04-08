@@ -1,15 +1,3 @@
-categories:
-  - category_id: handbag
-    super_category: Fashion
-    display_name: Handbag
-    weight: 0.5
-    grid_size: 2
-  - category_id: wristwatch
-    super_category: Fashion
-    display_name: Wristwatch
-    weight: 0.1
-    grid_size: 1
-
 identity_layers:
   - layer_id: bag_veil
     display_name: Fabric Pouch
