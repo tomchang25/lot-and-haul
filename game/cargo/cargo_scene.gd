@@ -76,33 +76,54 @@ func _ready() -> void:
 
 
 func _on_reset_pressed() -> void:
-    # Return all placed items back to temp storage; clear cargo.
-    # TODO: implement
-    pass
+    var unique_entries: Array[ItemEntry] = []
+    for pos: Vector2i in _cargo_placement:
+        var entry: ItemEntry = _cargo_placement[pos]
+        if entry not in unique_entries:
+            unique_entries.append(entry)
+    for entry: ItemEntry in unique_entries:
+        _temp_items.append(entry)
+    _cargo_placement.clear()
+
+    _active_item = null
+    _active_origin = ""
+    _phase = Phase.IDLE
+    _populate_temp_storage()
+    _recalc_totals()
+    _refresh_ui()
 
 
 func _on_continue_pressed() -> void:
-    # Commit cargo_placement → run_record.cargo_items.
-    # Sell every item still in _temp_items at ONSITE_SELL_PRICE.
-    # Advance to run review.
-    # TODO: implement
-    pass
+    var cargo: Array[ItemEntry] = []
+    for pos: Vector2i in _cargo_placement:
+        var entry: ItemEntry = _cargo_placement[pos]
+        if entry not in cargo:
+            cargo.append(entry)
+    RunManager.run_record.cargo_items = cargo
+    RunManager.run_record.onsite_proceeds = _temp_items.size() * ONSITE_SELL_PRICE
+    GameManager.go_to_run_review()
 
 
 func _on_cargo_cell_pressed(cell_pos: Vector2i) -> void:
-    # Called when a cargo grid cell is clicked.
-    # IDLE   + cell occupied → lift item back to temp (_lift_from_cargo)
-    # IDLE   + cell empty    → nothing
-    # ITEM_HELD + can place  → place item (_place_item)
-    # ITEM_HELD + cannot     → cancel hold, return to origin
-    # TODO: implement
-    pass
+    if _phase == Phase.IDLE:
+        if _cargo_placement.has(cell_pos):
+            _lift_from_cargo(_cargo_placement[cell_pos])
+    elif _phase == Phase.ITEM_HELD:
+        if _can_place_at(_active_item, cell_pos):
+            _place_item(_active_item, cell_pos)
 
 
 func _on_temp_item_pressed(entry: ItemEntry) -> void:
-    # Pick up an item from temp storage; switch to ITEM_HELD.
-    # TODO: implement
-    pass
+    if _phase == Phase.ITEM_HELD and _active_item == entry:
+        _active_item = null
+        _active_origin = ""
+        _phase = Phase.IDLE
+        _refresh_ui()
+    else:
+        _active_item = entry
+        _active_origin = "temp"
+        _phase = Phase.ITEM_HELD
+        _refresh_ui()
 
 # ══ Grid construction ══════════════════════════════════════════════════════════
 
@@ -122,10 +143,6 @@ func _build_cargo_grid() -> void:
 
 
 func _populate_temp_storage() -> void:
-    # Lay out all items in _temp_items as Panel nodes inside _temp_grid.
-    # _temp_grid is hardcoded to 16 columns × 4 rows.
-    # Each panel displays the item's shape footprint and name.
-    # TODO: implement — call _make_temp_item_node(entry) per item
     for child in _temp_grid.get_children():
         child.queue_free()
     _temp_item_nodes.clear()
@@ -139,27 +156,61 @@ func _populate_temp_storage() -> void:
 
 
 func _can_place_at(entry: ItemEntry, origin: Vector2i) -> bool:
-    # Returns true if entry's shape, offset to origin, fits within the cargo
-    # grid and does not collide with any already-placed item (excluding entry
-    # itself if it is being moved from cargo).
-    # TODO: implement
-    return false
+    var cells: Array[Vector2i] = entry.item_data.category_data.get_cells()
+    for c: Vector2i in cells:
+        var world := origin + c
+        if world.x < 0 or world.x >= 8 or world.y < 0 or world.y >= 4:
+            return false
+        if _cargo_placement.has(world) and _cargo_placement[world] != entry:
+            return false
+    return true
 
 
 func _place_item(entry: ItemEntry, origin: Vector2i) -> void:
-    # Write entry into _cargo_placement at all cells covered by its shape.
-    # Remove entry from _temp_items / _temp_item_nodes if coming from temp.
-    # Update cell visuals.
-    # TODO: implement
-    pass
+    # Remove entry's existing cells if being moved within cargo.
+    var keys_to_erase: Array[Vector2i] = []
+    for pos: Vector2i in _cargo_placement:
+        if _cargo_placement[pos] == entry:
+            keys_to_erase.append(pos)
+    for pos: Vector2i in keys_to_erase:
+        _cargo_placement.erase(pos)
+
+    # Write new cells.
+    var cells: Array[Vector2i] = entry.item_data.category_data.get_cells()
+    for c: Vector2i in cells:
+        _cargo_placement[origin + c] = entry
+
+    # Remove from temp if applicable.
+    if entry in _temp_items:
+        _temp_items.erase(entry)
+        _temp_item_nodes[entry].queue_free()
+        _temp_item_nodes.erase(entry)
+
+    _active_item = null
+    _active_origin = ""
+    _phase = Phase.IDLE
+    _recalc_totals()
+    _refresh_ui()
 
 
 func _lift_from_cargo(entry: ItemEntry) -> void:
-    # Remove entry from _cargo_placement.
-    # Add back to _temp_items and rebuild its temp node.
-    # Switch phase to ITEM_HELD with origin = "cargo".
-    # TODO: implement
-    pass
+    var keys_to_erase: Array[Vector2i] = []
+    for pos: Vector2i in _cargo_placement:
+        if _cargo_placement[pos] == entry:
+            keys_to_erase.append(pos)
+    for pos: Vector2i in keys_to_erase:
+        _cargo_placement.erase(pos)
+
+    _temp_items.append(entry)
+    var node := _make_temp_item_node(entry)
+    _temp_grid.add_child(node)
+    _temp_item_nodes[entry] = node
+
+    _active_item = entry
+    _active_origin = "cargo"
+    _phase = Phase.ITEM_HELD
+    _recalc_totals()
+    _refresh_ui()
 
 # ══ UI helpers ════════════════════════════════════════════════════════════════
 
@@ -167,11 +218,13 @@ func _lift_from_cargo(entry: ItemEntry) -> void:
 func _recalc_totals() -> void:
     _slots_used = 0
     _weight_used = 0.0
+    var seen: Array[ItemEntry] = []
     for pos: Vector2i in _cargo_placement:
         var entry: ItemEntry = _cargo_placement[pos]
-        # Count each entry only once — use its anchor cell (top-left of shape).
-        # TODO: deduplicate properly once placement is implemented
-        pass
+        if entry not in seen:
+            seen.append(entry)
+            _slots_used += entry.item_data.category_data.get_cells().size()
+            _weight_used += entry.item_data.category_data.weight
 
 
 func _refresh_ui() -> void:
@@ -185,17 +238,60 @@ func _refresh_ui() -> void:
 
 
 func _refresh_cargo_cell_visuals() -> void:
-    # Update each cell Panel to show occupied / empty / preview state.
-    # TODO: implement
-    pass
+    var preview_cells: Array[Vector2i] = []
+    var preview_valid := false
+    if _phase == Phase.ITEM_HELD and _hover_cell != Vector2i(-1, -1) and _active_item != null:
+        preview_valid = _can_place_at(_active_item, _hover_cell)
+        for c: Vector2i in _active_item.item_data.category_data.get_cells():
+            preview_cells.append(_hover_cell + c)
+
+    for pos: Vector2i in _cargo_cells:
+        var cell: Panel = _cargo_cells[pos]
+        var style: StyleBoxFlat
+        if pos in preview_cells:
+            if preview_valid:
+                style = _make_stylebox(
+                    Color(0.20, 0.45, 0.22, 1.0),
+                    Color(0.35, 0.75, 0.40, 1.0),
+                )
+            else:
+                style = _make_stylebox(
+                    Color(0.45, 0.18, 0.18, 1.0),
+                    Color(0.75, 0.30, 0.30, 1.0),
+                )
+        elif _cargo_placement.has(pos):
+            style = _make_stylebox(
+                Color(0.22, 0.30, 0.42, 1.0),
+                Color(0.40, 0.55, 0.75, 1.0),
+            )
+        else:
+            style = _make_stylebox(
+                Color(0.18, 0.18, 0.20, 1.0),
+                Color(0.35, 0.35, 0.38, 1.0),
+            )
+        cell.add_theme_stylebox_override("panel", style)
 
 
 func _refresh_temp_visuals() -> void:
-    # Dim / hide items in temp that cannot currently be placed anywhere.
-    # TODO: implement
-    pass
+    for entry: ItemEntry in _temp_item_nodes:
+        var node: Panel = _temp_item_nodes[entry]
+        if entry == _active_item:
+            node.modulate = Color(1, 1, 1, 0.45)
+        else:
+            node.modulate = Color(1, 1, 1, 1.0)
 
 # ══ Cell factory ══════════════════════════════════════════════════════════════
+
+
+func _make_stylebox(bg: Color, border: Color) -> StyleBoxFlat:
+    var s := StyleBoxFlat.new()
+    s.bg_color = bg
+    s.border_width_left = 1
+    s.border_width_right = 1
+    s.border_width_top = 1
+    s.border_width_bottom = 1
+    s.border_color = border
+    return s
 
 
 func _make_cell(pos: Vector2i) -> Panel:
@@ -211,6 +307,18 @@ func _make_cell(pos: Vector2i) -> Panel:
     style.border_width_bottom = 1
     style.border_color = Color(0.35, 0.35, 0.38, 1.0)
     cell.add_theme_stylebox_override("panel", style)
+
+    cell.mouse_entered.connect(
+        func() -> void:
+            _hover_cell = pos
+            _refresh_cargo_cell_visuals()
+    )
+    cell.mouse_exited.connect(
+        func() -> void:
+            if _hover_cell == pos:
+                _hover_cell = Vector2i(-1, -1)
+            _refresh_cargo_cell_visuals()
+    )
 
     cell.gui_input.connect(
         func(event: InputEvent) -> void:
