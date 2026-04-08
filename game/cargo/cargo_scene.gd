@@ -47,6 +47,15 @@ var _hover_extra_index: int = -1
 
 var _phase: Phase = Phase.IDLE
 
+# Rotation of the currently held item (0–3 = 0° / 90° / 180° / 270° CW).
+# Loaded from _item_rotations on lift; written back to _item_rotations on place.
+var _active_rotation: int = 0
+
+# Per-item rotation memory for this session (ItemEntry → int).
+# Populated when an item is placed; read when the same item is lifted again.
+# Cleared on full reset. Never written outside this scene.
+var _item_rotations: Dictionary = { } # ItemEntry → int
+
 # ── Cargo Grid State ──────────────────────────────────────────────────────────
 
 # Maps cargo grid position → ItemEntry.
@@ -138,6 +147,21 @@ func _input(event: InputEvent) -> void:
                 _cancel_placement()
                 accept_event()
 
+
+func _unhandled_input(event: InputEvent) -> void:
+    if _phase != Phase.ITEM_HELD or _active_item == null:
+        return
+    if event is InputEventKey and event.pressed and not event.echo:
+        match event.keycode:
+            KEY_Q:
+                _active_rotation = (_active_rotation + 3) % 4 # one step CCW
+                _refresh_ui()
+                get_viewport().set_input_as_handled()
+            KEY_E:
+                _active_rotation = (_active_rotation + 1) % 4 # one step CW
+                _refresh_ui()
+                get_viewport().set_input_as_handled()
+
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
@@ -161,6 +185,7 @@ func _on_reset_pressed() -> void:
 
     # Re-populate temp with all won items
     _temp_placement.clear()
+    _item_rotations.clear()
     _populate_temp_storage()
     _recalc_totals()
     _refresh_ui()
@@ -309,10 +334,15 @@ func _populate_temp_storage() -> void:
 # ══ Placement logic ════════════════════════════════════════════════════════════
 
 
+func _get_active_cells(entry: ItemEntry) -> Array[Vector2i]:
+    var base: Array[Vector2i] = entry.item_data.category_data.get_cells()
+    return CargoShapes.rotate_cells(base, _active_rotation)
+
+
 func _can_place_at_cargo(entry: ItemEntry, origin: Vector2i) -> bool:
     var cols := RunManager.run_record.car_config.grid_columns
     var rows := RunManager.run_record.car_config.grid_rows
-    var cells: Array[Vector2i] = entry.item_data.category_data.get_cells()
+    var cells: Array[Vector2i] = _get_active_cells(entry)
 
     # Check grid bounds and collision
     for c: Vector2i in cells:
@@ -364,11 +394,11 @@ func _get_pending_slots(entry: ItemEntry) -> int:
     for pos: Vector2i in _cargo_placement:
         if _cargo_placement[pos] == entry:
             return 0
-    return entry.item_data.category_data.get_cells().size()
+    return _get_active_cells(entry).size()
 
 
 func _can_place_at_temp(entry: ItemEntry, origin: Vector2i) -> bool:
-    var cells: Array[Vector2i] = entry.item_data.category_data.get_cells()
+    var cells: Array[Vector2i] = _get_active_cells(entry)
     for c: Vector2i in cells:
         var world := origin + c
         if world.x < 0 or world.x >= TEMP_GRID_COLS or world.y < 0 or world.y >= TEMP_GRID_ROWS:
@@ -387,10 +417,11 @@ func _place_item_in_cargo(entry: ItemEntry, origin: Vector2i) -> void:
     _erase_from_extra(entry)
 
     # Write new cells.
-    var cells: Array[Vector2i] = entry.item_data.category_data.get_cells()
+    var cells: Array[Vector2i] = _get_active_cells(entry)
     for c: Vector2i in cells:
         _cargo_placement[origin + c] = entry
 
+    _item_rotations[_active_item] = _active_rotation
     _active_item = null
     _active_origin = ""
     _active_origin_pos = Vector2i(-1, -1)
@@ -408,10 +439,11 @@ func _place_item_in_temp(entry: ItemEntry, origin: Vector2i) -> void:
     _erase_from_extra(entry)
 
     # Write new cells.
-    var cells: Array[Vector2i] = entry.item_data.category_data.get_cells()
+    var cells: Array[Vector2i] = _get_active_cells(entry)
     for c: Vector2i in cells:
         _temp_placement[origin + c] = entry
 
+    _item_rotations[_active_item] = _active_rotation
     _active_item = null
     _active_origin = ""
     _active_origin_pos = Vector2i(-1, -1)
@@ -422,7 +454,7 @@ func _place_item_in_temp(entry: ItemEntry, origin: Vector2i) -> void:
 
 func _place_item_in_temp_silent(entry: ItemEntry, origin: Vector2i) -> void:
     # Place without changing phase or refreshing UI (used during initial population)
-    var cells: Array[Vector2i] = entry.item_data.category_data.get_cells()
+    var cells: Array[Vector2i] = _get_active_cells(entry)
     for c: Vector2i in cells:
         _temp_placement[origin + c] = entry
 
@@ -461,6 +493,7 @@ func _lift_from_cargo(entry: ItemEntry) -> void:
 
     # Don't erase from cargo yet - keep it there until placed elsewhere or cancelled
     _active_item = entry
+    _active_rotation = _item_rotations.get(entry, 0)
     _active_origin = "cargo"
     _active_origin_pos = origin_pos
     _phase = Phase.ITEM_HELD
@@ -477,6 +510,7 @@ func _lift_from_temp(entry: ItemEntry) -> void:
 
     # Item stays in temp visually but we're now holding it
     _active_item = entry
+    _active_rotation = _item_rotations.get(entry, 0)
     _active_origin = "temp"
     _active_origin_pos = origin_pos
     _phase = Phase.ITEM_HELD
@@ -493,6 +527,7 @@ func _cancel_placement() -> void:
 
     # Item was never removed from its original grid (cargo/temp), so just deselect
     _active_item = null
+    _active_rotation = 0
     _active_origin = ""
     _active_origin_pos = Vector2i(-1, -1)
     _phase = Phase.IDLE
@@ -502,6 +537,7 @@ func _cancel_placement() -> void:
 
 func _lift_from_extra(slot_index: int) -> void:
     _active_item = _extra_slot_items[slot_index]
+    _active_rotation = _item_rotations.get(_active_item, 0)
     _active_origin = "extra"
     _active_origin_extra_index = slot_index
     _extra_slot_items[slot_index] = null
@@ -592,7 +628,7 @@ func _refresh_cargo_cell_visuals() -> void:
     var preview_valid := false
     if _phase == Phase.ITEM_HELD and _hover_cell != Vector2i(-1, -1) and _active_item != null:
         preview_valid = _can_place_at_cargo(_active_item, _hover_cell)
-        for c: Vector2i in _active_item.item_data.category_data.get_cells():
+        for c: Vector2i in _get_active_cells(_active_item):
             preview_cells.append(_hover_cell + c)
 
     for pos: Vector2i in _cargo_cells:
@@ -636,7 +672,7 @@ func _refresh_temp_cell_visuals() -> void:
     var preview_valid := false
     if _phase == Phase.ITEM_HELD and _temp_hover_cell != Vector2i(-1, -1) and _active_item != null:
         preview_valid = _can_place_at_temp(_active_item, _temp_hover_cell)
-        for c: Vector2i in _active_item.item_data.category_data.get_cells():
+        for c: Vector2i in _get_active_cells(_active_item):
             preview_cells.append(_temp_hover_cell + c)
 
     for pos: Vector2i in _temp_cells:
