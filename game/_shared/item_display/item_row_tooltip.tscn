@@ -15,6 +15,7 @@ corner_radius_bottom_left = 3
 corner_detail = 5
 
 [node name="ItemRowTooltip" type="PanelContainer" unique_id=1000000001]
+visible = false
 z_index = 10
 custom_minimum_size = Vector2(160, 0)
 offset_right = 160.0

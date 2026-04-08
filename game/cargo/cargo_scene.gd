@@ -10,6 +10,8 @@ const ONSITE_SELL_PRICE := 50
 const CELL_SIZE := 56 # px per grid cell
 const CELL_GAP := 3 # px between cells
 
+const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
+
 # ── Enums ─────────────────────────────────────────────────────────────────────
 
 enum Phase {
@@ -48,6 +50,13 @@ var _temp_item_nodes: Dictionary = { } # ItemEntry → Panel
 var _slots_used: int = 0
 var _weight_used: float = 0.0
 
+# Tooltip support
+var _ctx: ItemViewContext = null
+var _tooltip: ItemRowTooltip = null
+
+# Track which item is currently being hovered for tooltip
+var _hovered_item: ItemEntry = null
+
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _slots_label: Label = $RootVBox/StatsBar/SlotsLabel
@@ -56,13 +65,19 @@ var _weight_used: float = 0.0
 @onready var _temp_grid: GridContainer = $RootVBox/TempSection/TempGrid
 @onready var _reset_btn: Button = $RootVBox/Footer/ResetButton
 @onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
+@onready var _confirm_popup: ConfirmationDialog = $ConfirmPopup
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
 func _ready() -> void:
+    _ctx = ItemViewContext.for_cargo()
+    _tooltip = ItemRowTooltipScene.instantiate()
+    add_child(_tooltip)
+
     _reset_btn.pressed.connect(_on_reset_pressed)
     _continue_btn.pressed.connect(_on_continue_pressed)
+    _confirm_popup.confirmed.connect(_on_confirm_popup_confirmed)
 
     _won_items = RunManager.run_record.won_items
     _temp_items = _won_items.duplicate()
@@ -94,6 +109,11 @@ func _on_reset_pressed() -> void:
 
 
 func _on_continue_pressed() -> void:
+    _confirm_popup.dialog_text = _build_summary_text()
+    _confirm_popup.popup_centered()
+
+
+func _on_confirm_popup_confirmed() -> void:
     var cargo: Array[ItemEntry] = []
     for pos: Vector2i in _cargo_placement:
         var entry: ItemEntry = _cargo_placement[pos]
@@ -105,6 +125,7 @@ func _on_continue_pressed() -> void:
 
 
 func _on_cargo_cell_pressed(cell_pos: Vector2i) -> void:
+    _hide_tooltip()
     if _phase == Phase.IDLE:
         if _cargo_placement.has(cell_pos):
             _lift_from_cargo(_cargo_placement[cell_pos])
@@ -114,6 +135,7 @@ func _on_cargo_cell_pressed(cell_pos: Vector2i) -> void:
 
 
 func _on_temp_item_pressed(entry: ItemEntry) -> void:
+    _hide_tooltip()
     if _phase == Phase.ITEM_HELD and _active_item == entry:
         _active_item = null
         _active_origin = ""
@@ -280,6 +302,31 @@ func _refresh_temp_visuals() -> void:
         else:
             node.modulate = Color(1, 1, 1, 1.0)
 
+
+func _build_summary_text() -> String:
+    var loading: Array[String] = []
+    var selling: Array[String] = []
+
+    # Build cargo list (items being loaded)
+    var cargo_entries: Array[ItemEntry] = []
+    for pos: Vector2i in _cargo_placement:
+        var entry: ItemEntry = _cargo_placement[pos]
+        if entry not in cargo_entries:
+            cargo_entries.append(entry)
+            loading.append("  " + entry.display_name)
+
+    # Build selling list (items in temp storage)
+    for entry: ItemEntry in _temp_items:
+        selling.append("  " + entry.display_name)
+
+    var lines: Array[String] = []
+    lines.append("Loading (%d):" % loading.size())
+    lines.append_array(loading if not loading.is_empty() else ["  (none)"])
+    lines.append("")
+    lines.append("Selling to merchant (%d)  →  $%d:" % [selling.size(), selling.size() * ONSITE_SELL_PRICE])
+    lines.append_array(selling if not selling.is_empty() else ["  (none)"])
+    return "\n".join(lines)
+
 # ══ Cell factory ══════════════════════════════════════════════════════════════
 
 
@@ -312,12 +359,16 @@ func _make_cell(pos: Vector2i) -> Panel:
         func() -> void:
             _hover_cell = pos
             _refresh_cargo_cell_visuals()
+            # Show tooltip for item in this cargo cell if not dragging
+            if _phase != Phase.ITEM_HELD and _cargo_placement.has(pos):
+                _show_tooltip_for_item(_cargo_placement[pos], cell.get_global_rect())
     )
     cell.mouse_exited.connect(
         func() -> void:
             if _hover_cell == pos:
                 _hover_cell = Vector2i(-1, -1)
             _refresh_cargo_cell_visuals()
+            _hide_tooltip()
     )
 
     cell.gui_input.connect(
@@ -333,7 +384,6 @@ func _make_cell(pos: Vector2i) -> Panel:
 func _make_temp_item_node(entry: ItemEntry) -> Panel:
     # Build a Panel that represents one item in temp storage.
     # Size = bounding box of entry's shape × CELL_SIZE.
-    # TODO: implement visual content
     var cells: Array[Vector2i] = entry.item_data.category_data.get_cells()
     var max_col := 0
     var max_row := 0
@@ -358,6 +408,18 @@ func _make_temp_item_node(entry: ItemEntry) -> Panel:
     style.border_color = Color(0.40, 0.55, 0.75, 1.0)
     node.add_theme_stylebox_override("panel", style)
 
+    # Add tooltip support for temp items
+    node.mouse_entered.connect(
+        func() -> void:
+            # Only show tooltip when not dragging
+            if _phase != Phase.ITEM_HELD:
+                _show_tooltip_for_item(entry, node.get_global_rect())
+    )
+    node.mouse_exited.connect(
+        func() -> void:
+            _hide_tooltip()
+    )
+
     node.gui_input.connect(
         func(event: InputEvent) -> void:
             if event is InputEventMouseButton \
@@ -366,3 +428,18 @@ func _make_temp_item_node(entry: ItemEntry) -> Panel:
                 _on_temp_item_pressed(entry)
     )
     return node
+
+# ══ Tooltip helpers ════════════════════════════════════════════════════════════
+
+
+func _show_tooltip_for_item(entry: ItemEntry, anchor: Rect2) -> void:
+    if _phase == Phase.ITEM_HELD:
+        # Don't show tooltips while dragging
+        return
+    _hovered_item = entry
+    _tooltip.show_for(entry, _ctx, anchor)
+
+
+func _hide_tooltip() -> void:
+    _hovered_item = null
+    _tooltip.hide_tooltip()

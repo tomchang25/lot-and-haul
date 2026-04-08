@@ -113,3 +113,7 @@ custom_minimum_size = Vector2(160, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 text = "Continue"
+
+[node name="ConfirmPopup" type="ConfirmationDialog" parent="." unique_id=500000002]
+title = "Continue?"
+ok_button_text = "Confirm"
