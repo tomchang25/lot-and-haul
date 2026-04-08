@@ -25,6 +25,7 @@ super_categories:
   - Fashion
   - Decorative
   - Fine Art
+  - Weapon
 
 categories:
   # ── Vehicle (3) ───────────────────────────────────────
@@ -102,3 +103,22 @@ categories:
     display_name: Sculpture
     weight: 8.0
     shape_id: s1x3
+
+  # ── Weapon (3) ────────────────────────────────────────
+  - category_id: pistol
+    super_category: Weapon
+    display_name: Pistol
+    weight: 1.2
+    shape_id: sL11
+
+  - category_id: rifle
+    super_category: Weapon
+    display_name: Rifle
+    weight: 4.5
+    shape_id: sL12
+
+  - category_id: crossbow
+    super_category: Weapon
+    display_name: Crossbow
+    weight: 3.5
+    shape_id: sT3

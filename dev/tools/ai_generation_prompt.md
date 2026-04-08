@@ -36,18 +36,21 @@ OUTPUT FORMAT RULES:
 Output structure:
 
 categories: - category_id: snake_case string, unique. Matches .tres filename stem.
-super_category: Broad type shown in UI (e.g. "Fine Art", "Vehicle", "Furniture").
+super_category: Broad type shown in UI (e.g. "Fine Art", "Vehicle", "Weapon", "Furniture").
 display_name: Fine-grained player-facing label (e.g. "Oil Lamp", "Pocket Watch").
 weight: float, kilograms.
-grid_size: int 1–8. Physical footprint in the cargo inventory grid.
-1 = keychain, coin, small figurine
-2 = oil lamp, pocket watch, small vase
-3 = handbag, rifle, typewriter
-4 = bicycle wheel, large painting, sewing machine
-6 = bicycle, grandfather clock, chest of drawers
-8 = large industrial machine, upright piano, engine block
-Use the value that best matches the category's real-world size.
-Any int from 1 to 8 is valid; do not restrict to the examples above.
+shape_id: string. The cargo grid footprint. Must be one of:
+s1x1 — 1 cell. Coin, keychain, small figurine.
+s1x2 — 2 cells. Oil lamp, pocket watch, small vase.
+s1x3 — 3 cells. Clock, poster, typewriter.
+s1x4 — 4 cells. Very long thin object.
+s2x2 — 4 cells sq. Compact square item, small crate.
+s2x3 — 6 cells rect. Bicycle, sewing machine.
+s2x4 — 8 cells rect. Motorcycle, automobile, large machine.
+sL11 — 3 cells, small L. Pistol (grip + short barrel).
+sL12 — 4 cells, tall L. Rifle (stock + long barrel), walking cane.
+sT3 — 4 cells, T. Crossbow (horizontal prod + tiller).
+Choose the shape that best matches the item's real-world silhouette.
 
 identity_layers: - layer_id: snake_case string, globally unique across ALL layers in the file.
 display_name: String shown to the player when this layer is their current knowledge.
@@ -174,7 +177,7 @@ Category: [CATEGORY_DISPLAY_NAME]
 Super category: [SUPER_CATEGORY]
 category_id: [CATEGORY_ID]
 weight: [WEIGHT_KG]
-grid_size: [GRID_SIZE]
+shape_id: [SHAPE_ID]
 
 Item rarity distribution: [e.g. "3 COMMON, 4 UNCOMMON, 2 RARE, 1 EPIC"]
 
@@ -201,7 +204,7 @@ Category: Oil Lamp
 Super category: Decorative
 category_id: oil_lamp
 weight: 3.0
-grid_size: 2
+shape_id: s1x2
 
 Item rarity distribution: 2 RARE, 1 EPIC, 1 LEGENDARY
 
@@ -229,4 +232,4 @@ Output the complete YAML block starting with 'categories:'.
 [ ] No required_level without required_skill on the same unlock_action
 [ ] required_skill values are only: appraisal, authentication, mechanical
 [ ] Shared layers appear exactly once in identity_layers
-[ ] grid_size is an int between 1 and 8
+[ ] shape_id is a valid key: s1x1, s1x2, s1x3, s1x4, s2x2, s2x3, s2x4, sL11, sL12, sT3

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://t1jjs6o05ukl"]
+
+[ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
+[ext_resource type="Resource" uid="uid://xeozxgbp1kxg" path="res://data/categories/rifle.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://jfu7xl5vmxen" path="res://data/identity_layers/rifle_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://j9i6a8vmgseb" path="res://data/identity_layers/rifle_body.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://vvkxr11z6h4m" path="res://data/identity_layers/rifle_military_proof.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://4i2prz5b0kbn" path="res://data/identity_layers/rifle_regiment_mark.tres" id="6_layer"]
+[ext_resource type="Resource" uid="uid://f04s0ca8sxwf" path="res://data/identity_layers/rifle_leaf_regiment.tres" id="7_layer"]
+
+[resource]
+script = ExtResource("1_jyqit")
+item_id = "rifle_crimea_enfield"
+category_data = ExtResource("2_cat")
+identity_layers = [ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer"), ExtResource("6_layer"), ExtResource("7_layer")]
+rarity = 3

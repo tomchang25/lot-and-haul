@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://wol7luvebly1"]
+
+[ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
+[ext_resource type="Resource" uid="uid://5r7ovws0oxat" path="res://data/categories/crossbow.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://kropzweqwqx5" path="res://data/identity_layers/crossbow_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://j9sec987qysd" path="res://data/identity_layers/crossbow_body.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://9z1vzu1btsyp" path="res://data/identity_layers/crossbow_leaf_hunting.tres" id="5_layer"]
+
+[resource]
+script = ExtResource("1_jyqit")
+item_id = "crossbow_german_hunting"
+category_data = ExtResource("2_cat")
+identity_layers = [ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer")]
+rarity = 1

@@ -1,0 +1,310 @@
+identity_layers:
+  # ── Pistol layers ──────────────────────────────────────
+
+  - layer_id: pistol_veil
+    display_name: Heavy Metal Object
+    base_value: 40
+    unlock_action:
+      context: 0
+
+  - layer_id: pistol_body
+    display_name: Short Firearm Body
+    base_value: 90
+    unlock_action:
+      context: 1
+      time_cost: 1
+
+  - layer_id: pistol_proofmark
+    display_name: Proofmarked Pistol
+    base_value: 350
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: pistol_arsenal_stamp
+    display_name: Arsenal-Stamped Pistol
+    base_value: 900
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: appraisal
+      required_level: 1
+
+  - layer_id: pistol_carved_grip
+    display_name: Ornate Grip Pistol
+    base_value: 600
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: pistol_maker_mark
+    display_name: Signed Maker Pistol
+    base_value: 2000
+    unlock_action:
+      context: 1
+      time_cost: 4
+      required_skill: authentication
+      required_level: 1
+
+  - layer_id: pistol_leaf_dutch
+    display_name: Dutch Holster Pistol
+    base_value: 450
+    unlock_action: null
+
+  - layer_id: pistol_leaf_naval
+    display_name: British Naval Pistol
+    base_value: 1200
+    unlock_action: null
+
+  - layer_id: pistol_leaf_cavalry
+    display_name: French Cavalry Pistol
+    base_value: 4500
+    unlock_action: null
+
+  - layer_id: pistol_leaf_boutet
+    display_name: Boutet Pistol, c.1800
+    base_value: 12000
+    unlock_action: null
+
+  # ── Rifle layers ───────────────────────────────────────
+
+  - layer_id: rifle_veil
+    display_name: Heavy Long Object
+    base_value: 50
+    unlock_action:
+      context: 0
+
+  - layer_id: rifle_body
+    display_name: Long-Barreled Firearm
+    base_value: 120
+    unlock_action:
+      context: 1
+      time_cost: 1
+
+  - layer_id: rifle_military_proof
+    display_name: Military-Proved Rifle
+    base_value: 500
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: rifle_regiment_mark
+    display_name: Regiment-Marked Rifle
+    base_value: 1500
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: appraisal
+      required_level: 1
+
+  - layer_id: rifle_engraved_action
+    display_name: Engraved Action Rifle
+    base_value: 1200
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: rifle_maker_signed
+    display_name: Signed by Maker
+    base_value: 3500
+    unlock_action:
+      context: 1
+      time_cost: 4
+      required_skill: authentication
+      required_level: 1
+
+  - layer_id: rifle_leaf_charleville
+    display_name: Charleville Musket
+    base_value: 700
+    unlock_action: null
+
+  - layer_id: rifle_leaf_springfield
+    display_name: Springfield M1861
+    base_value: 1800
+    unlock_action: null
+
+  - layer_id: rifle_leaf_regiment
+    display_name: Crimea Enfield Rifle
+    base_value: 5000
+    unlock_action: null
+
+  - layer_id: rifle_leaf_whitworth
+    display_name: Whitworth Rifle, c.1860
+    base_value: 15000
+    unlock_action: null
+
+  # ── Crossbow layers ────────────────────────────────────
+
+  - layer_id: crossbow_veil
+    display_name: Heavy Wooden Object
+    base_value: 30
+    unlock_action:
+      context: 0
+
+  - layer_id: crossbow_body
+    display_name: Old Crossbow Frame
+    base_value: 80
+    unlock_action:
+      context: 1
+      time_cost: 1
+
+  - layer_id: crossbow_mechanism
+    display_name: Crossbow with Trigger
+    base_value: 300
+    unlock_action:
+      context: 1
+      time_cost: 2
+
+  - layer_id: crossbow_provenance
+    display_name: Documented Crossbow
+    base_value: 900
+    unlock_action:
+      context: 1
+      time_cost: 3
+      required_skill: appraisal
+      required_level: 1
+
+  - layer_id: crossbow_leaf_repro
+    display_name: Modern Reproduction
+    base_value: 100
+    unlock_action: null
+
+  - layer_id: crossbow_leaf_hunting
+    display_name: German Hunting Bow
+    base_value: 500
+    unlock_action: null
+
+  - layer_id: crossbow_leaf_military
+    display_name: Swiss Military Bow
+    base_value: 1600
+    unlock_action: null
+
+  - layer_id: crossbow_leaf_noble
+    display_name: Noble Presentation Bow
+    base_value: 5500
+    unlock_action: null
+
+items:
+  # ── Pistol items ───────────────────────────────────────
+  # All share pistol_veil + pistol_body (layers 0–1).
+  # Items 2+3 share pistol_proofmark (deep trunk at layer 2).
+  # Item 4 diverges at layer 2 via pistol_carved_grip.
+
+  - item_id: pistol_dutch_holster
+    category_id: pistol
+    rarity: 1
+    layer_ids:
+      - pistol_veil
+      - pistol_body
+      - pistol_leaf_dutch
+
+  - item_id: pistol_british_naval
+    category_id: pistol
+    rarity: 2
+    layer_ids:
+      - pistol_veil
+      - pistol_body
+      - pistol_proofmark
+      - pistol_leaf_naval
+
+  - item_id: pistol_french_cavalry
+    category_id: pistol
+    rarity: 3
+    layer_ids:
+      - pistol_veil
+      - pistol_body
+      - pistol_proofmark
+      - pistol_arsenal_stamp
+      - pistol_leaf_cavalry
+
+  - item_id: pistol_boutet_versailles
+    category_id: pistol
+    rarity: 4
+    layer_ids:
+      - pistol_veil
+      - pistol_body
+      - pistol_carved_grip
+      - pistol_maker_mark
+      - pistol_leaf_boutet
+
+  # ── Rifle items ────────────────────────────────────────
+  # All share rifle_veil + rifle_body (layers 0–1).
+  # Items 2+3 share rifle_military_proof (deep trunk at layer 2).
+  # Item 4 diverges at layer 2 via rifle_engraved_action.
+
+  - item_id: rifle_charleville_repro
+    category_id: rifle
+    rarity: 1
+    layer_ids:
+      - rifle_veil
+      - rifle_body
+      - rifle_leaf_charleville
+
+  - item_id: rifle_springfield_1861
+    category_id: rifle
+    rarity: 2
+    layer_ids:
+      - rifle_veil
+      - rifle_body
+      - rifle_military_proof
+      - rifle_leaf_springfield
+
+  - item_id: rifle_crimea_enfield
+    category_id: rifle
+    rarity: 3
+    layer_ids:
+      - rifle_veil
+      - rifle_body
+      - rifle_military_proof
+      - rifle_regiment_mark
+      - rifle_leaf_regiment
+
+  - item_id: rifle_whitworth_sniper
+    category_id: rifle
+    rarity: 4
+    layer_ids:
+      - rifle_veil
+      - rifle_body
+      - rifle_engraved_action
+      - rifle_maker_signed
+      - rifle_leaf_whitworth
+
+  # ── Crossbow items ─────────────────────────────────────
+  # All share crossbow_veil + crossbow_body (layers 0–1).
+  # Items 1+2 diverge immediately at layer 2 (standard fork to leaf).
+  # Items 3+4 share crossbow_mechanism (layer 2), then fork.
+
+  - item_id: crossbow_modern_repro
+    category_id: crossbow
+    rarity: 0
+    layer_ids:
+      - crossbow_veil
+      - crossbow_body
+      - crossbow_leaf_repro
+
+  - item_id: crossbow_german_hunting
+    category_id: crossbow
+    rarity: 1
+    layer_ids:
+      - crossbow_veil
+      - crossbow_body
+      - crossbow_leaf_hunting
+
+  - item_id: crossbow_swiss_military
+    category_id: crossbow
+    rarity: 2
+    layer_ids:
+      - crossbow_veil
+      - crossbow_body
+      - crossbow_mechanism
+      - crossbow_leaf_military
+
+  - item_id: crossbow_noble_presentation
+    category_id: crossbow
+    rarity: 3
+    layer_ids:
+      - crossbow_veil
+      - crossbow_body
+      - crossbow_mechanism
+      - crossbow_provenance
+      - crossbow_leaf_noble

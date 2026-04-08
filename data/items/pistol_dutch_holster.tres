@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://itr4ix7cht0f"]
+
+[ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
+[ext_resource type="Resource" uid="uid://257u5l7gb6g2" path="res://data/categories/pistol.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://atczqjmg2sa6" path="res://data/identity_layers/pistol_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://7vq76rcsm3dv" path="res://data/identity_layers/pistol_body.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://4wngc6holeef" path="res://data/identity_layers/pistol_leaf_dutch.tres" id="5_layer"]
+
+[resource]
+script = ExtResource("1_jyqit")
+item_id = "pistol_dutch_holster"
+category_data = ExtResource("2_cat")
+identity_layers = [ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer")]
+rarity = 1
