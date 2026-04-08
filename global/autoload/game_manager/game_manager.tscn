@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://blmyetrjsicyl" path="res://global/autoload/game_manager/game_manager.gd" id="1_eg3k6"]
 [ext_resource type="PackedScene" uid="uid://bauctionscn01" path="res://game/auction/auction_scene.tscn" id="2_ea43q"]
-[ext_resource type="PackedScene" uid="uid://bcargoscn0001" path="res://game/cargo/cargo_scene.tscn" id="3_yimu3"]
+[ext_resource type="PackedScene" uid="uid://bcargoscn0001" path="res://game/cargo/cargo_scene_legacy.tscn" id="3_yimu3"]
 [ext_resource type="PackedScene" uid="uid://bwhscenetscn1" path="res://game/inspection/inspection_scene.tscn" id="4_inspect"]
 [ext_resource type="PackedScene" uid="uid://dsgsj2f826clw" path="res://game/reveal/reveal_scene.tscn" id="5_31m1u"]
 [ext_resource type="Script" uid="uid://bvxr6q4cplcj8" path="res://global/autoload/game_manager/scene_registry.gd" id="5_ea43q"]
