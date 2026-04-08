@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://4z71jd15wvid"]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://mdjeqiw6ksv2"]
 
 [ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
-[ext_resource type="Resource" uid="uid://zpy5u71fjnxh" path="res://data/categories/oil_lamp.tres" id="2_cat"]
-[ext_resource type="Resource" uid="uid://i4mxmpoghinu" path="res://data/identity_layers/lamp_veil.tres" id="3_layer"]
-[ext_resource type="Resource" uid="uid://8vnd79kgssxz" path="res://data/identity_layers/lamp_glass_body.tres" id="4_layer"]
-[ext_resource type="Resource" uid="uid://ekddrqczz9rx" path="res://data/identity_layers/lamp_pressed_font.tres" id="5_layer"]
-[ext_resource type="Resource" uid="uid://sc7mx7rzklwd" path="res://data/identity_layers/lamp_leaf_baccarat.tres" id="6_layer"]
+[ext_resource type="Resource" uid="uid://rlhnhvm1u0ol" path="res://data/categories/oil_lamp.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://kzg1z8ech3z1" path="res://data/identity_layers/lamp_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://ziutbrl69ex7" path="res://data/identity_layers/lamp_glass_body.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://ti5laxm4l6gg" path="res://data/identity_layers/lamp_pressed_font.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://ng8qyu98rgc2" path="res://data/identity_layers/lamp_leaf_baccarat.tres" id="6_layer"]
 
 [resource]
 script = ExtResource("1_jyqit")

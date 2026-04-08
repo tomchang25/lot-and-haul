@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://a8co6mc62vtq"]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://irv8oesgs6tb"]
 
 [ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
-[ext_resource type="Resource" uid="uid://kf9acbu3356j" path="res://data/categories/clock.tres" id="2_cat"]
-[ext_resource type="Resource" uid="uid://d7bo0b2nivy1" path="res://data/identity_layers/clock_veil.tres" id="3_layer"]
-[ext_resource type="Resource" uid="uid://x8bubszxik11" path="res://data/identity_layers/clock_wooden_case.tres" id="4_layer"]
-[ext_resource type="Resource" uid="uid://gkgurlls46kx" path="res://data/identity_layers/clock_enamel_dial.tres" id="5_layer"]
-[ext_resource type="Resource" uid="uid://j5jtrauavcoa" path="res://data/identity_layers/clock_platform_escapement.tres" id="6_layer"]
-[ext_resource type="Resource" uid="uid://q6u8qz5x689r" path="res://data/identity_layers/clock_leaf_carriage.tres" id="7_layer"]
+[ext_resource type="Resource" uid="uid://vl3m5x5elt0d" path="res://data/categories/clock.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://o4yxlig5vgbz" path="res://data/identity_layers/clock_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://asfvsijkpkgd" path="res://data/identity_layers/clock_wooden_case.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://nntaw4zx107z" path="res://data/identity_layers/clock_enamel_dial.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://0e9hqkgt6osv" path="res://data/identity_layers/clock_platform_escapement.tres" id="6_layer"]
+[ext_resource type="Resource" uid="uid://f3a3jes94x5b" path="res://data/identity_layers/clock_leaf_carriage.tres" id="7_layer"]
 
 [resource]
 script = ExtResource("1_jyqit")

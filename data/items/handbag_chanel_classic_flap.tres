@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bce0zp46oyqg"]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://0xpan4mxbje1"]
 
 [ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/_definitions/item_data.gd" id="1_jyqit"]
-[ext_resource type="Resource" uid="uid://rl8iihglrokc" path="res://data/categories/handbag.tres" id="2_cat"]
-[ext_resource type="Resource" uid="uid://4l86wyproac8" path="res://data/identity_layers/bag_veil.tres" id="3_layer"]
-[ext_resource type="Resource" uid="uid://kmwl6rquier3" path="res://data/identity_layers/bag_exterior_check.tres" id="4_layer"]
-[ext_resource type="Resource" uid="uid://jwzudjdgs8bu" path="res://data/identity_layers/bag_hardware_check.tres" id="5_layer"]
-[ext_resource type="Resource" uid="uid://v4h85a2opqq5" path="res://data/identity_layers/bag_serial_research.tres" id="6_layer"]
-[ext_resource type="Resource" uid="uid://p1iqp83plw93" path="res://data/identity_layers/bag_chanel_leaf.tres" id="7_layer"]
+[ext_resource type="Resource" uid="uid://ir19j0nw0fxt" path="res://data/categories/handbag.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://pjd9ox440z97" path="res://data/identity_layers/bag_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://mgwaftomz6wy" path="res://data/identity_layers/bag_exterior_check.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://5c5aju7nqc9k" path="res://data/identity_layers/bag_hardware_check.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://k2lwlgc2ruix" path="res://data/identity_layers/bag_serial_research.tres" id="6_layer"]
+[ext_resource type="Resource" uid="uid://sg3tdpjsiqpt" path="res://data/identity_layers/bag_chanel_leaf.tres" id="7_layer"]
 
 [resource]
 script = ExtResource("1_jyqit")

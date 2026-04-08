@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="CategoryData" format=3 uid="uid://cfull15ife51"]
+[gd_resource type="Resource" script_class="CategoryData" format=3 uid="uid://1nvn6k6zlags"]
 
 [ext_resource type="Script" uid="uid://c7fq6wupmgchg" path="res://data/_definitions/category_data.gd" id="1_catdef"]
-[ext_resource type="Resource" uid="uid://d4rk9wpy2bmc5" path="res://data/super_categories/decorative.tres" id="2_super"]
+[ext_resource type="Resource" uid="uid://9918aiteqw4z" path="res://data/super_categories/decorative.tres" id="2_super"]
 
 [resource]
 script = ExtResource("1_catdef")
