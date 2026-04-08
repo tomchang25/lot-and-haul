@@ -96,23 +96,27 @@ func _do_day_pass() -> void:
         if action.days_remaining <= 0:
             _apply_effect(action)
             var entry: ItemEntry = _find_storage_entry(action.item_id)
-            completed.append({
-                "name":   entry.display_name if entry != null else "Unknown",
-                "effect": _effect_label(action.action_type),
-            })
+            completed.append(
+                {
+                    "name": entry.display_name if entry != null else "Unknown",
+                    "effect": _effect_label(action.action_type),
+                },
+            )
         else:
             remaining.append(action.to_dict())
 
     SaveManager.active_actions = remaining
-    SaveManager.cash           -= DAILY_BASE_COST
-    SaveManager.current_day    += 1
+    SaveManager.cash -= DAILY_BASE_COST
+    SaveManager.current_day += 1
     SaveManager.save()
 
-    _day_pass_popup.populate({
-        "new_day":    SaveManager.current_day,
-        "cash_spent": DAILY_BASE_COST,
-        "completed":  completed,
-    })
+    _day_pass_popup.populate(
+        {
+            "new_day": SaveManager.current_day,
+            "cash_spent": DAILY_BASE_COST,
+            "completed": completed,
+        },
+    )
     _day_pass_popup.popup_centered()
 
 
@@ -128,7 +132,7 @@ func _apply_effect(action: ActiveActionEntry) -> void:
             KnowledgeManager.add_category_points(
                 entry.item_data.category_data.category_id,
                 entry.item_data.rarity,
-                KnowledgeManager.KnowledgeAction.REVEAL
+                KnowledgeManager.KnowledgeAction.REVEAL,
             )
 
 
@@ -141,8 +145,10 @@ func _find_storage_entry(item_id: int) -> ItemEntry:
 
 func _effect_label(type: ActiveActionEntry.ActionType) -> String:
     match type:
-        ActiveActionEntry.ActionType.MARKET_RESEARCH: return "Market Research done"
-        ActiveActionEntry.ActionType.UNLOCK:          return "Layer unlocked"
+        ActiveActionEntry.ActionType.MARKET_RESEARCH:
+            return "Market Research done"
+        ActiveActionEntry.ActionType.UNLOCK:
+            return "Layer unlocked"
     return "Done"
 
 # ══ Display ═══════════════════════════════════════════════════════════════════

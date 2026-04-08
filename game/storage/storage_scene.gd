@@ -19,11 +19,11 @@ const RESEARCH_COST: Dictionary = {
 }
 
 const RESEARCH_DAYS: Dictionary = {
-    ItemData.Rarity.COMMON:     1,
-    ItemData.Rarity.UNCOMMON:   2,
-    ItemData.Rarity.RARE:       3,
-    ItemData.Rarity.EPIC:       4,
-    ItemData.Rarity.LEGENDARY:  5,
+    ItemData.Rarity.COMMON: 1,
+    ItemData.Rarity.UNCOMMON: 2,
+    ItemData.Rarity.RARE: 3,
+    ItemData.Rarity.EPIC: 4,
+    ItemData.Rarity.LEGENDARY: 5,
 }
 
 # ── State ─────────────────────────────────────────────────────────────────────
@@ -110,7 +110,10 @@ func _on_unlock_confirmed() -> void:
     var action_def: LayerUnlockAction = entry.current_unlock_action()
     var days: int = action_def.unlock_days if action_def != null else 1
     var action := ActiveActionEntry.create(
-        ActiveActionEntry.ActionType.UNLOCK, entry.id, days)
+        ActiveActionEntry.ActionType.UNLOCK,
+        entry.id,
+        days,
+    )
     SaveManager.active_actions.append(action.to_dict())
     SaveManager.save()
     _refresh_row(entry)
@@ -125,7 +128,10 @@ func _on_research_confirmed() -> void:
         return
     var days: int = RESEARCH_DAYS.get(entry.item_data.rarity, 1)
     var action := ActiveActionEntry.create(
-        ActiveActionEntry.ActionType.MARKET_RESEARCH, entry.id, days)
+        ActiveActionEntry.ActionType.MARKET_RESEARCH,
+        entry.id,
+        days,
+    )
     SaveManager.active_actions.append(action.to_dict())
     SaveManager.cash -= cost
     SaveManager.save()
@@ -179,21 +185,21 @@ func _show_action_popup(entry: ItemEntry) -> void:
     )
     _unlock_btn.visible = can_unlock
     if can_unlock:
-        _unlock_btn.disabled     = block != ""
+        _unlock_btn.disabled = block != ""
         _unlock_btn.tooltip_text = block
 
     if not entry.is_veiled():
         var cost: int = RESEARCH_COST.get(entry.item_data.rarity, 500)
         _research_btn.visible = true
-        _research_btn.text    = "Market Research — $%d" % cost
+        _research_btn.text = "Market Research — $%d" % cost
         if block != "":
-            _research_btn.disabled     = true
+            _research_btn.disabled = true
             _research_btn.tooltip_text = block
         elif SaveManager.cash < cost:
-            _research_btn.disabled     = true
+            _research_btn.disabled = true
             _research_btn.tooltip_text = "Not enough cash"
         else:
-            _research_btn.disabled     = false
+            _research_btn.disabled = false
             _research_btn.tooltip_text = ""
     else:
         _research_btn.visible = false

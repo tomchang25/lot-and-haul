@@ -102,7 +102,7 @@ func get_price_range(super_category_id: String, rarity: ItemData.Rarity, layer_d
 
 func apply_market_research(entry: ItemEntry) -> void:
     var super_cat_id: String = \
-        entry.item_data.category_data.super_category.super_category_id
+    entry.item_data.category_data.super_category.super_category_id
     var layers_count: int = entry.item_data.identity_layers.size()
 
     var old_range: float = 0.0
@@ -116,7 +116,10 @@ func apply_market_research(entry: ItemEntry) -> void:
     for i in range(layers_count):
         var depth: int = maxi(0, i - entry.layer_index)
         var price_range: Vector2 = get_price_range(
-            super_cat_id, entry.item_data.rarity, depth)
+            super_cat_id,
+            entry.item_data.rarity,
+            depth,
+        )
         new_min[i] = price_range.x
         new_max[i] = price_range.y
 
