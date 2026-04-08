@@ -17,6 +17,11 @@ var potential_inspect_level: int = 0
 
 var condition_inspect_level: int = 0
 
+# Unique persistent ID assigned when this entry enters storage.
+# -1 = not yet in storage. Assigned by SaveManager.register_storage_item();
+# never assigned inside create() and never reassigned.
+var id: int = -1
+
 # Per-layer price bounds rolled once at lot draw.
 # Index matches identity_layers; deeper layers have wider gaps.
 var knowledge_min: Array[float] = []

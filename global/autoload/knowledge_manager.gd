@@ -19,6 +19,13 @@ const _BASE_MASTERY: Dictionary = {
 }
 
 
+var _perk_registry: Dictionary = {}   # perk_id → PerkData
+
+
+func _ready() -> void:
+    _load_perk_registry()
+
+
 func add_category_points(category_id: String, rarity: ItemData.Rarity, action: KnowledgeAction) -> void:
     var base: int = _BASE_MASTERY[action]
     var rarity_mult: int = rarity + 1 # COMMON=0→1, UNCOMMON=1→2, …, LEGENDARY=4→5
@@ -124,3 +131,36 @@ func can_advance(entry: ItemEntry, context: LayerUnlockAction.ActionContext) -> 
         return true
 
     return get_level(action.required_skill.skill_id) >= action.required_level
+
+# ══ Perk registry ════════════════════════════════════════════════════════════
+
+
+func unlock_perk(perk_id: String) -> void:
+    if SaveManager.unlocked_perks.has(perk_id):
+        return
+    SaveManager.unlocked_perks.append(perk_id)
+    SaveManager.save()
+
+
+func has_perk(perk_id: String) -> bool:
+    return SaveManager.unlocked_perks.has(perk_id)
+
+
+func get_perk(perk_id: String) -> PerkData:
+    return _perk_registry.get(perk_id, null)
+
+
+func _load_perk_registry() -> void:
+    var dir := DirAccess.open("res://data/perks")
+    if dir == null:
+        return
+    dir.list_dir_begin()
+    var filename: String = dir.get_next()
+    while filename != "":
+        if filename.ends_with(".tres"):
+            var path := "res://data/perks/" + filename
+            var perk := ResourceLoader.load(path) as PerkData
+            if perk != null and perk.perk_id != "":
+                _perk_registry[perk.perk_id] = perk
+        filename = dir.get_next()
+    dir.list_dir_end()
