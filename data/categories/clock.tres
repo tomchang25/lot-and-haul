@@ -9,4 +9,4 @@ category_id = "clock"
 super_category = ExtResource("2_super")
 display_name = "Clock"
 weight = 4.0
-grid_size = 3
+shape_id = "s1x3"

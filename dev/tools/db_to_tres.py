@@ -124,7 +124,7 @@ def _build_category_tres(
     super_category_uid: str,
     display_name: str,
     weight: float,
-    grid_size: int,
+    shape_id: str,
 ) -> str:
     lines = [
         f'[gd_resource type="Resource" script_class="CategoryData" format=3 uid="{category_uid}"]',
@@ -140,7 +140,7 @@ def _build_category_tres(
         'super_category = ExtResource("2_super")',
         f'display_name = "{display_name}"',
         f"weight = {float(weight)}",
-        f"grid_size = {grid_size}",
+        f'shape_id = "{shape_id}"',
         "",
     ]
     return "\n".join(lines)
@@ -233,16 +233,16 @@ def export_categories(
 ) -> None:
     cur  = conn.cursor()
     rows = cur.execute(
-        "SELECT category_id, super_category, display_name, weight, grid_size, uid "
+        "SELECT category_id, super_category, display_name, weight, shape_id, uid "
         "FROM categories ORDER BY category_id"
     ).fetchall()
 
-    for category_id, super_category, display_name, weight, grid_size, uid in rows:
+    for category_id, super_category, display_name, weight, shape_id, uid in rows:
         uid = uid or _new_uid()
         super_category_uid = super_category_uid_map.get(super_category, "")
         content = _build_category_tres(
             category_id, uid, super_category, super_category_uid,
-            display_name, weight, grid_size,
+            display_name, weight, shape_id,
         )
         out = categories_dir / f"{category_id}.tres"
         if dry_run:

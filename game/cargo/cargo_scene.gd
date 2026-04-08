@@ -90,12 +90,12 @@ func _recalc_totals() -> void:
     _weight_used = 0.0
     for entry: ItemEntry in _won_items:
         if _selected.get(entry, false):
-            _slots_used += entry.item_data.category_data.grid_size
+            _slots_used += entry.item_data.category_data.get_cells().size()
             _weight_used += entry.item_data.category_data.weight
 
 
 func _refresh_ui() -> void:
-    var max_slots: int = RunManager.run_record.car_config.max_slots
+    var max_slots: int = RunManager.run_record.car_config.total_slots()
     var max_weight: float = RunManager.run_record.car_config.max_weight
 
     _slots_label.text = "Slots: %d / %d" % [_slots_used, max_slots]
@@ -109,7 +109,7 @@ func _refresh_ui() -> void:
         if _selected.get(entry, false):
             row.set_cargo_state(ItemRow.CargoState.SELECTED)
         else:
-            var over_slots: bool = entry.item_data.category_data.grid_size > remaining_slots
+            var over_slots: bool = entry.item_data.category_data.get_cells().size() > remaining_slots
             var over_weight: bool = entry.item_data.category_data.weight > remaining_weight
             if over_slots or over_weight:
                 row.set_cargo_state(ItemRow.CargoState.BLOCKED)

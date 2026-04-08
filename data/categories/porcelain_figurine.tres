@@ -9,4 +9,4 @@ category_id = "porcelain_figurine"
 super_category = ExtResource("2_super")
 display_name = "Porcelain Figurine"
 weight = 0.8
-grid_size = 1
+shape_id = "s1x1"
