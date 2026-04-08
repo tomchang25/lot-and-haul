@@ -66,11 +66,11 @@ def seed_skills(conn: sqlite3.Connection, skills_dir: Path) -> dict[str, str]:
     cur = conn.cursor()
     uid_map: dict[str, str] = {}
     for f in sorted(skills_dir.glob("*.tres")):
-        text     = f.read_text(encoding="utf-8")
-        uid      = _header_uid(text)
+        text = f.read_text(encoding="utf-8")
+        uid = _header_uid(text)
         skill_id = _field(text, "skill_id") or f.stem
-        name     = _field(text, "display_name") or skill_id
-        max_lv   = int(_field(text, "max_level") or 5)
+        name = _field(text, "display_name") or skill_id
+        max_lv = int(_field(text, "max_level") or 5)
         cur.execute(
             """
             INSERT INTO skills (skill_id, display_name, max_level, uid)
@@ -94,13 +94,13 @@ def seed_categories(conn: sqlite3.Connection, categories_dir: Path) -> dict[str,
     cur = conn.cursor()
     uid_map: dict[str, str] = {}
     for f in sorted(categories_dir.glob("*.tres")):
-        text        = f.read_text(encoding="utf-8")
-        uid         = _header_uid(text)
+        text = f.read_text(encoding="utf-8")
+        uid = _header_uid(text)
         category_id = _field(text, "category_id") or f.stem
-        super_cat   = _field(text, "super_category") or ""
-        name        = _field(text, "display_name") or category_id
-        weight      = float(_field(text, "weight") or 0.0)
-        grid_size   = int(_field(text, "grid_size") or 1)
+        super_cat = _field(text, "super_category") or ""
+        name = _field(text, "display_name") or category_id
+        weight = float(_field(text, "weight") or 0.0)
+        grid_size = int(_field(text, "grid_size") or 1)
         cur.execute(
             """
             INSERT INTO categories
@@ -129,13 +129,13 @@ def seed_identity_layers(
 ) -> None:
     cur = conn.cursor()
     for f in sorted(layers_dir.glob("*.tres")):
-        text     = f.read_text(encoding="utf-8")
-        uid      = _header_uid(text)
-        subs     = _sub_resources(text)
-        ext_res  = _ext_resources(text)
+        text = f.read_text(encoding="utf-8")
+        uid = _header_uid(text)
+        subs = _sub_resources(text)
+        ext_res = _ext_resources(text)
         layer_id = _field(text, "layer_id") or f.stem
-        name     = _field(text, "display_name") or ""
-        value    = int(_field(text, "base_value") or 0)
+        name = _field(text, "display_name") or ""
+        value = int(_field(text, "base_value") or 0)
 
         cur.execute(
             """
@@ -149,11 +149,9 @@ def seed_identity_layers(
             (layer_id, name, value, uid),
         )
 
-        cur.execute(
-            "DELETE FROM layer_unlock_actions WHERE layer_id = ?", (layer_id,)
-        )
+        cur.execute("DELETE FROM layer_unlock_actions WHERE layer_id = ?", (layer_id,))
 
-        unlock_raw    = _field(text, "unlock_action")
+        unlock_raw = _field(text, "unlock_action")
         unlock_fields: dict[str, str] | None = None
 
         if unlock_raw and unlock_raw != "null":
@@ -197,16 +195,16 @@ def seed_items(
 ) -> None:
     cur = conn.cursor()
     for f in sorted(items_dir.glob("*.tres")):
-        text    = f.read_text(encoding="utf-8")
+        text = f.read_text(encoding="utf-8")
         item_id = _field(text, "item_id") or f.stem
-        uid     = _header_uid(text)
+        uid = _header_uid(text)
         ext_res = _ext_resources(text)
-        rarity  = int(_field(text, "rarity") or 0)
+        rarity = int(_field(text, "rarity") or 0)
 
         category_id: str | None = None
         cat_m = re.search(r'category_data\s*=\s*ExtResource\("([^"]+)"\)', text)
         if cat_m:
-            cat_uid     = ext_res.get(cat_m.group(1), {}).get("uid")
+            cat_uid = ext_res.get(cat_m.group(1), {}).get("uid")
             category_id = category_uid_map.get(cat_uid or "")
 
         cur.execute(
@@ -257,7 +255,7 @@ def main() -> None:
     parser.add_argument("--godot-root", required=True)
     args = parser.parse_args()
 
-    root    = Path(args.godot_root)
+    root = Path(args.godot_root)
     db_path = root / "data" / "_db" / "lot_haul.db"
 
     if not db_path.exists():
