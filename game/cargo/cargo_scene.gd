@@ -252,19 +252,23 @@ func _refresh_cargo_cell_visuals() -> void:
             if preview_valid:
                 style = _make_stylebox(
                     Color(0.20, 0.45, 0.22, 1.0),
-                    Color(0.35, 0.75, 0.40, 1.0))
+                    Color(0.35, 0.75, 0.40, 1.0),
+                )
             else:
                 style = _make_stylebox(
                     Color(0.45, 0.18, 0.18, 1.0),
-                    Color(0.75, 0.30, 0.30, 1.0))
+                    Color(0.75, 0.30, 0.30, 1.0),
+                )
         elif _cargo_placement.has(pos):
             style = _make_stylebox(
                 Color(0.22, 0.30, 0.42, 1.0),
-                Color(0.40, 0.55, 0.75, 1.0))
+                Color(0.40, 0.55, 0.75, 1.0),
+            )
         else:
             style = _make_stylebox(
                 Color(0.18, 0.18, 0.20, 1.0),
-                Color(0.35, 0.35, 0.38, 1.0))
+                Color(0.35, 0.35, 0.38, 1.0),
+            )
         cell.add_theme_stylebox_override("panel", style)
 
 
@@ -304,14 +308,16 @@ func _make_cell(pos: Vector2i) -> Panel:
     style.border_color = Color(0.35, 0.35, 0.38, 1.0)
     cell.add_theme_stylebox_override("panel", style)
 
-    cell.mouse_entered.connect(func() -> void:
-        _hover_cell = pos
-        _refresh_cargo_cell_visuals()
+    cell.mouse_entered.connect(
+        func() -> void:
+            _hover_cell = pos
+            _refresh_cargo_cell_visuals()
     )
-    cell.mouse_exited.connect(func() -> void:
-        if _hover_cell == pos:
-            _hover_cell = Vector2i(-1, -1)
-        _refresh_cargo_cell_visuals()
+    cell.mouse_exited.connect(
+        func() -> void:
+            if _hover_cell == pos:
+                _hover_cell = Vector2i(-1, -1)
+            _refresh_cargo_cell_visuals()
     )
 
     cell.gui_input.connect(

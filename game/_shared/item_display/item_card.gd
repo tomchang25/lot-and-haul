@@ -18,7 +18,7 @@ var _ctx: ItemViewContext = null
 @onready var _condition_mult_label: Label = $VBox/ConditionMultLabel
 @onready var _price_label: Label = $VBox/PriceLabel
 @onready var _weight_label: Label = $VBox/WeightLabel
-@onready var _grid_label:   Label = $VBox/GridLabel
+@onready var _grid_label: Label = $VBox/GridLabel
 
 
 func _ready() -> void:
@@ -79,7 +79,7 @@ func _apply() -> void:
         var cat := _entry.item_data.category_data
         var cell_count: int = cat.get_cells().size()
         _weight_label.text = "%.1f kg" % cat.weight
-        _grid_label.text   = "%d slot%s  (%s)" % [
+        _grid_label.text = "%d slot%s  (%s)" % [
             cell_count,
             "s" if cell_count != 1 else "",
             cat.shape_id,

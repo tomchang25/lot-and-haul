@@ -67,7 +67,7 @@ func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
         var cat := entry.item_data.category_data
         var cell_count: int = cat.get_cells().size()
         _weight_label.text = "Weight:  %.1f kg" % cat.weight
-        _grid_label.text   = "Grid:  %d slot%s  (%s)" % [
+        _grid_label.text = "Grid:  %d slot%s  (%s)" % [
             cell_count,
             "s" if cell_count != 1 else "",
             cat.shape_id,
