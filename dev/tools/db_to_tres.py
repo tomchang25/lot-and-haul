@@ -73,7 +73,7 @@ def _build_layer_tres(
             '[sub_resource type="Resource" id="unlock"]',
             'script = ExtResource("2_unlock")',
             f'context = {unlock["context"]}',
-            f'time_cost = {unlock["time_cost"]}',
+            f'unlock_days = {unlock["unlock_days"]}',
         ]
         if skill_tag:
             lines += [
@@ -279,7 +279,7 @@ def export_identity_layers(
     for layer_id, display_name, base_value, uid in rows:
         uid = uid or _new_uid()
         unlock_row = cur.execute(
-            "SELECT context, time_cost, skill_id, required_level, required_condition "
+            "SELECT context, unlock_days, skill_id, required_level, required_condition "
             "FROM layer_unlock_actions WHERE layer_id = ?",
             (layer_id,),
         ).fetchone()
@@ -288,7 +288,7 @@ def export_identity_layers(
         if unlock_row:
             unlock = {
                 "context": unlock_row[0],
-                "time_cost": unlock_row[1],
+                "unlock_days": unlock_row[1],
                 "skill_id": unlock_row[2],
                 "required_level": unlock_row[3],
                 "required_condition": unlock_row[4],

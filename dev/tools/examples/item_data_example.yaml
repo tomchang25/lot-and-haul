@@ -25,7 +25,7 @@
 #     1 = HOME  — the player works on the item in the home workshop.
 #                 Used on layer[1] and above. Always costs time.
 #
-#   time_cost:   int 1–5. How long the HOME action takes. Ignored when context=0.
+#   unlock_days:   int 1–5. How long the HOME action takes. Ignored when context=0.
 #                1 = quick look / wipe down
 #                2 = close inspection
 #                3 = moderate research
@@ -59,7 +59,7 @@ identity_layers:
     base_value: 220
     unlock_action:
       context: 1 # HOME
-      time_cost: 2
+      unlock_days: 2
 
   # ── Items A and B: fork at layer[2] ──────────────────────
   # Both share lamp_shaped_object and antique_oil_lamp.
@@ -91,14 +91,14 @@ identity_layers:
     base_value: 380
     unlock_action:
       context: 1 # HOME
-      time_cost: 2
+      unlock_days: 2
 
   - layer_id: ornate_lamp_body # shared mid-layer: C[2] and D[3]
     display_name: Ornate Lamp Body
     base_value: 700
     unlock_action:
       context: 1 # HOME
-      time_cost: 3
+      unlock_days: 3
       required_skill: appraisal
       required_level: 1
 
@@ -137,7 +137,7 @@ items:
     rarity: 2 # RARE
     layer_ids:
       - lamp_shaped_object # [0] context=0 AUTO
-      - antique_oil_lamp # [1] context=1 HOME time_cost=2
+      - antique_oil_lamp # [1] context=1 HOME unlock_days=2
       - signed_duplex_burner_lamp # [2] FINAL
 
   - item_id: viennese_chandelier
@@ -161,8 +161,8 @@ items:
     rarity: 3 # EPIC
     layer_ids:
       - lamp_shaped_object # [0] context=0 AUTO
-      - antique_oil_lamp # [1] HOME time_cost=2
-      - ornate_lamp_body # [2] HOME appraisal lv1, time_cost=3
+      - antique_oil_lamp # [1] HOME unlock_days=2
+      - ornate_lamp_body # [2] HOME appraisal lv1, unlock_days=3
       - french_empire_lamp # [3] FINAL
 
   - item_id: meissen_porcelain_lamp
@@ -170,7 +170,7 @@ items:
     rarity: 4 # LEGENDARY
     layer_ids:
       - lamp_shaped_object # [0] context=0 AUTO
-      - antique_oil_lamp # [1] HOME time_cost=2
-      - gilded_lamp_base # [2] HOME time_cost=2  ← extra step only Item D has
-      - ornate_lamp_body # [3] HOME appraisal lv1, time_cost=3  ← same layer as C[2]
+      - antique_oil_lamp # [1] HOME unlock_days=2
+      - gilded_lamp_base # [2] HOME unlock_days=2  ← extra step only Item D has
+      - ornate_lamp_body # [3] HOME appraisal lv1, unlock_days=3  ← same layer as C[2]
       - authenticated_meissen_lamp # [4] FINAL

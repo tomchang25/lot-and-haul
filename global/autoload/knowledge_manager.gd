@@ -100,6 +100,35 @@ func get_price_range(super_category_id: String, rarity: ItemData.Rarity, layer_d
     return Vector2(rank_min, rank_max)
 
 
+func apply_market_research(entry: ItemEntry) -> void:
+    var super_cat_id: String = \
+        entry.item_data.category_data.super_category.super_category_id
+    var layers_count: int = entry.item_data.identity_layers.size()
+
+    var old_range: float = 0.0
+    for i in range(layers_count):
+        old_range += entry.knowledge_max[i] - entry.knowledge_min[i]
+
+    var new_min: Array[float] = []
+    var new_max: Array[float] = []
+    new_min.resize(layers_count)
+    new_max.resize(layers_count)
+    for i in range(layers_count):
+        var depth: int = maxi(0, i - entry.layer_index)
+        var price_range: Vector2 = get_price_range(
+            super_cat_id, entry.item_data.rarity, depth)
+        new_min[i] = price_range.x
+        new_max[i] = price_range.y
+
+    var new_range: float = 0.0
+    for i in range(layers_count):
+        new_range += new_max[i] - new_min[i]
+
+    if new_range < old_range:
+        entry.knowledge_min = new_min
+        entry.knowledge_max = new_max
+
+
 # Flat skill registry. Returns the player's current level for the given skill.
 # Always 1 for this slice — full skill progression is deferred.
 func get_level(skill_id: String) -> int:

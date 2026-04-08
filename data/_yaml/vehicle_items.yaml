@@ -10,14 +10,14 @@ identity_layers:
     base_value: 60
     unlock_action:
       context: 1
-      time_cost: 1
+      unlock_days: 1
 
   - layer_id: bike_marque_identified
     display_name: Prewar English Roadster
     base_value: 220
     unlock_action:
       context: 1
-      time_cost: 2
+      unlock_days: 2
       required_skill: appraisal
       required_level: 1
 
@@ -42,14 +42,14 @@ identity_layers:
     base_value: 180
     unlock_action:
       context: 1
-      time_cost: 2
+      unlock_days: 2
 
   - layer_id: moto_british_twin
     display_name: British Parallel Twin
     base_value: 650
     unlock_action:
       context: 1
-      time_cost: 3
+      unlock_days: 3
       required_skill: mechanical
       required_level: 1
 
@@ -68,7 +68,7 @@ identity_layers:
     base_value: 900
     unlock_action:
       context: 1
-      time_cost: 3
+      unlock_days: 3
       required_skill: mechanical
       required_level: 2
 
@@ -88,14 +88,14 @@ identity_layers:
     base_value: 400
     unlock_action:
       context: 1
-      time_cost: 2
+      unlock_days: 2
 
   - layer_id: auto_american_coupe
     display_name: Prewar American Coupe
     base_value: 1600
     unlock_action:
       context: 1
-      time_cost: 3
+      unlock_days: 3
       required_skill: appraisal
       required_level: 1
 
@@ -109,7 +109,7 @@ identity_layers:
     base_value: 3800
     unlock_action:
       context: 1
-      time_cost: 4
+      unlock_days: 4
       required_skill: authentication
       required_level: 2
 

@@ -191,10 +191,10 @@ def check_identity_layers(conn: sqlite3.Connection, layers_dir: Path) -> list[Ro
         )
     }
     db_unlocks = {
-        r[0]: {"context": r[1], "time_cost": r[2], "skill_id": r[3],
+        r[0]: {"context": r[1], "unlock_days": r[2], "skill_id": r[3],
                "required_level": r[4], "required_condition": r[5]}
         for r in cur.execute(
-            "SELECT layer_id, context, time_cost, skill_id, required_level, "
+            "SELECT layer_id, context, unlock_days, skill_id, required_level, "
             "required_condition FROM layer_unlock_actions"
         )
     }
@@ -239,11 +239,11 @@ def check_identity_layers(conn: sqlite3.Connection, layers_dir: Path) -> list[Ro
             )
         elif tres_unlock and db_unlock:
             t_ctx = int(tres_unlock.get("context", 1))
-            t_tc  = int(tres_unlock.get("time_cost", 0))
+            t_tc  = int(tres_unlock.get("unlock_days", 0))
             if t_ctx != db_unlock["context"]:
                 diffs.append(f"unlock.context: tres={t_ctx}  db={db_unlock['context']}")
-            if t_tc != db_unlock["time_cost"]:
-                diffs.append(f"unlock.time_cost: tres={t_tc}  db={db_unlock['time_cost']}")
+            if t_tc != db_unlock["unlock_days"]:
+                diffs.append(f"unlock.unlock_days: tres={t_tc}  db={db_unlock['unlock_days']}")
 
         rows.append(Row("identity_layers", layer_id,
                         "mismatch" if diffs else "ok", diffs))

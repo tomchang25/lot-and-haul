@@ -20,7 +20,7 @@ enum ActionContext {
 
 # Time take to perform this action.
 # Ignored when context is AUTO.
-@export var time_cost: int = 0
+@export var unlock_days: int = 0
 
 # Skill required before this action is available.
 # Null means no skill prerequisite.

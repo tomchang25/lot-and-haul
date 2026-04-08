@@ -18,6 +18,14 @@ const RESEARCH_COST: Dictionary = {
     ItemData.Rarity.LEGENDARY: 8000,
 }
 
+const RESEARCH_DAYS: Dictionary = {
+    ItemData.Rarity.COMMON:     1,
+    ItemData.Rarity.UNCOMMON:   2,
+    ItemData.Rarity.RARE:       3,
+    ItemData.Rarity.EPIC:       4,
+    ItemData.Rarity.LEGENDARY:  5,
+}
+
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _ctx: ItemViewContext = null
@@ -99,11 +107,13 @@ func _on_unlock_confirmed() -> void:
         return
     if not KnowledgeManager.can_advance(entry, LayerUnlockAction.ActionContext.HOME):
         return
-    entry.layer_index += 1
-    var cat_id: String = entry.item_data.category_data.category_id
-    KnowledgeManager.add_category_points(cat_id, entry.item_data.rarity, KnowledgeManager.KnowledgeAction.APPRAISE)
-    _refresh_row(entry)
+    var action_def: LayerUnlockAction = entry.current_unlock_action()
+    var days: int = action_def.unlock_days if action_def != null else 1
+    var action := ActiveActionEntry.create(
+        ActiveActionEntry.ActionType.UNLOCK, entry.id, days)
+    SaveManager.active_actions.append(action.to_dict())
     SaveManager.save()
+    _refresh_row(entry)
 
 
 func _on_research_confirmed() -> void:
@@ -113,7 +123,13 @@ func _on_research_confirmed() -> void:
     var cost: int = RESEARCH_COST.get(entry.item_data.rarity, 500)
     if SaveManager.cash < cost:
         return
-    _do_market_research(entry)
+    var days: int = RESEARCH_DAYS.get(entry.item_data.rarity, 1)
+    var action := ActiveActionEntry.create(
+        ActiveActionEntry.ActionType.MARKET_RESEARCH, entry.id, days)
+    SaveManager.active_actions.append(action.to_dict())
+    SaveManager.cash -= cost
+    SaveManager.save()
+    _refresh_row(entry)
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 
@@ -142,67 +158,47 @@ func _populate_rows() -> void:
 # ══ Action popup ══════════════════════════════════════════════════════════════
 
 
+func _get_action_block_reason(entry: ItemEntry) -> String:
+    if SaveManager.active_actions.size() >= SaveManager.max_concurrent_actions:
+        return "No action slots available"
+    for d: Dictionary in SaveManager.active_actions:
+        if int(d.get("item_id", -1)) == entry.id:
+            return "Already in progress"
+    return ""
+
+
 func _show_action_popup(entry: ItemEntry) -> void:
     _action_item_label.text = entry.display_name
+    var block: String = _get_action_block_reason(entry)
 
-    # Unlock button: visible when HOME unlock action is available.
-    var action: LayerUnlockAction = entry.current_unlock_action()
+    var action_def: LayerUnlockAction = entry.current_unlock_action()
     var can_unlock: bool = (
-        action != null
-        and action.context == LayerUnlockAction.ActionContext.HOME
+        action_def != null
+        and action_def.context == LayerUnlockAction.ActionContext.HOME
         and KnowledgeManager.can_advance(entry, LayerUnlockAction.ActionContext.HOME)
     )
     _unlock_btn.visible = can_unlock
+    if can_unlock:
+        _unlock_btn.disabled     = block != ""
+        _unlock_btn.tooltip_text = block
 
-    # Market Research: available on any non-veiled item.
     if not entry.is_veiled():
         var cost: int = RESEARCH_COST.get(entry.item_data.rarity, 500)
         _research_btn.visible = true
-        _research_btn.text = "Market Research — $%d" % cost
-        _research_btn.disabled = SaveManager.cash < cost
+        _research_btn.text    = "Market Research — $%d" % cost
+        if block != "":
+            _research_btn.disabled     = true
+            _research_btn.tooltip_text = block
+        elif SaveManager.cash < cost:
+            _research_btn.disabled     = true
+            _research_btn.tooltip_text = "Not enough cash"
+        else:
+            _research_btn.disabled     = false
+            _research_btn.tooltip_text = ""
     else:
         _research_btn.visible = false
 
     _action_popup.popup_centered()
-
-# ══ Market research ═══════════════════════════════════════════════════════════
-
-
-func _do_market_research(entry: ItemEntry) -> void:
-    var super_cat_id: String = entry.item_data.category_data.super_category.super_category_id
-    var layers_count: int = entry.item_data.identity_layers.size()
-
-    var old_range: float = 0.0
-    for i in range(layers_count):
-        old_range += entry.knowledge_max[i] - entry.knowledge_min[i]
-
-    var new_min: Array[float] = []
-    var new_max: Array[float] = []
-    new_min.resize(layers_count)
-    new_max.resize(layers_count)
-    for i in range(layers_count):
-        var depth: int = maxi(0, i - entry.layer_index)
-        var price_range: Vector2 = KnowledgeManager.get_price_range(
-            super_cat_id,
-            entry.item_data.rarity,
-            depth,
-        )
-        new_min[i] = price_range.x
-        new_max[i] = price_range.y
-
-    var new_range: float = 0.0
-    for i in range(layers_count):
-        new_range += new_max[i] - new_min[i]
-
-    var cost: int = RESEARCH_COST.get(entry.item_data.rarity, 500)
-    SaveManager.cash -= cost
-
-    if new_range < old_range:
-        entry.knowledge_min = new_min
-        entry.knowledge_max = new_max
-
-    SaveManager.save()
-    _refresh_row(entry)
 
 # ══ Refresh ════════════════════════════════════════════════════════════════════
 

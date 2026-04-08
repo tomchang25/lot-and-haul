@@ -10,14 +10,14 @@ identity_layers:
     base_value: 55
     unlock_action:
       context: 1
-      time_cost: 1
+      unlock_days: 1
 
   - layer_id: bag_hardware_check
     display_name: Designer-Style Handbag
     base_value: 180
     unlock_action:
       context: 1
-      time_cost: 2
+      unlock_days: 2
 
   - layer_id: bag_hermes_leaf
     display_name: Hermès Birkin 30, c.2005
@@ -34,7 +34,7 @@ identity_layers:
     base_value: 1200
     unlock_action:
       context: 1
-      time_cost: 4
+      unlock_days: 4
       required_skill: authentication
       required_level: 2
 
@@ -54,14 +54,14 @@ identity_layers:
     base_value: 45
     unlock_action:
       context: 1
-      time_cost: 1
+      unlock_days: 1
 
   - layer_id: watch_movement_open
     display_name: Manual-Wind Dress Watch
     base_value: 200
     unlock_action:
       context: 1
-      time_cost: 2
+      unlock_days: 2
       required_skill: mechanical
       required_level: 1
 
@@ -75,7 +75,7 @@ identity_layers:
     base_value: 380
     unlock_action:
       context: 1
-      time_cost: 3
+      unlock_days: 3
       required_skill: appraisal
       required_level: 1
 

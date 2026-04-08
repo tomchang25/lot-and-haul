@@ -170,14 +170,14 @@ def seed_identity_layers(
             cur.execute(
                 """
                 INSERT INTO layer_unlock_actions
-                    (layer_id, context, time_cost, skill_id,
+                    (layer_id, context, unlock_days, skill_id,
                      required_level, required_condition)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (
                     layer_id,
                     int(unlock_fields.get("context", 1)),
-                    int(unlock_fields.get("time_cost", 0)),
+                    int(unlock_fields.get("unlock_days", 0)),
                     skill_id,
                     int(unlock_fields.get("required_level", 0)),
                     float(unlock_fields.get("required_condition", 0.0)),
