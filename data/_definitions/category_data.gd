@@ -5,6 +5,8 @@
 class_name CategoryData
 extends Resource
 
+const CargoShapes = preload("res://data/_definitions/cargo_shapes.gd")
+
 # Internal identifier. Matches the .tres filename stem and DB category_id.
 @export var category_id: String = ""
 
@@ -17,5 +19,9 @@ extends Resource
 # Weight in kilograms.
 @export var weight: float = 0.0
 
-# Number of inventory grid cells this item occupies.
-@export var grid_size: int = 1
+# Shape key into CargoShapes.SHAPES.
+@export var shape_id: String = "s1x1"
+
+
+func get_cells() -> Array[Vector2i]:
+    return CargoShapes.get_cells(shape_id)

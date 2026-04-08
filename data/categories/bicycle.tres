@@ -9,4 +9,4 @@ category_id = "bicycle"
 super_category = ExtResource("2_super")
 display_name = "Bicycle"
 weight = 12.0
-grid_size = 6
+shape_id = "s2x3"

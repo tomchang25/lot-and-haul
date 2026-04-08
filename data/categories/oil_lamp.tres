@@ -9,4 +9,4 @@ category_id = "oil_lamp"
 super_category = ExtResource("2_super")
 display_name = "Oil Lamp"
 weight = 3.0
-grid_size = 2
+shape_id = "s1x2"

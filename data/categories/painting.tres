@@ -9,4 +9,4 @@ category_id = "painting"
 super_category = ExtResource("2_super")
 display_name = "Painting"
 weight = 1.5
-grid_size = 2
+shape_id = "s1x2"

@@ -9,4 +9,4 @@ category_id = "wristwatch"
 super_category = ExtResource("2_super")
 display_name = "Wristwatch"
 weight = 0.1
-grid_size = 1
+shape_id = "s1x1"
