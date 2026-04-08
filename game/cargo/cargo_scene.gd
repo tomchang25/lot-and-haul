@@ -54,7 +54,7 @@ var _active_rotation: int = 0
 # Per-item rotation memory for this session (ItemEntry → int).
 # Populated when an item is placed; read when the same item is lifted again.
 # Cleared on full reset. Never written outside this scene.
-var _item_rotations: Dictionary = {}   # ItemEntry → int
+var _item_rotations: Dictionary = { } # ItemEntry → int
 
 # ── Cargo Grid State ──────────────────────────────────────────────────────────
 
@@ -154,11 +154,11 @@ func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo:
         match event.keycode:
             KEY_Q:
-                _active_rotation = (_active_rotation + 3) % 4  # one step CCW
+                _active_rotation = (_active_rotation + 3) % 4 # one step CCW
                 _refresh_ui()
                 get_viewport().set_input_as_handled()
             KEY_E:
-                _active_rotation = (_active_rotation + 1) % 4  # one step CW
+                _active_rotation = (_active_rotation + 1) % 4 # one step CW
                 _refresh_ui()
                 get_viewport().set_input_as_handled()
 
