@@ -34,14 +34,16 @@ var _active_origin: String = ""
 var _active_origin_pos: Vector2i = Vector2i(-1, -1) # Original position for cancel
 
 # Extra (trailer) slot state — parallel to _cargo_placement, never intersects it.
-var _extra_slot_items: Array[ItemEntry] = []          # size = car_config.extra_slot_count; null = empty
-var _active_origin_extra_index: int = -1              # set when _active_origin == "extra"
+var _extra_slot_items: Array[ItemEntry] = [] # size = car_config.extra_slot_count; null = empty
+var _active_origin_extra_index: int = -1 # set when _active_origin == "extra"
 
 # Current hover position in cargo grid coords (invalid when not hovering).
 var _hover_cell: Vector2i = Vector2i(-1, -1)
 
 # Current hover position in temp grid coords (invalid when not hovering).
 var _temp_hover_cell: Vector2i = Vector2i(-1, -1)
+
+var _hover_extra_index: int = -1
 
 var _phase: Phase = Phase.IDLE
 
@@ -69,7 +71,7 @@ var _temp_cells: Dictionary = { } # Vector2i → Panel
 
 # Runtime cell controls built in _build_extra_slots().
 # Maps slot index → the Panel node representing that cell.
-var _extra_slot_cells: Dictionary = {} # int → Panel
+var _extra_slot_cells: Dictionary = { } # int → Panel
 
 # ── Stats ─────────────────────────────────────────────────────────────────────
 
@@ -509,7 +511,7 @@ func _lift_from_extra(slot_index: int) -> void:
 
 func _place_item_in_extra(slot_index: int) -> void:
     if _extra_slot_items[slot_index] != null:
-        return   # occupied — reject
+        return # occupied — reject
 
     # Remove from previous grid if applicable.
     if _active_origin == "cargo":
@@ -680,9 +682,20 @@ func _refresh_extra_slot_visuals() -> void:
         var style: StyleBoxFlat
         var entry: ItemEntry = _extra_slot_items[i] if i < _extra_slot_items.size() else null
         if entry != null:
+            if i == _hover_extra_index and _phase != Phase.ITEM_HELD:
+                style = _make_stylebox(
+                    _get_item_color(entry).lightened(0.2),
+                    _get_item_border_color(entry).lightened(0.15),
+                )
+            else:
+                style = _make_stylebox(
+                    _get_item_color(entry),
+                    _get_item_border_color(entry),
+                )
+        elif i == _hover_extra_index and _phase == Phase.ITEM_HELD:
             style = _make_stylebox(
-                _get_item_color(entry),
-                _get_item_border_color(entry),
+                Color(0.20, 0.45, 0.22, 1.0),
+                Color(0.35, 0.75, 0.40, 1.0),
             )
         else:
             style = _make_stylebox(
@@ -694,7 +707,9 @@ func _refresh_extra_slot_visuals() -> void:
         # Update the icon label
         var icon_label: Label = cell.get_node("IconLabel")
         if entry != null:
-            icon_label.text = entry.item_data.display_name.left(2).to_upper()
+            var words = entry.active_layer().display_name.split(" ", false)
+            icon_label.text = (words[0].left(1) if words.size() > 0 else "") + (words[1].left(1) if words.size() > 1 else "")
+            icon_label.text = icon_label.text.to_upper()
         else:
             icon_label.text = ""
 
@@ -850,11 +865,17 @@ func _make_extra_slot_cell(slot_index: int) -> Panel:
 
     cell.mouse_entered.connect(
         func() -> void:
+            _hover_extra_index = slot_index
+            _refresh_extra_slot_visuals()
+
             if _phase != Phase.ITEM_HELD and _extra_slot_items[slot_index] != null:
                 _show_tooltip_for_item(_extra_slot_items[slot_index], cell.get_global_rect())
     )
     cell.mouse_exited.connect(
         func() -> void:
+            if _hover_extra_index == slot_index:
+                _hover_extra_index = -1
+            _refresh_extra_slot_visuals()
             _hide_tooltip()
     )
 
