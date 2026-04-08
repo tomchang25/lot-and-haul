@@ -3,12 +3,13 @@
 # Add one instance to the scene root (not to the row).
 # Call show_for() / hide_tooltip() from the parent scene.
 #
-# Always-shown rows: Super-category, Category, Weight, Grid.
+# Always-shown rows: Display Name, Super-category, Category, Weight, Grid.
 # Conditional rows:  Potential rating, Potential price, Condition detail
 #                    (hidden until inspected).
 class_name ItemRowTooltip
 extends PanelContainer
 
+@onready var _display_name_label: Label = $VBox/DisplayNameLabel
 @onready var _super_category_label: Label = $VBox/SuperCategoryLabel
 @onready var _category_label: Label = $VBox/CategoryLabel
 @onready var _potential_label: Label = $VBox/PotentialLabel
@@ -20,6 +21,10 @@ extends PanelContainer
 
 
 func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
+    # ── Display name (at the top) ────────────────────────────────────────────
+    _display_name_label.text = entry.display_name
+    _display_name_label.show()
+    
     # ── Always-visible: category identity ────────────────────────────────────
     if entry.item_data != null and entry.item_data.category_data != null:
         var cat := entry.item_data.category_data

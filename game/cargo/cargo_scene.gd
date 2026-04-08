@@ -10,6 +10,10 @@ const ONSITE_SELL_PRICE := 50
 const CELL_SIZE := 56 # px per grid cell
 const CELL_GAP := 3 # px between cells
 
+# Temp grid dimensions (adjust as needed)
+const TEMP_GRID_COLS := 10
+const TEMP_GRID_ROWS := 4
+
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 
 # ── Enums ─────────────────────────────────────────────────────────────────────
@@ -24,31 +28,46 @@ enum Phase {
 # All items from this run.
 var _won_items: Array[ItemEntry] = []
 
-# Items currently sitting in temp storage (not yet placed in cargo).
-var _temp_items: Array[ItemEntry] = []
+# Currently held item and where it came from ("temp" | "cargo").
+var _active_item: ItemEntry = null
+var _active_origin: String = ""
+var _active_origin_pos: Vector2i = Vector2i(-1, -1) # Original position for cancel
+
+# Current hover position in cargo grid coords (invalid when not hovering).
+var _hover_cell: Vector2i = Vector2i(-1, -1)
+
+# Current hover position in temp grid coords (invalid when not hovering).
+var _temp_hover_cell: Vector2i = Vector2i(-1, -1)
+
+var _phase: Phase = Phase.IDLE
+
+# ── Cargo Grid State ──────────────────────────────────────────────────────────
 
 # Maps cargo grid position → ItemEntry.
 # Only occupied cells appear as keys.
 var _cargo_placement: Dictionary = { } # Vector2i → ItemEntry
 
-# Currently held item and where it came from ("temp" | "cargo").
-var _active_item: ItemEntry = null
-var _active_origin: String = ""
-
-# Current hover position in cargo grid coords (invalid when not hovering).
-var _hover_cell: Vector2i = Vector2i(-1, -1)
-
-var _phase: Phase = Phase.IDLE
-
 # Runtime cell controls built in _build_cargo_grid().
 # Maps grid position → the Panel node representing that cell.
 var _cargo_cells: Dictionary = { } # Vector2i → Panel
 
-# Maps ItemEntry → the Panel node in temp storage.
-var _temp_item_nodes: Dictionary = { } # ItemEntry → Panel
+# ── Temp Grid State (refactored to be grid-based like cargo) ──────────────────
+
+# Maps temp grid position → ItemEntry.
+# Only occupied cells appear as keys.
+var _temp_placement: Dictionary = { } # Vector2i → ItemEntry
+
+# Runtime cell controls built in _build_temp_grid().
+# Maps grid position → the Panel node representing that cell.
+var _temp_cells: Dictionary = { } # Vector2i → Panel
+
+# ── Stats ─────────────────────────────────────────────────────────────────────
 
 var _slots_used: int = 0
 var _weight_used: float = 0.0
+
+# Unique color for each item (assigned once, persists through session)
+var _item_colors: Dictionary = { } # ItemEntry → Color
 
 # Tooltip support
 var _ctx: ItemViewContext = null
@@ -61,6 +80,7 @@ var _hovered_item: ItemEntry = null
 
 @onready var _slots_label: Label = $RootVBox/StatsBar/SlotsLabel
 @onready var _weight_label: Label = $RootVBox/StatsBar/WeightLabel
+@onready var _error_label: Label = $RootVBox/ErrorLabel
 @onready var _cargo_grid: GridContainer = $RootVBox/CargoSection/CargoGrid
 @onready var _temp_grid: GridContainer = $RootVBox/TempSection/TempGrid
 @onready var _reset_btn: Button = $RootVBox/Footer/ResetButton
@@ -80,29 +100,44 @@ func _ready() -> void:
     _confirm_popup.confirmed.connect(_on_confirm_popup_confirmed)
 
     _won_items = RunManager.run_record.won_items
-    _temp_items = _won_items.duplicate()
+
+    # Assign unique colors to each item
+    _assign_item_colors()
 
     _build_cargo_grid()
+    _build_temp_grid()
     _populate_temp_storage()
     _recalc_totals()
     _refresh_ui()
+
+
+func _input(event: InputEvent) -> void:
+    if event is InputEventMouseButton:
+        if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+            if _phase == Phase.ITEM_HELD:
+                # Cancel placement - return item to temp storage
+                _cancel_placement()
+                accept_event()
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
 func _on_reset_pressed() -> void:
+    # Move all cargo items back to temp
     var unique_entries: Array[ItemEntry] = []
     for pos: Vector2i in _cargo_placement:
         var entry: ItemEntry = _cargo_placement[pos]
         if entry not in unique_entries:
             unique_entries.append(entry)
-    for entry: ItemEntry in unique_entries:
-        _temp_items.append(entry)
     _cargo_placement.clear()
 
     _active_item = null
     _active_origin = ""
+    _active_origin_pos = Vector2i(-1, -1)
     _phase = Phase.IDLE
+
+    # Re-populate temp with all won items
+    _temp_placement.clear()
     _populate_temp_storage()
     _recalc_totals()
     _refresh_ui()
@@ -120,7 +155,14 @@ func _on_confirm_popup_confirmed() -> void:
         if entry not in cargo:
             cargo.append(entry)
     RunManager.run_record.cargo_items = cargo
-    RunManager.run_record.onsite_proceeds = _temp_items.size() * ONSITE_SELL_PRICE
+
+    # Count items left in temp storage
+    var temp_items: Array[ItemEntry] = []
+    for pos: Vector2i in _temp_placement:
+        var entry: ItemEntry = _temp_placement[pos]
+        if entry not in temp_items:
+            temp_items.append(entry)
+    RunManager.run_record.onsite_proceeds = temp_items.size() * ONSITE_SELL_PRICE
     GameManager.go_to_run_review()
 
 
@@ -130,92 +172,214 @@ func _on_cargo_cell_pressed(cell_pos: Vector2i) -> void:
         if _cargo_placement.has(cell_pos):
             _lift_from_cargo(_cargo_placement[cell_pos])
     elif _phase == Phase.ITEM_HELD:
-        if _can_place_at(_active_item, cell_pos):
-            _place_item(_active_item, cell_pos)
+        if _can_place_at_cargo(_active_item, cell_pos):
+            _place_item_in_cargo(_active_item, cell_pos)
 
 
-func _on_temp_item_pressed(entry: ItemEntry) -> void:
+func _on_temp_cell_pressed(cell_pos: Vector2i) -> void:
     _hide_tooltip()
-    if _phase == Phase.ITEM_HELD and _active_item == entry:
-        _active_item = null
-        _active_origin = ""
-        _phase = Phase.IDLE
-        _refresh_ui()
-    else:
-        _active_item = entry
-        _active_origin = "temp"
-        _phase = Phase.ITEM_HELD
-        _refresh_ui()
+    if _phase == Phase.IDLE:
+        if _temp_placement.has(cell_pos):
+            _lift_from_temp(_temp_placement[cell_pos])
+    elif _phase == Phase.ITEM_HELD:
+        if _can_place_at_temp(_active_item, cell_pos):
+            _place_item_in_temp(_active_item, cell_pos)
+
+# ══ Color assignment ═══════════════════════════════════════════════════════════
+
+
+func _assign_item_colors() -> void:
+    # Generate visually distinct colors for each item using golden ratio hue spacing
+    var golden_ratio := 0.618033988749895
+    var hue := randf() # Random starting hue for variety between sessions
+
+    for entry: ItemEntry in _won_items:
+        hue = fmod(hue + golden_ratio, 1.0)
+        # Use moderate saturation and value for pleasant, distinguishable colors
+        var color := Color.from_hsv(hue, 0.55, 0.50)
+        _item_colors[entry] = color
+
+
+func _get_item_color(entry: ItemEntry) -> Color:
+    if _item_colors.has(entry):
+        return _item_colors[entry]
+    return Color(0.22, 0.30, 0.42, 1.0) # Fallback
+
+
+func _get_item_border_color(entry: ItemEntry) -> Color:
+    if _item_colors.has(entry):
+        var base: Color = _item_colors[entry]
+        # Lighter border
+        return base.lightened(0.35)
+    return Color(0.40, 0.55, 0.75, 1.0) # Fallback
 
 # ══ Grid construction ══════════════════════════════════════════════════════════
 
 
 func _build_cargo_grid() -> void:
-    # Hardcoded 8×4 for now; wire to CarConfig.grid_columns/grid_rows later.
-    const COLS := 8
-    const ROWS := 4
-    _cargo_grid.columns = COLS
+    var cols := RunManager.run_record.car_config.grid_columns
+    var rows := RunManager.run_record.car_config.grid_rows
 
-    for row in ROWS:
-        for col in COLS:
+    _cargo_grid.columns = cols
+
+    for row in rows:
+        for col in cols:
             var pos := Vector2i(col, row)
-            var cell := _make_cell(pos)
+            var cell := _make_cargo_cell(pos)
             _cargo_grid.add_child(cell)
             _cargo_cells[pos] = cell
 
 
-func _populate_temp_storage() -> void:
-    for child in _temp_grid.get_children():
-        child.queue_free()
-    _temp_item_nodes.clear()
+func _build_temp_grid() -> void:
+    _temp_grid.columns = TEMP_GRID_COLS
 
-    for entry: ItemEntry in _temp_items:
-        var node := _make_temp_item_node(entry)
-        _temp_grid.add_child(node)
-        _temp_item_nodes[entry] = node
+    for row in TEMP_GRID_ROWS:
+        for col in TEMP_GRID_COLS:
+            var pos := Vector2i(col, row)
+            var cell := _make_temp_cell(pos)
+            _temp_grid.add_child(cell)
+            _temp_cells[pos] = cell
+
+
+func _populate_temp_storage() -> void:
+    # Clear existing placement
+    _temp_placement.clear()
+
+    # Place each won item in temp grid using first-fit algorithm
+    for entry: ItemEntry in _won_items:
+        var placed := false
+        for row in TEMP_GRID_ROWS:
+            if placed:
+                break
+            for col in TEMP_GRID_COLS:
+                var pos := Vector2i(col, row)
+                if _can_place_at_temp(entry, pos):
+                    _place_item_in_temp_silent(entry, pos)
+                    placed = true
+                    break
+        if not placed:
+            push_warning("Could not place item in temp grid: ", entry)
 
 # ══ Placement logic ════════════════════════════════════════════════════════════
 
 
-func _can_place_at(entry: ItemEntry, origin: Vector2i) -> bool:
+func _can_place_at_cargo(entry: ItemEntry, origin: Vector2i) -> bool:
+    var cols := RunManager.run_record.car_config.grid_columns
+    var rows := RunManager.run_record.car_config.grid_rows
+    var cells: Array[Vector2i] = entry.item_data.category_data.get_cells()
+
+    # Check grid bounds and collision
+    for c: Vector2i in cells:
+        var world := origin + c
+        if world.x < 0 or world.x >= cols or world.y < 0 or world.y >= rows:
+            return false
+        if _cargo_placement.has(world) and _cargo_placement[world] != entry:
+            return false
+
+    # Check weight limit
+    if _would_exceed_weight(entry):
+        return false
+
+    return true
+
+
+func _would_exceed_weight(entry: ItemEntry) -> bool:
+    # Check if placing this entry would exceed max weight
+    # If item is already in cargo, don't double count
+    var max_weight: float = RunManager.run_record.car_config.max_weight
+    var entry_weight: float = entry.item_data.category_data.weight
+
+    # Check if entry is already in cargo
+    var already_in_cargo := false
+    for pos: Vector2i in _cargo_placement:
+        if _cargo_placement[pos] == entry:
+            already_in_cargo = true
+            break
+
+    if already_in_cargo:
+        # Item already counted in _weight_used, so no additional weight
+        return false
+    else:
+        return (_weight_used + entry_weight) > max_weight
+
+
+func _get_pending_weight(entry: ItemEntry) -> float:
+    # Get the weight that would be added if this entry is placed in cargo
+    # Returns 0 if already in cargo
+    for pos: Vector2i in _cargo_placement:
+        if _cargo_placement[pos] == entry:
+            return 0.0
+    return entry.item_data.category_data.weight
+
+
+func _get_pending_slots(entry: ItemEntry) -> int:
+    # Get the slots that would be added if this entry is placed in cargo
+    # Returns 0 if already in cargo
+    for pos: Vector2i in _cargo_placement:
+        if _cargo_placement[pos] == entry:
+            return 0
+    return entry.item_data.category_data.get_cells().size()
+
+
+func _can_place_at_temp(entry: ItemEntry, origin: Vector2i) -> bool:
     var cells: Array[Vector2i] = entry.item_data.category_data.get_cells()
     for c: Vector2i in cells:
         var world := origin + c
-        if world.x < 0 or world.x >= 8 or world.y < 0 or world.y >= 4:
+        if world.x < 0 or world.x >= TEMP_GRID_COLS or world.y < 0 or world.y >= TEMP_GRID_ROWS:
             return false
-        if _cargo_placement.has(world) and _cargo_placement[world] != entry:
+        if _temp_placement.has(world) and _temp_placement[world] != entry:
             return false
     return true
 
 
-func _place_item(entry: ItemEntry, origin: Vector2i) -> void:
-    # Remove entry's existing cells if being moved within cargo.
-    var keys_to_erase: Array[Vector2i] = []
-    for pos: Vector2i in _cargo_placement:
-        if _cargo_placement[pos] == entry:
-            keys_to_erase.append(pos)
-    for pos: Vector2i in keys_to_erase:
-        _cargo_placement.erase(pos)
+func _place_item_in_cargo(entry: ItemEntry, origin: Vector2i) -> void:
+    # Remove entry's existing cells from cargo if being moved within cargo.
+    _erase_from_cargo(entry)
+
+    # Remove from temp if applicable.
+    _erase_from_temp(entry)
 
     # Write new cells.
     var cells: Array[Vector2i] = entry.item_data.category_data.get_cells()
     for c: Vector2i in cells:
         _cargo_placement[origin + c] = entry
 
-    # Remove from temp if applicable.
-    if entry in _temp_items:
-        _temp_items.erase(entry)
-        _temp_item_nodes[entry].queue_free()
-        _temp_item_nodes.erase(entry)
-
     _active_item = null
     _active_origin = ""
+    _active_origin_pos = Vector2i(-1, -1)
     _phase = Phase.IDLE
     _recalc_totals()
     _refresh_ui()
 
 
-func _lift_from_cargo(entry: ItemEntry) -> void:
+func _place_item_in_temp(entry: ItemEntry, origin: Vector2i) -> void:
+    # Remove entry's existing cells from temp if being moved within temp.
+    _erase_from_temp(entry)
+
+    # Remove from cargo if applicable.
+    _erase_from_cargo(entry)
+
+    # Write new cells.
+    var cells: Array[Vector2i] = entry.item_data.category_data.get_cells()
+    for c: Vector2i in cells:
+        _temp_placement[origin + c] = entry
+
+    _active_item = null
+    _active_origin = ""
+    _active_origin_pos = Vector2i(-1, -1)
+    _phase = Phase.IDLE
+    _recalc_totals()
+    _refresh_ui()
+
+
+func _place_item_in_temp_silent(entry: ItemEntry, origin: Vector2i) -> void:
+    # Place without changing phase or refreshing UI (used during initial population)
+    var cells: Array[Vector2i] = entry.item_data.category_data.get_cells()
+    for c: Vector2i in cells:
+        _temp_placement[origin + c] = entry
+
+
+func _erase_from_cargo(entry: ItemEntry) -> void:
     var keys_to_erase: Array[Vector2i] = []
     for pos: Vector2i in _cargo_placement:
         if _cargo_placement[pos] == entry:
@@ -223,15 +387,58 @@ func _lift_from_cargo(entry: ItemEntry) -> void:
     for pos: Vector2i in keys_to_erase:
         _cargo_placement.erase(pos)
 
-    _temp_items.append(entry)
-    var node := _make_temp_item_node(entry)
-    _temp_grid.add_child(node)
-    _temp_item_nodes[entry] = node
 
+func _erase_from_temp(entry: ItemEntry) -> void:
+    var keys_to_erase: Array[Vector2i] = []
+    for pos: Vector2i in _temp_placement:
+        if _temp_placement[pos] == entry:
+            keys_to_erase.append(pos)
+    for pos: Vector2i in keys_to_erase:
+        _temp_placement.erase(pos)
+
+
+func _lift_from_cargo(entry: ItemEntry) -> void:
+    # Find the origin cell (top-left of the item's bounding box)
+    var origin_pos := Vector2i(999, 999)
+    for pos: Vector2i in _cargo_placement:
+        if _cargo_placement[pos] == entry:
+            if pos.y < origin_pos.y or (pos.y == origin_pos.y and pos.x < origin_pos.x):
+                origin_pos = pos
+
+    # Don't erase from cargo yet - keep it there until placed elsewhere or cancelled
     _active_item = entry
     _active_origin = "cargo"
+    _active_origin_pos = origin_pos
     _phase = Phase.ITEM_HELD
-    _recalc_totals()
+    _refresh_ui()
+
+
+func _lift_from_temp(entry: ItemEntry) -> void:
+    # Find the origin cell (top-left of the item's bounding box)
+    var origin_pos := Vector2i(999, 999)
+    for pos: Vector2i in _temp_placement:
+        if _temp_placement[pos] == entry:
+            if pos.y < origin_pos.y or (pos.y == origin_pos.y and pos.x < origin_pos.x):
+                origin_pos = pos
+
+    # Item stays in temp visually but we're now holding it
+    _active_item = entry
+    _active_origin = "temp"
+    _active_origin_pos = origin_pos
+    _phase = Phase.ITEM_HELD
+    _refresh_ui()
+
+
+func _cancel_placement() -> void:
+    if _phase != Phase.ITEM_HELD or _active_item == null:
+        return
+
+    # Item was never removed from its original grid, so just deselect
+    _active_item = null
+    _active_origin = ""
+    _active_origin_pos = Vector2i(-1, -1)
+    _phase = Phase.IDLE
+
     _refresh_ui()
 
 # ══ UI helpers ════════════════════════════════════════════════════════════════
@@ -250,20 +457,53 @@ func _recalc_totals() -> void:
 
 
 func _refresh_ui() -> void:
-    # Hardcoded limits matching _build_cargo_grid(); swap to CarConfig later.
-    const MAX_SLOTS := 8 * 4
-    const MAX_WEIGHT := 20.0
-    _slots_label.text = "Slots: %d / %d" % [_slots_used, MAX_SLOTS]
-    _weight_label.text = "Weight: %.1f / %.1f kg" % [_weight_used, MAX_WEIGHT]
+    var cols := RunManager.run_record.car_config.grid_columns
+    var rows := RunManager.run_record.car_config.grid_rows
+    var max_slots := cols * rows
+    var max_weight: float = RunManager.run_record.car_config.max_weight
+
+    # Check if we're holding an item and calculate pending changes
+    var pending_slots := 0
+    var pending_weight := 0.0
+    var weight_exceeded := false
+
+    if _phase == Phase.ITEM_HELD and _active_item != null:
+        pending_slots = _get_pending_slots(_active_item)
+        pending_weight = _get_pending_weight(_active_item)
+        weight_exceeded = (_weight_used + pending_weight) > max_weight
+
+    # Format slots label
+    if pending_slots > 0:
+        _slots_label.text = "Slots: %d + %d / %d" % [_slots_used, pending_slots, max_slots]
+    else:
+        _slots_label.text = "Slots: %d / %d" % [_slots_used, max_slots]
+
+    # Format weight label
+    if pending_weight > 0.0:
+        _weight_label.text = "Weight: %.1f + %.1f / %.1f kg" % [_weight_used, pending_weight, max_weight]
+        if weight_exceeded:
+            _weight_label.add_theme_color_override("font_color", Color(0.9, 0.3, 0.3, 1.0))
+        else:
+            _weight_label.add_theme_color_override("font_color", Color(0.35, 0.75, 0.40, 1.0))
+    else:
+        _weight_label.text = "Weight: %.1f / %.1f kg" % [_weight_used, max_weight]
+        _weight_label.remove_theme_color_override("font_color")
+
+    # Show/hide error message
+    if weight_exceeded:
+        _error_label.text = "Weight limit exceeded! Cannot place item."
+    else:
+        _error_label.text = ""
+
     _refresh_cargo_cell_visuals()
-    _refresh_temp_visuals()
+    _refresh_temp_cell_visuals()
 
 
 func _refresh_cargo_cell_visuals() -> void:
     var preview_cells: Array[Vector2i] = []
     var preview_valid := false
     if _phase == Phase.ITEM_HELD and _hover_cell != Vector2i(-1, -1) and _active_item != null:
-        preview_valid = _can_place_at(_active_item, _hover_cell)
+        preview_valid = _can_place_at_cargo(_active_item, _hover_cell)
         for c: Vector2i in _active_item.item_data.category_data.get_cells():
             preview_cells.append(_hover_cell + c)
 
@@ -282,10 +522,19 @@ func _refresh_cargo_cell_visuals() -> void:
                     Color(0.75, 0.30, 0.30, 1.0),
                 )
         elif _cargo_placement.has(pos):
-            style = _make_stylebox(
-                Color(0.22, 0.30, 0.42, 1.0),
-                Color(0.40, 0.55, 0.75, 1.0),
-            )
+            var entry: ItemEntry = _cargo_placement[pos]
+            if _phase == Phase.ITEM_HELD and _active_item == entry:
+                # Highlight the held item (slightly brighter)
+                var base_color := _get_item_color(entry)
+                style = _make_stylebox(
+                    base_color.lightened(0.2),
+                    _get_item_border_color(entry).lightened(0.15),
+                )
+            else:
+                style = _make_stylebox(
+                    _get_item_color(entry),
+                    _get_item_border_color(entry),
+                )
         else:
             style = _make_stylebox(
                 Color(0.18, 0.18, 0.20, 1.0),
@@ -294,40 +543,77 @@ func _refresh_cargo_cell_visuals() -> void:
         cell.add_theme_stylebox_override("panel", style)
 
 
-func _refresh_temp_visuals() -> void:
-    for entry: ItemEntry in _temp_item_nodes:
-        var node: Panel = _temp_item_nodes[entry]
-        if entry == _active_item:
-            node.modulate = Color(1, 1, 1, 0.45)
+func _refresh_temp_cell_visuals() -> void:
+    var preview_cells: Array[Vector2i] = []
+    var preview_valid := false
+    if _phase == Phase.ITEM_HELD and _temp_hover_cell != Vector2i(-1, -1) and _active_item != null:
+        preview_valid = _can_place_at_temp(_active_item, _temp_hover_cell)
+        for c: Vector2i in _active_item.item_data.category_data.get_cells():
+            preview_cells.append(_temp_hover_cell + c)
+
+    for pos: Vector2i in _temp_cells:
+        var cell: Panel = _temp_cells[pos]
+        var style: StyleBoxFlat
+
+        if pos in preview_cells:
+            if preview_valid:
+                style = _make_stylebox(
+                    Color(0.20, 0.45, 0.22, 1.0),
+                    Color(0.35, 0.75, 0.40, 1.0),
+                )
+            else:
+                style = _make_stylebox(
+                    Color(0.45, 0.18, 0.18, 1.0),
+                    Color(0.75, 0.30, 0.30, 1.0),
+                )
+        elif _temp_placement.has(pos):
+            var entry: ItemEntry = _temp_placement[pos]
+            if _phase == Phase.ITEM_HELD and _active_item == entry:
+                # Highlight the held item (slightly brighter)
+                var base_color := _get_item_color(entry)
+                style = _make_stylebox(
+                    base_color.lightened(0.2),
+                    _get_item_border_color(entry).lightened(0.15),
+                )
+            else:
+                style = _make_stylebox(
+                    _get_item_color(entry),
+                    _get_item_border_color(entry),
+                )
         else:
-            node.modulate = Color(1, 1, 1, 1.0)
+            style = _make_stylebox(
+                Color(0.14, 0.14, 0.16, 1.0),
+                Color(0.28, 0.28, 0.30, 1.0),
+            )
+        cell.add_theme_stylebox_override("panel", style)
 
 
 func _build_summary_text() -> String:
-    var loading: Array[String] = []
-    var selling: Array[String] = []
-
-    # Build cargo list (items being loaded)
-    var cargo_entries: Array[ItemEntry] = []
+    var cargo_count := 0
+    var cargo_seen: Array[ItemEntry] = []
     for pos: Vector2i in _cargo_placement:
         var entry: ItemEntry = _cargo_placement[pos]
-        if entry not in cargo_entries:
-            cargo_entries.append(entry)
-            loading.append("  " + entry.display_name)
+        if entry not in cargo_seen:
+            cargo_seen.append(entry)
+            cargo_count += 1
 
-    # Build selling list (items in temp storage)
-    for entry: ItemEntry in _temp_items:
-        selling.append("  " + entry.display_name)
+    var temp_count := 0
+    var temp_seen: Array[ItemEntry] = []
+    for pos: Vector2i in _temp_placement:
+        var entry: ItemEntry = _temp_placement[pos]
+        if entry not in temp_seen:
+            temp_seen.append(entry)
+            temp_count += 1
 
-    var lines: Array[String] = []
-    lines.append("Loading (%d):" % loading.size())
-    lines.append_array(loading if not loading.is_empty() else ["  (none)"])
-    lines.append("")
-    lines.append("Selling to merchant (%d)  →  $%d:" % [selling.size(), selling.size() * ONSITE_SELL_PRICE])
-    lines.append_array(selling if not selling.is_empty() else ["  (none)"])
-    return "\n".join(lines)
+    var left_proceeds := temp_count * ONSITE_SELL_PRICE
 
-# ══ Cell factory ══════════════════════════════════════════════════════════════
+    return (
+        "Loaded items: %d\n" % cargo_count +
+        "Left behind: %d  (sold on-site for $%d)\n\n" % [temp_count, left_proceeds] +
+        "Continue to settlement?"
+    )
+
+# ══ Cell builders ══════════════════════════════════════════════════════════════
 
 
 func _make_stylebox(bg: Color, border: Color) -> StyleBoxFlat:
@@ -341,7 +627,7 @@ func _make_stylebox(bg: Color, border: Color) -> StyleBoxFlat:
     return s
 
 
-func _make_cell(pos: Vector2i) -> Panel:
+func _make_cargo_cell(pos: Vector2i) -> Panel:
     var cell := Panel.new()
     cell.custom_minimum_size = Vector2(CELL_SIZE, CELL_SIZE)
     cell.set_meta("cell_pos", pos)
@@ -373,61 +659,56 @@ func _make_cell(pos: Vector2i) -> Panel:
 
     cell.gui_input.connect(
         func(event: InputEvent) -> void:
-            if event is InputEventMouseButton \
-            and event.button_index == MOUSE_BUTTON_LEFT \
-            and event.pressed:
-                _on_cargo_cell_pressed(pos)
+            if event is InputEventMouseButton and event.pressed:
+                if event.button_index == MOUSE_BUTTON_LEFT:
+                    _on_cargo_cell_pressed(pos)
+                elif event.button_index == MOUSE_BUTTON_RIGHT:
+                    if _phase == Phase.ITEM_HELD:
+                        _cancel_placement()
     )
     return cell
 
 
-func _make_temp_item_node(entry: ItemEntry) -> Panel:
-    # Build a Panel that represents one item in temp storage.
-    # Size = bounding box of entry's shape × CELL_SIZE.
-    var cells: Array[Vector2i] = entry.item_data.category_data.get_cells()
-    var max_col := 0
-    var max_row := 0
-    for c: Vector2i in cells:
-        if c.x > max_col:
-            max_col = c.x
-        if c.y > max_row:
-            max_row = c.y
-    var w := (max_col + 1) * CELL_SIZE + max_col * CELL_GAP
-    var h := (max_row + 1) * CELL_SIZE + max_row * CELL_GAP
-
-    var node := Panel.new()
-    node.custom_minimum_size = Vector2(w, h)
-    node.set_meta("item_entry", entry)
+func _make_temp_cell(pos: Vector2i) -> Panel:
+    var cell := Panel.new()
+    cell.custom_minimum_size = Vector2(CELL_SIZE, CELL_SIZE)
+    cell.set_meta("cell_pos", pos)
 
     var style := StyleBoxFlat.new()
-    style.bg_color = Color(0.22, 0.30, 0.42, 1.0)
+    style.bg_color = Color(0.14, 0.14, 0.16, 1.0)
     style.border_width_left = 1
     style.border_width_right = 1
     style.border_width_top = 1
     style.border_width_bottom = 1
-    style.border_color = Color(0.40, 0.55, 0.75, 1.0)
-    node.add_theme_stylebox_override("panel", style)
+    style.border_color = Color(0.28, 0.28, 0.30, 1.0)
+    cell.add_theme_stylebox_override("panel", style)
 
-    # Add tooltip support for temp items
-    node.mouse_entered.connect(
+    cell.mouse_entered.connect(
         func() -> void:
-            # Only show tooltip when not dragging
-            if _phase != Phase.ITEM_HELD:
-                _show_tooltip_for_item(entry, node.get_global_rect())
+            _temp_hover_cell = pos
+            _refresh_temp_cell_visuals()
+            # Show tooltip for item in this temp cell if not dragging
+            if _phase != Phase.ITEM_HELD and _temp_placement.has(pos):
+                _show_tooltip_for_item(_temp_placement[pos], cell.get_global_rect())
     )
-    node.mouse_exited.connect(
+    cell.mouse_exited.connect(
         func() -> void:
+            if _temp_hover_cell == pos:
+                _temp_hover_cell = Vector2i(-1, -1)
+            _refresh_temp_cell_visuals()
             _hide_tooltip()
     )
 
-    node.gui_input.connect(
+    cell.gui_input.connect(
         func(event: InputEvent) -> void:
-            if event is InputEventMouseButton \
-            and event.button_index == MOUSE_BUTTON_LEFT \
-            and event.pressed:
-                _on_temp_item_pressed(entry)
+            if event is InputEventMouseButton and event.pressed:
+                if event.button_index == MOUSE_BUTTON_LEFT:
+                    _on_temp_cell_pressed(pos)
+                elif event.button_index == MOUSE_BUTTON_RIGHT:
+                    if _phase == Phase.ITEM_HELD:
+                        _cancel_placement()
     )
-    return node
+    return cell
 
 # ══ Tooltip helpers ════════════════════════════════════════════════════════════
 
