@@ -68,7 +68,7 @@ unlock_action: How the player advances PAST this layer.
                         1 = HOME  — player works on item in the home workshop.
                                     Used on layer[1] and above. Always costs time.
 
-        time_cost:    int 1–5. Cost in time units. Required when context=1.
+        unlock_days:  int 1–5. Cost in days. Required when context=1.
                         1 = quick look or wipe down
                         2 = close inspection
                         3 = moderate research
@@ -123,7 +123,7 @@ Items reference it by name. The layer does not know its own position.
 
 CROSS-CHAIN RULE:
 The shared mid-layer must have an unlock_action that makes sense at both depths.
-Skill and time_cost should reflect the harder of the two positions.
+Skill and unlock_days should reflect the harder of the two positions.
 
 LAYER NAMING:
 Early/shared layers: use vague physical descriptions only.
@@ -141,10 +141,10 @@ Example: 80 → 220 → 700 → 2400
 
 UNLOCK DIFFICULTY PROGRESSION:
 layer[0] → [1]: context=0 (AUTO). Always free.
-layer[1] → [2]: context=1, time_cost=1–2. No skill usually.
-layer[2] → [3]: context=1, time_cost=2–3. May add skill lv1.
-layer[3] → [4]: context=1, time_cost=3–4. Skill lv1–2 recommended.
-layer[4] → [5]: context=1, time_cost=4–5. Skill lv2–3 required.
+layer[1] → [2]: context=1, unlock_days=1–2. No skill usually.
+layer[2] → [3]: context=1, unlock_days=2–3. May add skill lv1.
+layer[3] → [4]: context=1, unlock_days=3–4. Skill lv1–2 recommended.
+layer[4] → [5]: context=1, unlock_days=4–5. Skill lv2–3 required.
 
 RARITY VS LAYER DEPTH:
 COMMON (0): 2–3 layers. Final value 50–300.
@@ -229,6 +229,7 @@ Output the complete YAML block starting with 'categories:'.
 [ ] Every item's final layer has unlock_action: null
 [ ] No non-final layer has unlock_action: null
 [ ] base_value strictly increases along each item's layer chain
+[ ] context=1 requires unlock_days >= 1
 [ ] No required_level without required_skill on the same unlock_action
 [ ] required_skill values are only: appraisal, authentication, mechanical
 [ ] Shared layers appear exactly once in identity_layers

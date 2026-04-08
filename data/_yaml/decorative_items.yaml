@@ -10,14 +10,14 @@ identity_layers:
     base_value: 40
     unlock_action:
       context: 1
-      time_cost: 1
+      unlock_days: 1
 
   - layer_id: lamp_ornate_base
     display_name: Ornate Metal Base
     base_value: 110
     unlock_action:
       context: 1
-      time_cost: 2
+      unlock_days: 2
 
   - layer_id: lamp_leaf_moser
     display_name: Moser Bohemian Lamp
@@ -29,7 +29,7 @@ identity_layers:
     base_value: 90
     unlock_action:
       context: 1
-      time_cost: 2
+      unlock_days: 2
 
   - layer_id: lamp_leaf_baccarat
     display_name: Baccarat Crystal Lamp
@@ -41,7 +41,7 @@ identity_layers:
     base_value: 300
     unlock_action:
       context: 1
-      time_cost: 3
+      unlock_days: 3
       required_skill: appraisal
       required_level: 1
 
@@ -50,7 +50,7 @@ identity_layers:
     base_value: 900
     unlock_action:
       context: 1
-      time_cost: 4
+      unlock_days: 4
       required_skill: authentication
       required_level: 2
 
@@ -70,14 +70,14 @@ identity_layers:
     base_value: 55
     unlock_action:
       context: 1
-      time_cost: 1
+      unlock_days: 1
 
   - layer_id: clock_brass_movement
     display_name: Brass Movement Inside
     base_value: 140
     unlock_action:
       context: 1
-      time_cost: 2
+      unlock_days: 2
 
   - layer_id: clock_leaf_ansonia
     display_name: Ansonia Mantel Clock
@@ -94,14 +94,14 @@ identity_layers:
     base_value: 200
     unlock_action:
       context: 1
-      time_cost: 2
+      unlock_days: 2
 
   - layer_id: clock_platform_escapement
     display_name: Platform Escapement
     base_value: 420
     unlock_action:
       context: 1
-      time_cost: 3
+      unlock_days: 3
       required_skill: mechanical
       required_level: 1
 
@@ -115,14 +115,14 @@ identity_layers:
     base_value: 320
     unlock_action:
       context: 1
-      time_cost: 3
+      unlock_days: 3
 
   - layer_id: clock_signed_movement
     display_name: Signed Movement Plate
     base_value: 800
     unlock_action:
       context: 1
-      time_cost: 4
+      unlock_days: 4
       required_skill: authentication
       required_level: 2
 
@@ -142,7 +142,7 @@ identity_layers:
     base_value: 20
     unlock_action:
       context: 1
-      time_cost: 1
+      unlock_days: 1
 
   - layer_id: vase_leaf_modern
     display_name: Modern Decorative Vase
@@ -154,14 +154,14 @@ identity_layers:
     base_value: 90
     unlock_action:
       context: 1
-      time_cost: 2
+      unlock_days: 2
 
   - layer_id: vase_transfer_pattern
     display_name: Transfer-Print Pattern
     base_value: 220
     unlock_action:
       context: 1
-      time_cost: 2
+      unlock_days: 2
 
   - layer_id: vase_leaf_spode
     display_name: Spode Blue Italian Vase
@@ -173,14 +173,14 @@ identity_layers:
     base_value: 150
     unlock_action:
       context: 1
-      time_cost: 2
+      unlock_days: 2
 
   - layer_id: vase_cobalt_gilding
     display_name: Cobalt and Gilt Detail
     base_value: 500
     unlock_action:
       context: 1
-      time_cost: 3
+      unlock_days: 3
       required_skill: appraisal
       required_level: 1
 
@@ -189,7 +189,7 @@ identity_layers:
     base_value: 1400
     unlock_action:
       context: 1
-      time_cost: 4
+      unlock_days: 4
       required_skill: authentication
       required_level: 2
 
@@ -198,7 +198,7 @@ identity_layers:
     base_value: 4000
     unlock_action:
       context: 1
-      time_cost: 5
+      unlock_days: 5
       required_skill: authentication
       required_level: 3
 

@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS identity_layers (
 CREATE TABLE IF NOT EXISTS layer_unlock_actions (
     layer_id           TEXT    PRIMARY KEY REFERENCES identity_layers(layer_id) ON DELETE CASCADE,
     context            INTEGER NOT NULL DEFAULT 1,
-    time_cost          INTEGER NOT NULL DEFAULT 1,
+    unlock_days        INTEGER NOT NULL DEFAULT 1,
     skill_id           TEXT    REFERENCES skills(skill_id),
     required_level     INTEGER NOT NULL DEFAULT 0,
     required_condition REAL    NOT NULL DEFAULT 0.0
@@ -88,7 +88,7 @@ _SEED_SUPER_CATEGORIES = [
 _SEED_CATEGORY = ("oil_lamp", "Decorative", "Oil Lamp", 3.0, "s1x2")
 
 _SEED_LAYERS = [
-    # (layer_id, display_name, base_value, unlock_context, time_cost, skill_id, req_level)
+    # (layer_id, display_name, base_value, unlock_context, unlock_days, skill_id, req_level)
     ("lamp_shaped_object", "Lamp-Shaped Object", 80, 0, 0, None, 0),
     ("antique_oil_lamp", "Antique Oil Lamp", 220, 1, 2, None, 0),
     (
@@ -148,7 +148,7 @@ def _seed(conn: sqlite3.Connection) -> None:
         if ctx is not None:
             cur.execute(
                 "INSERT OR IGNORE INTO layer_unlock_actions "
-                "(layer_id, context, time_cost, skill_id, required_level) VALUES (?,?,?,?,?)",
+                "(layer_id, context, unlock_days, skill_id, required_level) VALUES (?,?,?,?,?)",
                 (layer_id, ctx, tc or 0, sid, rlv),
             )
 

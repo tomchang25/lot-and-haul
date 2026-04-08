@@ -142,7 +142,7 @@ def import_identity_layers(
 
         if unlock is not None:
             ctx = int(unlock["context"])
-            tc = int(unlock.get("time_cost", 0))
+            tc = int(unlock.get("unlock_days", 0))
             sid = unlock.get("required_skill") or None
             rlv = int(unlock.get("required_level", 0))
             rcond = float(unlock.get("required_condition", 0.0))
@@ -150,7 +150,7 @@ def import_identity_layers(
             cur.execute(
                 """
                 INSERT INTO layer_unlock_actions
-                    (layer_id, context, time_cost, skill_id,
+                    (layer_id, context, unlock_days, skill_id,
                      required_level, required_condition)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """,
@@ -251,8 +251,8 @@ def _validate(data: dict) -> list[str]:
                 f"layer '{lid}': unlock_action.context must be 0 or 1, got {ctx!r}"
             )
 
-        if ctx == 1 and not unlock.get("time_cost"):
-            errors.append(f"layer '{lid}': context=1 (HOME) requires time_cost >= 1")
+        if ctx == 1 and not unlock.get("unlock_days"):
+            errors.append(f"layer '{lid}': context=1 (HOME) requires unlock_days >= 1")
 
         if unlock.get("required_level") and not unlock.get("required_skill"):
             errors.append(f"layer '{lid}': required_level set without required_skill")
