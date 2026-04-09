@@ -2,6 +2,21 @@ extends Node
 
 @export var scenes: SceneRegistry
 
+# ── Day-summary hand-off ─────────────────────────────────────────────────────
+
+var _pending_day_summary: DaySummary = null
+
+
+func go_to_day_summary(summary: DaySummary) -> void:
+    _pending_day_summary = summary
+    get_tree().change_scene_to_packed(scenes.day_summary)
+
+
+func consume_pending_day_summary() -> DaySummary:
+    var summary := _pending_day_summary
+    _pending_day_summary = null
+    return summary
+
 # ── Scene transitions ─────────────────────────────────────────────────────────
 
 

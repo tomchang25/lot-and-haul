@@ -13,12 +13,10 @@ const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 var _cargo_items: Array[ItemEntry] = []
 var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
-var _summary_shown: bool = false
 
 # ── Node references ───────────────────────────────────────────────────────────
 
-@onready var _row_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/RowContainer
-@onready var _summary_panel: DaySummaryPanel = $RootVBox/ListCenter/OuterVBox/DaySummaryPanel
+@onready var _row_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer/RowContainer
 @onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
@@ -34,22 +32,17 @@ func _ready() -> void:
     _cargo_items = RunManager.run_record.cargo_items
 
     _populate_rows()
-    _summary_panel.visible = false
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
 func _on_continue_pressed() -> void:
-    if _summary_shown:
-        GameManager.go_to_hub()
-        return
-
-    _resolve_run_and_show_summary()
+    _resolve_run_and_navigate()
 
 # ══ Run resolution ════════════════════════════════════════════════════════════
 
 
-func _resolve_run_and_show_summary() -> void:
+func _resolve_run_and_navigate() -> void:
     var r: RunRecord = RunManager.run_record
 
     # 1. Mutate sale-side cash
@@ -70,11 +63,8 @@ func _resolve_run_and_show_summary() -> void:
     # 5. Clear run state
     RunManager.clear_run_state()
 
-    # 6. Reveal in-scene summary; Continue button now returns to hub
-    _summary_panel.show_summary(summary)
-    _summary_panel.visible = true
-    _continue_btn.text = "Return to Hub"
-    _summary_shown = true
+    # 6. Navigate to day summary scene
+    GameManager.go_to_day_summary(summary)
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 

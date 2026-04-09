@@ -17,7 +17,6 @@ extends Control
 @onready var _knowledge_btn: Button = $RootVBox/ButtonsVBox/KnowledgeButton
 @onready var _day_pass_btn: Button = $RootVBox/ButtonsVBox/DayPassButton
 @onready var _day_pass_confirm: ConfirmationDialog = $DayPassConfirm
-@onready var _day_pass_popup: DayPassPopup = $DayPassPopup
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -32,8 +31,6 @@ func _ready() -> void:
 
     _next_run_popup.confirmed.connect(_on_next_run_confirmed)
     _day_pass_confirm.confirmed.connect(_on_day_pass_confirmed)
-
-    _day_pass_popup.dismissed.connect(_refresh_display)
 
     SaveManager.load()
 
@@ -78,8 +75,7 @@ func _on_day_pass_confirmed() -> void:
 
 func _do_day_pass() -> void:
     var summary := SaveManager.advance_days(1)
-    _day_pass_popup.show_summary(summary)
-    _day_pass_popup.popup_centered()
+    GameManager.go_to_day_summary(summary)
 
 # ══ Display ═══════════════════════════════════════════════════════════════════
 

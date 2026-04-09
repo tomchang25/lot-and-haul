@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://cysp2gm1hjmca"]
 
 [ext_resource type="Script" uid="uid://vpkwojtrrnv6" path="res://game/run_review/run_review_scene.gd" id="1_appraisal"]
-[ext_resource type="PackedScene" uid="uid://day_summary_panel1" path="res://game/_shared/day_summary/day_summary_panel.tscn" id="2_panel"]
 
 [node name="RunReviewScene" type="Control" unique_id=708244230]
 layout_mode = 3
@@ -95,12 +94,16 @@ vertical_alignment = 1
 [node name="HeaderSeparator" type="HSeparator" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=1661921171]
 layout_mode = 2
 
-[node name="RowContainer" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=357132903]
+[node name="ScrollContainer" type="ScrollContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox"]
+custom_minimum_size = Vector2(0, 360)
 layout_mode = 2
-theme_override_constants/separation = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="DaySummaryPanel" parent="RootVBox/ListCenter/OuterVBox" instance=ExtResource("2_panel")]
+[node name="RowContainer" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer" unique_id=357132903]
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
 
 [node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=84919131]
 custom_minimum_size = Vector2(0, 72)
