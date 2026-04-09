@@ -23,7 +23,6 @@ func _on_back_pressed() -> void:
 
 func _build_mastery_section() -> void:
     var heading := Label.new()
-    heading.theme_override_font_sizes = {}
     heading.add_theme_font_size_override("font_size", 22)
     heading.text = "Mastery Rank: %d" % KnowledgeManager.get_mastery_rank()
     _content.add_child(heading)
