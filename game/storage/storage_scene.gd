@@ -41,6 +41,7 @@ var _selected_entry: ItemEntry = null
 
 @onready var _action_popup: Window = $ActionPopup
 @onready var _action_item_label: Label = $ActionPopup/MarginContainer/VBoxContainer/ItemLabel
+@onready var _status_label: Label = $ActionPopup/MarginContainer/VBoxContainer/StatusLabel
 @onready var _unlock_btn: Button = $ActionPopup/MarginContainer/VBoxContainer/UnlockButton
 @onready var _research_btn: Button = $ActionPopup/MarginContainer/VBoxContainer/MarketResearchButton
 @onready var _popup_close_btn: Button = $ActionPopup/MarginContainer/VBoxContainer/CloseButton
@@ -54,7 +55,7 @@ var _selected_entry: ItemEntry = null
 
 
 func _ready() -> void:
-    _ctx = ItemViewContext.for_cargo()
+    _ctx = ItemViewContext.for_storage()
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 
@@ -173,21 +174,63 @@ func _get_action_block_reason(entry: ItemEntry) -> String:
     return ""
 
 
+func _get_unlock_block_reason(entry: ItemEntry) -> String:
+    var action_def: LayerUnlockAction = entry.current_unlock_action()
+    if action_def == null:
+        return "No further layers to unlock"
+    if action_def.context != LayerUnlockAction.ActionContext.HOME:
+        return "Must be unlocked elsewhere"
+    if not KnowledgeManager.can_advance(entry, LayerUnlockAction.ActionContext.HOME):
+        return "Not enough knowledge points"
+    return ""
+
+
+func _get_in_progress_action(entry: ItemEntry) -> Dictionary:
+    for d: Dictionary in SaveManager.active_actions:
+        if int(d.get("item_id", -1)) == entry.id:
+            return d
+    return { }
+
+
+func _action_type_label(action_type_string: String) -> String:
+    match action_type_string:
+        "market_research":
+            return "Market Research"
+        "unlock":
+            return "Unlock"
+        _:
+            return action_type_string
+
+
 func _show_action_popup(entry: ItemEntry) -> void:
     _action_item_label.text = entry.display_name
     var block: String = _get_action_block_reason(entry)
+    var in_progress: Dictionary = _get_in_progress_action(entry)
 
-    var action_def: LayerUnlockAction = entry.current_unlock_action()
-    var can_unlock: bool = (
-        action_def != null
-        and action_def.context == LayerUnlockAction.ActionContext.HOME
-        and KnowledgeManager.can_advance(entry, LayerUnlockAction.ActionContext.HOME)
-    )
-    _unlock_btn.visible = can_unlock
-    if can_unlock:
-        _unlock_btn.disabled = block != ""
+    # Status label
+    if not in_progress.is_empty():
+        _status_label.text = "⏳ %s in progress" % _action_type_label(in_progress["action_type"])
+        _status_label.visible = true
+    elif block != "":
+        _status_label.text = block
+        _status_label.visible = true
+    else:
+        _status_label.visible = false
+
+    # Unlock button — always visible, disabled with tooltip when blocked
+    var unlock_reason: String = _get_unlock_block_reason(entry)
+    _unlock_btn.visible = true
+    if block != "":
+        _unlock_btn.disabled = true
         _unlock_btn.tooltip_text = block
+    elif unlock_reason != "":
+        _unlock_btn.disabled = true
+        _unlock_btn.tooltip_text = unlock_reason
+    else:
+        _unlock_btn.disabled = false
+        _unlock_btn.tooltip_text = ""
 
+    # Market Research button — hidden only for veiled items
     if not entry.is_veiled():
         var cost: int = RESEARCH_COST.get(entry.item_data.rarity, 500)
         _research_btn.visible = true
@@ -197,7 +240,7 @@ func _show_action_popup(entry: ItemEntry) -> void:
             _research_btn.tooltip_text = block
         elif SaveManager.cash < cost:
             _research_btn.disabled = true
-            _research_btn.tooltip_text = "Not enough cash"
+            _research_btn.tooltip_text = "Not enough cash ($%d needed, $%d available)" % [cost, SaveManager.cash]
         else:
             _research_btn.disabled = false
             _research_btn.tooltip_text = ""

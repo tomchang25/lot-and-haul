@@ -5,8 +5,6 @@
 
 [sub_resource type="Resource" id="unlock"]
 script = ExtResource("2_unlock")
-context = 1
-time_cost = 4
 
 [resource]
 script = ExtResource("1_ilay")
