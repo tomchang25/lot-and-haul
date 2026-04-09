@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://bhubscene0001"]
 
 [ext_resource type="Script" uid="uid://cpdf8haohlsir" path="res://game/hub/hub_scene.gd" id="1_hubgd"]
-[ext_resource type="PackedScene" path="res://game/hub/day_pass_popup.tscn" id="2_jtvih"]
 
 [node name="HubScene" type="Control" unique_id=1000000001]
 layout_mode = 3
@@ -125,7 +124,3 @@ title = "Advance Day?"
 size = Vector2i(300, 100)
 dialog_text = "Pass one day?
 Daily upkeep will be deducted."
-
-[node name="DayPassPopup" parent="." unique_id=2062711103 instance=ExtResource("2_jtvih")]
-oversampling_override = 1.0
-visible = false
