@@ -8,4 +8,6 @@
 [resource]
 script = ExtResource("1_locdata")
 lot_pool = Array[ExtResource("2_lotscript")]([ExtResource("2_w4g73"), ExtResource("3_a4tx8")])
+entry_fee = 100
+travel_days = 2
 metadata/_custom_type_script = "uid://cy7warehsloc1"
