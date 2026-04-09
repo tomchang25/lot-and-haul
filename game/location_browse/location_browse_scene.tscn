@@ -74,3 +74,9 @@ layout_mode = 2
 size_flags_vertical = 10
 theme_override_font_sizes/font_size = 15
 text = "Skip to Cargo"
+
+[node name="SkipConfirmPopup" type="ConfirmationDialog" parent="." unique_id=200000011]
+title = "Skip to Cargo"
+initial_position = 2
+size = Vector2i(360, 120)
+dialog_text = "Skip the remaining lots and go straight to cargo?"

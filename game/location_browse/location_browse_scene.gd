@@ -18,6 +18,7 @@ const LotCardScene := preload("res://game/location_browse/lot_card/lot_card.tscn
 @onready var _cargo_panel: VBoxContainer = $RootVBox/CargoPanel
 @onready var _cargo_button: Button = $RootVBox/CargoPanel/CargoButton
 @onready var _skip_button: Button = $RootVBox/SkipButton
+@onready var _skip_confirm_popup: ConfirmationDialog = $SkipConfirmPopup
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
@@ -30,6 +31,7 @@ var _lot_cards: Array[LotCard] = []
 func _ready() -> void:
     _skip_button.pressed.connect(_on_skip_pressed)
     _cargo_button.pressed.connect(_on_cargo_pressed)
+    _skip_confirm_popup.confirmed.connect(_on_skip_confirmed)
 
     var record: RunRecord = RunManager.run_record
     if record.browse_lots.is_empty():
@@ -93,6 +95,15 @@ func _on_pass_pressed() -> void:
 
 
 func _on_skip_pressed() -> void:
+    var record: RunRecord = RunManager.run_record
+    var remaining: int = record.browse_lots.size() - record.browse_index
+    _skip_confirm_popup.dialog_text = (
+        "Skip the remaining %d lot(s) and go straight to cargo?" % remaining
+    )
+    _skip_confirm_popup.popup_centered()
+
+
+func _on_skip_confirmed() -> void:
     GameManager.go_to_cargo()
 
 
