@@ -51,6 +51,8 @@ var _selected_entry: ItemEntry = null
 
 @onready var _scroll_container: ScrollContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer
 
+@onready var _action_slot_hud: Label = $ActionSlotHUD
+
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
@@ -67,6 +69,7 @@ func _ready() -> void:
     _research_confirm.confirmed.connect(_on_research_confirmed)
 
     _populate_rows()
+    _refresh_action_slot_hud()
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
@@ -118,6 +121,7 @@ func _on_unlock_confirmed() -> void:
     SaveManager.active_actions.append(action.to_dict())
     SaveManager.save()
     _refresh_row(entry)
+    _refresh_action_slot_hud()
 
 
 func _on_research_confirmed() -> void:
@@ -137,6 +141,7 @@ func _on_research_confirmed() -> void:
     SaveManager.cash -= cost
     SaveManager.save()
     _refresh_row(entry)
+    _refresh_action_slot_hud()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 
@@ -255,3 +260,9 @@ func _show_action_popup(entry: ItemEntry) -> void:
 func _refresh_row(entry: ItemEntry) -> void:
     if _rows.has(entry):
         _rows[entry].refresh()
+
+
+func _refresh_action_slot_hud() -> void:
+    var used: int = SaveManager.active_actions.size()
+    var maximum: int = SaveManager.max_concurrent_actions
+    _action_slot_hud.text = "Slots  %d / %d" % [used, maximum]
