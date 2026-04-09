@@ -58,3 +58,11 @@ func go_to_storage() -> void:
 
 func go_to_pawn_shop() -> void:
     get_tree().change_scene_to_packed(scenes.pawn_shop)
+
+
+func go_to_skill_panel() -> void:
+    get_tree().change_scene_to_packed(scenes.skill_panel)
+
+
+func go_to_knowledge_panel() -> void:
+    get_tree().change_scene_to_packed(scenes.knowledge_panel)

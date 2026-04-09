@@ -29,3 +29,9 @@ enum ActionContext {
 @export var required_level: int = 0
 
 @export var required_condition: float = 0.0
+
+# Minimum category rank for the item's category. 0 = no gate.
+@export var required_category_rank: int = 0
+
+# Perk required before this action is available. "" = no gate.
+@export var required_perk_id: String = ""

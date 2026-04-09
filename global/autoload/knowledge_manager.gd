@@ -1,5 +1,22 @@
 extends Node
 
+enum AdvanceCheck {
+    OK,
+    NO_ACTION,
+    WRONG_CONTEXT,
+    INSUFFICIENT_CATEGORY_RANK,
+    INSUFFICIENT_SKILL,
+    MISSING_PERK,
+}
+
+enum UpgradeResult {
+    OK,
+    MAX_LEVEL,
+    INSUFFICIENT_SUPER_CATEGORY_RANK,
+    INSUFFICIENT_MASTERY_RANK,
+    INSUFFICIENT_CASH,
+}
+
 enum KnowledgeAction {
     POTENTIAL_INSPECT,
     CONDITION_INSPECT,
@@ -19,10 +36,12 @@ const _BASE_MASTERY: Dictionary = {
 }
 
 var _perk_registry: Dictionary = { } # perk_id → PerkData
+var _skill_registry: Dictionary = { } # skill_id → SkillData
 
 
 func _ready() -> void:
     _load_perk_registry()
+    _load_skill_registry()
 
 
 func add_category_points(category_id: String, rarity: ItemData.Rarity, action: KnowledgeAction) -> void:
@@ -50,15 +69,22 @@ func get_category_rank(category_id: String) -> int:
         return 0
 
 
-func get_mastery_rank(super_category_id: String) -> int:
+func get_super_category_rank(super_category_id: String) -> int:
     var total: int = 0
     for cat_id: String in ItemRegistry.get_categories_for_super(super_category_id):
         total += get_category_rank(cat_id)
     return total
 
 
+func get_mastery_rank() -> int:
+    var total: int = 0
+    for sc_id: String in ItemRegistry.get_all_super_category_ids():
+        total += get_super_category_rank(sc_id)
+    return total
+
+
 func get_price_range(super_category_id: String, rarity: ItemData.Rarity, layer_depth: int = 0) -> Vector2:
-    var rank: int = get_mastery_rank(super_category_id)
+    var rank: int = get_super_category_rank(super_category_id)
 
     var threshold: int
     var min_full_w: float
@@ -132,36 +158,81 @@ func apply_market_research(entry: ItemEntry) -> void:
         entry.knowledge_max = new_max
 
 
-# Flat skill registry. Returns the player's current level for the given skill.
-# Always 1 for this slice — full skill progression is deferred.
 func get_level(skill_id: String) -> int:
-    return 1
+    return SaveManager.skill_levels.get(skill_id, 0)
 
 
-# True if the player can advance the entry to the next identity layer.
-# Checks stamina cost and skill prerequisite via KnowledgeManager.
-func can_advance(entry: ItemEntry, context: LayerUnlockAction.ActionContext) -> bool:
+func get_skill(skill_id: String) -> SkillData:
+    return _skill_registry.get(skill_id, null)
+
+
+func get_all_skills() -> Array[SkillData]:
+    var result: Array[SkillData] = []
+    for skill: SkillData in _skill_registry.values():
+        result.append(skill)
+    return result
+
+
+func _check_upgrade(skill_id: String) -> UpgradeResult:
+    var skill: SkillData = _skill_registry.get(skill_id, null)
+    if skill == null:
+        return UpgradeResult.MAX_LEVEL
+    var current: int = get_level(skill_id)
+    if current >= skill.levels.size():
+        return UpgradeResult.MAX_LEVEL
+    var next: SkillLevelData = skill.levels[current]
+    for super_id: String in next.required_super_category_ranks:
+        var min_rank: int = int(next.required_super_category_ranks[super_id])
+        if get_super_category_rank(super_id) < min_rank:
+            return UpgradeResult.INSUFFICIENT_SUPER_CATEGORY_RANK
+    if get_mastery_rank() < next.required_mastery_rank:
+        return UpgradeResult.INSUFFICIENT_MASTERY_RANK
+    if SaveManager.cash < next.cash_cost:
+        return UpgradeResult.INSUFFICIENT_CASH
+    return UpgradeResult.OK
+
+
+func peek_upgrade(skill_id: String) -> UpgradeResult:
+    return _check_upgrade(skill_id)
+
+
+func try_upgrade_skill(skill_id: String) -> UpgradeResult:
+    var result: UpgradeResult = _check_upgrade(skill_id)
+    if result != UpgradeResult.OK:
+        return result
+    var skill: SkillData = _skill_registry[skill_id]
+    var current: int = get_level(skill_id)
+    var next: SkillLevelData = skill.levels[current]
+    SaveManager.cash -= next.cash_cost
+    SaveManager.skill_levels[skill_id] = current + 1
+    SaveManager.save()
+    return UpgradeResult.OK
+
+
+func can_advance(entry: ItemEntry, context: LayerUnlockAction.ActionContext) -> AdvanceCheck:
     var action: LayerUnlockAction = entry.current_unlock_action()
-    if action == null:
-        return false
-
-    if entry.is_at_final_layer():
-        return false
+    if action == null or entry.is_at_final_layer():
+        return AdvanceCheck.NO_ACTION
 
     if action.context == LayerUnlockAction.ActionContext.AUTO:
-        return false
+        return AdvanceCheck.NO_ACTION
 
     if action.context != context:
-        return false
+        return AdvanceCheck.WRONG_CONTEXT
 
-    # TODO: Remove it when implemented. Advance to the next layer requires time in home instead stamina in auction.
-    # if RunManager.run_record.stamina < action.stamina_cost:
-    #     return false
+    if action.required_category_rank > 0:
+        if get_category_rank(entry.item_data.category_data.category_id) < action.required_category_rank:
+            return AdvanceCheck.INSUFFICIENT_CATEGORY_RANK
 
-    if not action.required_skill:
-        return true
+    if action.required_skill != null:
+        if get_level(action.required_skill.skill_id) < action.required_level:
+            return AdvanceCheck.INSUFFICIENT_SKILL
 
-    return get_level(action.required_skill.skill_id) >= action.required_level
+    if action.required_perk_id != "":
+        if not has_perk(action.required_perk_id):
+            return AdvanceCheck.MISSING_PERK
+
+    return AdvanceCheck.OK
 
 # ══ Perk registry ════════════════════════════════════════════════════════════
 
@@ -181,6 +252,13 @@ func get_perk(perk_id: String) -> PerkData:
     return _perk_registry.get(perk_id, null)
 
 
+func get_all_perks() -> Array[PerkData]:
+    var result: Array[PerkData] = []
+    for perk: PerkData in _perk_registry.values():
+        result.append(perk)
+    return result
+
+
 func _load_perk_registry() -> void:
     var dir := DirAccess.open("res://data/perks")
     if dir == null:
@@ -193,5 +271,21 @@ func _load_perk_registry() -> void:
             var perk := ResourceLoader.load(path) as PerkData
             if perk != null and perk.perk_id != "":
                 _perk_registry[perk.perk_id] = perk
+        filename = dir.get_next()
+    dir.list_dir_end()
+
+
+func _load_skill_registry() -> void:
+    var dir := DirAccess.open("res://data/skills")
+    if dir == null:
+        return
+    dir.list_dir_begin()
+    var filename: String = dir.get_next()
+    while filename != "":
+        if filename.ends_with(".tres"):
+            var path := "res://data/skills/" + filename
+            var skill := ResourceLoader.load(path) as SkillData
+            if skill != null and skill.skill_id != "":
+                _skill_registry[skill.skill_id] = skill
         filename = dir.get_next()
     dir.list_dir_end()
