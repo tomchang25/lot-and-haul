@@ -109,7 +109,7 @@ func _on_unlock_confirmed() -> void:
     var entry: ItemEntry = _selected_entry
     if entry == null:
         return
-    if not KnowledgeManager.can_advance(entry, LayerUnlockAction.ActionContext.HOME):
+    if KnowledgeManager.can_advance(entry, LayerUnlockAction.ActionContext.HOME) != KnowledgeManager.AdvanceCheck.OK:
         return
     var action_def: LayerUnlockAction = entry.current_unlock_action()
     var days: int = action_def.unlock_days if action_def != null else 1
@@ -183,11 +183,13 @@ func _get_unlock_block_reason(entry: ItemEntry) -> String:
     var action_def: LayerUnlockAction = entry.current_unlock_action()
     if action_def == null:
         return "No further layers to unlock"
-    if action_def.context != LayerUnlockAction.ActionContext.HOME:
-        return "Must be unlocked elsewhere"
-    if not KnowledgeManager.can_advance(entry, LayerUnlockAction.ActionContext.HOME):
-        return "Not enough knowledge points"
-    return ""
+    var check: KnowledgeManager.AdvanceCheck = KnowledgeManager.can_advance(
+        entry,
+        LayerUnlockAction.ActionContext.HOME,
+    )
+    if check == KnowledgeManager.AdvanceCheck.OK:
+        return ""
+    return AdvanceCheckLabel.describe(check, action_def, entry)
 
 
 func _get_in_progress_action(entry: ItemEntry) -> Dictionary:

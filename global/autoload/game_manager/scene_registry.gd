@@ -12,3 +12,5 @@ extends Resource
 @export var storage: PackedScene
 @export var pawn_shop: PackedScene
 @export var day_summary: PackedScene
+@export var skill_panel: PackedScene
+@export var knowledge_panel: PackedScene

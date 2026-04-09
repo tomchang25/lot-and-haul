@@ -6,7 +6,7 @@ extends Node
 var _items: Array[ItemData] = []
 
 # Maps super_category_id (String) → Array[String] of category_id.
-var _super_category_to_categories: Dictionary = {}
+var _super_category_to_categories: Dictionary = { }
 
 
 func _ready() -> void:
@@ -65,8 +65,30 @@ func get_categories_for_super(super_category_id: String) -> Array[String]:
     return result
 
 
+func get_all_super_category_ids() -> Array[String]:
+    var result: Array[String] = []
+    for key in _super_category_to_categories.keys():
+        result.append(key)
+    return result
+
+
 func get_all_items() -> Array[ItemData]:
     return _items
+
+
+func get_super_category_display_name(super_category_id: String) -> String:
+    for item: ItemData in _items:
+        if item.category_data != null and item.category_data.super_category != null:
+            if item.category_data.super_category.super_category_id == super_category_id:
+                return item.category_data.super_category.display_name
+    return super_category_id
+
+
+func get_category_display_name(category_id: String) -> String:
+    for item: ItemData in _items:
+        if item.category_data != null and item.category_data.category_id == category_id:
+            return item.category_data.display_name
+    return category_id
 
 
 func get_item(item_id: String) -> ItemData:

@@ -82,6 +82,10 @@ def _build_layer_tres(
             ]
         if unlock.get("required_condition", 0.0) != 0.0:
             lines.append(f'required_condition = {float(unlock["required_condition"])}')
+        if unlock.get("required_category_rank", 0) != 0:
+            lines.append(f'required_category_rank = {unlock["required_category_rank"]}')
+        if unlock.get("required_perk_id", ""):
+            lines.append(f'required_perk_id = "{unlock["required_perk_id"]}"')
         lines.append("")
 
     unlock_ref = 'SubResource("unlock")' if unlock is not None else "null"
@@ -278,9 +282,24 @@ def export_identity_layers(
 
     for layer_id, display_name, base_value, uid in rows:
         uid = uid or _new_uid()
+        # Check which columns exist on layer_unlock_actions
+        col_names = [
+            r[1]
+            for r in cur.execute("PRAGMA table_info(layer_unlock_actions)").fetchall()
+        ]
+        has_category_rank = "required_category_rank" in col_names
+        has_perk_id = "required_perk_id" in col_names
+
+        select_cols = (
+            "context, unlock_days, skill_id, required_level, required_condition"
+        )
+        if has_category_rank:
+            select_cols += ", required_category_rank"
+        if has_perk_id:
+            select_cols += ", required_perk_id"
+
         unlock_row = cur.execute(
-            "SELECT context, unlock_days, skill_id, required_level, required_condition "
-            "FROM layer_unlock_actions WHERE layer_id = ?",
+            f"SELECT {select_cols} FROM layer_unlock_actions WHERE layer_id = ?",
             (layer_id,),
         ).fetchone()
 
@@ -293,6 +312,12 @@ def export_identity_layers(
                 "required_level": unlock_row[3],
                 "required_condition": unlock_row[4],
             }
+            idx = 5
+            if has_category_rank:
+                unlock["required_category_rank"] = unlock_row[idx] or 0
+                idx += 1
+            if has_perk_id:
+                unlock["required_perk_id"] = unlock_row[idx] or ""
 
         content = _build_layer_tres(
             layer_id, uid, display_name, base_value, unlock, skill_uid_map

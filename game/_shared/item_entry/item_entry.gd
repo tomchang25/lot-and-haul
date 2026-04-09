@@ -225,7 +225,7 @@ var sell_price: int:
         return int(
             active_layer().base_value
             * get_condition_multiplier()
-            * (1.0 + 0.01 * KnowledgeManager.get_mastery_rank(
+            * (1.0 + 0.01 * KnowledgeManager.get_super_category_rank(
                     item_data.category_data.super_category.super_category_id,
                 ) ),
         )
