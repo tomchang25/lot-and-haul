@@ -15,7 +15,7 @@ var max_concurrent_actions: int = 2
 var next_entry_id: int = 0 # monotonically increasing; never reset
 var active_actions: Array = [] # Array of plain Dictionaries
 var unlocked_perks: Array[String] = []
-var skill_levels: Dictionary = {} # skill_id (String) → int
+var skill_levels: Dictionary = { } # skill_id (String) → int
 
 
 func save() -> void:
@@ -85,12 +85,12 @@ func load() -> void:
             if s is String:
                 unlocked_perks.append(s)
     if parsed.has("skill_levels") and parsed["skill_levels"] is Dictionary:
-        skill_levels = {}
+        skill_levels = { }
         for key: Variant in parsed["skill_levels"]:
             if key is String and parsed["skill_levels"][key] is float:
                 skill_levels[key] = int(parsed["skill_levels"][key])
     else:
-        skill_levels = {}
+        skill_levels = { }
 
 
 func load_active_car() -> CarConfig:

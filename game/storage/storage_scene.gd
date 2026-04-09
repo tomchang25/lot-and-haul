@@ -184,7 +184,8 @@ func _get_unlock_block_reason(entry: ItemEntry) -> String:
     if action_def == null:
         return "No further layers to unlock"
     var check: KnowledgeManager.AdvanceCheck = KnowledgeManager.can_advance(
-        entry, LayerUnlockAction.ActionContext.HOME,
+        entry,
+        LayerUnlockAction.ActionContext.HOME,
     )
     if check == KnowledgeManager.AdvanceCheck.OK:
         return ""

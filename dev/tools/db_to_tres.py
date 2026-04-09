@@ -284,12 +284,15 @@ def export_identity_layers(
         uid = uid or _new_uid()
         # Check which columns exist on layer_unlock_actions
         col_names = [
-            r[1] for r in cur.execute("PRAGMA table_info(layer_unlock_actions)").fetchall()
+            r[1]
+            for r in cur.execute("PRAGMA table_info(layer_unlock_actions)").fetchall()
         ]
         has_category_rank = "required_category_rank" in col_names
         has_perk_id = "required_perk_id" in col_names
 
-        select_cols = "context, unlock_days, skill_id, required_level, required_condition"
+        select_cols = (
+            "context, unlock_days, skill_id, required_level, required_condition"
+        )
         if has_category_rank:
             select_cols += ", required_category_rank"
         if has_perk_id:

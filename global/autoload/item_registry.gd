@@ -6,7 +6,7 @@ extends Node
 var _items: Array[ItemData] = []
 
 # Maps super_category_id (String) → Array[String] of category_id.
-var _super_category_to_categories: Dictionary = {}
+var _super_category_to_categories: Dictionary = { }
 
 
 func _ready() -> void:

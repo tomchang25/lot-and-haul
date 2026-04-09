@@ -3,7 +3,6 @@
 class_name AdvanceCheckLabel
 extends RefCounted
 
-
 static func describe(check: int, action: LayerUnlockAction, entry: ItemEntry) -> String:
     if action == null or entry == null:
         return ""
