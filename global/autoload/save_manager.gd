@@ -106,7 +106,6 @@ func register_storage_items(entries: Array[ItemEntry]) -> void:
 
     save()
 
-
 # ══ Day advancement (sole chokepoint) ════════════════════════════════════════
 
 
@@ -142,11 +141,13 @@ func _tick_actions(days: int) -> Array[Dictionary]:
         if action.days_remaining <= 0:
             _apply_action_effect(action)
             var entry: ItemEntry = _find_storage_entry(action.item_id)
-            completions.append({
-                "name": entry.display_name if entry != null else "Unknown",
-                "effect": _action_effect_label(action.action_type),
-                "action_type": action.action_type,
-            })
+            completions.append(
+                {
+                    "name": entry.display_name if entry != null else "Unknown",
+                    "effect": _action_effect_label(action.action_type),
+                    "action_type": action.action_type,
+                },
+            )
         else:
             remaining.append(action.to_dict())
 

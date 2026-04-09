@@ -11,17 +11,14 @@ extends VBoxContainer
 @onready var _income_group: VBoxContainer = $IncomeGroup
 @onready var _onsite_label: Label = $IncomeGroup/OnsiteLabel
 
-@onready var _expenses_group: VBoxContainer = $ExpensesGroup
 @onready var _living_label: Label = $ExpensesGroup/LivingLabel
 @onready var _entry_fee_label: Label = $ExpensesGroup/EntryFeeLabel
 @onready var _fuel_label: Label = $ExpensesGroup/FuelLabel
 @onready var _paid_label: Label = $ExpensesGroup/PaidLabel
 
 @onready var _actions_group: VBoxContainer = $ActionsGroup
-@onready var _actions_header: Label = $ActionsGroup/ActionsHeader
 @onready var _actions_list: VBoxContainer = $ActionsGroup/ActionsList
 
-@onready var _net_separator: HSeparator = $NetSeparator
 @onready var _net_label: Label = $NetLabel
 @onready var _balance_label: Label = $BalanceLabel
 
@@ -42,7 +39,9 @@ func show_summary(summary: DaySummary) -> void:
 
     # Expenses group — always visible
     _living_label.text = "Living (%d/day × %d):   -$%d" % [
-        Economy.DAILY_BASE_COST, summary.days_elapsed, summary.living_cost,
+        Economy.DAILY_BASE_COST,
+        summary.days_elapsed,
+        summary.living_cost,
     ]
     _entry_fee_label.visible = summary.entry_fee != 0
     _entry_fee_label.text = "Entry Fee:   -$%d" % summary.entry_fee

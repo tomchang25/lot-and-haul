@@ -5,8 +5,6 @@
 class_name CategoryData
 extends Resource
 
-const CargoShapes = preload("res://data/_definitions/cargo_shapes.gd")
-
 # Internal identifier. Matches the .tres filename stem and DB category_id.
 @export var category_id: String = ""
 
