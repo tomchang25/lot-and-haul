@@ -6,6 +6,7 @@
 **/addons
 **/script_templates
 **/dev/docs/begin
+**/dev/prompts
 **/*_back
 
 **/*.uid
