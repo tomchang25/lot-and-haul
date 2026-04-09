@@ -55,7 +55,7 @@ var _selected_entry: ItemEntry = null
 
 
 func _ready() -> void:
-    _ctx = ItemViewContext.for_cargo()
+    _ctx = ItemViewContext.for_storage()
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 
@@ -189,7 +189,7 @@ func _get_in_progress_action(entry: ItemEntry) -> Dictionary:
     for d: Dictionary in SaveManager.active_actions:
         if int(d.get("item_id", -1)) == entry.id:
             return d
-    return {}
+    return { }
 
 
 func _action_type_label(action_type_string: String) -> String:

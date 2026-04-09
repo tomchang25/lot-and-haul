@@ -75,3 +75,12 @@ static func for_run_review() -> ItemViewContext:
     ctx.potential_mode = PotentialMode.FORCE_FULL
     ctx.price_mode = PriceMode.SELL_PRICE
     return ctx
+
+
+static func for_storage() -> ItemViewContext:
+    var ctx := ItemViewContext.new()
+    ctx.stage = Stage.CARGO
+    ctx.condition_mode = ConditionMode.FORCE_INSPECT_MAX
+    ctx.potential_mode = PotentialMode.FORCE_FULL
+    ctx.show_cargo_stats = false
+    return ctx

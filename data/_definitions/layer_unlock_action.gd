@@ -8,11 +8,9 @@ extends Resource
 # Where this action can be performed.
 #   AUTO    — triggered automatically on arrival at home; no player input required.
 #             Used exclusively for layer 0 → 1 (veiled → unveiled).
-#   AUCTION — allowed during lot preview at the auction. Simple visual inspection only.
 #   HOME    — requires the home workshop. Handling, research, tools, and skilled work.
 enum ActionContext {
     AUTO,
-    AUCTION,
     HOME,
 }
 

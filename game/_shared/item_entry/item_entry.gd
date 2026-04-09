@@ -195,8 +195,8 @@ var potential_price_min: int:
         if is_veiled() or knowledge_min.is_empty():
             return 0
         var cond_mult: float = get_known_condition_multiplier()
-        var result: int = int(item_data.identity_layers[0].base_value * knowledge_min[0])
-        for i in range(1, item_data.identity_layers.size()):
+        var result: int = int(item_data.identity_layers[layer_index].base_value * knowledge_min[layer_index])
+        for i in range(layer_index + 1, item_data.identity_layers.size()):
             var v: int = int(item_data.identity_layers[i].base_value * knowledge_min[i])
             if v < result:
                 result = v
@@ -207,8 +207,8 @@ var potential_price_max: int:
         if is_veiled() or knowledge_max.is_empty():
             return 0
         var cond_mult: float = get_known_condition_multiplier()
-        var result: int = 0
-        for i in range(item_data.identity_layers.size()):
+        var result: int = int(item_data.identity_layers[layer_index].base_value * knowledge_max[layer_index])
+        for i in range(layer_index + 1, item_data.identity_layers.size()):
             var v: int = int(item_data.identity_layers[i].base_value * knowledge_max[i])
             if v > result:
                 result = v
