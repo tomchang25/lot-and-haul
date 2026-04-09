@@ -13,6 +13,7 @@ const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 var _cargo_items: Array[ItemEntry] = []
 var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
+var _summary_shown: bool = false
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -39,6 +40,16 @@ func _ready() -> void:
 
 
 func _on_continue_pressed() -> void:
+    if _summary_shown:
+        GameManager.go_to_hub()
+        return
+
+    _resolve_run_and_show_summary()
+
+# ══ Run resolution ════════════════════════════════════════════════════════════
+
+
+func _resolve_run_and_show_summary() -> void:
     var r: RunRecord = RunManager.run_record
 
     # 1. Mutate sale-side cash
@@ -59,26 +70,11 @@ func _on_continue_pressed() -> void:
     # 5. Clear run state
     RunManager.clear_run_state()
 
-    # 6. Show summary then go to hub on dismissal
+    # 6. Reveal in-scene summary; Continue button now returns to hub
     _summary_panel.show_summary(summary)
     _summary_panel.visible = true
-    _continue_btn.visible = false
-
-    await get_tree().create_timer(0.05).timeout
-    _show_summary_popup(summary)
-
-
-func _show_summary_popup(summary: DaySummary) -> void:
-    var popup := preload("res://game/hub/day_pass_popup.tscn").instantiate()
-    add_child(popup)
-    popup.show_summary(summary)
-    popup.popup_centered()
-    popup.dismissed.connect(_on_summary_dismissed.bind(popup))
-
-
-func _on_summary_dismissed(popup: Window) -> void:
-    popup.queue_free()
-    GameManager.go_to_hub()
+    _continue_btn.text = "Return to Hub"
+    _summary_shown = true
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 
