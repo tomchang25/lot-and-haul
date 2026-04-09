@@ -10,5 +10,5 @@ grid_columns = 4
 grid_rows = 2
 max_weight = 100.0
 stamina_cap = 20
-travel_cost = 0
+fuel_cost_per_day = 50
 extra_slot_count = 2

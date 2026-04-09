@@ -11,4 +11,7 @@ extends Resource
 @export var lot_number: int = 3
 
 # Upfront cost deducted when entering this location.
-@export var maintenance_cost: int = 0
+@export var entry_fee: int = 0
+
+# Number of days the round-trip to this location takes.
+@export var travel_days: int = 1

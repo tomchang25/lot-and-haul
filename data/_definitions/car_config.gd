@@ -9,7 +9,7 @@ extends Resource
 @export var grid_rows: int
 @export var max_weight: float
 @export var stamina_cap: int
-@export var travel_cost: int
+@export var fuel_cost_per_day: int = 0
 
 ## Number of independent trailer slots this car has.
 ## 0 = no trailer. Each slot accepts any item regardless of shape or weight.

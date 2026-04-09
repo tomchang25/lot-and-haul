@@ -3,10 +3,6 @@
 # Reads: SaveManager.cash, SaveManager.storage_items
 extends Control
 
-# ── Constants ─────────────────────────────────────────────────────────────────
-
-const DAILY_BASE_COST: int = 100
-
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _balance_label: Label = $RootVBox/InfoContainer/BalanceLabel
@@ -81,69 +77,9 @@ func _on_day_pass_confirmed() -> void:
 
 
 func _do_day_pass() -> void:
-    var completed: Array[Dictionary] = []
-    var remaining: Array = []
-
-    for d: Dictionary in SaveManager.active_actions:
-        var action := ActiveActionEntry.from_dict(d)
-        action.days_remaining -= 1
-        if action.days_remaining <= 0:
-            _apply_effect(action)
-            var entry: ItemEntry = _find_storage_entry(action.item_id)
-            completed.append(
-                {
-                    "name": entry.display_name if entry != null else "Unknown",
-                    "effect": _effect_label(action.action_type),
-                },
-            )
-        else:
-            remaining.append(action.to_dict())
-
-    SaveManager.active_actions = remaining
-    SaveManager.cash -= DAILY_BASE_COST
-    SaveManager.current_day += 1
-    SaveManager.save()
-
-    _day_pass_popup.populate(
-        {
-            "new_day": SaveManager.current_day,
-            "cash_spent": DAILY_BASE_COST,
-            "completed": completed,
-        },
-    )
+    var summary := SaveManager.advance_days(1)
+    _day_pass_popup.show_summary(summary)
     _day_pass_popup.popup_centered()
-
-
-func _apply_effect(action: ActiveActionEntry) -> void:
-    var entry: ItemEntry = _find_storage_entry(action.item_id)
-    if entry == null:
-        return
-    match action.action_type:
-        ActiveActionEntry.ActionType.MARKET_RESEARCH:
-            KnowledgeManager.apply_market_research(entry)
-        ActiveActionEntry.ActionType.UNLOCK:
-            entry.layer_index += 1
-            KnowledgeManager.add_category_points(
-                entry.item_data.category_data.category_id,
-                entry.item_data.rarity,
-                KnowledgeManager.KnowledgeAction.REVEAL,
-            )
-
-
-func _find_storage_entry(item_id: int) -> ItemEntry:
-    for entry: ItemEntry in SaveManager.storage_items:
-        if entry.id == item_id:
-            return entry
-    return null
-
-
-func _effect_label(type: ActiveActionEntry.ActionType) -> String:
-    match type:
-        ActiveActionEntry.ActionType.MARKET_RESEARCH:
-            return "Market Research done"
-        ActiveActionEntry.ActionType.UNLOCK:
-            return "Layer unlocked"
-    return "Done"
 
 # ══ Display ═══════════════════════════════════════════════════════════════════
 

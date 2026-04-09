@@ -17,6 +17,8 @@ var last_lot_won_items: Array[ItemEntry] = []
 var onsite_proceeds: int = 0
 var paid_price: int = 0
 var net: int = 0
+var entry_fee: int = 0
+var fuel_cost: int = 0
 
 var stamina: int = 0
 var max_stamina: int = 30
@@ -44,8 +46,14 @@ static func create(location: LocationData, car: CarConfig) -> RunRecord:
     r.car_config = car
     r.max_stamina = car.stamina_cap
     r.stamina = r.max_stamina
+    r.compute_travel_costs()
 
     return r
+
+
+func compute_travel_costs() -> void:
+    entry_fee = location_data.entry_fee if location_data else 0
+    fuel_cost = car_config.fuel_cost_per_day * location_data.travel_days if location_data and car_config else 0
 
 # ══ Lot management ════════════════════════════════════════════════════════════
 

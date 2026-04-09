@@ -106,6 +106,86 @@ func register_storage_items(entries: Array[ItemEntry]) -> void:
 
     save()
 
+# ══ Day advancement (sole chokepoint) ════════════════════════════════════════
+
+
+func advance_days(days: int) -> DaySummary:
+    var summary := DaySummary.new()
+    if days <= 0:
+        summary.start_day = current_day
+        summary.end_day = current_day
+        summary.days_elapsed = 0
+        return summary
+
+    summary.start_day = current_day
+    summary.days_elapsed = days
+    summary.living_cost = days * Economy.DAILY_BASE_COST
+
+    current_day += days
+    cash -= summary.living_cost
+
+    summary.completed_actions = _tick_actions(days)
+    summary.end_day = current_day
+
+    save()
+    return summary
+
+
+func _tick_actions(days: int) -> Array[Dictionary]:
+    var completions: Array[Dictionary] = []
+    var remaining: Array = []
+
+    for d: Dictionary in active_actions:
+        var action := ActiveActionEntry.from_dict(d)
+        action.days_remaining -= days
+        if action.days_remaining <= 0:
+            _apply_action_effect(action)
+            var entry: ItemEntry = _find_storage_entry(action.item_id)
+            completions.append(
+                {
+                    "name": entry.display_name if entry != null else "Unknown",
+                    "effect": _action_effect_label(action.action_type),
+                    "action_type": action.action_type,
+                },
+            )
+        else:
+            remaining.append(action.to_dict())
+
+    active_actions = remaining
+    return completions
+
+
+func _apply_action_effect(action: ActiveActionEntry) -> void:
+    var entry: ItemEntry = _find_storage_entry(action.item_id)
+    if entry == null:
+        return
+    match action.action_type:
+        ActiveActionEntry.ActionType.MARKET_RESEARCH:
+            KnowledgeManager.apply_market_research(entry)
+        ActiveActionEntry.ActionType.UNLOCK:
+            entry.layer_index += 1
+            KnowledgeManager.add_category_points(
+                entry.item_data.category_data.category_id,
+                entry.item_data.rarity,
+                KnowledgeManager.KnowledgeAction.REVEAL,
+            )
+
+
+func _find_storage_entry(item_id: int) -> ItemEntry:
+    for entry: ItemEntry in storage_items:
+        if entry.id == item_id:
+            return entry
+    return null
+
+
+func _action_effect_label(type: ActiveActionEntry.ActionType) -> String:
+    match type:
+        ActiveActionEntry.ActionType.MARKET_RESEARCH:
+            return "Market Research done"
+        ActiveActionEntry.ActionType.UNLOCK:
+            return "Layer unlocked"
+    return "Done"
+
 
 func _serialize_item(entry: ItemEntry) -> Dictionary:
     var km: Array = []

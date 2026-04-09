@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cysp2gm1hjmca"]
 
 [ext_resource type="Script" uid="uid://vpkwojtrrnv6" path="res://game/run_review/run_review_scene.gd" id="1_appraisal"]
+[ext_resource type="PackedScene" uid="uid://day_summary_panel1" path="res://game/_shared/day_summary/day_summary_panel.tscn" id="2_panel"]
 
 [node name="RunReviewScene" type="Control" unique_id=708244230]
 layout_mode = 3
@@ -98,32 +99,8 @@ layout_mode = 2
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="SummaryContainer" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox" unique_id=1846196658]
+[node name="DaySummaryPanel" parent="RootVBox/ListCenter/OuterVBox" instance=ExtResource("2_panel")]
 layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="SummarySeparator" type="HSeparator" parent="RootVBox/ListCenter/OuterVBox/SummaryContainer" unique_id=1822759979]
-layout_mode = 2
-
-[node name="SellValueLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/SummaryContainer" unique_id=174167266]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-horizontal_alignment = 1
-
-[node name="OnsiteLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/SummaryContainer" unique_id=200000099]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-horizontal_alignment = 1
-
-[node name="PaidLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/SummaryContainer" unique_id=1955275326]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-horizontal_alignment = 1
-
-[node name="NetLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/SummaryContainer" unique_id=335078978]
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-horizontal_alignment = 1
 
 [node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=84919131]
 custom_minimum_size = Vector2(0, 72)
