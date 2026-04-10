@@ -11,6 +11,7 @@ enum Stage {
     REVEAL,
     CARGO,
     RUN_REVIEW,
+    STORAGE,
 }
 
 enum ConditionMode {
@@ -27,16 +28,13 @@ enum PotentialMode {
 enum PriceMode {
     CURRENT_ESTIMATE,
     SELL_PRICE,
+    BASE_VALUE,
 }
 
 var stage: Stage
 var condition_mode: ConditionMode = ConditionMode.RESPECT_INSPECT_LEVEL
 var potential_mode: PotentialMode = PotentialMode.RESPECT_INSPECT_LEVEL
 var price_mode: PriceMode = PriceMode.CURRENT_ESTIMATE
-
-# When true, ItemRow shows Weight and Grid columns.
-# Only enabled in the Cargo stage.
-var show_cargo_stats: bool = false
 
 # ── Factories ─────────────────────────────────────────────────────────────────
 
@@ -64,7 +62,6 @@ static func for_cargo() -> ItemViewContext:
     ctx.stage = Stage.CARGO
     ctx.condition_mode = ConditionMode.FORCE_INSPECT_MAX
     ctx.potential_mode = PotentialMode.FORCE_FULL
-    ctx.show_cargo_stats = true
     return ctx
 
 
@@ -79,8 +76,8 @@ static func for_run_review() -> ItemViewContext:
 
 static func for_storage() -> ItemViewContext:
     var ctx := ItemViewContext.new()
-    ctx.stage = Stage.CARGO
+    ctx.stage = Stage.STORAGE
     ctx.condition_mode = ConditionMode.FORCE_INSPECT_MAX
     ctx.potential_mode = PotentialMode.FORCE_FULL
-    ctx.show_cargo_stats = false
+    ctx.price_mode = PriceMode.SELL_PRICE
     return ctx

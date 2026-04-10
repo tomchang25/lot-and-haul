@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dbc6waemph2em"]
 
 [ext_resource type="Script" uid="uid://hjl5qq820j5" path="res://game/inspection/list_review/list_review_popup.gd" id="1_lstrv"]
+[ext_resource type="PackedScene" uid="uid://cilp5a1xr3e8m" path="res://game/_shared/item_display/item_list_panel/item_list_panel.tscn" id="2_ilp"]
 
 [node name="ListReviewPopup" type="Control" unique_id=796787196]
 layout_mode = 3
@@ -49,15 +50,9 @@ horizontal_alignment = 1
 [node name="HSep1" type="HSeparator" parent="Panel/VBox" unique_id=359748338]
 layout_mode = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Panel/VBox" unique_id=1866607395]
-custom_minimum_size = Vector2(0, 180)
+[node name="ItemListPanel" parent="Panel/VBox" instance=ExtResource("2_ilp")]
 layout_mode = 2
 size_flags_vertical = 3
-
-[node name="ItemList" type="VBoxContainer" parent="Panel/VBox/ScrollContainer" unique_id=245830925]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 2
 
 [node name="HSep2" type="HSeparator" parent="Panel/VBox" unique_id=808621132]
 layout_mode = 2

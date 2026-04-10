@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bhomescene001"]
 
 [ext_resource type="Script" uid="uid://u48bbtcw2fm4" path="res://game/storage/storage_scene.gd" id="1_uoidr"]
+[ext_resource type="PackedScene" uid="uid://cilp5a1xr3e8m" path="res://game/_shared/item_display/item_list_panel/item_list_panel.tscn" id="2_ilp"]
 
 [node name="StorageScene" type="Control" unique_id=2000000001]
 layout_mode = 3
@@ -45,64 +46,8 @@ custom_minimum_size = Vector2(960, 0)
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="ItemPanel" type="PanelContainer" parent="RootVBox/ListCenter/OuterVBox" unique_id=2000000009]
+[node name="ItemListPanel" parent="RootVBox/ListCenter/OuterVBox" instance=ExtResource("2_ilp")]
 layout_mode = 2
-
-[node name="PanelVBox" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel" unique_id=2000000010]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="ColumnHeader" type="HBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=2000000011]
-custom_minimum_size = Vector2(0, 36)
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="ItemHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=2000000012]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 14
-text = "Item"
-vertical_alignment = 1
-
-[node name="LevelHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=2000000013]
-custom_minimum_size = Vector2(120, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 14
-text = "Base Value"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ConditionHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=2000000014]
-custom_minimum_size = Vector2(120, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 14
-text = "Condition"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ValueHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=2000000015]
-custom_minimum_size = Vector2(160, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 14
-text = "Est. Value"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="HeaderSeparator" type="HSeparator" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=2000000016]
-layout_mode = 2
-
-[node name="ScrollContainer" type="ScrollContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=2000000017]
-custom_minimum_size = Vector2(0, 320)
-layout_mode = 2
-
-[node name="RowContainer" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer" unique_id=2000000018]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 0
 
 [node name="EmptyLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox" unique_id=2000000019]
 visible = false
