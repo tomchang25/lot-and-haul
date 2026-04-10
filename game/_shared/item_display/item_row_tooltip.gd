@@ -57,7 +57,7 @@ func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
     var cond_text := entry.condition_label_for(ctx)
     if cond_text != "???":
         var cond_mult_text := entry.condition_mult_label_for(ctx)
-        _condition_label.text = "%s (%s)" % [cond_text, cond_mult_text]
+        _condition_label.text = "Condition:  %s (%s)" % [cond_text, cond_mult_text]
         _condition_label.modulate = entry.condition_color_for(ctx)
         _condition_label.show()
     else:
