@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="PerkData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/definitions/perk_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+perk_id = "xray_inspect"
+display_name = "Portable X-Ray"
+description = "Scan veiled items during inspection to reveal their identity early."
