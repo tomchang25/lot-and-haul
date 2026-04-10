@@ -65,9 +65,8 @@ The key question for placement: **who writes this data?**
 
 ```
 data/
-  db/              → database files (dev tooling output)
   definitions/     → Resource .gd class definitions (the schema)
-  yaml/            → YAML source files for data pipeline input
+  yaml/            → YAML source files (human-authored)
   tres/            → .tres asset files organized by content type
 ```
 
@@ -228,7 +227,6 @@ The main scene for the current build is registered in `project.godot`.
 | Designer-authored Resource class definitions (`.gd`)    | `data/definitions/`                  |
 | Designer-authored asset files (`.tres`)                 | `data/<type>/`                       |
 | YAML source files for data pipeline                     | `data/yaml/`                         |
-| Database files (dev tooling output)                     | `data/db/`                           |
 | Code-generated runtime data structures                  | `game/_shared/` or `game/[feature]/` |
 | Block scene roots, UI components, block logic           | `game/[feature]/`                    |
 | UI components and helpers shared across multiple blocks | `game/_shared/`                      |
