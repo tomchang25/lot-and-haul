@@ -35,6 +35,8 @@ const _BASE_MASTERY: Dictionary = {
     KnowledgeAction.SELL: 3,
 }
 
+const RANK_THRESHOLDS: Array[int] = [0, 100, 400, 1600, 6400, 25600]
+
 var _perk_registry: Dictionary = { } # perk_id → PerkData
 var _skill_registry: Dictionary = { } # skill_id → SkillData
 

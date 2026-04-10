@@ -14,7 +14,6 @@ extends Control
 @onready var _pawn_shop_btn: Button = $RootVBox/ButtonsVBox/PawnShopButton
 @onready var _van_btn: Button = $RootVBox/ButtonsVBox/VanButton
 @onready var _knowledge_btn: Button = $RootVBox/ButtonsVBox/KnowledgeButton
-@onready var _skill_btn: Button = $RootVBox/ButtonsVBox/SkillButton
 @onready var _day_pass_btn: Button = $RootVBox/ButtonsVBox/DayPassButton
 @onready var _day_pass_confirm: ConfirmationDialog = $DayPassConfirm
 
@@ -27,7 +26,6 @@ func _ready() -> void:
     _pawn_shop_btn.pressed.connect(_on_pawn_shop_pressed)
     _van_btn.pressed.connect(_on_van_pressed)
     _knowledge_btn.pressed.connect(_on_knowledge_pressed)
-    _skill_btn.pressed.connect(_on_skill_pressed)
     _day_pass_btn.pressed.connect(_on_day_pass_pressed)
 
     _next_run_popup.confirmed.connect(_on_next_run_confirmed)
@@ -61,11 +59,7 @@ func _on_van_pressed() -> void:
 
 
 func _on_knowledge_pressed() -> void:
-    GameManager.go_to_knowledge_panel()
-
-
-func _on_skill_pressed() -> void:
-    GameManager.go_to_skill_panel()
+    GameManager.go_to_knowledge_hub()
 
 
 func _on_day_pass_pressed() -> void:

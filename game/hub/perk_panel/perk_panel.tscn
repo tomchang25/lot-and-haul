@@ -1,8 +1,8 @@
-[gd_scene format=3 uid="uid://knowledge_pnl01"]
+[gd_scene format=3 uid="uid://perk_panel_001"]
 
-[ext_resource type="Script" path="res://game/hub/knowledge_panel/knowledge_panel.gd" id="1_script"]
+[ext_resource type="Script" path="res://game/hub/perk_panel/perk_panel.gd" id="1_script"]
 
-[node name="KnowledgePanel" type="Control"]
+[node name="PerkPanel" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -33,7 +33,7 @@ theme_override_constants/separation = 16
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Knowledge"
+text = "Perks"
 horizontal_alignment = 1
 vertical_alignment = 1
 
