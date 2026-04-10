@@ -94,7 +94,7 @@ func load() -> void:
 
 
 func load_active_car() -> CarConfig:
-    var path := "res://data/cars/%s.tres" % active_car_id
+    var path := "res://data/tres/cars/%s.tres" % active_car_id
     if not ResourceLoader.exists(path):
         push_error("SaveManager: car resource not found at %s" % path)
         return null

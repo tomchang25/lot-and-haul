@@ -2,11 +2,11 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "DB: Init (schema + brass_lamp seed)",
+            "label": "YAML → .tres",
             "type": "shell",
             "command": "python",
             "args": [
-                "${workspaceFolder}/dev/tools/init.py",
+                "${workspaceFolder}/dev/tools/yaml_to_tres.py",
                 "--godot-root",
                 "${workspaceFolder}"
             ],
@@ -18,80 +18,11 @@
             "problemMatcher": []
         },
         {
-            "label": "DB: YAML → DB",
+            "label": "YAML → .tres (dry-run)",
             "type": "shell",
             "command": "python",
             "args": [
-                "${workspaceFolder}/dev/tools/yaml_to_db.py",
-                "--godot-root",
-                "${workspaceFolder}",
-                "--yaml",
-                "${input:yamlFile}"
-            ],
-            "group": "build",
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "DB: YAML → DB (dry-run)",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "${workspaceFolder}/dev/tools/yaml_to_db.py",
-                "--godot-root",
-                "${workspaceFolder}",
-                "--yaml",
-                "${input:yamlFile}",
-                "--dry-run"
-            ],
-            "group": "build",
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "DB: .tres → DB",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "${workspaceFolder}/dev/tools/tres_to_db.py",
-                "--godot-root",
-                "${workspaceFolder}"
-            ],
-            "group": "build",
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "DB: DB → .tres",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "${workspaceFolder}/dev/tools/db_to_tres.py",
-                "--godot-root",
-                "${workspaceFolder}"
-            ],
-            "group": "build",
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "DB: DB → .tres (dry-run)",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "${workspaceFolder}/dev/tools/db_to_tres.py",
+                "${workspaceFolder}/dev/tools/yaml_to_tres.py",
                 "--godot-root",
                 "${workspaceFolder}",
                 "--dry-run"
@@ -104,28 +35,11 @@
             "problemMatcher": []
         },
         {
-            "label": "DB: Check sync (.tres vs DB)",
+            "label": ".tres → YAML",
             "type": "shell",
             "command": "python",
             "args": [
-                "${workspaceFolder}/dev/tools/check_sync.py",
-                "--godot-root",
-                "${workspaceFolder}",
-                "--text"
-            ],
-            "group": "build",
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "DB: Check sync → HTML report",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "${workspaceFolder}/dev/tools/check_sync.py",
+                "${workspaceFolder}/dev/tools/tres_to_yaml.py",
                 "--godot-root",
                 "${workspaceFolder}"
             ],
@@ -134,24 +48,7 @@
                 "reveal": "always",
                 "panel": "shared"
             },
-            "problemMatcher": [],
-            "windows": {
-                "command": "python ${workspaceFolder}/dev/tools/check_sync.py --godot-root ${workspaceFolder} > ${workspaceFolder}/dev/tools/sync_report.html && start ${workspaceFolder}/dev/tools/sync_report.html"
-            },
-            "osx": {
-                "command": "python ${workspaceFolder}/dev/tools/check_sync.py --godot-root ${workspaceFolder} > ${workspaceFolder}/dev/tools/sync_report.html && open ${workspaceFolder}/dev/tools/sync_report.html"
-            },
-            "linux": {
-                "command": "python ${workspaceFolder}/dev/tools/check_sync.py --godot-root ${workspaceFolder} > ${workspaceFolder}/dev/tools/sync_report.html && xdg-open ${workspaceFolder}/dev/tools/sync_report.html"
-            }
-        }
-    ],
-    "inputs": [
-        {
-            "id": "yamlFile",
-            "type": "promptString",
-            "description": "Path to YAML dir (absolute or relative to workspace)",
-            "default": "${workspaceFolder}/data/yaml"
+            "problemMatcher": []
         }
     ]
 }
