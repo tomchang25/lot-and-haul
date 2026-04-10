@@ -14,7 +14,7 @@ func _ready() -> void:
 
 
 func _on_back_pressed() -> void:
-    GameManager.go_to_hub()
+    GameManager.go_to_knowledge_hub()
 
 
 func _populate_rows() -> void:

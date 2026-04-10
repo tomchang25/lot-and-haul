@@ -64,5 +64,13 @@ func go_to_skill_panel() -> void:
     get_tree().change_scene_to_packed(scenes.skill_panel)
 
 
-func go_to_knowledge_panel() -> void:
-    get_tree().change_scene_to_packed(scenes.knowledge_panel)
+func go_to_knowledge_hub() -> void:
+    get_tree().change_scene_to_packed(scenes.knowledge_hub)
+
+
+func go_to_mastery_panel() -> void:
+    get_tree().change_scene_to_packed(scenes.mastery_panel)
+
+
+func go_to_perk_panel() -> void:
+    get_tree().change_scene_to_packed(scenes.perk_panel)

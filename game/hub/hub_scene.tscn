@@ -96,13 +96,6 @@ size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
 text = "Knowledge"
 
-[node name="SkillButton" type="Button" parent="RootVBox/ButtonsVBox"]
-custom_minimum_size = Vector2(240, 52)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 18
-text = "Skills"
-
 [node name="DayPassButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1984289116]
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
