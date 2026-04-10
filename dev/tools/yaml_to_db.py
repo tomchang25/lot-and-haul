@@ -46,8 +46,8 @@ def ensure_skills(cur: sqlite3.Cursor, layers: list[dict], dry_run: bool) -> Non
         else:
             cur.execute(
                 """
-                INSERT INTO skills (skill_id, display_name, max_level)
-                VALUES (?, ?, 5)
+                INSERT INTO skills (skill_id, display_name)
+                VALUES (?, ?)
                 ON CONFLICT(skill_id) DO NOTHING
                 """,
                 (sid, disp),
@@ -144,17 +144,16 @@ def import_identity_layers(
             ctx = int(unlock["context"])
             tc = int(unlock.get("unlock_days", 0))
             sid = unlock.get("required_skill") or None
-            rlv = int(unlock.get("required_level", 0))
             rcond = float(unlock.get("required_condition", 0.0))
 
             cur.execute(
                 """
                 INSERT INTO layer_unlock_actions
                     (layer_id, context, unlock_days, skill_id,
-                     required_level, required_condition)
-                VALUES (?, ?, ?, ?, ?, ?)
+                     required_condition)
+                VALUES (?, ?, ?, ?, ?)
                 """,
-                (layer_id, ctx, tc, sid, rlv, rcond),
+                (layer_id, ctx, tc, sid, rcond),
             )
 
         print(f"  layer: {layer_id}")
@@ -254,8 +253,11 @@ def _validate(data: dict) -> list[str]:
         if ctx == 1 and not unlock.get("unlock_days"):
             errors.append(f"layer '{lid}': context=1 (HOME) requires unlock_days >= 1")
 
-        if unlock.get("required_level") and not unlock.get("required_skill"):
-            errors.append(f"layer '{lid}': required_level set without required_skill")
+        if unlock.get("required_level"):
+            errors.append(
+                f"layer '{lid}': required_level is no longer supported — "
+                f"skills are binary gates, remove required_level"
+            )
 
         sid = unlock.get("required_skill")
         if sid and sid not in ("appraisal", "authentication", "mechanical"):

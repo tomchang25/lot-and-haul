@@ -11,9 +11,6 @@ extends Resource
 # Name shown in UI (skill list, action tooltip, etc.).
 @export var display_name: String = ""
 
-# DEPRECATED: array size of levels is the new authoritative max
-@export var max_level: int = 5
-
 # Index 0 = requirements to reach level 1.
 # Array size determines max level (typically 5).
 @export var levels: Array[SkillLevelData] = []

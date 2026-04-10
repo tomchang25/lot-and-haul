@@ -70,17 +70,15 @@ def seed_skills(conn: sqlite3.Connection, skills_dir: Path) -> dict[str, str]:
         uid = _header_uid(text)
         skill_id = _field(text, "skill_id") or f.stem
         name = _field(text, "display_name") or skill_id
-        max_lv = int(_field(text, "max_level") or 5)
         cur.execute(
             """
-            INSERT INTO skills (skill_id, display_name, max_level, uid)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO skills (skill_id, display_name, uid)
+            VALUES (?, ?, ?)
             ON CONFLICT(skill_id) DO UPDATE SET
                 display_name = excluded.display_name,
-                max_level    = excluded.max_level,
                 uid          = excluded.uid
             """,
-            (skill_id, name, max_lv, uid),
+            (skill_id, name, uid),
         )
         if uid:
             uid_map[uid] = skill_id
@@ -171,15 +169,14 @@ def seed_identity_layers(
                 """
                 INSERT INTO layer_unlock_actions
                     (layer_id, context, unlock_days, skill_id,
-                     required_level, required_condition)
-                VALUES (?, ?, ?, ?, ?, ?)
+                     required_condition)
+                VALUES (?, ?, ?, ?, ?)
                 """,
                 (
                     layer_id,
                     int(unlock_fields.get("context", 1)),
                     int(unlock_fields.get("unlock_days", 0)),
                     skill_id,
-                    int(unlock_fields.get("required_level", 0)),
                     float(unlock_fields.get("required_condition", 0.0)),
                 ),
             )

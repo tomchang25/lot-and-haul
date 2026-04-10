@@ -20,7 +20,6 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS skills (
     skill_id     TEXT    PRIMARY KEY,
     display_name TEXT    NOT NULL,
-    max_level    INTEGER NOT NULL DEFAULT 5,
     uid          TEXT
 );
 
@@ -53,7 +52,6 @@ CREATE TABLE IF NOT EXISTS layer_unlock_actions (
     context            INTEGER NOT NULL DEFAULT 1,
     unlock_days        INTEGER NOT NULL DEFAULT 1,
     skill_id           TEXT    REFERENCES skills(skill_id),
-    required_level     INTEGER NOT NULL DEFAULT 0,
     required_condition REAL    NOT NULL DEFAULT 0.0
 );
 
@@ -75,7 +73,7 @@ CREATE TABLE IF NOT EXISTS item_identity_layers (
 
 # ── Seed data (brass_lamp) ────────────────────────────────────────────────────
 
-_SEED_SKILL = ("appraisal", "Appraisal", 5)
+_SEED_SKILL = ("appraisal", "Appraisal")
 
 _SEED_SUPER_CATEGORIES = [
     ("decorative", "Decorative"),
@@ -88,9 +86,9 @@ _SEED_SUPER_CATEGORIES = [
 _SEED_CATEGORY = ("oil_lamp", "Decorative", "Oil Lamp", 3.0, "s1x2")
 
 _SEED_LAYERS = [
-    # (layer_id, display_name, base_value, unlock_context, unlock_days, skill_id, req_level)
-    ("lamp_shaped_object", "Lamp-Shaped Object", 80, 0, 0, None, 0),
-    ("antique_oil_lamp", "Antique Oil Lamp", 220, 1, 2, None, 0),
+    # (layer_id, display_name, base_value, unlock_context, unlock_days, skill_id)
+    ("lamp_shaped_object", "Lamp-Shaped Object", 80, 0, 0, None),
+    ("antique_oil_lamp", "Antique Oil Lamp", 220, 1, 2, None),
     (
         "signed_duplex_burner_lamp",
         "Signed Duplex Burner Lamp",
@@ -98,7 +96,6 @@ _SEED_LAYERS = [
         None,
         None,
         None,
-        0,
     ),
 ]
 
@@ -125,10 +122,10 @@ def _seed(conn: sqlite3.Connection) -> None:
         )
 
     # skill
-    skill_id, display_name, max_level = _SEED_SKILL
+    skill_id, display_name = _SEED_SKILL
     cur.execute(
-        "INSERT OR IGNORE INTO skills (skill_id, display_name, max_level) VALUES (?,?,?)",
-        (skill_id, display_name, max_level),
+        "INSERT OR IGNORE INTO skills (skill_id, display_name) VALUES (?,?)",
+        (skill_id, display_name),
     )
 
     # category
@@ -140,7 +137,7 @@ def _seed(conn: sqlite3.Connection) -> None:
     )
 
     # layers
-    for layer_id, disp, value, ctx, tc, sid, rlv in _SEED_LAYERS:
+    for layer_id, disp, value, ctx, tc, sid in _SEED_LAYERS:
         cur.execute(
             "INSERT OR IGNORE INTO identity_layers (layer_id, display_name, base_value) VALUES (?,?,?)",
             (layer_id, disp, value),
@@ -148,8 +145,8 @@ def _seed(conn: sqlite3.Connection) -> None:
         if ctx is not None:
             cur.execute(
                 "INSERT OR IGNORE INTO layer_unlock_actions "
-                "(layer_id, context, unlock_days, skill_id, required_level) VALUES (?,?,?,?,?)",
-                (layer_id, ctx, tc or 0, sid, rlv),
+                "(layer_id, context, unlock_days, skill_id) VALUES (?,?,?,?)",
+                (layer_id, ctx, tc or 0, sid),
             )
 
     # item
