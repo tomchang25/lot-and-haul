@@ -5,6 +5,7 @@ extends Control
 
 # ── Node references ───────────────────────────────────────────────────────────
 
+@onready var _mastery_rank_label: Label = $RootVBox/MasteryRankLabel
 @onready var _balance_label: Label = $RootVBox/InfoContainer/BalanceLabel
 @onready var _storage_count_label: Label = $RootVBox/InfoContainer/StorageCountLabel
 @onready var _next_run_popup: ConfirmationDialog = $NextRunPopup
@@ -80,5 +81,6 @@ func _do_day_pass() -> void:
 
 
 func _refresh_display() -> void:
+    _mastery_rank_label.text = "Mastery Rank:   %d" % KnowledgeManager.get_mastery_rank()
     _balance_label.text = "Balance:   $%d" % SaveManager.cash
     _storage_count_label.text = "Storage:   %d items" % SaveManager.storage_items.size()

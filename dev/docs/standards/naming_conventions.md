@@ -244,6 +244,47 @@ All GDScript files use **4 spaces** per indent level. Tabs are not used.
 
 ---
 
+# 10. Match Wildcard Rule
+
+The wildcard arm `_:` in `match` statements is reserved for **error handling and
+truly unexpected values**. Do not use it as the default for a value that is a
+normal, expected member of the enum or type being matched.
+
+Every expected case must have its own explicit arm. This ensures the compiler
+(and the reader) can verify that all cases are covered, and that adding a new
+enum member later will surface unhandled branches.
+
+```gdscript
+# Good — every expected mode has an explicit arm; wildcard catches bugs.
+func price_label_for(ctx: ItemViewContext) -> String:
+    match ctx.price_mode:
+        ItemViewContext.PriceMode.CURRENT_ESTIMATE:
+            return current_price_label
+        ItemViewContext.PriceMode.SELL_PRICE:
+            return sell_price_label
+        ItemViewContext.PriceMode.BASE_VALUE:
+            return base_value_label
+        _:
+            push_warning("Unknown PriceMode: %d" % ctx.price_mode)
+            return current_price_label
+
+# Bad — CURRENT_ESTIMATE is a normal case hidden inside the wildcard.
+func price_label_for(ctx: ItemViewContext) -> String:
+    match ctx.price_mode:
+        ItemViewContext.PriceMode.SELL_PRICE:
+            return sell_price_label
+        ItemViewContext.PriceMode.BASE_VALUE:
+            return base_value_label
+        _:
+            return current_price_label
+```
+
+If a `match` covers all members of a known enum exhaustively, the wildcard arm
+should either be omitted entirely or contain only a `push_warning` / `push_error`
+to flag unexpected values at runtime (Recommend).
+
+---
+
 # Summary
 
 | Type              | Style                         | Example                   |
