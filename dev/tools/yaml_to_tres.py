@@ -434,6 +434,44 @@ def _validate(data: dict) -> list[str]:
                     f"item '{iid}': final layer '{layer_ids[-1]}' must have unlock_action: null"
                 )
 
+            # Position-aware checks along the item's layer chain.
+            prev_base_value: int | None = None
+            for index, lid in enumerate(layer_ids):
+                layer = next(
+                    (l for l in data["identity_layers"] if l["layer_id"] == lid),
+                    None,
+                )
+                if layer is None:
+                    continue
+
+                unlock = layer.get("unlock_action")
+
+                if index < len(layer_ids) - 1 and unlock is None:
+                    errors.append(
+                        f"item '{iid}': layer[{index}] '{lid}' has no unlock_action"
+                        f" but is not the final layer"
+                    )
+
+                if index >= 1 and unlock is not None and unlock.get("context") == 0:
+                    errors.append(
+                        f"item '{iid}': layer[{index}] '{lid}' uses context=0 (AUTO)"
+                        f" but only layer[0] may be AUTO"
+                    )
+
+                cur_base_value = layer.get("base_value")
+                if (
+                    prev_base_value is not None
+                    and cur_base_value is not None
+                    and cur_base_value <= prev_base_value
+                ):
+                    errors.append(
+                        f"item '{iid}': layer[{index}] '{lid}' base_value"
+                        f" {cur_base_value} is not greater than previous layer's"
+                        f" {prev_base_value}"
+                    )
+                if cur_base_value is not None:
+                    prev_base_value = cur_base_value
+
     return errors
 
 

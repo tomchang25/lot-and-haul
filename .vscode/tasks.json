@@ -49,6 +49,22 @@
                 "panel": "shared"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "YAML Stats",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/dev/tools/yaml_stats.py",
+                "--godot-root",
+                "${workspaceFolder}"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
         }
     ]
 }
