@@ -52,38 +52,8 @@ _IDENTITY_LAYER_SCRIPT_UID = "uid://btknl1cvjqdvh"
 _LAYER_UNLOCK_SCRIPT_UID = "uid://c23t4blqmaaj4"
 _CATEGORY_DATA_SCRIPT_UID = "uid://c7fq6wupmgchg"
 _SUPER_CATEGORY_DATA_SCRIPT_UID = "uid://d4gdoi2l561vy"
-
-
-# ── Skill script UID discovery ────────────────────────────────────────────────
-
-
-def _discover_skill_script_uids(
-    skills_dir: Path,
-) -> tuple[str | None, str | None]:
-    """Scan existing skill .tres files to find SkillData and SkillLevelData
-    script UIDs. Returns (skill_data_uid, skill_level_data_uid)."""
-    skill_data_uid: str | None = None
-    skill_level_data_uid: str | None = None
-
-    if not skills_dir.is_dir():
-        return None, None
-
-    for f in skills_dir.glob("*.tres"):
-        text = f.read_text(encoding="utf-8")
-        for m in re.finditer(
-            r'\[ext_resource[^\]]*uid="([^"]+)"[^\]]*path="([^"]+)"[^\]]*\]',
-            text,
-        ):
-            uid, path = m.group(1), m.group(2)
-            if path.endswith("skill_data.gd"):
-                skill_data_uid = uid
-            elif path.endswith("skill_level_data.gd"):
-                skill_level_data_uid = uid
-
-        if skill_data_uid and skill_level_data_uid:
-            break
-
-    return skill_data_uid, skill_level_data_uid
+_SKILL_DATA_SCRIPT_UID = "uid://bbu2d2yj7k7i4"
+_SKILL_LEVEL_DATA_SCRIPT_UID = "uid://qu7qx28tubh2"
 
 
 # ── .tres builders ────────────────────────────────────────────────────────────
@@ -234,9 +204,7 @@ def _build_layer_tres(
                 f'required_level = {int(unlock.get("required_level", 0))}',
             ]
         if float(unlock.get("required_condition", 0.0)) != 0.0:
-            lines.append(
-                f'required_condition = {float(unlock["required_condition"])}'
-            )
+            lines.append(f'required_condition = {float(unlock["required_condition"])}')
         if int(unlock.get("required_category_rank", 0)) != 0:
             lines.append(
                 f'required_category_rank = {int(unlock["required_category_rank"])}'
@@ -375,9 +343,7 @@ def _validate(data: dict) -> list[str]:
             )
 
     # ── Identity layers ───────────────────────────────────────────────────────
-    known_layer_ids: set[str] = {
-        l["layer_id"] for l in data.get("identity_layers", [])
-    }
+    known_layer_ids: set[str] = {l["layer_id"] for l in data.get("identity_layers", [])}
 
     for layer in data.get("identity_layers", []):
         lid = layer.get("layer_id", "?")
@@ -603,16 +569,6 @@ def main() -> None:
         help="Directory containing YAML files (default: <godot-root>/data/yaml)",
     )
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument(
-        "--skill-data-uid",
-        default=None,
-        help="Script UID for skill_data.gd (auto-discovered from existing .tres if omitted)",
-    )
-    parser.add_argument(
-        "--skill-level-data-uid",
-        default=None,
-        help="Script UID for skill_level_data.gd (auto-discovered from existing .tres if omitted)",
-    )
     args = parser.parse_args()
 
     root = Path(args.godot_root)
@@ -669,23 +625,6 @@ def main() -> None:
         ):
             d.mkdir(parents=True, exist_ok=True)
 
-    # ── Resolve skill script UIDs ─────────────────────────────────────────────
-    discovered_sd, discovered_sld = _discover_skill_script_uids(skills_dir)
-    skill_data_uid = args.skill_data_uid or discovered_sd
-    skill_level_data_uid = args.skill_level_data_uid or discovered_sld
-
-    if merged["skills"] and not (skill_data_uid and skill_level_data_uid):
-        msg = "Cannot determine skill script UIDs.\n"
-        if not skill_data_uid:
-            msg += "  Missing: skill_data.gd UID (pass --skill-data-uid)\n"
-        if not skill_level_data_uid:
-            msg += "  Missing: skill_level_data.gd UID (pass --skill-level-data-uid)\n"
-        msg += (
-            "\nTip: create one SkillData .tres in the Godot editor first, then re-run.\n"
-            "The script will then auto-discover script UIDs from existing files."
-        )
-        sys.exit(msg)
-
     # ── Export in dependency order ────────────────────────────────────────────
     uid_cache: dict[str, str] = {}
 
@@ -696,8 +635,8 @@ def main() -> None:
             skills_dir,
             uid_cache,
             args.dry_run,
-            skill_data_uid or "",
-            skill_level_data_uid or "",
+            _SKILL_DATA_SCRIPT_UID,
+            _SKILL_LEVEL_DATA_SCRIPT_UID,
         )
 
     print(f"Exporting super_categories ({len(merged['super_categories'])})...")
