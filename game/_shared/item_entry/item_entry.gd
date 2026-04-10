@@ -359,6 +359,47 @@ func is_veiled() -> bool:
 func is_at_final_layer() -> bool:
     return layer_index == item_data.identity_layers.size() - 1
 
+
+# Advances a veiled item (layer 0) to layer 1 and recalculates knowledge ranges
+# at the new layer depth. Shared by the reveal scene, the X-Ray inspect action,
+# and any other caller that needs to unveil an item mid-run.
+# The recalculated ranges are only accepted if the total spread is tighter
+# than the current ranges (same policy as KnowledgeManager.apply_market_research).
+func unveil() -> void:
+    if not is_veiled():
+        return
+
+    layer_index = 1
+
+    var super_cat_id: String = item_data.category_data.super_category.super_category_id
+    var layers_count: int = item_data.identity_layers.size()
+
+    var old_range: float = 0.0
+    for i in range(layers_count):
+        old_range += knowledge_max[i] - knowledge_min[i]
+
+    var new_min: Array[float] = []
+    var new_max: Array[float] = []
+    new_min.resize(layers_count)
+    new_max.resize(layers_count)
+    for i in range(layers_count):
+        var depth: int = maxi(0, i - layer_index)
+        var price_range: Vector2 = KnowledgeManager.get_price_range(
+            super_cat_id,
+            item_data.rarity,
+            depth,
+        )
+        new_min[i] = price_range.x
+        new_max[i] = price_range.y
+
+    var new_range: float = 0.0
+    for i in range(layers_count):
+        new_range += new_max[i] - new_min[i]
+
+    if new_range < old_range:
+        knowledge_min = new_min
+        knowledge_max = new_max
+
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
 

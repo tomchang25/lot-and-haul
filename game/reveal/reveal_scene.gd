@@ -48,8 +48,7 @@ func _ready() -> void:
 func _on_reveal_pressed() -> void:
     for i in _won_items.size():
         var entry: ItemEntry = _won_items[i]
-        if entry.is_veiled():
-            entry.layer_index = 1
+        entry.unveil()
         entry.condition_inspect_level = 2
         entry.potential_inspect_level = 2
         _rows[i].refresh()

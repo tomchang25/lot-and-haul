@@ -48,6 +48,7 @@ func _ready() -> void:
 
     _action_popup.potential_inspect_requested.connect(_on_potential_inspect)
     _action_popup.condition_inspect_requested.connect(_on_condition_inspect)
+    _action_popup.xray_inspect_requested.connect(_on_xray_inspect)
     _action_popup.cancelled.connect(_on_popup_cancelled)
     _start_btn.pressed.connect(_on_start_auction_pressed)
     _pass_btn.pressed.connect(_on_pass_pressed)
@@ -119,6 +120,30 @@ func _on_condition_inspect() -> void:
 
     entry.condition_inspect_level += 1
     _active_item.refresh(&"condition")
+    _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
+    _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
+    _action_popup.refresh(entry)
+
+
+func _on_xray_inspect() -> void:
+    if _active_item == null:
+        return
+    var entry: ItemEntry = _entry_for_display[_active_item]
+    if RunManager.run_record.stamina < ActionPopup.XRAY_COST:
+        return
+    if RunManager.run_record.actions_remaining <= 0:
+        return
+
+    RunManager.run_record.stamina -= ActionPopup.XRAY_COST
+    RunManager.run_record.actions_remaining -= 1
+
+    entry.unveil()
+    KnowledgeManager.add_category_points(
+        entry.item_data.category_data.category_id,
+        entry.item_data.rarity,
+        KnowledgeManager.KnowledgeAction.REVEAL,
+    )
+    _active_item.refresh(&"unveil")
     _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
     _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
     _action_popup.refresh(entry)
