@@ -3,10 +3,6 @@
 # Reads: KnowledgeManager, ItemRegistry, SaveManager.category_points
 extends Control
 
-# ── Constants ─────────────────────────────────────────────────────────────────
-
-const RANK_THRESHOLDS: Array[int] = [0, 100, 400, 1600, 6400, 25600]
-
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _back_btn: Button = $RootVBox/Footer/BackButton
@@ -54,7 +50,7 @@ func _build_content() -> void:
             if rank >= 5:
                 progress_text = "MAX"
             else:
-                var next_threshold: int = RANK_THRESHOLDS[rank + 1]
+                var next_threshold: int = KnowledgeManager.RANK_THRESHOLDS[rank + 1]
                 progress_text = "%d / %d" % [points, next_threshold]
 
             var cat_label := Label.new()
