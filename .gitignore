@@ -14,3 +14,5 @@
 **/*.tmp
 **/*.import
 **/*.db-journal
+
+**/__pycache__/
