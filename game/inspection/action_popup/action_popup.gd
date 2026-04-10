@@ -31,9 +31,9 @@ func refresh(entry: ItemEntry) -> void:
     # Potential button
     var p_maxed := entry.potential_inspect_level >= 2 or entry.is_veiled()
     _potential_button.disabled = p_maxed or _is_potential_action_disabled()
-    if entry.is_veiled():
-        _potential_button.text = "Veiled"
-    elif entry.potential_inspect_level >= 2:
+    _potential_button.visible = not entry.is_veiled()
+
+    if entry.potential_inspect_level >= 2:
         _potential_button.text = "Potential: Max"
     elif entry.potential_inspect_level == 1:
         _potential_button.text = "Inspect Potential Lv2 (%d SP)" % POTENTIAL_COST
@@ -44,21 +44,24 @@ func refresh(entry: ItemEntry) -> void:
     var c_locked := not entry.is_condition_inspectable()
     var c_maxed := entry.condition_inspect_level >= 2
     _condition_button.disabled = c_maxed or c_locked or _is_condition_action_disabled()
+    _condition_button.visible = not entry.is_veiled()
+
     if c_maxed:
         _condition_button.text = "Condition: Max"
-    elif entry.is_veiled():
-        _condition_button.text = "Condition: Veiled"
     elif c_locked:
         _condition_button.text = "Condition: Too Damaged"
     else:
         _condition_button.text = "Inspect Condition (%d SP)" % CONDITION_COST
 
-    # X-Ray button — only shown for veiled items when the perk is unlocked.
-    var xray_visible := entry.is_veiled() and KnowledgeManager.has_perk("xray_inspect")
-    _xray_button.visible = xray_visible
-    if xray_visible:
+    _xray_button.disabled = not KnowledgeManager.has_perk("xray_inspect") or _is_xray_action_disabled()
+    _xray_button.visible = entry.is_veiled()
+
+    if KnowledgeManager.has_perk("xray_inspect"):
         _xray_button.text = "X-Ray Scan (%d SP)" % XRAY_COST
-        _xray_button.disabled = _is_xray_action_disabled()
+    else:
+        _xray_button.text = "Veiled"
+
+    reset_size()
 
 
 func _on_potential_pressed() -> void:

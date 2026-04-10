@@ -3,7 +3,8 @@
 [ext_resource type="Script" uid="uid://bhb5838knlltx" path="res://game/inspection/action_popup/action_popup.gd" id="1_actpop"]
 
 [node name="ActionPopup" type="PanelContainer" unique_id=77789669]
-custom_minimum_size = Vector2(170, 0)
+custom_minimum_size = Vector2(40, 0)
+offset_right = 40.0
 script = ExtResource("1_actpop")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=660494512]
