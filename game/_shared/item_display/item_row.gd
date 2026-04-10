@@ -58,7 +58,6 @@ static func get_price_header(ctx: ItemViewContext) -> String:
             push_warning("Unknown PriceMode: %d" % ctx.price_mode)
             return "Price"
 
-
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _entry: ItemEntry = null
@@ -85,7 +84,6 @@ static func _ensure_styles() -> void:
     _style_blocked = StyleBoxFlat.new()
     _style_blocked.bg_color = Color(0.08, 0.08, 0.08, 0.9) # near-black
 
-
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _name_label: Label = $HBoxContainer/NameLabel
@@ -95,7 +93,6 @@ static func _ensure_styles() -> void:
 @onready var _weight_label: Label = $HBoxContainer/WeightLabel
 @onready var _grid_label: Label = $HBoxContainer/GridLabel
 
-
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
@@ -104,7 +101,6 @@ func _ready() -> void:
     mouse_exited.connect(_on_mouse_exited)
 
     _refresh()
-
 
 # ══ Common API ════════════════════════════════════════════════════════════════
 
@@ -142,7 +138,6 @@ func set_selection_state(state: SelectionState) -> void:
             remove_theme_stylebox_override(&"panel")
             mouse_default_cursor_shape = Control.CURSOR_ARROW
 
-
 # ══ Input ═════════════════════════════════════════════════════════════════════
 
 
@@ -154,7 +149,6 @@ func _gui_input(event: InputEvent) -> void:
     and event.pressed:
         row_pressed.emit(_entry)
         accept_event()
-
 
 # ══ Refresh ═══════════════════════════════════════════════════════════════════
 
@@ -191,7 +185,6 @@ func _refresh() -> void:
         var cat := _entry.item_data.category_data
         _weight_label.text = "%.1f kg" % cat.weight
         _grid_label.text = "%d  %s" % [cat.get_cells().size(), cat.shape_id]
-
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 

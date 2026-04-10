@@ -27,7 +27,6 @@ var _rows: Dictionary = { } # ItemEntry → ItemRow
 @onready var _column_header: HBoxContainer = $PanelVBox/ColumnHeader
 @onready var _row_container: VBoxContainer = $PanelVBox/ScrollContainer/RowContainer
 
-
 # ══ Common API ════════════════════════════════════════════════════════════════
 
 
@@ -81,7 +80,6 @@ func refresh_row(entry: ItemEntry) -> void:
 func rebuild_header() -> void:
     _build_header()
 
-
 # ══ Sorting ═══════════════════════════════════════════════════════════════════
 
 
@@ -130,7 +128,6 @@ static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewC
             push_warning("Unknown Column: %d" % col)
             return 0
 
-
 # ══ Header ════════════════════════════════════════════════════════════════════
 
 
@@ -178,7 +175,6 @@ func _on_header_pressed(column: ItemRow.Column) -> void:
 
     _build_header()
     apply_sort()
-
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 

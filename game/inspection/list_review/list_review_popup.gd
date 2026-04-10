@@ -16,6 +16,7 @@ const LIST_REVIEW_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
     ItemRow.Column.PRICE,
+    ItemRow.Column.POTENTIAL,
 ]
 
 # ── State ─────────────────────────────────────────────────────────────────────

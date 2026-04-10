@@ -13,6 +13,7 @@ const PAWN_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
     ItemRow.Column.PRICE,
+    ItemRow.Column.POTENTIAL,
 ]
 
 const ASK_PRICE_MIN_FACTOR := 0.50
