@@ -1,6 +1,6 @@
 # identity_layer.gd
 # Designer-authored resource. Represents one rung in an item's identity chain.
-# Place reusable standalone .tres files under data/identity_layers/
+# Place reusable standalone .tres files under data/tres/identity_layers/
 class_name IdentityLayer
 extends Resource
 

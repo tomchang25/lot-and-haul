@@ -262,14 +262,14 @@ func get_all_perks() -> Array[PerkData]:
 
 
 func _load_perk_registry() -> void:
-    var dir := DirAccess.open("res://data/perks")
+    var dir := DirAccess.open("res://data/tres/perks")
     if dir == null:
         return
     dir.list_dir_begin()
     var filename: String = dir.get_next()
     while filename != "":
         if filename.ends_with(".tres"):
-            var path := "res://data/perks/" + filename
+            var path := "res://data/tres/perks/" + filename
             var perk := ResourceLoader.load(path) as PerkData
             if perk != null and perk.perk_id != "":
                 _perk_registry[perk.perk_id] = perk
@@ -278,14 +278,14 @@ func _load_perk_registry() -> void:
 
 
 func _load_skill_registry() -> void:
-    var dir := DirAccess.open("res://data/skills")
+    var dir := DirAccess.open("res://data/tres/skills")
     if dir == null:
         return
     dir.list_dir_begin()
     var filename: String = dir.get_next()
     while filename != "":
         if filename.ends_with(".tres"):
-            var path := "res://data/skills/" + filename
+            var path := "res://data/tres/skills/" + filename
             var skill := ResourceLoader.load(path) as SkillData
             if skill != null and skill.skill_id != "":
                 _skill_registry[skill.skill_id] = skill

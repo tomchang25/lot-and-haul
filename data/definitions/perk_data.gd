@@ -3,7 +3,7 @@
 # Perks have no fixed unlock path — they are granted by calling
 # KnowledgeManager.unlock_perk(perk_id) from any system (cash purchase,
 # quest reward, etc.).
-# Place .tres files under data/perks/
+# Place .tres files under data/tres/perks/
 class_name PerkData
 extends Resource
 

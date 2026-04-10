@@ -144,16 +144,17 @@ def import_identity_layers(
             ctx = int(unlock["context"])
             tc = int(unlock.get("unlock_days", 0))
             sid = unlock.get("required_skill") or None
+            rlv = int(unlock.get("required_level", 0))
             rcond = float(unlock.get("required_condition", 0.0))
 
             cur.execute(
                 """
                 INSERT INTO layer_unlock_actions
                     (layer_id, context, unlock_days, skill_id,
-                     required_condition)
-                VALUES (?, ?, ?, ?, ?)
+                     required_level, required_condition)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """,
-                (layer_id, ctx, tc, sid, rcond),
+                (layer_id, ctx, tc, sid, rlv, rcond),
             )
 
         print(f"  layer: {layer_id}")
@@ -315,13 +316,13 @@ def main() -> None:
     parser.add_argument(
         "--yaml-dir",
         default=None,
-        help="Directory containing YAML files (default: <godot-root>/data/_yaml)",
+        help="Directory containing YAML files (default: <godot-root>/data/yaml)",
     )
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
     root = Path(args.godot_root)
-    yaml_dir = Path(args.yaml_dir) if args.yaml_dir else root / "data" / "_yaml"
+    yaml_dir = Path(args.yaml_dir) if args.yaml_dir else root / "data" / "yaml"
 
     if not yaml_dir.is_dir():
         sys.exit(f"YAML directory not found: {yaml_dir}")
@@ -356,7 +357,7 @@ def main() -> None:
         sys.exit(1)
     print("  OK")
 
-    db_path = root / "data" / "_db" / "lot_haul.db"
+    db_path = root / "data" / "db" / "lot_haul.db"
     if not db_path.exists():
         sys.exit(f"DB not found: {db_path}\nRun init.py first.")
 

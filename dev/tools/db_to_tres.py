@@ -47,13 +47,13 @@ def _build_layer_tres(
         f'[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="{layer_uid}"]',
         "",
         f'[ext_resource type="Script" uid="{_IDENTITY_LAYER_SCRIPT_UID}" '
-        f'path="res://data/_definitions/identity_layer.gd" id="1_ilay"]',
+        f'path="res://data/definitions/identity_layer.gd" id="1_ilay"]',
     ]
 
     if unlock is not None:
         lines.append(
             f'[ext_resource type="Script" uid="{_LAYER_UNLOCK_SCRIPT_UID}" '
-            f'path="res://data/_definitions/layer_unlock_action.gd" id="2_unlock"]'
+            f'path="res://data/definitions/layer_unlock_action.gd" id="2_unlock"]'
         )
 
         skill_tag: str | None = None
@@ -63,7 +63,7 @@ def _build_layer_tres(
             if suid:
                 lines.append(
                     f'[ext_resource type="Resource" uid="{suid}" '
-                    f'path="res://data/skills/{sid}.tres" id="3_skill"]'
+                    f'path="res://data/tres/skills/{sid}.tres" id="3_skill"]'
                 )
                 skill_tag = "3_skill"
 
@@ -110,7 +110,7 @@ def _build_super_category_tres(
         f'[gd_resource type="Resource" script_class="SuperCategoryData" format=3 uid="{super_category_uid}"]',
         "",
         f'[ext_resource type="Script" uid="{_SUPER_CATEGORY_DATA_SCRIPT_UID}" '
-        f'path="res://data/_definitions/super_category_data.gd" id="1_superdef"]',
+        f'path="res://data/definitions/super_category_data.gd" id="1_superdef"]',
         "",
         "[resource]",
         'script = ExtResource("1_superdef")',
@@ -134,9 +134,9 @@ def _build_category_tres(
         f'[gd_resource type="Resource" script_class="CategoryData" format=3 uid="{category_uid}"]',
         "",
         f'[ext_resource type="Script" uid="{_CATEGORY_DATA_SCRIPT_UID}" '
-        f'path="res://data/_definitions/category_data.gd" id="1_catdef"]',
+        f'path="res://data/definitions/category_data.gd" id="1_catdef"]',
         f'[ext_resource type="Resource" uid="{super_category_uid}" '
-        f'path="res://data/super_categories/{super_category_id}.tres" id="2_super"]',
+        f'path="res://data/tres/super_categories/{super_category_id}.tres" id="2_super"]',
         "",
         "[resource]",
         'script = ExtResource("1_catdef")',
@@ -162,20 +162,20 @@ def _build_item_tres(
         f'[gd_resource type="Resource" script_class="ItemData" format=3 uid="{item_uid}"]',
         "",
         f'[ext_resource type="Script" uid="{_ITEM_DATA_SCRIPT_UID}" '
-        f'path="res://data/_definitions/item_data.gd" id="1_jyqit"]',
+        f'path="res://data/definitions/item_data.gd" id="1_jyqit"]',
     ]
 
     if category_uid and category_id:
         lines.append(
             f'[ext_resource type="Resource" uid="{category_uid}" '
-            f'path="res://data/categories/{category_id}.tres" id="2_cat"]'
+            f'path="res://data/tres/categories/{category_id}.tres" id="2_cat"]'
         )
 
     for i, layer in enumerate(layers):
         tag = f"{3 + i}_layer"
         lines.append(
             f'[ext_resource type="Resource" uid="{layer["layer_uid"]}" '
-            f'path="res://data/identity_layers/{layer["layer_id"]}.tres" id="{tag}"]'
+            f'path="res://data/tres/identity_layers/{layer["layer_id"]}.tres" id="{tag}"]'
         )
 
     cat_ref = 'ExtResource("2_cat")' if (category_uid and category_id) else "null"
@@ -397,11 +397,11 @@ def main() -> None:
     args = parser.parse_args()
 
     root = Path(args.godot_root)
-    super_categories_dir = root / "data" / "super_categories"
-    categories_dir = root / "data" / "categories"
-    layers_dir = root / "data" / "identity_layers"
-    item_dir = root / "data" / "items"
-    db_path = root / "data" / "_db" / "lot_haul.db"
+    super_categories_dir = root / "data" / "tres" / "super_categories"
+    categories_dir = root / "data" / "tres" / "categories"
+    layers_dir = root / "data" / "tres" / "identity_layers"
+    item_dir = root / "data" / "tres" / "items"
+    db_path = root / "data" / "db" / "lot_haul.db"
 
     for d in (super_categories_dir, categories_dir, layers_dir, item_dir):
         d.mkdir(parents=True, exist_ok=True)

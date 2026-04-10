@@ -65,13 +65,13 @@ The key question for placement: **who writes this data?**
 
 ```
 data/
-  _db/              → database files (dev tooling output)
-  _definitions/     → Resource .gd class definitions (the schema)
-  _yaml/            → YAML source files for data pipeline input
-  [content-type]/   → .tres asset files organized by content type
+  db/              → database files (dev tooling output)
+  definitions/     → Resource .gd class definitions (the schema)
+  yaml/            → YAML source files for data pipeline input
+  tres/            → .tres asset files organized by content type
 ```
 
-### \_definitions/
+### definitions/
 
 All Resource `.gd` class files belong here, regardless of which block uses them.
 
@@ -225,10 +225,10 @@ The main scene for the current build is registered in `project.godot`.
 | Content type                                            | Location                             |
 | ------------------------------------------------------- | ------------------------------------ |
 | Reusable framework or engine utilities                  | `common/`                            |
-| Designer-authored Resource class definitions (`.gd`)    | `data/_definitions/`                 |
+| Designer-authored Resource class definitions (`.gd`)    | `data/definitions/`                  |
 | Designer-authored asset files (`.tres`)                 | `data/<type>/`                       |
-| YAML source files for data pipeline                     | `data/_yaml/`                        |
-| Database files (dev tooling output)                     | `data/_db/`                          |
+| YAML source files for data pipeline                     | `data/yaml/`                         |
+| Database files (dev tooling output)                     | `data/db/`                           |
 | Code-generated runtime data structures                  | `game/_shared/` or `game/[feature]/` |
 | Block scene roots, UI components, block logic           | `game/[feature]/`                    |
 | UI components and helpers shared across multiple blocks | `game/_shared/`                      |

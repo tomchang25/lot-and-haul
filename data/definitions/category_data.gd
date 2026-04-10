@@ -1,7 +1,7 @@
 # category_data.gd
 # Designer-authored resource. Holds physical properties shared by all items of
 # the same fine-grained type. ItemData holds a direct reference.
-# Place .tres files under data/categories/
+# Place .tres files under data/tres/categories/
 class_name CategoryData
 extends Resource
 

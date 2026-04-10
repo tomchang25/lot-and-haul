@@ -496,11 +496,11 @@ def main() -> None:
     args = parser.parse_args()
 
     root = Path(args.godot_root)
-    super_categories_dir = root / "data" / "super_categories"
-    categories_dir = root / "data" / "categories"
-    layers_dir = root / "data" / "identity_layers"
-    item_dir = root / "data" / "items"
-    db_path = root / "data" / "_db" / "lot_haul.db"
+    super_categories_dir = root / "data" / "tres" / "super_categories"
+    categories_dir = root / "data" / "tres" / "categories"
+    layers_dir = root / "data" / "tres" / "identity_layers"
+    item_dir = root / "data" / "tres" / "items"
+    db_path = root / "data" / "db" / "lot_haul.db"
 
     if not db_path.exists():
         sys.exit(f"DB not found: {db_path}\nRun init.py first.")

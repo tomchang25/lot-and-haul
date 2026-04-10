@@ -2,7 +2,7 @@
 tres_to_db.py
 Seed lot_haul.db from existing .tres files in the Godot project.
 
-Reads: data/skills/, data/categories/, data/identity_layers/, data/items/
+Reads: data/tres/skills/, data/tres/categories/, data/tres/identity_layers/, data/tres/items/
 All inserts use UPSERT so re-running is safe.
 
 Usage:
@@ -169,14 +169,15 @@ def seed_identity_layers(
                 """
                 INSERT INTO layer_unlock_actions
                     (layer_id, context, unlock_days, skill_id,
-                     required_condition)
-                VALUES (?, ?, ?, ?, ?)
+                     required_level, required_condition)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (
                     layer_id,
                     int(unlock_fields.get("context", 1)),
                     int(unlock_fields.get("unlock_days", 0)),
                     skill_id,
+                    int(unlock_fields.get("required_level", 0)),
                     float(unlock_fields.get("required_condition", 0.0)),
                 ),
             )
@@ -253,7 +254,7 @@ def main() -> None:
     args = parser.parse_args()
 
     root = Path(args.godot_root)
-    db_path = root / "data" / "_db" / "lot_haul.db"
+    db_path = root / "data" / "db" / "lot_haul.db"
 
     if not db_path.exists():
         sys.exit(f"DB not found: {db_path}\nRun init.py first.")
@@ -262,16 +263,18 @@ def main() -> None:
     conn.execute("PRAGMA foreign_keys = ON")
 
     print("Seeding skills...")
-    skill_uid_map = seed_skills(conn, root / "data" / "skills")
+    skill_uid_map = seed_skills(conn, root / "data" / "tres" / "skills")
 
     print("Seeding categories...")
-    category_uid_map = seed_categories(conn, root / "data" / "categories")
+    category_uid_map = seed_categories(conn, root / "data" / "tres" / "categories")
 
     print("Seeding identity_layers...")
-    seed_identity_layers(conn, root / "data" / "identity_layers", skill_uid_map)
+    seed_identity_layers(
+        conn, root / "data" / "tres" / "identity_layers", skill_uid_map
+    )
 
     print("Seeding items...")
-    seed_items(conn, root / "data" / "items", category_uid_map)
+    seed_items(conn, root / "data" / "tres" / "items", category_uid_map)
 
     conn.close()
     print(f"\nDone → {db_path}")
