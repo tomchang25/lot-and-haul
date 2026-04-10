@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="SuperCategoryData" format=3 uid="uid://r4i56ex88ni2"]
-
-[ext_resource type="Script" uid="uid://d4gdoi2l561vy" path="res://data/definitions/super_category_data.gd" id="1_superdef"]
-
-
-[resource]
-script = ExtResource("1_superdef")
-super_category_id = "fashion"
-display_name = "Fashion"
