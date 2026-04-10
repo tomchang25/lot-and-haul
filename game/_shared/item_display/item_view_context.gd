@@ -48,12 +48,20 @@ static func for_inspection() -> ItemViewContext:
 static func for_list_review() -> ItemViewContext:
     var ctx := ItemViewContext.new()
     ctx.stage = Stage.LIST_REVIEW
+    ctx.condition_mode = ConditionMode.RESPECT_INSPECT_LEVEL
+    ctx.potential_mode = PotentialMode.RESPECT_INSPECT_LEVEL
+    ctx.price_mode = PriceMode.CURRENT_ESTIMATE
+
     return ctx
 
 
 static func for_reveal() -> ItemViewContext:
     var ctx := ItemViewContext.new()
     ctx.stage = Stage.REVEAL
+    ctx.condition_mode = ConditionMode.RESPECT_INSPECT_LEVEL
+    ctx.potential_mode = PotentialMode.RESPECT_INSPECT_LEVEL
+    ctx.price_mode = PriceMode.CURRENT_ESTIMATE
+
     return ctx
 
 
@@ -62,6 +70,8 @@ static func for_cargo() -> ItemViewContext:
     ctx.stage = Stage.CARGO
     ctx.condition_mode = ConditionMode.FORCE_INSPECT_MAX
     ctx.potential_mode = PotentialMode.FORCE_FULL
+    ctx.price_mode = PriceMode.CURRENT_ESTIMATE
+
     return ctx
 
 
