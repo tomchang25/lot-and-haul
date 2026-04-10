@@ -3,9 +3,13 @@ yaml_to_tres.py
 Write SkillData, SuperCategoryData, CategoryData, IdentityLayer, and ItemData
 .tres files directly from YAML source files, without an intermediate database.
 
-Existing Godot UIDs are preserved by reading the header line of each existing
-.tres file on disk. Entities that have no .tres yet get a freshly generated
-uid://... identifier.
+Resource UIDs are derived deterministically from each entity's (type, id) pair
+via SHA-256, so regenerating from YAML produces byte-identical output even with
+no existing .tres files on disk.
+
+Script UIDs for the referenced .gd classes are read at runtime from their
+Godot sidecar files (e.g. data/definitions/item_data.gd.uid), so Godot can
+regenerate them freely without silently breaking this tool.
 
 Usage:
     python yaml_to_tres.py --godot-root /path/to/godot/project
@@ -14,8 +18,7 @@ Usage:
 """
 
 import argparse
-import random
-import re
+import hashlib
 import string
 import sys
 from pathlib import Path
@@ -31,29 +34,50 @@ except ImportError:
 _UID_CHARS = string.ascii_lowercase + string.digits
 
 
-def _new_uid() -> str:
-    return "uid://" + "".join(random.choices(_UID_CHARS, k=12))
+def _deterministic_uid(entity_type: str, entity_id: str) -> str:
+    """Stable uid://... for an (entity_type, entity_id) pair.
+
+    Using a prefix ensures two entities with the same id but different types
+    (e.g. skill:appraisal vs category:appraisal) get distinct UIDs.
+    """
+    digest = hashlib.sha256(f"{entity_type}:{entity_id}".encode()).digest()
+    chars = "".join(_UID_CHARS[b % 36] for b in digest[:12])
+    return "uid://" + chars
 
 
-def _read_existing_uid(tres_path: Path) -> str | None:
-    """Extract uid://... from the first line of an existing .tres file."""
-    if not tres_path.exists():
-        return None
-    with tres_path.open("r", encoding="utf-8") as f:
-        first_line = f.readline()
-    m = re.search(r'uid="(uid://[a-z0-9]+)"', first_line)
-    return m.group(1) if m else None
+# ── Script paths ──────────────────────────────────────────────────────────────
+#
+# UIDs for these scripts are read at runtime from their .gd.uid sidecar files
+# (see _read_script_uid). Keep these paths in sync with the actual .gd files.
+
+_ITEM_DATA_SCRIPT_PATH = "res://data/definitions/item_data.gd"
+_IDENTITY_LAYER_SCRIPT_PATH = "res://data/definitions/identity_layer.gd"
+_LAYER_UNLOCK_SCRIPT_PATH = "res://data/definitions/layer_unlock_action.gd"
+_CATEGORY_DATA_SCRIPT_PATH = "res://data/definitions/category_data.gd"
+_SUPER_CATEGORY_DATA_SCRIPT_PATH = "res://data/definitions/super_category_data.gd"
+_SKILL_DATA_SCRIPT_PATH = "res://data/definitions/skill_data.gd"
+_SKILL_LEVEL_DATA_SCRIPT_PATH = "res://data/definitions/skill_level_data.gd"
 
 
-# ── Script UID constants ──────────────────────────────────────────────────────
+def _read_script_uid(godot_root: Path, res_path: str) -> str:
+    """Read a script's UID from its Godot .gd.uid sidecar file.
 
-_ITEM_DATA_SCRIPT_UID = "uid://bhqs42afjqbgi"
-_IDENTITY_LAYER_SCRIPT_UID = "uid://btknl1cvjqdvh"
-_LAYER_UNLOCK_SCRIPT_UID = "uid://c23t4blqmaaj4"
-_CATEGORY_DATA_SCRIPT_UID = "uid://c7fq6wupmgchg"
-_SUPER_CATEGORY_DATA_SCRIPT_UID = "uid://d4gdoi2l561vy"
-_SKILL_DATA_SCRIPT_UID = "uid://bbu2d2yj7k7i4"
-_SKILL_LEVEL_DATA_SCRIPT_UID = "uid://qu7qx28tubh2"
+    ``res_path`` is a Godot resource path like
+    ``res://data/definitions/item_data.gd``. The sidecar is expected at the
+    same filesystem location with a trailing ``.uid`` suffix.
+    """
+    if not res_path.startswith("res://"):
+        sys.exit(f"Script path must start with 'res://': {res_path}")
+    rel = res_path[len("res://"):]
+    sidecar = godot_root / (rel + ".uid")
+    if not sidecar.is_file():
+        sys.exit(f"Script UID sidecar not found: {sidecar}")
+    content = sidecar.read_text(encoding="utf-8").strip()
+    if not content.startswith("uid://"):
+        sys.exit(
+            f"Script UID sidecar malformed (expected 'uid://...'): {sidecar}"
+        )
+    return content
 
 
 # ── .tres builders ────────────────────────────────────────────────────────────
@@ -113,11 +137,12 @@ def _build_super_category_tres(
     super_category_id: str,
     super_category_uid: str,
     display_name: str,
+    super_category_data_script_uid: str,
 ) -> str:
     lines = [
         f'[gd_resource type="Resource" script_class="SuperCategoryData" format=3 uid="{super_category_uid}"]',
         "",
-        f'[ext_resource type="Script" uid="{_SUPER_CATEGORY_DATA_SCRIPT_UID}" '
+        f'[ext_resource type="Script" uid="{super_category_data_script_uid}" '
         f'path="res://data/definitions/super_category_data.gd" id="1_superdef"]',
         "",
         "[resource]",
@@ -137,11 +162,12 @@ def _build_category_tres(
     display_name: str,
     weight: float,
     shape_id: str,
+    category_data_script_uid: str,
 ) -> str:
     lines = [
         f'[gd_resource type="Resource" script_class="CategoryData" format=3 uid="{category_uid}"]',
         "",
-        f'[ext_resource type="Script" uid="{_CATEGORY_DATA_SCRIPT_UID}" '
+        f'[ext_resource type="Script" uid="{category_data_script_uid}" '
         f'path="res://data/definitions/category_data.gd" id="1_catdef"]',
         f'[ext_resource type="Resource" uid="{super_category_uid}" '
         f'path="res://data/tres/super_categories/{super_category_id}.tres" id="2_super"]',
@@ -165,17 +191,19 @@ def _build_layer_tres(
     base_value: int,
     unlock: dict | None,
     uid_cache: dict[str, str],
+    identity_layer_script_uid: str,
+    layer_unlock_script_uid: str,
 ) -> str:
     lines = [
         f'[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="{layer_uid}"]',
         "",
-        f'[ext_resource type="Script" uid="{_IDENTITY_LAYER_SCRIPT_UID}" '
+        f'[ext_resource type="Script" uid="{identity_layer_script_uid}" '
         f'path="res://data/definitions/identity_layer.gd" id="1_ilay"]',
     ]
 
     if unlock is not None:
         lines.append(
-            f'[ext_resource type="Script" uid="{_LAYER_UNLOCK_SCRIPT_UID}" '
+            f'[ext_resource type="Script" uid="{layer_unlock_script_uid}" '
             f'path="res://data/definitions/layer_unlock_action.gd" id="2_unlock"]'
         )
 
@@ -233,11 +261,12 @@ def _build_item_tres(
     category_uid: str | None,
     rarity: int,
     layers: list[dict],
+    item_data_script_uid: str,
 ) -> str:
     lines = [
         f'[gd_resource type="Resource" script_class="ItemData" format=3 uid="{item_uid}"]',
         "",
-        f'[ext_resource type="Script" uid="{_ITEM_DATA_SCRIPT_UID}" '
+        f'[ext_resource type="Script" uid="{item_data_script_uid}" '
         f'path="res://data/definitions/item_data.gd" id="1_jyqit"]',
     ]
 
@@ -411,11 +440,6 @@ def _validate(data: dict) -> list[str]:
 # ── Export phases ─────────────────────────────────────────────────────────────
 
 
-def _resolve_or_new_uid(out_path: Path) -> str:
-    """Read UID from an existing .tres or mint a new one."""
-    return _read_existing_uid(out_path) or _new_uid()
-
-
 def _write(out_path: Path, content: str, dry_run: bool, label: str) -> None:
     if dry_run:
         print(f"  [dry] would write {out_path}")
@@ -435,7 +459,7 @@ def export_skills(
     for skill in skills:
         sid = skill["skill_id"]
         out = out_dir / f"{sid}.tres"
-        uid = _resolve_or_new_uid(out)
+        uid = _deterministic_uid("skill", sid)
         uid_cache[sid] = uid
         content = _build_skill_tres(
             sid,
@@ -453,14 +477,20 @@ def export_super_categories(
     out_dir: Path,
     uid_cache: dict[str, str],
     dry_run: bool,
+    super_category_data_script_uid: str,
 ) -> None:
     for entry in super_categories:
         display_name = str(entry)
         super_category_id = display_name.lower().replace(" ", "_")
         out = out_dir / f"{super_category_id}.tres"
-        uid = _resolve_or_new_uid(out)
+        uid = _deterministic_uid("super_category", super_category_id)
         uid_cache[super_category_id] = uid
-        content = _build_super_category_tres(super_category_id, uid, display_name)
+        content = _build_super_category_tres(
+            super_category_id,
+            uid,
+            display_name,
+            super_category_data_script_uid,
+        )
         _write(out, content, dry_run, "super_category")
 
 
@@ -469,6 +499,7 @@ def export_categories(
     out_dir: Path,
     uid_cache: dict[str, str],
     dry_run: bool,
+    category_data_script_uid: str,
 ) -> None:
     for cat in categories:
         cat_id = cat["category_id"]
@@ -476,7 +507,7 @@ def export_categories(
         super_cat_uid = uid_cache.get(super_cat_id, "")
 
         out = out_dir / f"{cat_id}.tres"
-        uid = _resolve_or_new_uid(out)
+        uid = _deterministic_uid("category", cat_id)
         uid_cache[cat_id] = uid
 
         content = _build_category_tres(
@@ -487,6 +518,7 @@ def export_categories(
             cat["display_name"],
             float(cat.get("weight", 0.0)),
             str(cat.get("shape_id", "s1x1")),
+            category_data_script_uid,
         )
         _write(out, content, dry_run, "category")
 
@@ -496,11 +528,13 @@ def export_identity_layers(
     out_dir: Path,
     uid_cache: dict[str, str],
     dry_run: bool,
+    identity_layer_script_uid: str,
+    layer_unlock_script_uid: str,
 ) -> None:
     for layer in layers:
         layer_id = layer["layer_id"]
         out = out_dir / f"{layer_id}.tres"
-        uid = _resolve_or_new_uid(out)
+        uid = _deterministic_uid("identity_layer", layer_id)
         uid_cache[layer_id] = uid
 
         content = _build_layer_tres(
@@ -510,6 +544,8 @@ def export_identity_layers(
             int(layer["base_value"]),
             layer.get("unlock_action"),
             uid_cache,
+            identity_layer_script_uid,
+            layer_unlock_script_uid,
         )
         _write(out, content, dry_run, "layer")
 
@@ -520,13 +556,14 @@ def export_items(
     out_dir: Path,
     uid_cache: dict[str, str],
     dry_run: bool,
+    item_data_script_uid: str,
 ) -> None:
     layers_by_id = {l["layer_id"]: l for l in identity_layers}
 
     for item in items:
         item_id = item["item_id"]
         out = out_dir / f"{item_id}.tres"
-        uid = _resolve_or_new_uid(out)
+        uid = _deterministic_uid("item", item_id)
         uid_cache[item_id] = uid
 
         cat_id = item.get("category_id")
@@ -551,6 +588,7 @@ def export_items(
             cat_uid,
             int(item.get("rarity", 0)),
             layer_refs,
+            item_data_script_uid,
         )
         _write(out, content, dry_run, f"item ({len(layer_refs)} layers)")
 
@@ -582,6 +620,19 @@ def main() -> None:
 
     if not yaml_dir.is_dir():
         sys.exit(f"YAML directory not found: {yaml_dir}")
+
+    # ── Resolve script UIDs from .gd.uid sidecar files ───────────────────────
+    script_uids: dict[str, str] = {
+        "item_data": _read_script_uid(root, _ITEM_DATA_SCRIPT_PATH),
+        "identity_layer": _read_script_uid(root, _IDENTITY_LAYER_SCRIPT_PATH),
+        "layer_unlock_action": _read_script_uid(root, _LAYER_UNLOCK_SCRIPT_PATH),
+        "category_data": _read_script_uid(root, _CATEGORY_DATA_SCRIPT_PATH),
+        "super_category_data": _read_script_uid(
+            root, _SUPER_CATEGORY_DATA_SCRIPT_PATH
+        ),
+        "skill_data": _read_script_uid(root, _SKILL_DATA_SCRIPT_PATH),
+        "skill_level_data": _read_script_uid(root, _SKILL_LEVEL_DATA_SCRIPT_PATH),
+    }
 
     yaml_files = sorted(yaml_dir.glob("*.yaml"))
     if not yaml_files:
@@ -635,21 +686,36 @@ def main() -> None:
             skills_dir,
             uid_cache,
             args.dry_run,
-            _SKILL_DATA_SCRIPT_UID,
-            _SKILL_LEVEL_DATA_SCRIPT_UID,
+            script_uids["skill_data"],
+            script_uids["skill_level_data"],
         )
 
     print(f"Exporting super_categories ({len(merged['super_categories'])})...")
     export_super_categories(
-        merged["super_categories"], super_categories_dir, uid_cache, args.dry_run
+        merged["super_categories"],
+        super_categories_dir,
+        uid_cache,
+        args.dry_run,
+        script_uids["super_category_data"],
     )
 
     print(f"Exporting categories ({len(merged['categories'])})...")
-    export_categories(merged["categories"], categories_dir, uid_cache, args.dry_run)
+    export_categories(
+        merged["categories"],
+        categories_dir,
+        uid_cache,
+        args.dry_run,
+        script_uids["category_data"],
+    )
 
     print(f"Exporting identity_layers ({len(merged['identity_layers'])})...")
     export_identity_layers(
-        merged["identity_layers"], layers_dir, uid_cache, args.dry_run
+        merged["identity_layers"],
+        layers_dir,
+        uid_cache,
+        args.dry_run,
+        script_uids["identity_layer"],
+        script_uids["layer_unlock_action"],
     )
 
     print(f"Exporting items ({len(merged['items'])})...")
@@ -659,6 +725,7 @@ def main() -> None:
         items_dir,
         uid_cache,
         args.dry_run,
+        script_uids["item_data"],
     )
 
     total = (
