@@ -154,9 +154,7 @@ def main() -> None:
         avg_depth = statistics.mean(depths) if depths else 0.0
         all_final_values.extend(final_values)
 
-        print(
-            f"Category: {cat_id} ({len(items)} items, avg depth: {avg_depth:.1f})"
-        )
+        print(f"Category: {cat_id} ({len(items)} items, avg depth: {avg_depth:.1f})")
         print(f"  Rarity: {_rarity_summary(rarity_counts)}")
 
         if final_values:
@@ -177,9 +175,7 @@ def main() -> None:
 
     # ── Grand total ──────────────────────────────────────────────────────────
     print("──────────────────────────────────")
-    print(
-        f"Total: {total_items} items across {len(items_by_category)} categories"
-    )
+    print(f"Total: {total_items} items across {len(items_by_category)} categories")
     if all_final_values:
         grand_avg = statistics.mean(all_final_values)
         grand_std = _safe_stdev(all_final_values)
