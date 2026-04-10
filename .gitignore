@@ -7,6 +7,7 @@
 **/script_templates
 **/dev/docs/architecture
 **/dev/prompts
+**/data/tres
 **/*_back
 
 **/*.uid
