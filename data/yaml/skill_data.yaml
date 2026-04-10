@@ -1,0 +1,47 @@
+skills:
+  - skill_id: appraisal
+    display_name: Appraisal
+    levels:
+      - cash_cost: 200
+        required_mastery_rank: 0
+        required_super_category_ranks: {}
+
+      - cash_cost: 800
+        required_mastery_rank: 2
+        required_super_category_ranks: {}
+
+      - cash_cost: 2000
+        required_mastery_rank: 5
+        required_super_category_ranks:
+          decorative: 3
+
+  - skill_id: authentication
+    display_name: Authentication
+    levels:
+      - cash_cost: 500
+        required_mastery_rank: 1
+        required_super_category_ranks: {}
+
+      - cash_cost: 1500
+        required_mastery_rank: 4
+        required_super_category_ranks:
+          fine_art: 2
+
+      - cash_cost: 4000
+        required_mastery_rank: 8
+        required_super_category_ranks:
+          fine_art: 4
+          decorative: 3
+
+  - skill_id: mechanical
+    display_name: Mechanical
+    levels:
+      - cash_cost: 300
+        required_mastery_rank: 0
+        required_super_category_ranks:
+          vehicle: 1
+
+      - cash_cost: 1200
+        required_mastery_rank: 3
+        required_super_category_ranks:
+          vehicle: 3
