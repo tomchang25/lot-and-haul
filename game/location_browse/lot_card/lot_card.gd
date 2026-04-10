@@ -7,6 +7,12 @@ extends VBoxContainer
 signal enter_pressed
 signal pass_pressed
 
+# ── State ─────────────────────────────────────────────────────────────────────
+
+var _lot_data: LotData = null
+var _index: int = 0
+var _total: int = 0
+
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _index_label: Label = $IndexLabel
@@ -24,33 +30,45 @@ func _ready() -> void:
     _enter_button.pressed.connect(func() -> void: enter_pressed.emit())
     _pass_button.pressed.connect(func() -> void: pass_pressed.emit())
 
+    if _lot_data != null:
+        _apply()
+
 # ══ Public API ════════════════════════════════════════════════════════════════
 
 
 # Populate the card for lot at position index (0-based) out of total.
 func setup(lot_data: LotData, index: int, total: int) -> void:
-    _index_label.text = "Lot %d / %d" % [index + 1, total]
-    _item_count_label.text = "%d–%d items" % [lot_data.item_count_min, lot_data.item_count_max]
-    _rarity_label.text = "Rarity: %s" % _rarity_range_text(lot_data.rarity_weights)
+    _lot_data = lot_data
+    _index = index
+    _total = total
+
+    if is_node_ready():
+        _apply()
+
+
+func _apply() -> void:
+    _index_label.text = "Lot %d / %d" % [_index + 1, _total]
+    _item_count_label.text = "%d–%d items" % [_lot_data.item_count_min, _lot_data.item_count_max]
+    _rarity_label.text = "Rarity: %s" % _rarity_range_text(_lot_data.rarity_weights)
 
     # Super Category row
-    if lot_data.super_category_weights.is_empty():
+    if _lot_data.super_category_weights.is_empty():
         _super_category_label.visible = false
     else:
         _super_category_label.visible = true
-        _super_category_label.text = "Super Category: %s" % _category_text(lot_data.super_category_weights)
+        _super_category_label.text = "Super Category: %s" % _category_text(_lot_data.super_category_weights)
 
     # Build the set of category IDs already covered by super-category weights.
     var covered: Dictionary = { }
-    for sc_id in lot_data.super_category_weights.keys():
+    for sc_id in _lot_data.super_category_weights.keys():
         for cat_id in ItemRegistry.get_categories_for_super(sc_id):
             covered[cat_id] = true
 
     # Extra Category row — only categories NOT covered by any super-category.
     var extra_weights: Dictionary = { }
-    for cat_id in lot_data.category_weights.keys():
+    for cat_id in _lot_data.category_weights.keys():
         if not covered.has(cat_id):
-            extra_weights[cat_id] = lot_data.category_weights[cat_id]
+            extra_weights[cat_id] = _lot_data.category_weights[cat_id]
 
     if extra_weights.is_empty():
         _category_label.visible = false
