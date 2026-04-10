@@ -68,15 +68,13 @@ def _read_script_uid(godot_root: Path, res_path: str) -> str:
     """
     if not res_path.startswith("res://"):
         sys.exit(f"Script path must start with 'res://': {res_path}")
-    rel = res_path[len("res://"):]
+    rel = res_path[len("res://") :]
     sidecar = godot_root / (rel + ".uid")
     if not sidecar.is_file():
         sys.exit(f"Script UID sidecar not found: {sidecar}")
     content = sidecar.read_text(encoding="utf-8").strip()
     if not content.startswith("uid://"):
-        sys.exit(
-            f"Script UID sidecar malformed (expected 'uid://...'): {sidecar}"
-        )
+        sys.exit(f"Script UID sidecar malformed (expected 'uid://...'): {sidecar}")
     return content
 
 
@@ -307,6 +305,7 @@ _VALID_SHAPE_IDS: frozenset[str] = frozenset(
         "s1x1",
         "s1x2",
         "s1x3",
+        "s1x4",
         "s2x2",
         "s2x3",
         "s2x4",
@@ -433,6 +432,44 @@ def _validate(data: dict) -> list[str]:
                 errors.append(
                     f"item '{iid}': final layer '{layer_ids[-1]}' must have unlock_action: null"
                 )
+
+            # Position-aware checks along the item's layer chain.
+            prev_base_value: int | None = None
+            for index, lid in enumerate(layer_ids):
+                layer = next(
+                    (l for l in data["identity_layers"] if l["layer_id"] == lid),
+                    None,
+                )
+                if layer is None:
+                    continue
+
+                unlock = layer.get("unlock_action")
+
+                if index < len(layer_ids) - 1 and unlock is None:
+                    errors.append(
+                        f"item '{iid}': layer[{index}] '{lid}' has no unlock_action"
+                        f" but is not the final layer"
+                    )
+
+                if index >= 1 and unlock is not None and unlock.get("context") == 0:
+                    errors.append(
+                        f"item '{iid}': layer[{index}] '{lid}' uses context=0 (AUTO)"
+                        f" but only layer[0] may be AUTO"
+                    )
+
+                cur_base_value = layer.get("base_value")
+                if (
+                    prev_base_value is not None
+                    and cur_base_value is not None
+                    and cur_base_value <= prev_base_value
+                ):
+                    errors.append(
+                        f"item '{iid}': layer[{index}] '{lid}' base_value"
+                        f" {cur_base_value} is not greater than previous layer's"
+                        f" {prev_base_value}"
+                    )
+                if cur_base_value is not None:
+                    prev_base_value = cur_base_value
 
     return errors
 
@@ -627,9 +664,7 @@ def main() -> None:
         "identity_layer": _read_script_uid(root, _IDENTITY_LAYER_SCRIPT_PATH),
         "layer_unlock_action": _read_script_uid(root, _LAYER_UNLOCK_SCRIPT_PATH),
         "category_data": _read_script_uid(root, _CATEGORY_DATA_SCRIPT_PATH),
-        "super_category_data": _read_script_uid(
-            root, _SUPER_CATEGORY_DATA_SCRIPT_PATH
-        ),
+        "super_category_data": _read_script_uid(root, _SUPER_CATEGORY_DATA_SCRIPT_PATH),
         "skill_data": _read_script_uid(root, _SKILL_DATA_SCRIPT_PATH),
         "skill_level_data": _read_script_uid(root, _SKILL_LEVEL_DATA_SCRIPT_PATH),
     }
