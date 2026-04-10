@@ -1,8 +1,15 @@
 [gd_resource type="Resource" script_class="SkillData" format=3 uid="uid://c6gc6nxk2jb1f"]
 
 [ext_resource type="Script" uid="uid://bbu2d2yj7k7i4" path="res://data/_definitions/skill_data.gd" id="1_skilldef"]
+[ext_resource type="Script" uid="uid://qu7qx28tubh2" path="res://data/_definitions/skill_level_data.gd" id="1_th5f1"]
+
+[sub_resource type="Resource" id="Resource_qycal"]
+script = ExtResource("1_th5f1")
+cash_cost = 500
+metadata/_custom_type_script = "uid://qu7qx28tubh2"
 
 [resource]
 script = ExtResource("1_skilldef")
 skill_id = "authentication"
 display_name = "Authentication"
+levels = Array[ExtResource("1_th5f1")]([SubResource("Resource_qycal")])
