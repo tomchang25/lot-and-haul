@@ -5,8 +5,16 @@
 # Writes: SaveManager.cash, SaveManager.storage_items
 extends Control
 
-const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
+# ── Constants ─────────────────────────────────────────────────────────────────
+
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
+
+const REVIEW_COLUMNS: Array = [
+    ItemRow.Column.NAME,
+    ItemRow.Column.CONDITION,
+    ItemRow.Column.PRICE,
+    ItemRow.Column.POTENTIAL,
+]
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
@@ -16,7 +24,7 @@ var _tooltip: ItemRowTooltip = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
-@onready var _row_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer/RowContainer
+@onready var _item_list_panel: ItemListPanel = $RootVBox/ListCenter/OuterVBox/ItemListPanel
 @onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
@@ -29,6 +37,9 @@ func _ready() -> void:
 
     _continue_btn.pressed.connect(_on_continue_pressed)
 
+    _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
+    _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
+
     _cargo_items = RunManager.run_record.cargo_items
 
     _populate_rows()
@@ -38,6 +49,14 @@ func _ready() -> void:
 
 func _on_continue_pressed() -> void:
     _resolve_run_and_navigate()
+
+
+func _on_row_tooltip_requested(
+        entry: ItemEntry,
+        ctx: ItemViewContext,
+        anchor: Rect2,
+) -> void:
+    _tooltip.show_for(entry, ctx, anchor)
 
 # ══ Run resolution ════════════════════════════════════════════════════════════
 
@@ -70,19 +89,5 @@ func _resolve_run_and_navigate() -> void:
 
 
 func _populate_rows() -> void:
-    for entry: ItemEntry in _cargo_items:
-        var row: ItemRow = ItemRowScene.instantiate()
-        row.setup(entry, _ctx)
-
-        row.tooltip_requested.connect(_on_row_tooltip_requested)
-        row.tooltip_dismissed.connect(_tooltip.hide_tooltip)
-
-        _row_container.add_child(row)
-
-
-func _on_row_tooltip_requested(
-        entry: ItemEntry,
-        ctx: ItemViewContext,
-        anchor: Rect2,
-) -> void:
-    _tooltip.show_for(entry, ctx, anchor)
+    _item_list_panel.setup(_ctx, REVIEW_COLUMNS)
+    _item_list_panel.populate(_cargo_items)

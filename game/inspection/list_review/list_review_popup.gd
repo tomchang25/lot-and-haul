@@ -8,19 +8,27 @@ extends Control
 signal auction_entered
 signal back_requested
 
-const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
+# ── Constants ─────────────────────────────────────────────────────────────────
+
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 
-# ── Node references ───────────────────────────────────────────────────────────
-
-@onready var _item_list: VBoxContainer = $Panel/VBox/ScrollContainer/ItemList
-@onready var _total_label: Label = $Panel/VBox/TotalEstimateLabel
-@onready var _opening_bid_label: Label = $Panel/VBox/OpeningBidLabel
+const LIST_REVIEW_COLUMNS: Array = [
+    ItemRow.Column.NAME,
+    ItemRow.Column.CONDITION,
+    ItemRow.Column.PRICE,
+    ItemRow.Column.POTENTIAL,
+]
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
+
+# ── Node references ───────────────────────────────────────────────────────────
+
+@onready var _item_list_panel: ItemListPanel = $Panel/VBox/ItemListPanel
+@onready var _total_label: Label = $Panel/VBox/TotalEstimateLabel
+@onready var _opening_bid_label: Label = $Panel/VBox/OpeningBidLabel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -33,16 +41,19 @@ func _ready() -> void:
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 
+    _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
+    _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
+
 # ══ Common API ════════════════════════════════════════════════════════════════
 
 
 # Rebuild rows from current GameManager state, then call show().
 func populate() -> void:
-    for child in _item_list.get_children():
-        child.queue_free()
-
     var lot: LotEntry = RunManager.run_record.lot_entry
     var lot_items: Array[ItemEntry] = RunManager.run_record.lot_items
+
+    _item_list_panel.setup(_ctx, LIST_REVIEW_COLUMNS)
+    _item_list_panel.populate(lot_items)
 
     var total_min := 0
     var total_max := 0
@@ -53,14 +64,6 @@ func populate() -> void:
         else:
             total_min += entry.current_price_min
             total_max += entry.current_price_max
-
-        var row: ItemRow = ItemRowScene.instantiate()
-        row.setup(entry, _ctx)
-
-        row.tooltip_requested.connect(_on_row_tooltip_requested)
-        row.tooltip_dismissed.connect(_tooltip.hide_tooltip)
-
-        _item_list.add_child(row)
 
     var total_text: String
     if total_min == total_max:

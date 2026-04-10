@@ -6,19 +6,26 @@
 # Writes: (none — mutates ItemEntry.layer_index in place)
 extends Control
 
-const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
+# ── Constants ─────────────────────────────────────────────────────────────────
+
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
+
+const REVEAL_COLUMNS: Array = [
+    ItemRow.Column.NAME,
+    ItemRow.Column.CONDITION,
+    ItemRow.Column.PRICE,
+    ItemRow.Column.POTENTIAL,
+]
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _won_items: Array[ItemEntry] = []
-var _rows: Array[ItemRow] = []
 var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
-@onready var _row_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/RowContainer
+@onready var _item_list_panel: ItemListPanel = $RootVBox/ListCenter/OuterVBox/ItemListPanel
 @onready var _reveal_btn: Button = $RootVBox/Footer/RevealButton
 @onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
 
@@ -33,6 +40,9 @@ func _ready() -> void:
     _reveal_btn.pressed.connect(_on_reveal_pressed)
     _continue_btn.pressed.connect(_on_continue_pressed)
 
+    _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
+    _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
+
     _won_items = RunManager.run_record.last_lot_won_items
     _continue_btn.hide()
 
@@ -46,12 +56,12 @@ func _ready() -> void:
 
 
 func _on_reveal_pressed() -> void:
-    for i in _won_items.size():
-        var entry: ItemEntry = _won_items[i]
+    for entry: ItemEntry in _won_items:
         entry.unveil()
         entry.condition_inspect_level = 2
         entry.potential_inspect_level = 2
-        _rows[i].refresh()
+
+    _on_reveal_complete()
 
     _reveal_btn.hide()
     _continue_btn.show()
@@ -60,21 +70,6 @@ func _on_reveal_pressed() -> void:
 func _on_continue_pressed() -> void:
     GameManager.go_to_location_browse()
 
-# ══ Reveal sequence ════════════════════════════════════════════════════════════
-
-
-func _populate_rows() -> void:
-    for entry: ItemEntry in _won_items:
-        _row_container.add_child(HSeparator.new())
-        var row: ItemRow = ItemRowScene.instantiate()
-        row.setup(entry, _ctx)
-
-        row.tooltip_requested.connect(_on_row_tooltip_requested)
-        row.tooltip_dismissed.connect(_tooltip.hide_tooltip)
-
-        _row_container.add_child(row)
-        _rows.append(row)
-
 
 func _on_row_tooltip_requested(
         entry: ItemEntry,
@@ -82,3 +77,20 @@ func _on_row_tooltip_requested(
         anchor: Rect2,
 ) -> void:
     _tooltip.show_for(entry, ctx, anchor)
+
+# ══ Reveal sequence ════════════════════════════════════════════════════════════
+
+
+func _populate_rows() -> void:
+    _item_list_panel.setup(_ctx, REVEAL_COLUMNS)
+    _item_list_panel.populate(_won_items)
+
+
+func _on_reveal_complete() -> void:
+    _ctx.condition_mode = ItemViewContext.ConditionMode.FORCE_INSPECT_MAX
+    _ctx.potential_mode = ItemViewContext.PotentialMode.FORCE_FULL
+    _ctx.price_mode = ItemViewContext.PriceMode.CURRENT_ESTIMATE
+
+    _item_list_panel.rebuild_header()
+    for entry: ItemEntry in _won_items:
+        _item_list_panel.refresh_row(entry)

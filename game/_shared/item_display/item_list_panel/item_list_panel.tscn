@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://cilp5a1xr3e8m"]
+
+[ext_resource type="Script" uid="uid://bilpgd2xr3e8m" path="res://game/_shared/item_display/item_list_panel/item_list_panel.gd" id="1_ilp"]
+
+[node name="ItemListPanel" type="PanelContainer" unique_id=3000000001]
+offset_right = 960.0
+offset_bottom = 400.0
+script = ExtResource("1_ilp")
+
+[node name="PanelVBox" type="VBoxContainer" parent="." unique_id=3000000002]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="ColumnHeader" type="HBoxContainer" parent="PanelVBox" unique_id=3000000003]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="HeaderSeparator" type="HSeparator" parent="PanelVBox" unique_id=3000000004]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelVBox" unique_id=3000000005]
+custom_minimum_size = Vector2(0, 360)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="RowContainer" type="VBoxContainer" parent="PanelVBox/ScrollContainer" unique_id=3000000006]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0

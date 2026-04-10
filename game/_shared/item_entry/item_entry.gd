@@ -332,11 +332,26 @@ func price_label_for(ctx: ItemViewContext) -> String:
     match ctx.price_mode:
         ItemViewContext.PriceMode.SELL_PRICE:
             return sell_price_label
+        ItemViewContext.PriceMode.BASE_VALUE:
+            return "???" if is_veiled() else "$%d" % active_layer().base_value
         ItemViewContext.PriceMode.CURRENT_ESTIMATE:
             return current_price_label
         _:
             push_warning("Unknown PriceMode: %d" % ctx.price_mode)
             return current_price_label
+
+
+func price_value_for(ctx: ItemViewContext) -> int:
+    match ctx.price_mode:
+        ItemViewContext.PriceMode.SELL_PRICE:
+            return sell_price
+        ItemViewContext.PriceMode.BASE_VALUE:
+            return 0 if is_veiled() else active_layer().base_value
+        ItemViewContext.PriceMode.CURRENT_ESTIMATE:
+            return current_price_min
+        _:
+            push_warning("Unknown PriceMode: %d" % ctx.price_mode)
+            return 0
 
 
 # Returns the layer currently visible to the player.

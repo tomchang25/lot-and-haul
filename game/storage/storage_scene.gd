@@ -6,8 +6,14 @@ extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
+
+const STORAGE_COLUMNS: Array = [
+    ItemRow.Column.NAME,
+    ItemRow.Column.CONDITION,
+    ItemRow.Column.PRICE,
+    ItemRow.Column.POTENTIAL,
+]
 
 # Market Research cost per rarity.
 const RESEARCH_COST: Dictionary = {
@@ -30,12 +36,11 @@ const RESEARCH_DAYS: Dictionary = {
 
 var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
-var _rows: Dictionary = { } # ItemEntry → ItemRow
 var _selected_entry: ItemEntry = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
-@onready var _row_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer/RowContainer
+@onready var _item_list_panel: ItemListPanel = $RootVBox/ListCenter/OuterVBox/ItemListPanel
 @onready var _back_btn: Button = $RootVBox/Footer/BackButton
 @onready var _empty_label: Label = $RootVBox/ListCenter/OuterVBox/EmptyLabel
 
@@ -48,8 +53,6 @@ var _selected_entry: ItemEntry = null
 
 @onready var _unlock_confirm: ConfirmationDialog = $UnlockConfirm
 @onready var _research_confirm: ConfirmationDialog = $ResearchConfirm
-
-@onready var _scroll_container: ScrollContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer
 
 @onready var _action_slot_hud: Label = $ActionSlotHUD
 
@@ -67,6 +70,10 @@ func _ready() -> void:
     _research_btn.pressed.connect(_on_research_pressed)
     _unlock_confirm.confirmed.connect(_on_unlock_confirmed)
     _research_confirm.confirmed.connect(_on_research_confirmed)
+
+    _item_list_panel.row_pressed.connect(_on_row_pressed)
+    _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
+    _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
 
     _populate_rows()
     _refresh_action_slot_hud()
@@ -149,24 +156,20 @@ func _on_research_confirmed() -> void:
 func _populate_rows() -> void:
     if SaveManager.storage_items.is_empty():
         _empty_label.visible = true
-        _scroll_container.visible = false
+        _item_list_panel.visible = false
         return
 
     _empty_label.visible = false
-    _scroll_container.visible = true
+    _item_list_panel.visible = true
+
+    _item_list_panel.setup(_ctx, STORAGE_COLUMNS)
+    _item_list_panel.populate(SaveManager.storage_items)
 
     for entry: ItemEntry in SaveManager.storage_items:
-        var row: ItemRow = ItemRowScene.instantiate()
-        row.setup(entry, _ctx)
-        row.set_cargo_state(ItemRow.CargoState.AVAILABLE)
-        row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        var row: ItemRow = _item_list_panel.get_row(entry)
+        if row != null:
+            row.set_selection_state(ItemRow.SelectionState.AVAILABLE)
 
-        row.row_pressed.connect(_on_row_pressed)
-        row.tooltip_requested.connect(_on_row_tooltip_requested)
-        row.tooltip_dismissed.connect(_tooltip.hide_tooltip)
-
-        _row_container.add_child(row)
-        _rows[entry] = row
 # ══ Action popup ══════════════════════════════════════════════════════════════
 
 
@@ -260,8 +263,7 @@ func _show_action_popup(entry: ItemEntry) -> void:
 
 
 func _refresh_row(entry: ItemEntry) -> void:
-    if _rows.has(entry):
-        _rows[entry].refresh()
+    _item_list_panel.refresh_row(entry)
 
 
 func _refresh_action_slot_hud() -> void:

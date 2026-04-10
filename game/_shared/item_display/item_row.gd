@@ -1,7 +1,7 @@
 # item_row.gd
-# Generalised item row used by list_review, reveal, cargo, and run_review.
-# Collapsed state: Name | Base value | Condition mult | Estimate
-#   + Weight | Grid   (cargo stage only, gated by ctx.show_cargo_stats)
+# Generalised item row used by list_review, reveal, run_review, storage,
+# and pawn_shop.
+# Column visibility is driven by the columns array passed to setup().
 # Hover: emits tooltip_requested for the parent scene to position and show.
 class_name ItemRow
 extends PanelContainer
@@ -10,16 +10,60 @@ signal tooltip_requested(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2)
 signal tooltip_dismissed
 signal row_pressed(entry: ItemEntry)
 
-enum CargoState {
-    NONE, # not in cargo stage — no override applied
-    SELECTED, # loaded into cargo → white
+enum SelectionState {
+    NONE, # no override applied
+    SELECTED, # selected → white
     AVAILABLE, # can still be toggled → grey
     BLOCKED, # would exceed capacity → near-black
 }
 
+enum Column {
+    NAME,
+    CONDITION,
+    PRICE,
+    POTENTIAL,
+    WEIGHT,
+    GRID,
+}
+
+# Header text shown for each column. PRICE is dynamic — see get_price_header().
+const COLUMN_HEADERS: Dictionary = {
+    Column.NAME: "Item",
+    Column.CONDITION: "Condition",
+    Column.PRICE: "",
+    Column.POTENTIAL: "Potential",
+    Column.WEIGHT: "Weight",
+    Column.GRID: "Grid",
+}
+
+const COLUMN_MIN_WIDTH: Dictionary = {
+    Column.NAME: 0,
+    Column.CONDITION: 120,
+    Column.PRICE: 160,
+    Column.POTENTIAL: 160,
+    Column.WEIGHT: 100,
+    Column.GRID: 80,
+}
+
+
+static func get_price_header(ctx: ItemViewContext) -> String:
+    match ctx.price_mode:
+        ItemViewContext.PriceMode.CURRENT_ESTIMATE:
+            return "Est. Value"
+        ItemViewContext.PriceMode.SELL_PRICE:
+            return "Sell Price"
+        ItemViewContext.PriceMode.BASE_VALUE:
+            return "Base Value"
+        _:
+            push_warning("Unknown PriceMode: %d" % ctx.price_mode)
+            return "Price"
+
+# ── State ─────────────────────────────────────────────────────────────────────
+
 var _entry: ItemEntry = null
 var _ctx: ItemViewContext = null
-var _cargo_state: CargoState = CargoState.NONE
+var _columns: Array = []
+var _selection_state: SelectionState = SelectionState.NONE
 
 # Built once on demand and reused across all rows.
 static var _style_selected: StyleBoxFlat = null
@@ -40,13 +84,16 @@ static func _ensure_styles() -> void:
     _style_blocked = StyleBoxFlat.new()
     _style_blocked.bg_color = Color(0.08, 0.08, 0.08, 0.9) # near-black
 
+# ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _name_label: Label = $HBoxContainer/NameLabel
-@onready var _base_value_label: Label = $HBoxContainer/BaseValueLabel
-@onready var _condition_mult_label: Label = $HBoxContainer/ConditionMultLabel
-@onready var _estimate_label: Label = $HBoxContainer/EstimateLabel
+@onready var _condition_label: Label = $HBoxContainer/ConditionLabel
+@onready var _price_label: Label = $HBoxContainer/PriceLabel
+@onready var _potential_label: Label = $HBoxContainer/PotentialLabel
 @onready var _weight_label: Label = $HBoxContainer/WeightLabel
 @onready var _grid_label: Label = $HBoxContainer/GridLabel
+
+# ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
 func _ready() -> void:
@@ -55,10 +102,13 @@ func _ready() -> void:
 
     _refresh()
 
+# ══ Common API ════════════════════════════════════════════════════════════════
 
-func setup(entry: ItemEntry, ctx: ItemViewContext) -> void:
+
+func setup(entry: ItemEntry, ctx: ItemViewContext, columns: Array = []) -> void:
     _entry = entry
     _ctx = ctx
+    _columns = columns
 
     if is_node_ready():
         _refresh()
@@ -68,29 +118,31 @@ func refresh() -> void:
     _refresh()
 
 
-# Called by cargo_scene each time selection state changes.
+# Called by consuming scenes to apply row selection styling.
 # Applies background colour and enables/disables click handling.
-func set_cargo_state(state: CargoState) -> void:
-    _cargo_state = state
+func set_selection_state(state: SelectionState) -> void:
+    _selection_state = state
     _ensure_styles()
 
     match state:
-        CargoState.SELECTED:
+        SelectionState.SELECTED:
             add_theme_stylebox_override(&"panel", _style_selected)
             mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-        CargoState.AVAILABLE:
+        SelectionState.AVAILABLE:
             add_theme_stylebox_override(&"panel", _style_available)
             mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-        CargoState.BLOCKED:
+        SelectionState.BLOCKED:
             add_theme_stylebox_override(&"panel", _style_blocked)
             mouse_default_cursor_shape = Control.CURSOR_ARROW
-        CargoState.NONE:
+        SelectionState.NONE:
             remove_theme_stylebox_override(&"panel")
             mouse_default_cursor_shape = Control.CURSOR_ARROW
 
+# ══ Input ═════════════════════════════════════════════════════════════════════
+
 
 func _gui_input(event: InputEvent) -> void:
-    if _cargo_state == CargoState.NONE or _cargo_state == CargoState.BLOCKED:
+    if _selection_state == SelectionState.NONE or _selection_state == SelectionState.BLOCKED:
         return
     if event is InputEventMouseButton \
     and event.button_index == MOUSE_BUTTON_LEFT \
@@ -98,33 +150,43 @@ func _gui_input(event: InputEvent) -> void:
         row_pressed.emit(_entry)
         accept_event()
 
+# ══ Refresh ═══════════════════════════════════════════════════════════════════
+
 
 func _refresh() -> void:
     if _entry == null:
         return
 
+    # ── Column visibility ─────────────────────────────────────────────────────
+    _name_label.visible = Column.NAME in _columns
+    _condition_label.visible = Column.CONDITION in _columns
+    _price_label.visible = Column.PRICE in _columns
+    _potential_label.visible = Column.POTENTIAL in _columns
+    _weight_label.visible = Column.WEIGHT in _columns
+    _grid_label.visible = Column.GRID in _columns
+
+    # ── NAME ──────────────────────────────────────────────────────────────────
     _name_label.text = _entry.display_name
 
-    if _entry.is_veiled():
-        _base_value_label.text = "???"
-    else:
-        _base_value_label.text = "$%d" % _entry.active_layer().base_value
+    # ── CONDITION ─────────────────────────────────────────────────────────────
+    _condition_label.text = _entry.condition_label_for(_ctx)
+    _condition_label.modulate = _entry.condition_color_for(_ctx)
 
-    _condition_mult_label.text = _entry.condition_label_for(_ctx)
-    _condition_mult_label.modulate = _entry.condition_color_for(_ctx)
+    # ── PRICE ─────────────────────────────────────────────────────────────────
+    _price_label.text = _entry.price_label_for(_ctx)
+    _price_label.add_theme_color_override(&"font_color", _entry.price_color)
 
-    _estimate_label.text = _entry.price_label_for(_ctx)
-    _estimate_label.add_theme_color_override(&"font_color", _entry.price_color)
+    # ── POTENTIAL ─────────────────────────────────────────────────────────────
+    _potential_label.text = _entry.potential_price_label if not _entry.is_veiled() else "???"
+    _potential_label.add_theme_color_override(&"font_color", _entry.price_color)
 
-    # ── Cargo stats (weight / grid) ───────────────────────────────────────────
-    var show_cargo: bool = _ctx != null and _ctx.show_cargo_stats
-    _weight_label.visible = show_cargo
-    _grid_label.visible = show_cargo
-
-    if show_cargo and _entry.item_data != null and _entry.item_data.category_data != null:
-        _weight_label.text = "%.1f kg" % _entry.item_data.category_data.weight
+    # ── WEIGHT / GRID ─────────────────────────────────────────────────────────
+    if _entry.item_data != null and _entry.item_data.category_data != null:
         var cat := _entry.item_data.category_data
+        _weight_label.text = "%.1f kg" % cat.weight
         _grid_label.text = "%d  %s" % [cat.get_cells().size(), cat.shape_id]
+
+# ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
 func _on_mouse_entered() -> void:

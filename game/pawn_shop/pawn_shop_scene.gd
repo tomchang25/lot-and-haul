@@ -9,6 +9,13 @@ extends Control
 const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 
+const PAWN_COLUMNS: Array = [
+    ItemRow.Column.NAME,
+    ItemRow.Column.CONDITION,
+    ItemRow.Column.PRICE,
+    ItemRow.Column.POTENTIAL,
+]
+
 const ASK_PRICE_MIN_FACTOR := 0.50
 const ASK_PRICE_MAX_FACTOR := 1.50
 
@@ -115,8 +122,8 @@ func _populate_rows() -> void:
         _ask_prices[entry] = entry.sell_price
 
         var row: ItemRow = ItemRowScene.instantiate()
-        row.setup(entry, _ctx)
-        row.set_cargo_state(ItemRow.CargoState.AVAILABLE)
+        row.setup(entry, _ctx, PAWN_COLUMNS)
+        row.set_selection_state(ItemRow.SelectionState.AVAILABLE)
         row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
         row.row_pressed.connect(_on_row_pressed)
@@ -138,8 +145,8 @@ func _populate_rows() -> void:
 func _refresh_row_state(entry: ItemEntry) -> void:
     var sel: bool = _selected.get(entry, false)
     if _rows.has(entry):
-        _rows[entry].set_cargo_state(
-            ItemRow.CargoState.SELECTED if sel else ItemRow.CargoState.AVAILABLE,
+        _rows[entry].set_selection_state(
+            ItemRow.SelectionState.SELECTED if sel else ItemRow.SelectionState.AVAILABLE,
         )
     if _price_rows.has(entry):
         _price_rows[entry].visible = sel
