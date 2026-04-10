@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://xlhrh0i66a82"]
+
+[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/definitions/identity_layer.gd" id="1_ilay"]
+[ext_resource type="Script" uid="uid://c23t4blqmaaj4" path="res://data/definitions/layer_unlock_action.gd" id="2_unlock"]
+
+
+[sub_resource type="Resource" id="unlock"]
+script = ExtResource("2_unlock")
+context = 1
+time_cost = 2
+
+[resource]
+script = ExtResource("1_ilay")
+layer_id = "antique_oil_lamp"
+display_name = "Antique Oil Lamp"
+base_value = 220
+unlock_action = SubResource("unlock")

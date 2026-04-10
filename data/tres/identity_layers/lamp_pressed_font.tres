@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://ti5laxm4l6gg"]
+
+[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/definitions/identity_layer.gd" id="1_ilay"]
+[ext_resource type="Script" uid="uid://c23t4blqmaaj4" path="res://data/definitions/layer_unlock_action.gd" id="2_unlock"]
+
+
+[sub_resource type="Resource" id="unlock"]
+script = ExtResource("2_unlock")
+context = 1
+time_cost = 2
+
+[resource]
+script = ExtResource("1_ilay")
+layer_id = "lamp_pressed_font"
+display_name = "Pressed Glass Font"
+base_value = 90
+unlock_action = SubResource("unlock")

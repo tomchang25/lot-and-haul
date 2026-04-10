@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://ja1akqa4q0ok"]
+
+[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/definitions/identity_layer.gd" id="1_ilay"]
+[ext_resource type="Script" uid="uid://c23t4blqmaaj4" path="res://data/definitions/layer_unlock_action.gd" id="2_unlock"]
+
+
+[sub_resource type="Resource" id="unlock"]
+script = ExtResource("2_unlock")
+context = 0
+time_cost = 0
+
+[resource]
+script = ExtResource("1_ilay")
+layer_id = "lamp_shaped_object"
+display_name = "Lamp-Shaped Object"
+base_value = 80
+unlock_action = SubResource("unlock")

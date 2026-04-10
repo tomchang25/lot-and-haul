@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://4q8038h04t2n"]
+
+[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/definitions/identity_layer.gd" id="1_ilay"]
+
+[resource]
+script = ExtResource("1_ilay")
+layer_id = "bag_replica_leaf"
+display_name = "High-Grade Replica Bag"
+base_value = 220
+unlock_action = null

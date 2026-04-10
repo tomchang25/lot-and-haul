@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://5rncj1sp3jq3"]
+
+[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/definitions/identity_layer.gd" id="1_ilay"]
+
+[resource]
+script = ExtResource("1_ilay")
+layer_id = "crossbow_leaf_repro"
+display_name = "Modern Reproduction"
+base_value = 100
+unlock_action = null

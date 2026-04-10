@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://offel4hegrwf"]
+
+[ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/definitions/item_data.gd" id="1_jyqit"]
+[ext_resource type="Resource" uid="uid://1nvn6k60lags" path="res://data/tres/categories/vase.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://1gdxt1oxiqug" path="res://data/tres/identity_layers/vase_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://lo4atfvx01ay" path="res://data/tres/identity_layers/vase_ceramic_body.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://2j0py8qia30v" path="res://data/tres/identity_layers/vase_painted_surface.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://ifvjqfpvmedm" path="res://data/tres/identity_layers/vase_transfer_pattern.tres" id="6_layer"]
+[ext_resource type="Resource" uid="uid://v0enaodqcc44" path="res://data/tres/identity_layers/vase_leaf_spode.tres" id="7_layer"]
+
+
+[resource]
+script = ExtResource("1_jyqit")
+item_id = "vase_spode_blue_italian"
+category_data = ExtResource("2_cat")
+identity_layers = [ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer"), ExtResource("6_layer"), ExtResource("7_layer")]
+rarity = 2

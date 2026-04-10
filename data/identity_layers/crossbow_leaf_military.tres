@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://babehe2bd80kh"]
-
-[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="1_ilay"]
-[resource]
-script = ExtResource("1_ilay")
-layer_id = "crossbow_leaf_military"
-display_name = "Swiss Military Bow"
-base_value = 1600
-unlock_action = null

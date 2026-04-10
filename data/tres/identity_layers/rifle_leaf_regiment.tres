@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://f04s0ca8sxwf"]
+
+[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/definitions/identity_layer.gd" id="1_ilay"]
+
+[resource]
+script = ExtResource("1_ilay")
+layer_id = "rifle_leaf_regiment"
+display_name = "Crimea Enfield Rifle"
+base_value = 5000
+unlock_action = null

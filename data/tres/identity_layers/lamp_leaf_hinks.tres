@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://imhhahwge4ia"]
+
+[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/definitions/identity_layer.gd" id="1_ilay"]
+
+[resource]
+script = ExtResource("1_ilay")
+layer_id = "lamp_leaf_hinks"
+display_name = "Hinks & Son Duplex Lamp"
+base_value = 3200
+unlock_action = null

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://kxrqjnapqve8"]
+
+[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/definitions/identity_layer.gd" id="1_ilay"]
+
+[resource]
+script = ExtResource("1_ilay")
+layer_id = "bike_penny_leaf"
+display_name = "Penny-Farthing, c.1885"
+base_value = 3200
+unlock_action = null

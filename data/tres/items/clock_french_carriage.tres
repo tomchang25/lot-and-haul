@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://irv8oesgs6tb"]
+
+[ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/definitions/item_data.gd" id="1_jyqit"]
+[ext_resource type="Resource" uid="uid://vl3m5x5elt0d" path="res://data/tres/categories/clock.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://o4yxlig5vgb0" path="res://data/tres/identity_layers/clock_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://sfvsijkpkgd" path="res://data/tres/identity_layers/clock_wooden_case.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://nntaw40x1070" path="res://data/tres/identity_layers/clock_enamel_dial.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://0fahqkgt6osv" path="res://data/tres/identity_layers/clock_platform_escapement.tres" id="6_layer"]
+[ext_resource type="Resource" uid="uid://f3a3jeta4x5b" path="res://data/tres/identity_layers/clock_leaf_carriage.tres" id="7_layer"]
+
+
+[resource]
+script = ExtResource("1_jyqit")
+item_id = "clock_french_carriage"
+category_data = ExtResource("2_cat")
+identity_layers = [ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer"), ExtResource("6_layer"), ExtResource("7_layer")]
+rarity = 2

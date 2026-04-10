@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://00tidnu5lo2i"]
+
+[ext_resource type="Script" uid="uid://bhqs42afjqbgi" path="res://data/definitions/item_data.gd" id="1_jyqit"]
+[ext_resource type="Resource" uid="uid://00lsu48ioito" path="res://data/tres/categories/motorcycle.tres" id="2_cat"]
+[ext_resource type="Resource" uid="uid://syktenbyiya6" path="res://data/tres/identity_layers/moto_veil.tres" id="3_layer"]
+[ext_resource type="Resource" uid="uid://f6e6gfds4102" path="res://data/tres/identity_layers/moto_engine_check.tres" id="4_layer"]
+[ext_resource type="Resource" uid="uid://0uqmrcukeit" path="res://data/tres/identity_layers/moto_german_single.tres" id="5_layer"]
+[ext_resource type="Resource" uid="uid://jrna1ecpj842" path="res://data/tres/identity_layers/moto_zundapp_leaf.tres" id="6_layer"]
+
+
+[resource]
+script = ExtResource("1_jyqit")
+item_id = "motorcycle_zundapp_k800"
+category_data = ExtResource("2_cat")
+identity_layers = [ExtResource("3_layer"), ExtResource("4_layer"), ExtResource("5_layer"), ExtResource("6_layer")]
+rarity = 4

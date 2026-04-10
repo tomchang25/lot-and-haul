@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="IdentityLayer" format=3 uid="uid://3y41jbitmdlb"]
-
-[ext_resource type="Script" uid="uid://btknl1cvjqdvh" path="res://data/_definitions/identity_layer.gd" id="1_ilay"]
-[resource]
-script = ExtResource("1_ilay")
-layer_id = "rifle_leaf_whitworth"
-display_name = "Whitworth Rifle, c.1860"
-base_value = 15000
-unlock_action = null
