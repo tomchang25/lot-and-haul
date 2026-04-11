@@ -25,7 +25,7 @@ func _ready() -> void:
 
 
 func _inject_fake_state() -> void:
-    RunManager.run_record = RunRecord.create(location_data, SaveManager.load_active_car())
+    RunManager.run_record = RunRecord.create(location_data, SaveManager.active_car)
 
 
 func _launch_lot_browse_scene() -> void:

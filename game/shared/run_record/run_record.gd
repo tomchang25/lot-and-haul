@@ -22,7 +22,7 @@ var fuel_cost: int = 0
 
 var stamina: int = 0
 var max_stamina: int = 30
-var car_config: CarConfig = null
+var car_data: CarData = null
 
 var actions_remaining: int = 0 # resets each lot from LotData.action_quota
 
@@ -40,10 +40,10 @@ var browse_index: int = 0
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
 
-static func create(location: LocationData, car: CarConfig) -> RunRecord:
+static func create(location: LocationData, car: CarData) -> RunRecord:
     var r := RunRecord.new()
     r.location_data = location
-    r.car_config = car
+    r.car_data = car
     r.max_stamina = car.stamina_cap
     r.stamina = r.max_stamina
     r.compute_travel_costs()
@@ -53,7 +53,7 @@ static func create(location: LocationData, car: CarConfig) -> RunRecord:
 
 func compute_travel_costs() -> void:
     entry_fee = location_data.entry_fee if location_data else 0
-    fuel_cost = car_config.fuel_cost_per_day * location_data.travel_days if location_data and car_config else 0
+    fuel_cost = car_data.fuel_cost_per_day * location_data.travel_days if location_data and car_data else 0
 
 # ══ Lot management ════════════════════════════════════════════════════════════
 
