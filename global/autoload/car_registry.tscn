@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://ccarreg000001"]
-
-[ext_resource type="Script" path="res://global/autoload/car_registry.gd" id="1_carreg"]
-
-[node name="CarRegistry" type="Node"]
-script = ExtResource("1_carreg")

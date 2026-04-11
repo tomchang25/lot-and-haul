@@ -8,7 +8,6 @@ extends Control
 
 const LocationCardScene := preload("res://game/meta/location_select/location_card/location_card.tscn")
 
-
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _cards_container: HBoxContainer = $RootVBox/CardsContainer
