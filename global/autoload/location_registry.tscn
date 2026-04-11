@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://cc3411m8kg2x1"]
-
-[ext_resource type="Script" uid="uid://cnpilh6m4wo27" path="res://global/autoload/location_registry.gd" id="1_locreg"]
-
-[node name="LocationRegistry" type="Node" unique_id=1344643569]
-script = ExtResource("1_locreg")
