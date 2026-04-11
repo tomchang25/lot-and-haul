@@ -1,17 +1,15 @@
 [gd_scene format=3 uid="uid://bwrhentry001"]
 
-[ext_resource type="Script" uid="uid://dgqkq17nec472" path="res://stage/runs/warehouse/warehouse_entry.gd" id="1_wentry"]
-[ext_resource type="Resource" uid="uid://cy7warehsloc1" path="res://data/tres/locations/warehouse_location.tres" id="2_locdata"]
+[ext_resource type="Script" path="res://stage/runs/location_entry/location_entry.gd" id="1_locentry"]
 
-[node name="WarehouseEntry" type="Control" unique_id=70781841]
+[node name="LocationEntry" type="Control" unique_id=70781841]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_wentry")
-location_data = ExtResource("2_locdata")
+script = ExtResource("1_locentry")
 
 [node name="Background" type="ColorRect" parent="." unique_id=2071240176]
 visible = false

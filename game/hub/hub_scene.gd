@@ -44,7 +44,7 @@ func _on_next_run_pressed() -> void:
 
 
 func _on_next_run_confirmed() -> void:
-    GameManager.go_to_warehouse_entry()
+    GameManager.go_to_location_select()
 
 
 func _on_storage_pressed() -> void:

@@ -15,3 +15,12 @@ extends Resource
 
 # Number of days the round-trip to this location takes.
 @export var travel_days: int = 1
+
+# Stable identifier for this location. Must match the .tres filename stem.
+@export var location_id: String = ""
+
+# Player-facing name shown on the location selection screen.
+@export var display_name: String = ""
+
+# One-line flavor / summary shown on the location selection screen.
+@export var description: String = ""

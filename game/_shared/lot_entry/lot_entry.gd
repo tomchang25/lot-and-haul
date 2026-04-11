@@ -1,7 +1,7 @@
 # lot_entry.gd
 # Runtime context for a single lot within a run.
 # Rolls factor values from LotData ranges and generates ItemEntry instances.
-# Created by warehouse_entry; consumed through the end of auction.
+# Created by location_entry; consumed through the end of auction.
 class_name LotEntry
 extends RefCounted
 

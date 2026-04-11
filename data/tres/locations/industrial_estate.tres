@@ -1,0 +1,74 @@
+[gd_resource type="Resource" script_class="LocationData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://data/definitions/location_data.gd" id="1_location_script"]
+[ext_resource type="Script" path="res://data/definitions/lot_data.gd" id="2_lot_script"]
+
+[sub_resource type="Resource" id="LotData_industrial_a"]
+script = ExtResource("2_lot_script")
+aggressive_factor_min = 0.45
+aggressive_factor_max = 0.9
+aggressive_lerp_min = 0.85
+aggressive_lerp_max = 1.4
+npc_layer_sight_chance = 0.6
+opening_bid_factor = 0.3
+veiled_chance = 0.5
+item_count_min = 4
+item_count_max = 6
+rarity_weights = {
+0: 30,
+1: 30,
+2: 25,
+3: 12,
+4: 3
+}
+super_category_weights = {
+"Fine Art": 3,
+"Vehicle": 2,
+"Weapon": 2
+}
+category_weights = { }
+price_floor_factor = 0.55
+price_ceiling_factor = 1.5
+price_variance_min = 0.85
+price_variance_max = 1.2
+action_quota = 6
+
+[sub_resource type="Resource" id="LotData_industrial_b"]
+script = ExtResource("2_lot_script")
+aggressive_factor_min = 0.5
+aggressive_factor_max = 0.95
+aggressive_lerp_min = 0.9
+aggressive_lerp_max = 1.4
+npc_layer_sight_chance = 0.65
+opening_bid_factor = 0.3
+veiled_chance = 0.5
+item_count_min = 4
+item_count_max = 6
+rarity_weights = {
+0: 25,
+1: 30,
+2: 25,
+3: 15,
+4: 5
+}
+super_category_weights = {
+"Fine Art": 3,
+"Vehicle": 3,
+"Decorative": 1
+}
+category_weights = { }
+price_floor_factor = 0.55
+price_ceiling_factor = 1.5
+price_variance_min = 0.85
+price_variance_max = 1.2
+action_quota = 6
+
+[resource]
+script = ExtResource("1_location_script")
+lot_pool = Array[LotData]([SubResource("LotData_industrial_a"), SubResource("LotData_industrial_b")])
+lot_number = 4
+entry_fee = 450
+travel_days = 3
+location_id = "industrial_estate"
+display_name = "Industrial Estate Auction"
+description = "A high-stakes industrial compound. Expensive entry, aggressive bidders, rare finds."
