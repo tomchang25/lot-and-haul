@@ -1,13 +1,12 @@
 # location_select.gd
-# Location Select screen. Scans the locations directory for LocationData .tres
-# files, builds a LocationCard per entry, and — when a card is chosen —
-# constructs the active RunRecord and advances to the Location Entry scene.
+# Location Select screen. Fetches all LocationData from LocationRegistry,
+# builds a LocationCard per entry, and — when a card is chosen — constructs
+# the active RunRecord and advances to the Location Entry scene.
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 const LocationCardScene := preload("res://game/meta/location_select/location_card/location_card.tscn")
-
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -25,32 +24,12 @@ func _ready() -> void:
 
 
 func _populate_cards() -> void:
-    var locations := _load_all_locations()
+    var locations := LocationRegistry.get_all_locations()
     for location: LocationData in locations:
         var card: LocationCard = LocationCardScene.instantiate()
         _cards_container.add_child(card)
         card.setup(location)
         card.pressed.connect(_on_card_pressed)
-
-
-func _load_all_locations() -> Array[LocationData]:
-    var result: Array[LocationData] = []
-    var dir := DirAccess.open(DataPaths.LOCATIONS_DIR)
-    if dir == null:
-        push_error("LocationSelect: could not open " + DataPaths.LOCATIONS_DIR)
-        return result
-
-    dir.list_dir_begin()
-    var file_name := dir.get_next()
-    while file_name != "":
-        if not dir.current_is_dir() and file_name.ends_with(".tres"):
-            var path := DataPaths.LOCATIONS_DIR + "/" + file_name
-            var resource := load(path)
-            if resource is LocationData:
-                result.append(resource as LocationData)
-        file_name = dir.get_next()
-    dir.list_dir_end()
-    return result
 
 # ══ Signal handlers ═══════════════════════════════════════════════════════════
 
@@ -59,7 +38,7 @@ func _on_card_pressed(card: LocationCard) -> void:
     var location := card.get_location_data()
     RunManager.run_record = RunRecord.create(
         location,
-        SaveManager.load_active_car(),
+        SaveManager.active_car,
     )
     GameManager.go_to_location_entry()
 

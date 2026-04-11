@@ -18,18 +18,20 @@ const CargoScene := preload("res://game/cargo/cargo_scene.tscn")
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
+
 func _ready() -> void:
     _inject_fake_state()
     _launch_cargo_scene()
 
 # ══ Setup helpers ══════════════════════════════════════════════════════════════
 
+
 func _inject_fake_state() -> void:
-    const WAREHOUSE_LOTDATA  = preload("uid://l8xrnjwietdt")
+    const WAREHOUSE_LOTDATA = preload("uid://l8xrnjwietdt")
     const WAREHOUSE_LOCATION = preload("res://data/tres/locations/warehouse_location.tres")
 
     var lot := LotEntry.create(WAREHOUSE_LOTDATA)
-    RunManager.run_record = RunRecord.create(WAREHOUSE_LOCATION, SaveManager.load_active_car())
+    RunManager.run_record = RunRecord.create(WAREHOUSE_LOCATION, SaveManager.active_car)
     RunManager.run_record.set_lot(lot)
 
     var entries: Array[ItemEntry] = RunManager.run_record.lot_entry.item_entries
@@ -39,8 +41,8 @@ func _inject_fake_state() -> void:
         entry.potential_inspect_level = 2
         entry.layer_index = 1
 
-    RunManager.run_record.paid_price  = paid_price
-    RunManager.run_record.won_items   = entries.duplicate()
+    RunManager.run_record.paid_price = paid_price
+    RunManager.run_record.won_items = entries.duplicate()
     RunManager.run_record.cargo_items.clear()
 
 

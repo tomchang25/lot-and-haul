@@ -7,6 +7,12 @@ var category_points: Dictionary = { }
 var cash: int = 0
 var active_car_id: String = "van_basic"
 
+# The CarData resource for the currently active car. Resolved lazily via
+# CarRegistry so the save file only has to persist the id.
+var active_car: CarData:
+    get:
+        return CarRegistry.get_car(active_car_id)
+
 # Array of Dictionary on disk; deserialized to Array[ItemEntry] on load.
 var storage_items: Array = []
 
@@ -91,14 +97,6 @@ func load() -> void:
                 skill_levels[key] = int(parsed["skill_levels"][key])
     else:
         skill_levels = { }
-
-
-func load_active_car() -> CarConfig:
-    var path := "res://data/tres/cars/%s.tres" % active_car_id
-    if not ResourceLoader.exists(path):
-        push_error("SaveManager: car resource not found at %s" % path)
-        return null
-    return ResourceLoader.load(path) as CarConfig
 
 
 # Assigns a unique id to entry, appends it to storage_items, and saves.

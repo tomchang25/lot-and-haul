@@ -1,6 +1,12 @@
-# car_config.gd
+# car_data.gd
 # Designer-authored resource defining a car's gameplay properties.
-class_name CarConfig
+#
+# TODO: If non-car vehicles (trucks, boats, planes, etc.) are eventually added
+# to the game, revisit this class name at that point. `Vehicle` is already
+# taken by an item super_category, so `Rig` or similar may be the answer.
+# Do not rename preemptively — wait until a concrete second vehicle type
+# actually exists.
+class_name CarData
 extends Resource
 
 @export var car_id: String

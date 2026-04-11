@@ -1,6 +1,6 @@
 # cargo_scene_v2.gd
 # Block 05 — Cargo Loading (v2: 2-D grid packing)
-# Reads:  RunManager.run_record.won_items, RunManager.run_record.car_config
+# Reads:  RunManager.run_record.won_items, RunManager.run_record.car_data
 # Writes: RunManager.run_record.cargo_items, RunManager.run_record.onsite_proceeds
 extends Control
 
@@ -34,7 +34,7 @@ var _active_origin: String = ""
 var _active_origin_pos: Vector2i = Vector2i(-1, -1) # Original position for cancel
 
 # Extra (trailer) slot state — parallel to _cargo_placement, never intersects it.
-var _extra_slot_items: Array[ItemEntry] = [] # size = car_config.extra_slot_count; null = empty
+var _extra_slot_items: Array[ItemEntry] = [] # size = car_data.extra_slot_count; null = empty
 var _active_origin_extra_index: int = -1 # set when _active_origin == "extra"
 
 # Current hover position in cargo grid coords (invalid when not hovering).
@@ -125,7 +125,7 @@ func _ready() -> void:
     _won_items = RunManager.run_record.won_items
 
     # Initialise extra slot state
-    _extra_slot_items.resize(RunManager.run_record.car_config.extra_slot_count)
+    _extra_slot_items.resize(RunManager.run_record.car_data.extra_slot_count)
     _extra_slot_items.fill(null)
 
     # Assign unique colors to each item
@@ -279,8 +279,8 @@ func _get_item_border_color(entry: ItemEntry) -> Color:
 
 
 func _build_cargo_grid() -> void:
-    var cols := RunManager.run_record.car_config.grid_columns
-    var rows := RunManager.run_record.car_config.grid_rows
+    var cols := RunManager.run_record.car_data.grid_columns
+    var rows := RunManager.run_record.car_data.grid_rows
 
     _cargo_grid.columns = cols
 
@@ -304,7 +304,7 @@ func _build_temp_grid() -> void:
 
 
 func _build_extra_slots() -> void:
-    var count := RunManager.run_record.car_config.extra_slot_count
+    var count := RunManager.run_record.car_data.extra_slot_count
     _extra_slot_section.visible = count > 0
     for i in count:
         var cell := _make_extra_slot_cell(i)
@@ -340,8 +340,8 @@ func _get_active_cells(entry: ItemEntry) -> Array[Vector2i]:
 
 
 func _can_place_at_cargo(entry: ItemEntry, origin: Vector2i) -> bool:
-    var cols := RunManager.run_record.car_config.grid_columns
-    var rows := RunManager.run_record.car_config.grid_rows
+    var cols := RunManager.run_record.car_data.grid_columns
+    var rows := RunManager.run_record.car_data.grid_rows
     var cells: Array[Vector2i] = _get_active_cells(entry)
 
     # Check grid bounds and collision
@@ -362,7 +362,7 @@ func _can_place_at_cargo(entry: ItemEntry, origin: Vector2i) -> bool:
 func _would_exceed_weight(entry: ItemEntry) -> bool:
     # Check if placing this entry would exceed max weight
     # If item is already in cargo, don't double count
-    var max_weight: float = RunManager.run_record.car_config.max_weight
+    var max_weight: float = RunManager.run_record.car_data.max_weight
     var entry_weight: float = entry.item_data.category_data.weight
 
     # Check if entry is already in cargo
@@ -580,10 +580,10 @@ func _recalc_totals() -> void:
 
 
 func _refresh_ui() -> void:
-    var cols := RunManager.run_record.car_config.grid_columns
-    var rows := RunManager.run_record.car_config.grid_rows
+    var cols := RunManager.run_record.car_data.grid_columns
+    var rows := RunManager.run_record.car_data.grid_rows
     var max_slots := cols * rows
-    var max_weight: float = RunManager.run_record.car_config.max_weight
+    var max_weight: float = RunManager.run_record.car_data.max_weight
 
     # Check if we're holding an item and calculate pending changes
     var pending_slots := 0
