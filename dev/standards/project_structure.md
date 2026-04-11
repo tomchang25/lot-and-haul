@@ -124,35 +124,111 @@ Organize tools by function. Register common tasks in `.vscode/tasks.json` for ed
 
 ## game/
 
-Use this folder for **all block-specific game content**.
-
-This includes block scene roots, UI components, and logic scripts that belong to a specific block or are shared across blocks.
+Use this folder for **all block-specific game content**: block scene roots,
+UI components, and logic scripts that belong to a specific block or are
+shared across blocks.
 
 ### Structure
 
 ```
 game/
-  _shared/        → components used by more than one block
-  [feature]/      → one folder per block or feature
+  shared/         → components used by more than one block
+  run/            → in-location run loop blocks
+  meta/           → out-of-run meta-game blocks
 ```
 
-### game/\_shared/
+Top-level `game/` contains exactly these three entries. Every block lives
+inside one of them. Do not add new top-level folders under `game/` without
+updating this document.
 
-Contains UI components and logic helpers that are referenced by more than one block.
+### game/shared/
 
-Rule: a component moves to `_shared/` only when a second block actually needs it.
-Do not pre-emptively place things here.
+Contains UI components and logic helpers that are referenced by more than
+one block — across groups as well as within a group.
 
-### game/[feature]/
+Rules:
 
-Each block folder contains everything that belongs to that block: scene roots, UI component sub-scenes, and logic scripts.
+- A component moves to `shared/` only when a **second block actually needs
+  it**. Do not pre-emptively place things here.
+- `shared/` is **not** split into `run/shared/` and `meta/shared/`. A single
+  flat `shared/` avoids the problem of the first cross-group component
+  needing to break the rule.
 
-Do not split logic and scene files into sub-folders unless the block has grown large enough to make the flat layout hard to navigate.
+### game/run/
+
+Blocks that are part of a single in-location run. A run begins when the
+player enters a location and ends at run review. Everything the player
+interacts with **during** a run lives here.
+
+```
+game/run/
+  location_entry/
+  lot_browse/
+  inspection/
+  auction/
+  reveal/
+  cargo/
+  run_review/
+```
+
+Placement test: **does this block only exist while a run is in progress,
+and does leaving it mean the run is over or advancing?** If yes → `run/`.
+
+### game/meta/
+
+Blocks that exist **between** runs — the home base, shops, progression
+screens, and day-boundary scenes.
+
+```
+game/meta/
+  hub/
+    hub_scene.gd
+    hub_scene.tscn
+  location_select/
+  storage/
+  pawn_shop/
+  day_summary/
+  knowledge/
+    knowledge_hub.gd
+    knowledge_hub.tscn
+    skill_panel/
+    mastery_panel/
+    perk_panel/
+```
+
+Placement test: **is this block reachable without being inside a run?**
+If yes → `meta/`.
+
+#### Sub-grouping inside meta/
+
+`meta/` may contain a second level of grouping when a parent block owns
+several sub-scenes that are only reachable through it. The current example
+is `meta/knowledge/`: `knowledge_hub` is a navigation menu, and
+`skill_panel` / `mastery_panel` / `perk_panel` are its children (their
+back buttons return to `knowledge_hub`).
+
+Rules for sub-groups:
+
+- A sub-group folder is only created when a block owns **two or more**
+  dedicated sub-scenes. One sub-scene stays flat.
+- The parent block's scene and script live **directly inside** the
+  sub-group folder (e.g. `meta/knowledge/knowledge_hub.gd`), not in a
+  further nested folder.
+- Sub-group names must reflect gameplay concepts, not technical categories.
+  `knowledge/` is fine; `panels/` or `ui/` is not.
+
+### Block folder layout
+
+Each block folder contains everything that belongs to that block: scene
+roots, UI component sub-scenes, and logic scripts.
+
+Do not split logic and scene files into sub-folders unless the block has
+grown large enough to make the flat layout hard to navigate.
 
 Example layout for a mid-complexity block:
 
 ```
-game/inspection/
+game/run/inspection/
   inspection_scene.gd
   inspection_scene.tscn
   stamina_hud/
@@ -163,12 +239,13 @@ game/inspection/
 Example layout for a simple block:
 
 ```
-game/auction/
+game/run/auction/
   auction_scene.gd
   auction_scene.tscn
 ```
 
-Code-generated runtime data structures live in the block folder (or `_shared/`) that owns them, not in `data/`.
+Code-generated runtime data structures live in the block folder (or
+`game/shared/`) that owns them, not in `data/`.
 
 ---
 
