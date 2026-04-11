@@ -1,0 +1,56 @@
+# ============================================================
+# Lot & Haul — Car Data Authoring
+# data/yaml/car_data.yaml
+#
+# Pipeline: this file → yaml_to_tres.py → data/tres/cars/*.tres
+#
+# Each entry becomes one CarData .tres picked up by CarRegistry at
+# startup. The `car_id` must be snake_case and matches the .tres
+# filename stem. SaveManager.active_car_id defaults to "van_basic", so
+# that id must exist here for fresh saves to resolve.
+#
+# Progression curve: grid / weight / stamina climb monotonically while
+# fuel_cost_per_day rises so later tiers feel like real upgrades but
+# cost more per trip.
+# ============================================================
+
+cars:
+  # ── Tier 1 — starter (matches SaveManager default) ──────────
+  - car_id: van_basic
+    display_name: Rusty Van
+    grid_columns: 3
+    grid_rows: 3
+    max_weight: 400.0
+    stamina_cap: 6
+    fuel_cost_per_day: 20
+    extra_slot_count: 0
+
+  # ── Tier 2 — bigger grid, modest bumps ──────────────────────
+  - car_id: box_truck
+    display_name: Box Truck
+    grid_columns: 4
+    grid_rows: 4
+    max_weight: 700.0
+    stamina_cap: 8
+    fuel_cost_per_day: 35
+    extra_slot_count: 1
+
+  # ── Tier 3 — notable weight and stamina bumps ───────────────
+  - car_id: cargo_hauler
+    display_name: Cargo Hauler
+    grid_columns: 5
+    grid_rows: 4
+    max_weight: 1100.0
+    stamina_cap: 10
+    fuel_cost_per_day: 55
+    extra_slot_count: 1
+
+  # ── Tier 4 — biggest grid, highest stamina, high fuel ───────
+  - car_id: semi_rig
+    display_name: Semi Rig
+    grid_columns: 6
+    grid_rows: 5
+    max_weight: 1800.0
+    stamina_cap: 13
+    fuel_cost_per_day: 90
+    extra_slot_count: 2

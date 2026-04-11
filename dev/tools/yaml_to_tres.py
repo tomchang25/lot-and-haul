@@ -1,7 +1,8 @@
 """
 yaml_to_tres.py
-Write SkillData, SuperCategoryData, CategoryData, IdentityLayer, and ItemData
-.tres files directly from YAML source files, without an intermediate database.
+Write SkillData, SuperCategoryData, CategoryData, IdentityLayer, ItemData, and
+CarData .tres files directly from YAML source files, without an intermediate
+database.
 
 Resource UIDs are derived deterministically from each entity's (type, id) pair
 via SHA-256, so regenerating from YAML produces byte-identical output even with
@@ -57,6 +58,7 @@ _CATEGORY_DATA_SCRIPT_PATH = "res://data/definitions/category_data.gd"
 _SUPER_CATEGORY_DATA_SCRIPT_PATH = "res://data/definitions/super_category_data.gd"
 _SKILL_DATA_SCRIPT_PATH = "res://data/definitions/skill_data.gd"
 _SKILL_LEVEL_DATA_SCRIPT_PATH = "res://data/definitions/skill_level_data.gd"
+_CAR_DATA_SCRIPT_PATH = "res://data/definitions/car_data.gd"
 
 
 def _read_script_uid(godot_root: Path, res_path: str) -> str:
@@ -297,6 +299,39 @@ def _build_item_tres(
     return "\n".join(lines)
 
 
+def _build_car_tres(
+    car_id: str,
+    car_uid: str,
+    display_name: str,
+    grid_columns: int,
+    grid_rows: int,
+    max_weight: float,
+    stamina_cap: int,
+    fuel_cost_per_day: int,
+    extra_slot_count: int,
+    car_data_script_uid: str,
+) -> str:
+    lines = [
+        f'[gd_resource type="Resource" script_class="CarData" format=3 uid="{car_uid}"]',
+        "",
+        f'[ext_resource type="Script" uid="{car_data_script_uid}" '
+        f'path="res://data/definitions/car_data.gd" id="1_cardef"]',
+        "",
+        "[resource]",
+        'script = ExtResource("1_cardef")',
+        f'car_id = "{car_id}"',
+        f'display_name = "{display_name}"',
+        f"grid_columns = {int(grid_columns)}",
+        f"grid_rows = {int(grid_rows)}",
+        f"max_weight = {float(max_weight)}",
+        f"stamina_cap = {int(stamina_cap)}",
+        f"fuel_cost_per_day = {int(fuel_cost_per_day)}",
+        f"extra_slot_count = {int(extra_slot_count)}",
+        "",
+    ]
+    return "\n".join(lines)
+
+
 # ── Validation ────────────────────────────────────────────────────────────────
 
 
@@ -471,6 +506,59 @@ def _validate(data: dict) -> list[str]:
                 if cur_base_value is not None:
                     prev_base_value = cur_base_value
 
+    # ── Cars ──────────────────────────────────────────────────────────────────
+    seen_car_ids: set[str] = set()
+    for car in data.get("cars", []):
+        car_id = car.get("car_id", "")
+        if not car_id:
+            errors.append("Car missing car_id")
+            continue
+        if car_id in seen_car_ids:
+            errors.append(f"Duplicate car_id: '{car_id}'")
+        seen_car_ids.add(car_id)
+
+        grid_columns = car.get("grid_columns")
+        if not isinstance(grid_columns, int) or grid_columns <= 0:
+            errors.append(
+                f"car '{car_id}': grid_columns must be a positive integer,"
+                f" got {grid_columns!r}"
+            )
+
+        grid_rows = car.get("grid_rows")
+        if not isinstance(grid_rows, int) or grid_rows <= 0:
+            errors.append(
+                f"car '{car_id}': grid_rows must be a positive integer,"
+                f" got {grid_rows!r}"
+            )
+
+        max_weight = car.get("max_weight")
+        if not isinstance(max_weight, (int, float)) or max_weight <= 0:
+            errors.append(
+                f"car '{car_id}': max_weight must be a positive number,"
+                f" got {max_weight!r}"
+            )
+
+        stamina_cap = car.get("stamina_cap")
+        if not isinstance(stamina_cap, int) or stamina_cap <= 0:
+            errors.append(
+                f"car '{car_id}': stamina_cap must be a positive integer,"
+                f" got {stamina_cap!r}"
+            )
+
+        fuel_cost_per_day = car.get("fuel_cost_per_day", 0)
+        if not isinstance(fuel_cost_per_day, int) or fuel_cost_per_day < 0:
+            errors.append(
+                f"car '{car_id}': fuel_cost_per_day must be a non-negative"
+                f" integer, got {fuel_cost_per_day!r}"
+            )
+
+        extra_slot_count = car.get("extra_slot_count", 0)
+        if not isinstance(extra_slot_count, int) or extra_slot_count < 0:
+            errors.append(
+                f"car '{car_id}': extra_slot_count must be a non-negative"
+                f" integer, got {extra_slot_count!r}"
+            )
+
     return errors
 
 
@@ -630,6 +718,34 @@ def export_items(
         _write(out, content, dry_run, f"item ({len(layer_refs)} layers)")
 
 
+def export_cars(
+    cars: list[dict],
+    out_dir: Path,
+    uid_cache: dict[str, str],
+    dry_run: bool,
+    car_data_script_uid: str,
+) -> None:
+    for car in cars:
+        car_id = car["car_id"]
+        out = out_dir / f"{car_id}.tres"
+        uid = _deterministic_uid("car", car_id)
+        uid_cache[car_id] = uid
+
+        content = _build_car_tres(
+            car_id,
+            uid,
+            car["display_name"],
+            int(car["grid_columns"]),
+            int(car["grid_rows"]),
+            float(car["max_weight"]),
+            int(car["stamina_cap"]),
+            int(car.get("fuel_cost_per_day", 0)),
+            int(car.get("extra_slot_count", 0)),
+            car_data_script_uid,
+        )
+        _write(out, content, dry_run, "car")
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 
@@ -654,6 +770,7 @@ def main() -> None:
     categories_dir = tres_root / "categories"
     layers_dir = tres_root / "identity_layers"
     items_dir = tres_root / "items"
+    cars_dir = tres_root / "cars"
 
     if not yaml_dir.is_dir():
         sys.exit(f"YAML directory not found: {yaml_dir}")
@@ -667,6 +784,7 @@ def main() -> None:
         "super_category_data": _read_script_uid(root, _SUPER_CATEGORY_DATA_SCRIPT_PATH),
         "skill_data": _read_script_uid(root, _SKILL_DATA_SCRIPT_PATH),
         "skill_level_data": _read_script_uid(root, _SKILL_LEVEL_DATA_SCRIPT_PATH),
+        "car_data": _read_script_uid(root, _CAR_DATA_SCRIPT_PATH),
     }
 
     yaml_files = sorted(yaml_dir.glob("*.yaml"))
@@ -680,6 +798,7 @@ def main() -> None:
         "categories": [],
         "identity_layers": [],
         "items": [],
+        "cars": [],
     }
 
     for yaml_path in yaml_files:
@@ -708,6 +827,7 @@ def main() -> None:
             categories_dir,
             layers_dir,
             items_dir,
+            cars_dir,
         ):
             d.mkdir(parents=True, exist_ok=True)
 
@@ -763,12 +883,22 @@ def main() -> None:
         script_uids["item_data"],
     )
 
+    print(f"Exporting cars ({len(merged['cars'])})...")
+    export_cars(
+        merged["cars"],
+        cars_dir,
+        uid_cache,
+        args.dry_run,
+        script_uids["car_data"],
+    )
+
     total = (
         len(merged["skills"])
         + len(merged["super_categories"])
         + len(merged["categories"])
         + len(merged["identity_layers"])
         + len(merged["items"])
+        + len(merged["cars"])
     )
     tag = "[dry run] " if args.dry_run else ""
     print(f"\n{tag}Done — {total} records processed.")
