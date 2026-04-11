@@ -8,7 +8,6 @@ extends Control
 @onready var _mastery_rank_label: Label = $RootVBox/MasteryRankLabel
 @onready var _balance_label: Label = $RootVBox/InfoContainer/BalanceLabel
 @onready var _storage_count_label: Label = $RootVBox/InfoContainer/StorageCountLabel
-@onready var _next_run_popup: ConfirmationDialog = $NextRunPopup
 @onready var _van_popup: AcceptDialog = $VanPopup
 @onready var _next_run_btn: Button = $RootVBox/ButtonsVBox/NextRunButton
 @onready var _storage_btn: Button = $RootVBox/ButtonsVBox/StorageButton
@@ -29,7 +28,6 @@ func _ready() -> void:
     _knowledge_btn.pressed.connect(_on_knowledge_pressed)
     _day_pass_btn.pressed.connect(_on_day_pass_pressed)
 
-    _next_run_popup.confirmed.connect(_on_next_run_confirmed)
     _day_pass_confirm.confirmed.connect(_on_day_pass_confirmed)
 
     SaveManager.load()
@@ -40,11 +38,7 @@ func _ready() -> void:
 
 
 func _on_next_run_pressed() -> void:
-    _next_run_popup.popup_centered()
-
-
-func _on_next_run_confirmed() -> void:
-    GameManager.go_to_warehouse_entry()
+    GameManager.go_to_location_select()
 
 
 func _on_storage_pressed() -> void:

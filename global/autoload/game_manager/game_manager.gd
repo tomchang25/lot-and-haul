@@ -20,8 +20,12 @@ func consume_pending_day_summary() -> DaySummary:
 # ── Scene transitions ─────────────────────────────────────────────────────────
 
 
-func go_to_warehouse_entry() -> void:
-    get_tree().change_scene_to_packed(scenes.warehouse_entry)
+func go_to_location_select() -> void:
+    get_tree().change_scene_to_packed(scenes.location_select)
+
+
+func go_to_location_entry() -> void:
+    get_tree().change_scene_to_packed(scenes.location_entry)
 
 
 func go_to_lot_browse() -> void:

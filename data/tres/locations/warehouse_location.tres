@@ -1,0 +1,74 @@
+[gd_resource type="Resource" script_class="LocationData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://data/definitions/location_data.gd" id="1_location_script"]
+[ext_resource type="Script" path="res://data/definitions/lot_data.gd" id="2_lot_script"]
+
+[sub_resource type="Resource" id="LotData_warehouse_a"]
+script = ExtResource("2_lot_script")
+aggressive_factor_min = 0.3
+aggressive_factor_max = 0.7
+aggressive_lerp_min = 0.75
+aggressive_lerp_max = 1.1
+npc_layer_sight_chance = 0.5
+opening_bid_factor = 0.25
+veiled_chance = 0.4
+item_count_min = 3
+item_count_max = 5
+rarity_weights = {
+0: 60,
+1: 25,
+2: 10,
+3: 4,
+4: 1
+}
+super_category_weights = {
+"Decorative": 3,
+"Fashion": 2,
+"Weapon": 1
+}
+category_weights = { }
+price_floor_factor = 0.6
+price_ceiling_factor = 1.3
+price_variance_min = 0.9
+price_variance_max = 1.1
+action_quota = 6
+
+[sub_resource type="Resource" id="LotData_warehouse_b"]
+script = ExtResource("2_lot_script")
+aggressive_factor_min = 0.3
+aggressive_factor_max = 0.7
+aggressive_lerp_min = 0.8
+aggressive_lerp_max = 1.15
+npc_layer_sight_chance = 0.5
+opening_bid_factor = 0.25
+veiled_chance = 0.4
+item_count_min = 3
+item_count_max = 5
+rarity_weights = {
+0: 55,
+1: 28,
+2: 12,
+3: 4,
+4: 1
+}
+super_category_weights = {
+"Decorative": 2,
+"Fine Art": 2,
+"Vehicle": 1
+}
+category_weights = { }
+price_floor_factor = 0.6
+price_ceiling_factor = 1.3
+price_variance_min = 0.9
+price_variance_max = 1.1
+action_quota = 6
+
+[resource]
+script = ExtResource("1_location_script")
+lot_pool = Array[LotData]([SubResource("LotData_warehouse_a"), SubResource("LotData_warehouse_b")])
+lot_number = 3
+entry_fee = 120
+travel_days = 1
+location_id = "warehouse_default"
+display_name = "Riverside Warehouse"
+description = "A familiar warehouse on the edge of town. Low stakes, mixed lots."
