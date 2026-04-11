@@ -1,12 +1,14 @@
 **/.godot
 **/.commitsage
 
+**/dev/docs/architecture
+**/dev/docs/prompts
+
+
 **/shader_cache
 **/assets
 **/addons
 **/script_templates
-**/dev/docs/architecture
-**/dev/prompts
 **/data/tres
 **/*_back
 
