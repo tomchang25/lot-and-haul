@@ -47,7 +47,7 @@ func _ready() -> void:
     _continue_btn.hide()
 
     if _won_items.is_empty():
-        GameManager.go_to_location_browse()
+        GameManager.go_to_lot_browse()
         return
 
     _populate_rows()
@@ -68,7 +68,7 @@ func _on_reveal_pressed() -> void:
 
 
 func _on_continue_pressed() -> void:
-    GameManager.go_to_location_browse()
+    GameManager.go_to_lot_browse()
 
 
 func _on_row_tooltip_requested(

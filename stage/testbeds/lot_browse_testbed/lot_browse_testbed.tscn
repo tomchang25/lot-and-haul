@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://blbtestbed001"]
 
-[ext_resource type="Script" path="res://stage/testbeds/location_browse_testbed/location_browse_testbed.gd" id="1_lbtestbed"]
+[ext_resource type="Script" path="res://stage/testbeds/lot_browse_testbed/lot_browse_testbed.gd" id="1_lbtestbed"]
 
-[node name="LocationBrowseTestbed" type="Control" unique_id=300000001]
+[node name="LotBrowseTestbed" type="Control" unique_id=300000001]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

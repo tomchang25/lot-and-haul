@@ -2,7 +2,7 @@ class_name SceneRegistry
 extends Resource
 
 @export var warehouse_entry: PackedScene
-@export var location_browse: PackedScene
+@export var lot_browse: PackedScene
 @export var inspection: PackedScene
 @export var auction: PackedScene
 @export var reveal: PackedScene

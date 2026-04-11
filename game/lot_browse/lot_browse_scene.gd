@@ -1,5 +1,5 @@
-# location_browse_scene.gd
-# Location browse loop — player cycles through sampled lots and chooses to
+# lot_browse_scene.gd
+# Lot browse loop — player cycles through sampled lots and chooses to
 # Enter (inspect + auction) or Pass each one.
 #
 # State persists across scene transitions via RunRecord.browse_lots / browse_index.
@@ -10,7 +10,7 @@ extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-const LotCardScene := preload("res://game/location_browse/lot_card/lot_card.tscn")
+const LotCardScene := preload("res://game/lot_browse/lot_card/lot_card.tscn")
 
 # ── Node references ───────────────────────────────────────────────────────────
 

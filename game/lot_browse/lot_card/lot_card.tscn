@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://blotcardscn01"]
 
-[ext_resource type="Script" uid="uid://bscj2uyxr07x8" path="res://game/location_browse/lot_card/lot_card.gd" id="1_lotcard"]
+[ext_resource type="Script" uid="uid://bscj2uyxr07x8" path="res://game/lot_browse/lot_card/lot_card.gd" id="1_lotcard"]
 
 [node name="LotCard" type="VBoxContainer" unique_id=100000001]
 alignment = 1
