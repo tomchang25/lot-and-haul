@@ -24,8 +24,8 @@ func go_to_warehouse_entry() -> void:
     get_tree().change_scene_to_packed(scenes.warehouse_entry)
 
 
-func go_to_location_browse() -> void:
-    get_tree().change_scene_to_packed(scenes.location_browse)
+func go_to_lot_browse() -> void:
+    get_tree().change_scene_to_packed(scenes.lot_browse)
 
 
 func go_to_inspection() -> void:

@@ -31,7 +31,7 @@ var actions_remaining: int = 0 # resets each lot from LotData.action_quota
 var location_data: LocationData = null
 
 # Sampled lot list for this location visit. Populated on first entry to
-# LocationBrowseScene, persists across scene transitions.
+# LotBrowseScene, persists across scene transitions.
 var browse_lots: Array[LotData] = []
 
 # Index into browse_lots pointing at the current (or next) lot to show.

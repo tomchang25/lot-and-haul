@@ -22,7 +22,7 @@ player_controller.gd
 item_entry.gd
 item_row.gd
 run_record.gd
-location_browse_scene.gd
+lot_browse_scene.gd
 ```
 
 Scene files match their script names.

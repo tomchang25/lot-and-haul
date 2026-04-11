@@ -8,7 +8,7 @@
 [ext_resource type="Script" uid="uid://bvxr6q4cplcj8" path="res://global/autoload/game_manager/scene_registry.gd" id="5_ea43q"]
 [ext_resource type="PackedScene" uid="uid://cysp2gm1hjmca" path="res://game/run_review/run_review_scene.tscn" id="6_f47ts"]
 [ext_resource type="PackedScene" uid="uid://bwrhentry001" path="res://stage/runs/warehouse/warehouse_entry.tscn" id="6_warehse"]
-[ext_resource type="PackedScene" uid="uid://blocbrowse001" path="res://game/location_browse/location_browse_scene.tscn" id="7_locbrw"]
+[ext_resource type="PackedScene" uid="uid://blocbrowse001" path="res://game/lot_browse/lot_browse_scene.tscn" id="7_locbrw"]
 [ext_resource type="PackedScene" uid="uid://bhubscene0001" path="res://game/hub/hub_scene.tscn" id="8_hub01"]
 [ext_resource type="PackedScene" uid="uid://bhomescene001" path="res://game/storage/storage_scene.tscn" id="9_home01"]
 [ext_resource type="PackedScene" uid="uid://bpawnshop0001" path="res://game/pawn_shop/pawn_shop_scene.tscn" id="10_pawn1"]
@@ -21,7 +21,7 @@
 [sub_resource type="Resource" id="Resource_yimu3"]
 script = ExtResource("5_ea43q")
 warehouse_entry = ExtResource("6_warehse")
-location_browse = ExtResource("7_locbrw")
+lot_browse = ExtResource("7_locbrw")
 inspection = ExtResource("4_inspect")
 auction = ExtResource("2_ea43q")
 reveal = ExtResource("5_31m1u")

@@ -172,7 +172,7 @@ func _on_confirm_popup_confirmed() -> void:
     _close_popup()
     if _pulse_tween:
         _pulse_tween.kill()
-    GameManager.go_to_location_browse()
+    GameManager.go_to_lot_browse()
 
 # ══ Item display ══════════════════════════════════════════════════════════════
 
