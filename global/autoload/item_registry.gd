@@ -15,16 +15,16 @@ func _ready() -> void:
 
 
 func _load_all_items() -> void:
-    var dir := DirAccess.open("res://data/tres/items")
+    var dir := DirAccess.open(DataPaths.ITEMS_DIR)
     if dir == null:
-        push_error("ItemRegistry: could not open res://data/tres/items")
+        push_error("ItemRegistry: could not open " + DataPaths.ITEMS_DIR)
         return
 
     dir.list_dir_begin()
     var file_name := dir.get_next()
     while file_name != "":
         if not dir.current_is_dir() and file_name.ends_with(".tres"):
-            var path := "res://data/tres/items/" + file_name
+            var path := DataPaths.ITEMS_DIR + "/" + file_name
             var resource := load(path)
             if resource is ItemData:
                 _items.append(resource as ItemData)
