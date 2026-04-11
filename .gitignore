@@ -1,8 +1,7 @@
 **/.godot
 **/.commitsage
 
-**/dev/docs/architecture
-**/dev/docs/prompts
+**/dev/docs
 
 
 **/shader_cache
