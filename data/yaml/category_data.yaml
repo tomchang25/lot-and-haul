@@ -21,20 +21,12 @@
 #     shape_id: s1x2                 # cargo shape key. See CargoShapes.SHAPES.
 
 super_categories:
-  - Vehicle
   - Fashion
   - Decorative
   - Fine Art
   - Weapon
 
 categories:
-  # ── Vehicle (3) ───────────────────────────────────────
-  - category_id: bicycle
-    super_category: Vehicle
-    display_name: Bicycle
-    weight: 12.0
-    shape_id: s2x3
-
   - category_id: motorcycle
     super_category: Vehicle
     display_name: Motorcycle
