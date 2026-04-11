@@ -38,10 +38,10 @@ text = "Hub"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MasteryRankLabel" type="Label" parent="RootVBox"]
+[node name="MasteryRankLabel" type="Label" parent="RootVBox" unique_id=120845050]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.7, 1, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(0.75, 0.7, 1.0, 1)
 text = "Mastery Rank:   0"
 horizontal_alignment = 1
 
@@ -110,16 +110,11 @@ size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
 text = "Day Pass"
 
-[node name="NextRunPopup" type="ConfirmationDialog" parent="." unique_id=1000000014]
-oversampling_override = 1.0
-title = "Start Next Run?"
-dialog_text = "Begin the next warehouse run?"
-
-[node name="VanPopup" type="AcceptDialog" parent="."]
+[node name="VanPopup" type="AcceptDialog" parent="." unique_id=866730729]
 oversampling_override = 1.0
 title = "Van Info"
 
-[node name="DayPassConfirm" type="ConfirmationDialog" parent="."]
+[node name="DayPassConfirm" type="ConfirmationDialog" parent="." unique_id=1205180003]
 oversampling_override = 1.0
 title = "Pass a Day?"
 dialog_text = "Skip one day? Daily living cost will be deducted."

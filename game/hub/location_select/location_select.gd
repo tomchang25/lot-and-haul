@@ -6,7 +6,6 @@ extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-const LOCATIONS_DIR: String = "res://data/tres/locations"
 const LocationCardScene := preload("res://game/hub/location_select/location_card/location_card.tscn")
 
 # ── Node references ───────────────────────────────────────────────────────────
@@ -35,16 +34,16 @@ func _populate_cards() -> void:
 
 func _load_all_locations() -> Array[LocationData]:
     var result: Array[LocationData] = []
-    var dir := DirAccess.open(LOCATIONS_DIR)
+    var dir := DirAccess.open(DataPaths.LOCATIONS_DIR)
     if dir == null:
-        push_error("LocationSelect: could not open " + LOCATIONS_DIR)
+        push_error("LocationSelect: could not open " + DataPaths.LOCATIONS_DIR)
         return result
 
     dir.list_dir_begin()
     var file_name := dir.get_next()
     while file_name != "":
         if not dir.current_is_dir() and file_name.ends_with(".tres"):
-            var path := LOCATIONS_DIR + "/" + file_name
+            var path := DataPaths.LOCATIONS_DIR + "/" + file_name
             var resource := load(path)
             if resource is LocationData:
                 result.append(resource as LocationData)

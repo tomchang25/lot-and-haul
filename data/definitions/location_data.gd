@@ -4,18 +4,6 @@
 class_name LocationData
 extends Resource
 
-# Pool of LotData to draw from when the player visits this location.
-@export var lot_pool: Array[LotData] = []
-
-# How many lots are sampled (without replacement) from lot_pool per visit.
-@export var lot_number: int = 3
-
-# Upfront cost deducted when entering this location.
-@export var entry_fee: int = 0
-
-# Number of days the round-trip to this location takes.
-@export var travel_days: int = 1
-
 # Stable identifier for this location. Must match the .tres filename stem.
 @export var location_id: String = ""
 
@@ -24,3 +12,15 @@ extends Resource
 
 # One-line flavor / summary shown on the location selection screen.
 @export var description: String = ""
+
+# Upfront cost deducted when entering this location.
+@export var entry_fee: int = 0
+
+# Number of days the round-trip to this location takes.
+@export var travel_days: int = 1
+
+# How many lots are sampled (without replacement) from lot_pool per visit.
+@export var lot_number: int = 3
+
+# Pool of LotData to draw from when the player visits this location.
+@export var lot_pool: Array[LotData] = []
