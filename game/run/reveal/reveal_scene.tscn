@@ -1,0 +1,68 @@
+[gd_scene format=3 uid="uid://dsgsj2f826clw"]
+
+[ext_resource type="Script" uid="uid://b62533yf8nr3" path="res://game/run/reveal/reveal_scene.gd" id="1_bbq33"]
+[ext_resource type="PackedScene" uid="uid://cilp5a1xr3e8m" path="res://game/shared/item_display/item_list_panel/item_list_panel.tscn" id="2_ilp"]
+
+[node name="RevealScene" type="Control" unique_id=708244230]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_bbq33")
+
+[node name="Background" type="ColorRect" parent="." unique_id=172726597]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.1, 0.1, 0.12, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="." unique_id=2101566182]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="RootVBox" unique_id=935298121]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Reveal"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ListCenter" type="CenterContainer" parent="RootVBox" unique_id=2131226200]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="OuterVBox" type="VBoxContainer" parent="RootVBox/ListCenter" unique_id=777929070]
+custom_minimum_size = Vector2(760, 0)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ItemListPanel" parent="RootVBox/ListCenter/OuterVBox" instance=ExtResource("2_ilp")]
+layout_mode = 2
+
+[node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=84919131]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="RevealButton" type="Button" parent="RootVBox/Footer" unique_id=1005702364]
+custom_minimum_size = Vector2(160, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Reveal Next"
+
+[node name="ContinueButton" type="Button" parent="RootVBox/Footer" unique_id=1969516138]
+visible = false
+custom_minimum_size = Vector2(160, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Continue"

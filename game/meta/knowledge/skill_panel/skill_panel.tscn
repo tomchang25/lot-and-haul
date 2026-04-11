@@ -1,0 +1,64 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://d13776nnixjin" path="res://game/meta/knowledge/skill_panel/skill_panel.gd" id="1_script"]
+
+[node name="SkillPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.1, 0.1, 0.12, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Skills"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EmptyLabel" type="Label" parent="RootVBox"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "No skills available"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="RootVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RowContainer" type="VBoxContainer" parent="RootVBox/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Footer" type="HBoxContainer" parent="RootVBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="BackButton" type="Button" parent="RootVBox/Footer"]
+custom_minimum_size = Vector2(200, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Back"

@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://blocbrowse001"]
+
+[ext_resource type="Script" uid="uid://oaqiu5lk0e6d" path="res://game/run/lot_browse/lot_browse_scene.gd" id="1_lbscene"]
+
+[node name="LotBrowseScene" type="Control" unique_id=200000001]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lbscene")
+
+[node name="Bg" type="ColorRect" parent="." unique_id=200000002]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.1, 0.09, 0.12, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="." unique_id=200000003]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="RootVBox" unique_id=200000004]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Storage Unit"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="RootVBox" unique_id=1965203958]
+custom_minimum_size = Vector2(0, 320)
+layout_mode = 2
+
+[node name="LotCardContainer" type="HBoxContainer" parent="RootVBox/ScrollContainer" unique_id=649655757]
+custom_minimum_size = Vector2(0, 320)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CargoPanel" type="VBoxContainer" parent="RootVBox" unique_id=200000006]
+layout_mode = 2
+size_flags_vertical = 10
+alignment = 1
+
+[node name="CargoReadyLabel" type="Label" parent="RootVBox/CargoPanel" unique_id=200000007]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "All lots reviewed. Ready to load cargo."
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="RootVBox/CargoPanel" unique_id=200000008]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+
+[node name="CargoButton" type="Button" parent="RootVBox/CargoPanel" unique_id=200000009]
+custom_minimum_size = Vector2(200, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Cargo"
+
+[node name="SkipButton" type="Button" parent="RootVBox" unique_id=200000010]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_vertical = 10
+theme_override_font_sizes/font_size = 15
+text = "Skip to Cargo"
+
+[node name="SkipConfirmPopup" type="ConfirmationDialog" parent="." unique_id=200000011]
+title = "Skip to Cargo"
+initial_position = 2
+size = Vector2i(360, 120)
+dialog_text = "Skip the remaining lots and go straight to cargo?"

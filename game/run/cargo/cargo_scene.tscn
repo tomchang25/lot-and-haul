@@ -1,0 +1,142 @@
+[gd_scene format=3 uid="uid://bed421fg56sjp"]
+
+[ext_resource type="Script" uid="uid://bmkpu1bykwvjt" path="res://game/run/cargo/cargo_scene.gd" id="1_cargov2"]
+
+[node name="CargoSceneV2" type="Control" unique_id=1664710573]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_cargov2")
+
+[node name="Bg" type="ColorRect" parent="." unique_id=1391372000]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.1, 0.1, 0.12, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="." unique_id=1689435404]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="RootVBox" unique_id=1461676406]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Cargo Loading"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StatsBar" type="HBoxContainer" parent="RootVBox" unique_id=1500582744]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme_override_constants/separation = 48
+alignment = 1
+
+[node name="SlotsLabel" type="Label" parent="RootVBox/StatsBar" unique_id=187646297]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Slots: 0 / 0"
+
+[node name="WeightLabel" type="Label" parent="RootVBox/StatsBar" unique_id=803095996]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Weight: 0.0 / 0.0 kg"
+
+[node name="ErrorLabel" type="Label" parent="RootVBox" unique_id=500000003]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.3, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+text = " - "
+horizontal_alignment = 1
+
+[node name="CargoSection" type="VBoxContainer" parent="RootVBox" unique_id=1058774043]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 6
+
+[node name="CargoSectionLabel" type="Label" parent="RootVBox/CargoSection" unique_id=1832749165]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 12
+text = "Car cargo"
+horizontal_alignment = 1
+
+[node name="CargoGrid" type="GridContainer" parent="RootVBox/CargoSection" unique_id=178417464]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 3
+theme_override_constants/v_separation = 3
+
+[node name="ExtraSlotSection" type="VBoxContainer" parent="RootVBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 6
+
+[node name="ExtraSlotSectionLabel" type="Label" parent="RootVBox/ExtraSlotSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 12
+text = "Trailer"
+horizontal_alignment = 1
+
+[node name="ExtraSlotContainer" type="HBoxContainer" parent="RootVBox/ExtraSlotSection"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 3
+
+[node name="TempSection" type="VBoxContainer" parent="RootVBox" unique_id=1738765546]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="TempSectionLabel" type="Label" parent="RootVBox/TempSection" unique_id=934800839]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 12
+text = "Items — click to pick up, click a cargo cell to place"
+horizontal_alignment = 1
+
+[node name="TempGrid" type="GridContainer" parent="RootVBox/TempSection" unique_id=1095432084]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+theme_override_constants/h_separation = 3
+theme_override_constants/v_separation = 3
+
+[node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=1118572476]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ResetButton" type="Button" parent="RootVBox/Footer" unique_id=1359420237]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Reset"
+
+[node name="FooterSpacer" type="Control" parent="RootVBox/Footer" unique_id=1734322296]
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+
+[node name="ContinueButton" type="Button" parent="RootVBox/Footer" unique_id=362281920]
+custom_minimum_size = Vector2(160, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Continue"
+
+[node name="ConfirmPopup" type="ConfirmationDialog" parent="." unique_id=500000002]
+title = "Continue?"
+ok_button_text = "Confirm"

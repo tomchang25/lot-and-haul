@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://brx8agwvlpi3f"]
+
+[ext_resource type="Script" uid="uid://bq288jpve02e7" path="res://game/shared/item_display/item_row.gd" id="1_itemrow"]
+
+[node name="ItemRow" type="PanelContainer" unique_id=901414141]
+custom_minimum_size = Vector2(0, 48)
+offset_right = 401.0
+offset_bottom = 48.0
+script = ExtResource("1_itemrow")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1729974819]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="NameLabel" type="Label" parent="HBoxContainer" unique_id=1000000002]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+vertical_alignment = 1
+
+[node name="ConditionLabel" type="Label" parent="HBoxContainer" unique_id=1000000004]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PriceLabel" type="Label" parent="HBoxContainer" unique_id=1000000005]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PotentialLabel" type="Label" parent="HBoxContainer" unique_id=1000000008]
+visible = false
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WeightLabel" type="Label" parent="HBoxContainer" unique_id=1000000006]
+visible = false
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GridLabel" type="Label" parent="HBoxContainer" unique_id=1000000007]
+visible = false
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+vertical_alignment = 1

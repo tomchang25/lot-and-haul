@@ -1,0 +1,77 @@
+[gd_scene format=3 uid="uid://3kvnpn7pek5i"]
+
+[ext_resource type="Script" uid="uid://co3dfe6cemp2b" path="res://game/shared/item_display/item_row_tooltip.gd" id="1_tooltip"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x6k72"]
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+bg_color = Color(0.1, 0.1, 0.1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="ItemRowTooltip" type="PanelContainer" unique_id=1000000001]
+visible = false
+z_index = 10
+custom_minimum_size = Vector2(160, 0)
+offset_right = 160.0
+offset_bottom = 62.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_x6k72")
+script = ExtResource("1_tooltip")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=1000000002]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="DisplayNameLabel" type="Label" parent="VBox" unique_id=1156801002]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 12
+
+[node name="DisplayNameSeparator" type="HSeparator" parent="VBox" unique_id=642666974]
+layout_mode = 2
+
+[node name="SuperCategoryLabel" type="Label" parent="VBox" unique_id=1000000010]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 12
+
+[node name="CategoryLabel" type="Label" parent="VBox" unique_id=1000000011]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+
+[node name="CategorySeparator" type="HSeparator" parent="VBox" unique_id=1294752904]
+layout_mode = 2
+
+[node name="PotentialLabel" type="Label" parent="VBox" unique_id=1000000003]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+
+[node name="ConditionLabel" type="Label" parent="VBox" unique_id=1000000005]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+
+[node name="PriceLabel" type="Label" parent="VBox" unique_id=1000000013]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+
+[node name="PotentialPriceLabel" type="Label" parent="VBox" unique_id=1000000004]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+
+[node name="CargoSeparator" type="HSeparator" parent="VBox" unique_id=1000000012]
+layout_mode = 2
+
+[node name="WeightLabel" type="Label" parent="VBox" unique_id=1000000006]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_font_sizes/font_size = 13
+
+[node name="GridLabel" type="Label" parent="VBox" unique_id=1000000007]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_font_sizes/font_size = 13

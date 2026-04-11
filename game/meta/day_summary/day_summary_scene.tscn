@@ -1,0 +1,142 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://herl5nijad6n" path="res://game/meta/day_summary/day_summary_scene.gd" id="1_script"]
+
+[node name="DaySummaryScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.1, 0.1, 0.12, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Day Summary"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PanelCenter" type="CenterContainer" parent="RootVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="OuterPanel" type="PanelContainer" parent="RootVBox/PanelCenter"]
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="RootVBox/PanelCenter/OuterPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="ContentVBox" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DayHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
+layout_mode = 2
+
+[node name="IncomeGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="IncomeHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/IncomeGroup"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Income"
+
+[node name="OnsiteLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/IncomeGroup"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="ExpensesGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ExpensesHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/ExpensesGroup"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Expenses"
+
+[node name="LivingLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/ExpensesGroup"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="EntryFeeLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/ExpensesGroup"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="FuelLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/ExpensesGroup"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="PaidLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/ExpensesGroup"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="ActionsGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ActionsHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/ActionsGroup"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Completed Actions"
+
+[node name="ActionsList" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/ActionsGroup"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="NetSeparator" type="HSeparator" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
+layout_mode = 2
+
+[node name="NetLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="BalanceLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="Footer" type="HBoxContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+alignment = 1
+
+[node name="ContinueButton" type="Button" parent="RootVBox/Footer"]
+custom_minimum_size = Vector2(160, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Continue"
