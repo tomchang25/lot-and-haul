@@ -355,6 +355,7 @@ func _populate_rows() -> void:
     for entry: ItemEntry in _items:
         var row: ItemRow = ItemRowScene.instantiate()
         row.setup(entry, _ctx)
+        row.row_pressed.connect(_on_row_pressed)
         _row_container.add_child(row)
 ```
 
@@ -410,6 +411,146 @@ func _ready() -> void:
 
 This applies to all signal connections — buttons, custom signals from child nodes, and
 connections to autoloads.
+
+---
+
+## Instantiating packed scenes
+
+When instantiating a reusable component scene (row, card, etc.) into a container,
+follow this fixed order:
+
+```gdscript
+for entry: ItemEntry in _items:
+    var row: ItemRow = ItemRowScene.instantiate()   # 1. instantiate
+    row.setup(entry, _ctx)                          # 2. apply data
+    row.row_pressed.connect(_on_row_pressed)        # 3. connect signals
+    _row_container.add_child(row)                   # 4. add to tree
+```
+
+Why this order:
+
+- **`setup()` before `add_child()`** — `add_child()` triggers the child's `_ready()`.
+  Applying data first means `_ready()` runs with the node already populated, removing
+  the need for an `is_node_ready()` guard inside `setup()` and a matching refresh inside
+  `_ready()`.
+- **`connect()` before `add_child()`** — ensures every listener is attached before any
+  signal the child might emit during `_ready()`.
+
+The component's `setup()` is its **apply function**: a single public entry point that
+takes all data the component needs and leaves the component ready to display. Components
+should not rely on setters, direct property assignment, or post-construction tweaking
+from the parent — everything flows through `setup()`.
+
+If the component must also support updates after being shown, expose a separate
+`refresh()` (no arguments, re-reads current state) rather than overloading `setup()`.
+
+---
+
+## Component `setup()` implementation
+
+A reusable component's `setup()` is its **apply function** — but it has a specific
+internal shape, because it may be called either before or after the component enters
+the scene tree.
+
+The pattern:
+
+```gdscript
+# ── State ─────────────────────────────────────────────────────────────────────
+
+var _lot_data: LotData = null
+var _index: int = 0
+var _total: int = 0
+
+# ── Node references ───────────────────────────────────────────────────────────
+
+@onready var _index_label: Label = $IndexLabel
+@onready var _item_count_label: Label = $ItemCountLabel
+# ...
+
+# ══ Lifecycle ═════════════════════════════════════════════════════════════════
+
+func _ready() -> void:
+    _enter_button.pressed.connect(func() -> void: enter_pressed.emit())
+    _pass_button.pressed.connect(func() -> void: pass_pressed.emit())
+
+    if _lot_data != null:
+        _apply()
+
+# ══ Common API ════════════════════════════════════════════════════════════════
+
+func setup(lot_data: LotData, index: int, total: int) -> void:
+    _lot_data = lot_data
+    _index = index
+    _total = total
+
+    if is_node_ready():
+        _apply()
+
+
+func refresh() -> void:
+    if is_node_ready():
+        _apply()
+
+# ══ View ══════════════════════════════════════════════════════════════════════
+
+func _apply() -> void:
+    _index_label.text = "Lot %d / %d" % [_index + 1, _total]
+    _item_count_label.text = "%d items" % _lot_data.items.size()
+    # ... writes every @onready node from private state
+```
+
+Rules:
+
+- `setup()` **only** stores arguments to private variables, then calls `_apply()` gated
+  by `is_node_ready()`. It must not touch any `@onready` node directly.
+- `_apply()` is private, takes no arguments, reads private state, and writes the
+  `@onready` nodes. It is the **only** function that touches view nodes.
+- `_ready()` connects signals first, then — if private state has already been populated
+  by an earlier `setup()` call — calls `_apply()`. The sentinel is whatever private
+  field is `null` / default before `setup()` is called (e.g. `_lot_data != null`).
+- `refresh()`, if the component exposes one, calls `_apply()` guarded by `is_node_ready()`.
+  It never re-assigns private state.
+
+Why this shape:
+
+- **Covers both call orders.** Calling `setup()` before `add_child()` stores the data
+  and defers the paint until `_ready()`. Calling `setup()` after `add_child()` (to
+  re-use a live component with new data) paints immediately.
+- **No nil crashes on `@onready`.** `setup()` never dereferences a node that may not
+  be resolved yet — `_apply()` is the only place that does, and it's always called
+  after `is_node_ready()` has returned true.
+- **One source of paint truth.** Every path that needs to update the view goes through
+  `_apply()`. There is no second code path in `_ready()` that reads private state and
+  writes nodes, so the two cannot drift.
+
+Do **not** write components that paint directly inside `setup()` without the guard —
+they work only when the parent happens to call `setup()` after `add_child()`, and break
+silently the moment someone flips the order.
+
+---
+
+## Component `.tscn` default content
+
+A component's `.tscn` defines the full node tree with neutral **placeholder** values
+in every user-visible field — not blank strings, not real data, not leftover editor
+text from whoever built the scene.
+
+Use values that clearly read as "not yet populated":
+
+```
+text = " - "
+text = "? / ?"
+text = "0"
+```
+
+Reason: between the moment the component enters the tree and the moment `_apply()`
+runs, its nodes are visible. With placeholders the intermediate frame reads as an
+unpopulated shell; with leftover real-looking data it reads as a bug (wrong name,
+wrong price, wrong count). Placeholders also make it obvious during development if a
+field is ever missed by `_apply()` — the `—` will still be there at runtime.
+
+This applies to `Label.text`, `TextureRect.texture` (leave null), `Button.text` on
+dynamic buttons, and any other field `_apply()` will overwrite.
 
 ---
 
