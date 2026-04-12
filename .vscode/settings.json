@@ -12,6 +12,7 @@
         "**/art/**": true,
         // "**/assets/**": true,
         "**/asset/**": true,
+        "**/dev/docs/lot-and-haul/**": true,
     },
     // "tree-generator.exclude": {
     //     "**/*.*": true,
