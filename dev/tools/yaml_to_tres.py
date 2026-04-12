@@ -325,9 +325,7 @@ def _build_car_tres(
     ]
 
     if has_icon:
-        lines.append(
-            f'[ext_resource type="Texture2D" path="{icon_path}" id="2_icon"]'
-        )
+        lines.append(f'[ext_resource type="Texture2D" path="{icon_path}" id="2_icon"]')
 
     lines += [
         "",
