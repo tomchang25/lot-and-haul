@@ -21,6 +21,12 @@ extends Resource
 ## 0 = no trailer. Each slot accepts any item regardless of shape or weight.
 @export var extra_slot_count: int = 0
 
+## Cost to buy this car in the Car Shop. Starter cars use 0.
+@export var price: int = 0
+
+## Icon shown in the Car Select / Car Shop UI. May be null for cars with no art.
+@export var icon: Texture2D
+
 
 func total_slots() -> int:
     return grid_columns * grid_rows

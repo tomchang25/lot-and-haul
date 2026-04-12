@@ -78,3 +78,15 @@ func go_to_mastery_panel() -> void:
 
 func go_to_perk_panel() -> void:
     get_tree().change_scene_to_packed(scenes.perk_panel)
+
+
+func go_to_vehicle_hub() -> void:
+    get_tree().change_scene_to_packed(scenes.vehicle_hub)
+
+
+func go_to_car_select() -> void:
+    get_tree().change_scene_to_packed(scenes.car_select)
+
+
+func go_to_car_shop() -> void:
+    get_tree().change_scene_to_packed(scenes.car_shop)

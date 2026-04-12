@@ -18,6 +18,9 @@
 [ext_resource type="PackedScene" path="res://game/meta/knowledge/knowledge_hub.tscn" id="13_khub"]
 [ext_resource type="PackedScene" path="res://game/meta/knowledge/mastery_panel/mastery_panel.tscn" id="14_mastery"]
 [ext_resource type="PackedScene" path="res://game/meta/knowledge/perk_panel/perk_panel.tscn" id="15_perk"]
+[ext_resource type="PackedScene" path="res://game/meta/vehicle/vehicle_hub.tscn" id="16_vehhub"]
+[ext_resource type="PackedScene" path="res://game/meta/vehicle/car_select/car_select_scene.tscn" id="17_csel"]
+[ext_resource type="PackedScene" path="res://game/meta/vehicle/car_shop/car_shop_scene.tscn" id="18_cshop"]
 
 [sub_resource type="Resource" id="Resource_yimu3"]
 script = ExtResource("5_ea43q")
@@ -37,6 +40,9 @@ skill_panel = ExtResource("12_skill")
 knowledge_hub = ExtResource("13_khub")
 mastery_panel = ExtResource("14_mastery")
 perk_panel = ExtResource("15_perk")
+vehicle_hub = ExtResource("16_vehhub")
+car_select = ExtResource("17_csel")
+car_shop = ExtResource("18_cshop")
 metadata/_custom_type_script = "uid://bvxr6q4cplcj8"
 
 [node name="GameManager" type="Node2D" unique_id=1537594909]

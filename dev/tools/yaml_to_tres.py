@@ -309,13 +309,25 @@ def _build_car_tres(
     stamina_cap: int,
     fuel_cost_per_day: int,
     extra_slot_count: int,
+    price: int,
+    icon_path: str,
     car_data_script_uid: str,
 ) -> str:
+    has_icon = bool(icon_path)
+    load_steps = 3 if has_icon else 2
+
     lines = [
-        f'[gd_resource type="Resource" script_class="CarData" format=3 uid="{car_uid}"]',
+        f'[gd_resource type="Resource" script_class="CarData" '
+        f'load_steps={load_steps} format=3 uid="{car_uid}"]',
         "",
         f'[ext_resource type="Script" uid="{car_data_script_uid}" '
         f'path="res://data/definitions/car_data.gd" id="1_cardef"]',
+    ]
+
+    if has_icon:
+        lines.append(f'[ext_resource type="Texture2D" path="{icon_path}" id="2_icon"]')
+
+    lines += [
         "",
         "[resource]",
         'script = ExtResource("1_cardef")',
@@ -327,8 +339,13 @@ def _build_car_tres(
         f"stamina_cap = {int(stamina_cap)}",
         f"fuel_cost_per_day = {int(fuel_cost_per_day)}",
         f"extra_slot_count = {int(extra_slot_count)}",
-        "",
+        f"price = {int(price)}",
     ]
+
+    if has_icon:
+        lines.append('icon = ExtResource("2_icon")')
+
+    lines.append("")
     return "\n".join(lines)
 
 
@@ -741,6 +758,8 @@ def export_cars(
             int(car["stamina_cap"]),
             int(car.get("fuel_cost_per_day", 0)),
             int(car.get("extra_slot_count", 0)),
+            int(car.get("price", 0)),
+            str(car.get("icon", "")),
             car_data_script_uid,
         )
         _write(out, content, dry_run, "car")

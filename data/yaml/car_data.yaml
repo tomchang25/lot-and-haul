@@ -24,6 +24,8 @@ cars:
     stamina_cap: 6
     fuel_cost_per_day: 20
     extra_slot_count: 0
+    price: 0
+    icon: res://assets/cars/car_placeholder.png
 
   # ── Tier 2 — bigger grid, modest bumps ──────────────────────
   - car_id: box_truck
@@ -34,6 +36,8 @@ cars:
     stamina_cap: 8
     fuel_cost_per_day: 35
     extra_slot_count: 1
+    price: 3000
+    icon: res://assets/cars/car_placeholder.png
 
   # ── Tier 3 — notable weight and stamina bumps ───────────────
   - car_id: cargo_hauler
@@ -44,6 +48,8 @@ cars:
     stamina_cap: 10
     fuel_cost_per_day: 55
     extra_slot_count: 1
+    price: 8000
+    icon: res://assets/cars/car_placeholder.png
 
   # ── Tier 4 — biggest grid, highest stamina, high fuel ───────
   - car_id: semi_rig
@@ -54,3 +60,5 @@ cars:
     stamina_cap: 13
     fuel_cost_per_day: 90
     extra_slot_count: 2
+    price: 20000
+    icon: res://assets/cars/car_placeholder.png
