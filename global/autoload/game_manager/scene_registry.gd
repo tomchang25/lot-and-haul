@@ -17,3 +17,6 @@ extends Resource
 @export var knowledge_hub: PackedScene
 @export var mastery_panel: PackedScene
 @export var perk_panel: PackedScene
+@export var vehicle_hub: PackedScene
+@export var car_select: PackedScene
+@export var car_shop: PackedScene

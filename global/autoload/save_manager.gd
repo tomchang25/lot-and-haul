@@ -7,11 +7,28 @@ var category_points: Dictionary = { }
 var cash: int = 0
 var active_car_id: String = "van_basic"
 
+# Ids of every car the player owns. The starter "van_basic" is appended on
+# first load (and as a migration for saves that predate this field) via the
+# logic at the end of `load()`. Follows the same id-string pattern as
+# active_car_id; resolve to CarData through `owned_cars` below.
+var owned_car_ids: Array[String] = []
+
 # The CarData resource for the currently active car. Resolved lazily via
 # CarRegistry so the save file only has to persist the id.
 var active_car: CarData:
     get:
         return CarRegistry.get_car(active_car_id)
+
+# Mirrors `active_car`: resolve each owned id via CarRegistry, skipping any
+# that fail to resolve (e.g. if a car was removed from the data pipeline).
+var owned_cars: Array[CarData]:
+    get:
+        var result: Array[CarData] = []
+        for id: String in owned_car_ids:
+            var car: CarData = CarRegistry.get_car(id)
+            if car != null:
+                result.append(car)
+        return result
 
 # Array of Dictionary on disk; deserialized to Array[ItemEntry] on load.
 var storage_items: Array = []
@@ -33,6 +50,7 @@ func save() -> void:
         "category_points": category_points,
         "cash": cash,
         "active_car_id": active_car_id,
+        "owned_car_ids": owned_car_ids,
         "storage_items": serialized_items,
         "current_day": current_day,
         "max_concurrent_actions": max_concurrent_actions,
@@ -49,6 +67,11 @@ func save() -> void:
 
 
 func load() -> void:
+    _read_save_file()
+    _migrate_owned_cars()
+
+
+func _read_save_file() -> void:
     if not FileAccess.file_exists(SAVE_PATH):
         return
     var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
@@ -66,6 +89,11 @@ func load() -> void:
         cash = int(parsed["cash"])
     if parsed.has("active_car_id") and parsed["active_car_id"] is String:
         active_car_id = parsed["active_car_id"]
+    if parsed.has("owned_car_ids") and parsed["owned_car_ids"] is Array:
+        owned_car_ids = []
+        for id: Variant in parsed["owned_car_ids"]:
+            if id is String:
+                owned_car_ids.append(id)
     if parsed.has("storage_items") and parsed["storage_items"] is Array:
         storage_items = []
         for d: Variant in parsed["storage_items"]:
@@ -97,6 +125,32 @@ func load() -> void:
                 skill_levels[key] = int(parsed["skill_levels"][key])
     else:
         skill_levels = { }
+
+
+# Idempotent migration: guarantees a fresh save gets the starter van, and
+# repairs saves whose `active_car_id` no longer resolves against CarRegistry
+# (e.g. the car was removed from the data pipeline). Safe to re-run.
+func _migrate_owned_cars() -> void:
+    if owned_car_ids.is_empty():
+        owned_car_ids.append("van_basic")
+    if active_car_id.is_empty() or CarRegistry.get_car(active_car_id) == null:
+        active_car_id = owned_car_ids[0]
+
+
+# Attempts to purchase `car` using `SaveManager.cash`.
+# Returns false if the player cannot afford it or already owns it.
+# On success, debits the price, appends the id, persists, and returns true.
+func buy_car(car: CarData) -> bool:
+    if car == null:
+        return false
+    if owned_car_ids.has(car.car_id):
+        return false
+    if cash < car.price:
+        return false
+    cash -= car.price
+    owned_car_ids.append(car.car_id)
+    save()
+    return true
 
 
 # Assigns a unique id to entry, appends it to storage_items, and saves.

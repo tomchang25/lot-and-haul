@@ -89,12 +89,12 @@ size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
 text = "Pawn Shop"
 
-[node name="VanButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000012]
+[node name="VehicleButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000012]
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
-text = "Van"
+text = "Vehicle"
 
 [node name="KnowledgeButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000013]
 custom_minimum_size = Vector2(240, 52)
@@ -109,10 +109,6 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
 text = "Day Pass"
-
-[node name="VanPopup" type="AcceptDialog" parent="." unique_id=866730729]
-oversampling_override = 1.0
-title = "Van Info"
 
 [node name="DayPassConfirm" type="ConfirmationDialog" parent="." unique_id=1205180003]
 oversampling_override = 1.0

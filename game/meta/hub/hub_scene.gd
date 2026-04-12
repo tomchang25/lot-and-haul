@@ -8,11 +8,10 @@ extends Control
 @onready var _mastery_rank_label: Label = $RootVBox/MasteryRankLabel
 @onready var _balance_label: Label = $RootVBox/InfoContainer/BalanceLabel
 @onready var _storage_count_label: Label = $RootVBox/InfoContainer/StorageCountLabel
-@onready var _van_popup: AcceptDialog = $VanPopup
 @onready var _next_run_btn: Button = $RootVBox/ButtonsVBox/NextRunButton
 @onready var _storage_btn: Button = $RootVBox/ButtonsVBox/StorageButton
 @onready var _pawn_shop_btn: Button = $RootVBox/ButtonsVBox/PawnShopButton
-@onready var _van_btn: Button = $RootVBox/ButtonsVBox/VanButton
+@onready var _vehicle_btn: Button = $RootVBox/ButtonsVBox/VehicleButton
 @onready var _knowledge_btn: Button = $RootVBox/ButtonsVBox/KnowledgeButton
 @onready var _day_pass_btn: Button = $RootVBox/ButtonsVBox/DayPassButton
 @onready var _day_pass_confirm: ConfirmationDialog = $DayPassConfirm
@@ -24,7 +23,7 @@ func _ready() -> void:
     _next_run_btn.pressed.connect(_on_next_run_pressed)
     _storage_btn.pressed.connect(_on_storage_pressed)
     _pawn_shop_btn.pressed.connect(_on_pawn_shop_pressed)
-    _van_btn.pressed.connect(_on_van_pressed)
+    _vehicle_btn.pressed.connect(_on_vehicle_pressed)
     _knowledge_btn.pressed.connect(_on_knowledge_pressed)
     _day_pass_btn.pressed.connect(_on_day_pass_pressed)
 
@@ -49,8 +48,8 @@ func _on_pawn_shop_pressed() -> void:
     GameManager.go_to_pawn_shop()
 
 
-func _on_van_pressed() -> void:
-    _van_popup.popup_centered()
+func _on_vehicle_pressed() -> void:
+    GameManager.go_to_vehicle_hub()
 
 
 func _on_knowledge_pressed() -> void:
