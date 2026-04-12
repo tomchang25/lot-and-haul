@@ -3,8 +3,12 @@
 # one with cash. Shop inventory is simply `CarRegistry.get_all_cars()` filtered
 # against `SaveManager.owned_car_ids`.
 # Reads:  SaveManager.cash, SaveManager.owned_car_ids, CarRegistry
-# Writes: SaveManager.cash, SaveManager.owned_car_ids (via SaveManager.buy_car)
+# Writes: SaveManager.cash, SaveManager.owned_car_ids
 extends Control
+
+# ── Constants ──────────────────────────────────────────────────────────────────
+
+const CarCardScene := preload("res://game/meta/vehicle/car_shop/car_card/car_card.tscn")
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -56,67 +60,7 @@ func _populate_rows() -> void:
         return
 
     for car: CarData in inventory:
-        _rows_container.add_child(_build_row(car))
-
-
-func _build_row(car: CarData) -> Control:
-    var panel := PanelContainer.new()
-    panel.custom_minimum_size = Vector2(0, 104)
-
-    var hbox := HBoxContainer.new()
-    hbox.add_theme_constant_override("separation", 16)
-    panel.add_child(hbox)
-
-    # ── Icon ──────────────────────────────────────────────────────────────
-    var icon_rect := TextureRect.new()
-    icon_rect.custom_minimum_size = Vector2(80, 80)
-    icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-    icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-    icon_rect.texture = car.icon
-    hbox.add_child(icon_rect)
-
-    # ── Stats block ───────────────────────────────────────────────────────
-    var stats := VBoxContainer.new()
-    stats.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    stats.add_theme_constant_override("separation", 4)
-    hbox.add_child(stats)
-
-    var name_label := Label.new()
-    name_label.add_theme_font_size_override("font_size", 20)
-    name_label.text = car.display_name
-    stats.add_child(name_label)
-
-    var stats_label := Label.new()
-    stats_label.add_theme_font_size_override("font_size", 14)
-    stats_label.text = _format_stats(car)
-    stats.add_child(stats_label)
-
-    var price_label := Label.new()
-    price_label.add_theme_font_size_override("font_size", 16)
-    price_label.text = "Price:   $%d" % car.price
-    stats.add_child(price_label)
-
-    # ── Buy button ────────────────────────────────────────────────────────
-    var buy_btn := Button.new()
-    buy_btn.custom_minimum_size = Vector2(120, 44)
-    buy_btn.text = "Buy"
-    buy_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-    buy_btn.disabled = SaveManager.cash < car.price
-    buy_btn.pressed.connect(_on_buy_pressed.bind(car))
-    hbox.add_child(buy_btn)
-
-    return panel
-
-
-func _format_stats(car: CarData) -> String:
-    return (
-        "Grid: %d×%d    Weight: %d    Stamina: %d    Fuel/day: %d    Extra slots: %d"
-        % [
-            car.grid_columns,
-            car.grid_rows,
-            int(car.max_weight),
-            car.stamina_cap,
-            car.fuel_cost_per_day,
-            car.extra_slot_count,
-        ]
-    )
+        var card: CarCard = CarCardScene.instantiate()
+        card.setup(car, SaveManager.cash >= car.price)
+        card.buy_pressed.connect(_on_buy_pressed)
+        _rows_container.add_child(card)

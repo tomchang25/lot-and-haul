@@ -1,0 +1,43 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/meta/vehicle/car_shop/car_card/car_card.gd" id="1_script"]
+
+[node name="CarCard" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 104)
+script = ExtResource("1_script")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="IconRect" type="TextureRect" parent="HBoxContainer"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Stats" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NameLabel" type="Label" parent="HBoxContainer/Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = " - "
+
+[node name="StatsLabel" type="Label" parent="HBoxContainer/Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = " - "
+
+[node name="PriceLabel" type="Label" parent="HBoxContainer/Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Price: $-"
+
+[node name="BuyButton" type="Button" parent="HBoxContainer"]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+size_flags_vertical = 4
+text = "Buy"
