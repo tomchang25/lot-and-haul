@@ -63,59 +63,63 @@ horizontal_alignment = 1
 [node name="HSeparator" type="HSeparator" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
 layout_mode = 2
 
-[node name="IncomeGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
+[node name="TripGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="IncomeHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/IncomeGroup"]
+[node name="TripHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-text = "Income"
+text = "Trip"
 
-[node name="OnsiteLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/IncomeGroup"]
+[node name="OnsiteLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="ExpensesGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
+[node name="EntryFeeLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="FuelLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="PaidLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="DailyGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="ExpensesHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/ExpensesGroup"]
+[node name="DailyHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-text = "Expenses"
+text = "Daily"
 
-[node name="LivingLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/ExpensesGroup"]
+[node name="LivingLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="EntryFeeLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/ExpensesGroup"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-
-[node name="FuelLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/ExpensesGroup"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-
-[node name="PaidLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/ExpensesGroup"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-
-[node name="ActionsGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
+[node name="ActionsGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup"]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="ActionsHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/ActionsGroup"]
+[node name="ActionsHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/ActionsGroup"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "Completed Actions"
 
-[node name="ActionsList" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/ActionsGroup"]
+[node name="ActionsList" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/ActionsGroup"]
 layout_mode = 2
 theme_override_constants/separation = 4
+
+[node name="CargoCountLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
 
 [node name="NetSeparator" type="HSeparator" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
 layout_mode = 2

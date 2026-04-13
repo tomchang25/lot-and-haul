@@ -25,6 +25,11 @@ var _tooltip: ItemRowTooltip = null
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _item_list_panel: ItemListPanel = $RootVBox/ListCenter/OuterVBox/ItemListPanel
+@onready var _cost_cash_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/CostCashLabel
+@onready var _finance_onsite_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/OnsiteLabel
+@onready var _overall_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/OverallLabel
+@onready var _estimate_price_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/EstimatePriceLabel
+@onready var _estimate_profit_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/EstimateProfitLabel
 @onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
@@ -43,6 +48,7 @@ func _ready() -> void:
     _cargo_items = RunManager.run_record.cargo_items
 
     _populate_rows()
+    _populate_finance()
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
@@ -78,6 +84,7 @@ func _resolve_run_and_navigate() -> void:
     summary.paid_price = r.paid_price
     summary.entry_fee = r.entry_fee
     summary.fuel_cost = r.fuel_cost
+    summary.cargo_count = r.cargo_items.size()
 
     # 5. Clear run state
     RunManager.clear_run_state()
@@ -91,3 +98,33 @@ func _resolve_run_and_navigate() -> void:
 func _populate_rows() -> void:
     _item_list_panel.setup(_ctx, REVIEW_COLUMNS)
     _item_list_panel.populate(_cargo_items)
+
+
+func _populate_finance() -> void:
+    var r := RunManager.run_record
+    var cost_cash := r.paid_price + r.entry_fee + r.fuel_cost
+    var onsite := r.onsite_proceeds
+    var overall := onsite - cost_cash
+
+    _cost_cash_label.text = "Cost Cash:   -$%d" % cost_cash
+    _finance_onsite_label.text = "Sold On-site:   +$%d" % onsite
+
+    if overall >= 0:
+        _overall_label.text = "Cash Flow:   +$%d" % overall
+        _overall_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
+    else:
+        _overall_label.text = "Cash Flow:   -$%d" % (-overall)
+        _overall_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
+
+    var estimate_price: int = 0
+    for entry: ItemEntry in _cargo_items:
+        estimate_price += entry.sell_price
+    _estimate_price_label.text = "Est. Cargo Value:   $%d" % estimate_price
+
+    var estimate_profit := overall + estimate_price
+    if estimate_profit >= 0:
+        _estimate_profit_label.text = "Est. Profit:   +$%d" % estimate_profit
+        _estimate_profit_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
+    else:
+        _estimate_profit_label.text = "Est. Profit:   -$%d" % (-estimate_profit)
+        _estimate_profit_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))

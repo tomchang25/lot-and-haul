@@ -14,6 +14,7 @@ var entry_fee: int = 0
 var fuel_cost: int = 0
 
 # Universal
+var cargo_count: int = 0
 var living_cost: int = 0
 var completed_actions: Array[Dictionary] = []
 

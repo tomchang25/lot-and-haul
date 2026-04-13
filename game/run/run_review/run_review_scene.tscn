@@ -48,6 +48,48 @@ theme_override_constants/separation = 16
 [node name="ItemListPanel" parent="RootVBox/ListCenter/OuterVBox" instance=ExtResource("2_ilp")]
 layout_mode = 2
 
+[node name="FinanceCenter" type="CenterContainer" parent="RootVBox"]
+layout_mode = 2
+
+[node name="FinancePanel" type="PanelContainer" parent="RootVBox/FinanceCenter"]
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+
+[node name="FinanceMargin" type="MarginContainer" parent="RootVBox/FinanceCenter/FinancePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="FinanceVBox" type="VBoxContainer" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="CostCashLabel" type="Label" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="OnsiteLabel" type="Label" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="OverallLabel" type="Label" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="FinanceSeparator" type="HSeparator" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox"]
+layout_mode = 2
+
+[node name="EstimatePriceLabel" type="Label" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="EstimateProfitLabel" type="Label" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
 [node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=84919131]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2

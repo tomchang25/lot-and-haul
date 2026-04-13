@@ -39,7 +39,12 @@ text = "Choose a Location"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CardsContainer" type="HBoxContainer" parent="RootVBox" unique_id=4000000005]
+[node name="CardsScroll" type="ScrollContainer" parent="RootVBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+vertical_scroll_mode = 0
+
+[node name="CardsContainer" type="HBoxContainer" parent="RootVBox/CardsScroll" unique_id=4000000005]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/separation = 16
