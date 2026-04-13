@@ -5,6 +5,9 @@
 class_name LotData
 extends Resource
 
+# Stable identifier for this lot. Must match the .tres filename stem.
+@export var lot_id: String = ""
+
 # ── NPC aggression ────────────────────────────────────────────────────────────
 
 # Range from which aggressive_factor is rolled at run start.

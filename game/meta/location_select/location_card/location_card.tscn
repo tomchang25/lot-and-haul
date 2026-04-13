@@ -46,6 +46,12 @@ theme_override_font_sizes/font_size = 14
 text = "Lots:   0"
 horizontal_alignment = 1
 
+[node name="TotalCostLabel" type="Label" parent="VBox/StatsGrid" unique_id=3000000010]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Est. Cost:   $0"
+horizontal_alignment = 1
+
 [node name="SelectButton" type="Button" parent="VBox" unique_id=3000000009]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2

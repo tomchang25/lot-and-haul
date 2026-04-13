@@ -309,7 +309,9 @@ def _validate_merchants(merchants: list, known_super_cat_ids: set[str]) -> list[
             )
 
         accept_chance = merchant.get("accept_base_chance", 0.8)
-        if not isinstance(accept_chance, (int, float)) or not (0.0 <= accept_chance <= 1.0):
+        if not isinstance(accept_chance, (int, float)) or not (
+            0.0 <= accept_chance <= 1.0
+        ):
             errors.append(
                 f"merchant '{mid}': accept_base_chance must be between 0.0 and 1.0,"
                 f" got {accept_chance!r}"
@@ -360,12 +362,9 @@ def validate(data: dict) -> list[str]:
 
     # Build known super_category_ids from the raw super_categories list
     known_super_cat_ids: set[str] = {
-        str(s).lower().replace(" ", "_")
-        for s in data.get("super_categories", [])
+        str(s).lower().replace(" ", "_") for s in data.get("super_categories", [])
     }
-    errors.extend(
-        _validate_merchants(data.get("merchants", []), known_super_cat_ids)
-    )
+    errors.extend(_validate_merchants(data.get("merchants", []), known_super_cat_ids))
 
     return errors
 
