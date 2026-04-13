@@ -188,6 +188,8 @@ func advance_days(days: int) -> DaySummary:
     summary.completed_actions = _tick_actions(days)
     summary.end_day = current_day
 
+    MerchantRegistry.roll_special_orders()
+
     save()
     return summary
 

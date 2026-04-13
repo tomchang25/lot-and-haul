@@ -277,126 +277,54 @@ def _validate_cars(cars: list) -> list[str]:
     return errors
 
 
-def _validate_lots(lots: list) -> tuple[list[str], set[str]]:
-    """Validate lot entries. Returns (errors, known_lot_ids)."""
+def _validate_merchants(merchants: list, known_super_cat_ids: set[str]) -> list[str]:
+    """Validate merchant entries."""
     errors: list[str] = []
-    seen_lot_ids: set[str] = set()
+    seen_ids: set[str] = set()
 
-    _RANGE_PAIRS: list[tuple[str, str]] = [
-        ("aggressive_factor_min", "aggressive_factor_max"),
-        ("aggressive_lerp_min", "aggressive_lerp_max"),
-        ("item_count_min", "item_count_max"),
-        ("price_floor_factor", "price_ceiling_factor"),
-        ("price_variance_min", "price_variance_max"),
-    ]
-
-    for lot in lots:
-        lid = lot.get("lot_id", "")
-        if not lid:
-            errors.append("Lot missing lot_id")
+    for merchant in merchants:
+        mid = merchant.get("merchant_id", "")
+        if not mid:
+            errors.append("Merchant missing merchant_id")
             continue
-        if lid in seen_lot_ids:
-            errors.append(f"Duplicate lot_id: '{lid}'")
-        seen_lot_ids.add(lid)
+        if mid in seen_ids:
+            errors.append(f"Duplicate merchant_id: '{mid}'")
+        seen_ids.add(mid)
 
-        for lo_key, hi_key in _RANGE_PAIRS:
-            lo = lot.get(lo_key)
-            hi = lot.get(hi_key)
-            if (
-                lo is not None
-                and hi is not None
-                and isinstance(lo, (int, float))
-                and isinstance(hi, (int, float))
-                and lo > hi
-            ):
-                errors.append(
-                    f"lot '{lid}': {lo_key} ({lo}) must be <= {hi_key} ({hi})"
-                )
+        if not merchant.get("display_name"):
+            errors.append(f"merchant '{mid}': missing display_name")
 
-        item_count_min = lot.get("item_count_min", 3)
-        if not isinstance(item_count_min, int) or item_count_min < 1:
+        price_mult = merchant.get("price_multiplier", 1.0)
+        if not isinstance(price_mult, (int, float)) or price_mult <= 0:
             errors.append(
-                f"lot '{lid}': item_count_min must be a positive integer,"
-                f" got {item_count_min!r}"
+                f"merchant '{mid}': price_multiplier must be positive,"
+                f" got {price_mult!r}"
             )
 
-        action_quota = lot.get("action_quota", 6)
-        if not isinstance(action_quota, int) or action_quota < 1:
+        off_cat_mult = merchant.get("off_category_multiplier", 0.5)
+        if not isinstance(off_cat_mult, (int, float)) or off_cat_mult < 0:
             errors.append(
-                f"lot '{lid}': action_quota must be a positive integer,"
-                f" got {action_quota!r}"
+                f"merchant '{mid}': off_category_multiplier must be non-negative,"
+                f" got {off_cat_mult!r}"
             )
 
-        rarity_weights = lot.get("rarity_weights", {})
-        if rarity_weights is not None and not isinstance(rarity_weights, dict):
+        accept_chance = merchant.get("accept_base_chance", 0.8)
+        if not isinstance(accept_chance, (int, float)) or not (
+            0.0 <= accept_chance <= 1.0
+        ):
             errors.append(
-                f"lot '{lid}': rarity_weights must be a dict,"
-                f" got {type(rarity_weights).__name__}"
+                f"merchant '{mid}': accept_base_chance must be between 0.0 and 1.0,"
+                f" got {accept_chance!r}"
             )
 
-        cat_w = lot.get("category_weights", {}) or {}
-        super_w = lot.get("super_category_weights", {}) or {}
-        if not cat_w and not super_w:
-            errors.append(
-                f"lot '{lid}': at least one of category_weights or"
-                f" super_category_weights must be non-empty"
-            )
-
-    return errors, set(seen_lot_ids)
-
-
-def _validate_locations(locations: list, known_lot_ids: set[str]) -> list[str]:
-    """Validate location entries."""
-    errors: list[str] = []
-    seen_location_ids: set[str] = set()
-
-    for loc in locations:
-        loc_id = loc.get("location_id", "")
-        if not loc_id:
-            errors.append("Location missing location_id")
-            continue
-        if loc_id in seen_location_ids:
-            errors.append(f"Duplicate location_id: '{loc_id}'")
-        seen_location_ids.add(loc_id)
-
-        if not loc.get("display_name"):
-            errors.append(f"location '{loc_id}': missing display_name")
-
-        entry_fee = loc.get("entry_fee", 0)
-        if not isinstance(entry_fee, int) or entry_fee < 0:
-            errors.append(
-                f"location '{loc_id}': entry_fee must be a non-negative"
-                f" integer, got {entry_fee!r}"
-            )
-
-        travel_days = loc.get("travel_days", 1)
-        if not isinstance(travel_days, int) or travel_days < 1:
-            errors.append(
-                f"location '{loc_id}': travel_days must be a positive"
-                f" integer, got {travel_days!r}"
-            )
-
-        lot_number = loc.get("lot_number", 3)
-        if not isinstance(lot_number, int) or lot_number < 1:
-            errors.append(
-                f"location '{loc_id}': lot_number must be a positive"
-                f" integer, got {lot_number!r}"
-            )
-
-        lot_pool = loc.get("lot_pool", []) or []
-        if not lot_pool:
-            errors.append(f"location '{loc_id}': lot_pool must be non-empty")
-        else:
-            if len(lot_pool) < lot_number:
-                errors.append(
-                    f"location '{loc_id}': lot_pool has {len(lot_pool)}"
-                    f" lot(s) but lot_number is {lot_number}"
-                )
-            for ref in lot_pool:
-                if ref not in known_lot_ids:
+        # Validate accepted_super_categories references
+        if known_super_cat_ids:
+            for sc in merchant.get("accepted_super_categories", []) or []:
+                sc_id = str(sc).lower().replace(" ", "_")
+                if sc_id not in known_super_cat_ids:
                     errors.append(
-                        f"location '{loc_id}': lot_pool references"
-                        f" unknown lot_id '{ref}'"
+                        f"merchant '{mid}': accepted_super_category '{sc}'"
+                        f" not defined in super_categories"
                     )
 
     return errors
@@ -432,10 +360,11 @@ def validate(data: dict) -> list[str]:
 
     errors.extend(_validate_cars(data.get("cars", [])))
 
-    lot_errors, known_lot_ids = _validate_lots(data.get("lots", []))
-    errors.extend(lot_errors)
-
-    errors.extend(_validate_locations(data.get("locations", []), known_lot_ids))
+    # Build known super_category_ids from the raw super_categories list
+    known_super_cat_ids: set[str] = {
+        str(s).lower().replace(" ", "_") for s in data.get("super_categories", [])
+    }
+    errors.extend(_validate_merchants(data.get("merchants", []), known_super_cat_ids))
 
     return errors
 
@@ -469,8 +398,7 @@ def main() -> None:
         "identity_layers": [],
         "items": [],
         "cars": [],
-        "lots": [],
-        "locations": [],
+        "merchants": [],
     }
 
     for yaml_path in yaml_files:

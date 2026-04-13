@@ -82,12 +82,12 @@ size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
 text = "Storage"
 
-[node name="PawnShopButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000011]
+[node name="MerchantButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000011]
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
-text = "Pawn Shop"
+text = "Merchants"
 
 [node name="VehicleButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000012]
 custom_minimum_size = Vector2(240, 52)

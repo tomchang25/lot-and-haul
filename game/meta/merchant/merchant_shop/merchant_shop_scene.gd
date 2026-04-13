@@ -1,6 +1,6 @@
-# pawn_shop_scene.gd
-# Pawn Shop — Sell selected storage items to the merchant.
-# Reads:  SaveManager.storage_items, SaveManager.cash
+# merchant_shop_scene.gd
+# Merchant Shop — Sell selected storage items to a specific merchant.
+# Reads:  SaveManager.storage_items, SaveManager.cash, GameManager (merchant hand-off)
 # Writes: SaveManager.storage_items, SaveManager.cash
 extends Control
 
@@ -9,7 +9,7 @@ extends Control
 const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 
-const PAWN_COLUMNS: Array = [
+const SHOP_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
     ItemRow.Column.PRICE,
@@ -21,16 +21,19 @@ const ASK_PRICE_MAX_FACTOR := 1.50
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
+var _merchant: MerchantData = null
 var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
 var _selected: Dictionary = { } # ItemEntry → bool
 var _ask_prices: Dictionary = { } # ItemEntry → int
+var _merchant_prices: Dictionary = { } # ItemEntry → int (base price with merchant mult)
 var _price_labels: Dictionary = { } # ItemEntry → Label
 var _price_rows: Dictionary = { } # ItemEntry → Control (the slider row)
 var _rows: Dictionary = { } # ItemEntry → ItemRow
 
 # ── Node references ───────────────────────────────────────────────────────────
 
+@onready var _title_label: Label = $RootVBox/TitleLabel
 @onready var _row_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer/RowContainer
 @onready var _sell_btn: Button = $RootVBox/Footer/SellButton
 @onready var _back_btn: Button = $RootVBox/Footer/BackButton
@@ -43,9 +46,12 @@ var _rows: Dictionary = { } # ItemEntry → ItemRow
 
 
 func _ready() -> void:
+    _merchant = GameManager.consume_pending_merchant()
     _ctx = ItemViewContext.for_run_review()
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
+
+    _title_label.text = _merchant.display_name if _merchant else "Merchant"
 
     _back_btn.pressed.connect(_on_back_pressed)
     _sell_btn.pressed.connect(_on_sell_pressed)
@@ -58,7 +64,7 @@ func _ready() -> void:
 
 
 func _on_back_pressed() -> void:
-    GameManager.go_to_hub()
+    GameManager.go_to_merchant_hub()
 
 
 func _on_row_pressed(entry: ItemEntry) -> void:
@@ -85,12 +91,17 @@ func _on_sell_confirmed() -> void:
     var sold: Array[ItemEntry] = []
     for entry: ItemEntry in SaveManager.storage_items:
         if _selected.get(entry, false):
-            total += _ask_prices.get(entry, entry.sell_price)
+            total += _ask_prices.get(entry, _merchant_prices.get(entry, entry.sell_price))
             sold.append(entry)
 
     SaveManager.cash += total
     for entry: ItemEntry in sold:
         SaveManager.storage_items.erase(entry)
+        KnowledgeManager.add_category_points(
+            entry.item_data.category_data.category_id,
+            entry.item_data.rarity,
+            KnowledgeManager.KnowledgeAction.SELL,
+        )
     SaveManager.save()
 
     _rebuild_after_sale()
@@ -99,16 +110,43 @@ func _on_sell_confirmed() -> void:
 func _on_slider_changed(entry: ItemEntry, normalized: float) -> void:
     # normalized ∈ [0,1] → factor ∈ [50%, 150%]
     var factor: float = lerp(ASK_PRICE_MIN_FACTOR, ASK_PRICE_MAX_FACTOR, normalized)
-    var ask: int = int(entry.sell_price * factor)
+    var base: int = _merchant_prices.get(entry, entry.sell_price)
+    var ask: int = int(base * factor)
     _ask_prices[entry] = ask
     if _price_labels.has(entry):
         _price_labels[entry].text = "$%d" % ask
+
+# ══ Merchant pricing ═════════════════════════════════════════════════════════
+
+
+func _merchant_price(entry: ItemEntry) -> int:
+    var base: int = entry.sell_price
+    if _merchant == null:
+        return base
+    var super_cat := entry.item_data.category_data.super_category
+    var is_specialist := not _merchant.accepted_super_categories.is_empty()
+    var is_on_category := not is_specialist or _merchant.accepted_super_categories.has(super_cat)
+
+    if is_on_category:
+        return int(base * _merchant.price_multiplier)
+    elif _merchant.accepts_off_category:
+        return int(base * _merchant.off_category_multiplier)
+    else:
+        return 0
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 
 
 func _populate_rows() -> void:
-    if SaveManager.storage_items.is_empty():
+    # Filter items this merchant will buy
+    var buyable: Array[ItemEntry] = []
+    for entry: ItemEntry in SaveManager.storage_items:
+        var mp: int = _merchant_price(entry)
+        if mp > 0:
+            buyable.append(entry)
+            _merchant_prices[entry] = mp
+
+    if buyable.is_empty():
         _empty_label.visible = true
         _sell_btn.disabled = true
         _scroll_container.visible = false
@@ -117,12 +155,12 @@ func _populate_rows() -> void:
     _empty_label.visible = false
     _scroll_container.visible = true
 
-    for entry: ItemEntry in SaveManager.storage_items:
+    for entry: ItemEntry in buyable:
         _selected[entry] = false
-        _ask_prices[entry] = entry.sell_price
+        _ask_prices[entry] = _merchant_prices[entry]
 
         var row: ItemRow = ItemRowScene.instantiate()
-        row.setup(entry, _ctx, PAWN_COLUMNS)
+        row.setup(entry, _ctx, SHOP_COLUMNS)
         row.set_selection_state(ItemRow.SelectionState.AVAILABLE)
         row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
@@ -155,6 +193,7 @@ func _refresh_row_state(entry: ItemEntry) -> void:
 func _rebuild_after_sale() -> void:
     _selected.clear()
     _ask_prices.clear()
+    _merchant_prices.clear()
     _price_labels.clear()
     _price_rows.clear()
     _rows.clear()
@@ -170,8 +209,8 @@ func _rebuild_after_sale() -> void:
 
 func _refresh_sell_button() -> void:
     var any_selected: bool = false
-    for entry: ItemEntry in SaveManager.storage_items:
-        if _selected.get(entry, false):
+    for entry: ItemEntry in _selected:
+        if _selected[entry]:
             any_selected = true
             break
     _sell_btn.disabled = not any_selected
@@ -182,7 +221,7 @@ func _build_sell_summary() -> String:
     var total: int = 0
     for entry: ItemEntry in SaveManager.storage_items:
         if _selected.get(entry, false):
-            var ask: int = _ask_prices.get(entry, entry.sell_price)
+            var ask: int = _ask_prices.get(entry, _merchant_prices.get(entry, entry.sell_price))
             total += ask
             lines.append("  %s — $%d" % [entry.display_name, ask])
     lines.append("")
@@ -214,7 +253,7 @@ func _make_price_row(entry: ItemEntry) -> HBoxContainer:
     var value_label := Label.new()
     value_label.custom_minimum_size = Vector2(100, 0)
     value_label.add_theme_font_size_override("font_size", 14)
-    value_label.text = "$%d" % entry.sell_price
+    value_label.text = "$%d" % _merchant_prices.get(entry, entry.sell_price)
     price_row.add_child(value_label)
 
     _price_labels[entry] = value_label

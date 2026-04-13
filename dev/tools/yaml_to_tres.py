@@ -63,6 +63,7 @@ _SKILL_LEVEL_DATA_SCRIPT_PATH = "res://data/definitions/skill_level_data.gd"
 _CAR_DATA_SCRIPT_PATH = "res://data/definitions/car_data.gd"
 _LOT_DATA_SCRIPT_PATH = "res://data/definitions/lot_data.gd"
 _LOCATION_DATA_SCRIPT_PATH = "res://data/definitions/location_data.gd"
+_MERCHANT_DATA_SCRIPT_PATH = "res://data/definitions/merchant_data.gd"
 
 
 def _read_script_uid(godot_root: Path, res_path: str) -> str:
@@ -427,9 +428,7 @@ def _build_location_tres(
             f'path="res://data/tres/lots/{lid}.tres" id="{tag}"]'
         )
 
-    lot_refs = ", ".join(
-        f'ExtResource("{2 + i}_lot")' for i in range(len(lot_ids))
-    )
+    lot_refs = ", ".join(f'ExtResource("{2 + i}_lot")' for i in range(len(lot_ids)))
 
     lines += [
         "",
@@ -442,6 +441,82 @@ def _build_location_tres(
         f'travel_days = {int(location.get("travel_days", 1))}',
         f'lot_number = {int(location.get("lot_number", 3))}',
         f"lot_pool = [{lot_refs}]",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def _build_merchant_tres(
+    merchant_id: str,
+    merchant_uid: str,
+    display_name: str,
+    description: str,
+    accepted_super_category_ids: list[str],
+    price_multiplier: float,
+    accepts_off_category: bool,
+    off_category_multiplier: float,
+    accept_base_chance: float,
+    haggle_penalty_per_10pct: float,
+    max_counter_offers: int,
+    special_order_item_ids: list[str],
+    special_order_count: int,
+    special_order_bonus: float,
+    required_perk_id: str,
+    uid_cache: dict[str, str],
+    merchant_data_script_uid: str,
+) -> str:
+    # Count ext_resources: 1 (script) + super_categories + special_order items
+    ext_idx = 1
+    lines = [
+        f'[gd_resource type="Resource" script_class="MerchantData" format=3 uid="{merchant_uid}"]',
+        "",
+        f'[ext_resource type="Script" uid="{merchant_data_script_uid}" '
+        f'path="res://data/definitions/merchant_data.gd" id="1_mdef"]',
+    ]
+
+    sc_tags: list[str] = []
+    for sc_id in accepted_super_category_ids:
+        ext_idx += 1
+        tag = f"{ext_idx}_sc"
+        sc_uid = uid_cache.get(sc_id, "")
+        lines.append(
+            f'[ext_resource type="Resource" uid="{sc_uid}" '
+            f'path="res://data/tres/super_categories/{sc_id}.tres" id="{tag}"]'
+        )
+        sc_tags.append(tag)
+
+    so_tags: list[str] = []
+    for item_id in special_order_item_ids:
+        ext_idx += 1
+        tag = f"{ext_idx}_so"
+        item_uid = uid_cache.get(item_id, "")
+        lines.append(
+            f'[ext_resource type="Resource" uid="{item_uid}" '
+            f'path="res://data/tres/items/{item_id}.tres" id="{tag}"]'
+        )
+        so_tags.append(tag)
+
+    sc_refs = ", ".join(f'ExtResource("{t}")' for t in sc_tags)
+    so_refs = ", ".join(f'ExtResource("{t}")' for t in so_tags)
+
+    lines += [
+        "",
+        "[resource]",
+        'script = ExtResource("1_mdef")',
+        f'merchant_id = "{merchant_id}"',
+        f'display_name = "{display_name}"',
+        f'description = "{description}"',
+        f"accepted_super_categories = [{sc_refs}]",
+        f"price_multiplier = {float(price_multiplier)}",
+        f"accepts_off_category = {str(accepts_off_category).lower()}",
+        f"off_category_multiplier = {float(off_category_multiplier)}",
+        f"accept_base_chance = {float(accept_base_chance)}",
+        f"haggle_penalty_per_10pct = {float(haggle_penalty_per_10pct)}",
+        f"max_counter_offers = {int(max_counter_offers)}",
+        f"special_order_pool = [{so_refs}]",
+        f"special_order_count = {int(special_order_count)}",
+        f"special_order_bonus = {float(special_order_bonus)}",
+        f'required_perk_id = "{required_perk_id}"',
         "",
     ]
     return "\n".join(lines)
@@ -674,6 +749,48 @@ def export_locations(
         )
 
 
+def export_merchants(
+    merchants: list[dict],
+    out_dir: Path,
+    uid_cache: dict[str, str],
+    dry_run: bool,
+    merchant_data_script_uid: str,
+) -> None:
+    for merchant in merchants:
+        mid = merchant["merchant_id"]
+        out = out_dir / f"{mid}.tres"
+        uid = _deterministic_uid("merchant", mid)
+        uid_cache[mid] = uid
+
+        # Resolve super_category ids from YAML names
+        raw_sc = merchant.get("accepted_super_categories", []) or []
+        sc_ids = [str(s).lower().replace(" ", "_") for s in raw_sc]
+
+        # Resolve special order item ids
+        so_ids = merchant.get("special_order_pool", []) or []
+
+        content = _build_merchant_tres(
+            mid,
+            uid,
+            merchant.get("display_name", ""),
+            merchant.get("description", ""),
+            sc_ids,
+            float(merchant.get("price_multiplier", 1.0)),
+            bool(merchant.get("accepts_off_category", False)),
+            float(merchant.get("off_category_multiplier", 0.5)),
+            float(merchant.get("accept_base_chance", 0.8)),
+            float(merchant.get("haggle_penalty_per_10pct", 0.15)),
+            int(merchant.get("max_counter_offers", 2)),
+            so_ids,
+            int(merchant.get("special_order_count", 2)),
+            float(merchant.get("special_order_bonus", 0.25)),
+            merchant.get("required_perk_id", ""),
+            uid_cache,
+            merchant_data_script_uid,
+        )
+        _write(out, content, dry_run, "merchant")
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 
@@ -701,6 +818,7 @@ def main() -> None:
     cars_dir = tres_root / "cars"
     lots_dir = tres_root / "lots"
     locations_dir = tres_root / "locations"
+    merchants_dir = tres_root / "merchants"
 
     if not yaml_dir.is_dir():
         sys.exit(f"YAML directory not found: {yaml_dir}")
@@ -717,6 +835,7 @@ def main() -> None:
         "car_data": _read_script_uid(root, _CAR_DATA_SCRIPT_PATH),
         "lot_data": _read_script_uid(root, _LOT_DATA_SCRIPT_PATH),
         "location_data": _read_script_uid(root, _LOCATION_DATA_SCRIPT_PATH),
+        "merchant_data": _read_script_uid(root, _MERCHANT_DATA_SCRIPT_PATH),
     }
 
     yaml_files = sorted(yaml_dir.glob("*.yaml"))
@@ -733,6 +852,7 @@ def main() -> None:
         "cars": [],
         "lots": [],
         "locations": [],
+        "merchants": [],
     }
 
     for yaml_path in yaml_files:
@@ -764,6 +884,7 @@ def main() -> None:
             cars_dir,
             lots_dir,
             locations_dir,
+            merchants_dir,
         ):
             d.mkdir(parents=True, exist_ok=True)
 
@@ -848,6 +969,16 @@ def main() -> None:
             script_uids["location_data"],
         )
 
+    if merged["merchants"]:
+        print(f"Exporting merchants ({len(merged['merchants'])})...")
+        export_merchants(
+            merged["merchants"],
+            merchants_dir,
+            uid_cache,
+            args.dry_run,
+            script_uids["merchant_data"],
+        )
+
     total = (
         len(merged["skills"])
         + len(merged["super_categories"])
@@ -857,6 +988,7 @@ def main() -> None:
         + len(merged["cars"])
         + len(merged["lots"])
         + len(merged["locations"])
+        + len(merged["merchants"])
     )
     tag = "[dry run] " if args.dry_run else ""
     print(f"\n{tag}Done — {total} records processed.")

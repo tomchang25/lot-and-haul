@@ -1,0 +1,134 @@
+[gd_scene format=3 uid="uid://up5kyjwu6ne4"]
+
+[ext_resource type="Script" uid="uid://c7c0b30e7uy02" path="res://game/meta/merchant/merchant_shop/merchant_shop_scene.gd" id="1_mshopgd"]
+
+[node name="MerchantShopScene" type="Control" unique_id=110369565]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mshopgd")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1115199416]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.1, 0.1, 0.12, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="." unique_id=962670025]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="RootVBox" unique_id=1996828720]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Merchant"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ListCenter" type="CenterContainer" parent="RootVBox" unique_id=2138403240]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="OuterVBox" type="VBoxContainer" parent="RootVBox/ListCenter" unique_id=136341928]
+custom_minimum_size = Vector2(960, 480)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ItemPanel" type="PanelContainer" parent="RootVBox/ListCenter/OuterVBox" unique_id=1441532601]
+layout_mode = 2
+
+[node name="PanelVBox" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel" unique_id=156001695]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="ColumnHeader" type="HBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=1951409334]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="ItemHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=1095267960]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Item"
+vertical_alignment = 1
+
+[node name="ConditionHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=1585753935]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Condition"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ValueHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=714145033]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Sell Price"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PotentialValueHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=974237622]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Potential Price"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeaderSeparator" type="HSeparator" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=1234724672]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=489654858]
+custom_minimum_size = Vector2(0, 320)
+layout_mode = 2
+
+[node name="RowContainer" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer" unique_id=6977322]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="EmptyLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox" unique_id=83594311]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "No items available for this merchant."
+horizontal_alignment = 1
+
+[node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=1995426106]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="SellButton" type="Button" parent="RootVBox/Footer" unique_id=745457223]
+custom_minimum_size = Vector2(180, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+disabled = true
+text = "Sell Selected"
+
+[node name="BackButton" type="Button" parent="RootVBox/Footer" unique_id=1447101039]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Back"
+
+[node name="SellConfirm" type="ConfirmationDialog" parent="." unique_id=1717982265]
+title = "Confirm Sale"

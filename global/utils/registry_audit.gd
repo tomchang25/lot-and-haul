@@ -43,6 +43,9 @@ static func _check_registry_sizes() -> bool:
     if KnowledgeManager.skill_count() == 0:
         push_error("RegistryAudit: KnowledgeManager skill registry is empty")
         ok = false
+    if MerchantRegistry.size() == 0:
+        push_error("RegistryAudit: MerchantRegistry is empty")
+        ok = false
 
     return ok
 
