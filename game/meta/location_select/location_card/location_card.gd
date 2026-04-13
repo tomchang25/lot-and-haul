@@ -15,6 +15,7 @@ var _location_data: LocationData = null
 @onready var _entry_fee_label: Label = $VBox/StatsGrid/EntryFeeLabel
 @onready var _travel_days_label: Label = $VBox/StatsGrid/TravelDaysLabel
 @onready var _lot_number_label: Label = $VBox/StatsGrid/LotNumberLabel
+@onready var _total_cost_label: Label = $VBox/StatsGrid/TotalCostLabel
 @onready var _select_button: Button = $VBox/SelectButton
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
@@ -49,6 +50,10 @@ func _apply() -> void:
         "" if _location_data.travel_days == 1 else "s",
     ]
     _lot_number_label.text = "Lots:   %d" % _location_data.lot_number
+    var car: CarData = SaveManager.active_car
+    var fuel_cost := car.fuel_cost_per_day * _location_data.travel_days if car else 0
+    var total_cost := _location_data.entry_fee + fuel_cost
+    _total_cost_label.text = "Est. Cost:   $%d" % total_cost
 
 
 func _on_select_button_pressed() -> void:
