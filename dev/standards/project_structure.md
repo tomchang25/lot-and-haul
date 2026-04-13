@@ -104,17 +104,6 @@ dev/
   tools/    → standalone scripts for data authoring and tooling
 ```
 
-### dev/docs/
-
-Project documentation organized by purpose.
-
-```
-dev/docs/
-  begin/        → block design documents
-  skills/       → GDScript technique references
-  standards/    → architecture and naming standards (this file lives here)
-```
-
 ### dev/tools/
 
 Standalone scripts used during development to generate or manage data assets.
@@ -311,7 +300,6 @@ The main scene for the current build is registered in `project.godot`.
 | Testbed scenes                                          | `stage/testbeds/`                    |
 | Run entry scenes                                        | `stage/runs/`                        |
 | Tilesets and terrain assets                             | `stage/tilesets/`                    |
-| Documentation                                           | `dev/docs/`                          |
 | Tooling scripts                                         | `dev/tools/`                         |
 | Localization files                                      | `localization/`                      |
 
