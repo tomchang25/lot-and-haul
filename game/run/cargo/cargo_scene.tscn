@@ -26,6 +26,7 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_bottom = -72.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 16
@@ -79,19 +80,19 @@ size_flags_horizontal = 4
 theme_override_constants/h_separation = 3
 theme_override_constants/v_separation = 3
 
-[node name="ExtraSlotSection" type="VBoxContainer" parent="RootVBox"]
+[node name="ExtraSlotSection" type="VBoxContainer" parent="RootVBox" unique_id=406092085]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/separation = 6
 
-[node name="ExtraSlotSectionLabel" type="Label" parent="RootVBox/ExtraSlotSection"]
+[node name="ExtraSlotSectionLabel" type="Label" parent="RootVBox/ExtraSlotSection" unique_id=867876086]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
 theme_override_font_sizes/font_size = 12
 text = "Trailer"
 horizontal_alignment = 1
 
-[node name="ExtraSlotContainer" type="HBoxContainer" parent="RootVBox/ExtraSlotSection"]
+[node name="ExtraSlotContainer" type="HBoxContainer" parent="RootVBox/ExtraSlotSection" unique_id=1029681779]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/separation = 3
@@ -115,25 +116,31 @@ size_flags_vertical = 3
 theme_override_constants/h_separation = 3
 theme_override_constants/v_separation = 3
 
-[node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=1118572476]
-custom_minimum_size = Vector2(0, 64)
-layout_mode = 2
-theme_override_constants/separation = 0
-alignment = 1
-
-[node name="ResetButton" type="Button" parent="RootVBox/Footer" unique_id=1359420237]
+[node name="ResetButton" type="Button" parent="." unique_id=1359420237]
 custom_minimum_size = Vector2(120, 40)
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -56.0
+offset_right = 136.0
+offset_bottom = -16.0
 theme_override_font_sizes/font_size = 15
 text = "Reset"
 
-[node name="FooterSpacer" type="Control" parent="RootVBox/Footer" unique_id=1734322296]
-custom_minimum_size = Vector2(48, 0)
-layout_mode = 2
-
-[node name="ContinueButton" type="Button" parent="RootVBox/Footer" unique_id=362281920]
+[node name="ContinueButton" type="Button" parent="." unique_id=362281920]
 custom_minimum_size = Vector2(160, 40)
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -176.0
+offset_top = -56.0
+offset_right = -16.0
+offset_bottom = -16.0
 theme_override_font_sizes/font_size = 15
 text = "Continue"
 

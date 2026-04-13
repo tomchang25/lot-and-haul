@@ -10,7 +10,7 @@ const LocationCardScene := preload("res://game/meta/location_select/location_car
 
 # ── Node references ───────────────────────────────────────────────────────────
 
-@onready var _cards_container: HBoxContainer = $RootVBox/CardsContainer
+@onready var _cards_container: HBoxContainer = $RootVBox/CardsScroll/CardsContainer
 @onready var _back_button: Button = $RootVBox/BackButton
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
@@ -24,12 +24,17 @@ func _ready() -> void:
 
 
 func _populate_cards() -> void:
-    var locations := LocationRegistry.get_all_locations()
-    for location: LocationData in locations:
+    if SaveManager.available_location_ids.is_empty():
+        SaveManager.roll_available_locations()
+    for loc_id: String in SaveManager.available_location_ids:
+        var location := LocationRegistry.get_location(loc_id)
+        if location == null:
+            push_warning("LocationSelect: unknown location id '%s'" % loc_id)
+            continue
         var card: LocationCard = LocationCardScene.instantiate()
-        _cards_container.add_child(card)
         card.setup(location)
         card.pressed.connect(_on_card_pressed)
+        _cards_container.add_child(card)
 
 # ══ Signal handlers ═══════════════════════════════════════════════════════════
 

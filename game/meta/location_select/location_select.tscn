@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ba36wua7kesgv" path="res://game/meta/location_select/location_select.gd" id="1_locsel"]
 
-[node name="LocationSelect" type="Control" unique_id=4000000001]
+[node name="LocationSelect" type="Control" unique_id=-294967295]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,7 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_locsel")
 
-[node name="Background" type="ColorRect" parent="." unique_id=4000000002]
+[node name="Background" type="ColorRect" parent="." unique_id=-294967294]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,7 +21,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.1, 0.1, 0.12, 1)
 
-[node name="RootVBox" type="VBoxContainer" parent="." unique_id=4000000003]
+[node name="RootVBox" type="VBoxContainer" parent="." unique_id=-294967293]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -31,7 +31,7 @@ grow_vertical = 2
 theme_override_constants/separation = 24
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="RootVBox" unique_id=4000000004]
+[node name="TitleLabel" type="Label" parent="RootVBox" unique_id=-294967292]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
@@ -39,13 +39,19 @@ text = "Choose a Location"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CardsContainer" type="HBoxContainer" parent="RootVBox" unique_id=4000000005]
+[node name="CardsScroll" type="ScrollContainer" parent="RootVBox" unique_id=1689089688]
+custom_minimum_size = Vector2(720, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+vertical_scroll_mode = 0
+
+[node name="CardsContainer" type="HBoxContainer" parent="RootVBox/CardsScroll" unique_id=-294967291]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="BackButton" type="Button" parent="RootVBox" unique_id=4000000006]
+[node name="BackButton" type="Button" parent="RootVBox" unique_id=-294967290]
 custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 size_flags_horizontal = 4

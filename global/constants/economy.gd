@@ -4,3 +4,4 @@ class_name Economy
 extends RefCounted
 
 const DAILY_BASE_COST: int = 100
+const LOCATION_SAMPLE_SIZE: int = 3

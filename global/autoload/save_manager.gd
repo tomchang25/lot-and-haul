@@ -37,6 +37,7 @@ var current_day: int = 0
 var max_concurrent_actions: int = 2
 var next_entry_id: int = 0 # monotonically increasing; never reset
 var active_actions: Array = [] # Array of plain Dictionaries
+var available_location_ids: Array[String] = []
 var unlocked_perks: Array[String] = []
 var skill_levels: Dictionary = { } # skill_id (String) → int
 
@@ -56,6 +57,7 @@ func save() -> void:
         "max_concurrent_actions": max_concurrent_actions,
         "next_entry_id": next_entry_id,
         "active_actions": active_actions,
+        "available_location_ids": available_location_ids,
         "unlocked_perks": unlocked_perks,
         "skill_levels": skill_levels,
     }
@@ -113,6 +115,11 @@ func _read_save_file() -> void:
         for d: Variant in parsed["active_actions"]:
             if d is Dictionary:
                 active_actions.append(d)
+    if parsed.has("available_location_ids") and parsed["available_location_ids"] is Array:
+        available_location_ids = []
+        for id: Variant in parsed["available_location_ids"]:
+            if id is String:
+                available_location_ids.append(id)
     if parsed.has("unlocked_perks") and parsed["unlocked_perks"] is Array:
         unlocked_perks = []
         for s: Variant in parsed["unlocked_perks"]:
@@ -167,6 +174,17 @@ func register_storage_items(entries: Array[ItemEntry]) -> void:
 
     save()
 
+# ══ Location sampling ════════════════════════════════════════════════════════
+
+
+func roll_available_locations() -> void:
+    var all := LocationRegistry.get_all_locations()
+    var ids: Array[String] = []
+    for loc: LocationData in all:
+        ids.append(loc.location_id)
+    ids.shuffle()
+    available_location_ids = ids.slice(0, mini(Economy.LOCATION_SAMPLE_SIZE, ids.size()))
+
 # ══ Day advancement (sole chokepoint) ════════════════════════════════════════
 
 
@@ -189,6 +207,7 @@ func advance_days(days: int) -> DaySummary:
     summary.end_day = current_day
 
     MerchantRegistry.roll_special_orders()
+    available_location_ids.clear()
 
     save()
     return summary
