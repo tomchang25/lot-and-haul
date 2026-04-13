@@ -21,6 +21,25 @@ func consume_pending_day_summary() -> DaySummary:
     _pending_day_summary = null
     return summary
 
+# ── Merchant hand-off ────────────────────────────────────────────────────────
+
+var _pending_merchant: MerchantData = null
+
+
+func go_to_merchant_hub() -> void:
+    get_tree().change_scene_to_packed(scenes.merchant_hub)
+
+
+func go_to_merchant_shop(merchant: MerchantData) -> void:
+    _pending_merchant = merchant
+    get_tree().change_scene_to_packed(scenes.merchant_shop)
+
+
+func consume_pending_merchant() -> MerchantData:
+    var m := _pending_merchant
+    _pending_merchant = null
+    return m
+
 # ── Scene transitions ─────────────────────────────────────────────────────────
 
 
@@ -62,10 +81,6 @@ func go_to_hub() -> void:
 
 func go_to_storage() -> void:
     get_tree().change_scene_to_packed(scenes.storage)
-
-
-func go_to_pawn_shop() -> void:
-    get_tree().change_scene_to_packed(scenes.pawn_shop)
 
 
 func go_to_skill_panel() -> void:

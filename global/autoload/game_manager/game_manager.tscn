@@ -12,7 +12,8 @@
 [ext_resource type="PackedScene" uid="uid://blocbrowse001" path="res://game/run/lot_browse/lot_browse_scene.tscn" id="7_locbrw"]
 [ext_resource type="PackedScene" uid="uid://bhubscene0001" path="res://game/meta/hub/hub_scene.tscn" id="8_hub01"]
 [ext_resource type="PackedScene" uid="uid://bhomescene001" path="res://game/meta/storage/storage_scene.tscn" id="9_home01"]
-[ext_resource type="PackedScene" uid="uid://bpawnshop0001" path="res://game/meta/pawn_shop/pawn_shop_scene.tscn" id="10_pawn1"]
+[ext_resource type="PackedScene" path="res://game/meta/merchant/merchant_hub.tscn" id="10_mhub"]
+[ext_resource type="PackedScene" path="res://game/meta/merchant/merchant_shop/merchant_shop_scene.tscn" id="10_mshop"]
 [ext_resource type="PackedScene" path="res://game/meta/day_summary/day_summary_scene.tscn" id="11_daysum"]
 [ext_resource type="PackedScene" path="res://game/meta/knowledge/skill_panel/skill_panel.tscn" id="12_skill"]
 [ext_resource type="PackedScene" path="res://game/meta/knowledge/knowledge_hub.tscn" id="13_khub"]
@@ -34,7 +35,8 @@ cargo = ExtResource("3_yimu3")
 run_review = ExtResource("6_f47ts")
 hub = ExtResource("8_hub01")
 storage = ExtResource("9_home01")
-pawn_shop = ExtResource("10_pawn1")
+merchant_hub = ExtResource("10_mhub")
+merchant_shop = ExtResource("10_mshop")
 day_summary = ExtResource("11_daysum")
 skill_panel = ExtResource("12_skill")
 knowledge_hub = ExtResource("13_khub")

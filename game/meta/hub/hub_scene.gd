@@ -10,7 +10,7 @@ extends Control
 @onready var _storage_count_label: Label = $RootVBox/InfoContainer/StorageCountLabel
 @onready var _next_run_btn: Button = $RootVBox/ButtonsVBox/NextRunButton
 @onready var _storage_btn: Button = $RootVBox/ButtonsVBox/StorageButton
-@onready var _pawn_shop_btn: Button = $RootVBox/ButtonsVBox/PawnShopButton
+@onready var _merchant_btn: Button = $RootVBox/ButtonsVBox/MerchantButton
 @onready var _vehicle_btn: Button = $RootVBox/ButtonsVBox/VehicleButton
 @onready var _knowledge_btn: Button = $RootVBox/ButtonsVBox/KnowledgeButton
 @onready var _day_pass_btn: Button = $RootVBox/ButtonsVBox/DayPassButton
@@ -22,7 +22,7 @@ extends Control
 func _ready() -> void:
     _next_run_btn.pressed.connect(_on_next_run_pressed)
     _storage_btn.pressed.connect(_on_storage_pressed)
-    _pawn_shop_btn.pressed.connect(_on_pawn_shop_pressed)
+    _merchant_btn.pressed.connect(_on_merchant_pressed)
     _vehicle_btn.pressed.connect(_on_vehicle_pressed)
     _knowledge_btn.pressed.connect(_on_knowledge_pressed)
     _day_pass_btn.pressed.connect(_on_day_pass_pressed)
@@ -44,8 +44,8 @@ func _on_storage_pressed() -> void:
     GameManager.go_to_storage()
 
 
-func _on_pawn_shop_pressed() -> void:
-    GameManager.go_to_pawn_shop()
+func _on_merchant_pressed() -> void:
+    GameManager.go_to_merchant_hub()
 
 
 func _on_vehicle_pressed() -> void:

@@ -277,6 +277,57 @@ def _validate_cars(cars: list) -> list[str]:
     return errors
 
 
+def _validate_merchants(merchants: list, known_super_cat_ids: set[str]) -> list[str]:
+    """Validate merchant entries."""
+    errors: list[str] = []
+    seen_ids: set[str] = set()
+
+    for merchant in merchants:
+        mid = merchant.get("merchant_id", "")
+        if not mid:
+            errors.append("Merchant missing merchant_id")
+            continue
+        if mid in seen_ids:
+            errors.append(f"Duplicate merchant_id: '{mid}'")
+        seen_ids.add(mid)
+
+        if not merchant.get("display_name"):
+            errors.append(f"merchant '{mid}': missing display_name")
+
+        price_mult = merchant.get("price_multiplier", 1.0)
+        if not isinstance(price_mult, (int, float)) or price_mult <= 0:
+            errors.append(
+                f"merchant '{mid}': price_multiplier must be positive,"
+                f" got {price_mult!r}"
+            )
+
+        off_cat_mult = merchant.get("off_category_multiplier", 0.5)
+        if not isinstance(off_cat_mult, (int, float)) or off_cat_mult < 0:
+            errors.append(
+                f"merchant '{mid}': off_category_multiplier must be non-negative,"
+                f" got {off_cat_mult!r}"
+            )
+
+        accept_chance = merchant.get("accept_base_chance", 0.8)
+        if not isinstance(accept_chance, (int, float)) or not (0.0 <= accept_chance <= 1.0):
+            errors.append(
+                f"merchant '{mid}': accept_base_chance must be between 0.0 and 1.0,"
+                f" got {accept_chance!r}"
+            )
+
+        # Validate accepted_super_categories references
+        if known_super_cat_ids:
+            for sc in merchant.get("accepted_super_categories", []) or []:
+                sc_id = str(sc).lower().replace(" ", "_")
+                if sc_id not in known_super_cat_ids:
+                    errors.append(
+                        f"merchant '{mid}': accepted_super_category '{sc}'"
+                        f" not defined in super_categories"
+                    )
+
+    return errors
+
+
 # ── Public API ───────────────────────────────────────────────────────────────
 
 
@@ -306,6 +357,15 @@ def validate(data: dict) -> list[str]:
     )
 
     errors.extend(_validate_cars(data.get("cars", [])))
+
+    # Build known super_category_ids from the raw super_categories list
+    known_super_cat_ids: set[str] = {
+        str(s).lower().replace(" ", "_")
+        for s in data.get("super_categories", [])
+    }
+    errors.extend(
+        _validate_merchants(data.get("merchants", []), known_super_cat_ids)
+    )
 
     return errors
 
@@ -339,6 +399,7 @@ def main() -> None:
         "identity_layers": [],
         "items": [],
         "cars": [],
+        "merchants": [],
     }
 
     for yaml_path in yaml_files:
