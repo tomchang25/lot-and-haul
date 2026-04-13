@@ -35,6 +35,22 @@
             "problemMatcher": []
         },
         {
+            "label": "Validate YAML",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/dev/tools/validate_yaml.py",
+                "--yaml-dir",
+                "${workspaceFolder}/data/yaml"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": ".tres → YAML",
             "type": "shell",
             "command": "python",
