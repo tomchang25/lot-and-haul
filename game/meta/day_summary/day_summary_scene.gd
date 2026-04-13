@@ -18,7 +18,8 @@ extends Control
 @onready var _actions_group: VBoxContainer = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/ActionsGroup
 @onready var _actions_list: VBoxContainer = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/ActionsGroup/ActionsList
 
-@onready var _cargo_count_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CargoCountLabel
+@onready var _cargo_group: VBoxContainer = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CargoGroup
+@onready var _cargo_count_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CargoGroup/CargoCountLabel
 
 @onready var _net_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/NetLabel
 @onready var _balance_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/BalanceLabel
@@ -78,7 +79,7 @@ func _render(summary: DaySummary) -> void:
         _actions_list.add_child(lbl)
 
     # Cargo count
-    _cargo_count_label.visible = summary.cargo_count > 0
+    _cargo_group.visible = summary.cargo_count > 0
     if summary.cargo_count == 1:
         _cargo_count_label.text = "Cargo brought back: 1 item"
     elif summary.cargo_count > 1:

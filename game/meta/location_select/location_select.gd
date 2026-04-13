@@ -32,9 +32,9 @@ func _populate_cards() -> void:
             push_warning("LocationSelect: unknown location id '%s'" % loc_id)
             continue
         var card: LocationCard = LocationCardScene.instantiate()
-        _cards_container.add_child(card)
         card.setup(location)
         card.pressed.connect(_on_card_pressed)
+        _cards_container.add_child(card)
 
 # ══ Signal handlers ═══════════════════════════════════════════════════════════
 
