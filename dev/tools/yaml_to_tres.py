@@ -61,6 +61,8 @@ _SUPER_CATEGORY_DATA_SCRIPT_PATH = "res://data/definitions/super_category_data.g
 _SKILL_DATA_SCRIPT_PATH = "res://data/definitions/skill_data.gd"
 _SKILL_LEVEL_DATA_SCRIPT_PATH = "res://data/definitions/skill_level_data.gd"
 _CAR_DATA_SCRIPT_PATH = "res://data/definitions/car_data.gd"
+_LOT_DATA_SCRIPT_PATH = "res://data/definitions/lot_data.gd"
+_LOCATION_DATA_SCRIPT_PATH = "res://data/definitions/location_data.gd"
 
 
 def _read_script_uid(godot_root: Path, res_path: str) -> str:
@@ -86,11 +88,24 @@ def _read_script_uid(godot_root: Path, res_path: str) -> str:
 
 
 def _format_dict(d: dict) -> str:
-    """Format a Python dict as a Godot Dictionary literal."""
+    """Format a Python dict as a Godot Dictionary literal (string keys)."""
     if not d:
         return "{}"
     pairs = ", ".join(f'"{k}": {v}' for k, v in sorted(d.items()))
     return "{ " + pairs + " }"
+
+
+def _format_dict_auto_keys(d: dict) -> str:
+    """Format a dict using bare int keys where possible, quoted otherwise."""
+    if not d:
+        return "{}"
+    pairs: list[str] = []
+    for k, v in sorted(d.items(), key=lambda x: str(x[0])):
+        try:
+            pairs.append(f"{int(k)}: {v}")
+        except (ValueError, TypeError):
+            pairs.append(f'"{k}": {v}')
+    return "{ " + ", ".join(pairs) + " }"
 
 
 def _build_skill_tres(
@@ -351,6 +366,87 @@ def _build_car_tres(
     return "\n".join(lines)
 
 
+def _build_lot_tres(
+    lot_id: str,
+    lot_uid: str,
+    lot: dict,
+    lot_data_script_uid: str,
+) -> str:
+    lines = [
+        f'[gd_resource type="Resource" script_class="LotData" format=3 uid="{lot_uid}"]',
+        "",
+        f'[ext_resource type="Script" uid="{lot_data_script_uid}" '
+        f'path="res://data/definitions/lot_data.gd" id="1_lotdef"]',
+        "",
+        "[resource]",
+        'script = ExtResource("1_lotdef")',
+        f'lot_id = "{lot_id}"',
+        f'aggressive_factor_min = {float(lot.get("aggressive_factor_min", 0.3))}',
+        f'aggressive_factor_max = {float(lot.get("aggressive_factor_max", 0.7))}',
+        f'aggressive_lerp_min = {float(lot.get("aggressive_lerp_min", 0.8))}',
+        f'aggressive_lerp_max = {float(lot.get("aggressive_lerp_max", 1.2))}',
+        f'npc_layer_sight_chance = {float(lot.get("npc_layer_sight_chance", 0.5))}',
+        f'opening_bid_factor = {float(lot.get("opening_bid_factor", 0.25))}',
+        f'veiled_chance = {float(lot.get("veiled_chance", 0.4))}',
+        f'item_count_min = {int(lot.get("item_count_min", 3))}',
+        f'item_count_max = {int(lot.get("item_count_max", 5))}',
+        f"rarity_weights = {_format_dict_auto_keys(lot.get('rarity_weights', {}) or {})}",
+        f"super_category_weights = {_format_dict_auto_keys(lot.get('super_category_weights', {}) or {})}",
+        f"category_weights = {_format_dict_auto_keys(lot.get('category_weights', {}) or {})}",
+        f'price_floor_factor = {float(lot.get("price_floor_factor", 0.6))}',
+        f'price_ceiling_factor = {float(lot.get("price_ceiling_factor", 1.4))}',
+        f'price_variance_min = {float(lot.get("price_variance_min", 0.85))}',
+        f'price_variance_max = {float(lot.get("price_variance_max", 1.15))}',
+        f'action_quota = {int(lot.get("action_quota", 6))}',
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def _build_location_tres(
+    location_id: str,
+    location_uid: str,
+    location: dict,
+    uid_cache: dict[str, str],
+    location_data_script_uid: str,
+) -> str:
+    lot_ids: list[str] = location.get("lot_pool", []) or []
+
+    lines = [
+        f'[gd_resource type="Resource" script_class="LocationData" format=3 uid="{location_uid}"]',
+        "",
+        f'[ext_resource type="Script" uid="{location_data_script_uid}" '
+        f'path="res://data/definitions/location_data.gd" id="1_locdef"]',
+    ]
+
+    for i, lid in enumerate(lot_ids):
+        lot_uid = uid_cache.get(lid, "")
+        tag = f"{2 + i}_lot"
+        lines.append(
+            f'[ext_resource type="Resource" uid="{lot_uid}" '
+            f'path="res://data/tres/lots/{lid}.tres" id="{tag}"]'
+        )
+
+    lot_refs = ", ".join(
+        f'ExtResource("{2 + i}_lot")' for i in range(len(lot_ids))
+    )
+
+    lines += [
+        "",
+        "[resource]",
+        'script = ExtResource("1_locdef")',
+        f'location_id = "{location_id}"',
+        f'display_name = "{location.get("display_name", "")}"',
+        f'description = "{location.get("description", "")}"',
+        f'entry_fee = {int(location.get("entry_fee", 0))}',
+        f'travel_days = {int(location.get("travel_days", 1))}',
+        f'lot_number = {int(location.get("lot_number", 3))}',
+        f"lot_pool = [{lot_refs}]",
+        "",
+    ]
+    return "\n".join(lines)
+
+
 # ── Export phases ─────────────────────────────────────────────────────────────
 
 
@@ -537,6 +633,47 @@ def export_cars(
         _write(out, content, dry_run, "car")
 
 
+def export_lots(
+    lots: list[dict],
+    out_dir: Path,
+    uid_cache: dict[str, str],
+    dry_run: bool,
+    lot_data_script_uid: str,
+) -> None:
+    for lot in lots:
+        lot_id = lot["lot_id"]
+        out = out_dir / f"{lot_id}.tres"
+        uid = _deterministic_uid("lot", lot_id)
+        uid_cache[lot_id] = uid
+
+        content = _build_lot_tres(lot_id, uid, lot, lot_data_script_uid)
+        _write(out, content, dry_run, "lot")
+
+
+def export_locations(
+    locations: list[dict],
+    out_dir: Path,
+    uid_cache: dict[str, str],
+    dry_run: bool,
+    location_data_script_uid: str,
+) -> None:
+    for location in locations:
+        location_id = location["location_id"]
+        out = out_dir / f"{location_id}.tres"
+        uid = _deterministic_uid("location", location_id)
+        uid_cache[location_id] = uid
+
+        content = _build_location_tres(
+            location_id, uid, location, uid_cache, location_data_script_uid
+        )
+        _write(
+            out,
+            content,
+            dry_run,
+            f"location ({len(location.get('lot_pool', []))} lots)",
+        )
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 
@@ -562,6 +699,8 @@ def main() -> None:
     layers_dir = tres_root / "identity_layers"
     items_dir = tres_root / "items"
     cars_dir = tres_root / "cars"
+    lots_dir = tres_root / "lots"
+    locations_dir = tres_root / "locations"
 
     if not yaml_dir.is_dir():
         sys.exit(f"YAML directory not found: {yaml_dir}")
@@ -576,6 +715,8 @@ def main() -> None:
         "skill_data": _read_script_uid(root, _SKILL_DATA_SCRIPT_PATH),
         "skill_level_data": _read_script_uid(root, _SKILL_LEVEL_DATA_SCRIPT_PATH),
         "car_data": _read_script_uid(root, _CAR_DATA_SCRIPT_PATH),
+        "lot_data": _read_script_uid(root, _LOT_DATA_SCRIPT_PATH),
+        "location_data": _read_script_uid(root, _LOCATION_DATA_SCRIPT_PATH),
     }
 
     yaml_files = sorted(yaml_dir.glob("*.yaml"))
@@ -590,6 +731,8 @@ def main() -> None:
         "identity_layers": [],
         "items": [],
         "cars": [],
+        "lots": [],
+        "locations": [],
     }
 
     for yaml_path in yaml_files:
@@ -619,6 +762,8 @@ def main() -> None:
             layers_dir,
             items_dir,
             cars_dir,
+            lots_dir,
+            locations_dir,
         ):
             d.mkdir(parents=True, exist_ok=True)
 
@@ -683,6 +828,26 @@ def main() -> None:
         script_uids["car_data"],
     )
 
+    if merged["lots"]:
+        print(f"Exporting lots ({len(merged['lots'])})...")
+        export_lots(
+            merged["lots"],
+            lots_dir,
+            uid_cache,
+            args.dry_run,
+            script_uids["lot_data"],
+        )
+
+    if merged["locations"]:
+        print(f"Exporting locations ({len(merged['locations'])})...")
+        export_locations(
+            merged["locations"],
+            locations_dir,
+            uid_cache,
+            args.dry_run,
+            script_uids["location_data"],
+        )
+
     total = (
         len(merged["skills"])
         + len(merged["super_categories"])
@@ -690,6 +855,8 @@ def main() -> None:
         + len(merged["identity_layers"])
         + len(merged["items"])
         + len(merged["cars"])
+        + len(merged["lots"])
+        + len(merged["locations"])
     )
     tag = "[dry run] " if args.dry_run else ""
     print(f"\n{tag}Done — {total} records processed.")

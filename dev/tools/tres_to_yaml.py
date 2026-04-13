@@ -351,6 +351,109 @@ def parse_items(
     return out
 
 
+def parse_lots(
+    lots_dir: Path,
+    uid_to_id: dict[str, str],
+) -> list[dict]:
+    out: list[dict] = []
+    if not lots_dir.is_dir():
+        return out
+
+    _FLOAT_FIELDS = [
+        "aggressive_factor_min",
+        "aggressive_factor_max",
+        "aggressive_lerp_min",
+        "aggressive_lerp_max",
+        "npc_layer_sight_chance",
+        "opening_bid_factor",
+        "veiled_chance",
+        "price_floor_factor",
+        "price_ceiling_factor",
+        "price_variance_min",
+        "price_variance_max",
+    ]
+    _INT_FIELDS = [
+        "item_count_min",
+        "item_count_max",
+        "action_quota",
+    ]
+    _DICT_FIELDS = [
+        "rarity_weights",
+        "super_category_weights",
+        "category_weights",
+    ]
+
+    for f in sorted(lots_dir.glob("*.tres")):
+        text = f.read_text(encoding="utf-8")
+        uid = _header_uid(text)
+        lot_id = _field(text, "lot_id") or f.stem
+        if uid:
+            uid_to_id[uid] = lot_id
+
+        lot: dict = {"lot_id": lot_id}
+        for key in _FLOAT_FIELDS:
+            val = _field(text, key)
+            if val is not None:
+                lot[key] = float(val)
+        for key in _INT_FIELDS:
+            val = _field(text, key)
+            if val is not None:
+                lot[key] = int(val)
+        for key in _DICT_FIELDS:
+            val = _field(text, key)
+            if val is not None:
+                lot[key] = _parse_godot_dict(val)
+
+        out.append(lot)
+    return out
+
+
+def parse_locations(
+    locations_dir: Path,
+    uid_to_id: dict[str, str],
+) -> list[dict]:
+    out: list[dict] = []
+    if not locations_dir.is_dir():
+        return out
+
+    for f in sorted(locations_dir.glob("*.tres")):
+        text = f.read_text(encoding="utf-8")
+        uid = _header_uid(text)
+        location_id = _field(text, "location_id") or f.stem
+        if uid:
+            uid_to_id[uid] = location_id
+
+        display_name = _field(text, "display_name") or location_id
+        description = _field(text, "description") or ""
+        entry_fee = int(_field(text, "entry_fee") or 0)
+        travel_days = int(_field(text, "travel_days") or 1)
+        lot_number = int(_field(text, "lot_number") or 3)
+
+        ext_res = _ext_resources(text)
+
+        lot_ids: list[str] = []
+        lp_m = re.search(r"lot_pool\s*=\s*\[([^\]]*)\]", text)
+        if lp_m:
+            for tag_m in re.finditer(r'ExtResource\("([^"]+)"\)', lp_m.group(1)):
+                lot_uid = ext_res.get(tag_m.group(1), {}).get("uid", "")
+                lid = uid_to_id.get(lot_uid, "")
+                if lid:
+                    lot_ids.append(lid)
+
+        out.append(
+            {
+                "location_id": location_id,
+                "display_name": display_name,
+                "description": description,
+                "entry_fee": entry_fee,
+                "travel_days": travel_days,
+                "lot_number": lot_number,
+                "lot_pool": lot_ids,
+            }
+        )
+    return out
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 
@@ -384,6 +487,8 @@ def main() -> None:
         tres_root / "identity_layers", uid_to_id
     )
     items = parse_items(tres_root / "items", uid_to_id)
+    lots = parse_lots(tres_root / "lots", uid_to_id)
+    locations = parse_locations(tres_root / "locations", uid_to_id)
 
     data: dict = {}
     if skills:
@@ -396,6 +501,10 @@ def main() -> None:
         data["identity_layers"] = identity_layers
     if items:
         data["items"] = items
+    if lots:
+        data["lots"] = lots
+    if locations:
+        data["locations"] = locations
 
     yaml_text = yaml.dump(
         data,
