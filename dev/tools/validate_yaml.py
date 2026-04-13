@@ -345,9 +345,7 @@ def _validate_lots(lots: list) -> tuple[list[str], set[str]]:
     return errors, set(seen_lot_ids)
 
 
-def _validate_locations(
-    locations: list, known_lot_ids: set[str]
-) -> list[str]:
+def _validate_locations(locations: list, known_lot_ids: set[str]) -> list[str]:
     """Validate location entries."""
     errors: list[str] = []
     seen_location_ids: set[str] = set()
@@ -437,9 +435,7 @@ def validate(data: dict) -> list[str]:
     lot_errors, known_lot_ids = _validate_lots(data.get("lots", []))
     errors.extend(lot_errors)
 
-    errors.extend(
-        _validate_locations(data.get("locations", []), known_lot_ids)
-    )
+    errors.extend(_validate_locations(data.get("locations", []), known_lot_ids))
 
     return errors
 

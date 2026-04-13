@@ -286,9 +286,7 @@ def parse_identity_layers(
                 if required_condition:
                     unlock["required_condition"] = required_condition
 
-                required_category_rank = int(
-                    fields.get("required_category_rank", "0")
-                )
+                required_category_rank = int(fields.get("required_category_rank", "0"))
                 if required_category_rank:
                     unlock["required_category_rank"] = required_category_rank
 
@@ -483,9 +481,7 @@ def main() -> None:
     categories = parse_categories(
         tres_root / "categories", uid_to_id, super_cat_display_by_id
     )
-    identity_layers = parse_identity_layers(
-        tres_root / "identity_layers", uid_to_id
-    )
+    identity_layers = parse_identity_layers(tres_root / "identity_layers", uid_to_id)
     items = parse_items(tres_root / "items", uid_to_id)
     lots = parse_lots(tres_root / "lots", uid_to_id)
     locations = parse_locations(tres_root / "locations", uid_to_id)
