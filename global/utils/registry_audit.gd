@@ -6,7 +6,6 @@ extends RefCounted
 # scene exports are wired up, and save data references entities that still
 # exist. Runs once at game startup from GameManager._ready().
 
-
 # Runs all checks. Emits push_error for each problem found.
 # Returns true if all checks pass, false otherwise.
 static func run(scene_registry: SceneRegistry) -> bool:
@@ -22,7 +21,6 @@ static func run(scene_registry: SceneRegistry) -> bool:
         ok = false
 
     return ok
-
 
 # ══ Registry non-emptiness ═══════════════════════════════════════════════════
 
@@ -48,7 +46,6 @@ static func _check_registry_sizes() -> bool:
 
     return ok
 
-
 # ══ SceneRegistry wiring ════════════════════════════════════════════════════
 
 
@@ -69,7 +66,6 @@ static func _check_scene_registry(scene_registry: SceneRegistry) -> bool:
 
     return ok
 
-
 # ══ Save data car references ════════════════════════════════════════════════
 
 
@@ -79,7 +75,7 @@ static func _check_save_car_refs() -> bool:
     if CarRegistry.get_car(SaveManager.active_car_id) == null:
         push_error(
             "RegistryAudit: SaveManager.active_car_id '%s' not found in CarRegistry"
-            % SaveManager.active_car_id
+            % SaveManager.active_car_id,
         )
         ok = false
 
@@ -87,12 +83,11 @@ static func _check_save_car_refs() -> bool:
         if CarRegistry.get_car(car_id) == null:
             push_error(
                 "RegistryAudit: SaveManager.owned_car_ids '%s' not found in CarRegistry"
-                % car_id
+                % car_id,
             )
             ok = false
 
     return ok
-
 
 # ══ Save data perk references ═══════════════════════════════════════════════
 
@@ -104,7 +99,7 @@ static func _check_save_perks() -> bool:
         if KnowledgeManager.get_perk(perk_id) == null:
             push_error(
                 "RegistryAudit: SaveManager.unlocked_perks '%s' not found in KnowledgeManager"
-                % perk_id
+                % perk_id,
             )
             ok = false
 
