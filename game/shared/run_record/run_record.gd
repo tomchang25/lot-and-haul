@@ -12,6 +12,7 @@ var lot_items: Array[ItemEntry]:
         return lot_entry.item_entries if lot_entry else []
 var won_items: Array[ItemEntry] = []
 var cargo_items: Array[ItemEntry] = []
+var trailer_items: Array[ItemEntry] = []
 var last_lot_won_items: Array[ItemEntry] = []
 
 var onsite_proceeds: int = 0

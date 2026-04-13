@@ -48,6 +48,12 @@ theme_override_constants/separation = 16
 [node name="ItemListPanel" parent="RootVBox/ListCenter/OuterVBox" instance=ExtResource("2_ilp")]
 layout_mode = 2
 
+[node name="TrailerDamageLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+
 [node name="FinanceCenter" type="CenterContainer" parent="RootVBox"]
 layout_mode = 2
 

@@ -30,6 +30,7 @@ var _tooltip: ItemRowTooltip = null
 @onready var _overall_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/OverallLabel
 @onready var _estimate_price_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/EstimatePriceLabel
 @onready var _estimate_profit_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/EstimateProfitLabel
+@onready var _trailer_damage_label: Label = $RootVBox/ListCenter/OuterVBox/TrailerDamageLabel
 @onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
@@ -47,6 +48,12 @@ func _ready() -> void:
 
     _cargo_items = RunManager.run_record.cargo_items
 
+    var cracked := _apply_trailer_damage()
+    if cracked > 0:
+        _trailer_damage_label.text = "%d trailer item(s) cracked during transport" % cracked
+        _trailer_damage_label.add_theme_color_override(&"font_color", Color(1.0, 0.8, 0.3))
+        _trailer_damage_label.visible = true
+
     _populate_rows()
     _populate_finance()
 
@@ -63,6 +70,23 @@ func _on_row_tooltip_requested(
         anchor: Rect2,
 ) -> void:
     _tooltip.show_for(entry, ctx, anchor)
+
+# ══ Trailer damage ════════════════════════════════════════════════════════════
+
+
+func _apply_trailer_damage() -> int:
+    var r := RunManager.run_record
+    var car := r.car_data
+    if car.trailer_damage_chance <= 0.0:
+        return 0
+
+    var cracked := 0
+    for entry: ItemEntry in r.trailer_items:
+        if randf() < car.trailer_damage_chance:
+            var ratio := randf_range(car.trailer_damage_ratio_min, car.trailer_damage_ratio_max)
+            entry.condition = maxf(0.0, entry.condition - ratio)
+            cracked += 1
+    return cracked
 
 # ══ Run resolution ════════════════════════════════════════════════════════════
 
