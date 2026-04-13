@@ -3,37 +3,23 @@
 # Access globally via ItemRegistry.get_items(rarity, category_id).
 extends Node
 
-var _items: Array[ItemData] = []
+var _items_by_id: Dictionary = { } # item_id → ItemData
 
 # Maps super_category_id (String) → Array[String] of category_id.
 var _super_category_to_categories: Dictionary = { }
 
 
 func _ready() -> void:
-    _load_all_items()
+    _items_by_id = ResourceDirLoader.load_by_id(
+        DataPaths.ITEMS_DIR,
+        func(r: Resource) -> String:
+            return (r as ItemData).item_id if r is ItemData else ""
+    )
     _build_super_category_index()
 
 
-func _load_all_items() -> void:
-    var dir := DirAccess.open(DataPaths.ITEMS_DIR)
-    if dir == null:
-        push_error("ItemRegistry: could not open " + DataPaths.ITEMS_DIR)
-        return
-
-    dir.list_dir_begin()
-    var file_name := dir.get_next()
-    while file_name != "":
-        if not dir.current_is_dir() and file_name.ends_with(".tres"):
-            var path := DataPaths.ITEMS_DIR + "/" + file_name
-            var resource := load(path)
-            if resource is ItemData:
-                _items.append(resource as ItemData)
-        file_name = dir.get_next()
-    dir.list_dir_end()
-
-
 func _build_super_category_index() -> void:
-    for item: ItemData in _items:
+    for item: ItemData in _items_by_id.values():
         if item.category_data == null or item.category_data.super_category == null:
             continue
         var sc_id: String = item.category_data.super_category.super_category_id
@@ -49,7 +35,7 @@ func _build_super_category_index() -> void:
 # Returns an empty array if none match.
 func get_items(rarity: ItemData.Rarity, category_id: String) -> Array[ItemData]:
     var result: Array[ItemData] = []
-    for item: ItemData in _items:
+    for item: ItemData in _items_by_id.values():
         if item.rarity == rarity and item.category_data != null and item.category_data.category_id == category_id:
             result.append(item)
     return result
@@ -73,11 +59,14 @@ func get_all_super_category_ids() -> Array[String]:
 
 
 func get_all_items() -> Array[ItemData]:
-    return _items
+    var result: Array[ItemData] = []
+    for item: ItemData in _items_by_id.values():
+        result.append(item)
+    return result
 
 
 func get_super_category_display_name(super_category_id: String) -> String:
-    for item: ItemData in _items:
+    for item: ItemData in _items_by_id.values():
         if item.category_data != null and item.category_data.super_category != null:
             if item.category_data.super_category.super_category_id == super_category_id:
                 return item.category_data.super_category.display_name
@@ -85,14 +74,11 @@ func get_super_category_display_name(super_category_id: String) -> String:
 
 
 func get_category_display_name(category_id: String) -> String:
-    for item: ItemData in _items:
+    for item: ItemData in _items_by_id.values():
         if item.category_data != null and item.category_data.category_id == category_id:
             return item.category_data.display_name
     return category_id
 
 
 func get_item(item_id: String) -> ItemData:
-    for item: ItemData in _items:
-        if item.item_id == item_id:
-            return item
-    return null
+    return _items_by_id.get(item_id, null)

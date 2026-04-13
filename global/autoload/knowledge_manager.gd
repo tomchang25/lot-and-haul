@@ -262,32 +262,16 @@ func get_all_perks() -> Array[PerkData]:
 
 
 func _load_perk_registry() -> void:
-    var dir := DirAccess.open(DataPaths.PERKS_DIR)
-    if dir == null:
-        return
-    dir.list_dir_begin()
-    var filename: String = dir.get_next()
-    while filename != "":
-        if filename.ends_with(".tres"):
-            var path := DataPaths.PERKS_DIR + "/" + filename
-            var perk := ResourceLoader.load(path) as PerkData
-            if perk != null and perk.perk_id != "":
-                _perk_registry[perk.perk_id] = perk
-        filename = dir.get_next()
-    dir.list_dir_end()
+    _perk_registry = ResourceDirLoader.load_by_id(
+        DataPaths.PERKS_DIR,
+        func(r: Resource) -> String:
+            return (r as PerkData).perk_id if r is PerkData else ""
+    )
 
 
 func _load_skill_registry() -> void:
-    var dir := DirAccess.open(DataPaths.SKILLS_DIR)
-    if dir == null:
-        return
-    dir.list_dir_begin()
-    var filename: String = dir.get_next()
-    while filename != "":
-        if filename.ends_with(".tres"):
-            var path := DataPaths.SKILLS_DIR + "/" + filename
-            var skill := ResourceLoader.load(path) as SkillData
-            if skill != null and skill.skill_id != "":
-                _skill_registry[skill.skill_id] = skill
-        filename = dir.get_next()
-    dir.list_dir_end()
+    _skill_registry = ResourceDirLoader.load_by_id(
+        DataPaths.SKILLS_DIR,
+        func(r: Resource) -> String:
+            return (r as SkillData).skill_id if r is SkillData else ""
+    )
