@@ -261,6 +261,14 @@ func get_all_perks() -> Array[PerkData]:
     return result
 
 
+func perk_count() -> int:
+    return _perk_registry.size()
+
+
+func skill_count() -> int:
+    return _skill_registry.size()
+
+
 func _load_perk_registry() -> void:
     _perk_registry = ResourceDirLoader.load_by_id(
         DataPaths.PERKS_DIR,

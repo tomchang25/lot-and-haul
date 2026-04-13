@@ -2,6 +2,11 @@ extends Node
 
 @export var scenes: SceneRegistry
 
+
+func _ready() -> void:
+    RegistryAudit.run(scenes)
+
+
 # ── Day-summary hand-off ─────────────────────────────────────────────────────
 
 var _pending_day_summary: DaySummary = null
