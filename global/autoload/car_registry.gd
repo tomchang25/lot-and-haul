@@ -25,3 +25,7 @@ func get_all_cars() -> Array[CarData]:
     for car: CarData in _cars.values():
         result.append(car)
     return result
+
+
+func size() -> int:
+    return _cars.size()

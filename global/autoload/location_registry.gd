@@ -25,3 +25,7 @@ func get_all_locations() -> Array[LocationData]:
     for loc: LocationData in _locations.values():
         result.append(loc)
     return result
+
+
+func size() -> int:
+    return _locations.size()

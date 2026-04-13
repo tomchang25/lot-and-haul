@@ -82,3 +82,7 @@ func get_category_display_name(category_id: String) -> String:
 
 func get_item(item_id: String) -> ItemData:
     return _items_by_id.get(item_id, null)
+
+
+func size() -> int:
+    return _items_by_id.size()
