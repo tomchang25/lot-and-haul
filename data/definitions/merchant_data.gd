@@ -16,14 +16,13 @@ extends Resource
 
 # ── Category focus ───────────────────────────────────────────────────────────
 
-# Super-categories this merchant will buy at the specialist rate.
-# Empty array = accepts all categories at the general rate (pawn shop behaviour).
+# Super-categories this merchant buys at specialist rate.
+# Items outside this list fall through to off-category handling.
 @export var accepted_super_categories: Array[SuperCategoryData] = []
 
 # ── Pricing ──────────────────────────────────────────────────────────────────
 
-# Multiplier applied to appraised_value for items in accepted super-categories
-# (or all items when accepted_super_categories is empty).
+# Multiplier applied to appraised_value for items in accepted super-categories.
 @export var price_multiplier: float = 1.0
 
 # ── Off-category handling ────────────────────────────────────────────────────
@@ -69,8 +68,7 @@ extends Resource
 
 func offer_for(entry: ItemEntry) -> int:
     var base: int = entry.appraised_value
-    if not accepted_super_categories.is_empty() \
-    and accepted_super_categories.has(entry.item_data.category_data.super_category):
+    if accepted_super_categories.has(entry.item_data.category_data.super_category):
         return int(base * price_multiplier)
     elif accepts_off_category:
         return int(base * off_category_multiplier)
