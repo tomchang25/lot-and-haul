@@ -125,7 +125,7 @@ static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewC
                 return 0
             return entry.item_data.category_data.get_cells().size()
         ItemRow.Column.MARKET_FACTOR:
-            return 0.0
+            return entry.market_factor_delta
         _:
             push_warning("Unknown Column: %d" % col)
             return 0

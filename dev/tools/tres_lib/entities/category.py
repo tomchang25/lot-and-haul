@@ -38,7 +38,7 @@ class CategorySpec:
 
     def build_tres(self, entry: dict, ctx: BuildCtx) -> str:
         cat_id = entry["category_id"]
-        super_cat_id = str(entry["super_category"]).lower().replace(" ", "_")
+        super_cat_id = entry["super_category"]
         super_cat_uid = ctx.uid_cache.get(super_cat_id, "")
 
         uid = deterministic_uid(self.uid_prefix, cat_id)
@@ -76,18 +76,15 @@ class CategorySpec:
         shape_id = tres_field(text, "shape_id") or "s1x1"
 
         ext_res = ext_resources(text)
-        super_cat_display = ""
+        super_cat_id = ""
         cat_m = re.search(r'super_category\s*=\s*ExtResource\("([^"]+)"\)', text)
         if cat_m:
             sc_uid = ext_res.get(cat_m.group(1), {}).get("uid", "")
-            sc_id = ctx.uid_to_id.get(sc_uid, "")
-            super_cat_display = ctx.super_cat_display_by_id.get(
-                sc_id, sc_id.replace("_", " ").title()
-            )
+            super_cat_id = ctx.uid_to_id.get(sc_uid, "")
 
         return {
             "category_id": cat_id,
-            "super_category": super_cat_display,
+            "super_category": super_cat_id,
             "display_name": display_name,
             "weight": weight,
             "shape_id": shape_id,
@@ -95,6 +92,13 @@ class CategorySpec:
 
     def validate(self, entries: list, all_data: dict) -> list[str]:
         errors: list[str] = []
+        known_super_cat_ids: set[str] = set()
+        for sc in all_data.get("super_categories", []):
+            if isinstance(sc, dict):
+                known_super_cat_ids.add(sc["super_category_id"])
+            else:
+                known_super_cat_ids.add(str(sc).lower().replace(" ", "_"))
+
         for cat in entries:
             cid = cat.get("category_id", "?")
             shape_id = cat.get("shape_id")
@@ -105,6 +109,14 @@ class CategorySpec:
                     f"category '{cid}': unknown shape_id '{shape_id}'"
                     f" — valid: {sorted(_VALID_SHAPE_IDS)}"
                 )
+
+            sc_ref = cat.get("super_category", "")
+            if known_super_cat_ids and sc_ref not in known_super_cat_ids:
+                errors.append(
+                    f"category '{cid}': super_category '{sc_ref}' not found "
+                    f"in known super_category ids: {sorted(known_super_cat_ids)}"
+                )
+
         return errors
 
 
