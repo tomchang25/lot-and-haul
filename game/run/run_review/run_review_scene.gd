@@ -142,7 +142,7 @@ func _populate_finance() -> void:
 
     var estimate_price: int = 0
     for entry: ItemEntry in _cargo_items:
-        estimate_price += entry.sell_price
+        estimate_price += entry.appraised_value
     _estimate_price_label.text = "Est. Cargo Value:   $%d" % estimate_price
 
     var estimate_profit := overall + estimate_price

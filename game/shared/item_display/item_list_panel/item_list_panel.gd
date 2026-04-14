@@ -20,6 +20,7 @@ var _ctx: ItemViewContext = null
 var _columns: Array = [] # Array of ItemRow.Column
 var _sort_column: ItemRow.Column = ItemRow.Column.NAME
 var _sort_ascending: bool = true
+var _provider: RowDataProvider = null
 var _rows: Dictionary = { } # ItemEntry → ItemRow
 
 # ── Node references ───────────────────────────────────────────────────────────
@@ -30,9 +31,10 @@ var _rows: Dictionary = { } # ItemEntry → ItemRow
 # ══ Common API ════════════════════════════════════════════════════════════════
 
 
-func setup(ctx: ItemViewContext, columns: Array) -> void:
+func setup(ctx: ItemViewContext, columns: Array, provider: RowDataProvider = null) -> void:
     _ctx = ctx
     _columns = columns
+    _provider = provider
     if _columns.size() > 0 and not (_sort_column in _columns):
         _sort_column = _columns[0]
     if is_node_ready():
@@ -45,6 +47,7 @@ func populate(entries: Array) -> void:
     for entry: ItemEntry in entries:
         var row: ItemRow = ItemRowScene.instantiate()
         row.setup(entry, _ctx, _columns)
+        row.set_provider(_provider)
         row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
         row.row_pressed.connect(_on_row_pressed)
@@ -91,11 +94,12 @@ func apply_sort() -> void:
     var col: ItemRow.Column = _sort_column
     var ctx: ItemViewContext = _ctx
     var ascending: bool = _sort_ascending
+    var provider: RowDataProvider = _provider
 
     entries.sort_custom(
         func(a: ItemEntry, b: ItemEntry) -> bool:
-            var va: Variant = get_sort_value(a, col, ctx)
-            var vb: Variant = get_sort_value(b, col, ctx)
+            var va: Variant = get_sort_value(a, col, ctx, provider)
+            var vb: Variant = get_sort_value(b, col, ctx, provider)
             if ascending:
                 return va < vb
             return va > vb
@@ -106,13 +110,15 @@ func apply_sort() -> void:
         _row_container.move_child(row, i)
 
 
-static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewContext) -> Variant:
+static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewContext, provider: RowDataProvider = null) -> Variant:
     match col:
         ItemRow.Column.NAME:
             return entry.display_name
         ItemRow.Column.CONDITION:
             return entry.condition
         ItemRow.Column.PRICE:
+            if provider != null:
+                return provider.price_for(entry)
             return entry.price_value_for(ctx)
         ItemRow.Column.POTENTIAL:
             return 0 if entry.is_veiled() else entry.potential_price_max
@@ -124,6 +130,10 @@ static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewC
             if entry.item_data == null or entry.item_data.category_data == null:
                 return 0
             return entry.item_data.category_data.get_cells().size()
+        ItemRow.Column.MARKET_FACTOR:
+            if provider != null:
+                return provider.market_factor_for(entry)
+            return 0.0
         _:
             push_warning("Unknown Column: %d" % col)
             return 0
@@ -144,7 +154,15 @@ func _build_header() -> void:
 
         var label_text: String
         if col == ItemRow.Column.PRICE:
-            label_text = ItemRow.get_price_header(_ctx)
+            if _provider != null:
+                label_text = _provider.price_header()
+            else:
+                label_text = ItemRow.get_price_header(_ctx)
+        elif col == ItemRow.Column.MARKET_FACTOR:
+            if _provider != null:
+                label_text = _provider.market_factor_header()
+            else:
+                label_text = ItemRow.COLUMN_HEADERS[col]
         else:
             label_text = ItemRow.COLUMN_HEADERS[col]
 

@@ -168,27 +168,27 @@ func get_potential_rating() -> String:
         return "Probably Junk"
 
 
-var current_price_min: int:
+var estimated_value_min: int:
     get:
         if is_veiled():
             return 0
         var cond_mult: float = get_known_condition_multiplier()
         return int(active_layer().base_value * cond_mult * knowledge_min[layer_index])
 
-var current_price_max: int:
+var estimated_value_max: int:
     get:
         if is_veiled():
             return 0
         var cond_mult: float = get_known_condition_multiplier()
         return int(active_layer().base_value * cond_mult * knowledge_max[layer_index])
 
-var current_price_label: String:
+var estimated_value_label: String:
     get:
         if is_veiled():
             return "???"
-        if current_price_min == current_price_max:
-            return "$%d" % current_price_min
-        return "$%d - $%d" % [current_price_min, current_price_max]
+        if estimated_value_min == estimated_value_max:
+            return "$%d" % estimated_value_min
+        return "$%d - $%d" % [estimated_value_min, estimated_value_max]
 
 var potential_price_min: int:
     get:
@@ -220,7 +220,7 @@ var potential_price_label: String:
             return "???"
         return "$%d - $%d" % [potential_price_min, potential_price_max]
 
-var sell_price: int:
+var appraised_value: int:
     get:
         return int(
             active_layer().base_value
@@ -230,9 +230,9 @@ var sell_price: int:
                 ) ),
         )
 
-var sell_price_label: String:
+var appraised_value_label: String:
     get:
-        return "$%d" % sell_price
+        return "$%d" % appraised_value
 
 # ── Display colors ────────────────────────────────────────────────────────────
 
@@ -330,25 +330,25 @@ func should_show_potential_price_for(ctx: ItemViewContext) -> bool:
 
 func price_label_for(ctx: ItemViewContext) -> String:
     match ctx.price_mode:
-        ItemViewContext.PriceMode.SELL_PRICE:
-            return sell_price_label
+        ItemViewContext.PriceMode.APPRAISED_VALUE:
+            return appraised_value_label
         ItemViewContext.PriceMode.BASE_VALUE:
             return "???" if is_veiled() else "$%d" % active_layer().base_value
-        ItemViewContext.PriceMode.CURRENT_ESTIMATE:
-            return current_price_label
+        ItemViewContext.PriceMode.ESTIMATED_VALUE:
+            return estimated_value_label
         _:
             push_warning("Unknown PriceMode: %d" % ctx.price_mode)
-            return current_price_label
+            return estimated_value_label
 
 
 func price_value_for(ctx: ItemViewContext) -> int:
     match ctx.price_mode:
-        ItemViewContext.PriceMode.SELL_PRICE:
-            return sell_price
+        ItemViewContext.PriceMode.APPRAISED_VALUE:
+            return appraised_value
         ItemViewContext.PriceMode.BASE_VALUE:
             return 0 if is_veiled() else active_layer().base_value
-        ItemViewContext.PriceMode.CURRENT_ESTIMATE:
-            return current_price_min
+        ItemViewContext.PriceMode.ESTIMATED_VALUE:
+            return estimated_value_min
         _:
             push_warning("Unknown PriceMode: %d" % ctx.price_mode)
             return 0

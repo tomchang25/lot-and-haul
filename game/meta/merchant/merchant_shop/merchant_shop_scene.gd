@@ -91,7 +91,7 @@ func _on_sell_confirmed() -> void:
     var sold: Array[ItemEntry] = []
     for entry: ItemEntry in SaveManager.storage_items:
         if _selected.get(entry, false):
-            total += _ask_prices.get(entry, _merchant_prices.get(entry, entry.sell_price))
+            total += _ask_prices.get(entry, _merchant_prices.get(entry, entry.appraised_value))
             sold.append(entry)
 
     SaveManager.cash += total
@@ -110,7 +110,7 @@ func _on_sell_confirmed() -> void:
 func _on_slider_changed(entry: ItemEntry, normalized: float) -> void:
     # normalized ∈ [0,1] → factor ∈ [50%, 150%]
     var factor: float = lerp(ASK_PRICE_MIN_FACTOR, ASK_PRICE_MAX_FACTOR, normalized)
-    var base: int = _merchant_prices.get(entry, entry.sell_price)
+    var base: int = _merchant_prices.get(entry, entry.appraised_value)
     var ask: int = int(base * factor)
     _ask_prices[entry] = ask
     if _price_labels.has(entry):
@@ -120,7 +120,7 @@ func _on_slider_changed(entry: ItemEntry, normalized: float) -> void:
 
 
 func _merchant_price(entry: ItemEntry) -> int:
-    var base: int = entry.sell_price
+    var base: int = entry.appraised_value
     if _merchant == null:
         return base
     var super_cat := entry.item_data.category_data.super_category
@@ -221,7 +221,7 @@ func _build_sell_summary() -> String:
     var total: int = 0
     for entry: ItemEntry in SaveManager.storage_items:
         if _selected.get(entry, false):
-            var ask: int = _ask_prices.get(entry, _merchant_prices.get(entry, entry.sell_price))
+            var ask: int = _ask_prices.get(entry, _merchant_prices.get(entry, entry.appraised_value))
             total += ask
             lines.append("  %s — $%d" % [entry.display_name, ask])
     lines.append("")
@@ -253,7 +253,7 @@ func _make_price_row(entry: ItemEntry) -> HBoxContainer:
     var value_label := Label.new()
     value_label.custom_minimum_size = Vector2(100, 0)
     value_label.add_theme_font_size_override("font_size", 14)
-    value_label.text = "$%d" % _merchant_prices.get(entry, entry.sell_price)
+    value_label.text = "$%d" % _merchant_prices.get(entry, entry.appraised_value)
     price_row.add_child(value_label)
 
     _price_labels[entry] = value_label

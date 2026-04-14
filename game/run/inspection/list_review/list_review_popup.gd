@@ -62,8 +62,8 @@ func populate() -> void:
         if entry.is_veiled():
             has_veiled = true
         else:
-            total_min += entry.current_price_min
-            total_max += entry.current_price_max
+            total_min += entry.estimated_value_min
+            total_max += entry.estimated_value_max
 
     var total_text: String
     if total_min == total_max:

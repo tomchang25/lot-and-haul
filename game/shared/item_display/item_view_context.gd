@@ -26,15 +26,15 @@ enum PotentialMode {
 }
 
 enum PriceMode {
-    CURRENT_ESTIMATE,
-    SELL_PRICE,
+    ESTIMATED_VALUE,
+    APPRAISED_VALUE,
     BASE_VALUE,
 }
 
 var stage: Stage
 var condition_mode: ConditionMode = ConditionMode.RESPECT_INSPECT_LEVEL
 var potential_mode: PotentialMode = PotentialMode.RESPECT_INSPECT_LEVEL
-var price_mode: PriceMode = PriceMode.CURRENT_ESTIMATE
+var price_mode: PriceMode = PriceMode.ESTIMATED_VALUE
 
 # ── Factories ─────────────────────────────────────────────────────────────────
 
@@ -50,7 +50,7 @@ static func for_list_review() -> ItemViewContext:
     ctx.stage = Stage.LIST_REVIEW
     ctx.condition_mode = ConditionMode.RESPECT_INSPECT_LEVEL
     ctx.potential_mode = PotentialMode.RESPECT_INSPECT_LEVEL
-    ctx.price_mode = PriceMode.CURRENT_ESTIMATE
+    ctx.price_mode = PriceMode.ESTIMATED_VALUE
 
     return ctx
 
@@ -60,7 +60,7 @@ static func for_reveal() -> ItemViewContext:
     ctx.stage = Stage.REVEAL
     ctx.condition_mode = ConditionMode.RESPECT_INSPECT_LEVEL
     ctx.potential_mode = PotentialMode.RESPECT_INSPECT_LEVEL
-    ctx.price_mode = PriceMode.CURRENT_ESTIMATE
+    ctx.price_mode = PriceMode.ESTIMATED_VALUE
 
     return ctx
 
@@ -70,7 +70,7 @@ static func for_cargo() -> ItemViewContext:
     ctx.stage = Stage.CARGO
     ctx.condition_mode = ConditionMode.FORCE_INSPECT_MAX
     ctx.potential_mode = PotentialMode.FORCE_FULL
-    ctx.price_mode = PriceMode.CURRENT_ESTIMATE
+    ctx.price_mode = PriceMode.ESTIMATED_VALUE
 
     return ctx
 
@@ -80,7 +80,7 @@ static func for_run_review() -> ItemViewContext:
     ctx.stage = Stage.RUN_REVIEW
     ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
     ctx.potential_mode = PotentialMode.FORCE_FULL
-    ctx.price_mode = PriceMode.SELL_PRICE
+    ctx.price_mode = PriceMode.APPRAISED_VALUE
     return ctx
 
 
@@ -89,5 +89,5 @@ static func for_storage() -> ItemViewContext:
     ctx.stage = Stage.STORAGE
     ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
     ctx.potential_mode = PotentialMode.FORCE_FULL
-    ctx.price_mode = PriceMode.SELL_PRICE
+    ctx.price_mode = PriceMode.APPRAISED_VALUE
     return ctx

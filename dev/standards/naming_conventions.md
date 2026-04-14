@@ -258,25 +258,25 @@ enum member later will surface unhandled branches.
 # Good — every expected mode has an explicit arm; wildcard catches bugs.
 func price_label_for(ctx: ItemViewContext) -> String:
     match ctx.price_mode:
-        ItemViewContext.PriceMode.CURRENT_ESTIMATE:
-            return current_price_label
-        ItemViewContext.PriceMode.SELL_PRICE:
-            return sell_price_label
+        ItemViewContext.PriceMode.ESTIMATED_VALUE:
+            return estimated_value_label
+        ItemViewContext.PriceMode.APPRAISED_VALUE:
+            return appraised_value_label
         ItemViewContext.PriceMode.BASE_VALUE:
             return base_value_label
         _:
             push_warning("Unknown PriceMode: %d" % ctx.price_mode)
-            return current_price_label
+            return estimated_value_label
 
-# Bad — CURRENT_ESTIMATE is a normal case hidden inside the wildcard.
+# Bad — ESTIMATED_VALUE is a normal case hidden inside the wildcard.
 func price_label_for(ctx: ItemViewContext) -> String:
     match ctx.price_mode:
-        ItemViewContext.PriceMode.SELL_PRICE:
-            return sell_price_label
+        ItemViewContext.PriceMode.APPRAISED_VALUE:
+            return appraised_value_label
         ItemViewContext.PriceMode.BASE_VALUE:
             return base_value_label
         _:
-            return current_price_label
+            return estimated_value_label
 ```
 
 If a `match` covers all members of a known enum exhaustively, the wildcard arm
