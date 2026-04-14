@@ -21,6 +21,15 @@ extends Resource
 ## 0 = no trailer. Each slot accepts any item regardless of shape or weight.
 @export var extra_slot_count: int = 0
 
+## Probability (0–1) that each trailer item takes damage at end of run.
+@export var trailer_damage_chance: float = 0.0
+
+## Minimum fraction of condition lost when trailer damage occurs.
+@export var trailer_damage_ratio_min: float = 0.0
+
+## Maximum fraction of condition lost when trailer damage occurs.
+@export var trailer_damage_ratio_max: float = 0.0
+
 ## Cost to buy this car in the Car Shop. Starter cars use 0.
 @export var price: int = 0
 

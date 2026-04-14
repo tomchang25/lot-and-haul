@@ -53,6 +53,9 @@ class CarSpec:
         w.add_field_int("stamina_cap", int(entry["stamina_cap"]))
         w.add_field_int("fuel_cost_per_day", int(entry.get("fuel_cost_per_day", 0)))
         w.add_field_int("extra_slot_count", int(entry.get("extra_slot_count", 0)))
+        w.add_field_float("trailer_damage_chance", float(entry.get("trailer_damage_chance", 0.0)))
+        w.add_field_float("trailer_damage_ratio_min", float(entry.get("trailer_damage_ratio_min", 0.0)))
+        w.add_field_float("trailer_damage_ratio_max", float(entry.get("trailer_damage_ratio_max", 0.0)))
         w.add_field_int("price", int(entry.get("price", 0)))
 
         if has_icon:
@@ -116,6 +119,36 @@ class CarSpec:
                 errors.append(
                     f"car '{car_id}': extra_slot_count must be a non-negative"
                     f" integer, got {extra_slot_count!r}"
+                )
+
+            trailer_damage_chance = car.get("trailer_damage_chance", 0.0)
+            if not isinstance(trailer_damage_chance, (int, float)) or not (0.0 <= trailer_damage_chance <= 1.0):
+                errors.append(
+                    f"car '{car_id}': trailer_damage_chance must be a float"
+                    f" in [0, 1], got {trailer_damage_chance!r}"
+                )
+
+            trailer_damage_ratio_min = car.get("trailer_damage_ratio_min", 0.0)
+            if not isinstance(trailer_damage_ratio_min, (int, float)) or not (0.0 <= trailer_damage_ratio_min <= 1.0):
+                errors.append(
+                    f"car '{car_id}': trailer_damage_ratio_min must be a float"
+                    f" in [0, 1], got {trailer_damage_ratio_min!r}"
+                )
+
+            trailer_damage_ratio_max = car.get("trailer_damage_ratio_max", 0.0)
+            if not isinstance(trailer_damage_ratio_max, (int, float)) or not (0.0 <= trailer_damage_ratio_max <= 1.0):
+                errors.append(
+                    f"car '{car_id}': trailer_damage_ratio_max must be a float"
+                    f" in [0, 1], got {trailer_damage_ratio_max!r}"
+                )
+
+            if (isinstance(trailer_damage_ratio_min, (int, float))
+                    and isinstance(trailer_damage_ratio_max, (int, float))
+                    and trailer_damage_ratio_min > trailer_damage_ratio_max):
+                errors.append(
+                    f"car '{car_id}': trailer_damage_ratio_min"
+                    f" ({trailer_damage_ratio_min}) must be <="
+                    f" trailer_damage_ratio_max ({trailer_damage_ratio_max})"
                 )
 
         return errors

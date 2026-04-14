@@ -35,7 +35,10 @@ cars:
     max_weight: 700.0
     stamina_cap: 8
     fuel_cost_per_day: 35
-    extra_slot_count: 1
+    extra_slot_count: 5
+    trailer_damage_chance: 0.75
+    trailer_damage_ratio_min: 0.05
+    trailer_damage_ratio_max: 0.2
     price: 3000
     icon: res://assets/cars/car_placeholder.png
 
@@ -48,6 +51,9 @@ cars:
     stamina_cap: 10
     fuel_cost_per_day: 55
     extra_slot_count: 1
+    trailer_damage_chance: 0.3
+    trailer_damage_ratio_min: 0.05
+    trailer_damage_ratio_max: 0.2
     price: 8000
     icon: res://assets/cars/car_placeholder.png
 
@@ -60,5 +66,8 @@ cars:
     stamina_cap: 13
     fuel_cost_per_day: 90
     extra_slot_count: 2
+    trailer_damage_chance: 0.3
+    trailer_damage_ratio_min: 0.05
+    trailer_damage_ratio_max: 0.2
     price: 20000
     icon: res://assets/cars/car_placeholder.png
