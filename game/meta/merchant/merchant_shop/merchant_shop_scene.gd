@@ -13,6 +13,7 @@ const SHOP_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
     ItemRow.Column.PRICE,
+    ItemRow.Column.MARKET_FACTOR,
     ItemRow.Column.POTENTIAL,
 ]
 

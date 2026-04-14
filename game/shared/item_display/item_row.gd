@@ -194,7 +194,7 @@ func _refresh() -> void:
         _grid_label.text = "%d  %s" % [cat.get_cells().size(), cat.shape_id]
 
     # ── MARKET FACTOR ─────────────────────────────────────────────────────────
-    _market_factor_label.text = "+0%"
+    _market_factor_label.text = "%+d%%" % int(round(_entry.market_factor_delta * 100))
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 

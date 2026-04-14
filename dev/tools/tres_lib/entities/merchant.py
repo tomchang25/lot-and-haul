@@ -30,7 +30,7 @@ class MerchantSpec:
         ctx.uid_cache[mid] = uid
 
         raw_sc = entry.get("accepted_super_categories", []) or []
-        sc_ids = [str(s).lower().replace(" ", "_") for s in raw_sc]
+        sc_ids = [str(s) for s in raw_sc]
         so_ids = entry.get("special_order_pool", []) or []
 
         w = TresWriter("Resource", "MerchantData", uid)
@@ -116,10 +116,12 @@ class MerchantSpec:
     def validate(self, entries: list, all_data: dict) -> list[str]:
         errors: list[str] = []
         seen_ids: set[str] = set()
-        known_super_cat_ids: set[str] = {
-            str(s).lower().replace(" ", "_")
-            for s in all_data.get("super_categories", [])
-        }
+        known_super_cat_ids: set[str] = set()
+        for sc in all_data.get("super_categories", []):
+            if isinstance(sc, dict):
+                known_super_cat_ids.add(sc["super_category_id"])
+            else:
+                known_super_cat_ids.add(str(sc).lower().replace(" ", "_"))
 
         for merchant in entries:
             mid = merchant.get("merchant_id", "")
@@ -158,7 +160,7 @@ class MerchantSpec:
 
             if known_super_cat_ids:
                 for sc in merchant.get("accepted_super_categories", []) or []:
-                    sc_id = str(sc).lower().replace(" ", "_")
+                    sc_id = str(sc)
                     if sc_id not in known_super_cat_ids:
                         errors.append(
                             f"merchant '{mid}': accepted_super_category '{sc}'"
