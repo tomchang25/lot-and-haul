@@ -4,11 +4,14 @@
 # Persisted via SaveManager; advanced via advance_market() on day pass.
 extends Node
 
+const MIN_CATEGORY_FACTOR := 0.5
+const MAX_CATEGORY_FACTOR := 2.0
+
 # { super_category_id: String → float } — drifting mean per super-category.
-var super_cat_means: Dictionary = {}
+var super_cat_means: Dictionary = { }
 
 # { category_id: String → float } — today's price factor per category.
-var category_factors_today: Dictionary = {}
+var category_factors_today: Dictionary = { }
 
 
 func _ready() -> void:
@@ -32,7 +35,6 @@ func advance_market(days: int) -> void:
     _walk_means(days)
     _resample_today()
 
-
 # ── Private ──────────────────────────────────────────────────────────────────
 
 
@@ -47,7 +49,7 @@ func _walk_means(days: int) -> void:
         if sc == null:
             continue
         var mean: float = super_cat_means[sc_id]
-        for _d in range(days):
+        for d in range(days):
             mean += randfn(0.0, sc.market_drift_per_day)
             mean = clampf(mean, sc.market_mean_min, sc.market_mean_max)
         super_cat_means[sc_id] = mean
@@ -60,7 +62,7 @@ func _resample_today() -> void:
         var mean: float = super_cat_means.get(sc_id, 1.0)
         var stddev: float = sc.market_stddev if sc != null else 0.02
         var factor: float = randfn(mean, stddev)
-        factor = clampf(factor, 0.5, 2.0)
+        factor = clampf(factor, MIN_CATEGORY_FACTOR, MAX_CATEGORY_FACTOR)
         category_factors_today[cat_id] = factor
 
 

@@ -232,13 +232,16 @@ var appraised_value: int:
 
 var market_price: int:
     get:
-        return int(appraised_value *
-            MarketManager.get_category_factor(item_data.category_data.category_id))
+        return int(
+            appraised_value *
+            MarketManager.get_category_factor(item_data.category_data.category_id),
+        )
 
 var market_factor_delta: float:
     get:
         return MarketManager.get_category_factor(
-            item_data.category_data.category_id) - 1.0
+            item_data.category_data.category_id,
+        ) - 1.0
 
 var appraised_value_label: String:
     get:
