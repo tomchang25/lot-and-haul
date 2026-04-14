@@ -89,7 +89,7 @@ func _populate_rows() -> void:
 func _on_reveal_complete() -> void:
     _ctx.condition_mode = ItemViewContext.ConditionMode.FORCE_INSPECT_MAX
     _ctx.potential_mode = ItemViewContext.PotentialMode.FORCE_FULL
-    _ctx.price_mode = ItemViewContext.PriceMode.CURRENT_ESTIMATE
+    _ctx.price_mode = ItemViewContext.PriceMode.ESTIMATED_VALUE
 
     _item_list_panel.rebuild_header()
     for entry: ItemEntry in _won_items:

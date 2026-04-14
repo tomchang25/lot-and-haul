@@ -24,6 +24,7 @@ enum Column {
     POTENTIAL,
     WEIGHT,
     GRID,
+    MARKET_FACTOR,
 }
 
 # Header text shown for each column. PRICE is dynamic — see get_price_header().
@@ -34,6 +35,7 @@ const COLUMN_HEADERS: Dictionary = {
     Column.POTENTIAL: "Potential",
     Column.WEIGHT: "Weight",
     Column.GRID: "Grid",
+    Column.MARKET_FACTOR: "Market",
 }
 
 const COLUMN_MIN_WIDTH: Dictionary = {
@@ -43,15 +45,16 @@ const COLUMN_MIN_WIDTH: Dictionary = {
     Column.POTENTIAL: 160,
     Column.WEIGHT: 100,
     Column.GRID: 80,
+    Column.MARKET_FACTOR: 100,
 }
 
 
 static func get_price_header(ctx: ItemViewContext) -> String:
     match ctx.price_mode:
-        ItemViewContext.PriceMode.CURRENT_ESTIMATE:
+        ItemViewContext.PriceMode.ESTIMATED_VALUE:
             return "Est. Value"
-        ItemViewContext.PriceMode.SELL_PRICE:
-            return "Sell Price"
+        ItemViewContext.PriceMode.APPRAISED_VALUE:
+            return "Appraised Value"
         ItemViewContext.PriceMode.BASE_VALUE:
             return "Base Value"
         _:
@@ -63,6 +66,7 @@ static func get_price_header(ctx: ItemViewContext) -> String:
 var _entry: ItemEntry = null
 var _ctx: ItemViewContext = null
 var _columns: Array = []
+var _provider: RowDataProvider = null
 var _selection_state: SelectionState = SelectionState.NONE
 
 # Built once on demand and reused across all rows.
@@ -92,6 +96,7 @@ static func _ensure_styles() -> void:
 @onready var _potential_label: Label = $HBoxContainer/PotentialLabel
 @onready var _weight_label: Label = $HBoxContainer/WeightLabel
 @onready var _grid_label: Label = $HBoxContainer/GridLabel
+@onready var _market_factor_label: Label = $HBoxContainer/MarketFactorLabel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -116,6 +121,10 @@ func setup(entry: ItemEntry, ctx: ItemViewContext, columns: Array = []) -> void:
 
 func refresh() -> void:
     _refresh()
+
+
+func set_provider(provider: RowDataProvider) -> void:
+    _provider = provider
 
 
 # Called by consuming scenes to apply row selection styling.
@@ -164,6 +173,7 @@ func _refresh() -> void:
     _potential_label.visible = Column.POTENTIAL in _columns
     _weight_label.visible = Column.WEIGHT in _columns
     _grid_label.visible = Column.GRID in _columns
+    _market_factor_label.visible = Column.MARKET_FACTOR in _columns
 
     # ── NAME ──────────────────────────────────────────────────────────────────
     _name_label.text = _entry.display_name
@@ -173,7 +183,10 @@ func _refresh() -> void:
     _condition_label.modulate = _entry.condition_color_for(_ctx)
 
     # ── PRICE ─────────────────────────────────────────────────────────────────
-    _price_label.text = _entry.price_label_for(_ctx)
+    if _provider != null:
+        _price_label.text = _provider.price_label_for(_entry)
+    else:
+        _price_label.text = _entry.price_label_for(_ctx)
     _price_label.add_theme_color_override(&"font_color", _entry.price_color)
 
     # ── POTENTIAL ─────────────────────────────────────────────────────────────
@@ -185,6 +198,12 @@ func _refresh() -> void:
         var cat := _entry.item_data.category_data
         _weight_label.text = "%.1f kg" % cat.weight
         _grid_label.text = "%d  %s" % [cat.get_cells().size(), cat.shape_id]
+
+    # ── MARKET FACTOR ─────────────────────────────────────────────────────────
+    if _provider != null:
+        _market_factor_label.text = _provider.market_factor_label_for(_entry)
+    else:
+        _market_factor_label.text = "0%"
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
