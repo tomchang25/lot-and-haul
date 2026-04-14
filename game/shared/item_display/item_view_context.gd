@@ -96,11 +96,11 @@ static func for_storage() -> ItemViewContext:
     return ctx
 
 
-static func for_merchant_shop(merchant: MerchantData) -> ItemViewContext:
+static func for_merchant_shop(_merchant: MerchantData) -> ItemViewContext:
     var ctx := ItemViewContext.new()
     ctx.stage = Stage.MERCHANT_SHOP
     ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
     ctx.potential_mode = PotentialMode.FORCE_FULL
     ctx.price_mode = PriceMode.MERCHANT_OFFER
-    ctx.merchant = merchant
+    ctx.merchant = _merchant
     return ctx

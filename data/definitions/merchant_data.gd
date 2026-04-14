@@ -75,7 +75,7 @@ func offer_for(entry: ItemEntry) -> int:
     elif accepts_off_category:
         return int(base * off_category_multiplier)
     else:
-        return base
+        return 0
 
 # ── Runtime state (not serialised) ───────────────────────────────────────────
 
