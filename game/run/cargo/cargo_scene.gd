@@ -203,10 +203,11 @@ func _on_confirm_popup_confirmed() -> void:
         if entry not in cargo:
             cargo.append(entry)
 
+    RunManager.run_record.cargo_items = cargo
+
     var trailer: Array[ItemEntry] = []
     for entry: ItemEntry in _extra_slot_items:
         if entry != null:
-            cargo.append(entry)
             trailer.append(entry)
 
     RunManager.run_record.cargo_items = cargo
