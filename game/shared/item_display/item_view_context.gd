@@ -12,6 +12,7 @@ enum Stage {
     CARGO,
     RUN_REVIEW,
     STORAGE,
+    MERCHANT_SHOP,
 }
 
 enum ConditionMode {
@@ -29,12 +30,14 @@ enum PriceMode {
     ESTIMATED_VALUE,
     APPRAISED_VALUE,
     BASE_VALUE,
+    MERCHANT_OFFER,
 }
 
 var stage: Stage
 var condition_mode: ConditionMode = ConditionMode.RESPECT_INSPECT_LEVEL
 var potential_mode: PotentialMode = PotentialMode.RESPECT_INSPECT_LEVEL
 var price_mode: PriceMode = PriceMode.ESTIMATED_VALUE
+var merchant: MerchantData = null
 
 # ── Factories ─────────────────────────────────────────────────────────────────
 
@@ -90,4 +93,14 @@ static func for_storage() -> ItemViewContext:
     ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
     ctx.potential_mode = PotentialMode.FORCE_FULL
     ctx.price_mode = PriceMode.APPRAISED_VALUE
+    return ctx
+
+
+static func for_merchant_shop(merchant: MerchantData) -> ItemViewContext:
+    var ctx := ItemViewContext.new()
+    ctx.stage = Stage.MERCHANT_SHOP
+    ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
+    ctx.potential_mode = PotentialMode.FORCE_FULL
+    ctx.price_mode = PriceMode.MERCHANT_OFFER
+    ctx.merchant = merchant
     return ctx

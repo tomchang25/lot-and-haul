@@ -336,6 +336,8 @@ func price_label_for(ctx: ItemViewContext) -> String:
             return "???" if is_veiled() else "$%d" % active_layer().base_value
         ItemViewContext.PriceMode.ESTIMATED_VALUE:
             return estimated_value_label
+        ItemViewContext.PriceMode.MERCHANT_OFFER:
+            return "$%d" % price_value_for(ctx)
         _:
             push_warning("Unknown PriceMode: %d" % ctx.price_mode)
             return estimated_value_label
@@ -349,6 +351,8 @@ func price_value_for(ctx: ItemViewContext) -> int:
             return 0 if is_veiled() else active_layer().base_value
         ItemViewContext.PriceMode.ESTIMATED_VALUE:
             return estimated_value_min
+        ItemViewContext.PriceMode.MERCHANT_OFFER:
+            return ctx.merchant.offer_for(self) if ctx.merchant else appraised_value
         _:
             push_warning("Unknown PriceMode: %d" % ctx.price_mode)
             return 0

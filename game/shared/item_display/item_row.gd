@@ -57,6 +57,8 @@ static func get_price_header(ctx: ItemViewContext) -> String:
             return "Appraised Value"
         ItemViewContext.PriceMode.BASE_VALUE:
             return "Base Value"
+        ItemViewContext.PriceMode.MERCHANT_OFFER:
+            return "%s Offer" % ctx.merchant.display_name if ctx.merchant else "Offer"
         _:
             push_warning("Unknown PriceMode: %d" % ctx.price_mode)
             return "Price"
@@ -66,7 +68,6 @@ static func get_price_header(ctx: ItemViewContext) -> String:
 var _entry: ItemEntry = null
 var _ctx: ItemViewContext = null
 var _columns: Array = []
-var _provider: RowDataProvider = null
 var _selection_state: SelectionState = SelectionState.NONE
 
 # Built once on demand and reused across all rows.
@@ -121,10 +122,6 @@ func setup(entry: ItemEntry, ctx: ItemViewContext, columns: Array = []) -> void:
 
 func refresh() -> void:
     _refresh()
-
-
-func set_provider(provider: RowDataProvider) -> void:
-    _provider = provider
 
 
 # Called by consuming scenes to apply row selection styling.
@@ -183,10 +180,7 @@ func _refresh() -> void:
     _condition_label.modulate = _entry.condition_color_for(_ctx)
 
     # ── PRICE ─────────────────────────────────────────────────────────────────
-    if _provider != null:
-        _price_label.text = _provider.price_label_for(_entry)
-    else:
-        _price_label.text = _entry.price_label_for(_ctx)
+    _price_label.text = _entry.price_label_for(_ctx)
     _price_label.add_theme_color_override(&"font_color", _entry.price_color)
 
     # ── POTENTIAL ─────────────────────────────────────────────────────────────
@@ -200,10 +194,7 @@ func _refresh() -> void:
         _grid_label.text = "%d  %s" % [cat.get_cells().size(), cat.shape_id]
 
     # ── MARKET FACTOR ─────────────────────────────────────────────────────────
-    if _provider != null:
-        _market_factor_label.text = _provider.market_factor_label_for(_entry)
-    else:
-        _market_factor_label.text = "0%"
+    _market_factor_label.text = "+0%"
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 

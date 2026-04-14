@@ -64,6 +64,19 @@ extends Resource
 # Empty string = no gate (accessible to all players).
 @export var required_perk_id: String = ""
 
+# ── Offer logic ──────────────────────────────────────────────────────────────
+
+
+func offer_for(entry: ItemEntry) -> int:
+    var base: int = entry.appraised_value
+    if not accepted_super_categories.is_empty() \
+    and accepted_super_categories.has(entry.item_data.category_data.super_category):
+        return int(base * price_multiplier)
+    elif accepts_off_category:
+        return int(base * off_category_multiplier)
+    else:
+        return base
+
 # ── Runtime state (not serialised) ───────────────────────────────────────────
 
 # Items currently on special order. Populated at runtime each Day Pass by

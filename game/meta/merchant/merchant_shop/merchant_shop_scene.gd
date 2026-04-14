@@ -26,7 +26,6 @@ var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
 var _selected: Dictionary = { } # ItemEntry → bool
 var _ask_prices: Dictionary = { } # ItemEntry → int
-var _merchant_prices: Dictionary = { } # ItemEntry → int (base price with merchant mult)
 var _price_labels: Dictionary = { } # ItemEntry → Label
 var _price_rows: Dictionary = { } # ItemEntry → Control (the slider row)
 var _rows: Dictionary = { } # ItemEntry → ItemRow
@@ -47,7 +46,7 @@ var _rows: Dictionary = { } # ItemEntry → ItemRow
 
 func _ready() -> void:
     _merchant = GameManager.consume_pending_merchant()
-    _ctx = ItemViewContext.for_run_review()
+    _ctx = ItemViewContext.for_merchant_shop(_merchant)
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 
@@ -91,7 +90,7 @@ func _on_sell_confirmed() -> void:
     var sold: Array[ItemEntry] = []
     for entry: ItemEntry in SaveManager.storage_items:
         if _selected.get(entry, false):
-            total += _ask_prices.get(entry, _merchant_prices.get(entry, entry.appraised_value))
+            total += _ask_prices.get(entry, _merchant.offer_for(entry))
             sold.append(entry)
 
     SaveManager.cash += total
@@ -110,29 +109,11 @@ func _on_sell_confirmed() -> void:
 func _on_slider_changed(entry: ItemEntry, normalized: float) -> void:
     # normalized ∈ [0,1] → factor ∈ [50%, 150%]
     var factor: float = lerp(ASK_PRICE_MIN_FACTOR, ASK_PRICE_MAX_FACTOR, normalized)
-    var base: int = _merchant_prices.get(entry, entry.appraised_value)
+    var base: int = _merchant.offer_for(entry)
     var ask: int = int(base * factor)
     _ask_prices[entry] = ask
     if _price_labels.has(entry):
         _price_labels[entry].text = "$%d" % ask
-
-# ══ Merchant pricing ═════════════════════════════════════════════════════════
-
-
-func _merchant_price(entry: ItemEntry) -> int:
-    var base: int = entry.appraised_value
-    if _merchant == null:
-        return base
-    var super_cat := entry.item_data.category_data.super_category
-    var is_specialist := not _merchant.accepted_super_categories.is_empty()
-    var is_on_category := not is_specialist or _merchant.accepted_super_categories.has(super_cat)
-
-    if is_on_category:
-        return int(base * _merchant.price_multiplier)
-    elif _merchant.accepts_off_category:
-        return int(base * _merchant.off_category_multiplier)
-    else:
-        return 0
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 
@@ -141,10 +122,9 @@ func _populate_rows() -> void:
     # Filter items this merchant will buy
     var buyable: Array[ItemEntry] = []
     for entry: ItemEntry in SaveManager.storage_items:
-        var mp: int = _merchant_price(entry)
+        var mp: int = _merchant.offer_for(entry)
         if mp > 0:
             buyable.append(entry)
-            _merchant_prices[entry] = mp
 
     if buyable.is_empty():
         _empty_label.visible = true
@@ -157,7 +137,7 @@ func _populate_rows() -> void:
 
     for entry: ItemEntry in buyable:
         _selected[entry] = false
-        _ask_prices[entry] = _merchant_prices[entry]
+        _ask_prices[entry] = _merchant.offer_for(entry)
 
         var row: ItemRow = ItemRowScene.instantiate()
         row.setup(entry, _ctx, SHOP_COLUMNS)
@@ -193,7 +173,6 @@ func _refresh_row_state(entry: ItemEntry) -> void:
 func _rebuild_after_sale() -> void:
     _selected.clear()
     _ask_prices.clear()
-    _merchant_prices.clear()
     _price_labels.clear()
     _price_rows.clear()
     _rows.clear()
@@ -221,7 +200,7 @@ func _build_sell_summary() -> String:
     var total: int = 0
     for entry: ItemEntry in SaveManager.storage_items:
         if _selected.get(entry, false):
-            var ask: int = _ask_prices.get(entry, _merchant_prices.get(entry, entry.appraised_value))
+            var ask: int = _ask_prices.get(entry, _merchant.offer_for(entry))
             total += ask
             lines.append("  %s — $%d" % [entry.display_name, ask])
     lines.append("")
@@ -253,7 +232,7 @@ func _make_price_row(entry: ItemEntry) -> HBoxContainer:
     var value_label := Label.new()
     value_label.custom_minimum_size = Vector2(100, 0)
     value_label.add_theme_font_size_override("font_size", 14)
-    value_label.text = "$%d" % _merchant_prices.get(entry, entry.appraised_value)
+    value_label.text = "$%d" % _merchant.offer_for(entry)
     price_row.add_child(value_label)
 
     _price_labels[entry] = value_label
