@@ -60,6 +60,8 @@ func save() -> void:
         "available_location_ids": available_location_ids,
         "unlocked_perks": unlocked_perks,
         "skill_levels": skill_levels,
+        "super_cat_means": MarketManager.super_cat_means,
+        "category_factors_today": MarketManager.category_factors_today,
     }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
     if file == null:
@@ -132,6 +134,16 @@ func _read_save_file() -> void:
                 skill_levels[key] = int(parsed["skill_levels"][key])
     else:
         skill_levels = { }
+    if parsed.has("super_cat_means") and parsed["super_cat_means"] is Dictionary:
+        MarketManager.super_cat_means = { }
+        for key: Variant in parsed["super_cat_means"]:
+            if key is String and parsed["super_cat_means"][key] is float:
+                MarketManager.super_cat_means[key] = parsed["super_cat_means"][key]
+    if parsed.has("category_factors_today") and parsed["category_factors_today"] is Dictionary:
+        MarketManager.category_factors_today = { }
+        for key: Variant in parsed["category_factors_today"]:
+            if key is String and parsed["category_factors_today"][key] is float:
+                MarketManager.category_factors_today[key] = parsed["category_factors_today"][key]
 
 
 # Idempotent migration: guarantees a fresh save gets the starter van, and
@@ -206,6 +218,7 @@ func advance_days(days: int) -> DaySummary:
     summary.completed_actions = _tick_actions(days)
     summary.end_day = current_day
 
+    MarketManager.advance_market(days)
     MerchantRegistry.roll_special_orders()
     available_location_ids.clear()
 

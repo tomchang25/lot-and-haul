@@ -21,10 +21,30 @@
 #     shape_id: s1x2                 # cargo shape key. See CargoShapes.SHAPES.
 
 super_categories:
-  - Fashion
-  - Decorative
-  - Fine Art
-  - Weapon
+  - super_category_id: fashion
+    display_name: Fashion
+    market_mean_min: 0.7
+    market_mean_max: 1.3
+    market_stddev: 0.08
+    market_drift_per_day: 0.05
+  - super_category_id: decorative
+    display_name: Decorative
+    market_mean_min: 0.7
+    market_mean_max: 1.3
+    market_stddev: 0.08
+    market_drift_per_day: 0.05
+  - super_category_id: fine_art
+    display_name: Fine Art
+    market_mean_min: 0.7
+    market_mean_max: 1.3
+    market_stddev: 0.08
+    market_drift_per_day: 0.05
+  - super_category_id: weapon
+    display_name: Weapon
+    market_mean_min: 0.7
+    market_mean_max: 1.3
+    market_stddev: 0.08
+    market_drift_per_day: 0.05
 
 categories:
   - category_id: motorcycle

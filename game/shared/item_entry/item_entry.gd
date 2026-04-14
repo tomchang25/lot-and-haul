@@ -234,6 +234,15 @@ var appraised_value_label: String:
     get:
         return "$%d" % appraised_value
 
+var market_price: int:
+    get:
+        return int(appraised_value * MarketManager.get_category_factor(
+            item_data.category_data.category_id))
+
+var market_price_label: String:
+    get:
+        return "$%d" % market_price
+
 # ── Display colors ────────────────────────────────────────────────────────────
 
 ## The tint to apply to any condition label, based on the true condition value.
@@ -331,7 +340,7 @@ func should_show_potential_price_for(ctx: ItemViewContext) -> bool:
 func price_label_for(ctx: ItemViewContext) -> String:
     match ctx.price_mode:
         ItemViewContext.PriceMode.APPRAISED_VALUE:
-            return appraised_value_label
+            return market_price_label
         ItemViewContext.PriceMode.BASE_VALUE:
             return "???" if is_veiled() else "$%d" % active_layer().base_value
         ItemViewContext.PriceMode.ESTIMATED_VALUE:
@@ -344,7 +353,7 @@ func price_label_for(ctx: ItemViewContext) -> String:
 func price_value_for(ctx: ItemViewContext) -> int:
     match ctx.price_mode:
         ItemViewContext.PriceMode.APPRAISED_VALUE:
-            return appraised_value
+            return market_price
         ItemViewContext.PriceMode.BASE_VALUE:
             return 0 if is_veiled() else active_layer().base_value
         ItemViewContext.PriceMode.ESTIMATED_VALUE:

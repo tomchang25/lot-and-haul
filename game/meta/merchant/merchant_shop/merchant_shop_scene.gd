@@ -120,7 +120,7 @@ func _on_slider_changed(entry: ItemEntry, normalized: float) -> void:
 
 
 func _merchant_price(entry: ItemEntry) -> int:
-    var base: int = entry.appraised_value
+    var base: int = entry.market_price
     if _merchant == null:
         return base
     var super_cat := entry.item_data.category_data.super_category
