@@ -3,9 +3,9 @@ merchants:
     display_name: Pawn Shop
     description: "Buys anything, but at below-market rates."
     accepted_super_categories: []
-    price_multiplier: 0.7
-    accepts_off_category: false
-    off_category_multiplier: 0.5
+    price_multiplier: 1.0
+    accepts_off_category: true
+    off_category_multiplier: 0.7
     accept_base_chance: 0.95
     haggle_penalty_per_10pct: 0.20
     max_counter_offers: 1
