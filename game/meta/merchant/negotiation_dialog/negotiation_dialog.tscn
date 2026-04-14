@@ -1,0 +1,202 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/meta/merchant/negotiation_dialog/negotiation_dialog.gd" id="1_negdlg"]
+
+[node name="NegotiationDialog" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_negdlg")
+
+[node name="Overlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0, 0, 0, 0.6)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Negotiation"
+horizontal_alignment = 1
+
+[node name="Sep1" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="BasketSummaryVBox" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BasketCountLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBox/BasketSummaryVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "0 items"
+horizontal_alignment = 1
+
+[node name="BasketValueLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBox/BasketSummaryVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Base offer: $0"
+horizontal_alignment = 1
+
+[node name="Sep2" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="OfferVBox" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CurrentOfferLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBox/OfferVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Current Offer: $0"
+horizontal_alignment = 1
+
+[node name="CeilingRangeLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBox/OfferVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Merchant range: $0 – $0"
+horizontal_alignment = 1
+
+[node name="AngerBar" type="ProgressBar" parent="CenterContainer/Panel/MarginContainer/VBox/OfferVBox"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+max_value = 100.0
+show_percentage = false
+
+[node name="AngerLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBox/OfferVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "Merchant patience"
+horizontal_alignment = 1
+
+[node name="Sep3" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="ProposalVBox" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ProposalButtonRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBox/ProposalVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="Minus50Btn" type="Button" parent="CenterContainer/Panel/MarginContainer/VBox/ProposalVBox/ProposalButtonRow"]
+custom_minimum_size = Vector2(64, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "-50%"
+
+[node name="Minus25Btn" type="Button" parent="CenterContainer/Panel/MarginContainer/VBox/ProposalVBox/ProposalButtonRow"]
+custom_minimum_size = Vector2(64, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "-25%"
+
+[node name="Minus10Btn" type="Button" parent="CenterContainer/Panel/MarginContainer/VBox/ProposalVBox/ProposalButtonRow"]
+custom_minimum_size = Vector2(64, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "-10%"
+
+[node name="Plus10Btn" type="Button" parent="CenterContainer/Panel/MarginContainer/VBox/ProposalVBox/ProposalButtonRow"]
+custom_minimum_size = Vector2(64, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "+10%"
+
+[node name="Plus25Btn" type="Button" parent="CenterContainer/Panel/MarginContainer/VBox/ProposalVBox/ProposalButtonRow"]
+custom_minimum_size = Vector2(64, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "+25%"
+
+[node name="Plus50Btn" type="Button" parent="CenterContainer/Panel/MarginContainer/VBox/ProposalVBox/ProposalButtonRow"]
+custom_minimum_size = Vector2(64, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "+50%"
+
+[node name="SubmitRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBox/ProposalVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="ProposalInput" type="SpinBox" parent="CenterContainer/Panel/MarginContainer/VBox/ProposalVBox/SubmitRow"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+min_value = 0.0
+max_value = 999999.0
+step = 1.0
+rounded = true
+
+[node name="SubmitBtn" type="Button" parent="CenterContainer/Panel/MarginContainer/VBox/ProposalVBox/SubmitRow"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Submit Proposal"
+
+[node name="FinalOfferVBox" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBox"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FinalOfferMessage" type="Label" parent="CenterContainer/Panel/MarginContainer/VBox/FinalOfferVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.7, 0.3, 1)
+theme_override_font_sizes/font_size = 16
+text = "This is the shopkeeper's final offer — take it or leave it."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="AcceptBtn" type="Button" parent="CenterContainer/Panel/MarginContainer/VBox/FinalOfferVBox"]
+custom_minimum_size = Vector2(200, 44)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 18
+text = "Accept"
+
+[node name="WalkAwayBtn" type="Button" parent="CenterContainer/Panel/MarginContainer/VBox"]
+custom_minimum_size = Vector2(200, 44)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 16
+text = "Walk Away"
+
+[node name="LowballConfirm" type="ConfirmationDialog" parent="."]
+title = "Below Current Offer"
+dialog_text = "Your offer is below the shopkeeper's — are you sure?"

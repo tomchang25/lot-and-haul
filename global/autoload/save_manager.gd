@@ -62,6 +62,7 @@ func save() -> void:
         "skill_levels": skill_levels,
         "super_cat_means": MarketManager.super_cat_means,
         "category_factors_today": MarketManager.category_factors_today,
+        "merchant_negotiations_used_today": _build_negotiation_dict(),
     }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
     if file == null:
@@ -147,6 +148,14 @@ func _read_save_file() -> void:
             if key is String and parsed["category_factors_today"][key] is float:
                 MarketManager.category_factors_today[key] = float(parsed["category_factors_today"][key])
 
+    if parsed.has("merchant_negotiations_used_today") and parsed["merchant_negotiations_used_today"] is Dictionary:
+        var neg_dict: Dictionary = parsed["merchant_negotiations_used_today"]
+        for key: Variant in neg_dict:
+            if key is String and neg_dict[key] is float:
+                var m: MerchantData = MerchantRegistry.get_merchant(key)
+                if m != null:
+                    m.negotiations_used_today = int(neg_dict[key])
+
 
 # Idempotent migration: guarantees a fresh save gets the starter van, and
 # repairs saves whose `active_car_id` no longer resolves against CarRegistry
@@ -221,7 +230,7 @@ func advance_days(days: int) -> DaySummary:
     summary.end_day = current_day
 
     MarketManager.advance_market(days)
-    MerchantRegistry.roll_special_orders()
+    MerchantRegistry.advance_day()
     available_location_ids.clear()
 
     save()
@@ -282,6 +291,14 @@ func _action_effect_label(type: ActiveActionEntry.ActionType) -> String:
         ActiveActionEntry.ActionType.UNLOCK:
             return "Layer unlocked"
     return "Done"
+
+
+func _build_negotiation_dict() -> Dictionary:
+    var result: Dictionary = { }
+    for m: MerchantData in MerchantRegistry.get_all_merchants():
+        if m.negotiations_used_today > 0:
+            result[m.merchant_id] = m.negotiations_used_today
+    return result
 
 
 func _serialize_item(entry: ItemEntry) -> Dictionary:

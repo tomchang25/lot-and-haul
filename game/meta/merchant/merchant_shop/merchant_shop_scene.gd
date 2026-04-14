@@ -1,13 +1,15 @@
 # merchant_shop_scene.gd
-# Merchant Shop — Sell selected storage items to a specific merchant.
+# Merchant Shop — Select storage items and negotiate a basket sale.
 # Reads:  SaveManager.storage_items, SaveManager.cash, GameManager (merchant hand-off)
 # Writes: SaveManager.storage_items, SaveManager.cash
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
+const NegotiationDialogScene: PackedScene = preload(
+    "res://game/meta/merchant/negotiation_dialog/negotiation_dialog.tscn"
+)
 
 const SHOP_COLUMNS: Array = [
     ItemRow.Column.NAME,
@@ -17,30 +19,21 @@ const SHOP_COLUMNS: Array = [
     ItemRow.Column.POTENTIAL,
 ]
 
-const ASK_PRICE_MIN_FACTOR := 0.50
-const ASK_PRICE_MAX_FACTOR := 1.50
-
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _merchant: MerchantData = null
 var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
 var _selected: Dictionary = { } # ItemEntry → bool
-var _ask_prices: Dictionary = { } # ItemEntry → int
-var _price_labels: Dictionary = { } # ItemEntry → Label
-var _price_rows: Dictionary = { } # ItemEntry → Control (the slider row)
-var _rows: Dictionary = { } # ItemEntry → ItemRow
+var _negotiation_dialog: Control = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _title_label: Label = $RootVBox/TitleLabel
-@onready var _row_container: VBoxContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer/RowContainer
+@onready var _item_list_panel: ItemListPanel = $RootVBox/ListCenter/OuterVBox/ItemListPanel
 @onready var _sell_btn: Button = $RootVBox/Footer/SellButton
 @onready var _back_btn: Button = $RootVBox/Footer/BackButton
 @onready var _empty_label: Label = $RootVBox/ListCenter/OuterVBox/EmptyLabel
-@onready var _sell_confirm: ConfirmationDialog = $SellConfirm
-
-@onready var _scroll_container: ScrollContainer = $RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -55,7 +48,10 @@ func _ready() -> void:
 
     _back_btn.pressed.connect(_on_back_pressed)
     _sell_btn.pressed.connect(_on_sell_pressed)
-    _sell_confirm.confirmed.connect(_on_sell_confirmed)
+
+    _item_list_panel.row_pressed.connect(_on_row_pressed)
+    _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
+    _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
 
     _populate_rows()
     _refresh_sell_button()
@@ -69,7 +65,11 @@ func _on_back_pressed() -> void:
 
 func _on_row_pressed(entry: ItemEntry) -> void:
     _selected[entry] = not _selected.get(entry, false)
-    _refresh_row_state(entry)
+    var row: ItemRow = _item_list_panel.get_row(entry)
+    if row != null:
+        row.set_selection_state(
+            ItemRow.SelectionState.SELECTED if _selected[entry] else ItemRow.SelectionState.AVAILABLE,
+        )
     _refresh_sell_button()
 
 
@@ -82,19 +82,29 @@ func _on_row_tooltip_requested(
 
 
 func _on_sell_pressed() -> void:
-    _sell_confirm.dialog_text = _build_sell_summary()
-    _sell_confirm.popup_centered()
+    var basket: Array[ItemEntry] = []
+    for entry: ItemEntry in _selected:
+        if _selected[entry]:
+            basket.append(entry)
+    if basket.is_empty():
+        return
+
+    if _negotiation_dialog == null:
+        _negotiation_dialog = NegotiationDialogScene.instantiate()
+        add_child(_negotiation_dialog)
+        _negotiation_dialog.accepted.connect(_on_negotiation_accepted)
+        _negotiation_dialog.cancelled.connect(_on_negotiation_cancelled)
+
+    _negotiation_dialog.begin(_merchant, basket)
 
 
-func _on_sell_confirmed() -> void:
-    var total: int = 0
+func _on_negotiation_accepted(final_price: int) -> void:
     var sold: Array[ItemEntry] = []
-    for entry: ItemEntry in SaveManager.storage_items:
-        if _selected.get(entry, false):
-            total += _ask_prices.get(entry, _merchant.offer_for(entry))
+    for entry: ItemEntry in _selected:
+        if _selected[entry]:
             sold.append(entry)
 
-    SaveManager.cash += total
+    SaveManager.cash += final_price
     for entry: ItemEntry in sold:
         SaveManager.storage_items.erase(entry)
         KnowledgeManager.add_category_points(
@@ -102,87 +112,43 @@ func _on_sell_confirmed() -> void:
             entry.item_data.rarity,
             KnowledgeManager.KnowledgeAction.SELL,
         )
+
+    MerchantRegistry.increment_negotiation(_merchant)
     SaveManager.save()
+    GameManager.go_to_merchant_hub()
 
-    _rebuild_after_sale()
 
-
-func _on_slider_changed(entry: ItemEntry, normalized: float) -> void:
-    # normalized ∈ [0,1] → factor ∈ [50%, 150%]
-    var factor: float = lerp(ASK_PRICE_MIN_FACTOR, ASK_PRICE_MAX_FACTOR, normalized)
-    var base: int = _merchant.offer_for(entry)
-    var ask: int = int(base * factor)
-    _ask_prices[entry] = ask
-    if _price_labels.has(entry):
-        _price_labels[entry].text = "$%d" % ask
+func _on_negotiation_cancelled() -> void:
+    MerchantRegistry.increment_negotiation(_merchant)
+    SaveManager.save()
+    GameManager.go_to_merchant_hub()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 
 
 func _populate_rows() -> void:
-    # Filter items this merchant will buy
     var buyable: Array[ItemEntry] = []
     for entry: ItemEntry in SaveManager.storage_items:
-        var mp: int = _merchant.offer_for(entry)
-        if mp > 0:
+        if _merchant.offer_for(entry) > 0:
             buyable.append(entry)
 
     if buyable.is_empty():
         _empty_label.visible = true
+        _item_list_panel.visible = false
         _sell_btn.disabled = true
-        _scroll_container.visible = false
         return
 
     _empty_label.visible = false
-    _scroll_container.visible = true
+    _item_list_panel.visible = true
+
+    _item_list_panel.setup(_ctx, SHOP_COLUMNS)
+    _item_list_panel.populate(buyable)
 
     for entry: ItemEntry in buyable:
         _selected[entry] = false
-        _ask_prices[entry] = _merchant.offer_for(entry)
-
-        var row: ItemRow = ItemRowScene.instantiate()
-        row.setup(entry, _ctx, SHOP_COLUMNS)
-        row.set_selection_state(ItemRow.SelectionState.AVAILABLE)
-        row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-
-        row.row_pressed.connect(_on_row_pressed)
-        row.tooltip_requested.connect(_on_row_tooltip_requested)
-        row.tooltip_dismissed.connect(_tooltip.hide_tooltip)
-
-        _rows[entry] = row
-
-        var price_row: HBoxContainer = _make_price_row(entry)
-        _price_rows[entry] = price_row
-
-        var wrapper := VBoxContainer.new()
-        wrapper.add_theme_constant_override("separation", 0)
-        wrapper.add_child(row)
-        wrapper.add_child(price_row)
-        _row_container.add_child(wrapper)
-
-
-func _refresh_row_state(entry: ItemEntry) -> void:
-    var sel: bool = _selected.get(entry, false)
-    if _rows.has(entry):
-        _rows[entry].set_selection_state(
-            ItemRow.SelectionState.SELECTED if sel else ItemRow.SelectionState.AVAILABLE,
-        )
-    if _price_rows.has(entry):
-        _price_rows[entry].visible = sel
-
-
-func _rebuild_after_sale() -> void:
-    _selected.clear()
-    _ask_prices.clear()
-    _price_labels.clear()
-    _price_rows.clear()
-    _rows.clear()
-
-    for child in _row_container.get_children():
-        child.queue_free()
-
-    _populate_rows()
-    _refresh_sell_button()
+        var row: ItemRow = _item_list_panel.get_row(entry)
+        if row != null:
+            row.set_selection_state(ItemRow.SelectionState.AVAILABLE)
 
 # ══ UI state ══════════════════════════════════════════════════════════════════
 
@@ -194,54 +160,3 @@ func _refresh_sell_button() -> void:
             any_selected = true
             break
     _sell_btn.disabled = not any_selected
-
-
-func _build_sell_summary() -> String:
-    var lines: Array[String] = []
-    var total: int = 0
-    for entry: ItemEntry in SaveManager.storage_items:
-        if _selected.get(entry, false):
-            var ask: int = _ask_prices.get(entry, _merchant.offer_for(entry))
-            total += ask
-            lines.append("  %s — $%d" % [entry.display_name, ask])
-    lines.append("")
-    lines.append("Total:  $%d" % total)
-    return "\n".join(lines)
-
-# ══ UI builder ════════════════════════════════════════════════════════════════
-
-
-func _make_price_row(entry: ItemEntry) -> HBoxContainer:
-    var price_row := HBoxContainer.new()
-    price_row.visible = false
-    price_row.add_theme_constant_override("separation", 12)
-
-    var ask_label := Label.new()
-    ask_label.text = "Ask: "
-    ask_label.add_theme_font_size_override("font_size", 14)
-    price_row.add_child(ask_label)
-
-    var slider := HSlider.new()
-    slider.min_value = 0.0
-    slider.max_value = 1.0
-    slider.step = 0.01
-    slider.value = 0.5 # 100% → midpoint of [50%, 150%] → 0.5 in [0,1]
-    slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    slider.custom_minimum_size = Vector2(200, 0)
-    price_row.add_child(slider)
-
-    var value_label := Label.new()
-    value_label.custom_minimum_size = Vector2(100, 0)
-    value_label.add_theme_font_size_override("font_size", 14)
-    value_label.text = "$%d" % _merchant.offer_for(entry)
-    price_row.add_child(value_label)
-
-    _price_labels[entry] = value_label
-
-    var captured_entry: ItemEntry = entry
-    slider.value_changed.connect(
-        func(v: float) -> void:
-            _on_slider_changed(captured_entry, v)
-    )
-
-    return price_row
