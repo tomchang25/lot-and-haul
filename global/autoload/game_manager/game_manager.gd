@@ -109,3 +109,8 @@ func go_to_car_select() -> void:
 
 func go_to_car_shop() -> void:
     get_tree().change_scene_to_packed(scenes.car_shop)
+
+
+func go_to_fulfillment_panel(merchant: MerchantData) -> void:
+    _pending_merchant = merchant
+    get_tree().change_scene_to_packed(scenes.fulfillment_panel)

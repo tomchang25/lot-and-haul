@@ -22,7 +22,7 @@ from tres_lib.registry import REGISTRY
 from validate_yaml import validate
 
 # Entities that are silently skipped when empty (no "Exporting ..." line).
-_SKIP_IF_EMPTY = frozenset({"skills", "lots", "locations", "merchants"})
+_SKIP_IF_EMPTY = frozenset({"skills", "lots", "locations", "special_orders", "merchants"})
 
 
 def _write(out_path: Path, content: str, dry_run: bool, label: str) -> None:

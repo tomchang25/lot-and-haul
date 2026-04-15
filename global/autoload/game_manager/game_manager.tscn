@@ -22,6 +22,7 @@
 [ext_resource type="PackedScene" path="res://game/meta/vehicle/vehicle_hub.tscn" id="16_vehhub"]
 [ext_resource type="PackedScene" path="res://game/meta/vehicle/car_select/car_select_scene.tscn" id="17_csel"]
 [ext_resource type="PackedScene" path="res://game/meta/vehicle/car_shop/car_shop_scene.tscn" id="18_cshop"]
+[ext_resource type="PackedScene" path="res://game/meta/merchant/fulfillment_panel/fulfillment_panel.tscn" id="19_fpanel"]
 
 [sub_resource type="Resource" id="Resource_yimu3"]
 script = ExtResource("5_ea43q")
@@ -45,6 +46,7 @@ perk_panel = ExtResource("15_perk")
 vehicle_hub = ExtResource("16_vehhub")
 car_select = ExtResource("17_csel")
 car_shop = ExtResource("18_cshop")
+fulfillment_panel = ExtResource("19_fpanel")
 metadata/_custom_type_script = "uid://bvxr6q4cplcj8"
 
 [node name="GameManager" type="Node2D" unique_id=1537594909]

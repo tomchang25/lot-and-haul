@@ -59,16 +59,15 @@ extends Resource
 
 # ── Special orders ───────────────────────────────────────────────────────────
 
-# Designer-defined pool that special_orders is drawn from each Day Pass.
-# Leave empty for merchants with no special orders (e.g. pawn shop).
-@export var special_order_pool: Array[ItemData] = []
+# Pool of order templates this merchant draws from on each roll.
+# Empty = no orders (pawn shop).
+@export var special_orders: Array[SpecialOrderData] = []
 
-# How many items to draw into special_orders each Day Pass.
-@export var special_order_count: int = 2
+# Days between roll attempts. 0 = no orders.
+@export var order_roll_cadence: int = 0
 
-# Bonus multiplier added on top of sale price when fulfilling a special order.
-# e.g. 0.25 = 25% bonus.
-@export var special_order_bonus: float = 0.25
+# Cap on simultaneously active orders. Typically 1-2.
+@export var max_active_orders: int = 1
 
 # ── Access gate ──────────────────────────────────────────────────────────────
 
@@ -88,14 +87,11 @@ func offer_for(entry: ItemEntry) -> int:
     else:
         return 0
 
-# ── Runtime state (not serialised) ───────────────────────────────────────────
+# ── Runtime state (not exported, persisted via SaveManager) ──────────────────
 
-# Items currently on special order. Populated at runtime each Day Pass by
-# drawing special_order_count items from special_order_pool.
-var special_orders: Array[ItemData] = []
-
-# Item IDs of completed special orders this Day Pass. Reset on day advance.
-var completed_order_ids: Array[String] = []
+var active_orders: Array[SpecialOrder] = []
+var completed_order_ids: Array[String] = []   # accumulates; never cleared
+var last_order_roll_day: int = -1
 
 # How many negotiation sessions have been used today. Persisted via SaveManager.
 var negotiations_used_today: int = 0

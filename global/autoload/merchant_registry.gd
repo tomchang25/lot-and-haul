@@ -5,6 +5,7 @@
 extends Node
 
 var _merchants: Dictionary = { } # merchant_id → MerchantData
+var _next_order_id: int = 0
 
 
 func _ready() -> void:
@@ -41,9 +42,9 @@ func size() -> int:
 
 
 # Orchestrator called by SaveManager.advance_days(). Groups all day-advance
-# work for merchants: refreshes special orders and resets negotiation budgets.
+# work for merchants: rolls/expires special orders and resets negotiation budgets.
 func advance_day() -> void:
-    roll_special_orders()
+    _advance_orders()
     _reset_negotiations()
 
 
@@ -55,20 +56,74 @@ func increment_negotiation(merchant: MerchantData) -> void:
     merchant.negotiations_used_today += 1
 
 
+func get_active_orders(merchant: MerchantData) -> Array[SpecialOrder]:
+    return merchant.active_orders
+
+
+func has_active_orders(merchant: MerchantData) -> bool:
+    return not merchant.active_orders.is_empty()
+
+
 func _reset_negotiations() -> void:
     for m: MerchantData in _merchants.values():
         m.negotiations_used_today = 0
 
 
-# Refreshes special orders for all merchants.
-func roll_special_orders() -> void:
+func _advance_orders() -> void:
+    var day: int = SaveManager.current_day
     for m: MerchantData in _merchants.values():
-        m.special_orders.clear()
-        m.completed_order_ids.clear()
-        if m.special_order_pool.is_empty():
+        # 1. Clear expired orders (no payout)
+        var kept: Array[SpecialOrder] = []
+        for order: SpecialOrder in m.active_orders:
+            if not order.is_expired(day):
+                kept.append(order)
+        m.active_orders = kept
+
+        # 2. Roll new order if eligible
+        if m.order_roll_cadence <= 0:
             continue
-        var pool: Array[ItemData] = m.special_order_pool.duplicate()
-        pool.shuffle()
-        var count: int = mini(m.special_order_count, pool.size())
-        for i in range(count):
-            m.special_orders.append(pool[i])
+        if m.special_orders.is_empty():
+            continue
+        if m.last_order_roll_day >= 0 and (day - m.last_order_roll_day) < m.order_roll_cadence:
+            continue
+        if m.active_orders.size() >= m.max_active_orders:
+            continue
+
+        var order := _generate_order(m, day)
+        if order != null:
+            m.active_orders.append(order)
+            m.last_order_roll_day = day
+
+
+func _generate_order(m: MerchantData, day: int) -> SpecialOrder:
+    var template: SpecialOrderData = m.special_orders.pick_random()
+    if template.allowed_categories.is_empty():
+        return null
+
+    var order := SpecialOrder.new()
+    order.id = "%s_%d" % [m.merchant_id, _next_order_id]
+    _next_order_id += 1
+    order.special_order_id = template.special_order_id
+    order.merchant_id = m.merchant_id
+    order.buff = randf_range(template.buff_min, template.buff_max)
+    order.completion_bonus = template.completion_bonus
+    order.deadline_day = day + template.deadline_days
+    order.uses_condition_pricing = template.uses_condition_pricing
+    order.allow_partial_delivery = template.allow_partial_delivery
+
+    var slot_count: int = randi_range(template.slot_count_min, template.slot_count_max)
+    for i in range(slot_count):
+        var slot := OrderSlot.new()
+        slot.category = template.allowed_categories.pick_random()
+        slot.required_count = randi_range(template.required_count_min, template.required_count_max)
+        if randf() < template.rarity_gate_chance:
+            slot.min_rarity = ItemData.Rarity.UNCOMMON
+        else:
+            slot.min_rarity = -1
+        if randf() < template.condition_gate_chance:
+            slot.min_condition = 0.6
+        else:
+            slot.min_condition = 0.0
+        order.slots.append(slot)
+
+    return order

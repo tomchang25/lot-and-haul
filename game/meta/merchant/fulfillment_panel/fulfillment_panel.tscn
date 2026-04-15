@@ -1,0 +1,103 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/meta/merchant/fulfillment_panel/fulfillment_panel.gd" id="1_fpgd"]
+[ext_resource type="PackedScene" uid="uid://cilp5a1xr3e8m" path="res://game/shared/item_display/item_list_panel/item_list_panel.tscn" id="2_ilp"]
+
+[node name="FulfillmentPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_fpgd")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.1, 0.1, 0.12, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Orders"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ContentHBox" type="HBoxContainer" parent="RootVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="LeftVBox" type="VBoxContainer" parent="RootVBox/ContentHBox"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="OrderListVBox" type="VBoxContainer" parent="RootVBox/ContentHBox/LeftVBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="OrderInfoVBox" type="VBoxContainer" parent="RootVBox/ContentHBox/LeftVBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SlotsVBox" type="VBoxContainer" parent="RootVBox/ContentHBox/LeftVBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="RightVBox" type="VBoxContainer" parent="RootVBox/ContentHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ItemListPanel" parent="RootVBox/ContentHBox/RightVBox" instance=ExtResource("2_ilp")]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SummaryVBox" type="VBoxContainer" parent="RootVBox/ContentHBox/RightVBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SessionPayoutLabel" type="Label" parent="RootVBox/ContentHBox/RightVBox/SummaryVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Session Payout: $0"
+
+[node name="CompletionBonusLabel" type="Label" parent="RootVBox/ContentHBox/RightVBox/SummaryVBox"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Completion Bonus: $0"
+
+[node name="Footer" type="HBoxContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="ConfirmButton" type="Button" parent="RootVBox/Footer"]
+custom_minimum_size = Vector2(180, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+disabled = true
+text = "Confirm"
+
+[node name="BackButton" type="Button" parent="RootVBox/Footer"]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Back"

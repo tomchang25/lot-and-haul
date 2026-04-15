@@ -63,6 +63,8 @@ func save() -> void:
         "super_cat_means": MarketManager.super_cat_means,
         "category_factors_today": MarketManager.category_factors_today,
         "merchant_negotiations_used_today": _build_negotiation_dict(),
+        "merchant_orders": _build_order_dict(),
+        "next_order_id": MerchantRegistry._next_order_id,
     }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
     if file == null:
@@ -155,6 +157,33 @@ func _read_save_file() -> void:
                 var m: MerchantData = MerchantRegistry.get_merchant(key)
                 if m != null:
                     m.negotiations_used_today = int(neg_dict[key])
+
+    if parsed.has("next_order_id") and parsed["next_order_id"] is float:
+        MerchantRegistry._next_order_id = int(parsed["next_order_id"])
+
+    if parsed.has("merchant_orders") and parsed["merchant_orders"] is Dictionary:
+        var orders_dict: Dictionary = parsed["merchant_orders"]
+        for key: Variant in orders_dict:
+            if not key is String:
+                continue
+            var m: MerchantData = MerchantRegistry.get_merchant(key)
+            if m == null:
+                continue
+            var entry: Variant = orders_dict[key]
+            if not entry is Dictionary:
+                continue
+            if entry.has("last_roll_day") and entry["last_roll_day"] is float:
+                m.last_order_roll_day = int(entry["last_roll_day"])
+            if entry.has("active_orders") and entry["active_orders"] is Array:
+                m.active_orders = []
+                for od: Variant in entry["active_orders"]:
+                    if od is Dictionary:
+                        m.active_orders.append(SpecialOrder.from_dict(od))
+            if entry.has("completed_order_ids") and entry["completed_order_ids"] is Array:
+                m.completed_order_ids = []
+                for cid: Variant in entry["completed_order_ids"]:
+                    if cid is String:
+                        m.completed_order_ids.append(cid)
 
 
 # Idempotent migration: guarantees a fresh save gets the starter van, and
@@ -298,6 +327,22 @@ func _build_negotiation_dict() -> Dictionary:
     for m: MerchantData in MerchantRegistry.get_all_merchants():
         if m.negotiations_used_today > 0:
             result[m.merchant_id] = m.negotiations_used_today
+    return result
+
+
+func _build_order_dict() -> Dictionary:
+    var result: Dictionary = { }
+    for m: MerchantData in MerchantRegistry.get_all_merchants():
+        if m.active_orders.is_empty() and m.completed_order_ids.is_empty() and m.last_order_roll_day < 0:
+            continue
+        var order_dicts: Array = []
+        for order: SpecialOrder in m.active_orders:
+            order_dicts.append(order.to_dict())
+        result[m.merchant_id] = {
+            "last_roll_day": m.last_order_roll_day,
+            "active_orders": order_dicts,
+            "completed_order_ids": m.completed_order_ids,
+        }
     return result
 
 

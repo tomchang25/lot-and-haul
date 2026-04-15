@@ -13,6 +13,7 @@ enum Stage {
     RUN_REVIEW,
     STORAGE,
     MERCHANT_SHOP,
+    FULFILLMENT_PANEL,
 }
 
 enum ConditionMode {
@@ -31,6 +32,7 @@ enum PriceMode {
     APPRAISED_VALUE,
     BASE_VALUE,
     MERCHANT_OFFER,
+    SPECIAL_ORDER,
 }
 
 var stage: Stage
@@ -38,6 +40,7 @@ var condition_mode: ConditionMode = ConditionMode.RESPECT_INSPECT_LEVEL
 var potential_mode: PotentialMode = PotentialMode.RESPECT_INSPECT_LEVEL
 var price_mode: PriceMode = PriceMode.ESTIMATED_VALUE
 var merchant: MerchantData = null
+var order: SpecialOrder = null
 
 # ── Factories ─────────────────────────────────────────────────────────────────
 
@@ -103,4 +106,14 @@ static func for_merchant_shop(_merchant: MerchantData) -> ItemViewContext:
     ctx.potential_mode = PotentialMode.FORCE_FULL
     ctx.price_mode = PriceMode.MERCHANT_OFFER
     ctx.merchant = _merchant
+    return ctx
+
+
+static func for_fulfillment(_order: SpecialOrder) -> ItemViewContext:
+    var ctx := ItemViewContext.new()
+    ctx.stage = Stage.FULFILLMENT_PANEL
+    ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
+    ctx.potential_mode = PotentialMode.FORCE_FULL
+    ctx.price_mode = PriceMode.SPECIAL_ORDER
+    ctx.order = _order
     return ctx
