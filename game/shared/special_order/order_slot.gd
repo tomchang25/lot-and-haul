@@ -19,6 +19,21 @@ func is_full() -> bool:
     return filled_count >= required_count
 
 
+static func create(template: SpecialOrderData) -> OrderSlot:
+    var slot := OrderSlot.new()
+    slot.category = template.allowed_categories.pick_random()
+    slot.required_count = randi_range(template.required_count_min, template.required_count_max)
+    if randf() < template.rarity_gate_chance:
+        slot.min_rarity = ItemData.Rarity.UNCOMMON
+    else:
+        slot.min_rarity = -1
+    if randf() < template.condition_gate_chance:
+        slot.min_condition = 0.6
+    else:
+        slot.min_condition = 0.0
+    return slot
+
+
 func accepts(entry: ItemEntry) -> bool:
     if entry.item_data.category_data != category:
         return false

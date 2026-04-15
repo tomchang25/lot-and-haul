@@ -89,41 +89,17 @@ func _advance_orders() -> void:
         if m.active_orders.size() >= m.max_active_orders:
             continue
 
-        var order := _generate_order(m, day)
+        var order := _generate_order(m)
         if order != null:
             m.active_orders.append(order)
             m.last_order_roll_day = day
 
 
-func _generate_order(m: MerchantData, day: int) -> SpecialOrder:
+func _generate_order(m: MerchantData) -> SpecialOrder:
     var template: SpecialOrderData = m.special_orders.pick_random()
     if template.allowed_categories.is_empty():
         return null
 
-    var order := SpecialOrder.new()
-    order.id = "%s_%d" % [m.merchant_id, next_order_id]
+    var id_string: String = "%s_%d" % [m.merchant_id, next_order_id]
     next_order_id += 1
-    order.special_order_id = template.special_order_id
-    order.merchant_id = m.merchant_id
-    order.buff = randf_range(template.buff_min, template.buff_max)
-    order.completion_bonus = template.completion_bonus
-    order.deadline_day = day + template.deadline_days
-    order.uses_condition_pricing = template.uses_condition_pricing
-    order.allow_partial_delivery = template.allow_partial_delivery
-
-    var slot_count: int = randi_range(template.slot_count_min, template.slot_count_max)
-    for i in range(slot_count):
-        var slot := OrderSlot.new()
-        slot.category = template.allowed_categories.pick_random()
-        slot.required_count = randi_range(template.required_count_min, template.required_count_max)
-        if randf() < template.rarity_gate_chance:
-            slot.min_rarity = ItemData.Rarity.UNCOMMON
-        else:
-            slot.min_rarity = -1
-        if randf() < template.condition_gate_chance:
-            slot.min_condition = 0.6
-        else:
-            slot.min_condition = 0.0
-        order.slots.append(slot)
-
-    return order
+    return SpecialOrder.create(template, m.merchant_id, id_string)

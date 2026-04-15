@@ -15,6 +15,28 @@ var uses_condition_pricing: bool = false
 var allow_partial_delivery: bool = false
 
 
+static func create(
+        template: SpecialOrderData,
+        merchant_id: String,
+        order_id: String,
+) -> SpecialOrder:
+    var order := SpecialOrder.new()
+    order.id = order_id
+    order.special_order_id = template.special_order_id
+    order.merchant_id = merchant_id
+    order.buff = randf_range(template.buff_min, template.buff_max)
+    order.completion_bonus = template.completion_bonus
+    order.deadline_day = SaveManager.current_day + template.deadline_days
+    order.uses_condition_pricing = template.uses_condition_pricing
+    order.allow_partial_delivery = template.allow_partial_delivery
+
+    var slot_count: int = randi_range(template.slot_count_min, template.slot_count_max)
+    for i in range(slot_count):
+        order.slots.append(OrderSlot.create(template))
+
+    return order
+
+
 func is_complete() -> bool:
     for slot: OrderSlot in slots:
         if not slot.is_full():
