@@ -14,6 +14,8 @@ var deadline_day: int = 0 # absolute day
 var uses_condition_pricing: bool = false
 var allow_partial_delivery: bool = false
 
+enum Eligibility { NONE, PARTIAL, FULL }
+
 
 static func create(
         template: SpecialOrderData,
@@ -46,6 +48,48 @@ func is_complete() -> bool:
 
 func is_expired(current_day: int) -> bool:
     return current_day > deadline_day
+
+
+func check_eligibility(storage: Array) -> Eligibility:
+    var available: Array = storage.duplicate()
+    var all_satisfiable: bool = true
+    var any_satisfiable: bool = false
+
+    for slot: OrderSlot in slots:
+        var needed: int = slot.remaining()
+        if needed <= 0:
+            continue
+
+        var matched: int = 0
+        var consumed: Array = []
+        for entry: Variant in available:
+            if slot.accepts(entry as ItemEntry):
+                consumed.append(entry)
+                matched += 1
+                if matched >= needed:
+                    break
+
+        for item: Variant in consumed:
+            available.erase(item)
+
+        if matched <= 0:
+            all_satisfiable = false
+        elif matched < needed:
+            all_satisfiable = false
+            any_satisfiable = true
+        else:
+            any_satisfiable = true
+
+    if all_satisfiable and any_satisfiable:
+        return Eligibility.FULL
+    elif any_satisfiable:
+        return Eligibility.PARTIAL
+    else:
+        # All slots already full (order complete) counts as FULL.
+        for slot: OrderSlot in slots:
+            if slot.remaining() > 0:
+                return Eligibility.NONE
+        return Eligibility.FULL
 
 
 func compute_item_price(entry: ItemEntry) -> int:
