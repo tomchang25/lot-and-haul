@@ -1,5 +1,5 @@
 # negotiation_dialog.gd
-# Basket-level negotiation overlay. The player submits counter-proposals;
+# Basket-level negotiation overlay. The player submits counter-proposals
 # the shopkeeper responds with anger updates and counter-offers until a deal
 # is struck, the merchant's patience runs out, or the player walks away.
 extends Control

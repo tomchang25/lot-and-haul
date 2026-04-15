@@ -14,9 +14,11 @@ class MerchantSpec:
     yaml_key: str = "merchants"
     tres_subdir: str = "merchants"
     uid_prefix: str = "merchant"
-    script_paths: dict[str, str] = field(default_factory=lambda: {
-        "merchant_data": "res://data/definitions/merchant_data.gd",
-    })
+    script_paths: dict[str, str] = field(
+        default_factory=lambda: {
+            "merchant_data": "res://data/definitions/merchant_data.gd",
+        }
+    )
 
     def entity_id(self, entry: dict) -> str:
         return entry["merchant_id"]
@@ -73,9 +75,7 @@ class MerchantSpec:
         w.add_field_str("display_name", entry.get("display_name", ""))
         w.add_field_str("description", entry.get("description", ""))
         w.add_field_ext_ref_array("accepted_super_categories", sc_tags)
-        w.add_field_float(
-            "price_multiplier", float(entry.get("price_multiplier", 1.0))
-        )
+        w.add_field_float("price_multiplier", float(entry.get("price_multiplier", 1.0)))
         w.add_field_bool(
             "accepts_off_category",
             bool(entry.get("accepts_off_category", False)),
@@ -92,12 +92,8 @@ class MerchantSpec:
             "ceiling_multiplier_max",
             float(entry.get("ceiling_multiplier_max", 1.3)),
         )
-        w.add_field_float(
-            "anger_max", float(entry.get("anger_max", 100.0))
-        )
-        w.add_field_float(
-            "anger_k", float(entry.get("anger_k", 20.0))
-        )
+        w.add_field_float("anger_max", float(entry.get("anger_max", 100.0)))
+        w.add_field_float("anger_k", float(entry.get("anger_k", 20.0)))
         w.add_field_float(
             "anger_per_round",
             float(entry.get("anger_per_round", 20.0)),
@@ -119,9 +115,7 @@ class MerchantSpec:
             "special_order_bonus",
             float(entry.get("special_order_bonus", 0.25)),
         )
-        w.add_field_str(
-            "required_perk_id", entry.get("required_perk_id", "")
-        )
+        w.add_field_str("required_perk_id", entry.get("required_perk_id", ""))
         return w.render()
 
     def parse_tres(self, text: str, ctx: ParseCtx) -> None:
@@ -200,7 +194,10 @@ class MerchantSpec:
                 )
 
             anger_per_round_val = merchant.get("anger_per_round", 20.0)
-            if not isinstance(anger_per_round_val, (int, float)) or anger_per_round_val < 0:
+            if (
+                not isinstance(anger_per_round_val, (int, float))
+                or anger_per_round_val < 0
+            ):
                 errors.append(
                     f"merchant '{mid}': anger_per_round must be non-negative,"
                     f" got {anger_per_round_val!r}"
