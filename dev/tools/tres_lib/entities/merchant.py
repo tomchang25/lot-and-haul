@@ -102,6 +102,14 @@ class MerchantSpec:
             "counter_aggressiveness",
             float(entry.get("counter_aggressiveness", 0.3)),
         )
+        w.add_field_float(
+            "auto_accept_threshold",
+            float(entry.get("auto_accept_threshold", 0.2)),
+        )
+        w.add_field_float(
+            "auto_accept_p_min",
+            float(entry.get("auto_accept_p_min", 0.01)),
+        )
         w.add_field_int(
             "negotiation_per_day",
             int(entry.get("negotiation_per_day", 1)),
@@ -210,6 +218,24 @@ class MerchantSpec:
                 errors.append(
                     f"merchant '{mid}': counter_aggressiveness must be in (0, 1],"
                     f" got {counter_agg!r}"
+                )
+
+            aa_thresh = merchant.get("auto_accept_threshold", 0.2)
+            if not isinstance(aa_thresh, (int, float)) or not (
+                0.0 < aa_thresh < 1.0
+            ):
+                errors.append(
+                    f"merchant '{mid}': auto_accept_threshold must be in (0, 1),"
+                    f" got {aa_thresh!r}"
+                )
+
+            aa_p_min = merchant.get("auto_accept_p_min", 0.01)
+            if not isinstance(aa_p_min, (int, float)) or not (
+                0.0 <= aa_p_min <= 1.0
+            ):
+                errors.append(
+                    f"merchant '{mid}': auto_accept_p_min must be in [0, 1],"
+                    f" got {aa_p_min!r}"
                 )
 
             neg_per_day = merchant.get("negotiation_per_day", 1)

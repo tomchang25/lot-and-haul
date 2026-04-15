@@ -12,6 +12,8 @@ merchants:
     anger_k: 20.0
     anger_per_round: 20.0
     counter_aggressiveness: 0.3
+    auto_accept_threshold: 0.2
+    auto_accept_p_min: 0.05
     negotiation_per_day: 1
     special_orders: []
     order_roll_cadence: 0
@@ -31,6 +33,8 @@ merchants:
     anger_k: 25.0
     anger_per_round: 25.0
     counter_aggressiveness: 0.4
+    auto_accept_threshold: 0.15
+    auto_accept_p_min: 0.1
     negotiation_per_day: 1
     special_orders: [antique_dealer_premium, antique_dealer_bulk]
     order_roll_cadence: 3
