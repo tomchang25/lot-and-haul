@@ -59,7 +59,7 @@ extends Resource
 
 # Minimum acceptance probability at the threshold boundary.
 # Interpolates from 1.0 (ratio = 0) down to this value (ratio = threshold).
-@export var auto_accept_p_min: float = 0.01
+@export var auto_accept_p_min: float = 0.05
 
 # How many negotiation sessions this merchant allows per day.
 @export var negotiation_per_day: int = 1
