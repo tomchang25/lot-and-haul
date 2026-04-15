@@ -254,11 +254,21 @@ func _refresh_slot_display() -> void:
         if slot.min_condition > 0.0:
             slot_text += " [Cond >= %d%%]" % int(slot.min_condition * 100)
 
+        var completed: bool = slot.is_full()
+        var slot_elig: SpecialOrder.Eligibility = SpecialOrder.Eligibility.NONE
+        if not completed:
+            var result: Dictionary = slot.check_eligibility(SaveManager.storage_items)
+            slot_elig = result["eligibility"]
+            slot_text += _eligibility_suffix(slot_elig)
+
         var btn := Button.new()
         btn.custom_minimum_size = Vector2(200, 32)
         btn.add_theme_font_size_override("font_size", 13)
         btn.text = slot_text
-        btn.disabled = slot.is_full()
+        btn.disabled = completed
+
+        if not completed:
+            btn.add_theme_color_override(&"font_color", _eligibility_color(slot_elig))
 
         if i == _selected_slot_index:
             var style := StyleBoxFlat.new()
