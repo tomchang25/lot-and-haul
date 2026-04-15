@@ -153,12 +153,43 @@ func _populate_order_list() -> void:
         btn.custom_minimum_size = Vector2(200, 36)
         btn.add_theme_font_size_override("font_size", 14)
         btn.text = order.special_order_id.replace("_", " ").capitalize()
+
+        var eligibility := order.check_eligibility(SaveManager.storage_items)
+        btn.text += _eligibility_suffix(eligibility)
+        btn.add_theme_color_override(&"font_color", _eligibility_color(eligibility))
+
         var captured: SpecialOrder = order
         btn.pressed.connect(func() -> void: _on_order_selected(captured))
         _order_list_vbox.add_child(btn)
 
     if _merchant.active_orders.size() > 0:
         _select_order(_merchant.active_orders[0])
+
+
+static func _eligibility_color(eligibility: SpecialOrder.Eligibility) -> Color:
+    match eligibility:
+        SpecialOrder.Eligibility.FULL:
+            return Color(0.4, 1.0, 0.5)
+        SpecialOrder.Eligibility.PARTIAL:
+            return Color(0.92, 0.72, 0.18)
+        SpecialOrder.Eligibility.NONE:
+            return Color(1.0, 0.4, 0.4)
+        _:
+            push_warning("Unknown Eligibility: %d" % eligibility)
+            return Color(1.0, 0.4, 0.4)
+
+
+static func _eligibility_suffix(eligibility: SpecialOrder.Eligibility) -> String:
+    match eligibility:
+        SpecialOrder.Eligibility.FULL:
+            return " [Ready]"
+        SpecialOrder.Eligibility.PARTIAL:
+            return " [Partial]"
+        SpecialOrder.Eligibility.NONE:
+            return " [No Match]"
+        _:
+            push_warning("Unknown Eligibility: %d" % eligibility)
+            return " [No Match]"
 
 # ══ Order detail ═════════════════════════════════════════════════════════════
 
