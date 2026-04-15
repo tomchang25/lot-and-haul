@@ -54,6 +54,13 @@ extends Resource
 # Fraction of the gap the shopkeeper closes each counter round, in (0, 1].
 @export var counter_aggressiveness: float = 0.3
 
+# Fraction of remaining gap below which auto-accept may trigger.
+@export var auto_accept_threshold: float = 0.2
+
+# Minimum acceptance probability at the threshold boundary.
+# Interpolates from 1.0 (ratio = 0) down to this value (ratio = threshold).
+@export var auto_accept_p_min: float = 0.01
+
 # How many negotiation sessions this merchant allows per day.
 @export var negotiation_per_day: int = 1
 

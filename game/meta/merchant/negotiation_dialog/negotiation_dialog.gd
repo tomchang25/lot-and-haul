@@ -144,6 +144,18 @@ func _resolve_proposal(proposal: int) -> void:
         _refresh_ui()
         return
 
+    # Auto-accept roll — when the proposal is close to the current offer,
+    # the merchant may accept immediately instead of countering.
+    var remaining_gap: float = maxf(1.0, float(_ceiling - _current_offer))
+    var ratio: float = float(proposal - _current_offer) / remaining_gap
+    if ratio <= _merchant.auto_accept_threshold:
+        var t: float = ratio / _merchant.auto_accept_threshold
+        var p: float = lerpf(1.0, _merchant.auto_accept_p_min, t)
+        if randf() < p:
+            visible = false
+            accepted.emit(proposal)
+            return
+
     # Counter-offer
     _current_offer += int(_merchant.counter_aggressiveness * float(proposal - _current_offer))
     _proposal_input.value = _current_offer
