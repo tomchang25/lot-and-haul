@@ -9,7 +9,7 @@ signal cancelled
 
 # ── Enums ────────────────────────────────────────────────────────────────────
 
-enum State {
+enum Phase {
     NEGOTIATING,
     FINAL_OFFER,
 }
@@ -22,7 +22,7 @@ var _base_offer: int = 0
 var _ceiling: int = 0
 var _current_offer: int = 0
 var _anger: float = 0.0
-var _state: State = State.NEGOTIATING
+var _state: Phase = Phase.NEGOTIATING
 
 # ── Node references ──────────────────────────────────────────────────────────
 
@@ -75,7 +75,7 @@ func begin(merchant: MerchantData, basket: Array[ItemEntry]) -> void:
     _merchant = merchant
     _basket = basket
     _anger = 0.0
-    _state = State.NEGOTIATING
+    _state = Phase.NEGOTIATING
 
     _base_offer = 0
     for entry: ItemEntry in _basket:
@@ -140,7 +140,7 @@ func _resolve_proposal(proposal: int) -> void:
     # Check anger cap
     if _anger >= _merchant.anger_max:
         _anger = _merchant.anger_max
-        _state = State.FINAL_OFFER
+        _state = Phase.FINAL_OFFER
         _refresh_ui()
         return
 
@@ -175,9 +175,9 @@ func _refresh_ui() -> void:
         _anger_label.text = "Merchant patience"
 
     match _state:
-        State.NEGOTIATING:
+        Phase.NEGOTIATING:
             _proposal_vbox.visible = true
             _final_offer_vbox.visible = false
-        State.FINAL_OFFER:
+        Phase.FINAL_OFFER:
             _proposal_vbox.visible = false
             _final_offer_vbox.visible = true
