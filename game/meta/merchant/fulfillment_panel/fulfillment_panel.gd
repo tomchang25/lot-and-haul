@@ -170,7 +170,10 @@ static func _eligibility_color(eligibility: SpecialOrder.Eligibility) -> Color:
             return Color(0.4, 1.0, 0.5)
         SpecialOrder.Eligibility.PARTIAL:
             return Color(0.92, 0.72, 0.18)
+        SpecialOrder.Eligibility.NONE:
+            return Color(1.0, 0.4, 0.4)
         _:
+            push_warning("Unknown Eligibility: %d" % eligibility)
             return Color(1.0, 0.4, 0.4)
 
 
@@ -180,7 +183,10 @@ static func _eligibility_suffix(eligibility: SpecialOrder.Eligibility) -> String
             return " [Ready]"
         SpecialOrder.Eligibility.PARTIAL:
             return " [Partial]"
+        SpecialOrder.Eligibility.NONE:
+            return " [No Match]"
         _:
+            push_warning("Unknown Eligibility: %d" % eligibility)
             return " [No Match]"
 
 # ══ Order detail ═════════════════════════════════════════════════════════════

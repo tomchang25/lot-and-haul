@@ -14,7 +14,11 @@ var deadline_day: int = 0 # absolute day
 var uses_condition_pricing: bool = false
 var allow_partial_delivery: bool = false
 
-enum Eligibility { NONE, PARTIAL, FULL }
+enum Eligibility {
+    NONE,
+    PARTIAL,
+    FULL,
+}
 
 
 static func create(
