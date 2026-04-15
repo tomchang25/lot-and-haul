@@ -172,6 +172,9 @@ func _refresh() -> void:
     _grid_label.visible = Column.GRID in _columns
     _market_factor_label.visible = Column.MARKET_FACTOR in _columns
 
+    # ── Column order ──────────────────────────────────────────────────────────
+    _apply_column_order()
+
     # ── NAME ──────────────────────────────────────────────────────────────────
     _name_label.text = _entry.display_name
 
@@ -195,6 +198,28 @@ func _refresh() -> void:
 
     # ── MARKET FACTOR ─────────────────────────────────────────────────────────
     _market_factor_label.text = "%+d%%" % int(round(_entry.market_factor_delta * 100))
+
+# ══ Column ordering ═══════════════════════════════════════════════════════════
+
+
+func _apply_column_order() -> void:
+    if _columns.is_empty() or not is_node_ready():
+        return
+
+    var column_to_label: Dictionary = {
+        Column.NAME: _name_label,
+        Column.CONDITION: _condition_label,
+        Column.PRICE: _price_label,
+        Column.POTENTIAL: _potential_label,
+        Column.WEIGHT: _weight_label,
+        Column.GRID: _grid_label,
+        Column.MARKET_FACTOR: _market_factor_label,
+    }
+
+    for i in _columns.size():
+        var col: Column = _columns[i]
+        if column_to_label.has(col):
+            $HBoxContainer.move_child(column_to_label[col], i)
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
