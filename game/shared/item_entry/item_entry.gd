@@ -351,6 +351,8 @@ func price_label_for(ctx: ItemViewContext) -> String:
             return estimated_value_label
         ItemViewContext.PriceMode.MERCHANT_OFFER:
             return "$%d" % price_value_for(ctx)
+        ItemViewContext.PriceMode.SPECIAL_ORDER:
+            return "$%d" % price_value_for(ctx)
         _:
             push_warning("Unknown PriceMode: %d" % ctx.price_mode)
             return estimated_value_label
@@ -366,6 +368,8 @@ func price_value_for(ctx: ItemViewContext) -> int:
             return estimated_value_min
         ItemViewContext.PriceMode.MERCHANT_OFFER:
             return ctx.merchant.offer_for(self) if ctx.merchant else appraised_value
+        ItemViewContext.PriceMode.SPECIAL_ORDER:
+            return ctx.order.compute_item_price(self) if ctx.order else 0
         _:
             push_warning("Unknown PriceMode: %d" % ctx.price_mode)
             return 0

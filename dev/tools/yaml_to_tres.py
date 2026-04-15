@@ -22,7 +22,9 @@ from tres_lib.registry import REGISTRY
 from validate_yaml import validate
 
 # Entities that are silently skipped when empty (no "Exporting ..." line).
-_SKIP_IF_EMPTY = frozenset({"skills", "lots", "locations", "merchants"})
+_SKIP_IF_EMPTY = frozenset(
+    {"skills", "lots", "locations", "special_orders", "merchants"}
+)
 
 
 def _write(out_path: Path, content: str, dry_run: bool, label: str) -> None:
@@ -36,8 +38,11 @@ def _write(out_path: Path, content: str, dry_run: bool, label: str) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser(description="Write .tres files from YAML.")
     ap.add_argument("--godot-root", required=True)
-    ap.add_argument("--yaml-dir", default=None,
-                    help="YAML directory (default: <godot-root>/data/yaml)")
+    ap.add_argument(
+        "--yaml-dir",
+        default=None,
+        help="YAML directory (default: <godot-root>/data/yaml)",
+    )
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -85,8 +90,9 @@ def main() -> None:
             (tres_root / spec.tres_subdir).mkdir(parents=True, exist_ok=True)
 
     # Export in registry (dependency) order.
-    ctx = BuildCtx(godot_root=root, uid_cache={},
-                   script_uids=script_uids, dry_run=args.dry_run)
+    ctx = BuildCtx(
+        godot_root=root, uid_cache={}, script_uids=script_uids, dry_run=args.dry_run
+    )
     total = 0
     for spec in REGISTRY:
         entries = merged.get(spec.yaml_key, [])
@@ -97,8 +103,9 @@ def main() -> None:
         for entry in entries:
             eid = spec.entity_id(entry)
             content = spec.build_tres(entry, ctx)
-            _write(out_dir / f"{eid}.tres", content, args.dry_run,
-                   spec.build_label(entry))
+            _write(
+                out_dir / f"{eid}.tres", content, args.dry_run, spec.build_label(entry)
+            )
         total += len(entries)
 
     tag = "[dry run] " if args.dry_run else ""

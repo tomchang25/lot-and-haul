@@ -103,6 +103,13 @@ func get_all_category_ids() -> Array[String]:
     return result
 
 
+func get_category_data(category_id: String) -> CategoryData:
+    for item: ItemData in _items_by_id.values():
+        if item.category_data != null and item.category_data.category_id == category_id:
+            return item.category_data
+    return null
+
+
 func get_item(item_id: String) -> ItemData:
     return _items_by_id.get(item_id, null)
 

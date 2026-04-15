@@ -128,6 +128,8 @@ static func get_price_header(ctx: ItemViewContext) -> String:
             return "Base Value"
         ItemViewContext.PriceMode.MERCHANT_OFFER:
             return "%s Offer" % ctx.merchant.display_name if ctx.merchant else "Offer"
+        ItemViewContext.PriceMode.SPECIAL_ORDER:
+            return "Order Price"
         _:
             push_warning("Unknown PriceMode: %d" % ctx.price_mode)
             return "Price"

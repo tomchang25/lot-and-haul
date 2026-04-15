@@ -1,0 +1,30 @@
+special_orders:
+  - special_order_id: antique_dealer_premium
+    slot_count_min: 2
+    slot_count_max: 4
+    required_count_min: 1
+    required_count_max: 1
+    allowed_categories: [oil_lamp, clock, vase, porcelain_figurine]
+    rarity_gate_chance: 0.5
+    condition_gate_chance: 0.3
+    buff_min: 1.8
+    buff_max: 3.0
+    uses_condition_pricing: true
+    allow_partial_delivery: false
+    completion_bonus: 200
+    deadline_days: 5
+
+  - special_order_id: antique_dealer_bulk
+    slot_count_min: 1
+    slot_count_max: 1
+    required_count_min: 6
+    required_count_max: 10
+    allowed_categories: [oil_lamp, clock, vase, porcelain_figurine, poster]
+    rarity_gate_chance: 0.0
+    condition_gate_chance: 0.0
+    buff_min: 0.7
+    buff_max: 0.7
+    uses_condition_pricing: false
+    allow_partial_delivery: true
+    completion_bonus: 50
+    deadline_days: 5

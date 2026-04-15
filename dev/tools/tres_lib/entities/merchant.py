@@ -33,7 +33,7 @@ class MerchantSpec:
 
         raw_sc = entry.get("accepted_super_categories", []) or []
         sc_ids = [str(s) for s in raw_sc]
-        so_ids = entry.get("special_order_pool", []) or []
+        so_ids = entry.get("special_orders", []) or []
 
         w = TresWriter("Resource", "MerchantData", uid)
         w.add_ext_resource(
@@ -58,15 +58,15 @@ class MerchantSpec:
             sc_tags.append(tag)
 
         so_tags: list[str] = []
-        for item_id in so_ids:
+        for so_id in so_ids:
             ext_idx += 1
             tag = f"{ext_idx}_so"
-            item_uid = ctx.uid_cache.get(item_id, "")
+            so_uid = ctx.uid_cache.get(so_id, "")
             w.add_ext_resource(
                 tag,
                 "Resource",
-                f"res://data/tres/items/{item_id}.tres",
-                item_uid,
+                f"res://data/tres/special_orders/{so_id}.tres",
+                so_uid,
             )
             so_tags.append(tag)
 
@@ -106,14 +106,14 @@ class MerchantSpec:
             "negotiation_per_day",
             int(entry.get("negotiation_per_day", 1)),
         )
-        w.add_field_ext_ref_array("special_order_pool", so_tags)
+        w.add_field_ext_ref_array("special_orders", so_tags)
         w.add_field_int(
-            "special_order_count",
-            int(entry.get("special_order_count", 2)),
+            "order_roll_cadence",
+            int(entry.get("order_roll_cadence", 0)),
         )
-        w.add_field_float(
-            "special_order_bonus",
-            float(entry.get("special_order_bonus", 0.25)),
+        w.add_field_int(
+            "max_active_orders",
+            int(entry.get("max_active_orders", 1)),
         )
         w.add_field_str("required_perk_id", entry.get("required_perk_id", ""))
         return w.render()
@@ -226,6 +226,36 @@ class MerchantSpec:
                         errors.append(
                             f"merchant '{mid}': accepted_super_category '{sc}'"
                             f" not defined in super_categories"
+                        )
+
+            order_cadence = merchant.get("order_roll_cadence", 0)
+            if not isinstance(order_cadence, (int, float)) or int(order_cadence) < 0:
+                errors.append(
+                    f"merchant '{mid}': order_roll_cadence must be >= 0,"
+                    f" got {order_cadence!r}"
+                )
+
+            max_orders = merchant.get("max_active_orders", 1)
+            if not isinstance(max_orders, (int, float)) or not (
+                0 <= int(max_orders) <= 3
+            ):
+                errors.append(
+                    f"merchant '{mid}': max_active_orders must be in [0, 3],"
+                    f" got {max_orders!r}"
+                )
+
+            known_so_ids: set[str] = set()
+            for so in all_data.get("special_orders", []):
+                if isinstance(so, dict):
+                    known_so_ids.add(so["special_order_id"])
+
+            if known_so_ids:
+                for so_ref in merchant.get("special_orders", []) or []:
+                    so_id = str(so_ref)
+                    if so_id not in known_so_ids:
+                        errors.append(
+                            f"merchant '{mid}': special_order '{so_ref}'"
+                            f" not defined in special_orders"
                         )
 
         return errors
