@@ -153,9 +153,11 @@ func _populate_order_list() -> void:
         btn.custom_minimum_size = Vector2(200, 36)
         btn.add_theme_font_size_override("font_size", 14)
         btn.text = order.special_order_id.replace("_", " ").capitalize()
+
         var eligibility := order.check_eligibility(SaveManager.storage_items)
         btn.text += _eligibility_suffix(eligibility)
         btn.add_theme_color_override(&"font_color", _eligibility_color(eligibility))
+
         var captured: SpecialOrder = order
         btn.pressed.connect(func() -> void: _on_order_selected(captured))
         _order_list_vbox.add_child(btn)

@@ -23,13 +23,13 @@ enum Eligibility {
 
 static func create(
         template: SpecialOrderData,
-        merchant_id: String,
+        new_merchant_id: String,
         order_id: String,
 ) -> SpecialOrder:
     var order := SpecialOrder.new()
     order.id = order_id
     order.special_order_id = template.special_order_id
-    order.merchant_id = merchant_id
+    order.merchant_id = new_merchant_id
     order.buff = randf_range(template.buff_min, template.buff_max)
     order.completion_bonus = template.completion_bonus
     order.deadline_day = SaveManager.current_day + template.deadline_days
