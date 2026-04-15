@@ -5,7 +5,7 @@
 extends Node
 
 var _merchants: Dictionary = { } # merchant_id → MerchantData
-var _next_order_id: int = 0
+var next_order_id: int = 0
 
 
 func _ready() -> void:
@@ -101,8 +101,8 @@ func _generate_order(m: MerchantData, day: int) -> SpecialOrder:
         return null
 
     var order := SpecialOrder.new()
-    order.id = "%s_%d" % [m.merchant_id, _next_order_id]
-    _next_order_id += 1
+    order.id = "%s_%d" % [m.merchant_id, next_order_id]
+    next_order_id += 1
     order.special_order_id = template.special_order_id
     order.merchant_id = m.merchant_id
     order.buff = randf_range(template.buff_min, template.buff_max)

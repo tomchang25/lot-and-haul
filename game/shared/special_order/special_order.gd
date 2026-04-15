@@ -4,65 +4,65 @@
 class_name SpecialOrder
 extends RefCounted
 
-var id: String                    # "{merchant_id}_{counter}"
-var special_order_id: String      # source SpecialOrderData.special_order_id
+var id: String # "{merchant_id}_{counter}"
+var special_order_id: String # source SpecialOrderData.special_order_id
 var merchant_id: String
 var slots: Array[OrderSlot] = []
 var buff: float = 1.0
 var completion_bonus: int = 0
-var deadline_day: int = 0         # absolute day
+var deadline_day: int = 0 # absolute day
 var uses_condition_pricing: bool = false
 var allow_partial_delivery: bool = false
 
 
 func is_complete() -> bool:
-	for slot: OrderSlot in slots:
-		if not slot.is_full():
-			return false
-	return true
+    for slot: OrderSlot in slots:
+        if not slot.is_full():
+            return false
+    return true
 
 
 func is_expired(current_day: int) -> bool:
-	return current_day > deadline_day
+    return current_day > deadline_day
 
 
 func compute_item_price(entry: ItemEntry) -> int:
-	var base: int = entry.active_layer().base_value
-	if uses_condition_pricing:
-		return int(base * entry.get_condition_multiplier() * buff)
-	else:
-		return int(base * buff)
+    var base: int = entry.active_layer().base_value
+    if uses_condition_pricing:
+        return int(base * entry.get_condition_multiplier() * buff)
+    else:
+        return int(base * buff)
 
 
 func to_dict() -> Dictionary:
-	var slot_dicts: Array = []
-	for slot: OrderSlot in slots:
-		slot_dicts.append(slot.to_dict())
-	return {
-		"id": id,
-		"special_order_id": special_order_id,
-		"merchant_id": merchant_id,
-		"slots": slot_dicts,
-		"buff": buff,
-		"completion_bonus": completion_bonus,
-		"deadline_day": deadline_day,
-		"uses_condition_pricing": uses_condition_pricing,
-		"allow_partial_delivery": allow_partial_delivery,
-	}
+    var slot_dicts: Array = []
+    for slot: OrderSlot in slots:
+        slot_dicts.append(slot.to_dict())
+    return {
+        "id": id,
+        "special_order_id": special_order_id,
+        "merchant_id": merchant_id,
+        "slots": slot_dicts,
+        "buff": buff,
+        "completion_bonus": completion_bonus,
+        "deadline_day": deadline_day,
+        "uses_condition_pricing": uses_condition_pricing,
+        "allow_partial_delivery": allow_partial_delivery,
+    }
 
 
 static func from_dict(d: Dictionary) -> SpecialOrder:
-	var order := SpecialOrder.new()
-	order.id = str(d.get("id", ""))
-	order.special_order_id = str(d.get("special_order_id", ""))
-	order.merchant_id = str(d.get("merchant_id", ""))
-	order.buff = float(d.get("buff", 1.0))
-	order.completion_bonus = int(d.get("completion_bonus", 0))
-	order.deadline_day = int(d.get("deadline_day", 0))
-	order.uses_condition_pricing = bool(d.get("uses_condition_pricing", false))
-	order.allow_partial_delivery = bool(d.get("allow_partial_delivery", false))
-	var raw_slots: Array = d.get("slots", [])
-	for sd: Variant in raw_slots:
-		if sd is Dictionary:
-			order.slots.append(OrderSlot.from_dict(sd))
-	return order
+    var order := SpecialOrder.new()
+    order.id = str(d.get("id", ""))
+    order.special_order_id = str(d.get("special_order_id", ""))
+    order.merchant_id = str(d.get("merchant_id", ""))
+    order.buff = float(d.get("buff", 1.0))
+    order.completion_bonus = int(d.get("completion_bonus", 0))
+    order.deadline_day = int(d.get("deadline_day", 0))
+    order.uses_condition_pricing = bool(d.get("uses_condition_pricing", false))
+    order.allow_partial_delivery = bool(d.get("allow_partial_delivery", false))
+    var raw_slots: Array = d.get("slots", [])
+    for sd: Variant in raw_slots:
+        if sd is Dictionary:
+            order.slots.append(OrderSlot.from_dict(sd))
+    return order

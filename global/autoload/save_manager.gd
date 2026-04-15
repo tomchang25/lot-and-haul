@@ -64,7 +64,7 @@ func save() -> void:
         "category_factors_today": MarketManager.category_factors_today,
         "merchant_negotiations_used_today": _build_negotiation_dict(),
         "merchant_orders": _build_order_dict(),
-        "next_order_id": MerchantRegistry._next_order_id,
+        "next_order_id": MerchantRegistry.next_order_id,
     }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
     if file == null:
@@ -159,7 +159,7 @@ func _read_save_file() -> void:
                     m.negotiations_used_today = int(neg_dict[key])
 
     if parsed.has("next_order_id") and parsed["next_order_id"] is float:
-        MerchantRegistry._next_order_id = int(parsed["next_order_id"])
+        MerchantRegistry.next_order_id = int(parsed["next_order_id"])
 
     if parsed.has("merchant_orders") and parsed["merchant_orders"] is Dictionary:
         var orders_dict: Dictionary = parsed["merchant_orders"]

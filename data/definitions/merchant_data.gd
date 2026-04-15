@@ -90,7 +90,7 @@ func offer_for(entry: ItemEntry) -> int:
 # ── Runtime state (not exported, persisted via SaveManager) ──────────────────
 
 var active_orders: Array[SpecialOrder] = []
-var completed_order_ids: Array[String] = []   # accumulates; never cleared
+var completed_order_ids: Array[String] = [] # accumulates; never cleared
 var last_order_roll_day: int = -1
 
 # How many negotiation sessions have been used today. Persisted via SaveManager.
