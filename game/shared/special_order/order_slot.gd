@@ -44,6 +44,29 @@ func accepts(entry: ItemEntry) -> bool:
     return true
 
 
+func check_eligibility(available: Array) -> Dictionary:
+    if remaining() == 0:
+        return {"eligibility": SpecialOrder.Eligibility.FULL, "matches": []}
+
+    var matches: Array[ItemEntry] = []
+    var needed: int = remaining()
+    for entry: Variant in available:
+        if accepts(entry as ItemEntry):
+            matches.append(entry as ItemEntry)
+            if matches.size() >= needed:
+                break
+
+    var eligibility: SpecialOrder.Eligibility
+    if matches.size() >= needed:
+        eligibility = SpecialOrder.Eligibility.FULL
+    elif matches.size() > 0:
+        eligibility = SpecialOrder.Eligibility.PARTIAL
+    else:
+        eligibility = SpecialOrder.Eligibility.NONE
+
+    return {"eligibility": eligibility, "matches": matches}
+
+
 func to_dict() -> Dictionary:
     return {
         "category_id": category.category_id if category else "",
