@@ -40,7 +40,27 @@ func size() -> int:
     return _merchants.size()
 
 
-# Called by SaveManager.advance_days() to refresh special orders for all merchants.
+# Orchestrator called by SaveManager.advance_days(). Groups all day-advance
+# work for merchants: refreshes special orders and resets negotiation budgets.
+func advance_day() -> void:
+    roll_special_orders()
+    _reset_negotiations()
+
+
+func can_negotiate(merchant: MerchantData) -> bool:
+    return merchant.negotiations_used_today < merchant.negotiation_per_day
+
+
+func increment_negotiation(merchant: MerchantData) -> void:
+    merchant.negotiations_used_today += 1
+
+
+func _reset_negotiations() -> void:
+    for m: MerchantData in _merchants.values():
+        m.negotiations_used_today = 0
+
+
+# Refreshes special orders for all merchants.
 func roll_special_orders() -> void:
     for m: MerchantData in _merchants.values():
         m.special_orders.clear()

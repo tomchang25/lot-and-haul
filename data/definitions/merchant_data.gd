@@ -35,14 +35,27 @@ extends Resource
 
 # ── Negotiation ──────────────────────────────────────────────────────────────
 
-# Base probability (0.0–1.0) the merchant accepts the player's ask price at 100%.
-@export var accept_base_chance: float = 0.8
+# Ceiling rolled uniformly per session within these bounds, applied to the
+# basket initial offer. Determines maximum price the merchant will consider.
+@export var ceiling_multiplier_min: float = 1.1
+@export var ceiling_multiplier_max: float = 1.3
 
-# How much the accept chance drops per 10% above the merchant's base offer.
-@export var haggle_penalty_per_10pct: float = 0.15
+# Session anger cap. When anger reaches this value the merchant makes a
+# final offer at the current counter-offer price.
+@export var anger_max: float = 100.0
 
-# Maximum counter-offers before the merchant says "final offer".
-@export var max_counter_offers: int = 2
+# Gain coefficient for the proposal-greed term of the anger formula.
+@export var anger_k: float = 20.0
+
+# Flat anger added every submission regardless of proposal size.
+# anger_max / anger_per_round is the hard round ceiling.
+@export var anger_per_round: float = 20.0
+
+# Fraction of the gap the shopkeeper closes each counter round, in (0, 1].
+@export var counter_aggressiveness: float = 0.3
+
+# How many negotiation sessions this merchant allows per day.
+@export var negotiation_per_day: int = 1
 
 # ── Special orders ───────────────────────────────────────────────────────────
 
@@ -83,3 +96,6 @@ var special_orders: Array[ItemData] = []
 
 # Item IDs of completed special orders this Day Pass. Reset on day advance.
 var completed_order_ids: Array[String] = []
+
+# How many negotiation sessions have been used today. Persisted via SaveManager.
+var negotiations_used_today: int = 0

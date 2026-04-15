@@ -6,9 +6,13 @@ merchants:
     price_multiplier: 1.0
     accepts_off_category: true
     off_category_multiplier: 0.7
-    accept_base_chance: 0.95
-    haggle_penalty_per_10pct: 0.20
-    max_counter_offers: 1
+    ceiling_multiplier_min: 1.1
+    ceiling_multiplier_max: 1.3
+    anger_max: 100.0
+    anger_k: 20.0
+    anger_per_round: 20.0
+    counter_aggressiveness: 0.3
+    negotiation_per_day: 1
     special_order_pool: []
     special_order_count: 0
     special_order_bonus: 0.0

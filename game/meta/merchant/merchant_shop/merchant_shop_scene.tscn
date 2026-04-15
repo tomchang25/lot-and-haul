@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://up5kyjwu6ne4"]
 
 [ext_resource type="Script" uid="uid://c7c0b30e7uy02" path="res://game/meta/merchant/merchant_shop/merchant_shop_scene.gd" id="1_mshopgd"]
+[ext_resource type="PackedScene" uid="uid://cilp5a1xr3e8m" path="res://game/shared/item_display/item_list_panel/item_list_panel.tscn" id="2_ilp"]
 
 [node name="MerchantShopScene" type="Control" unique_id=110369565]
 layout_mode = 3
@@ -45,64 +46,8 @@ custom_minimum_size = Vector2(960, 480)
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="ItemPanel" type="PanelContainer" parent="RootVBox/ListCenter/OuterVBox" unique_id=1441532601]
+[node name="ItemListPanel" parent="RootVBox/ListCenter/OuterVBox" instance=ExtResource("2_ilp")]
 layout_mode = 2
-
-[node name="PanelVBox" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel" unique_id=156001695]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="ColumnHeader" type="HBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=1951409334]
-custom_minimum_size = Vector2(0, 36)
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="ItemHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=1095267960]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 14
-text = "Item"
-vertical_alignment = 1
-
-[node name="ConditionHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=1585753935]
-custom_minimum_size = Vector2(120, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 14
-text = "Condition"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ValueHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=714145033]
-custom_minimum_size = Vector2(160, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 14
-text = "Sell Price"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="PotentialValueHeaderLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ColumnHeader" unique_id=974237622]
-custom_minimum_size = Vector2(160, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 14
-text = "Potential Price"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="HeaderSeparator" type="HSeparator" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=1234724672]
-layout_mode = 2
-
-[node name="ScrollContainer" type="ScrollContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox" unique_id=489654858]
-custom_minimum_size = Vector2(0, 320)
-layout_mode = 2
-
-[node name="RowContainer" type="VBoxContainer" parent="RootVBox/ListCenter/OuterVBox/ItemPanel/PanelVBox/ScrollContainer" unique_id=6977322]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 0
 
 [node name="EmptyLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox" unique_id=83594311]
 visible = false
@@ -129,6 +74,3 @@ custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Back"
-
-[node name="SellConfirm" type="ConfirmationDialog" parent="." unique_id=1717982265]
-title = "Confirm Sale"

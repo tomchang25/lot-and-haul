@@ -37,9 +37,12 @@ func _populate_merchants() -> void:
         btn.text = m.display_name
 
         var available: bool = m.required_perk_id == "" or KnowledgeManager.has_perk(m.required_perk_id)
-        btn.disabled = not available
+        var can_negotiate: bool = MerchantRegistry.can_negotiate(m)
+        btn.disabled = not available or not can_negotiate
         if not available:
             btn.tooltip_text = "Requires perk: %s" % m.required_perk_id
+        elif not can_negotiate:
+            btn.tooltip_text = "Closed — come back tomorrow"
 
         var captured: MerchantData = m
         btn.pressed.connect(func() -> void: _on_merchant_pressed(captured))

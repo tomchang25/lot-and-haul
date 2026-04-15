@@ -14,9 +14,11 @@ class MerchantSpec:
     yaml_key: str = "merchants"
     tres_subdir: str = "merchants"
     uid_prefix: str = "merchant"
-    script_paths: dict[str, str] = field(default_factory=lambda: {
-        "merchant_data": "res://data/definitions/merchant_data.gd",
-    })
+    script_paths: dict[str, str] = field(
+        default_factory=lambda: {
+            "merchant_data": "res://data/definitions/merchant_data.gd",
+        }
+    )
 
     def entity_id(self, entry: dict) -> str:
         return entry["merchant_id"]
@@ -73,9 +75,7 @@ class MerchantSpec:
         w.add_field_str("display_name", entry.get("display_name", ""))
         w.add_field_str("description", entry.get("description", ""))
         w.add_field_ext_ref_array("accepted_super_categories", sc_tags)
-        w.add_field_float(
-            "price_multiplier", float(entry.get("price_multiplier", 1.0))
-        )
+        w.add_field_float("price_multiplier", float(entry.get("price_multiplier", 1.0)))
         w.add_field_bool(
             "accepts_off_category",
             bool(entry.get("accepts_off_category", False)),
@@ -85,16 +85,26 @@ class MerchantSpec:
             float(entry.get("off_category_multiplier", 0.5)),
         )
         w.add_field_float(
-            "accept_base_chance",
-            float(entry.get("accept_base_chance", 0.8)),
+            "ceiling_multiplier_min",
+            float(entry.get("ceiling_multiplier_min", 1.1)),
         )
         w.add_field_float(
-            "haggle_penalty_per_10pct",
-            float(entry.get("haggle_penalty_per_10pct", 0.15)),
+            "ceiling_multiplier_max",
+            float(entry.get("ceiling_multiplier_max", 1.3)),
+        )
+        w.add_field_float("anger_max", float(entry.get("anger_max", 100.0)))
+        w.add_field_float("anger_k", float(entry.get("anger_k", 20.0)))
+        w.add_field_float(
+            "anger_per_round",
+            float(entry.get("anger_per_round", 20.0)),
+        )
+        w.add_field_float(
+            "counter_aggressiveness",
+            float(entry.get("counter_aggressiveness", 0.3)),
         )
         w.add_field_int(
-            "max_counter_offers",
-            int(entry.get("max_counter_offers", 2)),
+            "negotiation_per_day",
+            int(entry.get("negotiation_per_day", 1)),
         )
         w.add_field_ext_ref_array("special_order_pool", so_tags)
         w.add_field_int(
@@ -105,9 +115,7 @@ class MerchantSpec:
             "special_order_bonus",
             float(entry.get("special_order_bonus", 0.25)),
         )
-        w.add_field_str(
-            "required_perk_id", entry.get("required_perk_id", "")
-        )
+        w.add_field_str("required_perk_id", entry.get("required_perk_id", ""))
         return w.render()
 
     def parse_tres(self, text: str, ctx: ParseCtx) -> None:
@@ -149,13 +157,66 @@ class MerchantSpec:
                     f" got {off_cat_mult!r}"
                 )
 
-            accept_chance = merchant.get("accept_base_chance", 0.8)
-            if not isinstance(accept_chance, (int, float)) or not (
-                0.0 <= accept_chance <= 1.0
+            ceiling_min = merchant.get("ceiling_multiplier_min", 1.1)
+            ceiling_max = merchant.get("ceiling_multiplier_max", 1.3)
+            if not isinstance(ceiling_min, (int, float)) or ceiling_min <= 0:
+                errors.append(
+                    f"merchant '{mid}': ceiling_multiplier_min must be positive,"
+                    f" got {ceiling_min!r}"
+                )
+            if not isinstance(ceiling_max, (int, float)) or ceiling_max <= 0:
+                errors.append(
+                    f"merchant '{mid}': ceiling_multiplier_max must be positive,"
+                    f" got {ceiling_max!r}"
+                )
+            if (
+                isinstance(ceiling_min, (int, float))
+                and isinstance(ceiling_max, (int, float))
+                and ceiling_min > ceiling_max
             ):
                 errors.append(
-                    f"merchant '{mid}': accept_base_chance must be between 0.0 and 1.0,"
-                    f" got {accept_chance!r}"
+                    f"merchant '{mid}': ceiling_multiplier_min ({ceiling_min})"
+                    f" > ceiling_multiplier_max ({ceiling_max})"
+                )
+
+            anger_max_val = merchant.get("anger_max", 100.0)
+            if not isinstance(anger_max_val, (int, float)) or anger_max_val <= 0:
+                errors.append(
+                    f"merchant '{mid}': anger_max must be positive,"
+                    f" got {anger_max_val!r}"
+                )
+
+            anger_k_val = merchant.get("anger_k", 20.0)
+            if not isinstance(anger_k_val, (int, float)) or anger_k_val < 0:
+                errors.append(
+                    f"merchant '{mid}': anger_k must be non-negative,"
+                    f" got {anger_k_val!r}"
+                )
+
+            anger_per_round_val = merchant.get("anger_per_round", 20.0)
+            if (
+                not isinstance(anger_per_round_val, (int, float))
+                or anger_per_round_val < 0
+            ):
+                errors.append(
+                    f"merchant '{mid}': anger_per_round must be non-negative,"
+                    f" got {anger_per_round_val!r}"
+                )
+
+            counter_agg = merchant.get("counter_aggressiveness", 0.3)
+            if not isinstance(counter_agg, (int, float)) or not (
+                0.0 < counter_agg <= 1.0
+            ):
+                errors.append(
+                    f"merchant '{mid}': counter_aggressiveness must be in (0, 1],"
+                    f" got {counter_agg!r}"
+                )
+
+            neg_per_day = merchant.get("negotiation_per_day", 1)
+            if not isinstance(neg_per_day, (int, float)) or int(neg_per_day) < 1:
+                errors.append(
+                    f"merchant '{mid}': negotiation_per_day must be >= 1,"
+                    f" got {neg_per_day!r}"
                 )
 
             if known_super_cat_ids:
