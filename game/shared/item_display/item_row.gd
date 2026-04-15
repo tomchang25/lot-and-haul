@@ -1,7 +1,7 @@
 # item_row.gd
 # Generalised item row used by list_review, reveal, run_review, storage,
 # and pawn_shop.
-# Column visibility is driven by the columns array passed to setup().
+# Column visibility and order are driven by the columns array passed to setup().
 # Hover: emits tooltip_requested for the parent scene to position and show.
 class_name ItemRow
 extends PanelContainer
@@ -9,6 +9,8 @@ extends PanelContainer
 signal tooltip_requested(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2)
 signal tooltip_dismissed
 signal row_pressed(entry: ItemEntry)
+
+# ── Enums ─────────────────────────────────────────────────────────────────────
 
 enum SelectionState {
     NONE, # no override applied
@@ -26,6 +28,8 @@ enum Column {
     GRID,
     MARKET_FACTOR,
 }
+
+# ── Constants ─────────────────────────────────────────────────────────────────
 
 # Header text shown for each column. PRICE is dynamic — see get_price_header().
 const COLUMN_HEADERS: Dictionary = {
@@ -48,21 +52,6 @@ const COLUMN_MIN_WIDTH: Dictionary = {
     Column.MARKET_FACTOR: 100,
 }
 
-
-static func get_price_header(ctx: ItemViewContext) -> String:
-    match ctx.price_mode:
-        ItemViewContext.PriceMode.ESTIMATED_VALUE:
-            return "Est. Value"
-        ItemViewContext.PriceMode.APPRAISED_VALUE:
-            return "Appraised Value"
-        ItemViewContext.PriceMode.BASE_VALUE:
-            return "Base Value"
-        ItemViewContext.PriceMode.MERCHANT_OFFER:
-            return "%s Offer" % ctx.merchant.display_name if ctx.merchant else "Offer"
-        _:
-            push_warning("Unknown PriceMode: %d" % ctx.price_mode)
-            return "Price"
-
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _entry: ItemEntry = null
@@ -70,27 +59,9 @@ var _ctx: ItemViewContext = null
 var _columns: Array = []
 var _selection_state: SelectionState = SelectionState.NONE
 
-# Built once on demand and reused across all rows.
-static var _style_selected: StyleBoxFlat = null
-static var _style_available: StyleBoxFlat = null
-static var _style_blocked: StyleBoxFlat = null
-
-
-static func _ensure_styles() -> void:
-    if _style_selected != null:
-        return
-
-    _style_selected = StyleBoxFlat.new()
-    _style_selected.bg_color = Color(1.0, 1.0, 1.0, 0.15) # white tint
-
-    _style_available = StyleBoxFlat.new()
-    _style_available.bg_color = Color(0.5, 0.5, 0.5, 0.15) # grey tint
-
-    _style_blocked = StyleBoxFlat.new()
-    _style_blocked.bg_color = Color(0.08, 0.08, 0.08, 0.9) # near-black
-
 # ── Node references ───────────────────────────────────────────────────────────
 
+@onready var _h_box_container: HBoxContainer = $HBoxContainer
 @onready var _name_label: Label = $HBoxContainer/NameLabel
 @onready var _condition_label: Label = $HBoxContainer/ConditionLabel
 @onready var _price_label: Label = $HBoxContainer/PriceLabel
@@ -143,6 +114,23 @@ func set_selection_state(state: SelectionState) -> void:
         SelectionState.NONE:
             remove_theme_stylebox_override(&"panel")
             mouse_default_cursor_shape = Control.CURSOR_ARROW
+        _:
+            push_warning("Unknown SelectionState: %d" % state)
+
+
+static func get_price_header(ctx: ItemViewContext) -> String:
+    match ctx.price_mode:
+        ItemViewContext.PriceMode.ESTIMATED_VALUE:
+            return "Est. Value"
+        ItemViewContext.PriceMode.APPRAISED_VALUE:
+            return "Appraised Value"
+        ItemViewContext.PriceMode.BASE_VALUE:
+            return "Base Value"
+        ItemViewContext.PriceMode.MERCHANT_OFFER:
+            return "%s Offer" % ctx.merchant.display_name if ctx.merchant else "Offer"
+        _:
+            push_warning("Unknown PriceMode: %d" % ctx.price_mode)
+            return "Price"
 
 # ══ Input ═════════════════════════════════════════════════════════════════════
 
@@ -192,9 +180,9 @@ func _refresh() -> void:
 
     # ── WEIGHT / GRID ─────────────────────────────────────────────────────────
     if _entry.item_data != null and _entry.item_data.category_data != null:
-        var cat := _entry.item_data.category_data
-        _weight_label.text = "%.1f kg" % cat.weight
-        _grid_label.text = "%d  %s" % [cat.get_cells().size(), cat.shape_id]
+        var category: CategoryData = _entry.item_data.category_data
+        _weight_label.text = "%.1f kg" % category.weight
+        _grid_label.text = "%d  %s" % [category.get_cells().size(), category.shape_id]
 
     # ── MARKET FACTOR ─────────────────────────────────────────────────────────
     _market_factor_label.text = "%+d%%" % int(round(_entry.market_factor_delta * 100))
@@ -219,7 +207,28 @@ func _apply_column_order() -> void:
     for i in _columns.size():
         var col: Column = _columns[i]
         if column_to_label.has(col):
-            $HBoxContainer.move_child(column_to_label[col], i)
+            _h_box_container.move_child(column_to_label[col], i)
+
+# ══ Selection styles ══════════════════════════════════════════════════════════
+
+# Built once on demand and reused across all rows.
+static var _style_selected: StyleBoxFlat = null
+static var _style_available: StyleBoxFlat = null
+static var _style_blocked: StyleBoxFlat = null
+
+
+static func _ensure_styles() -> void:
+    if _style_selected != null:
+        return
+
+    _style_selected = StyleBoxFlat.new()
+    _style_selected.bg_color = Color(1.0, 1.0, 1.0, 0.15) # white tint
+
+    _style_available = StyleBoxFlat.new()
+    _style_available.bg_color = Color(0.5, 0.5, 0.5, 0.15) # grey tint
+
+    _style_blocked = StyleBoxFlat.new()
+    _style_blocked.bg_color = Color(0.08, 0.08, 0.08, 0.9) # near-black
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
