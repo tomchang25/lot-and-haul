@@ -55,45 +55,35 @@ func is_expired(current_day: int) -> bool:
 
 
 func check_eligibility(storage: Array) -> Eligibility:
-    var available: Array = storage.duplicate()
-    var all_satisfiable: bool = true
-    var any_satisfiable: bool = false
+    var pool: Array = storage.duplicate()
+    var has_incomplete: bool = false
+    var all_full: bool = true
+    var any_match: bool = false
 
     for slot: OrderSlot in slots:
-        var needed: int = slot.remaining()
-        if needed <= 0:
+        var result: Dictionary = slot.check_eligibility(pool)
+        for entry: Variant in result["matches"]:
+            pool.erase(entry)
+
+        if slot.remaining() == 0:
             continue
 
-        var matched: int = 0
-        var consumed: Array = []
-        for entry: Variant in available:
-            if slot.accepts(entry as ItemEntry):
-                consumed.append(entry)
-                matched += 1
-                if matched >= needed:
-                    break
-
-        for item: Variant in consumed:
-            available.erase(item)
-
-        if matched <= 0:
-            all_satisfiable = false
-        elif matched < needed:
-            all_satisfiable = false
-            any_satisfiable = true
+        has_incomplete = true
+        if result["eligibility"] == Eligibility.FULL:
+            any_match = true
+        elif result["eligibility"] == Eligibility.PARTIAL:
+            all_full = false
+            any_match = true
         else:
-            any_satisfiable = true
+            all_full = false
 
-    if all_satisfiable and any_satisfiable:
+    if not has_incomplete:
         return Eligibility.FULL
-    elif any_satisfiable:
+    if all_full and any_match:
+        return Eligibility.FULL
+    if any_match:
         return Eligibility.PARTIAL
-    else:
-        # All slots already full (order complete) counts as FULL.
-        for slot: OrderSlot in slots:
-            if slot.remaining() > 0:
-                return Eligibility.NONE
-        return Eligibility.FULL
+    return Eligibility.NONE
 
 
 func compute_item_price(entry: ItemEntry) -> int:
