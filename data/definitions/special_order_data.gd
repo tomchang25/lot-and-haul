@@ -10,28 +10,25 @@ extends Resource
 
 # ── Slot generation ──────────────────────────────────────────────────────────
 
+# Total slot count range for the order. Each slot picks a pool entry uniformly
+# from `slot_pool` and uses that entry's floors/categories/count range.
 @export var slot_count_min: int = 1
 @export var slot_count_max: int = 1
-@export var required_count_min: int = 1
-@export var required_count_max: int = 1
 
-# Pool of categories a generated slot may target.
-@export var allowed_categories: Array[CategoryData] = []
-
-# Probability that a generated slot gets a rarity gate (>= UNCOMMON).
-@export var rarity_gate_chance: float = 0.0
-
-# Probability that a generated slot gets a condition gate (>= 0.6).
-@export var condition_gate_chance: float = 0.0
+# Pool of slot profiles. Must be non-empty. Each slot in a generated order
+# picks one entry uniformly at random.
+@export var slot_pool: Array[SpecialOrderSlotPoolEntry] = []
 
 # ── Pricing & turn-in flags ──────────────────────────────────────────────────
 
 @export var buff_min: float = 1.0
 @export var buff_max: float = 1.0
 
-# If true, per-item price uses entry.get_condition_multiplier().
-# Otherwise condition is ignored (flat-rate bulk).
-@export var uses_condition_pricing: bool = false
+# Per-factor pricing flags. These map one-to-one to the same-named fields on
+# SpecialOrder and feed the order's PriceConfig.
+@export var uses_condition: bool = false
+@export var uses_knowledge: bool = false
+@export var uses_market: bool = false
 
 # If true, confirm works with any non-empty assignment and slot progress
 # persists across sessions. If false, confirm is disabled until every slot
