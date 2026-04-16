@@ -341,38 +341,74 @@ func should_show_potential_price_for(ctx: ItemViewContext) -> bool:
     return should_show_potential_price
 
 
+# Bridge method — kept for ItemCard / ItemRowTooltip which dispatch on stage.
 func price_label_for(ctx: ItemViewContext) -> String:
-    match ctx.price_mode:
-        ItemViewContext.PriceMode.APPRAISED_VALUE:
+    match ctx.stage:
+        ItemViewContext.Stage.INSPECTION, \
+        ItemViewContext.Stage.LIST_REVIEW, \
+        ItemViewContext.Stage.REVEAL, \
+        ItemViewContext.Stage.CARGO:
+            return estimated_value_label
+        ItemViewContext.Stage.RUN_REVIEW, \
+        ItemViewContext.Stage.STORAGE:
             return appraised_value_label
-        ItemViewContext.PriceMode.BASE_VALUE:
-            return "???" if is_veiled() else "$%d" % active_layer().base_value
-        ItemViewContext.PriceMode.ESTIMATED_VALUE:
-            return estimated_value_label
-        ItemViewContext.PriceMode.MERCHANT_OFFER:
-            return "$%d" % price_value_for(ctx)
-        ItemViewContext.PriceMode.SPECIAL_ORDER:
-            return "$%d" % price_value_for(ctx)
+        ItemViewContext.Stage.MERCHANT_SHOP:
+            return merchant_offer_label(ctx.merchant)
+        ItemViewContext.Stage.FULFILLMENT_PANEL:
+            return special_order_label(ctx.order)
         _:
-            push_warning("Unknown PriceMode: %d" % ctx.price_mode)
+            push_warning("Unknown Stage for price: %d" % ctx.stage)
             return estimated_value_label
 
 
+# Bridge method — kept for ItemCard / ItemRowTooltip which dispatch on stage.
 func price_value_for(ctx: ItemViewContext) -> int:
-    match ctx.price_mode:
-        ItemViewContext.PriceMode.APPRAISED_VALUE:
+    match ctx.stage:
+        ItemViewContext.Stage.INSPECTION, \
+        ItemViewContext.Stage.LIST_REVIEW, \
+        ItemViewContext.Stage.REVEAL, \
+        ItemViewContext.Stage.CARGO:
+            return estimated_value_sort_value()
+        ItemViewContext.Stage.RUN_REVIEW, \
+        ItemViewContext.Stage.STORAGE:
             return appraised_value
-        ItemViewContext.PriceMode.BASE_VALUE:
-            return 0 if is_veiled() else active_layer().base_value
-        ItemViewContext.PriceMode.ESTIMATED_VALUE:
-            return estimated_value_min
-        ItemViewContext.PriceMode.MERCHANT_OFFER:
-            return ctx.merchant.offer_for(self) if ctx.merchant else appraised_value
-        ItemViewContext.PriceMode.SPECIAL_ORDER:
-            return ctx.order.compute_item_price(self) if ctx.order else 0
+        ItemViewContext.Stage.MERCHANT_SHOP:
+            return merchant_offer_value(ctx.merchant)
+        ItemViewContext.Stage.FULFILLMENT_PANEL:
+            return special_order_value(ctx.order)
         _:
-            push_warning("Unknown PriceMode: %d" % ctx.price_mode)
+            push_warning("Unknown Stage for price: %d" % ctx.stage)
             return 0
+
+# ── Per-column price getters ─────────────────────────────────────────────────
+
+
+func estimated_value_sort_value() -> int:
+    return estimated_value_min
+
+
+func base_value_label_text() -> String:
+    return "???" if is_veiled() else "$%d" % active_layer().base_value
+
+
+func base_value_sort_value() -> int:
+    return 0 if is_veiled() else active_layer().base_value
+
+
+func merchant_offer_label(merchant: MerchantData) -> String:
+    return "$%d" % merchant_offer_value(merchant)
+
+
+func merchant_offer_value(merchant: MerchantData) -> int:
+    return merchant.offer_for(self) if merchant else appraised_value
+
+
+func special_order_label(order: SpecialOrder) -> String:
+    return "$%d" % special_order_value(order)
+
+
+func special_order_value(order: SpecialOrder) -> int:
+    return order.compute_item_price(self) if order else 0
 
 
 # Returns the layer currently visible to the player.
