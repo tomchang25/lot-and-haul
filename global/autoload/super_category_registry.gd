@@ -9,8 +9,8 @@
 # _ready will fire if project.godot is reordered incorrectly.
 extends Node
 
-var _super_categories: Dictionary = { }     # super_category_id → SuperCategoryData
-var _categories_by_super: Dictionary = { }  # super_category_id → Array[CategoryData]
+var _super_categories: Dictionary = { } # super_category_id → SuperCategoryData
+var _categories_by_super: Dictionary = { } # super_category_id → Array[CategoryData]
 
 
 func _ready() -> void:
