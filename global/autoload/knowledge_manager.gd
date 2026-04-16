@@ -73,15 +73,15 @@ func get_category_rank(category_id: String) -> int:
 
 func get_super_category_rank(super_category_id: String) -> int:
     var total: int = 0
-    for cat_id: String in ItemRegistry.get_categories_for_super(super_category_id):
-        total += get_category_rank(cat_id)
+    for cat: CategoryData in SuperCategoryRegistry.get_categories_for_super(super_category_id):
+        total += get_category_rank(cat.category_id)
     return total
 
 
 func get_mastery_rank() -> int:
     var total: int = 0
-    for sc_id: String in ItemRegistry.get_all_super_category_ids():
-        total += get_super_category_rank(sc_id)
+    for sc: SuperCategoryData in SuperCategoryRegistry.get_all_super_categories():
+        total += get_super_category_rank(sc.super_category_id)
     return total
 
 

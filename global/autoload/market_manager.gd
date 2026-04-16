@@ -39,13 +39,13 @@ func advance_market(days: int) -> void:
 
 
 func _initialise_means() -> void:
-    for sc_id: String in ItemRegistry.get_all_super_category_ids():
+    for sc_id: String in SuperCategoryRegistry.get_all_super_category_ids():
         super_cat_means[sc_id] = 1.0
 
 
 func _walk_means(days: int) -> void:
     for sc_id: String in super_cat_means.keys():
-        var sc: SuperCategoryData = ItemRegistry.get_super_category_data(sc_id)
+        var sc: SuperCategoryData = SuperCategoryRegistry.get_super_category(sc_id)
         if sc == null:
             continue
         var mean: float = super_cat_means[sc_id]
@@ -56,19 +56,12 @@ func _walk_means(days: int) -> void:
 
 
 func _resample_today() -> void:
-    for cat_id: String in ItemRegistry.get_all_category_ids():
-        var sc_id: String = _super_category_for(cat_id)
-        var sc: SuperCategoryData = ItemRegistry.get_super_category_data(sc_id)
+    for cat: CategoryData in CategoryRegistry.get_all_categories():
+        var sc: SuperCategoryData = cat.super_category
+        if sc == null:
+            continue
+        var sc_id: String = sc.super_category_id
         var mean: float = super_cat_means.get(sc_id, 1.0)
-        var stddev: float = sc.market_stddev if sc != null else 0.02
-        var factor: float = randfn(mean, stddev)
+        var factor: float = randfn(mean, sc.market_stddev)
         factor = clampf(factor, MIN_CATEGORY_FACTOR, MAX_CATEGORY_FACTOR)
-        category_factors_today[cat_id] = factor
-
-
-func _super_category_for(category_id: String) -> String:
-    for sc_id: String in ItemRegistry.get_all_super_category_ids():
-        var cats: Array[String] = ItemRegistry.get_categories_for_super(sc_id)
-        if cats.has(category_id):
-            return sc_id
-    return ""
+        category_factors_today[cat.category_id] = factor

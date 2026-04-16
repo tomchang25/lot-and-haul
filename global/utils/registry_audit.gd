@@ -31,6 +31,12 @@ static func _check_registry_sizes() -> bool:
     if ItemRegistry.size() == 0:
         push_error("RegistryAudit: ItemRegistry is empty")
         ok = false
+    if CategoryRegistry.size() == 0:
+        push_error("RegistryAudit: CategoryRegistry is empty")
+        ok = false
+    if SuperCategoryRegistry.size() == 0:
+        push_error("RegistryAudit: SuperCategoryRegistry is empty")
+        ok = false
     if CarRegistry.size() == 0:
         push_error("RegistryAudit: CarRegistry is empty")
         ok = false
