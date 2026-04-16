@@ -16,6 +16,13 @@ func _ready() -> void:
     RegistryCoordinator.register(self)
 
 
+func migrate() -> void:
+    for key in SaveManager.category_points.keys():
+        if get_category(key) == null:
+            push_warning("CategoryRegistry.migrate: dropping unknown category_points key '%s'" % key)
+            SaveManager.category_points.erase(key)
+
+
 func validate() -> bool:
     var ok := true
     if size() == 0:

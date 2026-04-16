@@ -17,6 +17,18 @@ func _ready() -> void:
     RegistryCoordinator.register(self)
 
 
+func migrate() -> void:
+    for m: MerchantData in _merchants.values():
+        m.active_orders = m.active_orders.filter(
+            func(order: SpecialOrder) -> bool:
+                for slot in order.slots:
+                    if slot.category == null:
+                        push_warning("MerchantRegistry.migrate: dropping order '%s' (slot has unresolved category)" % order.id)
+                        return false
+                return true
+        )
+
+
 func validate() -> bool:
     var ok := true
     if size() == 0:
