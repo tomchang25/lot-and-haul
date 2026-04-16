@@ -35,6 +35,7 @@ var _negotiation_dialog: Control = null
 @onready var _sell_btn: Button = $RootVBox/Footer/SellButton
 @onready var _back_btn: Button = $RootVBox/Footer/BackButton
 @onready var _empty_label: Label = $RootVBox/ListCenter/OuterVBox/EmptyLabel
+@onready var _trade_summary_popup: AcceptDialog = $TradeSummaryPopup
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -49,6 +50,8 @@ func _ready() -> void:
 
     _back_btn.pressed.connect(_on_back_pressed)
     _sell_btn.pressed.connect(_on_sell_pressed)
+    _trade_summary_popup.confirmed.connect(_on_trade_summary_dismissed)
+    _trade_summary_popup.canceled.connect(_on_trade_summary_dismissed)
 
     _item_list_panel.row_pressed.connect(_on_row_pressed)
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
@@ -116,6 +119,16 @@ func _on_negotiation_accepted(final_price: int) -> void:
 
     MerchantRegistry.increment_negotiation(_merchant)
     SaveManager.save()
+
+    _trade_summary_popup.dialog_text = "Sold %d item%s for $%d." % [
+        sold.size(),
+        "" if sold.size() == 1 else "s",
+        final_price,
+    ]
+    _trade_summary_popup.popup_centered()
+
+
+func _on_trade_summary_dismissed() -> void:
     GameManager.go_to_merchant_hub()
 
 

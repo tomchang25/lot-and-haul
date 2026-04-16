@@ -74,3 +74,7 @@ custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Back"
+
+[node name="TradeSummaryPopup" type="AcceptDialog" parent="." unique_id=887342101]
+title = "Trade Complete"
+ok_button_text = "OK"
