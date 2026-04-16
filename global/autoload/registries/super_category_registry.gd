@@ -21,6 +21,22 @@ func _ready() -> void:
     )
     assert(CategoryRegistry.size() > 0, "SuperCategoryRegistry requires CategoryRegistry to load first")
     _build_categories_by_super_index()
+    RegistryCoordinator.register(self)
+
+
+func validate() -> bool:
+    var ok := true
+    if size() == 0:
+        push_error("SuperCategoryRegistry: registry is empty")
+        ok = false
+    for super_cat_id: String in MarketManager.super_cat_means.keys():
+        if get_super_category(super_cat_id) == null:
+            push_error(
+                "SuperCategoryRegistry: MarketManager.super_cat_means key '%s' not found"
+                % super_cat_id,
+            )
+            ok = false
+    return ok
 
 
 func _build_categories_by_super_index() -> void:

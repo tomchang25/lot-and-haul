@@ -13,6 +13,22 @@ func _ready() -> void:
         func(r: Resource) -> String:
             return (r as LocationData).location_id if r is LocationData else ""
     )
+    RegistryCoordinator.register(self)
+
+
+func validate() -> bool:
+    var ok := true
+    if size() == 0:
+        push_error("LocationRegistry: registry is empty")
+        ok = false
+    for location_id: String in SaveManager.available_location_ids:
+        if get_location(location_id) == null:
+            push_error(
+                "LocationRegistry: SaveManager.available_location_ids '%s' not found"
+                % location_id,
+            )
+            ok = false
+    return ok
 
 
 # Returns the LocationData with the given location_id, or null if not found.

@@ -8,8 +8,9 @@ var cash: int = 0
 var active_car_id: String = "van_basic"
 
 # Ids of every car the player owns. The starter "van_basic" is appended on
-# first load (and as a migration for saves that predate this field) via the
-# logic at the end of `load()`. Follows the same id-string pattern as
+# first load (and as a migration for saves that predate this field) by
+# `CarRegistry.migrate()`, which `RegistryCoordinator.run_migrations()`
+# drives after `load()`. Follows the same id-string pattern as
 # active_car_id; resolve to CarData through `owned_cars` below.
 var owned_car_ids: Array[String] = []
 
@@ -75,7 +76,6 @@ func save() -> void:
 
 func load() -> void:
     _read_save_file()
-    _migrate_owned_cars()
 
 
 func _read_save_file() -> void:
@@ -184,16 +184,6 @@ func _read_save_file() -> void:
                 for cid: Variant in entry["completed_order_ids"]:
                     if cid is String:
                         m.completed_order_ids.append(cid)
-
-
-# Idempotent migration: guarantees a fresh save gets the starter van, and
-# repairs saves whose `active_car_id` no longer resolves against CarRegistry
-# (e.g. the car was removed from the data pipeline). Safe to re-run.
-func _migrate_owned_cars() -> void:
-    if owned_car_ids.is_empty():
-        owned_car_ids.append("van_basic")
-    if active_car_id.is_empty() or CarRegistry.get_car(active_car_id) == null:
-        active_car_id = owned_car_ids[0]
 
 
 # Attempts to purchase `car` using `SaveManager.cash`.

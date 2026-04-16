@@ -4,7 +4,11 @@ extends Node
 
 
 func _ready() -> void:
-    RegistryAudit.run(scenes)
+    SaveManager.load()
+    RegistryCoordinator.run_migrations()
+    var validation_ok := RegistryCoordinator.run_validation()
+    var scene_ok := RegistryAudit.check_scene_registry(scenes)
+    var _audit_ok := validation_ok and scene_ok
 
 # ── Day-summary hand-off ─────────────────────────────────────────────────────
 
