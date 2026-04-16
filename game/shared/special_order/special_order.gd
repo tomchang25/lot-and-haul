@@ -11,8 +11,18 @@ var slots: Array[OrderSlot] = []
 var buff: float = 1.0
 var completion_bonus: int = 0
 var deadline_day: int = 0 # absolute day
-var uses_condition_pricing: bool = false
+
+# Per-factor pricing flags persisted with the order. The runtime PriceConfig
+# below is rebuilt from these in create() and from_dict().
+var uses_condition: bool = false
+var uses_knowledge: bool = false
+var uses_market: bool = false
+
 var allow_partial_delivery: bool = false
+
+# PriceConfig assembled once from the flags above plus buff; reused for every
+# item in compute_item_price() so per-row rendering never allocates.
+var pricing_config: PriceConfig = null
 
 enum Eligibility {
     NONE,
@@ -33,14 +43,25 @@ static func create(
     order.buff = randf_range(template.buff_min, template.buff_max)
     order.completion_bonus = template.completion_bonus
     order.deadline_day = SaveManager.current_day + template.deadline_days
-    order.uses_condition_pricing = template.uses_condition_pricing
+    order.uses_condition = template.uses_condition_pricing
+    order.uses_knowledge = false
+    order.uses_market = false
     order.allow_partial_delivery = template.allow_partial_delivery
+    order._rebuild_pricing_config()
 
     var slot_count: int = randi_range(template.slot_count_min, template.slot_count_max)
     for i in range(slot_count):
         order.slots.append(OrderSlot.create(template))
 
     return order
+
+
+func _rebuild_pricing_config() -> void:
+    pricing_config = PriceConfig.new()
+    pricing_config.condition = uses_condition
+    pricing_config.knowledge = uses_knowledge
+    pricing_config.market = uses_market
+    pricing_config.multiplier = buff
 
 
 func is_complete() -> bool:
@@ -87,11 +108,7 @@ func check_eligibility(storage: Array) -> Eligibility:
 
 
 func compute_item_price(entry: ItemEntry) -> int:
-    var base: int = entry.active_layer().base_value
-    if uses_condition_pricing:
-        return int(base * entry.get_condition_multiplier() * buff)
-    else:
-        return int(base * buff)
+    return entry.compute_price(pricing_config)
 
 
 func to_dict() -> Dictionary:
@@ -106,7 +123,9 @@ func to_dict() -> Dictionary:
         "buff": buff,
         "completion_bonus": completion_bonus,
         "deadline_day": deadline_day,
-        "uses_condition_pricing": uses_condition_pricing,
+        "uses_condition": uses_condition,
+        "uses_knowledge": uses_knowledge,
+        "uses_market": uses_market,
         "allow_partial_delivery": allow_partial_delivery,
     }
 
@@ -119,8 +138,18 @@ static func from_dict(d: Dictionary) -> SpecialOrder:
     order.buff = float(d.get("buff", 1.0))
     order.completion_bonus = int(d.get("completion_bonus", 0))
     order.deadline_day = int(d.get("deadline_day", 0))
-    order.uses_condition_pricing = bool(d.get("uses_condition_pricing", false))
+
+    # Old saves persisted `uses_condition_pricing`; new saves persist the three
+    # per-factor flags. Accept the legacy key as a fallback for uses_condition
+    # and default the new flags to false.
+    var legacy_condition: bool = bool(d.get("uses_condition_pricing", false))
+    order.uses_condition = bool(d.get("uses_condition", legacy_condition))
+    order.uses_knowledge = bool(d.get("uses_knowledge", false))
+    order.uses_market = bool(d.get("uses_market", false))
+
     order.allow_partial_delivery = bool(d.get("allow_partial_delivery", false))
+    order._rebuild_pricing_config()
+
     var raw_slots: Array = d.get("slots", [])
     for sd: Variant in raw_slots:
         if sd is Dictionary:

@@ -11,6 +11,15 @@ var _super_category_to_categories: Dictionary = { }
 # Maps super_category_id (String) → SuperCategoryData resource.
 var _super_categories_by_id: Dictionary = { }
 
+# ── PriceConfig preset cache ─────────────────────────────────────────────────
+# Preset PriceConfig instances built once at startup so high-frequency callers
+# (e.g. item row rendering) can read pricing policies without allocating.
+
+var price_config_flat: PriceConfig = null
+var price_config_condition_only: PriceConfig = null
+var price_config_appraised: PriceConfig = null
+var price_config_market: PriceConfig = null
+
 
 func _ready() -> void:
     _items_by_id = ResourceDirLoader.load_by_id(
@@ -19,6 +28,14 @@ func _ready() -> void:
             return (r as ItemData).item_id if r is ItemData else ""
     )
     _build_super_category_index()
+    _build_price_config_presets()
+
+
+func _build_price_config_presets() -> void:
+    price_config_flat = PriceConfig.flat()
+    price_config_condition_only = PriceConfig.condition_only()
+    price_config_appraised = PriceConfig.appraised()
+    price_config_market = PriceConfig.market()
 
 
 func _build_super_category_index() -> void:
