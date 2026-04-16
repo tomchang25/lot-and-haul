@@ -15,6 +15,8 @@ const PANEL_COLUMNS: Array = [
     ItemRow.Column.SPECIAL_ORDER,
 ]
 
+const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
+
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _merchant: MerchantData = null
@@ -251,7 +253,12 @@ func _refresh_slot_display() -> void:
 
         var slot_text: String = "%s: %d / %d" % [cat_name, total_filled, slot.required_count]
         if slot.min_rarity >= 0:
-            slot_text += " [Uncommon+]"
+            var rarity_name: String = (
+                RARITY_NAMES[slot.min_rarity]
+                if slot.min_rarity < RARITY_NAMES.size()
+                else "Unknown"
+            )
+            slot_text += " [%s+]" % rarity_name
         if slot.min_condition > 0.0:
             slot_text += " [Cond >= %d%%]" % int(slot.min_condition * 100)
 
