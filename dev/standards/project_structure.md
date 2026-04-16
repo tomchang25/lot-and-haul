@@ -244,8 +244,11 @@ Use this folder for **project-wide global systems** configured as autoloads.
 
 ```
 global/
-  autoload/     → one subfolder or file per autoloaded system
-  theme/        → shared theme resources
+  autoload/
+    registries/   → resource-backed registry autoloads
+                    (one file per type, e.g. car_registry.gd)
+    (other files) → managers and systems (SaveManager, GameManager, etc.)
+  theme/          → shared theme resources
 ```
 
 Only scripts that must be globally accessible at all times belong here.

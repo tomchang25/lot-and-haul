@@ -14,13 +14,13 @@ If a type meets the bar, the registry is the single source of truth for "does th
 
 ## File layout
 
-| Thing | Location |
-|---|---|
-| Script | `global/autoload/<singular>_registry.gd` |
-| Resource files | `data/tres/<plural>/` |
-| Path constant | `DataPaths.<PLURAL>_DIR` |
-| Autoload registration | `project.godot` |
-| Audit entry | own `validate()` + `RegistryCoordinator.register(self)` in `_ready()` |
+| Thing                 | Location                                                              |
+| --------------------- | --------------------------------------------------------------------- |
+| Script                | `global/autoload/<singular>_registry.gd`                              |
+| Resource files        | `data/tres/<plural>/`                                                 |
+| Path constant         | `DataPaths.<PLURAL>_DIR`                                              |
+| Autoload registration | `project.godot`                                                       |
+| Audit entry           | own `validate()` + `RegistryCoordinator.register(self)` in `_ready()` |
 
 Examples today: `car_registry.gd` → `data/tres/cars/`, `location_registry.gd` → `data/tres/locations/`.
 
@@ -76,7 +76,7 @@ Rule: if a method's parameter id-type differs from the registry's own id-type, t
 
 ## Checklist for a new registry
 
-1. Script at `global/autoload/<singular>_registry.gd`, loading via `ResourceDirLoader.load_by_id(DataPaths.<PLURAL>_DIR, id_getter)`.
+1. Script at `global/autoload/registries/<singular>_registry.gd`, loading via `ResourceDirLoader.load_by_id(DataPaths.<PLURAL>_DIR, id_getter)`.
 2. `DataPaths.<PLURAL>_DIR` constant. Comment if gitignored.
 3. Autoload line in `project.godot`, placed after `RegistryCoordinator`. Check load order if `_ready` reads other registries.
 4. Call `RegistryCoordinator.register(self)` at the end of `_ready()`, and implement `validate() -> bool` (size check + any save-reference checks). Add `migrate()` only if the registry needs to mutate save state at boot.
