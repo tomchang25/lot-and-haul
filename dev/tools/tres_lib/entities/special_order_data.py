@@ -78,9 +78,7 @@ class SpecialOrderDataSpec:
         sub_ids: list[str] = []
         for i, pool_entry in enumerate(slot_pool):
             cat_ids = [str(c) for c in (pool_entry.get("categories", []) or [])]
-            cat_refs = ", ".join(
-                f'ExtResource("{cat_tag_by_id[c]}")' for c in cat_ids
-            )
+            cat_refs = ", ".join(f'ExtResource("{cat_tag_by_id[c]}")' for c in cat_ids)
             sub_id = f"pool_{i}"
             w.add_sub_resource(
                 sub_id,

@@ -40,7 +40,7 @@ func accepts(entry: ItemEntry) -> bool:
 
 func check_eligibility(available: Array) -> Dictionary:
     if remaining() == 0:
-        return {"eligibility": SpecialOrder.Eligibility.FULL, "matches": []}
+        return { "eligibility": SpecialOrder.Eligibility.FULL, "matches": [] }
 
     var matches: Array[ItemEntry] = []
     var needed: int = remaining()
@@ -58,7 +58,7 @@ func check_eligibility(available: Array) -> Dictionary:
     else:
         eligibility = SpecialOrder.Eligibility.NONE
 
-    return {"eligibility": eligibility, "matches": matches}
+    return { "eligibility": eligibility, "matches": matches }
 
 
 func to_dict() -> Dictionary:
