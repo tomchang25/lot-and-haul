@@ -97,7 +97,7 @@ func _advance_orders() -> void:
 
 func _generate_order(m: MerchantData) -> SpecialOrder:
     var template: SpecialOrderData = m.special_orders.pick_random()
-    if template.allowed_categories.is_empty():
+    if template.slot_pool.is_empty():
         return null
 
     var id_string: String = "%s_%d" % [m.merchant_id, next_order_id]

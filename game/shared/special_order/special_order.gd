@@ -43,20 +43,21 @@ static func create(
     order.buff = randf_range(template.buff_min, template.buff_max)
     order.completion_bonus = template.completion_bonus
     order.deadline_day = SaveManager.current_day + template.deadline_days
-    order.uses_condition = template.uses_condition_pricing
-    order.uses_knowledge = false
-    order.uses_market = false
+    order.uses_condition = template.uses_condition
+    order.uses_knowledge = template.uses_knowledge
+    order.uses_market = template.uses_market
     order.allow_partial_delivery = template.allow_partial_delivery
-    order._rebuild_pricing_config()
+    order.rebuild_pricing_config()
 
     var slot_count: int = randi_range(template.slot_count_min, template.slot_count_max)
     for i in range(slot_count):
-        order.slots.append(OrderSlot.create(template))
+        var pool_entry: SpecialOrderSlotPoolEntry = template.slot_pool.pick_random()
+        order.slots.append(OrderSlot.create(pool_entry))
 
     return order
 
 
-func _rebuild_pricing_config() -> void:
+func rebuild_pricing_config() -> void:
     pricing_config = PriceConfig.new()
     pricing_config.condition = uses_condition
     pricing_config.knowledge = uses_knowledge
@@ -148,7 +149,7 @@ static func from_dict(d: Dictionary) -> SpecialOrder:
     order.uses_market = bool(d.get("uses_market", false))
 
     order.allow_partial_delivery = bool(d.get("allow_partial_delivery", false))
-    order._rebuild_pricing_config()
+    order.rebuild_pricing_config()
 
     var raw_slots: Array = d.get("slots", [])
     for sd: Variant in raw_slots:

@@ -19,18 +19,12 @@ func is_full() -> bool:
     return filled_count >= required_count
 
 
-static func create(template: SpecialOrderData) -> OrderSlot:
+static func create(pool_entry: SpecialOrderSlotPoolEntry) -> OrderSlot:
     var slot := OrderSlot.new()
-    slot.category = template.allowed_categories.pick_random()
-    slot.required_count = randi_range(template.required_count_min, template.required_count_max)
-    if randf() < template.rarity_gate_chance:
-        slot.min_rarity = ItemData.Rarity.UNCOMMON
-    else:
-        slot.min_rarity = -1
-    if randf() < template.condition_gate_chance:
-        slot.min_condition = 0.6
-    else:
-        slot.min_condition = 0.0
+    slot.category = pool_entry.categories.pick_random()
+    slot.required_count = randi_range(pool_entry.count_min, pool_entry.count_max)
+    slot.min_rarity = pool_entry.rarity_floor
+    slot.min_condition = pool_entry.condition_floor
     return slot
 
 
@@ -46,7 +40,7 @@ func accepts(entry: ItemEntry) -> bool:
 
 func check_eligibility(available: Array) -> Dictionary:
     if remaining() == 0:
-        return {"eligibility": SpecialOrder.Eligibility.FULL, "matches": []}
+        return { "eligibility": SpecialOrder.Eligibility.FULL, "matches": [] }
 
     var matches: Array[ItemEntry] = []
     var needed: int = remaining()
@@ -64,7 +58,7 @@ func check_eligibility(available: Array) -> Dictionary:
     else:
         eligibility = SpecialOrder.Eligibility.NONE
 
-    return {"eligibility": eligibility, "matches": matches}
+    return { "eligibility": eligibility, "matches": matches }
 
 
 func to_dict() -> Dictionary:
