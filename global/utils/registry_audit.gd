@@ -19,6 +19,18 @@ static func run(scene_registry: SceneRegistry) -> bool:
         ok = false
     if not _check_save_perks():
         ok = false
+    if not _check_save_location_refs():
+        ok = false
+    if not _check_save_skill_refs():
+        ok = false
+    if not _check_save_category_point_refs():
+        ok = false
+    if not _check_save_super_cat_refs():
+        ok = false
+    if not _check_save_category_factor_refs():
+        ok = false
+    if not _check_save_merchant_order_refs():
+        ok = false
 
     return ok
 
@@ -111,5 +123,104 @@ static func _check_save_perks() -> bool:
                 % perk_id,
             )
             ok = false
+
+    return ok
+
+# ══ Save data location references ═══════════════════════════════════════════
+
+
+static func _check_save_location_refs() -> bool:
+    var ok := true
+
+    for location_id: String in SaveManager.available_location_ids:
+        if LocationRegistry.get_location(location_id) == null:
+            push_error(
+                "RegistryAudit: SaveManager.available_location_ids '%s' not found in LocationRegistry"
+                % location_id,
+            )
+            ok = false
+
+    return ok
+
+# ══ Save data skill references ══════════════════════════════════════════════
+
+
+static func _check_save_skill_refs() -> bool:
+    var ok := true
+
+    for skill_id: String in SaveManager.skill_levels.keys():
+        if KnowledgeManager.get_skill(skill_id) == null:
+            push_error(
+                "RegistryAudit: SaveManager.skill_levels key '%s' not found in KnowledgeManager"
+                % skill_id,
+            )
+            ok = false
+
+    return ok
+
+# ══ Save data category-points references ════════════════════════════════════
+
+
+static func _check_save_category_point_refs() -> bool:
+    var ok := true
+
+    for category_id: String in SaveManager.category_points.keys():
+        if CategoryRegistry.get_category(category_id) == null:
+            push_error(
+                "RegistryAudit: SaveManager.category_points key '%s' not found in CategoryRegistry"
+                % category_id,
+            )
+            ok = false
+
+    return ok
+
+# ══ Save data super-category mean references ═══════════════════════════════
+
+
+static func _check_save_super_cat_refs() -> bool:
+    var ok := true
+
+    for super_cat_id: String in MarketManager.super_cat_means.keys():
+        if SuperCategoryRegistry.get_super_category(super_cat_id) == null:
+            push_error(
+                "RegistryAudit: MarketManager.super_cat_means key '%s' not found in SuperCategoryRegistry"
+                % super_cat_id,
+            )
+            ok = false
+
+    return ok
+
+# ══ Save data category-factor references ═══════════════════════════════════
+
+
+static func _check_save_category_factor_refs() -> bool:
+    var ok := true
+
+    for category_id: String in MarketManager.category_factors_today.keys():
+        if CategoryRegistry.get_category(category_id) == null:
+            push_error(
+                "RegistryAudit: MarketManager.category_factors_today key '%s' not found in CategoryRegistry"
+                % category_id,
+            )
+            ok = false
+
+    return ok
+
+# ══ Save data merchant order-slot category references ═══════════════════════
+
+
+static func _check_save_merchant_order_refs() -> bool:
+    var ok := true
+
+    for merchant: MerchantData in MerchantRegistry.get_all_merchants():
+        for order: SpecialOrder in merchant.active_orders:
+            for i in range(order.slots.size()):
+                var slot: OrderSlot = order.slots[i]
+                if slot.category == null:
+                    push_error(
+                        "RegistryAudit: merchant '%s' order '%s' slot %d category_id not found in CategoryRegistry"
+                        % [merchant.merchant_id, order.id, i],
+                    )
+                    ok = false
 
     return ok
