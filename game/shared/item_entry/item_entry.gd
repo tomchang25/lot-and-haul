@@ -380,7 +380,6 @@ func price_value_for(ctx: ItemViewContext) -> int:
             push_warning("Unknown Stage for price: %d" % ctx.stage)
             return 0
 
-
 # ── Per-column price getters ─────────────────────────────────────────────────
 
 

@@ -31,10 +31,10 @@ var _rows: Dictionary = { } # ItemEntry → ItemRow
 
 
 func setup(
-    ctx: ItemViewContext,
-    columns: Array,
-    default_sort_column: ItemRow.Column = ItemRow.Column.NAME,
-    default_ascending: bool = true,
+        ctx: ItemViewContext,
+        columns: Array,
+        default_sort_column: ItemRow.Column = ItemRow.Column.NAME,
+        default_ascending: bool = true,
 ) -> void:
     _ctx = ctx
     _columns = columns

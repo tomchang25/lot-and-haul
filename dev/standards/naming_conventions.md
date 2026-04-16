@@ -254,32 +254,6 @@ Every expected case must have its own explicit arm. This ensures the compiler
 (and the reader) can verify that all cases are covered, and that adding a new
 enum member later will surface unhandled branches.
 
-```gdscript
-# Good — every expected stage has an explicit arm; wildcard catches bugs.
-func price_label_for(ctx: ItemViewContext) -> String:
-    match ctx.stage:
-        ItemViewContext.Stage.INSPECTION, \
-        ItemViewContext.Stage.LIST_REVIEW, \
-        ItemViewContext.Stage.REVEAL, \
-        ItemViewContext.Stage.CARGO:
-            return estimated_value_label
-        ItemViewContext.Stage.RUN_REVIEW, \
-        ItemViewContext.Stage.STORAGE:
-            return appraised_value_label
-        _:
-            push_warning("Unknown Stage for price: %d" % ctx.stage)
-            return estimated_value_label
-
-# Bad — INSPECTION is a normal case hidden inside the wildcard.
-func price_label_for(ctx: ItemViewContext) -> String:
-    match ctx.stage:
-        ItemViewContext.Stage.RUN_REVIEW, \
-        ItemViewContext.Stage.STORAGE:
-            return appraised_value_label
-        _:
-            return estimated_value_label
-```
-
 If a `match` covers all members of a known enum exhaustively, the wildcard arm
 should either be omitted entirely or contain only a `push_warning` / `push_error`
 to flag unexpected values at runtime (Recommend).
