@@ -255,26 +255,27 @@ Every expected case must have its own explicit arm. This ensures the compiler
 enum member later will surface unhandled branches.
 
 ```gdscript
-# Good — every expected mode has an explicit arm; wildcard catches bugs.
+# Good — every expected stage has an explicit arm; wildcard catches bugs.
 func price_label_for(ctx: ItemViewContext) -> String:
-    match ctx.price_mode:
-        ItemViewContext.PriceMode.ESTIMATED_VALUE:
+    match ctx.stage:
+        ItemViewContext.Stage.INSPECTION, \
+        ItemViewContext.Stage.LIST_REVIEW, \
+        ItemViewContext.Stage.REVEAL, \
+        ItemViewContext.Stage.CARGO:
             return estimated_value_label
-        ItemViewContext.PriceMode.APPRAISED_VALUE:
+        ItemViewContext.Stage.RUN_REVIEW, \
+        ItemViewContext.Stage.STORAGE:
             return appraised_value_label
-        ItemViewContext.PriceMode.BASE_VALUE:
-            return base_value_label
         _:
-            push_warning("Unknown PriceMode: %d" % ctx.price_mode)
+            push_warning("Unknown Stage for price: %d" % ctx.stage)
             return estimated_value_label
 
-# Bad — ESTIMATED_VALUE is a normal case hidden inside the wildcard.
+# Bad — INSPECTION is a normal case hidden inside the wildcard.
 func price_label_for(ctx: ItemViewContext) -> String:
-    match ctx.price_mode:
-        ItemViewContext.PriceMode.APPRAISED_VALUE:
+    match ctx.stage:
+        ItemViewContext.Stage.RUN_REVIEW, \
+        ItemViewContext.Stage.STORAGE:
             return appraised_value_label
-        ItemViewContext.PriceMode.BASE_VALUE:
-            return base_value_label
         _:
             return estimated_value_label
 ```

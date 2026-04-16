@@ -22,7 +22,11 @@ enum SelectionState {
 enum Column {
     NAME,
     CONDITION,
-    PRICE,
+    ESTIMATED_VALUE,
+    APPRAISED_VALUE,
+    BASE_VALUE,
+    MERCHANT_OFFER,
+    SPECIAL_ORDER,
     POTENTIAL,
     WEIGHT,
     GRID,
@@ -31,11 +35,15 @@ enum Column {
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-# Header text shown for each column. PRICE is dynamic — see get_price_header().
+# Header text shown for each column. MERCHANT_OFFER is dynamic — see _build_header().
 const COLUMN_HEADERS: Dictionary = {
     Column.NAME: "Item",
     Column.CONDITION: "Condition",
-    Column.PRICE: "",
+    Column.ESTIMATED_VALUE: "Est. Value",
+    Column.APPRAISED_VALUE: "Appraised Value",
+    Column.BASE_VALUE: "Base Value",
+    Column.MERCHANT_OFFER: "",
+    Column.SPECIAL_ORDER: "Order Price",
     Column.POTENTIAL: "Potential",
     Column.WEIGHT: "Weight",
     Column.GRID: "Grid",
@@ -45,7 +53,11 @@ const COLUMN_HEADERS: Dictionary = {
 const COLUMN_MIN_WIDTH: Dictionary = {
     Column.NAME: 0,
     Column.CONDITION: 120,
-    Column.PRICE: 160,
+    Column.ESTIMATED_VALUE: 160,
+    Column.APPRAISED_VALUE: 160,
+    Column.BASE_VALUE: 160,
+    Column.MERCHANT_OFFER: 160,
+    Column.SPECIAL_ORDER: 160,
     Column.POTENTIAL: 160,
     Column.WEIGHT: 100,
     Column.GRID: 80,
@@ -64,7 +76,11 @@ var _selection_state: SelectionState = SelectionState.NONE
 @onready var _h_box_container: HBoxContainer = $HBoxContainer
 @onready var _name_label: Label = $HBoxContainer/NameLabel
 @onready var _condition_label: Label = $HBoxContainer/ConditionLabel
-@onready var _price_label: Label = $HBoxContainer/PriceLabel
+@onready var _estimated_value_label: Label = $HBoxContainer/EstimatedValueLabel
+@onready var _appraised_value_label: Label = $HBoxContainer/AppraisedValueLabel
+@onready var _base_value_label: Label = $HBoxContainer/BaseValueLabel
+@onready var _merchant_offer_label: Label = $HBoxContainer/MerchantOfferLabel
+@onready var _special_order_label: Label = $HBoxContainer/SpecialOrderLabel
 @onready var _potential_label: Label = $HBoxContainer/PotentialLabel
 @onready var _weight_label: Label = $HBoxContainer/WeightLabel
 @onready var _grid_label: Label = $HBoxContainer/GridLabel
@@ -118,20 +134,23 @@ func set_selection_state(state: SelectionState) -> void:
             push_warning("Unknown SelectionState: %d" % state)
 
 
+# Bridge method — kept for ItemRowTooltip which dispatches on stage.
 static func get_price_header(ctx: ItemViewContext) -> String:
-    match ctx.price_mode:
-        ItemViewContext.PriceMode.ESTIMATED_VALUE:
+    match ctx.stage:
+        ItemViewContext.Stage.INSPECTION, \
+        ItemViewContext.Stage.LIST_REVIEW, \
+        ItemViewContext.Stage.REVEAL, \
+        ItemViewContext.Stage.CARGO:
             return "Est. Value"
-        ItemViewContext.PriceMode.APPRAISED_VALUE:
+        ItemViewContext.Stage.RUN_REVIEW, \
+        ItemViewContext.Stage.STORAGE:
             return "Appraised Value"
-        ItemViewContext.PriceMode.BASE_VALUE:
-            return "Base Value"
-        ItemViewContext.PriceMode.MERCHANT_OFFER:
+        ItemViewContext.Stage.MERCHANT_SHOP:
             return "%s Offer" % ctx.merchant.display_name if ctx.merchant else "Offer"
-        ItemViewContext.PriceMode.SPECIAL_ORDER:
+        ItemViewContext.Stage.FULFILLMENT_PANEL:
             return "Order Price"
         _:
-            push_warning("Unknown PriceMode: %d" % ctx.price_mode)
+            push_warning("Unknown Stage for price header: %d" % ctx.stage)
             return "Price"
 
 # ══ Input ═════════════════════════════════════════════════════════════════════
@@ -156,7 +175,11 @@ func _refresh() -> void:
     # ── Column visibility ─────────────────────────────────────────────────────
     _name_label.visible = Column.NAME in _columns
     _condition_label.visible = Column.CONDITION in _columns
-    _price_label.visible = Column.PRICE in _columns
+    _estimated_value_label.visible = Column.ESTIMATED_VALUE in _columns
+    _appraised_value_label.visible = Column.APPRAISED_VALUE in _columns
+    _base_value_label.visible = Column.BASE_VALUE in _columns
+    _merchant_offer_label.visible = Column.MERCHANT_OFFER in _columns
+    _special_order_label.visible = Column.SPECIAL_ORDER in _columns
     _potential_label.visible = Column.POTENTIAL in _columns
     _weight_label.visible = Column.WEIGHT in _columns
     _grid_label.visible = Column.GRID in _columns
@@ -172,9 +195,25 @@ func _refresh() -> void:
     _condition_label.text = _entry.condition_label_for(_ctx)
     _condition_label.modulate = _entry.condition_color_for(_ctx)
 
-    # ── PRICE ─────────────────────────────────────────────────────────────────
-    _price_label.text = _entry.price_label_for(_ctx)
-    _price_label.add_theme_color_override(&"font_color", _entry.price_color)
+    # ── ESTIMATED_VALUE ────────────────────────────────────────────────────────
+    _estimated_value_label.text = _entry.estimated_value_label
+    _estimated_value_label.add_theme_color_override(&"font_color", _entry.price_color)
+
+    # ── APPRAISED_VALUE ────────────────────────────────────────────────────────
+    _appraised_value_label.text = _entry.appraised_value_label
+    _appraised_value_label.add_theme_color_override(&"font_color", _entry.price_color)
+
+    # ── BASE_VALUE ─────────────────────────────────────────────────────────────
+    _base_value_label.text = _entry.base_value_label_text()
+    _base_value_label.add_theme_color_override(&"font_color", _entry.price_color)
+
+    # ── MERCHANT_OFFER ─────────────────────────────────────────────────────────
+    _merchant_offer_label.text = _entry.merchant_offer_label(_ctx.merchant)
+    _merchant_offer_label.add_theme_color_override(&"font_color", _entry.price_color)
+
+    # ── SPECIAL_ORDER ──────────────────────────────────────────────────────────
+    _special_order_label.text = _entry.special_order_label(_ctx.order)
+    _special_order_label.add_theme_color_override(&"font_color", _entry.price_color)
 
     # ── POTENTIAL ─────────────────────────────────────────────────────────────
     _potential_label.text = _entry.potential_price_label if not _entry.is_veiled() else "???"
@@ -199,7 +238,11 @@ func _apply_column_order() -> void:
     var column_to_label: Dictionary = {
         Column.NAME: _name_label,
         Column.CONDITION: _condition_label,
-        Column.PRICE: _price_label,
+        Column.ESTIMATED_VALUE: _estimated_value_label,
+        Column.APPRAISED_VALUE: _appraised_value_label,
+        Column.BASE_VALUE: _base_value_label,
+        Column.MERCHANT_OFFER: _merchant_offer_label,
+        Column.SPECIAL_ORDER: _special_order_label,
         Column.POTENTIAL: _potential_label,
         Column.WEIGHT: _weight_label,
         Column.GRID: _grid_label,

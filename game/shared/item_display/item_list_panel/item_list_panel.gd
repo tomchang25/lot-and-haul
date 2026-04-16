@@ -30,11 +30,17 @@ var _rows: Dictionary = { } # ItemEntry → ItemRow
 # ══ Common API ════════════════════════════════════════════════════════════════
 
 
-func setup(ctx: ItemViewContext, columns: Array) -> void:
+func setup(
+    ctx: ItemViewContext,
+    columns: Array,
+    default_sort_column: ItemRow.Column = ItemRow.Column.NAME,
+    default_ascending: bool = true,
+) -> void:
     _ctx = ctx
     _columns = columns
     if _columns.size() > 0 and not (_sort_column in _columns):
-        _sort_column = _columns[0]
+        _sort_column = default_sort_column if default_sort_column in _columns else _columns[0]
+    _sort_ascending = default_ascending
     if is_node_ready():
         _build_header()
 
@@ -76,7 +82,7 @@ func refresh_row(entry: ItemEntry) -> void:
         _rows[entry].refresh()
 
 
-# Public wrapper — call after changing ctx.price_mode to update PRICE header.
+# Public wrapper — rebuilds all column header buttons.
 func rebuild_header() -> void:
     _build_header()
 
@@ -112,8 +118,16 @@ static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewC
             return entry.display_name
         ItemRow.Column.CONDITION:
             return entry.condition
-        ItemRow.Column.PRICE:
-            return entry.price_value_for(ctx)
+        ItemRow.Column.ESTIMATED_VALUE:
+            return entry.estimated_value_sort_value()
+        ItemRow.Column.APPRAISED_VALUE:
+            return entry.appraised_value
+        ItemRow.Column.BASE_VALUE:
+            return entry.base_value_sort_value()
+        ItemRow.Column.MERCHANT_OFFER:
+            return entry.merchant_offer_value(ctx.merchant)
+        ItemRow.Column.SPECIAL_ORDER:
+            return entry.special_order_value(ctx.order)
         ItemRow.Column.POTENTIAL:
             return 0 if entry.is_veiled() else entry.potential_price_max
         ItemRow.Column.WEIGHT:
@@ -145,10 +159,8 @@ func _build_header() -> void:
         btn.add_theme_color_override(&"font_color", Color(0.7, 0.7, 0.7, 1))
 
         var label_text: String
-        if col == ItemRow.Column.PRICE:
-            label_text = ItemRow.get_price_header(_ctx)
-        elif col == ItemRow.Column.MARKET_FACTOR:
-            label_text = ItemRow.COLUMN_HEADERS[col]
+        if col == ItemRow.Column.MERCHANT_OFFER:
+            label_text = "%s Offer" % _ctx.merchant.display_name if _ctx.merchant else "Offer"
         else:
             label_text = ItemRow.COLUMN_HEADERS[col]
 

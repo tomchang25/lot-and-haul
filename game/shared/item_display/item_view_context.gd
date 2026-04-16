@@ -27,18 +27,9 @@ enum PotentialMode {
     FORCE_FULL,
 }
 
-enum PriceMode {
-    ESTIMATED_VALUE,
-    APPRAISED_VALUE,
-    BASE_VALUE,
-    MERCHANT_OFFER,
-    SPECIAL_ORDER,
-}
-
 var stage: Stage
 var condition_mode: ConditionMode = ConditionMode.RESPECT_INSPECT_LEVEL
 var potential_mode: PotentialMode = PotentialMode.RESPECT_INSPECT_LEVEL
-var price_mode: PriceMode = PriceMode.ESTIMATED_VALUE
 var merchant: MerchantData = null
 var order: SpecialOrder = null
 
@@ -56,7 +47,6 @@ static func for_list_review() -> ItemViewContext:
     ctx.stage = Stage.LIST_REVIEW
     ctx.condition_mode = ConditionMode.RESPECT_INSPECT_LEVEL
     ctx.potential_mode = PotentialMode.RESPECT_INSPECT_LEVEL
-    ctx.price_mode = PriceMode.ESTIMATED_VALUE
 
     return ctx
 
@@ -66,7 +56,6 @@ static func for_reveal() -> ItemViewContext:
     ctx.stage = Stage.REVEAL
     ctx.condition_mode = ConditionMode.RESPECT_INSPECT_LEVEL
     ctx.potential_mode = PotentialMode.RESPECT_INSPECT_LEVEL
-    ctx.price_mode = PriceMode.ESTIMATED_VALUE
 
     return ctx
 
@@ -76,7 +65,6 @@ static func for_cargo() -> ItemViewContext:
     ctx.stage = Stage.CARGO
     ctx.condition_mode = ConditionMode.FORCE_INSPECT_MAX
     ctx.potential_mode = PotentialMode.FORCE_FULL
-    ctx.price_mode = PriceMode.ESTIMATED_VALUE
 
     return ctx
 
@@ -86,7 +74,6 @@ static func for_run_review() -> ItemViewContext:
     ctx.stage = Stage.RUN_REVIEW
     ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
     ctx.potential_mode = PotentialMode.FORCE_FULL
-    ctx.price_mode = PriceMode.APPRAISED_VALUE
     return ctx
 
 
@@ -95,7 +82,6 @@ static func for_storage() -> ItemViewContext:
     ctx.stage = Stage.STORAGE
     ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
     ctx.potential_mode = PotentialMode.FORCE_FULL
-    ctx.price_mode = PriceMode.APPRAISED_VALUE
     return ctx
 
 
@@ -104,7 +90,6 @@ static func for_merchant_shop(_merchant: MerchantData) -> ItemViewContext:
     ctx.stage = Stage.MERCHANT_SHOP
     ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
     ctx.potential_mode = PotentialMode.FORCE_FULL
-    ctx.price_mode = PriceMode.MERCHANT_OFFER
     ctx.merchant = _merchant
     return ctx
 
@@ -114,6 +99,5 @@ static func for_fulfillment(_order: SpecialOrder) -> ItemViewContext:
     ctx.stage = Stage.FULFILLMENT_PANEL
     ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
     ctx.potential_mode = PotentialMode.FORCE_FULL
-    ctx.price_mode = PriceMode.SPECIAL_ORDER
     ctx.order = _order
     return ctx

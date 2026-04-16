@@ -12,7 +12,7 @@ const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 const REVIEW_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
-    ItemRow.Column.PRICE,
+    ItemRow.Column.APPRAISED_VALUE,
     ItemRow.Column.POTENTIAL,
 ]
 
