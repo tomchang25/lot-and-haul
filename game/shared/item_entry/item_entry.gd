@@ -220,22 +220,37 @@ var potential_price_label: String:
             return "???"
         return "$%d - $%d" % [potential_price_min, potential_price_max]
 
+# Unified pricing pipeline. Reads the active layer's base value, then
+# conditionally folds in condition, knowledge, and market factors based on the
+# supplied PriceConfig, and finally scales by config.multiplier.
+func compute_price(config: PriceConfig) -> int:
+    var value: float = float(active_layer().base_value)
+
+    if config.condition:
+        value *= get_condition_multiplier()
+
+    if config.knowledge:
+        var rank: int = KnowledgeManager.get_super_category_rank(
+            item_data.category_data.super_category.super_category_id,
+        )
+        value *= 1.0 + 0.01 * rank
+
+    if config.market:
+        value *= MarketManager.get_category_factor(
+            item_data.category_data.category_id,
+        )
+
+    value *= config.multiplier
+    return int(value)
+
+
 var appraised_value: int:
     get:
-        return int(
-            active_layer().base_value
-            * get_condition_multiplier()
-            * (1.0 + 0.01 * KnowledgeManager.get_super_category_rank(
-                    item_data.category_data.super_category.super_category_id,
-                ) ),
-        )
+        return compute_price(ItemRegistry.price_config_with_appraisal)
 
 var market_price: int:
     get:
-        return int(
-            appraised_value *
-            MarketManager.get_category_factor(item_data.category_data.category_id),
-        )
+        return compute_price(ItemRegistry.price_config_with_market)
 
 var market_factor_delta: float:
     get:

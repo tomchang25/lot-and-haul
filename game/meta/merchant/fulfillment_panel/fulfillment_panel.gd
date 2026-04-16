@@ -223,7 +223,7 @@ func _refresh_order_info() -> void:
     ]
     if _selected_order.allow_partial_delivery:
         info_lines.append("Partial delivery allowed")
-    if _selected_order.uses_condition_pricing:
+    if _selected_order.uses_condition:
         info_lines.append("Condition affects price")
 
     for line: String in info_lines:
