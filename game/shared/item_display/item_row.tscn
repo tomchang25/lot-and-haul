@@ -25,7 +25,7 @@ theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="EstimatedValueLabel" type="Label" parent="HBoxContainer"]
+[node name="EstimatedValueLabel" type="Label" parent="HBoxContainer" unique_id=1429073259]
 visible = false
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
@@ -33,7 +33,7 @@ theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="AppraisedValueLabel" type="Label" parent="HBoxContainer"]
+[node name="AppraisedValueLabel" type="Label" parent="HBoxContainer" unique_id=931579626]
 visible = false
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
@@ -41,7 +41,7 @@ theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="BaseValueLabel" type="Label" parent="HBoxContainer"]
+[node name="BaseValueLabel" type="Label" parent="HBoxContainer" unique_id=554310868]
 visible = false
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
@@ -49,7 +49,7 @@ theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MerchantOfferLabel" type="Label" parent="HBoxContainer"]
+[node name="MerchantOfferLabel" type="Label" parent="HBoxContainer" unique_id=896985930]
 visible = false
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
@@ -57,7 +57,7 @@ theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SpecialOrderLabel" type="Label" parent="HBoxContainer"]
+[node name="SpecialOrderLabel" type="Label" parent="HBoxContainer" unique_id=1021785068]
 visible = false
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
