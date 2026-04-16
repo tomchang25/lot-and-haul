@@ -4,6 +4,13 @@
 class_name SpecialOrder
 extends RefCounted
 
+# Accepted pricing_mode strings. Each maps to a PriceConfig preset in
+# _rebuild_pricing_config().
+const PRICING_MODE_FLAT := "flat"
+const PRICING_MODE_CONDITION := "condition"
+const PRICING_MODE_APPRAISED := "appraised"
+const PRICING_MODE_MARKET := "market"
+
 var id: String # "{merchant_id}_{counter}"
 var special_order_id: String # source SpecialOrderData.special_order_id
 var merchant_id: String
@@ -12,15 +19,20 @@ var buff: float = 1.0
 var completion_bonus: int = 0
 var deadline_day: int = 0 # absolute day
 
+# Pricing preset copied from the template. Source of truth for the runtime
+# PriceConfig; the individual bools below are derived from this.
+var pricing_mode: String = PRICING_MODE_FLAT
+
 # Per-factor pricing flags persisted with the order. The runtime PriceConfig
-# below is rebuilt from these in create() and from_dict().
+# below is rebuilt from pricing_mode in create() and from_dict(). Persisted
+# alongside pricing_mode for debugging and backward compatibility.
 var uses_condition: bool = false
 var uses_knowledge: bool = false
 var uses_market: bool = false
 
 var allow_partial_delivery: bool = false
 
-# PriceConfig assembled once from the flags above plus buff; reused for every
+# PriceConfig assembled once from pricing_mode plus buff; reused for every
 # item in compute_item_price() so per-row rendering never allocates.
 var pricing_config: PriceConfig = null
 
@@ -43,25 +55,39 @@ static func create(
     order.buff = randf_range(template.buff_min, template.buff_max)
     order.completion_bonus = template.completion_bonus
     order.deadline_day = SaveManager.current_day + template.deadline_days
-    order.uses_condition = template.uses_condition_pricing
-    order.uses_knowledge = false
-    order.uses_market = false
+    order.pricing_mode = template.pricing_mode
     order.allow_partial_delivery = template.allow_partial_delivery
     order._rebuild_pricing_config()
 
     var slot_count: int = randi_range(template.slot_count_min, template.slot_count_max)
     for i in range(slot_count):
-        order.slots.append(OrderSlot.create(template))
+        var pool_entry: SpecialOrderSlotData = template.slot_pool.pick_random()
+        order.slots.append(OrderSlot.create(pool_entry))
 
     return order
 
 
 func _rebuild_pricing_config() -> void:
-    pricing_config = PriceConfig.new()
-    pricing_config.condition = uses_condition
-    pricing_config.knowledge = uses_knowledge
-    pricing_config.market = uses_market
+    pricing_config = _config_for_mode(pricing_mode)
     pricing_config.multiplier = buff
+    uses_condition = pricing_config.condition
+    uses_knowledge = pricing_config.knowledge
+    uses_market = pricing_config.market
+
+
+static func _config_for_mode(mode: String) -> PriceConfig:
+    match mode:
+        PRICING_MODE_FLAT:
+            return PriceConfig.plain()
+        PRICING_MODE_CONDITION:
+            return PriceConfig.with_condition()
+        PRICING_MODE_APPRAISED:
+            return PriceConfig.with_appraisal()
+        PRICING_MODE_MARKET:
+            return PriceConfig.with_market()
+        _:
+            push_warning("Unknown pricing_mode '%s'; falling back to flat" % mode)
+            return PriceConfig.plain()
 
 
 func is_complete() -> bool:
@@ -123,6 +149,7 @@ func to_dict() -> Dictionary:
         "buff": buff,
         "completion_bonus": completion_bonus,
         "deadline_day": deadline_day,
+        "pricing_mode": pricing_mode,
         "uses_condition": uses_condition,
         "uses_knowledge": uses_knowledge,
         "uses_market": uses_market,
@@ -139,13 +166,14 @@ static func from_dict(d: Dictionary) -> SpecialOrder:
     order.completion_bonus = int(d.get("completion_bonus", 0))
     order.deadline_day = int(d.get("deadline_day", 0))
 
-    # Old saves persisted `uses_condition_pricing`; new saves persist the three
-    # per-factor flags. Accept the legacy key as a fallback for uses_condition
-    # and default the new flags to false.
-    var legacy_condition: bool = bool(d.get("uses_condition_pricing", false))
-    order.uses_condition = bool(d.get("uses_condition", legacy_condition))
-    order.uses_knowledge = bool(d.get("uses_knowledge", false))
-    order.uses_market = bool(d.get("uses_market", false))
+    # New saves persist pricing_mode. Old saves persisted uses_condition_pricing
+    # only — fall back to condition mode if it was true, flat otherwise.
+    if d.has("pricing_mode"):
+        order.pricing_mode = str(d["pricing_mode"])
+    elif bool(d.get("uses_condition_pricing", false)):
+        order.pricing_mode = PRICING_MODE_CONDITION
+    else:
+        order.pricing_mode = PRICING_MODE_FLAT
 
     order.allow_partial_delivery = bool(d.get("allow_partial_delivery", false))
     order._rebuild_pricing_config()
