@@ -19,24 +19,24 @@ var multiplier: float = 1.0
 # the result (see ItemRegistry price preset properties).
 
 
-static func flat() -> PriceConfig:
+static func plain() -> PriceConfig:
     return PriceConfig.new()
 
 
-static func condition_only() -> PriceConfig:
+static func with_condition() -> PriceConfig:
     var cfg := PriceConfig.new()
     cfg.condition = true
     return cfg
 
 
-static func appraised() -> PriceConfig:
+static func with_appraisal() -> PriceConfig:
     var cfg := PriceConfig.new()
     cfg.condition = true
     cfg.knowledge = true
     return cfg
 
 
-static func market() -> PriceConfig:
+static func with_market() -> PriceConfig:
     var cfg := PriceConfig.new()
     cfg.condition = true
     cfg.knowledge = true

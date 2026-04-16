@@ -246,11 +246,11 @@ func compute_price(config: PriceConfig) -> int:
 
 var appraised_value: int:
     get:
-        return compute_price(ItemRegistry.price_config_appraised)
+        return compute_price(ItemRegistry.price_config_with_appraisal)
 
 var market_price: int:
     get:
-        return compute_price(ItemRegistry.price_config_market)
+        return compute_price(ItemRegistry.price_config_with_market)
 
 var market_factor_delta: float:
     get:

@@ -15,10 +15,10 @@ var _super_categories_by_id: Dictionary = { }
 # Preset PriceConfig instances built once at startup so high-frequency callers
 # (e.g. item row rendering) can read pricing policies without allocating.
 
-var price_config_flat: PriceConfig = null
-var price_config_condition_only: PriceConfig = null
-var price_config_appraised: PriceConfig = null
-var price_config_market: PriceConfig = null
+var price_config_plain: PriceConfig = null
+var price_config_with_condition: PriceConfig = null
+var price_config_with_appraisal: PriceConfig = null
+var price_config_with_market: PriceConfig = null
 
 
 func _ready() -> void:
@@ -32,10 +32,10 @@ func _ready() -> void:
 
 
 func _build_price_config_presets() -> void:
-    price_config_flat = PriceConfig.flat()
-    price_config_condition_only = PriceConfig.condition_only()
-    price_config_appraised = PriceConfig.appraised()
-    price_config_market = PriceConfig.market()
+    price_config_plain = PriceConfig.plain()
+    price_config_with_condition = PriceConfig.with_condition()
+    price_config_with_appraisal = PriceConfig.with_appraisal()
+    price_config_with_market = PriceConfig.with_market()
 
 
 func _build_super_category_index() -> void:
