@@ -14,6 +14,25 @@ func _ready() -> void:
         func(r: Resource) -> String:
             return (r as MerchantData).merchant_id if r is MerchantData else ""
     )
+    RegistryCoordinator.register(self)
+
+
+func validate() -> bool:
+    var ok := true
+    if size() == 0:
+        push_error("MerchantRegistry: registry is empty")
+        ok = false
+    for merchant: MerchantData in get_all_merchants():
+        for order: SpecialOrder in merchant.active_orders:
+            for i in range(order.slots.size()):
+                var slot: OrderSlot = order.slots[i]
+                if slot.category == null:
+                    push_error(
+                        "MerchantRegistry: merchant '%s' order '%s' slot %d category_id not found in CategoryRegistry"
+                        % [merchant.merchant_id, order.id, i],
+                    )
+                    ok = false
+    return ok
 
 
 # Returns the MerchantData with the given merchant_id, or null if not found.

@@ -13,6 +13,29 @@ func _ready() -> void:
         func(r: Resource) -> String:
             return (r as CategoryData).category_id if r is CategoryData else ""
     )
+    RegistryCoordinator.register(self)
+
+
+func validate() -> bool:
+    var ok := true
+    if size() == 0:
+        push_error("CategoryRegistry: registry is empty")
+        ok = false
+    for category_id: String in SaveManager.category_points.keys():
+        if get_category(category_id) == null:
+            push_error(
+                "CategoryRegistry: SaveManager.category_points key '%s' not found"
+                % category_id,
+            )
+            ok = false
+    for category_id: String in MarketManager.category_factors_today.keys():
+        if get_category(category_id) == null:
+            push_error(
+                "CategoryRegistry: MarketManager.category_factors_today key '%s' not found"
+                % category_id,
+            )
+            ok = false
+    return ok
 
 
 # Returns the CategoryData with the given category_id, or null if not found.

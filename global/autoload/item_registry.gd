@@ -23,6 +23,14 @@ func _ready() -> void:
             return (r as ItemData).item_id if r is ItemData else ""
     )
     _build_price_config_presets()
+    RegistryCoordinator.register(self)
+
+
+func validate() -> bool:
+    if size() == 0:
+        push_error("ItemRegistry: registry is empty")
+        return false
+    return true
 
 
 func _build_price_config_presets() -> void:

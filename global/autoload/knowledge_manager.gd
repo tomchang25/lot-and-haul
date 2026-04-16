@@ -44,6 +44,32 @@ var _skill_registry: Dictionary = { } # skill_id → SkillData
 func _ready() -> void:
     _load_perk_registry()
     _load_skill_registry()
+    RegistryCoordinator.register(self)
+
+
+func validate() -> bool:
+    var ok := true
+    if perk_count() == 0:
+        push_error("KnowledgeManager: perk registry is empty")
+        ok = false
+    if skill_count() == 0:
+        push_error("KnowledgeManager: skill registry is empty")
+        ok = false
+    for perk_id: String in SaveManager.unlocked_perks:
+        if get_perk(perk_id) == null:
+            push_error(
+                "KnowledgeManager: SaveManager.unlocked_perks '%s' not found"
+                % perk_id,
+            )
+            ok = false
+    for skill_id: String in SaveManager.skill_levels.keys():
+        if get_skill(skill_id) == null:
+            push_error(
+                "KnowledgeManager: SaveManager.skill_levels key '%s' not found"
+                % skill_id,
+            )
+            ok = false
+    return ok
 
 
 func add_category_points(category_id: String, rarity: ItemData.Rarity, action: KnowledgeAction) -> void:

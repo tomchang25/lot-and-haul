@@ -29,8 +29,6 @@ func _ready() -> void:
 
     _day_pass_confirm.confirmed.connect(_on_day_pass_confirmed)
 
-    SaveManager.load()
-
     _refresh_display()
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
