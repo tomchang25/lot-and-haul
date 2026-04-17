@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://blotactbar01"]
+[gd_scene format=3 uid="uid://dqniv6urp5xob"]
 
-[ext_resource type="Script" path="res://game/run/inspection/action_popup/lot_action_bar.gd" id="1_lotbar"]
+[ext_resource type="Script" uid="uid://r4pehjn5w3e3" path="res://game/run/inspection/action_popup/lot_action_bar.gd" id="1_lotbar"]
 
 [node name="LotActionBar" type="PanelContainer" unique_id=77789669]
 custom_minimum_size = Vector2(40, 0)
