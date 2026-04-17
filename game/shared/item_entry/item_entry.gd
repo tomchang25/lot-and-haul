@@ -161,6 +161,19 @@ func is_rarity_maxed() -> bool:
     return get_rarity_bucket() >= _rarity_thresholds().size() - 1
 
 
+func is_fully_inspected() -> bool:
+    return is_condition_maxed() and is_rarity_maxed()
+
+
+func apply_inspect(delta: float) -> void:
+    inspection_level += delta
+    KnowledgeManager.add_category_points(
+        item_data.category_data.category_id,
+        item_data.rarity,
+        KnowledgeManager.KnowledgeAction.CONDITION_INSPECT,
+    )
+
+
 func _rarity_thresholds() -> Array[float]:
     match item_data.rarity:
         ItemData.Rarity.COMMON:

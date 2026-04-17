@@ -112,6 +112,12 @@ func _animate_pop(target: Label) -> void:
     tween.tween_property(target, "modulate", Color.WHITE, 0.25)
 
 
+func flash_border() -> void:
+    var tween := create_tween()
+    tween.tween_property(self, "modulate", Color(1.6, 1.4, 0.6, 1.0), 0.08)
+    tween.tween_property(self, "modulate", Color.WHITE, 0.22)
+
+
 func _gui_input(event: InputEvent) -> void:
     if event is InputEventMouseButton \
     and event.pressed \
