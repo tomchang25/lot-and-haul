@@ -18,17 +18,15 @@ enum UpgradeResult {
 }
 
 enum KnowledgeAction {
-    POTENTIAL_INSPECT,
-    CONDITION_INSPECT,
-    REVEAL,
-    APPRAISE,
-    REPAIR,
-    SELL,
+    INSPECT = 1,
+    REVEAL = 2,
+    APPRAISE = 3,
+    REPAIR = 4,
+    SELL = 5,
 }
 
 const _BASE_MASTERY: Dictionary = {
-    KnowledgeAction.POTENTIAL_INSPECT: 2,
-    KnowledgeAction.CONDITION_INSPECT: 2,
+    KnowledgeAction.INSPECT: 2,
     KnowledgeAction.REVEAL: 1,
     KnowledgeAction.APPRAISE: 4,
     KnowledgeAction.REPAIR: 4,
