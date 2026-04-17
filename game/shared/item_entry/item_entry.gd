@@ -3,6 +3,15 @@
 class_name ItemEntry
 extends RefCounted
 
+# ── Inspection bucket tables ──────────────────────────────────────────────────
+
+# Shared across all items. Maps inspection_level to a resolution bucket:
+# 0 = rough, 1 = mid, 2 = fine.
+const CONDITION_THRESHOLDS: Array[float] = [0.0, 1.0, 2.0]
+
+# Display names indexed by ItemData.Rarity enum value.
+const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
+
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var item_data: ItemData = null
@@ -13,9 +22,9 @@ var layer_index: int = 0
 
 var condition: float = 1.0
 
-var potential_inspect_level: int = 0
-
-var condition_inspect_level: int = 0
+# Unified inspection progress for both condition resolution and rarity resolution.
+# Bumped by inspection actions; mapped to discrete buckets via the tables below.
+var inspection_level: float = 0.0
 
 # Unique persistent ID assigned when this entry enters storage.
 # -1 = not yet in storage. Assigned by SaveManager
@@ -48,26 +57,17 @@ var potential_inspect_label: String:
     get:
         if is_veiled():
             return "Veiled"
-        match potential_inspect_level:
-            0:
-                return "? / ?"
-            1, 2:
-                var current := layer_index
-                var max_layer := item_data.identity_layers.size() - 1
-                return "Lv %d / %d  [%s]" % [current, max_layer, get_potential_rating()]
-            _:
-                push_warning("potential_inspect_level out of range: %d" % potential_inspect_level)
-                return "? / ?"
+        return get_potential_rating()
 
 var should_show_potential_price: bool:
     get:
-        return not is_veiled() and potential_inspect_level >= 2
+        return not is_veiled() and is_rarity_maxed()
 
 var condition_mult_label: String:
     get:
         if is_veiled():
             return "×?"
-        match condition_inspect_level:
+        match get_condition_bucket():
             0:
                 return "×?"
             1:
@@ -75,7 +75,7 @@ var condition_mult_label: String:
             2:
                 return "~×%.2f" % get_known_condition_multiplier()
             _:
-                push_warning("condition_inspect_level out of range: %d" % condition_inspect_level)
+                push_warning("condition bucket out of range: %d" % get_condition_bucket())
                 return "×?"
 
 var condition_inspect_label: String:
@@ -83,7 +83,7 @@ var condition_inspect_label: String:
         if is_veiled():
             return ""
 
-        match condition_inspect_level:
+        match get_condition_bucket():
             0:
                 return "???"
             1:
@@ -102,10 +102,10 @@ var condition_inspect_label: String:
 
 
 func is_condition_inspectable() -> bool:
-    if is_veiled() or condition_inspect_level >= 2:
+    if is_veiled() or is_condition_maxed():
         return false
 
-    if condition_inspect_level == 1 and condition < 0.3:
+    if get_condition_bucket() == 1 and condition < 0.3:
         return false
 
     return true
@@ -120,12 +120,12 @@ func get_condition_multiplier() -> float:
         return remap(condition, 0.8, 1.0, 2.0, 4.0)
 
 
-# Returns the condition multiplier the player can infer from their current inspect level.
-# level 0 → neutral 1.0 (unknown)
-# level 1 → midpoint of the visible band (Poor: 0.75, Common: 1.5)
-# level 2 → true multiplier
+# Returns the condition multiplier the player can infer from their current inspect bucket.
+# bucket 0 → neutral 1.0 (unknown)
+# bucket 1 → midpoint of the visible band (Poor: 0.5, Common: 1.0)
+# bucket 2 → true banded multiplier
 func get_known_condition_multiplier() -> float:
-    match condition_inspect_level:
+    match get_condition_bucket():
         0:
             return 1.0
         1:
@@ -140,32 +140,70 @@ func get_known_condition_multiplier() -> float:
             else:
                 return 3.0
         _:
-            return 0
+            return 0.0
 
 
+# Rarity rating the player can see at the current inspection bucket.
+# Non-final buckets show "<Common|Uncommon|Rare>+" ("at least this rarity").
+# The final bucket shows the bare true rarity name.
 func get_potential_rating() -> String:
-    # Already at final layer — no upside
-    if is_at_final_layer():
-        return "Maxed"
+    var thresholds: Array[float] = _rarity_thresholds()
+    var bucket: int = get_rarity_bucket()
+    if bucket >= thresholds.size() - 1:
+        return _true_rarity_name()
+    return "%s+" % RARITY_NAMES[bucket]
 
-    var current_val := active_layer().base_value
-    if current_val <= 0:
-        return "Probably Junk"
 
-    # Find the best possible final layer value (upside ceiling)
-    var best_val := 0
-    for i in range(layer_index + 1, item_data.identity_layers.size()):
-        var v := item_data.identity_layers[i].base_value
-        if v > best_val:
-            best_val = v
+# ── Bucket helpers ────────────────────────────────────────────────────────────
 
-    var ratio := float(best_val) / float(current_val)
-    if ratio >= 4.0:
-        return "Potentially Valuable"
-    elif ratio >= 1.5:
-        return "Some Upside"
-    else:
-        return "Probably Junk"
+func get_condition_bucket() -> int:
+    return _bucket_index(inspection_level, CONDITION_THRESHOLDS)
+
+
+func get_rarity_bucket() -> int:
+    return _bucket_index(inspection_level, _rarity_thresholds())
+
+
+func is_condition_maxed() -> bool:
+    return get_condition_bucket() >= CONDITION_THRESHOLDS.size() - 1
+
+
+func is_rarity_maxed() -> bool:
+    return get_rarity_bucket() >= _rarity_thresholds().size() - 1
+
+
+func _rarity_thresholds() -> Array[float]:
+    match item_data.rarity:
+        ItemData.Rarity.COMMON:
+            return [0.0]
+        ItemData.Rarity.UNCOMMON:
+            return [0.0, 1.0]
+        ItemData.Rarity.RARE:
+            return [0.0, 1.0, 2.0, 4.0]
+        ItemData.Rarity.EPIC:
+            return [0.0, 1.0, 2.0, 4.0]
+        ItemData.Rarity.LEGENDARY:
+            return [0.0, 1.0, 2.0, 4.0]
+        _:
+            push_warning("ItemEntry: unexpected rarity %d" % item_data.rarity)
+            return [0.0]
+
+
+func _true_rarity_name() -> String:
+    var r: int = item_data.rarity
+    if r >= 0 and r < RARITY_NAMES.size():
+        return RARITY_NAMES[r]
+    return "?"
+
+
+static func _bucket_index(level: float, thresholds: Array[float]) -> int:
+    var idx: int = 0
+    for i in range(thresholds.size()):
+        if level >= thresholds[i]:
+            idx = i
+        else:
+            break
+    return idx
 
 
 var estimated_value_min: int:
@@ -278,10 +316,10 @@ var condition_color: Color:
             return Color.LIGHT_CORAL
 
 ## The tint to apply based on what the player *currently knows*.
-## Unknown (level 0) → neutral grey. Known → same as condition_color.
+## Unknown (bucket 0) → neutral grey. Known → same as condition_color.
 var condition_inspect_color: Color:
     get:
-        if condition_inspect_level == 0 or is_veiled():
+        if is_veiled() or get_condition_bucket() == 0:
             return Color(0.5, 0.5, 0.5)
         return condition_color
 
@@ -341,13 +379,11 @@ func condition_mult_label_for(ctx: ItemViewContext) -> String:
 
 
 func potential_label_for(ctx: ItemViewContext) -> String:
+    if is_veiled():
+        return "Veiled"
     if ctx.potential_mode == ItemViewContext.PotentialMode.FORCE_FULL:
-        if is_veiled():
-            return "Veiled"
-        var current := layer_index
-        var max_layer := item_data.identity_layers.size() - 1
-        return "Lv %d / %d  [%s]" % [current, max_layer, get_potential_rating()]
-    return potential_inspect_label
+        return _true_rarity_name()
+    return get_potential_rating()
 
 
 func should_show_potential_price_for(ctx: ItemViewContext) -> bool:

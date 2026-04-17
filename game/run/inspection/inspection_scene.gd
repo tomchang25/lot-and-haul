@@ -1,7 +1,7 @@
 # inspection_scene.gd
 # Block 02 — Inspection phase; player spends stamina to advance item identity layers.
 # Reads:  GameManager.item_entries
-# Writes: ItemEntry.layer_index
+# Writes: ItemEntry.layer_index, ItemEntry.inspection_level
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -99,7 +99,7 @@ func _on_potential_inspect() -> void:
     RunManager.run_record.stamina -= ActionPopup.POTENTIAL_COST
     RunManager.run_record.actions_remaining -= 1
 
-    entry.potential_inspect_level += 1
+    entry.inspection_level += 0.5
     _active_item.refresh(&"potential")
     _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
     _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
@@ -118,7 +118,7 @@ func _on_condition_inspect() -> void:
     RunManager.run_record.stamina -= ActionPopup.CONDITION_COST
     RunManager.run_record.actions_remaining -= 1
 
-    entry.condition_inspect_level += 1
+    entry.inspection_level += 0.5
     _active_item.refresh(&"condition")
     _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
     _stamina_hud.update_actions(RunManager.run_record.actions_remaining)

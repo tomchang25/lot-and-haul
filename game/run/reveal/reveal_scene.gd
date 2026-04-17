@@ -58,8 +58,7 @@ func _ready() -> void:
 func _on_reveal_pressed() -> void:
     for entry: ItemEntry in _won_items:
         entry.unveil()
-        entry.condition_inspect_level = 2
-        entry.potential_inspect_level = 2
+        entry.inspection_level = 4.0
 
     _on_reveal_complete()
 
