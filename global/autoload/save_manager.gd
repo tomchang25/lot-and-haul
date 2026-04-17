@@ -46,7 +46,7 @@ var skill_levels: Dictionary = { } # skill_id (String) → int
 func save() -> void:
     var serialized_items: Array = []
     for entry: ItemEntry in storage_items:
-        serialized_items.append(_serialize_item(entry))
+        serialized_items.append(entry.to_dict())
 
     var data := {
         "category_points": category_points,
@@ -106,7 +106,7 @@ func _read_save_file() -> void:
         for d: Variant in parsed["storage_items"]:
             if not d is Dictionary:
                 continue
-            var entry: ItemEntry = _deserialize_item(d)
+            var entry: ItemEntry = ItemEntry.from_dict(d)
             if entry != null:
                 storage_items.append(entry)
     if parsed.has("current_day") and parsed["current_day"] is float:
@@ -334,66 +334,3 @@ func _build_order_dict() -> Dictionary:
             "completed_order_ids": m.completed_order_ids,
         }
     return result
-
-
-func _serialize_item(entry: ItemEntry) -> Dictionary:
-    var km: Array = []
-    for v: float in entry.knowledge_min:
-        km.append(v)
-    var kmax: Array = []
-    for v: float in entry.knowledge_max:
-        kmax.append(v)
-    return {
-        "item_id": entry.item_data.item_id,
-        "id": entry.id,
-        "layer_index": entry.layer_index,
-        "condition": entry.condition,
-        "inspection_level": entry.inspection_level,
-        "knowledge_min": km,
-        "knowledge_max": kmax,
-    }
-
-
-func _deserialize_item(d: Dictionary) -> ItemEntry:
-    var item_data: ItemData = ItemRegistry.get_item(d["item_id"])
-    if item_data == null:
-        push_error("SaveManager: item not found for id '%s'" % d["item_id"])
-        return null
-    var entry := ItemEntry.new()
-    entry.item_data = item_data
-    entry.layer_index = int(d["layer_index"])
-    entry.condition = float(d["condition"])
-    entry.inspection_level = _read_inspection_level(d)
-    var km: Array = d["knowledge_min"]
-    var kmax: Array = d["knowledge_max"]
-    entry.knowledge_min.resize(km.size())
-    entry.knowledge_max.resize(kmax.size())
-    for i in range(km.size()):
-        entry.knowledge_min[i] = float(km[i])
-    for i in range(kmax.size()):
-        entry.knowledge_max[i] = float(kmax[i])
-    if d.has("id"):
-        entry.id = int(d["id"])
-    return entry
-
-
-# Reads inspection_level from the save dict, migrating from the old schema
-# (condition_inspect_level + potential_inspect_level as ints) when needed.
-# Old → new mapping uses max(old_condition, old_potential): 0 → 0.0, 1 → 1.0, 2 → 4.0.
-# The 2 → 4.0 mapping is deliberately generous so fully-inspected items land
-# at the finest rarity bucket for every rarity threshold table.
-func _read_inspection_level(d: Dictionary) -> float:
-    if d.has("inspection_level"):
-        return float(d["inspection_level"])
-    var old_cond: int = int(d.get("condition_inspect_level", 0))
-    var old_pot: int = int(d.get("potential_inspect_level", 0))
-    var old_max: int = maxi(old_cond, old_pot)
-    match old_max:
-        0:
-            return 0.0
-        1:
-            return 1.0
-        2:
-            return 4.0
-        _:
-            return 0.0
