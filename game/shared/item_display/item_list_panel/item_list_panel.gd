@@ -117,7 +117,9 @@ static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewC
         ItemRow.Column.NAME:
             return entry.display_name
         ItemRow.Column.CONDITION:
-            return entry.condition
+            if entry.is_veiled() or entry.get_condition_bucket() == 0:
+                return 0.0
+            return entry.get_known_condition_multiplier()
         ItemRow.Column.ESTIMATED_VALUE:
             return entry.estimated_value_sort_value()
         ItemRow.Column.APPRAISED_VALUE:
@@ -129,7 +131,11 @@ static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewC
         ItemRow.Column.SPECIAL_ORDER:
             return entry.special_order_value(ctx.order)
         ItemRow.Column.RARITY:
-            return 0 if entry.is_veiled() else entry.get_rarity_bucket()
+            if entry.is_veiled():
+                return -1
+            if entry.is_rarity_maxed():
+                return entry.item_data.rarity
+            return entry.get_rarity_bucket()
         ItemRow.Column.WEIGHT:
             if entry.item_data == null or entry.item_data.category_data == null:
                 return 0.0

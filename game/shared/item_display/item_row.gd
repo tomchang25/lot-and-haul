@@ -192,8 +192,8 @@ func _refresh() -> void:
     _name_label.text = _entry.display_name
 
     # ── CONDITION ─────────────────────────────────────────────────────────────
-    _condition_label.text = _entry.condition_label_for(_ctx)
-    _condition_label.modulate = _entry.condition_color_for(_ctx)
+    _condition_label.text = _entry.condition_label
+    _condition_label.modulate = _entry.condition_color
 
     # ── ESTIMATED_VALUE ────────────────────────────────────────────────────────
     _estimated_value_label.text = _entry.estimated_value_label

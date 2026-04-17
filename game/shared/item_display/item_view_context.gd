@@ -1,7 +1,8 @@
 # item_view_context.gd
-# Describes the display rules for a given stage.
+# Describes the display context for a given stage.
 # Pass one instance to ItemRow, ItemCard, and ItemRowTooltip.
-# UI components never branch on stage directly — they read the mode fields only.
+# Condition and rarity labels read inspection_level directly on ItemEntry;
+# this context only carries stage and side-channel data (merchant, order).
 class_name ItemViewContext
 extends RefCounted
 
@@ -16,20 +17,7 @@ enum Stage {
     FULFILLMENT_PANEL,
 }
 
-enum ConditionMode {
-    RESPECT_INSPECT_LEVEL,
-    FORCE_INSPECT_MAX,
-    FORCE_TRUE_VALUE,
-}
-
-enum PotentialMode {
-    RESPECT_INSPECT_LEVEL,
-    FORCE_FULL,
-}
-
 var stage: Stage
-var condition_mode: ConditionMode = ConditionMode.RESPECT_INSPECT_LEVEL
-var potential_mode: PotentialMode = PotentialMode.RESPECT_INSPECT_LEVEL
 var merchant: MerchantData = null
 var order: SpecialOrder = null
 
@@ -45,51 +33,36 @@ static func for_inspection() -> ItemViewContext:
 static func for_list_review() -> ItemViewContext:
     var ctx := ItemViewContext.new()
     ctx.stage = Stage.LIST_REVIEW
-    ctx.condition_mode = ConditionMode.RESPECT_INSPECT_LEVEL
-    ctx.potential_mode = PotentialMode.RESPECT_INSPECT_LEVEL
-
     return ctx
 
 
 static func for_reveal() -> ItemViewContext:
     var ctx := ItemViewContext.new()
     ctx.stage = Stage.REVEAL
-    ctx.condition_mode = ConditionMode.RESPECT_INSPECT_LEVEL
-    ctx.potential_mode = PotentialMode.RESPECT_INSPECT_LEVEL
-
     return ctx
 
 
 static func for_cargo() -> ItemViewContext:
     var ctx := ItemViewContext.new()
     ctx.stage = Stage.CARGO
-    ctx.condition_mode = ConditionMode.FORCE_INSPECT_MAX
-    ctx.potential_mode = PotentialMode.FORCE_FULL
-
     return ctx
 
 
 static func for_run_review() -> ItemViewContext:
     var ctx := ItemViewContext.new()
     ctx.stage = Stage.RUN_REVIEW
-    ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
-    ctx.potential_mode = PotentialMode.FORCE_FULL
     return ctx
 
 
 static func for_storage() -> ItemViewContext:
     var ctx := ItemViewContext.new()
     ctx.stage = Stage.STORAGE
-    ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
-    ctx.potential_mode = PotentialMode.FORCE_FULL
     return ctx
 
 
 static func for_merchant_shop(_merchant: MerchantData) -> ItemViewContext:
     var ctx := ItemViewContext.new()
     ctx.stage = Stage.MERCHANT_SHOP
-    ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
-    ctx.potential_mode = PotentialMode.FORCE_FULL
     ctx.merchant = _merchant
     return ctx
 
@@ -97,7 +70,5 @@ static func for_merchant_shop(_merchant: MerchantData) -> ItemViewContext:
 static func for_fulfillment(_order: SpecialOrder) -> ItemViewContext:
     var ctx := ItemViewContext.new()
     ctx.stage = Stage.FULFILLMENT_PANEL
-    ctx.condition_mode = ConditionMode.FORCE_TRUE_VALUE
-    ctx.potential_mode = PotentialMode.FORCE_FULL
     ctx.order = _order
     return ctx
