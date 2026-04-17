@@ -6,8 +6,10 @@ class_name LayerUnlockAction
 extends Resource
 
 # Where this action can be performed.
-#   AUTO    — triggered automatically on arrival at home; no player input required.
-#             Used exclusively for layer 0 → 1 (veiled → unveiled).
+#   AUTO    — DEPRECATED. Scheduled for removal once YAML/.tres sources are rewritten.
+#             Kept only because existing .tres resources still reference this value.
+#             The reveal flow unveils layer 0 directly via ItemEntry.unveil(); no
+#             AUTO-context unlock action is consulted at runtime.
 #   HOME    — requires the home workshop. Handling, research, tools, and skilled work.
 enum ActionContext {
     AUTO,

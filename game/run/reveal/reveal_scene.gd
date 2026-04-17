@@ -14,7 +14,7 @@ const REVEAL_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
     ItemRow.Column.ESTIMATED_VALUE,
-    ItemRow.Column.POTENTIAL,
+    ItemRow.Column.RARITY,
 ]
 
 # ── State ─────────────────────────────────────────────────────────────────────
@@ -57,8 +57,10 @@ func _ready() -> void:
 
 func _on_reveal_pressed() -> void:
     for entry: ItemEntry in _won_items:
-        entry.unveil()
-        entry.inspection_level = 4.0
+        if entry.is_veiled():
+            entry.unveil()
+
+        entry.reveal()
 
     _on_reveal_complete()
 

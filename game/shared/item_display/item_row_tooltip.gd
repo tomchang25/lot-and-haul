@@ -4,16 +4,13 @@
 # Call show_for() / hide_tooltip() from the parent scene.
 #
 # Always-shown rows: Display Name, Super-category, Category, Weight, Grid.
-# Conditional rows:  Potential rating, Potential price, Condition detail
-#                    (hidden until inspected).
+# Conditional rows:  Condition detail, Price (hidden until inspected).
 class_name ItemRowTooltip
 extends PanelContainer
 
 @onready var _display_name_label: Label = $VBox/DisplayNameLabel
 @onready var _super_category_label: Label = $VBox/SuperCategoryLabel
 @onready var _category_label: Label = $VBox/CategoryLabel
-@onready var _potential_label: Label = $VBox/PotentialLabel
-@onready var _potential_price_label: Label = $VBox/PotentialPriceLabel
 @onready var _condition_label: Label = $VBox/ConditionLabel
 @onready var _price_label: Label = $VBox/PriceLabel
 @onready var _cargo_separator: HSeparator = $VBox/CargoSeparator
@@ -38,21 +35,6 @@ func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
         _super_category_label.hide()
         _category_label.hide()
 
-    # ── Conditional: potential rating ────────────────────────────────────────
-    var pot_text := entry.potential_label_for(ctx)
-    if pot_text != "???":
-        _potential_label.text = pot_text
-        _potential_label.show()
-    else:
-        _potential_label.hide()
-
-    # ── Conditional: potential price range ───────────────────────────────────
-    if entry.should_show_potential_price_for(ctx):
-        _potential_price_label.text = "Potential Range: %s" % entry.potential_price_label
-        _potential_price_label.show()
-    else:
-        _potential_price_label.hide()
-
     # ── Conditional: condition detail ────────────────────────────────────────
     var cond_text := entry.condition_label_for(ctx)
     if cond_text != "???":
@@ -73,10 +55,7 @@ func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
         _price_label.hide()
 
     # ── Always-visible: cargo stats ──────────────────────────────────────────
-    var has_inspect_data: bool = _potential_label.visible \
-    or _potential_price_label.visible \
-    or _condition_label.visible \
-    or _price_label.visible
+    var has_inspect_data: bool = _condition_label.visible or _price_label.visible
 
     _cargo_separator.visible = has_inspect_data # only show divider when above rows exist
 

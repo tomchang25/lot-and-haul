@@ -65,9 +65,9 @@ theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PotentialLabel" type="Label" parent="HBoxContainer" unique_id=1000000008]
+[node name="RarityLabel" type="Label" parent="HBoxContainer" unique_id=1000000008]
 visible = false
-custom_minimum_size = Vector2(160, 0)
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1

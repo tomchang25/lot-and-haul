@@ -40,11 +40,10 @@ var knowledge_max: Array[float] = []
 
 var display_name: String:
     get:
-        return active_layer().display_name
-
-var level_label: String:
-    get:
-        return "???" if is_veiled() else "Level %d" % layer_index
+        var name: String = active_layer().display_name
+        if is_at_final_layer() and not is_veiled():
+            return "%s ·" % name
+        return name
 
 # Raw condition label used by reveal and run review (true value, no inspect gate).
 var condition_label: String:
@@ -52,16 +51,6 @@ var condition_label: String:
         var cond_percent := int(condition * 100)
 
         return "%d%%" % [cond_percent]
-
-var potential_inspect_label: String:
-    get:
-        if is_veiled():
-            return "Veiled"
-        return get_potential_rating()
-
-var should_show_potential_price: bool:
-    get:
-        return not is_veiled() and is_rarity_maxed()
 
 var condition_mult_label: String:
     get:
@@ -175,9 +164,9 @@ func is_rarity_maxed() -> bool:
 func _rarity_thresholds() -> Array[float]:
     match item_data.rarity:
         ItemData.Rarity.COMMON:
-            return [0.0]
-        ItemData.Rarity.UNCOMMON:
             return [0.0, 1.0]
+        ItemData.Rarity.UNCOMMON:
+            return [0.0, 1.0, 2.0]
         ItemData.Rarity.RARE:
             return [0.0, 1.0, 2.0, 4.0]
         ItemData.Rarity.EPIC:
@@ -227,36 +216,6 @@ var estimated_value_label: String:
         if estimated_value_min == estimated_value_max:
             return "$%d" % estimated_value_min
         return "$%d - $%d" % [estimated_value_min, estimated_value_max]
-
-var potential_price_min: int:
-    get:
-        if is_veiled() or knowledge_min.is_empty():
-            return 0
-        var cond_mult: float = get_known_condition_multiplier()
-        var result: int = int(item_data.identity_layers[layer_index].base_value * knowledge_min[layer_index])
-        for i in range(layer_index + 1, item_data.identity_layers.size()):
-            var v: int = int(item_data.identity_layers[i].base_value * knowledge_min[i])
-            if v < result:
-                result = v
-        return int(result * cond_mult)
-
-var potential_price_max: int:
-    get:
-        if is_veiled() or knowledge_max.is_empty():
-            return 0
-        var cond_mult: float = get_known_condition_multiplier()
-        var result: int = int(item_data.identity_layers[layer_index].base_value * knowledge_max[layer_index])
-        for i in range(layer_index + 1, item_data.identity_layers.size()):
-            var v: int = int(item_data.identity_layers[i].base_value * knowledge_max[i])
-            if v > result:
-                result = v
-        return int(result * cond_mult)
-
-var potential_price_label: String:
-    get:
-        if is_veiled():
-            return "???"
-        return "$%d - $%d" % [potential_price_min, potential_price_max]
 
 
 # Unified pricing pipeline. Reads the active layer's base value, then
@@ -385,12 +344,6 @@ func potential_label_for(ctx: ItemViewContext) -> String:
     if ctx.potential_mode == ItemViewContext.PotentialMode.FORCE_FULL:
         return _true_rarity_name()
     return get_potential_rating()
-
-
-func should_show_potential_price_for(ctx: ItemViewContext) -> bool:
-    if ctx.potential_mode == ItemViewContext.PotentialMode.FORCE_FULL:
-        return not is_veiled()
-    return should_show_potential_price
 
 
 # Bridge method — kept for ItemCard / ItemRowTooltip which dispatch on stage.
@@ -523,6 +476,10 @@ func unveil() -> void:
     if new_range < old_range:
         knowledge_min = new_min
         knowledge_max = new_max
+
+
+func reveal() -> void:
+    inspection_level = maxf(inspection_level, 1.0)
 
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
