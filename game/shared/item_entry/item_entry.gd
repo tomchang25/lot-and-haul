@@ -164,9 +164,9 @@ func is_rarity_maxed() -> bool:
 func _rarity_thresholds() -> Array[float]:
     match item_data.rarity:
         ItemData.Rarity.COMMON:
-            return [0.0]
-        ItemData.Rarity.UNCOMMON:
             return [0.0, 1.0]
+        ItemData.Rarity.UNCOMMON:
+            return [0.0, 1.0, 2.0]
         ItemData.Rarity.RARE:
             return [0.0, 1.0, 2.0, 4.0]
         ItemData.Rarity.EPIC:
@@ -216,6 +216,7 @@ var estimated_value_label: String:
         if estimated_value_min == estimated_value_max:
             return "$%d" % estimated_value_min
         return "$%d - $%d" % [estimated_value_min, estimated_value_max]
+
 
 # Unified pricing pipeline. Reads the active layer's base value, then
 # conditionally folds in condition, knowledge, and market factors based on the
@@ -475,6 +476,10 @@ func unveil() -> void:
     if new_range < old_range:
         knowledge_min = new_min
         knowledge_max = new_max
+
+
+func reveal() -> void:
+    inspection_level = maxf(inspection_level, 1.0)
 
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
