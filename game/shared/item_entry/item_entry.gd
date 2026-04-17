@@ -547,3 +547,68 @@ static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
         entry.knowledge_max[i] = price_range.y
 
     return entry
+
+# ══ Serialization ═════════════════════════════════════════════════════════════
+
+
+func to_dict() -> Dictionary:
+    var km: Array = []
+    for v: float in knowledge_min:
+        km.append(v)
+    var kmax: Array = []
+    for v: float in knowledge_max:
+        kmax.append(v)
+    return {
+        "item_id": item_data.item_id,
+        "id": id,
+        "layer_index": layer_index,
+        "condition": condition,
+        "inspection_level": inspection_level,
+        "knowledge_min": km,
+        "knowledge_max": kmax,
+    }
+
+
+static func from_dict(d: Dictionary) -> ItemEntry:
+    var item_data: ItemData = ItemRegistry.get_item(d["item_id"])
+    if item_data == null:
+        push_error("ItemEntry: item not found for id '%s'" % d["item_id"])
+        return null
+    var entry := ItemEntry.new()
+    entry.item_data = item_data
+    entry.layer_index = int(d["layer_index"])
+    entry.condition = float(d["condition"])
+    entry.inspection_level = _read_inspection_level(d)
+    var km: Array = d["knowledge_min"]
+    var kmax: Array = d["knowledge_max"]
+    entry.knowledge_min.resize(km.size())
+    entry.knowledge_max.resize(kmax.size())
+    for i in range(km.size()):
+        entry.knowledge_min[i] = float(km[i])
+    for i in range(kmax.size()):
+        entry.knowledge_max[i] = float(kmax[i])
+    if d.has("id"):
+        entry.id = int(d["id"])
+    return entry
+
+
+# Reads inspection_level from the save dict, migrating from the old schema
+# (condition_inspect_level + potential_inspect_level as ints) when needed.
+# Old → new mapping uses max(old_condition, old_potential): 0 → 0.0, 1 → 1.0, 2 → 4.0.
+# The 2 → 4.0 mapping is deliberately generous so fully-inspected items land
+# at the finest rarity bucket for every rarity threshold table.
+static func _read_inspection_level(d: Dictionary) -> float:
+    if d.has("inspection_level"):
+        return float(d["inspection_level"])
+    var old_cond: int = int(d.get("condition_inspect_level", 0))
+    var old_pot: int = int(d.get("potential_inspect_level", 0))
+    var old_max: int = maxi(old_cond, old_pot)
+    match old_max:
+        0:
+            return 0.0
+        1:
+            return 1.0
+        2:
+            return 4.0
+        _:
+            return 0.0
