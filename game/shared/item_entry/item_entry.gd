@@ -170,7 +170,7 @@ func apply_inspect(delta: float) -> void:
     KnowledgeManager.add_category_points(
         item_data.category_data.category_id,
         item_data.rarity,
-        KnowledgeManager.KnowledgeAction.CONDITION_INSPECT,
+        KnowledgeManager.KnowledgeAction.INSPECT,
     )
 
 
