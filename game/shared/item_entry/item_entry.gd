@@ -153,8 +153,8 @@ func get_potential_rating() -> String:
         return _true_rarity_name()
     return "%s+" % RARITY_NAMES[bucket]
 
-
 # ── Bucket helpers ────────────────────────────────────────────────────────────
+
 
 func get_condition_bucket() -> int:
     return _bucket_index(inspection_level, CONDITION_THRESHOLDS)
@@ -257,6 +257,7 @@ var potential_price_label: String:
         if is_veiled():
             return "???"
         return "$%d - $%d" % [potential_price_min, potential_price_max]
+
 
 # Unified pricing pipeline. Reads the active layer's base value, then
 # conditionally folds in condition, knowledge, and market factors based on the
@@ -570,12 +571,12 @@ func to_dict() -> Dictionary:
 
 
 static func from_dict(d: Dictionary) -> ItemEntry:
-    var item_data: ItemData = ItemRegistry.get_item(d["item_id"])
-    if item_data == null:
+    var data: ItemData = ItemRegistry.get_item(d["item_id"])
+    if data == null:
         push_error("ItemEntry: item not found for id '%s'" % d["item_id"])
         return null
     var entry := ItemEntry.new()
-    entry.item_data = item_data
+    entry.item_data = data
     entry.layer_index = int(d["layer_index"])
     entry.condition = float(d["condition"])
     entry.inspection_level = _read_inspection_level(d)
