@@ -45,12 +45,28 @@ var display_name: String:
             return "%s ·" % name
         return name
 
-# Raw condition label used by reveal and run review (true value, no inspect gate).
+# Condition label shown to the player, keyed off the current inspect bucket.
 var condition_label: String:
     get:
-        var cond_percent := int(condition * 100)
+        if is_veiled():
+            return ""
 
-        return "%d%%" % [cond_percent]
+        match get_condition_bucket():
+            0:
+                return "???"
+            1:
+                if condition < 0.3:
+                    return "Poor"
+                elif condition < 0.6:
+                    return "Fair"
+                elif condition < 0.8:
+                    return "Good"
+                else:
+                    return "Excellent"
+            2:
+                return "%d%%" % int(condition * 100)
+            _:
+                return "?????????"
 
 var condition_mult_label: String:
     get:
@@ -60,34 +76,18 @@ var condition_mult_label: String:
             0:
                 return "×?"
             1:
-                return "~×0.50" if condition < 0.3 else "~×1.00"
-            2:
                 return "~×%.2f" % get_known_condition_multiplier()
+            2:
+                return "×%.2f" % get_condition_multiplier()
             _:
                 push_warning("condition bucket out of range: %d" % get_condition_bucket())
                 return "×?"
 
-var condition_inspect_label: String:
+var potential_label: String:
     get:
         if is_veiled():
-            return ""
-
-        match get_condition_bucket():
-            0:
-                return "???"
-            1:
-                return "Poor" if condition < 0.3 else "Common"
-            2:
-                if condition < 0.3:
-                    return "Poor"
-                elif condition < 0.6:
-                    return "Fair"
-                elif condition < 0.8:
-                    return "Good"
-                else:
-                    return "Excellent"
-            _:
-                return "?????????"
+            return "Veiled"
+        return get_potential_rating()
 
 
 func is_condition_inspectable() -> bool:
@@ -111,15 +111,13 @@ func get_condition_multiplier() -> float:
 
 # Returns the condition multiplier the player can infer from their current inspect bucket.
 # bucket 0 → neutral 1.0 (unknown)
-# bucket 1 → midpoint of the visible band (Poor: 0.5, Common: 1.0)
-# bucket 2 → true banded multiplier
+# bucket 1 → midpoint of the visible 4-band (Poor / Fair / Good / Excellent)
+# bucket 2 → the precise true multiplier
 func get_known_condition_multiplier() -> float:
     match get_condition_bucket():
         0:
             return 1.0
         1:
-            return 0.5 if condition < 0.3 else 1.0
-        2:
             if condition < 0.3:
                 return 0.5
             elif condition < 0.6:
@@ -128,6 +126,8 @@ func get_known_condition_multiplier() -> float:
                 return 1.5
             else:
                 return 3.0
+        2:
+            return get_condition_multiplier()
         _:
             return 0.0
 
@@ -262,10 +262,12 @@ var appraised_value_label: String:
 
 # ── Display colors ────────────────────────────────────────────────────────────
 
-## The tint to apply to any condition label, based on the true condition value.
-## Use this in reveal, run review, or any "full truth" context.
+## The tint to apply to the condition label, based on what the player knows.
+## Unknown (veiled or bucket 0) → neutral grey. Known → banded by true condition.
 var condition_color: Color:
     get:
+        if is_veiled() or get_condition_bucket() == 0:
+            return Color(0.5, 0.5, 0.5)
         if condition >= 0.8:
             return Color.GOLD
         elif condition >= 0.6:
@@ -274,14 +276,6 @@ var condition_color: Color:
             return Color.WHITE
         else:
             return Color.LIGHT_CORAL
-
-## The tint to apply based on what the player *currently knows*.
-## Unknown (bucket 0) → neutral grey. Known → same as condition_color.
-var condition_inspect_color: Color:
-    get:
-        if is_veiled() or get_condition_bucket() == 0:
-            return Color(0.5, 0.5, 0.5)
-        return condition_color
 
 ## Standard green used for any confirmed price / value label.
 const PRICE_COLOR := Color(0.4, 1.0, 0.5)
@@ -295,55 +289,9 @@ var price_color: Color:
         return PRICE_UNKNOWN_COLOR if is_veiled() else PRICE_COLOR
 
 # ── Context-aware helpers ─────────────────────────────────────────────────────
-# These are the only display functions that ItemRow, ItemCard, and ItemRowTooltip
-# call. No UI component branches on stage directly.
-
-
-func condition_label_for(ctx: ItemViewContext) -> String:
-    match ctx.condition_mode:
-        ItemViewContext.ConditionMode.FORCE_TRUE_VALUE:
-            return condition_label
-        ItemViewContext.ConditionMode.FORCE_INSPECT_MAX:
-            if condition < 0.3:
-                return "Poor"
-            elif condition < 0.6:
-                return "Fair"
-            elif condition < 0.8:
-                return "Good"
-            else:
-                return "Excellent"
-        ItemViewContext.ConditionMode.RESPECT_INSPECT_LEVEL:
-            return condition_inspect_label
-        _:
-            push_warning("Unknown ConditionMode: %d" % ctx.condition_mode)
-            return condition_inspect_label
-
-
-func condition_color_for(ctx: ItemViewContext) -> Color:
-    if ctx.condition_mode == ItemViewContext.ConditionMode.RESPECT_INSPECT_LEVEL:
-        return condition_inspect_color
-    return condition_color
-
-
-func condition_mult_label_for(ctx: ItemViewContext) -> String:
-    match ctx.condition_mode:
-        ItemViewContext.ConditionMode.FORCE_TRUE_VALUE:
-            return "×%.2f" % get_condition_multiplier()
-        ItemViewContext.ConditionMode.FORCE_INSPECT_MAX:
-            return condition_mult_label
-        ItemViewContext.ConditionMode.RESPECT_INSPECT_LEVEL:
-            return condition_mult_label
-        _:
-            push_warning("Unknown ConditionMode: %d" % ctx.condition_mode)
-            return condition_mult_label
-
-
-func potential_label_for(ctx: ItemViewContext) -> String:
-    if is_veiled():
-        return "Veiled"
-    if ctx.potential_mode == ItemViewContext.PotentialMode.FORCE_FULL:
-        return _true_rarity_name()
-    return get_potential_rating()
+# The price helpers below are the only display functions that still take a
+# context, because they dispatch on stage (estimated / appraised / merchant /
+# order). Condition and rarity displays live on the properties above.
 
 
 # Bridge method — kept for ItemCard / ItemRowTooltip which dispatch on stage.

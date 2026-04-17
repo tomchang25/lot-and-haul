@@ -78,13 +78,13 @@ func _apply_unveiled() -> void:
         _super_category_label.hide()
         _category_label.hide()
 
-    _potential_label.text = _entry.potential_label_for(_ctx)
+    _potential_label.text = _entry.potential_label
     _potential_label.show()
 
-    _condition_label.text = _entry.condition_label_for(_ctx)
-    _condition_label.modulate = _entry.condition_color_for(_ctx)
+    _condition_label.text = _entry.condition_label
+    _condition_label.modulate = _entry.condition_color
     _condition_label.show()
-    _condition_mult_label.text = _entry.condition_mult_label_for(_ctx)
+    _condition_mult_label.text = _entry.condition_mult_label
     _condition_mult_label.show()
     _price_label.text = _entry.price_label_for(_ctx)
     _price_label.add_theme_color_override(&"font_color", _entry.price_color)
