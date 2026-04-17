@@ -348,8 +348,7 @@ func _serialize_item(entry: ItemEntry) -> Dictionary:
         "id": entry.id,
         "layer_index": entry.layer_index,
         "condition": entry.condition,
-        "potential_inspect_level": entry.potential_inspect_level,
-        "condition_inspect_level": entry.condition_inspect_level,
+        "inspection_level": entry.inspection_level,
         "knowledge_min": km,
         "knowledge_max": kmax,
     }
@@ -364,8 +363,7 @@ func _deserialize_item(d: Dictionary) -> ItemEntry:
     entry.item_data = item_data
     entry.layer_index = int(d["layer_index"])
     entry.condition = float(d["condition"])
-    entry.potential_inspect_level = int(d["potential_inspect_level"])
-    entry.condition_inspect_level = int(d["condition_inspect_level"])
+    entry.inspection_level = _read_inspection_level(d)
     var km: Array = d["knowledge_min"]
     var kmax: Array = d["knowledge_max"]
     entry.knowledge_min.resize(km.size())
@@ -377,3 +375,25 @@ func _deserialize_item(d: Dictionary) -> ItemEntry:
     if d.has("id"):
         entry.id = int(d["id"])
     return entry
+
+
+# Reads inspection_level from the save dict, migrating from the old schema
+# (condition_inspect_level + potential_inspect_level as ints) when needed.
+# Old → new mapping uses max(old_condition, old_potential): 0 → 0.0, 1 → 1.0, 2 → 4.0.
+# The 2 → 4.0 mapping is deliberately generous so fully-inspected items land
+# at the finest rarity bucket for every rarity threshold table.
+func _read_inspection_level(d: Dictionary) -> float:
+    if d.has("inspection_level"):
+        return float(d["inspection_level"])
+    var old_cond: int = int(d.get("condition_inspect_level", 0))
+    var old_pot: int = int(d.get("potential_inspect_level", 0))
+    var old_max: int = maxi(old_cond, old_pot)
+    match old_max:
+        0:
+            return 0.0
+        1:
+            return 1.0
+        2:
+            return 4.0
+        _:
+            return 0.0

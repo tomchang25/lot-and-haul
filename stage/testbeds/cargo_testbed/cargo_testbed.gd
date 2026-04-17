@@ -37,8 +37,7 @@ func _inject_fake_state() -> void:
     var entries: Array[ItemEntry] = RunManager.run_record.lot_entry.item_entries
 
     for entry: ItemEntry in entries:
-        entry.condition_inspect_level = 2
-        entry.potential_inspect_level = 2
+        entry.inspection_level = 4.0
         entry.layer_index = 1
 
     RunManager.run_record.paid_price = paid_price
