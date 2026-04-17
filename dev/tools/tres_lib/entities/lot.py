@@ -148,7 +148,32 @@ class LotSpec:
         return lot
 
     def validate(self, entries: list, all_data: dict) -> list[str]:
-        return []
+        errors: list[str] = []
+        known_cat_ids: set[str] = {
+            c["category_id"] for c in all_data.get("categories", [])
+        }
+        known_super_cat_ids: set[str] = {
+            sc["super_category_id"]
+            for sc in all_data.get("super_categories", [])
+            if isinstance(sc, dict)
+        }
+
+        for lot in entries:
+            lot_id = lot.get("lot_id", "?")
+
+            for key in (lot.get("category_weights") or {}).keys():
+                if key not in known_cat_ids:
+                    errors.append(
+                        f"lot '{lot_id}': category_weights key '{key}' not defined in categories"
+                    )
+
+            for key in (lot.get("super_category_weights") or {}).keys():
+                if key not in known_super_cat_ids:
+                    errors.append(
+                        f"lot '{lot_id}': super_category_weights key '{key}' not defined in super_categories"
+                    )
+
+        return errors
 
 
 SPEC = LotSpec()
