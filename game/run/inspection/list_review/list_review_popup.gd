@@ -16,7 +16,7 @@ const LIST_REVIEW_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
     ItemRow.Column.ESTIMATED_VALUE,
-    ItemRow.Column.POTENTIAL,
+    ItemRow.Column.RARITY,
 ]
 
 # ── State ─────────────────────────────────────────────────────────────────────

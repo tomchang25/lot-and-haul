@@ -242,9 +242,6 @@ func can_advance(entry: ItemEntry, context: LayerUnlockAction.ActionContext) -> 
     if action == null or entry.is_at_final_layer():
         return AdvanceCheck.NO_ACTION
 
-    if action.context == LayerUnlockAction.ActionContext.AUTO:
-        return AdvanceCheck.NO_ACTION
-
     if action.context != context:
         return AdvanceCheck.WRONG_CONTEXT
 

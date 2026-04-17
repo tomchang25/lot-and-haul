@@ -128,8 +128,8 @@ static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewC
             return entry.merchant_offer_value(ctx.merchant)
         ItemRow.Column.SPECIAL_ORDER:
             return entry.special_order_value(ctx.order)
-        ItemRow.Column.POTENTIAL:
-            return 0 if entry.is_veiled() else entry.potential_price_max
+        ItemRow.Column.RARITY:
+            return 0 if entry.is_veiled() else entry.get_rarity_bucket()
         ItemRow.Column.WEIGHT:
             if entry.item_data == null or entry.item_data.category_data == null:
                 return 0.0

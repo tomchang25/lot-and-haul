@@ -27,7 +27,7 @@ enum Column {
     BASE_VALUE,
     MERCHANT_OFFER,
     SPECIAL_ORDER,
-    POTENTIAL,
+    RARITY,
     WEIGHT,
     GRID,
     MARKET_FACTOR,
@@ -44,7 +44,7 @@ const COLUMN_HEADERS: Dictionary = {
     Column.BASE_VALUE: "Base Value",
     Column.MERCHANT_OFFER: "",
     Column.SPECIAL_ORDER: "Order Price",
-    Column.POTENTIAL: "Potential",
+    Column.RARITY: "Rarity",
     Column.WEIGHT: "Weight",
     Column.GRID: "Grid",
     Column.MARKET_FACTOR: "Market",
@@ -58,7 +58,7 @@ const COLUMN_MIN_WIDTH: Dictionary = {
     Column.BASE_VALUE: 160,
     Column.MERCHANT_OFFER: 160,
     Column.SPECIAL_ORDER: 160,
-    Column.POTENTIAL: 160,
+    Column.RARITY: 120,
     Column.WEIGHT: 100,
     Column.GRID: 80,
     Column.MARKET_FACTOR: 100,
@@ -81,7 +81,7 @@ var _selection_state: SelectionState = SelectionState.NONE
 @onready var _base_value_label: Label = $HBoxContainer/BaseValueLabel
 @onready var _merchant_offer_label: Label = $HBoxContainer/MerchantOfferLabel
 @onready var _special_order_label: Label = $HBoxContainer/SpecialOrderLabel
-@onready var _potential_label: Label = $HBoxContainer/PotentialLabel
+@onready var _rarity_label: Label = $HBoxContainer/RarityLabel
 @onready var _weight_label: Label = $HBoxContainer/WeightLabel
 @onready var _grid_label: Label = $HBoxContainer/GridLabel
 @onready var _market_factor_label: Label = $HBoxContainer/MarketFactorLabel
@@ -180,7 +180,7 @@ func _refresh() -> void:
     _base_value_label.visible = Column.BASE_VALUE in _columns
     _merchant_offer_label.visible = Column.MERCHANT_OFFER in _columns
     _special_order_label.visible = Column.SPECIAL_ORDER in _columns
-    _potential_label.visible = Column.POTENTIAL in _columns
+    _rarity_label.visible = Column.RARITY in _columns
     _weight_label.visible = Column.WEIGHT in _columns
     _grid_label.visible = Column.GRID in _columns
     _market_factor_label.visible = Column.MARKET_FACTOR in _columns
@@ -215,9 +215,8 @@ func _refresh() -> void:
     _special_order_label.text = _entry.special_order_label(_ctx.order)
     _special_order_label.add_theme_color_override(&"font_color", _entry.price_color)
 
-    # ── POTENTIAL ─────────────────────────────────────────────────────────────
-    _potential_label.text = _entry.potential_price_label if not _entry.is_veiled() else "???"
-    _potential_label.add_theme_color_override(&"font_color", _entry.price_color)
+    # ── RARITY ────────────────────────────────────────────────────────────────
+    _rarity_label.text = "???" if _entry.is_veiled() else _entry.get_potential_rating()
 
     # ── WEIGHT / GRID ─────────────────────────────────────────────────────────
     if _entry.item_data != null and _entry.item_data.category_data != null:
@@ -243,7 +242,7 @@ func _apply_column_order() -> void:
         Column.BASE_VALUE: _base_value_label,
         Column.MERCHANT_OFFER: _merchant_offer_label,
         Column.SPECIAL_ORDER: _special_order_label,
-        Column.POTENTIAL: _potential_label,
+        Column.RARITY: _rarity_label,
         Column.WEIGHT: _weight_label,
         Column.GRID: _grid_label,
         Column.MARKET_FACTOR: _market_factor_label,

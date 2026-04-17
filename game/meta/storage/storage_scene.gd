@@ -12,7 +12,7 @@ const STORAGE_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
     ItemRow.Column.APPRAISED_VALUE,
-    ItemRow.Column.POTENTIAL,
+    ItemRow.Column.RARITY,
 ]
 
 # Market Research cost per rarity.

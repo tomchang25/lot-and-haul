@@ -12,8 +12,6 @@ var _ctx: ItemViewContext = null
 @onready var _super_category_label: Label = $VBox/SuperCategoryLabel
 @onready var _category_label: Label = $VBox/CategoryLabel
 @onready var _potential_label: Label = $VBox/PotentialLabel
-@onready var _potential_price_row: Control = $VBox/PotentialPriceRow
-@onready var _potential_price_label: Label = $VBox/PotentialPriceRow/PotentialPriceLabel
 @onready var _condition_label: Label = $VBox/ConditionLabel
 @onready var _condition_mult_label: Label = $VBox/ConditionMultLabel
 @onready var _price_label: Label = $VBox/PriceLabel
@@ -45,36 +43,53 @@ func refresh(changed: StringName = &"") -> void:
 func _apply() -> void:
     _name_label.text = _entry.display_name
 
-    # ── Category identity ─────────────────────────────────────────────────────
+    if _entry.is_veiled():
+        _apply_veiled()
+    else:
+        _apply_unveiled()
+
+
+func _apply_veiled() -> void:
+    # Veiled rows show only the layer-0 display name and base value.
+    _super_category_label.hide()
+    _category_label.hide()
+    _potential_label.hide()
+    _condition_label.hide()
+    _condition_mult_label.hide()
+    _weight_label.hide()
+    _grid_label.hide()
+
+    _price_label.text = "$%d" % _entry.active_layer().base_value
+    _price_label.add_theme_color_override(&"font_color", _entry.price_color)
+    _price_label.show()
+
+
+func _apply_unveiled() -> void:
     if _entry.item_data != null and _entry.item_data.category_data != null:
         var cat := _entry.item_data.category_data
         if cat.super_category != null:
             _super_category_label.text = cat.super_category.display_name
-            _super_category_label.visible = true
+            _super_category_label.show()
         else:
             _super_category_label.hide()
         _category_label.text = cat.display_name
-        _category_label.visible = true
+        _category_label.show()
     else:
         _super_category_label.hide()
         _category_label.hide()
 
-    # ── Inspection data ───────────────────────────────────────────────────────
     _potential_label.text = _entry.potential_label_for(_ctx)
-
-    if _entry.should_show_potential_price_for(_ctx):
-        _potential_price_label.text = _entry.potential_price_label
-        _potential_price_row.show()
-    else:
-        _potential_price_row.hide()
+    _potential_label.show()
 
     _condition_label.text = _entry.condition_label_for(_ctx)
     _condition_label.modulate = _entry.condition_color_for(_ctx)
+    _condition_label.show()
     _condition_mult_label.text = _entry.condition_mult_label_for(_ctx)
+    _condition_mult_label.show()
     _price_label.text = _entry.price_label_for(_ctx)
     _price_label.add_theme_color_override(&"font_color", _entry.price_color)
+    _price_label.show()
 
-    # ── Cargo stats ───────────────────────────────────────────────────────────
     if _entry.item_data != null and _entry.item_data.category_data != null:
         var cat := _entry.item_data.category_data
         var cell_count: int = cat.get_cells().size()
