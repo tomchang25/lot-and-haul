@@ -28,6 +28,22 @@ func validate() -> bool:
                 % location_id,
             )
             ok = false
+    for location: LocationData in _locations.values():
+        for lot: LotData in location.lot_pool:
+            for key: String in lot.category_weights.keys():
+                if CategoryRegistry.get_category(key) == null:
+                    push_error(
+                        "LocationRegistry: location '%s' lot '%s' category_weights key '%s' not found"
+                        % [location.location_id, lot.lot_id, key],
+                    )
+                    ok = false
+            for key: String in lot.super_category_weights.keys():
+                if SuperCategoryRegistry.get_super_category(key) == null:
+                    push_error(
+                        "LocationRegistry: location '%s' lot '%s' super_category_weights key '%s' not found"
+                        % [location.location_id, lot.lot_id, key],
+                    )
+                    ok = false
     return ok
 
 
