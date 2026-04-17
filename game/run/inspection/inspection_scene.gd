@@ -13,15 +13,18 @@ const ITEM_GAP := Vector2(32.0, 28.0)
 # Top-left corner of the grid — centred horizontally, leaving room for the HUD row
 const GRID_ORIGIN := Vector2(376.0, 90.0)
 
+# Upper bound on the number of cards a single Inspect action can hit.
+# Hook point for future perk modification.
+const MAX_INSPECT_HITS := 3
+
 const ItemCardScene := preload("uid://bw23cjkf40y5r")
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _active_item: ItemCard = null
 var _item_displays: Array[ItemCard] = []
 
-# Maps each ItemCard to its corresponding ItemEntry for popup refresh.
-var _entry_for_display: Dictionary = { }
+# Maps each ItemEntry to its corresponding ItemCard for reverse lookup.
+var _card_for_entry: Dictionary = { }
 
 var _ctx: ItemViewContext = null
 
@@ -32,7 +35,7 @@ var _pulse_tween: Tween = null
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _items_grid: GridContainer = $HUD/Panel/MarginContainer/ScrollContainer/ItemsGrid
-@onready var _action_popup: ActionPopup = $ActionPopup
+@onready var _action_bar: LotActionBar = $HUD/LotActionBar
 @onready var _start_btn: Button = $HUD/Footer/StartAuctionButton
 @onready var _pass_btn: Button = $HUD/Footer/PassButton
 @onready var _list_review: ListReviewPopup = $ListReviewPopup
@@ -46,10 +49,8 @@ var _pulse_tween: Tween = null
 func _ready() -> void:
     _ctx = ItemViewContext.for_inspection()
 
-    _action_popup.potential_inspect_requested.connect(_on_potential_inspect)
-    _action_popup.condition_inspect_requested.connect(_on_condition_inspect)
-    _action_popup.xray_inspect_requested.connect(_on_xray_inspect)
-    _action_popup.cancelled.connect(_on_popup_cancelled)
+    _action_bar.inspect_requested.connect(_on_inspect_requested)
+    _action_bar.peek_requested.connect(_on_peek_requested)
     _start_btn.pressed.connect(_on_start_auction_pressed)
     _pass_btn.pressed.connect(_on_pass_pressed)
     _list_review.back_requested.connect(_on_list_review_back)
@@ -59,98 +60,79 @@ func _ready() -> void:
     _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
     _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
 
-    _action_popup.hide()
     _populate_item_displays()
-
-
-func _unhandled_input(event: InputEvent) -> void:
-    if not _action_popup.visible:
-        return
-    if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-        _close_popup()
-        get_viewport().set_input_as_handled()
-        return
-    if event is InputEventMouseButton \
-    and event.pressed \
-    and event.button_index == MOUSE_BUTTON_LEFT:
-        _close_popup()
-        get_viewport().set_input_as_handled()
+    _refresh_action_bar()
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
-func _on_item_clicked(display: ItemCard) -> void:
-    _open_popup(display)
-
-
-func _on_popup_cancelled() -> void:
-    _close_popup()
-
-
-func _on_potential_inspect() -> void:
-    if _active_item == null:
-        return
-    var entry: ItemEntry = _entry_for_display[_active_item]
-    if RunManager.run_record.stamina < ActionPopup.POTENTIAL_COST:
-        return
-    if RunManager.run_record.actions_remaining < 0:
-        return
-
-    RunManager.run_record.stamina -= ActionPopup.POTENTIAL_COST
-    RunManager.run_record.actions_remaining -= 1
-
-    entry.inspection_level += 0.5
-    _active_item.refresh(&"potential")
-    _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
-    _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
-    _action_popup.refresh(entry)
-
-
-func _on_condition_inspect() -> void:
-    if _active_item == null:
-        return
-    var entry: ItemEntry = _entry_for_display[_active_item]
-    if RunManager.run_record.stamina < ActionPopup.CONDITION_COST:
-        return
-    if RunManager.run_record.actions_remaining < 0:
-        return
-
-    RunManager.run_record.stamina -= ActionPopup.CONDITION_COST
-    RunManager.run_record.actions_remaining -= 1
-
-    entry.inspection_level += 0.5
-    _active_item.refresh(&"condition")
-    _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
-    _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
-    _action_popup.refresh(entry)
-
-
-func _on_xray_inspect() -> void:
-    if _active_item == null:
-        return
-    var entry: ItemEntry = _entry_for_display[_active_item]
-    if RunManager.run_record.stamina < ActionPopup.XRAY_COST:
+func _on_inspect_requested() -> void:
+    if RunManager.run_record.stamina < LotActionBar.INSPECT_COST:
         return
     if RunManager.run_record.actions_remaining <= 0:
         return
 
-    RunManager.run_record.stamina -= ActionPopup.XRAY_COST
+    RunManager.run_record.stamina -= LotActionBar.INSPECT_COST
     RunManager.run_record.actions_remaining -= 1
 
-    entry.unveil()
-    KnowledgeManager.add_category_points(
-        entry.item_data.category_data.category_id,
-        entry.item_data.rarity,
-        KnowledgeManager.KnowledgeAction.REVEAL,
-    )
-    _active_item.refresh(&"unveil")
+    var delta: float = 0.5 * _inspect_multiplier()
+    var hits: int = randi_range(1, MAX_INSPECT_HITS)
+
+    var pool: Array[ItemEntry] = []
+    for entry: ItemEntry in RunManager.run_record.lot_items:
+        if not entry.is_veiled() and not entry.is_fully_inspected():
+            pool.append(entry)
+
+    for i in range(hits):
+        if pool.is_empty():
+            break
+        var idx: int = randi() % pool.size()
+        var entry: ItemEntry = pool[idx]
+        entry.apply_inspect(delta)
+
+        var card: ItemCard = _card_for_entry[entry]
+        card.refresh(&"condition")
+        card.flash_border()
+
+        if entry.is_fully_inspected():
+            pool.remove_at(idx)
+
     _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
     _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
-    _action_popup.refresh(entry)
+    _refresh_action_bar()
+
+
+func _on_peek_requested() -> void:
+    if RunManager.run_record.stamina < LotActionBar.PEEK_COST:
+        return
+    if RunManager.run_record.actions_remaining <= 0:
+        return
+
+    RunManager.run_record.stamina -= LotActionBar.PEEK_COST
+    RunManager.run_record.actions_remaining -= 1
+
+    var success_chance: float = 1.0 if KnowledgeManager.has_perk("xray_inspect") else 0.5
+
+    for entry: ItemEntry in RunManager.run_record.lot_items:
+        if not entry.is_veiled():
+            continue
+        if randf() < success_chance:
+            entry.unveil()
+            KnowledgeManager.add_category_points(
+                entry.item_data.category_data.category_id,
+                entry.item_data.rarity,
+                KnowledgeManager.KnowledgeAction.REVEAL,
+            )
+            var card: ItemCard = _card_for_entry[entry]
+            card.refresh(&"unveil")
+            card.flash_border()
+
+    _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
+    _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
+    _refresh_action_bar()
 
 
 func _on_start_auction_pressed() -> void:
-    _close_popup()
     _list_review.populate()
     _list_review.show()
 
@@ -169,7 +151,6 @@ func _on_auction_entered() -> void:
 
 
 func _on_confirm_popup_confirmed() -> void:
-    _close_popup()
     if _pulse_tween:
         _pulse_tween.kill()
     GameManager.go_to_lot_browse()
@@ -189,29 +170,28 @@ func _populate_item_displays() -> void:
         display.custom_minimum_size = ITEM_SIZE
         display.setup(entry, _ctx)
 
-        display.clicked.connect(_on_item_clicked)
-
         _items_grid.add_child(display)
         _item_displays.append(display)
-        _entry_for_display[display] = entry
+        _card_for_entry[entry] = display
 
-# ══ Popup ═════════════════════════════════════════════════════════════════════
-
-
-func _open_popup(display: ItemCard) -> void:
-    _active_item = display
-    var entry: ItemEntry = _entry_for_display[display]
-    _action_popup.refresh(entry)
-
-    # Position popup directly below the item card
-    var rect := display.get_global_rect()
-    _action_popup.position = Vector2(rect.position.x, rect.position.y + rect.size.y + 6.0)
-    _action_popup.show()
+# ══ Action bar ════════════════════════════════════════════════════════════════
 
 
-func _close_popup() -> void:
-    _action_popup.hide()
-    _active_item = null
+func _refresh_action_bar() -> void:
+    var has_inspectable: bool = false
+    var has_veiled: bool = false
+    for entry: ItemEntry in RunManager.run_record.lot_items:
+        if entry.is_veiled():
+            has_veiled = true
+        elif not entry.is_fully_inspected():
+            has_inspectable = true
+    _action_bar.refresh_lot(has_inspectable, has_veiled)
+
+
+func _inspect_multiplier() -> float:
+    var appraisal_level: int = KnowledgeManager.get_level("appraisal")
+    var mastery_rank: int = KnowledgeManager.get_mastery_rank()
+    return 1.0 + pow(1.1, appraisal_level) * mastery_rank * 0.2
 
 # ══ Exit pulse ════════════════════════════════════════════════════════════════
 

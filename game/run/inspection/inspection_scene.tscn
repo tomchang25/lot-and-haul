@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bbr8kx3k0jv3c" path="res://game/run/inspection/inspection_scene.gd" id="1_idapx"]
 [ext_resource type="PackedScene" uid="uid://bstamhudtscn1" path="res://game/run/inspection/stamina_hud/stamina_hud.tscn" id="2_j573n"]
-[ext_resource type="PackedScene" uid="uid://bactpoptscn01" path="res://game/run/inspection/action_popup/action_popup.tscn" id="3_3483c"]
+[ext_resource type="PackedScene" uid="uid://blotactbar01" path="res://game/run/inspection/action_popup/lot_action_bar.tscn" id="3_3483c"]
 [ext_resource type="PackedScene" uid="uid://dbc6waemph2em" path="res://game/run/inspection/list_review/list_review_popup.tscn" id="4_icrf5"]
 
 [node name="InspectionScene" type="Control" unique_id=2043279360]
@@ -113,12 +113,19 @@ text = "Start Auction"
 visible = false
 layout_mode = 1
 
-[node name="ActionPopup" parent="." unique_id=615668654 instance=ExtResource("3_3483c")]
-visible = false
-z_index = 2
-layout_mode = 0
-offset_right = 170.0
-offset_bottom = 66.0
+[node name="LotActionBar" parent="HUD" unique_id=615668654 instance=ExtResource("3_3483c")]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -140.0
+offset_top = -116.0
+offset_right = 140.0
+offset_bottom = -72.0
+grow_horizontal = 2
+grow_vertical = 0
 
 [node name="StaminaHUD" parent="." unique_id=1666666860 instance=ExtResource("2_j573n")]
 layout_mode = 1

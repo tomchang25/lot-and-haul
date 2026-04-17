@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://blotactbar01"]
+
+[ext_resource type="Script" path="res://game/run/inspection/action_popup/lot_action_bar.gd" id="1_lotbar"]
+
+[node name="LotActionBar" type="PanelContainer" unique_id=77789669]
+custom_minimum_size = Vector2(40, 0)
+offset_right = 40.0
+script = ExtResource("1_lotbar")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=660494512]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="InspectButton" type="Button" parent="HBoxContainer" unique_id=1573260649]
+layout_mode = 2
+text = "Inspect (2 SP)"
+
+[node name="PeekButton" type="Button" parent="HBoxContainer" unique_id=2098776471]
+layout_mode = 2
+text = "Try to Peek (3 SP)"
