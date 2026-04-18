@@ -31,10 +31,10 @@ var inspection_level: float = 0.0
 # never assigned inside create() and never reassigned.
 var id: int = -1
 
-# Per-layer price bounds rolled once at lot draw.
-# Index matches identity_layers; deeper layers have wider gaps.
-var knowledge_min: Array[float] = []
-var knowledge_max: Array[float] = []
+# Rolled once at creation in [-0.5, 0.5]. Biases the estimated range away from
+# the true price at low inspection; its contribution scales to zero at max
+# inspection so the range always converges on the true value.
+var center_offset: float = 0.0
 
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
@@ -212,23 +212,24 @@ var estimated_value_min: int:
     get:
         if is_veiled():
             return 0
-        var cond_mult: float = get_known_condition_multiplier()
-        return int(active_layer().base_value * cond_mult * knowledge_min[layer_index])
+        return compute_price_range(ItemRegistry.price_config_with_estimated).x
 
 var estimated_value_max: int:
     get:
         if is_veiled():
             return 0
-        var cond_mult: float = get_known_condition_multiplier()
-        return int(active_layer().base_value * cond_mult * knowledge_max[layer_index])
+        return compute_price_range(ItemRegistry.price_config_with_estimated).y
 
 var estimated_value_label: String:
     get:
         if is_veiled():
             return "???"
-        if estimated_value_min == estimated_value_max:
-            return "$%d" % estimated_value_min
-        return "$%d - $%d" % [estimated_value_min, estimated_value_max]
+        var suffix: String = "" if is_at_final_layer() else "+"
+        var lo: int = estimated_value_min
+        var hi: int = estimated_value_max
+        if lo == hi:
+            return "$%d%s" % [lo, suffix]
+        return "$%d - $%d%s" % [lo, hi, suffix]
 
 
 # Unified pricing pipeline. Reads the active layer's base value, then
@@ -238,7 +239,10 @@ func compute_price(config: PriceConfig) -> int:
     var value: float = float(active_layer().base_value)
 
     if config.condition:
-        value *= get_condition_multiplier()
+        if config.use_known_condition:
+            value *= get_known_condition_multiplier()
+        else:
+            value *= get_condition_multiplier()
 
     if config.knowledge:
         var rank: int = KnowledgeManager.get_super_category_rank(
@@ -255,9 +259,41 @@ func compute_price(config: PriceConfig) -> int:
     return int(value)
 
 
-var appraised_value: int:
-    get:
-        return compute_price(ItemRegistry.price_config_with_appraisal)
+# Returns the estimated price range for the given config. The midpoint is
+# compute_price(config); the spread widens with lower inspection_level and
+# is biased by center_offset so identical items diverge until inspected.
+func compute_price_range(config: PriceConfig) -> Vector2i:
+    var base: float = float(compute_price(config))
+    var thresholds: Array[float] = _rarity_thresholds()
+    var max_threshold: float = thresholds[thresholds.size() - 1]
+    var progress: float = 1.0
+    if max_threshold > 0.0:
+        progress = clampf(inspection_level / max_threshold, 0.0, 1.0)
+    var spread: float = _max_spread() * (1.0 - progress)
+    var offset: float = center_offset * (1.0 - progress)
+    var range_min: float = 1.0 - spread + offset
+    var range_max: float = 1.0 + spread + offset
+    return Vector2i(int(base * range_min), int(base * range_max))
+
+
+# Rarity-keyed maximum range spread, in multiplier units around 1.0.
+# These are tuning knobs — adjust to taste.
+func _max_spread() -> float:
+    match item_data.rarity:
+        ItemData.Rarity.COMMON:
+            return 0.0
+        ItemData.Rarity.UNCOMMON:
+            return 0.5
+        ItemData.Rarity.RARE:
+            return 1.0
+        ItemData.Rarity.EPIC:
+            return 1.5
+        ItemData.Rarity.LEGENDARY:
+            return 2.0
+        _:
+            push_warning("ItemEntry: unexpected rarity %d" % item_data.rarity)
+            return 0.0
+
 
 var market_price: int:
     get:
@@ -268,10 +304,6 @@ var market_factor_delta: float:
         return MarketManager.get_category_factor(
             item_data.category_data.category_id,
         ) - 1.0
-
-var appraised_value_label: String:
-    get:
-        return "$%d" % appraised_value
 
 # ── Display colors ────────────────────────────────────────────────────────────
 
@@ -303,8 +335,8 @@ var price_color: Color:
 
 # ── Context-aware helpers ─────────────────────────────────────────────────────
 # The price helpers below are the only display functions that still take a
-# context, because they dispatch on stage (estimated / appraised / merchant /
-# order). Condition and rarity displays live on the properties above.
+# context, because they dispatch on stage (estimated / merchant / order).
+# Condition and rarity displays live on the properties above.
 
 
 # Bridge method — kept for ItemCard / ItemRowTooltip which dispatch on stage.
@@ -313,11 +345,10 @@ func price_label_for(ctx: ItemViewContext) -> String:
         ItemViewContext.Stage.INSPECTION, \
         ItemViewContext.Stage.LIST_REVIEW, \
         ItemViewContext.Stage.REVEAL, \
-        ItemViewContext.Stage.CARGO:
-            return estimated_value_label
+        ItemViewContext.Stage.CARGO, \
         ItemViewContext.Stage.RUN_REVIEW, \
         ItemViewContext.Stage.STORAGE:
-            return appraised_value_label
+            return estimated_value_label
         ItemViewContext.Stage.MERCHANT_SHOP:
             return merchant_offer_label(ctx.merchant)
         ItemViewContext.Stage.FULFILLMENT_PANEL:
@@ -333,11 +364,10 @@ func price_value_for(ctx: ItemViewContext) -> int:
         ItemViewContext.Stage.INSPECTION, \
         ItemViewContext.Stage.LIST_REVIEW, \
         ItemViewContext.Stage.REVEAL, \
-        ItemViewContext.Stage.CARGO:
-            return estimated_value_sort_value()
+        ItemViewContext.Stage.CARGO, \
         ItemViewContext.Stage.RUN_REVIEW, \
         ItemViewContext.Stage.STORAGE:
-            return appraised_value
+            return estimated_value_sort_value()
         ItemViewContext.Stage.MERCHANT_SHOP:
             return merchant_offer_value(ctx.merchant)
         ItemViewContext.Stage.FULFILLMENT_PANEL:
@@ -366,7 +396,7 @@ func merchant_offer_label(merchant: MerchantData) -> String:
 
 
 func merchant_offer_value(merchant: MerchantData) -> int:
-    return merchant.offer_for(self) if merchant else appraised_value
+    return merchant.offer_for(self) if merchant else market_price
 
 
 func special_order_label(order: SpecialOrder) -> String:
@@ -398,49 +428,19 @@ func is_at_final_layer() -> bool:
     return layer_index == item_data.identity_layers.size() - 1
 
 
-# Advances a veiled item (layer 0) to layer 1 and recalculates knowledge ranges
-# at the new layer depth. Shared by the reveal scene, the X-Ray inspect action,
-# and any other caller that needs to unveil an item mid-run.
-# The recalculated ranges are only accepted if the total spread is tighter
-# than the current ranges (same policy as KnowledgeManager.apply_market_research).
+# Advances a veiled item (layer 0) to layer 1. Shared by the reveal scene, the
+# X-Ray inspect action, and any other caller that needs to unveil an item
+# mid-run. The inspection-driven range already handles price resolution; this
+# function only moves the identity pointer.
 func unveil() -> void:
     if not is_veiled():
         return
-
     layer_index = 1
-
-    var super_cat_id: String = item_data.category_data.super_category.super_category_id
-    var layers_count: int = item_data.identity_layers.size()
-
-    var old_range: float = 0.0
-    for i in range(layers_count):
-        old_range += knowledge_max[i] - knowledge_min[i]
-
-    var new_min: Array[float] = []
-    var new_max: Array[float] = []
-    new_min.resize(layers_count)
-    new_max.resize(layers_count)
-    for i in range(layers_count):
-        var depth: int = maxi(0, i - layer_index)
-        var price_range: Vector2 = KnowledgeManager.get_price_range(
-            super_cat_id,
-            item_data.rarity,
-            depth,
-        )
-        new_min[i] = price_range.x
-        new_max[i] = price_range.y
-
-    var new_range: float = 0.0
-    for i in range(layers_count):
-        new_range += new_max[i] - new_min[i]
-
-    if new_range < old_range:
-        knowledge_min = new_min
-        knowledge_max = new_max
 
 
 func reveal() -> void:
-    inspection_level = maxf(inspection_level, 1.0)
+    var rank: int = KnowledgeManager.get_super_category_rank(item_data.category_data.super_category.super_category_id)
+    inspection_level = maxf(0.75 + float(rank) * 0.25, inspection_level)
 
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
@@ -450,20 +450,16 @@ static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
     entry.item_data = data
 
     entry.condition = randf()
+    entry.center_offset = randf_range(-0.5, 0.5)
 
     # Layer 0 = veiled. If veil does not apply, auto-advance to layer 1.
     var start_veiled := randf() < veil_chance
     entry.layer_index = 0 if start_veiled else 1
 
+    # Head start from category experience. Tunable — higher rank = more known.
     var super_cat_id: String = data.category_data.super_category.super_category_id
-    var layers_count: int = data.identity_layers.size()
-    entry.knowledge_min.resize(layers_count)
-    entry.knowledge_max.resize(layers_count)
-    for i in range(layers_count):
-        var depth: int = maxi(0, i - entry.layer_index)
-        var price_range: Vector2 = KnowledgeManager.get_price_range(super_cat_id, data.rarity, depth)
-        entry.knowledge_min[i] = price_range.x
-        entry.knowledge_max[i] = price_range.y
+    var rank: int = KnowledgeManager.get_super_category_rank(super_cat_id)
+    entry.inspection_level = 0.75 + float(rank) * 0.25
 
     return entry
 
@@ -471,20 +467,13 @@ static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
 
 
 func to_dict() -> Dictionary:
-    var km: Array = []
-    for v: float in knowledge_min:
-        km.append(v)
-    var kmax: Array = []
-    for v: float in knowledge_max:
-        kmax.append(v)
     return {
         "item_id": item_data.item_id,
         "id": id,
         "layer_index": layer_index,
         "condition": condition,
         "inspection_level": inspection_level,
-        "knowledge_min": km,
-        "knowledge_max": kmax,
+        "center_offset": center_offset,
     }
 
 
@@ -498,14 +487,12 @@ static func from_dict(d: Dictionary) -> ItemEntry:
     entry.layer_index = int(d["layer_index"])
     entry.condition = float(d["condition"])
     entry.inspection_level = _read_inspection_level(d)
-    var km: Array = d["knowledge_min"]
-    var kmax: Array = d["knowledge_max"]
-    entry.knowledge_min.resize(km.size())
-    entry.knowledge_max.resize(kmax.size())
-    for i in range(km.size()):
-        entry.knowledge_min[i] = float(km[i])
-    for i in range(kmax.size()):
-        entry.knowledge_max[i] = float(kmax[i])
+    if d.has("center_offset"):
+        entry.center_offset = float(d["center_offset"])
+    else:
+        # Migrate pre-range saves: roll a fresh offset so old items behave like
+        # new ones. Old knowledge_min/max are discarded.
+        entry.center_offset = randf_range(-0.5, 0.5)
     if d.has("id"):
         entry.id = int(d["id"])
     return entry

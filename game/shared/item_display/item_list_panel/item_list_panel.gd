@@ -122,8 +122,6 @@ static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewC
             return entry.get_known_condition_multiplier()
         ItemRow.Column.ESTIMATED_VALUE:
             return entry.estimated_value_sort_value()
-        ItemRow.Column.APPRAISED_VALUE:
-            return entry.appraised_value
         ItemRow.Column.BASE_VALUE:
             return entry.base_value_sort_value()
         ItemRow.Column.MERCHANT_OFFER:

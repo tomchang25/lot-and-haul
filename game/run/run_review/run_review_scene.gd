@@ -12,7 +12,7 @@ const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 const REVIEW_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
-    ItemRow.Column.APPRAISED_VALUE,
+    ItemRow.Column.ESTIMATED_VALUE,
     ItemRow.Column.RARITY,
 ]
 
@@ -142,7 +142,7 @@ func _populate_finance() -> void:
 
     var estimate_price: int = 0
     for entry: ItemEntry in _cargo_items:
-        estimate_price += entry.appraised_value
+        estimate_price += entry.compute_price(ItemRegistry.price_config_with_estimated)
     _estimate_price_label.text = "Est. Cargo Value:   $%d" % estimate_price
 
     var estimate_profit := overall + estimate_price

@@ -11,6 +11,11 @@ var condition: bool = false
 var knowledge: bool = false
 var market: bool = false
 
+# When true, compute_price reads the player's known condition multiplier
+# (bucket-resolved inference) instead of the true condition multiplier.
+# Only meaningful when `condition` is true.
+var use_known_condition: bool = false
+
 # Uniform scalar applied after all factor terms (e.g. SpecialOrder buff).
 var multiplier: float = 1.0
 
@@ -29,9 +34,10 @@ static func with_condition() -> PriceConfig:
     return cfg
 
 
-static func with_appraisal() -> PriceConfig:
+static func with_estimated() -> PriceConfig:
     var cfg := PriceConfig.new()
     cfg.condition = true
+    cfg.use_known_condition = true
     cfg.knowledge = true
     return cfg
 

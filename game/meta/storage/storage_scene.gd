@@ -11,26 +11,9 @@ const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 const STORAGE_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
-    ItemRow.Column.APPRAISED_VALUE,
+    ItemRow.Column.ESTIMATED_VALUE,
     ItemRow.Column.RARITY,
 ]
-
-# Market Research cost per rarity.
-const RESEARCH_COST: Dictionary = {
-    ItemData.Rarity.COMMON: 500,
-    ItemData.Rarity.UNCOMMON: 1000,
-    ItemData.Rarity.RARE: 2000,
-    ItemData.Rarity.EPIC: 4000,
-    ItemData.Rarity.LEGENDARY: 8000,
-}
-
-const RESEARCH_DAYS: Dictionary = {
-    ItemData.Rarity.COMMON: 1,
-    ItemData.Rarity.UNCOMMON: 2,
-    ItemData.Rarity.RARE: 3,
-    ItemData.Rarity.EPIC: 4,
-    ItemData.Rarity.LEGENDARY: 5,
-}
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
@@ -48,11 +31,9 @@ var _selected_entry: ItemEntry = null
 @onready var _action_item_label: Label = $ActionPopup/MarginContainer/VBoxContainer/ItemLabel
 @onready var _status_label: Label = $ActionPopup/MarginContainer/VBoxContainer/StatusLabel
 @onready var _unlock_btn: Button = $ActionPopup/MarginContainer/VBoxContainer/UnlockButton
-@onready var _research_btn: Button = $ActionPopup/MarginContainer/VBoxContainer/MarketResearchButton
 @onready var _popup_close_btn: Button = $ActionPopup/MarginContainer/VBoxContainer/CloseButton
 
 @onready var _unlock_confirm: ConfirmationDialog = $UnlockConfirm
-@onready var _research_confirm: ConfirmationDialog = $ResearchConfirm
 
 @onready var _action_slot_hud: Label = $ActionSlotHUD
 
@@ -67,9 +48,7 @@ func _ready() -> void:
     _back_btn.pressed.connect(_on_back_pressed)
     _popup_close_btn.pressed.connect(_action_popup.hide)
     _unlock_btn.pressed.connect(_on_unlock_pressed)
-    _research_btn.pressed.connect(_on_research_pressed)
     _unlock_confirm.confirmed.connect(_on_unlock_confirmed)
-    _research_confirm.confirmed.connect(_on_research_confirmed)
 
     _item_list_panel.row_pressed.connect(_on_row_pressed)
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
@@ -105,13 +84,6 @@ func _on_unlock_pressed() -> void:
     _unlock_confirm.popup_centered()
 
 
-func _on_research_pressed() -> void:
-    if _selected_entry == null:
-        return
-    _action_popup.hide()
-    _research_confirm.popup_centered()
-
-
 func _on_unlock_confirmed() -> void:
     var entry: ItemEntry = _selected_entry
     if entry == null:
@@ -126,26 +98,6 @@ func _on_unlock_confirmed() -> void:
         days,
     )
     SaveManager.active_actions.append(action.to_dict())
-    SaveManager.save()
-    _refresh_row(entry)
-    _refresh_action_slot_hud()
-
-
-func _on_research_confirmed() -> void:
-    var entry: ItemEntry = _selected_entry
-    if entry == null:
-        return
-    var cost: int = RESEARCH_COST.get(entry.item_data.rarity, 500)
-    if SaveManager.cash < cost:
-        return
-    var days: int = RESEARCH_DAYS.get(entry.item_data.rarity, 1)
-    var action := ActiveActionEntry.create(
-        ActiveActionEntry.ActionType.MARKET_RESEARCH,
-        entry.id,
-        days,
-    )
-    SaveManager.active_actions.append(action.to_dict())
-    SaveManager.cash -= cost
     SaveManager.save()
     _refresh_row(entry)
     _refresh_action_slot_hud()
@@ -204,8 +156,6 @@ func _get_in_progress_action(entry: ItemEntry) -> Dictionary:
 
 func _action_type_label(action_type_string: String) -> String:
     match action_type_string:
-        "market_research":
-            return "Market Research"
         "unlock":
             return "Unlock"
         _:
@@ -239,23 +189,6 @@ func _show_action_popup(entry: ItemEntry) -> void:
     else:
         _unlock_btn.disabled = false
         _unlock_btn.tooltip_text = ""
-
-    # Market Research button — hidden only for veiled items
-    if not entry.is_veiled():
-        var cost: int = RESEARCH_COST.get(entry.item_data.rarity, 500)
-        _research_btn.visible = true
-        _research_btn.text = "Market Research — $%d" % cost
-        if block != "":
-            _research_btn.disabled = true
-            _research_btn.tooltip_text = block
-        elif SaveManager.cash < cost:
-            _research_btn.disabled = true
-            _research_btn.tooltip_text = "Not enough cash ($%d needed, $%d available)" % [cost, SaveManager.cash]
-        else:
-            _research_btn.disabled = false
-            _research_btn.tooltip_text = ""
-    else:
-        _research_btn.visible = false
 
     _action_popup.popup_centered()
 

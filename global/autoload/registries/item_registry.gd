@@ -12,7 +12,7 @@ var _items_by_id: Dictionary = { } # item_id → ItemData
 
 var price_config_plain: PriceConfig = null
 var price_config_with_condition: PriceConfig = null
-var price_config_with_appraisal: PriceConfig = null
+var price_config_with_estimated: PriceConfig = null
 var price_config_with_market: PriceConfig = null
 
 
@@ -36,7 +36,7 @@ func validate() -> bool:
 func _build_price_config_presets() -> void:
     price_config_plain = PriceConfig.plain()
     price_config_with_condition = PriceConfig.with_condition()
-    price_config_with_appraisal = PriceConfig.with_appraisal()
+    price_config_with_estimated = PriceConfig.with_estimated()
     price_config_with_market = PriceConfig.with_market()
 
 
