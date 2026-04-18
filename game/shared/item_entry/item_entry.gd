@@ -12,6 +12,30 @@ const CONDITION_THRESHOLDS: Array[float] = [0.0, 1.0, 2.0]
 # Display names indexed by ItemData.Rarity enum value.
 const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
 
+# Per-rarity inspection threshold ladders. Each entry feeds _bucket_index.
+# Add a new rarity by adding one entry here (and one in MAX_SPREADS).
+const RARITY_THRESHOLDS: Dictionary = {
+    ItemData.Rarity.COMMON: [0.0, 1.0],
+    ItemData.Rarity.UNCOMMON: [0.0, 1.0, 2.0],
+    ItemData.Rarity.RARE: [0.0, 1.0, 2.0, 4.0],
+    ItemData.Rarity.EPIC: [0.0, 1.0, 2.0, 4.0],
+    ItemData.Rarity.LEGENDARY: [0.0, 1.0, 2.0, 4.0],
+}
+
+# Per-rarity maximum range spread, in multiplier units around 1.0.
+# Tuning knobs — adjust to taste.
+const MAX_SPREADS: Dictionary = {
+    ItemData.Rarity.COMMON: 0.0,
+    ItemData.Rarity.UNCOMMON: 0.5,
+    ItemData.Rarity.RARE: 1.0,
+    ItemData.Rarity.EPIC: 1.5,
+    ItemData.Rarity.LEGENDARY: 2.0,
+}
+
+# Inspection-level head-start formula: INSPECTION_BASE + rank * INSPECTION_PER_RANK.
+const INSPECTION_BASE: float = 0.75
+const INSPECTION_PER_RANK: float = 0.25
+
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var item_data: ItemData = null
@@ -175,20 +199,13 @@ func apply_inspect(delta: float) -> void:
 
 
 func _rarity_thresholds() -> Array[float]:
-    match item_data.rarity:
-        ItemData.Rarity.COMMON:
-            return [0.0, 1.0]
-        ItemData.Rarity.UNCOMMON:
-            return [0.0, 1.0, 2.0]
-        ItemData.Rarity.RARE:
-            return [0.0, 1.0, 2.0, 4.0]
-        ItemData.Rarity.EPIC:
-            return [0.0, 1.0, 2.0, 4.0]
-        ItemData.Rarity.LEGENDARY:
-            return [0.0, 1.0, 2.0, 4.0]
-        _:
-            push_warning("ItemEntry: unexpected rarity %d" % item_data.rarity)
-            return [0.0]
+    var key: int = item_data.rarity
+    if not RARITY_THRESHOLDS.has(key):
+        push_warning("ItemEntry: unexpected rarity %d" % key)
+        return [0.0]
+    var result: Array[float] = []
+    result.assign(RARITY_THRESHOLDS[key])
+    return result
 
 
 func _true_rarity_name() -> String:
@@ -212,13 +229,13 @@ var estimated_value_min: int:
     get:
         if is_veiled():
             return 0
-        return compute_price_range(ItemRegistry.price_config_with_estimated).x
+        return compute_price_range(ItemRegistry.price_config_with_estimated)[0]
 
 var estimated_value_max: int:
     get:
         if is_veiled():
             return 0
-        return compute_price_range(ItemRegistry.price_config_with_estimated).y
+        return compute_price_range(ItemRegistry.price_config_with_estimated)[1]
 
 var estimated_value_label: String:
     get:
@@ -259,10 +276,12 @@ func compute_price(config: PriceConfig) -> int:
     return int(value)
 
 
-# Returns the estimated price range for the given config. The midpoint is
-# compute_price(config); the spread widens with lower inspection_level and
-# is biased by center_offset so identical items diverge until inspected.
-func compute_price_range(config: PriceConfig) -> Vector2i:
+# Returns the estimated price range as [min, max] for the given config. The
+# midpoint is compute_price(config); the spread widens with lower
+# inspection_level and is biased by center_offset so identical items diverge
+# until inspected. Both ends are clamped to a minimum of 1 so the UI never
+# shows $0 or a negative price.
+func compute_price_range(config: PriceConfig) -> Array[int]:
     var base: float = float(compute_price(config))
     var thresholds: Array[float] = _rarity_thresholds()
     var max_threshold: float = thresholds[thresholds.size() - 1]
@@ -273,26 +292,18 @@ func compute_price_range(config: PriceConfig) -> Vector2i:
     var offset: float = center_offset * (1.0 - progress)
     var range_min: float = 1.0 - spread + offset
     var range_max: float = 1.0 + spread + offset
-    return Vector2i(int(base * range_min), int(base * range_max))
+    var result: Array[int] = []
+    result.append(maxi(1, int(base * range_min)))
+    result.append(maxi(1, int(base * range_max)))
+    return result
 
 
-# Rarity-keyed maximum range spread, in multiplier units around 1.0.
-# These are tuning knobs — adjust to taste.
 func _max_spread() -> float:
-    match item_data.rarity:
-        ItemData.Rarity.COMMON:
-            return 0.0
-        ItemData.Rarity.UNCOMMON:
-            return 0.5
-        ItemData.Rarity.RARE:
-            return 1.0
-        ItemData.Rarity.EPIC:
-            return 1.5
-        ItemData.Rarity.LEGENDARY:
-            return 2.0
-        _:
-            push_warning("ItemEntry: unexpected rarity %d" % item_data.rarity)
-            return 0.0
+    var key: int = item_data.rarity
+    if not MAX_SPREADS.has(key):
+        push_warning("ItemEntry: unexpected rarity %d" % key)
+        return 0.0
+    return MAX_SPREADS[key]
 
 
 var market_price: int:
@@ -440,7 +451,13 @@ func unveil() -> void:
 
 func reveal() -> void:
     var rank: int = KnowledgeManager.get_super_category_rank(item_data.category_data.super_category.super_category_id)
-    inspection_level = maxf(0.75 + float(rank) * 0.25, inspection_level)
+    inspection_level = maxf(_rank_inspection_level(rank), inspection_level)
+
+
+# Head-start inspection level granted by the player's category rank. Shared by
+# create() (initial value) and reveal() (post-unveil floor).
+static func _rank_inspection_level(rank: int) -> float:
+    return INSPECTION_BASE + float(rank) * INSPECTION_PER_RANK
 
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
@@ -459,7 +476,7 @@ static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
     # Head start from category experience. Tunable — higher rank = more known.
     var super_cat_id: String = data.category_data.super_category.super_category_id
     var rank: int = KnowledgeManager.get_super_category_rank(super_cat_id)
-    entry.inspection_level = 0.75 + float(rank) * 0.25
+    entry.inspection_level = _rank_inspection_level(rank)
 
     return entry
 
