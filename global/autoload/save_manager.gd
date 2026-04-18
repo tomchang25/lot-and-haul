@@ -118,7 +118,7 @@ func _read_save_file() -> void:
     if parsed.has("active_actions") and parsed["active_actions"] is Array:
         active_actions = []
         for d: Variant in parsed["active_actions"]:
-            if d is Dictionary:
+            if d is Dictionary and d.get("action_type", "") != "market_research":
                 active_actions.append(d)
     if parsed.has("available_location_ids") and parsed["available_location_ids"] is Array:
         available_location_ids = []
@@ -285,8 +285,6 @@ func _apply_action_effect(action: ActiveActionEntry) -> void:
     if entry == null:
         return
     match action.action_type:
-        ActiveActionEntry.ActionType.MARKET_RESEARCH:
-            KnowledgeManager.apply_market_research(entry)
         ActiveActionEntry.ActionType.UNLOCK:
             entry.layer_index += 1
             KnowledgeManager.add_category_points(
@@ -305,8 +303,6 @@ func _find_storage_entry(item_id: int) -> ItemEntry:
 
 func _action_effect_label(type: ActiveActionEntry.ActionType) -> String:
     match type:
-        ActiveActionEntry.ActionType.MARKET_RESEARCH:
-            return "Market Research done"
         ActiveActionEntry.ActionType.UNLOCK:
             return "Layer unlocked"
     return "Done"

@@ -23,7 +23,6 @@ enum Column {
     NAME,
     CONDITION,
     ESTIMATED_VALUE,
-    APPRAISED_VALUE,
     BASE_VALUE,
     MERCHANT_OFFER,
     SPECIAL_ORDER,
@@ -40,7 +39,6 @@ const COLUMN_HEADERS: Dictionary = {
     Column.NAME: "Item",
     Column.CONDITION: "Condition",
     Column.ESTIMATED_VALUE: "Est. Value",
-    Column.APPRAISED_VALUE: "Appraised Value",
     Column.BASE_VALUE: "Base Value",
     Column.MERCHANT_OFFER: "",
     Column.SPECIAL_ORDER: "Order Price",
@@ -54,7 +52,6 @@ const COLUMN_MIN_WIDTH: Dictionary = {
     Column.NAME: 0,
     Column.CONDITION: 120,
     Column.ESTIMATED_VALUE: 160,
-    Column.APPRAISED_VALUE: 160,
     Column.BASE_VALUE: 160,
     Column.MERCHANT_OFFER: 160,
     Column.SPECIAL_ORDER: 160,
@@ -77,7 +74,6 @@ var _selection_state: SelectionState = SelectionState.NONE
 @onready var _name_label: Label = $HBoxContainer/NameLabel
 @onready var _condition_label: Label = $HBoxContainer/ConditionLabel
 @onready var _estimated_value_label: Label = $HBoxContainer/EstimatedValueLabel
-@onready var _appraised_value_label: Label = $HBoxContainer/AppraisedValueLabel
 @onready var _base_value_label: Label = $HBoxContainer/BaseValueLabel
 @onready var _merchant_offer_label: Label = $HBoxContainer/MerchantOfferLabel
 @onready var _special_order_label: Label = $HBoxContainer/SpecialOrderLabel
@@ -140,11 +136,10 @@ static func get_price_header(ctx: ItemViewContext) -> String:
         ItemViewContext.Stage.INSPECTION, \
         ItemViewContext.Stage.LIST_REVIEW, \
         ItemViewContext.Stage.REVEAL, \
-        ItemViewContext.Stage.CARGO:
-            return "Est. Value"
+        ItemViewContext.Stage.CARGO, \
         ItemViewContext.Stage.RUN_REVIEW, \
         ItemViewContext.Stage.STORAGE:
-            return "Appraised Value"
+            return "Est. Value"
         ItemViewContext.Stage.MERCHANT_SHOP:
             return "%s Offer" % ctx.merchant.display_name if ctx.merchant else "Offer"
         ItemViewContext.Stage.FULFILLMENT_PANEL:
@@ -176,7 +171,6 @@ func _refresh() -> void:
     _name_label.visible = Column.NAME in _columns
     _condition_label.visible = Column.CONDITION in _columns
     _estimated_value_label.visible = Column.ESTIMATED_VALUE in _columns
-    _appraised_value_label.visible = Column.APPRAISED_VALUE in _columns
     _base_value_label.visible = Column.BASE_VALUE in _columns
     _merchant_offer_label.visible = Column.MERCHANT_OFFER in _columns
     _special_order_label.visible = Column.SPECIAL_ORDER in _columns
@@ -198,10 +192,6 @@ func _refresh() -> void:
     # ── ESTIMATED_VALUE ────────────────────────────────────────────────────────
     _estimated_value_label.text = _entry.estimated_value_label
     _estimated_value_label.add_theme_color_override(&"font_color", _entry.price_color)
-
-    # ── APPRAISED_VALUE ────────────────────────────────────────────────────────
-    _appraised_value_label.text = _entry.appraised_value_label
-    _appraised_value_label.add_theme_color_override(&"font_color", _entry.price_color)
 
     # ── BASE_VALUE ─────────────────────────────────────────────────────────────
     _base_value_label.text = _entry.base_value_label_text()
@@ -238,7 +228,6 @@ func _apply_column_order() -> void:
         Column.NAME: _name_label,
         Column.CONDITION: _condition_label,
         Column.ESTIMATED_VALUE: _estimated_value_label,
-        Column.APPRAISED_VALUE: _appraised_value_label,
         Column.BASE_VALUE: _base_value_label,
         Column.MERCHANT_OFFER: _merchant_offer_label,
         Column.SPECIAL_ORDER: _special_order_label,

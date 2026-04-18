@@ -14,7 +14,7 @@ const NegotiationDialogScene: PackedScene = preload(
 const SHOP_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
-    ItemRow.Column.APPRAISED_VALUE,
+    ItemRow.Column.ESTIMATED_VALUE,
     ItemRow.Column.MERCHANT_OFFER,
     ItemRow.Column.MARKET_FACTOR,
     ItemRow.Column.RARITY,

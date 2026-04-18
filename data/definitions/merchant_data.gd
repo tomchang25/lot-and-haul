@@ -22,7 +22,7 @@ extends Resource
 
 # ── Pricing ──────────────────────────────────────────────────────────────────
 
-# Multiplier applied to appraised_value for items in accepted super-categories.
+# Multiplier applied to market_price for items in accepted super-categories.
 @export var price_multiplier: float = 1.0
 
 # ── Off-category handling ────────────────────────────────────────────────────

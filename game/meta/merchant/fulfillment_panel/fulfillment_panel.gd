@@ -11,7 +11,7 @@ const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 const PANEL_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
-    ItemRow.Column.APPRAISED_VALUE,
+    ItemRow.Column.ESTIMATED_VALUE,
     ItemRow.Column.SPECIAL_ORDER,
 ]
 

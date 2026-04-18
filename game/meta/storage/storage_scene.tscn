@@ -123,11 +123,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Unlock Next Layer"
 
-[node name="MarketResearchButton" type="Button" parent="ActionPopup/MarginContainer/VBoxContainer" unique_id=2000000025]
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "Market Research"
-
 [node name="CloseButton" type="Button" parent="ActionPopup/MarginContainer/VBoxContainer" unique_id=2000000026]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
@@ -136,7 +131,3 @@ text = "Close"
 [node name="UnlockConfirm" type="ConfirmationDialog" parent="." unique_id=2000000027]
 title = "Unlock Layer?"
 dialog_text = "Perform research to advance this item's identity?"
-
-[node name="ResearchConfirm" type="ConfirmationDialog" parent="." unique_id=2000000028]
-title = "Market Research?"
-dialog_text = "Spend cash to attempt a narrower price estimate?"

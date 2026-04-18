@@ -1,15 +1,14 @@
 # active_action_entry.gd
-# Runtime representation of one queued hub action (market research or unlock).
+# Runtime representation of one queued hub action.
 # Deserialised from SaveManager.active_actions on load; serialised back on save.
 class_name ActiveActionEntry
 extends RefCounted
 
 enum ActionType {
-    MARKET_RESEARCH,
     UNLOCK,
 }
 
-var action_type: ActionType = ActionType.MARKET_RESEARCH
+var action_type: ActionType = ActionType.UNLOCK
 var item_id: int = -1 # matches ItemEntry.id of the target item
 var days_remaining: int = 0
 
@@ -25,8 +24,6 @@ static func create(type: ActionType, id: int, days: int) -> ActiveActionEntry:
 # Returns the string key used when serialising to SaveManager.active_actions.
 static func action_type_to_string(type: ActionType) -> String:
     match type:
-        ActionType.MARKET_RESEARCH:
-            return "market_research"
         ActionType.UNLOCK:
             return "unlock"
         _:
@@ -35,16 +32,14 @@ static func action_type_to_string(type: ActionType) -> String:
 
 
 # Returns ActionType from the string key stored in save data.
-# Returns MARKET_RESEARCH and pushes an error on unrecognised input.
+# Returns UNLOCK and pushes an error on unrecognised input.
 static func action_type_from_string(s: String) -> ActionType:
     match s:
-        "market_research":
-            return ActionType.MARKET_RESEARCH
         "unlock":
             return ActionType.UNLOCK
         _:
             push_error("ActiveActionEntry: unrecognised action_type string '%s'" % s)
-            return ActionType.MARKET_RESEARCH
+            return ActionType.UNLOCK
 
 
 func to_dict() -> Dictionary:
@@ -57,7 +52,7 @@ func to_dict() -> Dictionary:
 
 static func from_dict(d: Dictionary) -> ActiveActionEntry:
     var a := ActiveActionEntry.new()
-    a.action_type = action_type_from_string(d.get("action_type", "market_research"))
+    a.action_type = action_type_from_string(d.get("action_type", "unlock"))
     a.item_id = int(d.get("item_id", -1))
     a.days_remaining = int(d.get("days_remaining", 0))
     return a
