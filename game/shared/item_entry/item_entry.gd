@@ -439,7 +439,8 @@ func unveil() -> void:
 
 
 func reveal() -> void:
-    inspection_level = maxf(inspection_level, 1.0)
+    var rank: int = KnowledgeManager.get_super_category_rank(item_data.category_data.super_category.super_category_id)
+    inspection_level = maxf(0.75 + float(rank) * 0.25, inspection_level)
 
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
@@ -458,7 +459,7 @@ static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
     # Head start from category experience. Tunable — higher rank = more known.
     var super_cat_id: String = data.category_data.super_category.super_category_id
     var rank: int = KnowledgeManager.get_super_category_rank(super_cat_id)
-    entry.inspection_level = float(rank) * 0.1
+    entry.inspection_level = 0.75 + float(rank) * 0.25
 
     return entry
 
