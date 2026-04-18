@@ -209,10 +209,8 @@ func _refresh() -> void:
     _rarity_label.text = "???" if _entry.is_veiled() else _entry.get_potential_rating()
 
     # ── WEIGHT / GRID ─────────────────────────────────────────────────────────
-    if _entry.item_data != null and _entry.item_data.category_data != null:
-        var category: CategoryData = _entry.item_data.category_data
-        _weight_label.text = "%.1f kg" % category.weight
-        _grid_label.text = "%d  %s" % [category.get_cells().size(), category.shape_id]
+    _weight_label.text = "%.1f kg" % _entry.weight
+    _grid_label.text = "%d  %s" % [_entry.grid_cells.size(), _entry.shape_id]
 
     # ── MARKET FACTOR ─────────────────────────────────────────────────────────
     _market_factor_label.text = "%+d%%" % int(round(_entry.market_factor_delta * 100))

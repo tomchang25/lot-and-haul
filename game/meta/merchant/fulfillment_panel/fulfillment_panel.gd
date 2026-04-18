@@ -126,7 +126,7 @@ func _on_confirm_pressed() -> void:
     for entry: ItemEntry in consumed:
         SaveManager.storage_items.erase(entry)
         KnowledgeManager.add_category_points(
-            entry.item_data.category_data.category_id,
+            entry.category_id,
             entry.item_data.rarity,
             KnowledgeManager.KnowledgeAction.SELL,
         )

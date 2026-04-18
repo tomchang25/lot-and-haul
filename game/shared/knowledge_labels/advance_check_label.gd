@@ -15,7 +15,7 @@ static func describe(check: int, action: LayerUnlockAction, entry: ItemEntry) ->
         KnowledgeManager.AdvanceCheck.WRONG_CONTEXT:
             return "Must be performed at home"
         KnowledgeManager.AdvanceCheck.INSUFFICIENT_CATEGORY_RANK:
-            var cat_name: String = entry.item_data.category_data.display_name
+            var cat_name: String = entry.category_display_name
             return "Need %s rank %d" % [cat_name, action.required_category_rank]
         KnowledgeManager.AdvanceCheck.INSUFFICIENT_SKILL:
             var skill_name: String = action.required_skill.display_name if action.required_skill != null else "Unknown"

@@ -24,15 +24,14 @@ func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
     _display_name_label.show()
 
     # ── Always-visible: category identity ────────────────────────────────────
-    if entry.item_data != null and entry.item_data.category_data != null:
-        var cat := entry.item_data.category_data
-        _super_category_label.text = cat.super_category.display_name \
-        if cat.super_category != null else ""
-        _super_category_label.visible = cat.super_category != null
-        _category_label.text = cat.display_name
+    var sc: SuperCategoryData = entry.super_category
+    _super_category_label.text = sc.display_name if sc != null else ""
+    _super_category_label.visible = sc != null
+
+    if entry.category_data != null:
+        _category_label.text = entry.category_display_name
         _category_label.visible = true
     else:
-        _super_category_label.hide()
         _category_label.hide()
 
     # ── Conditional: condition detail ────────────────────────────────────────
@@ -58,14 +57,13 @@ func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
 
     _cargo_separator.visible = has_inspect_data # only show divider when above rows exist
 
-    if entry.item_data != null and entry.item_data.category_data != null:
-        var cat := entry.item_data.category_data
-        var cell_count: int = cat.get_cells().size()
-        _weight_label.text = "Weight:  %.1f kg" % cat.weight
+    if entry.category_data != null:
+        var cell_count: int = entry.grid_cells.size()
+        _weight_label.text = "Weight:  %.1f kg" % entry.weight
         _grid_label.text = "Grid:  %d slot%s  (%s)" % [
             cell_count,
             "s" if cell_count != 1 else "",
-            cat.shape_id,
+            entry.shape_id,
         ]
         _weight_label.show()
         _grid_label.show()

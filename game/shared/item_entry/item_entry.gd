@@ -62,8 +62,62 @@ var center_offset: float = 0.0
 
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
+# ── Safe chain accessors ─────────────────────────────────────────────────────
+# Short-hand getters that null-guard the item_data → category_data →
+# super_category chain. Return safe defaults when any link is missing so
+# consumers never crash on incomplete data.
+
+var category_data: CategoryData:
+    get:
+        return item_data.category_data if item_data != null else null
+
+var super_category: SuperCategoryData:
+    get:
+        var cat: CategoryData = category_data
+        return cat.super_category if cat != null else null
+
+var category_id: String:
+    get:
+        var cat: CategoryData = category_data
+        return cat.category_id if cat != null else ""
+
+var super_category_id: String:
+    get:
+        var sc: SuperCategoryData = super_category
+        return sc.super_category_id if sc != null else ""
+
+var category_display_name: String:
+    get:
+        var cat: CategoryData = category_data
+        return cat.display_name if cat != null else ""
+
+var super_category_display_name: String:
+    get:
+        var sc: SuperCategoryData = super_category
+        return sc.display_name if sc != null else ""
+
+var weight: float:
+    get:
+        var cat: CategoryData = category_data
+        return cat.weight if cat != null else 0.0
+
+var shape_id: String:
+    get:
+        var cat: CategoryData = category_data
+        return cat.shape_id if cat != null else "s1x1"
+
+var grid_cells: Array[Vector2i]:
+    get:
+        var cat: CategoryData = category_data
+        if cat == null:
+            var empty: Array[Vector2i] = []
+            return empty
+        return cat.get_cells()
+
 var display_name: String:
     get:
+        if item_data == null:
+            return ""
         var name: String = active_layer().display_name
         if is_at_final_layer() and not is_veiled():
             return "%s ·" % name
@@ -72,7 +126,7 @@ var display_name: String:
 # Condition label shown to the player, keyed off the current inspect bucket.
 var condition_label: String:
     get:
-        if is_veiled():
+        if item_data == null or is_veiled():
             return ""
 
         match get_condition_bucket():
@@ -94,7 +148,7 @@ var condition_label: String:
 
 var condition_mult_label: String:
     get:
-        if is_veiled():
+        if item_data == null or is_veiled():
             return "×?"
         match get_condition_bucket():
             0:
@@ -109,6 +163,8 @@ var condition_mult_label: String:
 
 var potential_label: String:
     get:
+        if item_data == null:
+            return ""
         if is_veiled():
             return "Veiled"
         return get_potential_rating()
@@ -192,7 +248,7 @@ func is_fully_inspected() -> bool:
 func apply_inspect(delta: float) -> void:
     inspection_level += delta
     KnowledgeManager.add_category_points(
-        item_data.category_data.category_id,
+        category_id,
         item_data.rarity,
         KnowledgeManager.KnowledgeAction.INSPECT,
     )
@@ -227,18 +283,20 @@ static func _bucket_index(level: float, thresholds: Array[float]) -> int:
 
 var estimated_value_min: int:
     get:
-        if is_veiled():
+        if item_data == null or is_veiled():
             return 0
         return compute_price_range(ItemRegistry.price_config_with_estimated)[0]
 
 var estimated_value_max: int:
     get:
-        if is_veiled():
+        if item_data == null or is_veiled():
             return 0
         return compute_price_range(ItemRegistry.price_config_with_estimated)[1]
 
 var estimated_value_label: String:
     get:
+        if item_data == null:
+            return ""
         if is_veiled():
             return "???"
         var suffix: String = "" if is_at_final_layer() else "+"
@@ -262,15 +320,11 @@ func compute_price(config: PriceConfig) -> int:
             value *= get_condition_multiplier()
 
     if config.knowledge:
-        var rank: int = KnowledgeManager.get_super_category_rank(
-            item_data.category_data.super_category.super_category_id,
-        )
+        var rank: int = KnowledgeManager.get_super_category_rank(super_category_id)
         value *= 1.0 + 0.01 * rank
 
     if config.market:
-        value *= MarketManager.get_category_factor(
-            item_data.category_data.category_id,
-        )
+        value *= MarketManager.get_category_factor(category_id)
 
     value *= config.multiplier
     return int(value)
@@ -312,9 +366,7 @@ var market_price: int:
 
 var market_factor_delta: float:
     get:
-        return MarketManager.get_category_factor(
-            item_data.category_data.category_id,
-        ) - 1.0
+        return MarketManager.get_category_factor(category_id) - 1.0
 
 # ── Display colors ────────────────────────────────────────────────────────────
 
@@ -322,7 +374,7 @@ var market_factor_delta: float:
 ## Unknown (veiled or bucket 0) → neutral grey. Known → banded by true condition.
 var condition_color: Color:
     get:
-        if is_veiled() or get_condition_bucket() == 0:
+        if item_data == null or is_veiled() or get_condition_bucket() == 0:
             return Color(0.5, 0.5, 0.5)
         if condition >= 0.8:
             return Color.GOLD
@@ -342,7 +394,9 @@ const PRICE_UNKNOWN_COLOR := Color(0.6, 0.6, 0.6)
 ## Returns the correct color for price labels.
 var price_color: Color:
     get:
-        return PRICE_UNKNOWN_COLOR if is_veiled() else PRICE_COLOR
+        if item_data == null or is_veiled():
+            return PRICE_UNKNOWN_COLOR
+        return PRICE_COLOR
 
 # ── Context-aware helpers ─────────────────────────────────────────────────────
 # The price helpers below are the only display functions that still take a
@@ -450,7 +504,7 @@ func unveil() -> void:
 
 
 func reveal() -> void:
-    var rank: int = KnowledgeManager.get_super_category_rank(item_data.category_data.super_category.super_category_id)
+    var rank: int = KnowledgeManager.get_super_category_rank(super_category_id)
     inspection_level = maxf(_rank_inspection_level(rank), inspection_level)
 
 

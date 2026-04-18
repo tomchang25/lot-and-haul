@@ -29,7 +29,7 @@ static func create(pool_entry: SpecialOrderSlotPoolEntry) -> OrderSlot:
 
 
 func accepts(entry: ItemEntry) -> bool:
-    if entry.item_data.category_data != category:
+    if entry.category_data != category:
         return false
     if min_rarity >= 0 and entry.item_data.rarity < min_rarity:
         return false

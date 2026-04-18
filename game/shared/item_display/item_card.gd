@@ -65,17 +65,17 @@ func _apply_veiled() -> void:
 
 
 func _apply_unveiled() -> void:
-    if _entry.item_data != null and _entry.item_data.category_data != null:
-        var cat := _entry.item_data.category_data
-        if cat.super_category != null:
-            _super_category_label.text = cat.super_category.display_name
-            _super_category_label.show()
-        else:
-            _super_category_label.hide()
-        _category_label.text = cat.display_name
-        _category_label.show()
+    var sc: SuperCategoryData = _entry.super_category
+    if sc != null:
+        _super_category_label.text = sc.display_name
+        _super_category_label.show()
     else:
         _super_category_label.hide()
+
+    if _entry.category_data != null:
+        _category_label.text = _entry.category_display_name
+        _category_label.show()
+    else:
         _category_label.hide()
 
     _potential_label.text = _entry.potential_label
@@ -90,14 +90,13 @@ func _apply_unveiled() -> void:
     _price_label.add_theme_color_override(&"font_color", _entry.price_color)
     _price_label.show()
 
-    if _entry.item_data != null and _entry.item_data.category_data != null:
-        var cat := _entry.item_data.category_data
-        var cell_count: int = cat.get_cells().size()
-        _weight_label.text = "%.1f kg" % cat.weight
+    if _entry.category_data != null:
+        var cell_count: int = _entry.grid_cells.size()
+        _weight_label.text = "%.1f kg" % _entry.weight
         _grid_label.text = "%d slot%s  (%s)" % [
             cell_count,
             "s" if cell_count != 1 else "",
-            cat.shape_id,
+            _entry.shape_id,
         ]
         _weight_label.show()
         _grid_label.show()

@@ -169,7 +169,7 @@ func can_advance(entry: ItemEntry, context: LayerUnlockAction.ActionContext) -> 
         return AdvanceCheck.WRONG_CONTEXT
 
     if action.required_category_rank > 0:
-        if get_category_rank(entry.item_data.category_data.category_id) < action.required_category_rank:
+        if get_category_rank(entry.category_id) < action.required_category_rank:
             return AdvanceCheck.INSUFFICIENT_CATEGORY_RANK
 
     if action.required_skill != null:

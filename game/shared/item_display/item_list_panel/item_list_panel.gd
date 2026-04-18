@@ -135,13 +135,9 @@ static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewC
                 return entry.item_data.rarity
             return entry.get_rarity_bucket()
         ItemRow.Column.WEIGHT:
-            if entry.item_data == null or entry.item_data.category_data == null:
-                return 0.0
-            return entry.item_data.category_data.weight
+            return entry.weight
         ItemRow.Column.GRID:
-            if entry.item_data == null or entry.item_data.category_data == null:
-                return 0
-            return entry.item_data.category_data.get_cells().size()
+            return entry.grid_cells.size()
         ItemRow.Column.MARKET_FACTOR:
             return entry.market_factor_delta
         _:

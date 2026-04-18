@@ -339,7 +339,7 @@ func _populate_temp_storage() -> void:
 
 
 func _get_active_cells(entry: ItemEntry) -> Array[Vector2i]:
-    var base: Array[Vector2i] = entry.item_data.category_data.get_cells()
+    var base: Array[Vector2i] = entry.grid_cells
     return CargoShapes.rotate_cells(base, _active_rotation)
 
 
@@ -367,7 +367,7 @@ func _would_exceed_weight(entry: ItemEntry) -> bool:
     # Check if placing this entry would exceed max weight
     # If item is already in cargo, don't double count
     var max_weight: float = RunManager.run_record.car_data.max_weight
-    var entry_weight: float = entry.item_data.category_data.weight
+    var entry_weight: float = entry.weight
 
     # Check if entry is already in cargo
     var already_in_cargo := false
@@ -389,7 +389,7 @@ func _get_pending_weight(entry: ItemEntry) -> float:
     for pos: Vector2i in _cargo_placement:
         if _cargo_placement[pos] == entry:
             return 0.0
-    return entry.item_data.category_data.weight
+    return entry.weight
 
 
 func _get_pending_slots(entry: ItemEntry) -> int:
@@ -579,8 +579,8 @@ func _recalc_totals() -> void:
         var entry: ItemEntry = _cargo_placement[pos]
         if entry not in seen:
             seen.append(entry)
-            _slots_used += entry.item_data.category_data.get_cells().size()
-            _weight_used += entry.item_data.category_data.weight
+            _slots_used += entry.grid_cells.size()
+            _weight_used += entry.weight
 
 
 func _refresh_ui() -> void:

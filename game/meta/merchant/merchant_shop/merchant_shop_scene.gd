@@ -112,7 +112,7 @@ func _on_negotiation_accepted(final_price: int) -> void:
     for entry: ItemEntry in sold:
         SaveManager.storage_items.erase(entry)
         KnowledgeManager.add_category_points(
-            entry.item_data.category_data.category_id,
+            entry.category_id,
             entry.item_data.rarity,
             KnowledgeManager.KnowledgeAction.SELL,
         )

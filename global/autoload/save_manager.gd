@@ -288,7 +288,7 @@ func _apply_action_effect(action: ActiveActionEntry) -> void:
         ActiveActionEntry.ActionType.UNLOCK:
             entry.layer_index += 1
             KnowledgeManager.add_category_points(
-                entry.item_data.category_data.category_id,
+                entry.category_id,
                 entry.item_data.rarity,
                 KnowledgeManager.KnowledgeAction.REVEAL,
             )
