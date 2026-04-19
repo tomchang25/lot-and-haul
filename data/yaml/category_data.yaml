@@ -49,26 +49,7 @@ super_categories:
     market_stddev: 0.02
     market_drift_per_day: 0.05
 
-  - super_category_id: vehicle
-    display_name: Vehicle
-    market_mean_min: 0.7
-    market_mean_max: 1.3
-    market_stddev: 0.02
-    market_drift_per_day: 0.05
-
 categories:
-  - category_id: motorcycle
-    super_category: vehicle
-    display_name: Motorcycle
-    weight: 180.0
-    shape_id: s2x4
-
-  - category_id: automobile
-    super_category: vehicle
-    display_name: Automobile
-    weight: 1200.0
-    shape_id: s2x4
-
   # ── Fashion (2) ───────────────────────────────────────
   - category_id: handbag
     super_category: fashion
