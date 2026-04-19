@@ -75,3 +75,17 @@ func _refresh_display() -> void:
     _mastery_rank_label.text = "Mastery Rank:   %d" % KnowledgeManager.get_mastery_rank()
     _balance_label.text = "Balance:   $%d" % SaveManager.cash
     _storage_count_label.text = "Storage:   %d items" % SaveManager.storage_items.size()
+
+    var done_count: int = _completed_research_count()
+    if done_count > 0:
+        _storage_btn.text = "Storage (%d done)" % done_count
+    else:
+        _storage_btn.text = "Storage"
+
+
+func _completed_research_count() -> int:
+    var count: int = 0
+    for d: Dictionary in SaveManager.research_slots:
+        if bool(d.get("completed", false)) and int(d.get("item_id", -1)) != -1:
+            count += 1
+    return count
