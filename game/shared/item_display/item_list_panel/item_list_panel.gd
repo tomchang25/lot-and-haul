@@ -144,6 +144,13 @@ static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewC
             return entry.item_data.category_data.get_cells().size()
         ItemRow.Column.MARKET_FACTOR:
             return entry.market_factor_delta
+        ItemRow.Column.RESEARCH_STATUS:
+            for d: Dictionary in SaveManager.research_slots:
+                if int(d.get("item_id", -1)) == entry.id:
+                    if bool(d.get("completed", false)):
+                        return 2
+                    return 1
+            return 0
         _:
             push_warning("Unknown Column: %d" % col)
             return 0

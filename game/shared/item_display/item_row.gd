@@ -30,6 +30,7 @@ enum Column {
     WEIGHT,
     GRID,
     MARKET_FACTOR,
+    RESEARCH_STATUS,
 }
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -46,6 +47,7 @@ const COLUMN_HEADERS: Dictionary = {
     Column.WEIGHT: "Weight",
     Column.GRID: "Grid",
     Column.MARKET_FACTOR: "Market",
+    Column.RESEARCH_STATUS: "Research",
 }
 
 const COLUMN_MIN_WIDTH: Dictionary = {
@@ -59,6 +61,7 @@ const COLUMN_MIN_WIDTH: Dictionary = {
     Column.WEIGHT: 100,
     Column.GRID: 80,
     Column.MARKET_FACTOR: 100,
+    Column.RESEARCH_STATUS: 100,
 }
 
 # ── State ─────────────────────────────────────────────────────────────────────
@@ -81,6 +84,7 @@ var _selection_state: SelectionState = SelectionState.NONE
 @onready var _weight_label: Label = $HBoxContainer/WeightLabel
 @onready var _grid_label: Label = $HBoxContainer/GridLabel
 @onready var _market_factor_label: Label = $HBoxContainer/MarketFactorLabel
+@onready var _research_status_label: Label = $HBoxContainer/ResearchStatusLabel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -178,6 +182,7 @@ func _refresh() -> void:
     _weight_label.visible = Column.WEIGHT in _columns
     _grid_label.visible = Column.GRID in _columns
     _market_factor_label.visible = Column.MARKET_FACTOR in _columns
+    _research_status_label.visible = Column.RESEARCH_STATUS in _columns
 
     # ── Column order ──────────────────────────────────────────────────────────
     _apply_column_order()
@@ -217,6 +222,33 @@ func _refresh() -> void:
     # ── MARKET FACTOR ─────────────────────────────────────────────────────────
     _market_factor_label.text = "%+d%%" % int(round(_entry.market_factor_delta * 100))
 
+    # ── RESEARCH STATUS ───────────────────────────────────────────────────────
+    _research_status_label.text = _research_status_text()
+
+# ══ Research status lookup ════════════════════════════════════════════════════
+
+
+func _research_status_text() -> String:
+    if _entry == null or _entry.id == -1:
+        return ""
+    for d: Dictionary in SaveManager.research_slots:
+        var slot_item_id: int = int(d.get("item_id", -1))
+        if slot_item_id == -1 or slot_item_id != _entry.id:
+            continue
+        if bool(d.get("completed", false)):
+            return "✓"
+        var action_string: String = String(d.get("action", ""))
+        match action_string:
+            "study":
+                return "S"
+            "repair":
+                return "R"
+            "unlock":
+                return "U"
+            _:
+                return "?"
+    return ""
+
 # ══ Column ordering ═══════════════════════════════════════════════════════════
 
 
@@ -235,6 +267,7 @@ func _apply_column_order() -> void:
         Column.WEIGHT: _weight_label,
         Column.GRID: _grid_label,
         Column.MARKET_FACTOR: _market_factor_label,
+        Column.RESEARCH_STATUS: _research_status_label,
     }
 
     for i in _columns.size():

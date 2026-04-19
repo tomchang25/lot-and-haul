@@ -68,24 +68,10 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Back"
 
-[node name="ActionSlotHUD" type="Label" parent="." unique_id=2000000050]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -190.0
-offset_top = 12.0
-offset_right = -12.0
-offset_bottom = 44.0
-grow_horizontal = 0
-theme_override_font_sizes/font_size = 18
-text = "Slots  0 / 2"
-horizontal_alignment = 2
-
 [node name="ActionPopup" type="Window" parent="." unique_id=2000000020]
 oversampling_override = 1.0
-title = "Item Actions"
-size = Vector2i(360, 240)
+title = "Research"
+size = Vector2i(380, 320)
 visible = false
 transient = true
 exclusive = true
@@ -118,16 +104,43 @@ theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="UnlockButton" type="Button" parent="ActionPopup/MarginContainer/VBoxContainer" unique_id=2000000024]
+[node name="ProgressLabel" type="Label" parent="ActionPopup/MarginContainer/VBoxContainer" unique_id=1258468690]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ActionButtons" type="VBoxContainer" parent="ActionPopup/MarginContainer/VBoxContainer" unique_id=2000000030]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="StudyButton" type="Button" parent="ActionPopup/MarginContainer/VBoxContainer/ActionButtons" unique_id=2000000031]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Unlock Next Layer"
+text = "Study"
 
-[node name="CloseButton" type="Button" parent="ActionPopup/MarginContainer/VBoxContainer" unique_id=2000000026]
+[node name="RepairButton" type="Button" parent="ActionPopup/MarginContainer/VBoxContainer/ActionButtons" unique_id=2000000032]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Close"
+text = "Repair"
 
-[node name="UnlockConfirm" type="ConfirmationDialog" parent="." unique_id=2000000027]
-title = "Unlock Layer?"
-dialog_text = "Perform research to advance this item's identity?"
+[node name="UnlockButton" type="Button" parent="ActionPopup/MarginContainer/VBoxContainer/ActionButtons" unique_id=2000000024]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Unlock"
+
+[node name="FooterRow" type="HBoxContainer" parent="ActionPopup/MarginContainer/VBoxContainer" unique_id=2000000033]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="RemoveButton" type="Button" parent="ActionPopup/MarginContainer/VBoxContainer/FooterRow" unique_id=2000000034]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Remove"
+
+[node name="CancelButton" type="Button" parent="ActionPopup/MarginContainer/VBoxContainer/FooterRow" unique_id=2000000026]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Cancel"
