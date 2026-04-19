@@ -74,8 +74,7 @@ class IdentityLayerSpec:
             skill_ref = f'ExtResource("{skill_tag}")' if skill_tag else "null"
             sub_fields = [
                 'script = ExtResource("2_unlock")',
-                f'context = {int(unlock["context"])}',
-                f'unlock_days = {int(unlock.get("unlock_days", 0))}',
+                f'difficulty = {float(unlock.get("difficulty", 1.0))}',
             ]
             if skill_tag:
                 sub_fields.append(f"required_skill = {skill_ref}")
@@ -123,12 +122,9 @@ class IdentityLayerSpec:
             m = re.match(r'SubResource\("([^"]+)"\)', unlock_raw)
             if m:
                 fields = subs.get(m.group(1), {})
-                ctx_val = int(fields.get("context", "1"))
-                unlock = {"context": ctx_val}
-
-                unlock_days = int(fields.get("unlock_days", "0"))
-                if ctx_val == 1 or unlock_days:
-                    unlock["unlock_days"] = unlock_days
+                unlock = {
+                    "difficulty": float(fields.get("difficulty", "1.0")),
+                }
 
                 skill_raw = fields.get("required_skill", "null")
                 sm = re.match(r'ExtResource\("([^"]+)"\)', skill_raw)
@@ -177,16 +173,13 @@ class IdentityLayerSpec:
             if unlock is None:
                 continue
 
-            ctx = unlock.get("context")
-            if ctx not in (0, 1):
-                errors.append(
-                    f"layer '{lid}': unlock_action.context must be 0 or 1, got {ctx!r}"
-                )
-
-            if ctx == 1 and not unlock.get("unlock_days"):
-                errors.append(
-                    f"layer '{lid}': context=1 (HOME) requires unlock_days >= 1"
-                )
+            if "difficulty" in unlock:
+                diff = unlock.get("difficulty")
+                if not isinstance(diff, (int, float)) or float(diff) <= 0.0:
+                    errors.append(
+                        f"layer '{lid}': unlock_action.difficulty must be a"
+                        f" positive float, got {diff!r}"
+                    )
 
             sid = unlock.get("required_skill")
             if sid and known_skill_ids and sid not in known_skill_ids:

@@ -2,22 +2,19 @@ identity_layers:
   - layer_id: bag_veil
     display_name: Fabric Pouch
     base_value: 10
-    unlock_action:
-      context: 0
+    unlock_action: null
 
   - layer_id: bag_exterior_check
     display_name: Structured Leather Bag
     base_value: 55
     unlock_action:
-      context: 1
-      unlock_days: 1
+      difficulty: 1.0
 
   - layer_id: bag_hardware_check
     display_name: Designer-Style Handbag
     base_value: 180
     unlock_action:
-      context: 1
-      unlock_days: 2
+      difficulty: 2.0
 
   - layer_id: bag_hermes_leaf
     display_name: Hermès Birkin 30, c.2005
@@ -33,8 +30,7 @@ identity_layers:
     display_name: Authenticated Luxury Bag
     base_value: 1200
     unlock_action:
-      context: 1
-      unlock_days: 4
+      difficulty: 4.0
       required_skill: authentication
       required_level: 2
 
@@ -46,22 +42,19 @@ identity_layers:
   - layer_id: watch_veil
     display_name: Small Metal Object
     base_value: 8
-    unlock_action:
-      context: 0
+    unlock_action: null
 
   - layer_id: watch_case_check
     display_name: Old Wristwatch
     base_value: 45
     unlock_action:
-      context: 1
-      unlock_days: 1
+      difficulty: 1.0
 
   - layer_id: watch_movement_open
     display_name: Manual-Wind Dress Watch
     base_value: 200
     unlock_action:
-      context: 1
-      unlock_days: 2
+      difficulty: 2.0
       required_skill: mechanical
       required_level: 1
 
@@ -74,8 +67,7 @@ identity_layers:
     display_name: Swiss Pocket Conversion
     base_value: 380
     unlock_action:
-      context: 1
-      unlock_days: 3
+      difficulty: 3.0
       required_skill: appraisal
       required_level: 1
 

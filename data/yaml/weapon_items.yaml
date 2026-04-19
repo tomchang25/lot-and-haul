@@ -4,29 +4,25 @@ identity_layers:
   - layer_id: pistol_veil
     display_name: Heavy Metal Object
     base_value: 40
-    unlock_action:
-      context: 0
+    unlock_action: null
 
   - layer_id: pistol_body
     display_name: Short Firearm Body
     base_value: 90
     unlock_action:
-      context: 1
-      unlock_days: 1
+      difficulty: 1.0
 
   - layer_id: pistol_proofmark
     display_name: Proofmarked Pistol
     base_value: 350
     unlock_action:
-      context: 1
-      unlock_days: 2
+      difficulty: 2.0
 
   - layer_id: pistol_arsenal_stamp
     display_name: Arsenal-Stamped Pistol
     base_value: 900
     unlock_action:
-      context: 1
-      unlock_days: 3
+      difficulty: 3.0
       required_skill: appraisal
       required_level: 1
 
@@ -34,15 +30,13 @@ identity_layers:
     display_name: Ornate Grip Pistol
     base_value: 600
     unlock_action:
-      context: 1
-      unlock_days: 2
+      difficulty: 2.0
 
   - layer_id: pistol_maker_mark
     display_name: Signed Maker Pistol
     base_value: 2000
     unlock_action:
-      context: 1
-      unlock_days: 4
+      difficulty: 4.0
       required_skill: authentication
       required_level: 1
 
@@ -71,29 +65,25 @@ identity_layers:
   - layer_id: rifle_veil
     display_name: Heavy Long Object
     base_value: 50
-    unlock_action:
-      context: 0
+    unlock_action: null
 
   - layer_id: rifle_body
     display_name: Long-Barreled Firearm
     base_value: 120
     unlock_action:
-      context: 1
-      unlock_days: 1
+      difficulty: 1.0
 
   - layer_id: rifle_military_proof
     display_name: Military-Proved Rifle
     base_value: 500
     unlock_action:
-      context: 1
-      unlock_days: 2
+      difficulty: 2.0
 
   - layer_id: rifle_regiment_mark
     display_name: Regiment-Marked Rifle
     base_value: 1500
     unlock_action:
-      context: 1
-      unlock_days: 3
+      difficulty: 3.0
       required_skill: appraisal
       required_level: 1
 
@@ -101,15 +91,13 @@ identity_layers:
     display_name: Engraved Action Rifle
     base_value: 1200
     unlock_action:
-      context: 1
-      unlock_days: 2
+      difficulty: 2.0
 
   - layer_id: rifle_maker_signed
     display_name: Signed by Maker
     base_value: 3500
     unlock_action:
-      context: 1
-      unlock_days: 4
+      difficulty: 4.0
       required_skill: authentication
       required_level: 1
 
@@ -138,29 +126,25 @@ identity_layers:
   - layer_id: crossbow_veil
     display_name: Heavy Wooden Object
     base_value: 30
-    unlock_action:
-      context: 0
+    unlock_action: null
 
   - layer_id: crossbow_body
     display_name: Old Crossbow Frame
     base_value: 80
     unlock_action:
-      context: 1
-      unlock_days: 1
+      difficulty: 1.0
 
   - layer_id: crossbow_mechanism
     display_name: Crossbow with Trigger
     base_value: 300
     unlock_action:
-      context: 1
-      unlock_days: 2
+      difficulty: 2.0
 
   - layer_id: crossbow_provenance
     display_name: Documented Crossbow
     base_value: 900
     unlock_action:
-      context: 1
-      unlock_days: 3
+      difficulty: 3.0
       required_skill: appraisal
       required_level: 1
 

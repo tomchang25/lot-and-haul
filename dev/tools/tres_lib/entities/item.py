@@ -128,17 +128,6 @@ class ItemSpec:
                     )
 
             if layer_ids:
-                first = next(
-                    (l for l in layers if l["layer_id"] == layer_ids[0]),
-                    None,
-                )
-                if first:
-                    ctx0 = (first.get("unlock_action") or {}).get("context")
-                    if ctx0 != 0:
-                        errors.append(
-                            f"item '{iid}': layer[0] '{layer_ids[0]}' must have context=0 (AUTO)"
-                        )
-
                 last = next(
                     (l for l in layers if l["layer_id"] == layer_ids[-1]),
                     None,
@@ -159,16 +148,10 @@ class ItemSpec:
 
                     unlock = layer.get("unlock_action")
 
-                    if index < len(layer_ids) - 1 and unlock is None:
+                    if index < len(layer_ids) - 1 and unlock is None and index != 0:
                         errors.append(
                             f"item '{iid}': layer[{index}] '{lid}' has no unlock_action"
                             f" but is not the final layer"
-                        )
-
-                    if index >= 1 and unlock is not None and unlock.get("context") == 0:
-                        errors.append(
-                            f"item '{iid}': layer[{index}] '{lid}' uses context=0 (AUTO)"
-                            f" but only layer[0] may be AUTO"
                         )
 
                     cur_base_value = layer.get("base_value")
