@@ -2,22 +2,19 @@ identity_layers:
   - layer_id: lamp_veil
     display_name: Lamp-Shaped Object
     base_value: 10
-    unlock_action:
-      context: 0
+    unlock_action: null
 
   - layer_id: lamp_glass_body
     display_name: Glass-Bodied Lamp
     base_value: 40
     unlock_action:
-      context: 1
-      unlock_days: 1
+      difficulty: 1.0
 
   - layer_id: lamp_ornate_base
     display_name: Ornate Metal Base
     base_value: 110
     unlock_action:
-      context: 1
-      unlock_days: 2
+      difficulty: 2.0
 
   - layer_id: lamp_leaf_moser
     display_name: Moser Bohemian Lamp
@@ -28,8 +25,7 @@ identity_layers:
     display_name: Pressed Glass Font
     base_value: 90
     unlock_action:
-      context: 1
-      unlock_days: 2
+      difficulty: 2.0
 
   - layer_id: lamp_leaf_baccarat
     display_name: Baccarat Crystal Lamp
@@ -40,8 +36,7 @@ identity_layers:
     display_name: Hallmarked Silver Collar
     base_value: 300
     unlock_action:
-      context: 1
-      unlock_days: 3
+      difficulty: 3.0
       required_skill: appraisal
       required_level: 1
 
@@ -49,8 +44,7 @@ identity_layers:
     display_name: Confirmed Maker's Mark
     base_value: 900
     unlock_action:
-      context: 1
-      unlock_days: 4
+      difficulty: 4.0
       required_skill: authentication
       required_level: 2
 
@@ -62,22 +56,19 @@ identity_layers:
   - layer_id: clock_veil
     display_name: Clock-Shaped Object
     base_value: 15
-    unlock_action:
-      context: 0
+    unlock_action: null
 
   - layer_id: clock_wooden_case
     display_name: Wooden-Cased Timepiece
     base_value: 55
     unlock_action:
-      context: 1
-      unlock_days: 1
+      difficulty: 1.0
 
   - layer_id: clock_brass_movement
     display_name: Brass Movement Inside
     base_value: 140
     unlock_action:
-      context: 1
-      unlock_days: 2
+      difficulty: 2.0
 
   - layer_id: clock_leaf_ansonia
     display_name: Ansonia Mantel Clock
@@ -93,15 +84,13 @@ identity_layers:
     display_name: Enamel Dial Face
     base_value: 200
     unlock_action:
-      context: 1
-      unlock_days: 2
+      difficulty: 2.0
 
   - layer_id: clock_platform_escapement
     display_name: Platform Escapement
     base_value: 420
     unlock_action:
-      context: 1
-      unlock_days: 3
+      difficulty: 3.0
       required_skill: mechanical
       required_level: 1
 
@@ -114,15 +103,13 @@ identity_layers:
     display_name: Gilded Brass Case
     base_value: 320
     unlock_action:
-      context: 1
-      unlock_days: 3
+      difficulty: 3.0
 
   - layer_id: clock_signed_movement
     display_name: Signed Movement Plate
     base_value: 800
     unlock_action:
-      context: 1
-      unlock_days: 4
+      difficulty: 4.0
       required_skill: authentication
       required_level: 2
 
@@ -134,15 +121,13 @@ identity_layers:
   - layer_id: vase_veil
     display_name: Vessel-Shaped Object
     base_value: 8
-    unlock_action:
-      context: 0
+    unlock_action: null
 
   - layer_id: vase_ceramic_body
     display_name: Ceramic Vessel
     base_value: 20
     unlock_action:
-      context: 1
-      unlock_days: 1
+      difficulty: 1.0
 
   - layer_id: vase_leaf_modern
     display_name: Modern Decorative Vase
@@ -153,15 +138,13 @@ identity_layers:
     display_name: Hand-Painted Surface
     base_value: 90
     unlock_action:
-      context: 1
-      unlock_days: 2
+      difficulty: 2.0
 
   - layer_id: vase_transfer_pattern
     display_name: Transfer-Print Pattern
     base_value: 220
     unlock_action:
-      context: 1
-      unlock_days: 2
+      difficulty: 2.0
 
   - layer_id: vase_leaf_spode
     display_name: Spode Blue Italian Vase
@@ -172,15 +155,13 @@ identity_layers:
     display_name: Fine Porcelain Body
     base_value: 150
     unlock_action:
-      context: 1
-      unlock_days: 2
+      difficulty: 2.0
 
   - layer_id: vase_cobalt_gilding
     display_name: Cobalt and Gilt Detail
     base_value: 500
     unlock_action:
-      context: 1
-      unlock_days: 3
+      difficulty: 3.0
       required_skill: appraisal
       required_level: 1
 
@@ -188,8 +169,7 @@ identity_layers:
     display_name: Factory Mark Confirmed
     base_value: 1400
     unlock_action:
-      context: 1
-      unlock_days: 4
+      difficulty: 4.0
       required_skill: authentication
       required_level: 2
 
@@ -197,8 +177,7 @@ identity_layers:
     display_name: Archival Provenance Found
     base_value: 4000
     unlock_action:
-      context: 1
-      unlock_days: 5
+      difficulty: 5.0
       required_skill: authentication
       required_level: 3
 

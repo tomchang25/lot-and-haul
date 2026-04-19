@@ -5,22 +5,8 @@
 class_name LayerUnlockAction
 extends Resource
 
-# Where this action can be performed.
-#   AUTO    — DEPRECATED. Scheduled for removal once YAML/.tres sources are rewritten.
-#             Kept only because existing .tres resources still reference this value.
-#             The reveal flow unveils layer 0 directly via ItemEntry.unveil(); no
-#             AUTO-context unlock action is consulted at runtime.
-#   HOME    — requires the home workshop. Handling, research, tools, and skilled work.
-enum ActionContext {
-    AUTO,
-    HOME,
-}
-
-@export var context: ActionContext = ActionContext.HOME
-
-# Time take to perform this action.
-# Ignored when context is AUTO.
-@export var unlock_days: int = 0
+# Higher value = harder to unlock. Feeds the progress-based unlock system.
+@export var difficulty: float = 1.0
 
 # Skill required before this action is available.
 # Null means no skill prerequisite.

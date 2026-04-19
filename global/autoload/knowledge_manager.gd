@@ -3,7 +3,6 @@ extends Node
 enum AdvanceCheck {
     OK,
     NO_ACTION,
-    WRONG_CONTEXT,
     INSUFFICIENT_CATEGORY_RANK,
     INSUFFICIENT_SKILL,
     MISSING_PERK,
@@ -160,13 +159,10 @@ func try_upgrade_skill(skill_id: String) -> UpgradeResult:
     return UpgradeResult.OK
 
 
-func can_advance(entry: ItemEntry, context: LayerUnlockAction.ActionContext) -> AdvanceCheck:
+func can_advance(entry: ItemEntry) -> AdvanceCheck:
     var action: LayerUnlockAction = entry.current_unlock_action()
     if action == null or entry.is_at_final_layer():
         return AdvanceCheck.NO_ACTION
-
-    if action.context != context:
-        return AdvanceCheck.WRONG_CONTEXT
 
     if action.required_category_rank > 0:
         if get_category_rank(entry.item_data.category_data.category_id) < action.required_category_rank:

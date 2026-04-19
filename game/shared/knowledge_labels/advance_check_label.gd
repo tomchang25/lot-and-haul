@@ -12,8 +12,6 @@ static func describe(check: int, action: LayerUnlockAction, entry: ItemEntry) ->
             return ""
         KnowledgeManager.AdvanceCheck.NO_ACTION:
             return "Cannot advance further"
-        KnowledgeManager.AdvanceCheck.WRONG_CONTEXT:
-            return "Must be performed at home"
         KnowledgeManager.AdvanceCheck.INSUFFICIENT_CATEGORY_RANK:
             var cat_name: String = entry.item_data.category_data.display_name
             return "Need %s rank %d" % [cat_name, action.required_category_rank]

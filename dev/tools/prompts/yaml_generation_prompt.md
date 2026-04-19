@@ -62,18 +62,12 @@ base_value: int. Market value at this level of knowledge.
 MUST strictly increase with each step. Final layer = true value.
 unlock_action: How the player advances PAST this layer.
 
-        context:      int.
-                        0 = AUTO  — triggers automatically on arrival home.
-                                    Use ONLY on layer[0]. Never on any other layer.
-                        1 = HOME  — player works on item in the home workshop.
-                                    Used on layer[1] and above. Always costs time.
-
-        unlock_days:  int 1–5. Cost in days. Required when context=1.
-                        1 = quick look or wipe down
-                        2 = close inspection
-                        3 = moderate research
-                        4 = specialist tools or references
-                        5 = archival research or expert consultation
+        difficulty:   float 1.0–5.0. Higher = harder to unlock.
+                        1.0 = quick look or wipe down
+                        2.0 = close inspection
+                        3.0 = moderate research
+                        4.0 = specialist tools or references
+                        5.0 = archival research or expert consultation
 
         required_skill: skill_id string. OMIT this key entirely if no skill is needed.
                         Valid values: "appraisal", "authentication", "mechanical"
@@ -81,12 +75,14 @@ unlock_action: How the player advances PAST this layer.
         required_condition: float 0.0–1.0. ONLY include when item condition gates the
                             action. Omit entirely if 0.
 
-      unlock_action: null   ← Use exactly this on every FINAL (leaf) layer.
+      unlock_action: null   ← Use on every FINAL (leaf) layer.
+                              Also use on layer[0] of items that auto-resolve
+                              on reveal (no gate to advance from the veil).
 
 items: - item_id: snake_case string, globally unique.
 category_id: Must exactly match a category_id defined in this file.
 rarity: int. 0=COMMON 1=UNCOMMON 2=RARE 3=EPIC 4=LEGENDARY
-layer_ids: Ordered list of layer_id references (vague → specific). - layer[0] = veil layer. Must have context: 0 (AUTO). - layer[-1] = final layer. Must have unlock_action: null. - Minimum 2 layers. Typical range: 3–5 layers.
+layer_ids: Ordered list of layer_id references (vague → specific). - layer[0] = veil layer. Must have unlock_action: null (auto-resolves on reveal). - layer[-1] = final layer. Must have unlock_action: null. - Minimum 2 layers. Typical range: 3–5 layers.
 
 ---
 
@@ -123,7 +119,7 @@ Items reference it by name. The layer does not know its own position.
 
 CROSS-CHAIN RULE:
 The shared mid-layer must have an unlock_action that makes sense at both depths.
-Skill and unlock_days should reflect the harder of the two positions.
+Skill and difficulty should reflect the harder of the two positions.
 
 LAYER NAMING:
 Early/shared layers: use vague physical descriptions only.
@@ -140,11 +136,11 @@ Typical per-step multipliers: 1.5× to 4×.
 Example: 80 → 220 → 700 → 2400
 
 UNLOCK DIFFICULTY PROGRESSION:
-layer[0] → [1]: context=0 (AUTO). Always free.
-layer[1] → [2]: context=1, unlock_days=1–2. No skill usually.
-layer[2] → [3]: context=1, unlock_days=2–3. May add skill lv1.
-layer[3] → [4]: context=1, unlock_days=3–4. Skill lv1–2 recommended.
-layer[4] → [5]: context=1, unlock_days=4–5. Skill lv2–3 required.
+layer[0] → [1]: unlock_action: null. Auto-resolves on reveal.
+layer[1] → [2]: difficulty=1.0–2.0. No skill usually.
+layer[2] → [3]: difficulty=2.0–3.0. May add skill lv1.
+layer[3] → [4]: difficulty=3.0–4.0. Skill lv1–2 recommended.
+layer[4] → [5]: difficulty=4.0–5.0. Skill lv2–3 required.
 
 RARITY VS LAYER DEPTH:
 COMMON (0): 2–3 layers. Final value 50–300.
@@ -155,10 +151,8 @@ LEGENDARY (4): 5 layers. Final value 8000+. At least one skill required.
 
 NEVER:
 
-- Use context=0 on any layer other than layer[0] of an item.
-- Use context=1 on layer[0].
-- Use unlock_action: null on any layer that is not the final layer of every item
-  that references it.
+- Use unlock_action: null on a non-leaf layer that is not layer[0].
+- Set difficulty <= 0.
 - Add required_level without required_skill on the same unlock_action.
 - Set base_value equal to or less than the previous layer in any item's chain.
 - Reuse item_id or layer_id values within the same file.
@@ -224,12 +218,11 @@ Output the complete YAML block starting with 'categories:'.
 [ ] Every layer_id is unique within the file
 [ ] Every item's category_id matches an entry in categories
 [ ] Every item's layer_ids entries are all defined in identity_layers
-[ ] Every item's layer[0] has unlock_action.context = 0 (AUTO)
-[ ] No layer other than layer[0] of any item has context = 0
+[ ] Every item's layer[0] has unlock_action: null (auto-resolves on reveal)
 [ ] Every item's final layer has unlock_action: null
-[ ] No non-final layer has unlock_action: null
+[ ] No non-final, non-layer[0] layer has unlock_action: null
 [ ] base_value strictly increases along each item's layer chain
-[ ] context=1 requires unlock_days >= 1
+[ ] difficulty is a positive float (typically 1.0–5.0)
 [ ] No required_level without required_skill on the same unlock_action
 [ ] required_skill values are only: appraisal, authentication, mechanical
 [ ] Shared layers appear exactly once in identity_layers

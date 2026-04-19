@@ -18,19 +18,14 @@
 # A layer_id appears ONCE in this list; items reference it by name.
 #
 # unlock_action: describes how the player advances PAST this layer.
+#   Set to null on layer[0] (auto-resolves on reveal) and on every final layer.
 #
-#   context:
-#     0 = AUTO  — triggers automatically when the item arrives home.
-#                 Use ONLY on layer[0]. The veil is always lifted for free.
-#     1 = HOME  — the player works on the item in the home workshop.
-#                 Used on layer[1] and above. Always costs time.
-#
-#   unlock_days:   int 1–5. How long the HOME action takes. Ignored when context=0.
-#                1 = quick look / wipe down
-#                2 = close inspection
-#                3 = moderate research
-#                4 = specialist tools or reference materials
-#                5 = archival research or expert consultation
+#   difficulty:   float 1.0–5.0. Higher = harder to unlock.
+#                 1.0 = quick look / wipe down
+#                 2.0 = close inspection
+#                 3.0 = moderate research
+#                 4.0 = specialist tools or reference materials
+#                 5.0 = archival research or expert consultation
 #
 #   required_skill:  skill_id string. Omit entirely if no skill is needed.
 #                    Valid values: "appraisal", "authentication", "mechanical"
@@ -39,6 +34,7 @@
 #                       Omit entirely if 0.
 #
 # Final layer rule: the last layer in ANY item's chain MUST have unlock_action: null.
+# Veil layer rule: layer[0] should have unlock_action: null (auto-resolves on reveal).
 #
 # KEY RULE — layer position is determined by the item, not the layer:
 #   A layer_id may sit at layer[2] in one item and at layer[3] in another.
@@ -51,15 +47,13 @@ identity_layers:
   - layer_id: lamp_shaped_object
     display_name: Lamp-Shaped Object
     base_value: 80
-    unlock_action:
-      context: 0 # AUTO — veil lifted on arrival home
+    unlock_action: null # veil — auto-resolves on reveal
 
   - layer_id: antique_oil_lamp
     display_name: Antique Oil Lamp
     base_value: 220
     unlock_action:
-      context: 1 # HOME
-      unlock_days: 2
+      difficulty: 2.0
 
   # ── Items A and B: fork at layer[2] ──────────────────────
   # Both share lamp_shaped_object and antique_oil_lamp.
@@ -90,15 +84,13 @@ identity_layers:
     display_name: Gilded Lamp Base
     base_value: 380
     unlock_action:
-      context: 1 # HOME
-      unlock_days: 2
+      difficulty: 2.0
 
   - layer_id: ornate_lamp_body # shared mid-layer: C[2] and D[3]
     display_name: Ornate Lamp Body
     base_value: 700
     unlock_action:
-      context: 1 # HOME
-      unlock_days: 3
+      difficulty: 3.0
       required_skill: appraisal
       required_level: 1
 
@@ -116,7 +108,7 @@ identity_layers:
 # ITEMS
 #
 # layer_ids: ordered list of layer_id references, vague → specific.
-#   layer[0]  = always the veil layer. unlock_action.context must be 0 (AUTO).
+#   layer[0]  = always the veil layer. unlock_action is null (auto-resolves on reveal).
 #   layer[-1] = always the final layer. unlock_action must be null.
 #   Minimum 2 layers. Typical range: 3–5.
 #
@@ -136,8 +128,8 @@ items:
     category_id: oil_lamp
     rarity: 2 # RARE
     layer_ids:
-      - lamp_shaped_object # [0] context=0 AUTO
-      - antique_oil_lamp # [1] context=1 HOME unlock_days=2
+      - lamp_shaped_object # [0] veil — auto-resolves
+      - antique_oil_lamp # [1] difficulty=2.0
       - signed_duplex_burner_lamp # [2] FINAL
 
   - item_id: viennese_chandelier
@@ -160,17 +152,17 @@ items:
     category_id: oil_lamp
     rarity: 3 # EPIC
     layer_ids:
-      - lamp_shaped_object # [0] context=0 AUTO
-      - antique_oil_lamp # [1] HOME unlock_days=2
-      - ornate_lamp_body # [2] HOME appraisal lv1, unlock_days=3
+      - lamp_shaped_object # [0] veil — auto-resolves
+      - antique_oil_lamp # [1] difficulty=2.0
+      - ornate_lamp_body # [2] appraisal lv1, difficulty=3.0
       - french_empire_lamp # [3] FINAL
 
   - item_id: meissen_porcelain_lamp
     category_id: oil_lamp
     rarity: 4 # LEGENDARY
     layer_ids:
-      - lamp_shaped_object # [0] context=0 AUTO
-      - antique_oil_lamp # [1] HOME unlock_days=2
-      - gilded_lamp_base # [2] HOME unlock_days=2  ← extra step only Item D has
-      - ornate_lamp_body # [3] HOME appraisal lv1, unlock_days=3  ← same layer as C[2]
+      - lamp_shaped_object # [0] veil — auto-resolves
+      - antique_oil_lamp # [1] difficulty=2.0
+      - gilded_lamp_base # [2] difficulty=2.0  ← extra step only Item D has
+      - ornate_lamp_body # [3] appraisal lv1, difficulty=3.0  ← same layer as C[2]
       - authenticated_meissen_lamp # [4] FINAL
