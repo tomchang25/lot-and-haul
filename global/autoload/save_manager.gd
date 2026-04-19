@@ -281,7 +281,7 @@ func _tick_research_slots(days: int) -> Array[Dictionary]:
             continue
 
         var completed_during_tick: bool = false
-        for _day: int in range(days):
+        for day: int in range(days):
             if slot.completed:
                 break
             match slot.action:
