@@ -81,8 +81,8 @@ unlock_action: How the player advances PAST this layer.
 
 items: - item_id: snake_case string, globally unique.
 category_id: Must exactly match a category_id defined in this file.
-rarity: int. 0=COMMON 1=UNCOMMON 2=RARE 3=EPIC 4=LEGENDARY
-layer_ids: Ordered list of layer_id references (vague → specific). - layer[0] = veil layer. Must have unlock_action: null (auto-resolves on reveal). - layer[-1] = final layer. Must have unlock_action: null. - Minimum 2 layers. Typical range: 3–5 layers.
+rarity: int. 0=COMMON 1=UNCOMMON 2=RARE 3=EPIC
+layer_ids: Ordered list of layer_id references (vague → specific). - layer[0] = veil layer. Must have unlock_action: null (auto-resolves on reveal). - layer[-1] = final layer. Must have unlock_action: null. - Minimum 2 layers. Maximum 5 layers.
 
 ---
 
@@ -127,7 +127,7 @@ Good: "Lamp-Shaped Object", "Framed Canvas", "Heavy Metal Object"
 Bad: "Victorian Lamp", "19th Century Painting" (too specific too early)
 
 Leaf layers: use specific, historically or commercially identifiable names.
-Good: "Authenticated Meissen Porcelain Lamp, c.1880"
+Good: "Meissen Porcelain Lamp"
 Bad: "Nice Lamp"
 
 VALUE PROGRESSION:
@@ -140,17 +140,33 @@ layer[0] → [1]: unlock_action: null. Auto-resolves on reveal.
 layer[1] → [2]: difficulty=1.0–2.0. No skill usually.
 layer[2] → [3]: difficulty=2.0–3.0. May add skill lv1.
 layer[3] → [4]: difficulty=3.0–4.0. Skill lv1–2 recommended.
-layer[4] → [5]: difficulty=4.0–5.0. Skill lv2–3 required.
 
 RARITY VS LAYER DEPTH:
-COMMON (0): 2–3 layers. Final value 50–300.
-UNCOMMON (1): 3 layers. Final value 300–800.
-RARE (2): 3–4 layers. Final value 800–2000.
-EPIC (3): 4–5 layers. Final value 2000–8000.
-LEGENDARY (4): 5 layers. Final value 8000+. At least one skill required.
+COMMON (0):    2 layers (Layer 0 + leaf). Final value 50–300. No unlock needed.
+UNCOMMON (1):  2–3 layers. Final value 300–800. 0–1 unlocks.
+RARE (2):      3–4 layers. Final value 800–2000. 1–2 unlocks.
+EPIC (3):      4–5 layers. Final value 2000–8000. 2–3 unlocks.
+LEGENDARY (4): DO NOT GENERATE. Legendary items are hand-authored only.
+               If the user prompt requests a Legendary item, skip it.
+
+ITEM VARIETY DISTRIBUTION (target across all content):
+~60% Common, ~25% Uncommon, ~10% Rare, ~4% Epic, ~1% Legendary.
+When a user prompt specifies a rarity distribution, follow it.
+When it does not, default to approximately this ratio.
+
+EPIC LIMIT: at most 1 Epic item per category. Never generate two or more
+Epic items in the same category, even if the user prompt requests it.
+
+DEPTH OVERLAP IS INTENTIONAL:
+A 2-layer Uncommon looks identical to a Common until the player invests
+research time. A 3-layer Rare looks like an Uncommon. Use short-chain
+items at each rarity to exploit this ambiguity — it strengthens the
+confusion mechanic.
 
 NEVER:
 
+- Generate a LEGENDARY (rarity 4) item. These are hand-authored only.
+- Generate more than one EPIC (rarity 3) item per category.
 - Use unlock_action: null on a non-leaf layer that is not layer[0].
 - Set difficulty <= 0.
 - Add required_level without required_skill on the same unlock_action.
@@ -173,12 +189,12 @@ category_id: [CATEGORY_ID]
 weight: [WEIGHT_KG]
 shape_id: [SHAPE_ID]
 
-Item rarity distribution: [e.g. "3 COMMON, 4 UNCOMMON, 2 RARE, 1 EPIC"]
+Item rarity distribution: [e.g. "6 COMMON, 2 UNCOMMON, 1 RARE, 1 EPIC"]
 
 Theme / era / origin: [e.g. "Victorian British lighting objects, 1850–1900"]
 
-Notes: [Optional. e.g. "Include one LEGENDARY item requiring authentication skill.
-Include one item that looks valuable at mid-layers but resolves COMMON."]
+Notes: [Optional. e.g. "Include one item that looks valuable at mid-layers
+but resolves COMMON — a convincing reproduction."]
 
 Output the complete YAML block starting with 'categories:'.
 
@@ -200,12 +216,11 @@ category_id: oil_lamp
 weight: 3.0
 shape_id: s1x2
 
-Item rarity distribution: 2 RARE, 1 EPIC, 1 LEGENDARY
+Item rarity distribution: 1 COMMON, 1 UNCOMMON, 1 RARE, 1 EPIC
 
 Theme / era / origin: Victorian-era British and Austro-Hungarian oil lamps, 1850–1900
 
-Notes: One item should require the authentication skill at its deepest layer.
-One item should look valuable at mid-layers but resolve as COMMON —
+Notes: Include one item that looks valuable at mid-layers but resolves COMMON —
 a convincing reproduction.
 
 Output the complete YAML block starting with 'categories:'.
@@ -227,3 +242,6 @@ Output the complete YAML block starting with 'categories:'.
 [ ] required_skill values are only: appraisal, authentication, mechanical
 [ ] Shared layers appear exactly once in identity_layers
 [ ] shape_id is a valid key: s1x1, s1x2, s1x3, s1x4, s2x2, s2x3, s2x4, sL11, sL12, sT3
+[ ] Layer depth matches rarity band (Common=2, Uncommon=2–3, Rare=3–4, Epic=4–5)
+[ ] No more than 1 Epic item per category
+[ ] No Legendary items generated (rarity 4 is hand-authored only)
