@@ -254,15 +254,16 @@ items:
       - rifle_leaf_whitworth
 
   # ── Crossbow items ─────────────────────────────────────
-  # Common modern_repro goes straight from crossbow_veil to its leaf.
-  # Uncommon/Rare/Epic share crossbow_veil + crossbow_body (layers 0–1).
-  # Rare+Epic share crossbow_mechanism (layer 2), then fork.
+  # All share crossbow_veil + crossbow_body (layers 0–1).
+  # Items 1+2 diverge immediately at layer 2 (standard fork to leaf).
+  # Items 3+4 share crossbow_mechanism (layer 2), then fork.
 
   - item_id: crossbow_modern_repro
     category_id: crossbow
     rarity: 0
     layer_ids:
       - crossbow_veil
+      - crossbow_body
       - crossbow_leaf_repro
 
   - item_id: crossbow_german_hunting

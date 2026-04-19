@@ -64,6 +64,12 @@ identity_layers:
     unlock_action:
       difficulty: 1.0
 
+  - layer_id: clock_brass_movement
+    display_name: Brass Movement Inside
+    base_value: 140
+    unlock_action:
+      difficulty: 2.0
+
   - layer_id: clock_leaf_ansonia
     display_name: Ansonia Mantel Clock
     base_value: 480
@@ -79,6 +85,14 @@ identity_layers:
     base_value: 200
     unlock_action:
       difficulty: 2.0
+
+  - layer_id: clock_platform_escapement
+    display_name: Platform Escapement
+    base_value: 420
+    unlock_action:
+      difficulty: 3.0
+      required_skill: mechanical
+      required_level: 1
 
   - layer_id: clock_leaf_carriage
     display_name: French Carriage Clock
@@ -126,6 +140,12 @@ identity_layers:
     unlock_action:
       difficulty: 2.0
 
+  - layer_id: vase_transfer_pattern
+    display_name: Transfer-Print Pattern
+    base_value: 220
+    unlock_action:
+      difficulty: 2.0
+
   - layer_id: vase_leaf_spode
     display_name: Spode Blue Italian Vase
     base_value: 750
@@ -136,6 +156,14 @@ identity_layers:
     base_value: 150
     unlock_action:
       difficulty: 2.0
+
+  - layer_id: vase_cobalt_gilding
+    display_name: Cobalt and Gilt Detail
+    base_value: 500
+    unlock_action:
+      difficulty: 3.0
+      required_skill: appraisal
+      required_level: 1
 
   - layer_id: vase_factory_mark
     display_name: Factory Mark Confirmed
@@ -193,6 +221,7 @@ items:
     layer_ids:
       - clock_veil
       - clock_wooden_case
+      - clock_brass_movement
       - clock_leaf_ansonia
 
   - item_id: clock_sessions_shelf
@@ -201,6 +230,7 @@ items:
     layer_ids:
       - clock_veil
       - clock_wooden_case
+      - clock_brass_movement
       - clock_leaf_sessions
 
   - item_id: clock_french_carriage
@@ -210,6 +240,7 @@ items:
       - clock_veil
       - clock_wooden_case
       - clock_enamel_dial
+      - clock_platform_escapement
       - clock_leaf_carriage
 
   - item_id: clock_boulle_mantel
@@ -227,6 +258,7 @@ items:
     rarity: 0
     layer_ids:
       - vase_veil
+      - vase_ceramic_body
       - vase_leaf_modern
 
   - item_id: vase_spode_blue_italian
@@ -236,6 +268,7 @@ items:
       - vase_veil
       - vase_ceramic_body
       - vase_painted_surface
+      - vase_transfer_pattern
       - vase_leaf_spode
 
   - item_id: vase_royal_vienna
@@ -244,6 +277,7 @@ items:
     layer_ids:
       - vase_veil
       - vase_porcelain_body
+      - vase_cobalt_gilding
       - vase_factory_mark
       - vase_archive_provenance
       - vase_leaf_royal_vienna
