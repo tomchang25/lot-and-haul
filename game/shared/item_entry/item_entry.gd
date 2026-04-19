@@ -36,6 +36,16 @@ const MAX_SPREADS: Dictionary = {
 const INSPECTION_BASE: float = 0.75
 const INSPECTION_PER_RANK: float = 0.25
 
+# ── Research tuning knobs ─────────────────────────────────────────────────────
+
+const STUDY_BASE_DELTA: float = 0.25
+
+const REPAIR_BASE: float = 0.15
+const REPAIR_POWER: float = 0.5
+const REPAIR_MIN_STEP: float = 0.02
+
+const UNLOCK_BASE_EFFORT: float = 1.0
+
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var item_data: ItemData = null
@@ -59,6 +69,11 @@ var id: int = -1
 # the true price at low inspection; its contribution scales to zero at max
 # inspection so the range always converges on the true value.
 var center_offset: float = 0.0
+
+# Accumulated effort toward the current layer's unlock action. Reset on
+# advance_layer(). Persisted because UNLOCK resets it on advance, so completion
+# cannot be derived from layer_index alone.
+var unlock_progress: float = 0.0
 
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
@@ -196,6 +211,55 @@ func apply_inspect(delta: float) -> void:
         item_data.rarity,
         KnowledgeManager.KnowledgeAction.INSPECT,
     )
+
+
+func apply_study(speed_factor: float = 1.0) -> void:
+    var delta: float = STUDY_BASE_DELTA * speed_factor
+    inspection_level += delta
+    KnowledgeManager.add_category_points(
+        item_data.category_data.category_id,
+        item_data.rarity,
+        KnowledgeManager.KnowledgeAction.APPRAISE,
+    )
+
+
+func apply_repair(speed_factor: float = 1.0) -> void:
+    var gap: float = 1.0 - condition
+    var raw: float = REPAIR_BASE * speed_factor * pow(gap, REPAIR_POWER)
+    var delta: float = maxf(raw, REPAIR_MIN_STEP * speed_factor)
+    condition = minf(1.0, condition + delta)
+    KnowledgeManager.add_category_points(
+        item_data.category_data.category_id,
+        item_data.rarity,
+        KnowledgeManager.KnowledgeAction.REPAIR,
+    )
+
+
+func add_unlock_effort(speed_factor: float = 1.0) -> void:
+    unlock_progress += UNLOCK_BASE_EFFORT * speed_factor
+
+
+func advance_layer() -> void:
+    layer_index += 1
+    unlock_progress = 0.0
+    KnowledgeManager.add_category_points(
+        item_data.category_data.category_id,
+        item_data.rarity,
+        KnowledgeManager.KnowledgeAction.REVEAL,
+    )
+
+
+func is_repair_complete() -> bool:
+    return condition >= 1.0
+
+
+func is_unlock_ready() -> bool:
+    if is_at_final_layer():
+        return false
+    var action: LayerUnlockAction = current_unlock_action()
+    if action == null:
+        return false
+    return unlock_progress >= action.difficulty
 
 
 func _rarity_thresholds() -> Array[float]:
@@ -491,6 +555,7 @@ func to_dict() -> Dictionary:
         "condition": condition,
         "inspection_level": inspection_level,
         "center_offset": center_offset,
+        "unlock_progress": unlock_progress,
     }
 
 
@@ -510,6 +575,8 @@ static func from_dict(d: Dictionary) -> ItemEntry:
         # Migrate pre-range saves: roll a fresh offset so old items behave like
         # new ones. Old knowledge_min/max are discarded.
         entry.center_offset = randf_range(-0.5, 0.5)
+    if d.has("unlock_progress"):
+        entry.unlock_progress = float(d["unlock_progress"])
     if d.has("id"):
         entry.id = int(d["id"])
     return entry

@@ -90,14 +90,8 @@ func _on_unlock_confirmed() -> void:
         return
     if KnowledgeManager.can_advance(entry) != KnowledgeManager.AdvanceCheck.OK:
         return
-    var action_def: LayerUnlockAction = entry.current_unlock_action()
-    var days: int = int(action_def.difficulty) if action_def != null else 1
-    var action := ActiveActionEntry.create(
-        ActiveActionEntry.ActionType.UNLOCK,
-        entry.id,
-        days,
-    )
-    SaveManager.active_actions.append(action.to_dict())
+    var slot := ResearchSlot.create(ResearchSlot.SlotAction.UNLOCK, entry.id)
+    SaveManager.research_slots.append(slot.to_dict())
     SaveManager.save()
     _refresh_row(entry)
     _refresh_action_slot_hud()
@@ -126,9 +120,9 @@ func _populate_rows() -> void:
 
 
 func _get_action_block_reason(entry: ItemEntry) -> String:
-    if SaveManager.active_actions.size() >= SaveManager.max_concurrent_actions:
+    if SaveManager.research_slots.size() >= SaveManager.max_research_slots:
         return "No action slots available"
-    for d: Dictionary in SaveManager.active_actions:
+    for d: Dictionary in SaveManager.research_slots:
         if int(d.get("item_id", -1)) == entry.id:
             return "Already in progress"
     return ""
@@ -145,18 +139,22 @@ func _get_unlock_block_reason(entry: ItemEntry) -> String:
 
 
 func _get_in_progress_action(entry: ItemEntry) -> Dictionary:
-    for d: Dictionary in SaveManager.active_actions:
+    for d: Dictionary in SaveManager.research_slots:
         if int(d.get("item_id", -1)) == entry.id:
             return d
     return { }
 
 
-func _action_type_label(action_type_string: String) -> String:
-    match action_type_string:
+func _action_type_label(action_string: String) -> String:
+    match action_string:
+        "study":
+            return "Study"
+        "repair":
+            return "Repair"
         "unlock":
             return "Unlock"
         _:
-            return action_type_string
+            return action_string
 
 
 func _show_action_popup(entry: ItemEntry) -> void:
@@ -166,7 +164,7 @@ func _show_action_popup(entry: ItemEntry) -> void:
 
     # Status label
     if not in_progress.is_empty():
-        _status_label.text = "⏳ %s in progress" % _action_type_label(in_progress["action_type"])
+        _status_label.text = "⏳ %s in progress" % _action_type_label(in_progress.get("action", ""))
         _status_label.visible = true
     elif block != "":
         _status_label.text = block
@@ -197,6 +195,6 @@ func _refresh_row(entry: ItemEntry) -> void:
 
 
 func _refresh_action_slot_hud() -> void:
-    var used: int = SaveManager.active_actions.size()
-    var maximum: int = SaveManager.max_concurrent_actions
+    var used: int = SaveManager.research_slots.size()
+    var maximum: int = SaveManager.max_research_slots
     _action_slot_hud.text = "Slots  %d / %d" % [used, maximum]

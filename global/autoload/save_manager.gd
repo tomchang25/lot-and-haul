@@ -35,9 +35,9 @@ var owned_cars: Array[CarData]:
 var storage_items: Array = []
 
 var current_day: int = 0
-var max_concurrent_actions: int = 2
+var max_research_slots: int = 4
 var next_entry_id: int = 0 # monotonically increasing; never reset
-var active_actions: Array = [] # Array of plain Dictionaries
+var research_slots: Array = [] # Array of plain Dictionaries (ResearchSlot)
 var available_location_ids: Array[String] = []
 var unlocked_perks: Array[String] = []
 var skill_levels: Dictionary = { } # skill_id (String) → int
@@ -55,9 +55,9 @@ func save() -> void:
         "owned_car_ids": owned_car_ids,
         "storage_items": serialized_items,
         "current_day": current_day,
-        "max_concurrent_actions": max_concurrent_actions,
+        "max_research_slots": max_research_slots,
         "next_entry_id": next_entry_id,
-        "active_actions": active_actions,
+        "research_slots": research_slots,
         "available_location_ids": available_location_ids,
         "unlocked_perks": unlocked_perks,
         "skill_levels": skill_levels,
@@ -111,15 +111,27 @@ func _read_save_file() -> void:
                 storage_items.append(entry)
     if parsed.has("current_day") and parsed["current_day"] is float:
         current_day = int(parsed["current_day"])
-    if parsed.has("max_concurrent_actions") and parsed["max_concurrent_actions"] is float:
-        max_concurrent_actions = int(parsed["max_concurrent_actions"])
+    if parsed.has("max_research_slots") and parsed["max_research_slots"] is float:
+        max_research_slots = int(parsed["max_research_slots"])
     if parsed.has("next_entry_id") and parsed["next_entry_id"] is float:
         next_entry_id = int(parsed["next_entry_id"])
-    if parsed.has("active_actions") and parsed["active_actions"] is Array:
-        active_actions = []
+    if parsed.has("research_slots") and parsed["research_slots"] is Array:
+        research_slots = []
+        for d: Variant in parsed["research_slots"]:
+            if d is Dictionary:
+                research_slots.append(d)
+    elif parsed.has("active_actions") and parsed["active_actions"] is Array:
+        research_slots = []
         for d: Variant in parsed["active_actions"]:
-            if d is Dictionary and d.get("action_type", "") != "market_research":
-                active_actions.append(d)
+            if not d is Dictionary:
+                continue
+            if d.get("action_type", "") != "unlock":
+                continue
+            var slot := ResearchSlot.create(
+                ResearchSlot.SlotAction.UNLOCK,
+                int(d.get("item_id", -1)),
+            )
+            research_slots.append(slot.to_dict())
     if parsed.has("available_location_ids") and parsed["available_location_ids"] is Array:
         available_location_ids = []
         for id: Variant in parsed["available_location_ids"]:
@@ -245,7 +257,7 @@ func advance_days(days: int) -> DaySummary:
     current_day += days
     cash -= summary.living_cost
 
-    summary.completed_actions = _tick_actions(days)
+    summary.completed_actions = _tick_research_slots(days)
     summary.end_day = current_day
 
     MarketManager.advance_market(days)
@@ -256,42 +268,55 @@ func advance_days(days: int) -> DaySummary:
     return summary
 
 
-func _tick_actions(days: int) -> Array[Dictionary]:
+func _tick_research_slots(days: int) -> Array[Dictionary]:
     var completions: Array[Dictionary] = []
-    var remaining: Array = []
 
-    for d: Dictionary in active_actions:
-        var action := ActiveActionEntry.from_dict(d)
-        action.days_remaining -= days
-        if action.days_remaining <= 0:
-            _apply_action_effect(action)
-            var entry: ItemEntry = _find_storage_entry(action.item_id)
+    for i: int in range(research_slots.size()):
+        var d: Dictionary = research_slots[i]
+        var slot := ResearchSlot.from_dict(d)
+        if slot.is_empty() or slot.completed:
+            continue
+        var entry: ItemEntry = _find_storage_entry(slot.item_id)
+        if entry == null:
+            continue
+
+        var completed_during_tick: bool = false
+        for _day: int in range(days):
+            if slot.completed:
+                break
+            match slot.action:
+                ResearchSlot.SlotAction.STUDY:
+                    if not entry.is_fully_inspected():
+                        entry.apply_study(_study_speed_factor())
+                    slot.completed = entry.is_fully_inspected()
+                ResearchSlot.SlotAction.REPAIR:
+                    if not entry.is_repair_complete():
+                        entry.apply_repair(_repair_speed_factor())
+                    slot.completed = entry.is_repair_complete()
+                ResearchSlot.SlotAction.UNLOCK:
+                    if entry.is_unlock_ready():
+                        entry.advance_layer()
+                        slot.completed = true
+                    else:
+                        entry.add_unlock_effort(_unlock_speed_factor())
+                _:
+                    push_warning("SaveManager: unknown SlotAction %d" % slot.action)
+                    break
+            if slot.completed and not completed_during_tick:
+                completed_during_tick = true
+
+        research_slots[i] = slot.to_dict()
+
+        if completed_during_tick:
             completions.append(
                 {
-                    "name": entry.display_name if entry != null else "Unknown",
-                    "effect": _action_effect_label(action.action_type),
-                    "action_type": action.action_type,
+                    "name": entry.display_name,
+                    "effect": _slot_effect_label(slot.action),
+                    "action": ResearchSlot.action_to_string(slot.action),
                 },
             )
-        else:
-            remaining.append(action.to_dict())
 
-    active_actions = remaining
     return completions
-
-
-func _apply_action_effect(action: ActiveActionEntry) -> void:
-    var entry: ItemEntry = _find_storage_entry(action.item_id)
-    if entry == null:
-        return
-    match action.action_type:
-        ActiveActionEntry.ActionType.UNLOCK:
-            entry.layer_index += 1
-            KnowledgeManager.add_category_points(
-                entry.item_data.category_data.category_id,
-                entry.item_data.rarity,
-                KnowledgeManager.KnowledgeAction.REVEAL,
-            )
 
 
 func _find_storage_entry(item_id: int) -> ItemEntry:
@@ -301,11 +326,37 @@ func _find_storage_entry(item_id: int) -> ItemEntry:
     return null
 
 
-func _action_effect_label(type: ActiveActionEntry.ActionType) -> String:
-    match type:
-        ActiveActionEntry.ActionType.UNLOCK:
+func _slot_effect_label(action: ResearchSlot.SlotAction) -> String:
+    match action:
+        ResearchSlot.SlotAction.STUDY:
+            return "Fully inspected"
+        ResearchSlot.SlotAction.REPAIR:
+            return "Repair complete"
+        ResearchSlot.SlotAction.UNLOCK:
             return "Layer unlocked"
-    return "Done"
+        _:
+            push_warning("SaveManager: unknown SlotAction %d" % action)
+            return "Done"
+
+
+# Shared skill-driven speed formula, same shape as inspection_scene's
+# inspect multiplier.
+func _skill_speed_factor(skill_id: String) -> float:
+    var skill_level: int = KnowledgeManager.get_level(skill_id)
+    var mastery_rank: int = KnowledgeManager.get_mastery_rank()
+    return 1.0 + pow(1.1, skill_level) * mastery_rank * 0.2
+
+
+func _study_speed_factor() -> float:
+    return _skill_speed_factor("appraisal")
+
+
+func _repair_speed_factor() -> float:
+    return _skill_speed_factor("mechanical")
+
+
+func _unlock_speed_factor() -> float:
+    return _skill_speed_factor("appraisal")
 
 
 func _build_negotiation_dict() -> Dictionary:
