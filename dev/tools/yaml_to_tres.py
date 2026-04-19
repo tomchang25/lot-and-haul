@@ -61,7 +61,7 @@ def main() -> None:
                 script_uids[name] = read_script_uid(root, res_path)
 
     # Merge all YAML files into one dataset.
-    yaml_files = sorted(yaml_dir.glob("*.yaml"))
+    yaml_files = sorted(yaml_dir.glob("**/*.yaml"))
     if not yaml_files:
         sys.exit(f"No .yaml files found in: {yaml_dir}")
 

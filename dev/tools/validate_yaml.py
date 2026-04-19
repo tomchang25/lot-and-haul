@@ -51,7 +51,7 @@ def main() -> None:
     if not yaml_dir.is_dir():
         sys.exit(f"YAML directory not found: {yaml_dir}")
 
-    yaml_files = sorted(yaml_dir.glob("*.yaml"))
+    yaml_files = sorted(yaml_dir.glob("**/*.yaml"))
     if not yaml_files:
         sys.exit(f"No .yaml files found in: {yaml_dir}")
 
