@@ -21,19 +21,6 @@ identity_layers:
     base_value: 4800
     unlock_action: null
 
-  - layer_id: bag_replica_leaf
-    display_name: High-Grade Replica Bag
-    base_value: 220
-    unlock_action: null
-
-  - layer_id: bag_serial_research
-    display_name: Authenticated Luxury Bag
-    base_value: 1200
-    unlock_action:
-      difficulty: 4.0
-      required_skill: authentication
-      required_level: 2
-
   - layer_id: bag_chanel_leaf
     display_name: Chanel Classic Flap, 1990s
     base_value: 3600
@@ -57,6 +44,14 @@ identity_layers:
       difficulty: 2.0
       required_skill: mechanical
       required_level: 1
+
+  - layer_id: watch_authenticated
+    display_name: Authenticated Swiss Chronometer
+    base_value: 2500
+    unlock_action:
+      difficulty: 4.0
+      required_skill: authentication
+      required_level: 2
 
   - layer_id: watch_rolex_leaf
     display_name: Rolex Submariner, c.1969
@@ -88,12 +83,11 @@ items:
 
   - item_id: handbag_chanel_classic_flap
     category_id: handbag
-    rarity: 3
+    rarity: 2
     layer_ids:
       - bag_veil
       - bag_exterior_check
       - bag_hardware_check
-      - bag_serial_research
       - bag_chanel_leaf
 
   - item_id: wristwatch_rolex_submariner
@@ -103,6 +97,7 @@ items:
       - watch_veil
       - watch_case_check
       - watch_movement_open
+      - watch_authenticated
       - watch_rolex_leaf
 
   - item_id: wristwatch_longines_13zn
