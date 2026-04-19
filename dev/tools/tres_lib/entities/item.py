@@ -11,6 +11,15 @@ from tres_lib.tres_writer import TresWriter
 from tres_lib.tres_format import header_uid, field as tres_field, ext_resources
 
 
+RARITY_DEPTH = {
+    0: (2, 2),   # Common — fixed 2 layers
+    1: (2, 3),   # Uncommon
+    2: (3, 4),   # Rare
+    3: (4, 5),   # Epic
+    4: (5, 5),   # Legendary — fixed 5 layers
+}
+
+
 @dataclass
 class ItemSpec:
     yaml_key: str = "items"
@@ -112,6 +121,7 @@ class ItemSpec:
         for item in entries:
             iid = item.get("item_id", "?")
             layer_ids = item.get("layer_ids", [])
+            rarity = int(item.get("rarity", 0))
 
             if item.get("category_id") not in known_cat_ids:
                 errors.append(
@@ -120,6 +130,16 @@ class ItemSpec:
 
             if len(layer_ids) < 2:
                 errors.append(f"item '{iid}': must have at least 2 layer_ids")
+
+            band = RARITY_DEPTH.get(rarity)
+            if band is not None:
+                min_depth, max_depth = band
+                depth = len(layer_ids)
+                if depth < min_depth or depth > max_depth:
+                    errors.append(
+                        f"item '{iid}': rarity {rarity} expects"
+                        f" {min_depth}–{max_depth} layers, got {depth}"
+                    )
 
             for lid in layer_ids:
                 if lid not in known_layer_ids:
@@ -167,6 +187,22 @@ class ItemSpec:
                         )
                     if cur_base_value is not None:
                         prev_base_value = cur_base_value
+
+        epics_by_category: dict[str, list[str]] = {}
+        for item in entries:
+            if int(item.get("rarity", 0)) != 3:
+                continue
+            cat_id = item.get("category_id", "")
+            epics_by_category.setdefault(cat_id, []).append(
+                item.get("item_id", "?")
+            )
+
+        for cat_id, item_ids in epics_by_category.items():
+            if len(item_ids) > 1:
+                errors.append(
+                    f"category '{cat_id}': {len(item_ids)} Epic items found,"
+                    f" maximum is 1 ({', '.join(item_ids)})"
+                )
 
         return errors
 
