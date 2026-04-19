@@ -1,11 +1,16 @@
 identity_layers:
-  - layer_id: bag_veil
+  - layer_id: bag_veil_01
     display_name: Fabric Pouch
     base_value: 10
     unlock_action: null
 
+  - layer_id: bag_veil_02
+    display_name: Bundled Cloth Bag
+    base_value: 12
+    unlock_action: null
+
   - layer_id: bag_exterior_check
-    display_name: Structured Leather Bag
+    display_name: Leather Handbag
     base_value: 55
     unlock_action:
       difficulty: 1.0
@@ -16,16 +21,6 @@ identity_layers:
     unlock_action:
       difficulty: 2.0
 
-  - layer_id: bag_hermes_leaf
-    display_name: Hermès Birkin 30, c.2005
-    base_value: 4800
-    unlock_action: null
-
-  - layer_id: bag_replica_leaf
-    display_name: High-Grade Replica Bag
-    base_value: 220
-    unlock_action: null
-
   - layer_id: bag_serial_research
     display_name: Authenticated Luxury Bag
     base_value: 1200
@@ -34,14 +29,64 @@ identity_layers:
       required_skill: authentication
       required_level: 2
 
-  - layer_id: bag_chanel_leaf
-    display_name: Chanel Classic Flap, 1990s
-    base_value: 3600
+  - layer_id: bag_leaf_canvas_tote
+    display_name: Canvas Tote Bag
+    base_value: 75
     unlock_action: null
 
-  - layer_id: watch_veil
+  - layer_id: bag_leaf_vinyl_clutch
+    display_name: Vinyl Clutch Purse
+    base_value: 90
+    unlock_action: null
+
+  - layer_id: bag_leaf_nylon
+    display_name: Nylon Crossbody
+    base_value: 60
+    unlock_action: null
+
+  - layer_id: bag_leaf_straw
+    display_name: Woven Straw Bag
+    base_value: 50
+    unlock_action: null
+
+  - layer_id: bag_leaf_faux_leather
+    display_name: Faux Leather Purse
+    base_value: 55
+    unlock_action: null
+
+  - layer_id: bag_leaf_cotton
+    display_name: Cotton Canvas Satchel
+    base_value: 80
+    unlock_action: null
+
+  - layer_id: bag_leaf_replica
+    display_name: Well-Made Replica Bag
+    base_value: 320
+    unlock_action: null
+
+  - layer_id: bag_leaf_coach
+    display_name: Coach Leather Bag
+    base_value: 450
+    unlock_action: null
+
+  - layer_id: bag_leaf_lv
+    display_name: Louis Vuitton Speedy
+    base_value: 1400
+    unlock_action: null
+
+  - layer_id: bag_leaf_hermes
+    display_name: "Herm\xE8s Birkin 30"
+    base_value: 4800
+    unlock_action: null
+
+  - layer_id: watch_veil_01
     display_name: Small Metal Object
     base_value: 8
+    unlock_action: null
+
+  - layer_id: watch_veil_02
+    display_name: Tarnished Metal Piece
+    base_value: 10
     unlock_action: null
 
   - layer_id: watch_case_check
@@ -51,65 +96,212 @@ identity_layers:
       difficulty: 1.0
 
   - layer_id: watch_movement_open
-    display_name: Manual-Wind Dress Watch
+    display_name: Manual-Wind Watch
     base_value: 200
     unlock_action:
       difficulty: 2.0
       required_skill: mechanical
       required_level: 1
 
-  - layer_id: watch_rolex_leaf
-    display_name: Rolex Submariner, c.1969
-    base_value: 9500
+  - layer_id: watch_leaf_quartz
+    display_name: Quartz Dress Watch
+    base_value: 60
     unlock_action: null
 
-  - layer_id: watch_maker_stamped
-    display_name: Swiss Pocket Conversion
-    base_value: 380
-    unlock_action:
-      difficulty: 3.0
-      required_skill: appraisal
-      required_level: 1
+  - layer_id: watch_leaf_digital
+    display_name: Digital LCD Watch
+    base_value: 50
+    unlock_action: null
 
-  - layer_id: watch_longines_leaf
+  - layer_id: watch_leaf_timex
+    display_name: Timex Wind-Up
+    base_value: 80
+    unlock_action: null
+
+  - layer_id: watch_leaf_russian
+    display_name: Russian Field Watch
+    base_value: 120
+    unlock_action: null
+
+  - layer_id: watch_leaf_cocktail
+    display_name: Ladies' Cocktail Watch
+    base_value: 90
+    unlock_action: null
+
+  - layer_id: watch_leaf_fashion
+    display_name: Fashion Brand Watch
+    base_value: 70
+    unlock_action: null
+
+  - layer_id: watch_leaf_seiko
+    display_name: Seiko 5 Auto, 1970s
+    base_value: 450
+    unlock_action: null
+
+  - layer_id: watch_leaf_bulova
+    display_name: Bulova Accutron
+    base_value: 650
+    unlock_action: null
+
+  - layer_id: watch_leaf_citizen
+    display_name: Citizen Chrono, 1980s
+    base_value: 380
+    unlock_action: null
+
+  - layer_id: watch_leaf_longines
     display_name: Longines 13ZN, c.1948
     base_value: 1100
     unlock_action: null
 
 items:
+  - item_id: handbag_canvas_tote
+    category_id: handbag
+    rarity: 0
+    layer_ids:
+      - bag_veil_01
+      - bag_leaf_canvas_tote
+
+  - item_id: handbag_vinyl_clutch
+    category_id: handbag
+    rarity: 0
+    layer_ids:
+      - bag_veil_01
+      - bag_leaf_vinyl_clutch
+
+  - item_id: handbag_nylon_crossbody
+    category_id: handbag
+    rarity: 0
+    layer_ids:
+      - bag_veil_02
+      - bag_leaf_nylon
+
+  - item_id: handbag_straw_bag
+    category_id: handbag
+    rarity: 0
+    layer_ids:
+      - bag_veil_02
+      - bag_leaf_straw
+
+  - item_id: handbag_faux_leather
+    category_id: handbag
+    rarity: 0
+    layer_ids:
+      - bag_veil_01
+      - bag_leaf_faux_leather
+
+  - item_id: handbag_cotton_satchel
+    category_id: handbag
+    rarity: 0
+    layer_ids:
+      - bag_veil_02
+      - bag_leaf_cotton
+
+  - item_id: handbag_replica_designer
+    category_id: handbag
+    rarity: 1
+    layer_ids:
+      - bag_veil_01
+      - bag_exterior_check
+      - bag_leaf_replica
+
+  - item_id: handbag_coach_leather
+    category_id: handbag
+    rarity: 1
+    layer_ids:
+      - bag_veil_02
+      - bag_exterior_check
+      - bag_leaf_coach
+
+  - item_id: handbag_louis_vuitton
+    category_id: handbag
+    rarity: 2
+    layer_ids:
+      - bag_veil_01
+      - bag_exterior_check
+      - bag_hardware_check
+      - bag_leaf_lv
+
   - item_id: handbag_hermes_birkin
     category_id: handbag
     rarity: 3
     layer_ids:
-      - bag_veil
-      - bag_exterior_check
-      - bag_hardware_check
-      - bag_hermes_leaf
-
-  - item_id: handbag_chanel_classic_flap
-    category_id: handbag
-    rarity: 3
-    layer_ids:
-      - bag_veil
+      - bag_veil_02
       - bag_exterior_check
       - bag_hardware_check
       - bag_serial_research
-      - bag_chanel_leaf
+      - bag_leaf_hermes
 
-  - item_id: wristwatch_rolex_submariner
+  - item_id: wristwatch_quartz_dress
     category_id: wristwatch
-    rarity: 4
+    rarity: 0
     layer_ids:
-      - watch_veil
+      - watch_veil_01
+      - watch_leaf_quartz
+
+  - item_id: wristwatch_digital_lcd
+    category_id: wristwatch
+    rarity: 0
+    layer_ids:
+      - watch_veil_01
+      - watch_leaf_digital
+
+  - item_id: wristwatch_timex_windup
+    category_id: wristwatch
+    rarity: 0
+    layer_ids:
+      - watch_veil_02
+      - watch_leaf_timex
+
+  - item_id: wristwatch_russian_field
+    category_id: wristwatch
+    rarity: 0
+    layer_ids:
+      - watch_veil_02
+      - watch_leaf_russian
+
+  - item_id: wristwatch_ladies_cocktail
+    category_id: wristwatch
+    rarity: 0
+    layer_ids:
+      - watch_veil_01
+      - watch_leaf_cocktail
+
+  - item_id: wristwatch_fashion_brand
+    category_id: wristwatch
+    rarity: 0
+    layer_ids:
+      - watch_veil_02
+      - watch_leaf_fashion
+
+  - item_id: wristwatch_seiko_auto
+    category_id: wristwatch
+    rarity: 1
+    layer_ids:
+      - watch_veil_01
       - watch_case_check
-      - watch_movement_open
-      - watch_rolex_leaf
+      - watch_leaf_seiko
+
+  - item_id: wristwatch_bulova_accutron
+    category_id: wristwatch
+    rarity: 1
+    layer_ids:
+      - watch_veil_02
+      - watch_case_check
+      - watch_leaf_bulova
+
+  - item_id: wristwatch_citizen_chrono
+    category_id: wristwatch
+    rarity: 1
+    layer_ids:
+      - watch_veil_01
+      - watch_case_check
+      - watch_leaf_citizen
 
   - item_id: wristwatch_longines_13zn
     category_id: wristwatch
     rarity: 2
     layer_ids:
-      - watch_veil
+      - watch_veil_02
       - watch_case_check
-      - watch_maker_stamped
-      - watch_longines_leaf
+      - watch_movement_open
+      - watch_leaf_longines

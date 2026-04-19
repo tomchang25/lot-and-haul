@@ -92,7 +92,9 @@ LAYER SHARING — the core confusion mechanic:
 Items in the same category MUST share early layers so players cannot distinguish
 them until they invest HOME time to advance.
 
-Required: all items share at minimum layer[0]. Aim for layer[0,1] at minimum.
+Required: all items in a category use one of the category's veil layers as
+layer[0]. Items sharing the same veil MUST also share at least layer[1] where
+possible (i.e. when the item has 3+ layers). Aim for shared layer[0,1] at minimum.
 
 Allowed fork patterns (mix these naturally across the batch):
 
@@ -116,6 +118,30 @@ Allowed fork patterns (mix these naturally across the batch):
 
 Every shared layer_id appears ONLY ONCE in the identity_layers list.
 Items reference it by name. The layer does not know its own position.
+
+VEIL LAYER VARIETY:
+Categories may use multiple veil layers to add early-game variety.
+One base veil is always required. For every 10 items in a category,
+one additional veil variant may be added.
+1–9 items → 1 veil (the base veil only)
+10–19 items → up to 2 veils
+20–29 items → up to 3 veils …and so on.
+Formula: max veil count = 1 + floor(item_count / 10).
+
+Name veil layers with a numbered suffix:
+{category_prefix}\_veil_01, {category_prefix}\_veil_02, …
+Examples: bag_veil_01, bag_veil_02, watch_veil_01, watch_veil_02
+
+All veil layers MUST:
+
+- Have unlock_action: null (auto-resolve on reveal).
+- Use generic, ambiguous display_names (same naming standard as any layer[0]).
+- Have similar but not necessarily identical base_value.
+
+Distribute items roughly evenly across the available veil variants.
+Each veil variant creates its own "sub-group" of indistinguishable items.
+Items sharing the same veil layer still follow the standard sharing rules
+(share layer[1] where possible for 3+ layer items).
 
 CROSS-CHAIN RULE:
 The shared mid-layer must have an unlock_action that makes sense at both depths.
@@ -142,12 +168,12 @@ layer[2] → [3]: difficulty=2.0–3.0. May add skill lv1.
 layer[3] → [4]: difficulty=3.0–4.0. Skill lv1–2 recommended.
 
 RARITY VS LAYER DEPTH:
-COMMON (0):    2 layers (Layer 0 + leaf). Final value 50–300. No unlock needed.
-UNCOMMON (1):  2–3 layers. Final value 300–800. 0–1 unlocks.
-RARE (2):      3–4 layers. Final value 800–2000. 1–2 unlocks.
-EPIC (3):      4–5 layers. Final value 2000–8000. 2–3 unlocks.
+COMMON (0): 2 layers (Layer 0 + leaf). Final value 50–300. No unlock needed.
+UNCOMMON (1): 2–3 layers. Final value 300–800. 0–1 unlocks.
+RARE (2): 3–4 layers. Final value 800–2000. 1–2 unlocks.
+EPIC (3): 4–5 layers. Final value 2000–8000. 2–3 unlocks.
 LEGENDARY (4): DO NOT GENERATE. Legendary items are hand-authored only.
-               If the user prompt requests a Legendary item, skip it.
+If the user prompt requests a Legendary item, skip it.
 
 ITEM VARIETY DISTRIBUTION (target across all content):
 ~60% Common, ~25% Uncommon, ~10% Rare, ~4% Epic, ~1% Legendary.
@@ -245,3 +271,6 @@ Output the complete YAML block starting with 'categories:'.
 [ ] Layer depth matches rarity band (Common=2, Uncommon=2–3, Rare=3–4, Epic=4–5)
 [ ] No more than 1 Epic item per category
 [ ] No Legendary items generated (rarity 4 is hand-authored only)
+[ ] Veil layer count per category does not exceed 1 + floor(item_count / 10)
+[ ] Veil layers use numbered suffix: {prefix}\_veil_01, {prefix}\_veil_02, …
+[ ] Items are distributed roughly evenly across veil variants
