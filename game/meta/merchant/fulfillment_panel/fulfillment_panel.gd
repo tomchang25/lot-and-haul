@@ -221,7 +221,7 @@ func _refresh_order_info() -> void:
     var info_lines: Array[String] = [
         "Buff: x%.1f" % _selected_order.buff,
         "Bonus: $%d" % _selected_order.completion_bonus,
-        "Deadline: %d day(s) left" % days_left,
+        "Deadline: Final day" if days_left == 0 else "Deadline: %d day(s) left" % days_left,
     ]
     if _selected_order.allow_partial_delivery:
         info_lines.append("Partial delivery allowed")
