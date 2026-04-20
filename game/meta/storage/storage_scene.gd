@@ -29,6 +29,8 @@ var _selected_entry: ItemEntry = null
 @onready var _item_list_panel: ItemListPanel = $RootVBox/ListCenter/OuterVBox/ItemListPanel
 @onready var _back_btn: Button = $RootVBox/Footer/BackButton
 @onready var _empty_label: Label = $RootVBox/ListCenter/OuterVBox/EmptyLabel
+@onready var _slot_count_label: Label = $RootVBox/SlotsHUD/SlotCountLabel
+@onready var _active_actions_label: Label = $RootVBox/SlotsHUD/ActiveActionsLabel
 
 @onready var _action_popup: Window = $ActionPopup
 @onready var _action_item_label: Label = $ActionPopup/MarginContainer/VBoxContainer/ItemLabel
@@ -61,6 +63,7 @@ func _ready() -> void:
     _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
 
     _populate_rows()
+    _refresh_slots_hud()
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
@@ -104,6 +107,7 @@ func _on_remove_pressed() -> void:
         SaveManager.save()
     _refresh_row(_selected_entry)
     _action_popup.hide()
+    _refresh_slots_hud()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 
@@ -255,6 +259,7 @@ func _assign_action(action: ResearchSlot.SlotAction) -> void:
     SaveManager.save()
     _refresh_row(_selected_entry)
     _action_popup.hide()
+    _refresh_slots_hud()
 
 # ══ Slot lookups ══════════════════════════════════════════════════════════════
 
@@ -276,3 +281,41 @@ func _empty_slot_index() -> int:
         if int(d.get("item_id", -1)) == -1:
             return i
     return -1
+
+# ══ HUD ═══════════════════════════════════════════════════════════════════════
+
+
+func _refresh_slots_hud() -> void:
+    var total: int = SaveManager.max_research_slots
+    var used: int = 0
+    for d: Dictionary in SaveManager.research_slots:
+        if int(d.get("item_id", -1)) != -1:
+            used += 1
+    var remaining: int = total - used
+    _slot_count_label.text = "Slots: %d / %d  (remaining: %d)" % [used, total, remaining]
+
+    var lines: PackedStringArray = []
+    for d: Dictionary in SaveManager.research_slots:
+        var item_id: int = int(d.get("item_id", -1))
+        if item_id == -1:
+            continue
+        var slot: ResearchSlot = ResearchSlot.from_dict(d)
+        var entry: ItemEntry = _find_entry_by_id(item_id)
+        var item_name: String = entry.display_name if entry != null else "Unknown (#%d)" % item_id
+        var action_name: String = ResearchSlot.action_to_string(slot.action).capitalize()
+        var line: String = "%s: %s" % [action_name, item_name]
+        if slot.completed:
+            line += " ✓"
+        lines.append(line)
+
+    if lines.is_empty():
+        _active_actions_label.text = "No active research"
+    else:
+        _active_actions_label.text = "\n".join(lines)
+
+
+func _find_entry_by_id(item_id: int) -> ItemEntry:
+    for entry: ItemEntry in SaveManager.storage_items:
+        if entry.id == item_id:
+            return entry
+    return null
