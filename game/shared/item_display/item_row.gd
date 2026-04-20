@@ -50,7 +50,7 @@ const COLUMN_HEADERS: Dictionary = {
     Column.GRID: "Grid",
     Column.MARKET_FACTOR: "Market",
     Column.RESEARCH_STATUS: "Research",
-    Column.INSPECTION: "Inspection",
+    Column.INSPECTION: "Price",
     Column.UNLOCK: "Unlock",
 }
 
@@ -236,7 +236,10 @@ func _refresh() -> void:
     _research_status_label.text = _research_status_text()
 
     # ── INSPECTION ────────────────────────────────────────────────────────────
-    _inspection_label.text = _entry.inspection_stars_display
+    if _entry.is_veiled():
+        _inspection_label.text = "???"
+    else:
+        _inspection_label.text = "%d%%" % int(_entry.price_convergence_ratio * 100)
 
     # ── UNLOCK ────────────────────────────────────────────────────────────────
     _unlock_label.text = _unlock_display_text()

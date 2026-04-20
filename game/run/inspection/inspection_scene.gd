@@ -80,7 +80,7 @@ func _on_inspect_requested() -> void:
 
     var pool: Array[ItemEntry] = []
     for entry: ItemEntry in RunManager.run_record.lot_items:
-        if not entry.is_veiled() and not entry.is_fully_inspected():
+        if not entry.is_veiled() and not entry.is_fully_resolved():
             pool.append(entry)
 
     for i in range(hits):
@@ -94,7 +94,7 @@ func _on_inspect_requested() -> void:
         card.refresh(&"condition")
         card.flash_border()
 
-        if entry.is_fully_inspected():
+        if entry.is_fully_resolved():
             pool.remove_at(idx)
 
     _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
@@ -183,7 +183,7 @@ func _refresh_action_bar() -> void:
     for entry: ItemEntry in RunManager.run_record.lot_items:
         if entry.is_veiled():
             has_veiled = true
-        elif not entry.is_fully_inspected():
+        elif not entry.is_fully_resolved():
             has_inspectable = true
     _action_bar.refresh_lot(has_inspectable, has_veiled)
 

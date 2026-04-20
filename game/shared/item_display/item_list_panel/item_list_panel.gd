@@ -131,7 +131,7 @@ static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewC
         ItemRow.Column.RARITY:
             if entry.is_veiled():
                 return -1
-            if entry.is_rarity_maxed():
+            if entry.is_rarity_resolved():
                 return entry.item_data.rarity
             return entry.get_rarity_bucket()
         ItemRow.Column.WEIGHT:
@@ -152,7 +152,7 @@ static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewC
                     return 1
             return 0
         ItemRow.Column.INSPECTION:
-            return entry.inspection_stars
+            return entry.price_convergence_ratio
         ItemRow.Column.UNLOCK:
             if entry.is_at_final_layer():
                 return 1.0

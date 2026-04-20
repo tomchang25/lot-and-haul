@@ -197,8 +197,8 @@ func _configure_action_btn(
 func _disabled_reason(entry: ItemEntry, action: ResearchSlot.SlotAction) -> String:
     match action:
         ResearchSlot.SlotAction.STUDY:
-            if entry.is_fully_inspected():
-                return "Fully inspected"
+            if entry.is_fully_resolved():
+                return "Fully resolved"
             return ""
         ResearchSlot.SlotAction.REPAIR:
             if entry.is_repair_complete():
@@ -219,8 +219,8 @@ func _disabled_reason(entry: ItemEntry, action: ResearchSlot.SlotAction) -> Stri
 func _progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
     match slot.action:
         ResearchSlot.SlotAction.STUDY:
-            if slot.completed or entry.is_fully_inspected():
-                return "Fully Inspected"
+            if slot.completed or entry.is_fully_resolved():
+                return "Fully Resolved"
             return "Rarity: %s   Condition: %s" % [entry.get_potential_rating(), entry.condition_label]
         ResearchSlot.SlotAction.REPAIR:
             if slot.completed or entry.is_repair_complete():
