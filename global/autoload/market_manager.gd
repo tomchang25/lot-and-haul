@@ -32,7 +32,8 @@ func get_super_category_trend(super_cat_id: String) -> float:
 func advance_market(days: int) -> void:
     if days <= 0:
         return
-    _walk_means(days)
+    var start_day: int = SaveManager.current_day - days
+    _walk_means(days, start_day)
     _resample_today()
 
 # ── Private ──────────────────────────────────────────────────────────────────
@@ -43,15 +44,16 @@ func _initialise_means() -> void:
         super_cat_means[sc_id] = 1.0
 
 
-func _walk_means(days: int) -> void:
+func _walk_means(days: int, start_day: int) -> void:
     for sc_id: String in super_cat_means.keys():
         var sc: SuperCategoryData = SuperCategoryRegistry.get_super_category(sc_id)
         if sc == null:
             continue
         var mean: float = super_cat_means[sc_id]
         for d in range(days):
-            mean += randfn(0.0, sc.market_drift_per_day)
-            mean = clampf(mean, sc.market_mean_min, sc.market_mean_max)
+            if (start_day + d) % 7 == 0:
+                mean += randfn(0.0, sc.market_drift_per_week)
+                mean = clampf(mean, sc.market_mean_min, sc.market_mean_max)
         super_cat_means[sc_id] = mean
 
 
