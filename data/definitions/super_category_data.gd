@@ -19,5 +19,5 @@ extends Resource
 # Standard deviation used when resampling daily category factors around the mean.
 @export var market_stddev: float = 0.02
 
-# Gaussian step standard deviation for the daily random walk of the mean.
-@export var market_drift_per_day: float = 0.05
+# Gaussian step standard deviation for the mean random walk; step fires once every 7 days.
+@export var market_drift_per_week: float = 0.05

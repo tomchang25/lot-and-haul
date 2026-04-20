@@ -70,8 +70,8 @@ class SuperCategorySpec:
             float(entry.get("market_stddev", 0.02)),
         )
         w.add_field_float(
-            "market_drift_per_day",
-            float(entry.get("market_drift_per_day", 0.05)),
+            "market_drift_per_week",
+            float(entry.get("market_drift_per_week", 0.05)),
         )
         return w.render()
 
@@ -86,7 +86,7 @@ class SuperCategorySpec:
         market_mean_min = float(tres_field(text, "market_mean_min") or 0.7)
         market_mean_max = float(tres_field(text, "market_mean_max") or 1.3)
         market_stddev = float(tres_field(text, "market_stddev") or 0.02)
-        market_drift_per_day = float(tres_field(text, "market_drift_per_day") or 0.05)
+        market_drift_per_week = float(tres_field(text, "market_drift_per_week") or 0.05)
 
         return {
             "super_category_id": super_cat_id,
@@ -94,7 +94,7 @@ class SuperCategorySpec:
             "market_mean_min": market_mean_min,
             "market_mean_max": market_mean_max,
             "market_stddev": market_stddev,
-            "market_drift_per_day": market_drift_per_day,
+            "market_drift_per_week": market_drift_per_week,
         }
 
     def validate(self, entries: list, all_data: dict) -> list[str]:
@@ -126,7 +126,7 @@ class SuperCategorySpec:
             mean_min = entry.get("market_mean_min", 0.7)
             mean_max = entry.get("market_mean_max", 1.3)
             stddev = entry.get("market_stddev", 0.02)
-            drift = entry.get("market_drift_per_day", 0.05)
+            drift = entry.get("market_drift_per_week", 0.05)
 
             if not isinstance(mean_min, (int, float)) or not isinstance(
                 mean_max, (int, float)
@@ -148,7 +148,7 @@ class SuperCategorySpec:
 
             if not isinstance(drift, (int, float)) or drift < 0:
                 errors.append(
-                    f"super_category '{sc_id}': market_drift_per_day must be "
+                    f"super_category '{sc_id}': market_drift_per_week must be "
                     f">= 0, got {drift!r}"
                 )
 
