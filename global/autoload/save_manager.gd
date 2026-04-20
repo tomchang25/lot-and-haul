@@ -291,19 +291,16 @@ func _tick_research_slots(days: int) -> Array[Dictionary]:
                 break
             match slot.action:
                 ResearchSlot.SlotAction.STUDY:
-                    if not entry.is_fully_inspected():
-                        entry.apply_study(_study_speed_factor())
+                    entry.apply_study(_study_speed_factor())
                     slot.completed = entry.is_fully_inspected()
                 ResearchSlot.SlotAction.REPAIR:
-                    if not entry.is_repair_complete():
-                        entry.apply_repair(_repair_speed_factor())
+                    entry.apply_repair(_repair_speed_factor())
                     slot.completed = entry.is_repair_complete()
                 ResearchSlot.SlotAction.UNLOCK:
+                    entry.add_unlock_effort(_unlock_speed_factor())
                     if entry.is_unlock_ready():
                         entry.advance_layer()
                         slot.completed = true
-                    else:
-                        entry.add_unlock_effort(_unlock_speed_factor())
                 _:
                     push_warning("SaveManager: unknown SlotAction %d" % slot.action)
                     break
