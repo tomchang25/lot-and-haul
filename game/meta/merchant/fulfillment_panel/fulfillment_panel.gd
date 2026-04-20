@@ -26,6 +26,7 @@ var _selected_slot_index: int = -1
 var _session_assignments: Dictionary = { } # slot_index (int) → Array[ItemEntry]
 var _tooltip: ItemRowTooltip = null
 var _ctx: ItemViewContext = null
+var _research_warning_dialog: ConfirmationDialog = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -51,6 +52,10 @@ func _ready() -> void:
 
     _back_btn.pressed.connect(_on_back_pressed)
     _confirm_btn.pressed.connect(_on_confirm_pressed)
+
+    _research_warning_dialog = ConfirmationDialog.new()
+    _research_warning_dialog.confirmed.connect(_on_research_warning_confirmed)
+    add_child(_research_warning_dialog)
 
     _item_list_panel.row_pressed.connect(_on_item_row_pressed)
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
@@ -112,6 +117,36 @@ func _on_confirm_pressed() -> void:
     if _selected_order == null:
         return
 
+    var consumed: Array[ItemEntry] = []
+    for slot_idx: Variant in _session_assignments:
+        for entry: ItemEntry in _session_assignments[slot_idx]:
+            consumed.append(entry)
+
+    var researched_lines: PackedStringArray = []
+    for entry: ItemEntry in consumed:
+        var action: String = ResearchSlot.action_for_item(SaveManager.research_slots, entry.id)
+        if action != "":
+            researched_lines.append("• %s (%s)" % [entry.display_name, action])
+
+    if not researched_lines.is_empty():
+        _research_warning_dialog.dialog_text = (
+            "The following items are currently being researched:\n%s\n\nDelivering will cancel their research. Continue?"
+            % "\n".join(researched_lines)
+        )
+        _research_warning_dialog.popup_centered()
+        return
+
+    _execute_delivery()
+
+
+func _on_research_warning_confirmed() -> void:
+    _execute_delivery()
+
+
+func _execute_delivery() -> void:
+    if _selected_order == null:
+        return
+
     var total_payout: int = 0
     var consumed: Array[ItemEntry] = []
 
@@ -126,6 +161,7 @@ func _on_confirm_pressed() -> void:
     # Remove consumed items from storage and award knowledge
     for entry: ItemEntry in consumed:
         SaveManager.storage_items.erase(entry)
+        ResearchSlot.clear_for_item(SaveManager.research_slots, entry.id)
         KnowledgeManager.add_category_points(
             entry.item_data.category_data.category_id,
             entry.item_data.rarity,

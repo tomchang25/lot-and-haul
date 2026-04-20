@@ -58,6 +58,41 @@ static func action_from_string(s: String) -> SlotAction:
             return SlotAction.STUDY
 
 
+static func find_index(slots: Array, item_id: int) -> int:
+    for i in range(slots.size()):
+        var d: Dictionary = slots[i]
+        if int(d.get("item_id", -1)) == item_id:
+            return i
+    return -1
+
+
+static func action_for_item(slots: Array, item_id: int) -> String:
+    for d: Dictionary in slots:
+        if int(d.get("item_id", -1)) != item_id:
+            continue
+        if bool(d.get("completed", false)):
+            continue
+        return d.get("action", "")
+    return ""
+
+
+static func clear_for_item(slots: Array, item_id: int) -> void:
+    var idx: int = find_index(slots, item_id)
+    if idx < 0:
+        return
+    slots[idx] = { "item_id": -1, "action": "study", "completed": false }
+
+
+static func purge_orphaned(slots: Array, valid_ids: Array) -> void:
+    for i in range(slots.size()):
+        var d: Dictionary = slots[i]
+        var sid: int = int(d.get("item_id", -1))
+        if sid == -1:
+            continue
+        if not valid_ids.has(sid):
+            slots[i] = { "item_id": -1, "action": "study", "completed": false }
+
+
 func to_dict() -> Dictionary:
     return {
         "item_id": item_id,

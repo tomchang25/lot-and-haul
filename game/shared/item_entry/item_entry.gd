@@ -81,7 +81,9 @@ var display_name: String:
     get:
         var name: String = active_layer().display_name
         if is_at_final_layer() and not is_veiled():
-            return "%s ·" % name
+            name = "%s ·" % name
+        if id >= 0 and ResearchSlot.action_for_item(SaveManager.research_slots, id) != "":
+            name += " ⚙"
         return name
 
 # Condition label shown to the player, keyed off the current inspect bucket.
@@ -281,7 +283,6 @@ var inspection_stars: int:
             stars += 1
         return stars
 
-
 var inspection_stars_display: String:
     get:
         if is_veiled():
@@ -290,7 +291,6 @@ var inspection_stars_display: String:
         for i: int in range(3):
             result += "★" if i < inspection_stars else "☆"
         return result
-
 
 var unlock_ratio: float:
     get:

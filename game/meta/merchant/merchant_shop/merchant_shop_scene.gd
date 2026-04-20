@@ -28,6 +28,8 @@ var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
 var _selected: Dictionary = { } # ItemEntry → bool
 var _negotiation_dialog: Control = null
+var _research_warning_dialog: ConfirmationDialog = null
+var _pending_basket: Array[ItemEntry] = []
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -59,6 +61,10 @@ func _ready() -> void:
     _item_list_panel.row_pressed.connect(_on_row_pressed)
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
     _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
+
+    _research_warning_dialog = ConfirmationDialog.new()
+    _research_warning_dialog.confirmed.connect(_on_research_warning_confirmed)
+    add_child(_research_warning_dialog)
 
     _populate_rows()
     _refresh_sell_button()
@@ -96,6 +102,30 @@ func _on_sell_pressed() -> void:
     if basket.is_empty():
         return
 
+    var researched_lines: PackedStringArray = []
+    for entry: ItemEntry in basket:
+        var action: String = ResearchSlot.action_for_item(SaveManager.research_slots, entry.id)
+        if action != "":
+            researched_lines.append("• %s (%s)" % [entry.display_name, action])
+
+    if not researched_lines.is_empty():
+        _pending_basket = basket
+        _research_warning_dialog.dialog_text = (
+            "The following items are currently being researched:\n%s\n\nSelling will cancel their research. Continue?"
+            % "\n".join(researched_lines)
+        )
+        _research_warning_dialog.popup_centered()
+        return
+
+    _open_negotiation(basket)
+
+
+func _on_research_warning_confirmed() -> void:
+    _open_negotiation(_pending_basket)
+    _pending_basket = []
+
+
+func _open_negotiation(basket: Array[ItemEntry]) -> void:
     if _negotiation_dialog == null:
         _negotiation_dialog = NegotiationDialogScene.instantiate()
         add_child(_negotiation_dialog)
@@ -114,6 +144,7 @@ func _on_negotiation_accepted(final_price: int) -> void:
     SaveManager.cash += final_price
     for entry: ItemEntry in sold:
         SaveManager.storage_items.erase(entry)
+        ResearchSlot.clear_for_item(SaveManager.research_slots, entry.id)
         KnowledgeManager.add_category_points(
             entry.item_data.category_data.category_id,
             entry.item_data.rarity,
