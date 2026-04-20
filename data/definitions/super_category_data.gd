@@ -13,8 +13,8 @@ extends Resource
 # ── Market tuning ────────────────────────────────────────────────────────────
 
 # Bounds for the super-category's drifting mean (MarketManager random walk).
-@export var market_mean_min: float = 0.7
-@export var market_mean_max: float = 1.3
+@export var market_mean_min: float = 0.1
+@export var market_mean_max: float = 4.0
 
 # Standard deviation used when resampling daily category factors around the mean.
 @export var market_stddev: float = 0.02

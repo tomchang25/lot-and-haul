@@ -19,9 +19,11 @@ class SuperCategorySpec:
     yaml_key: str = "super_categories"
     tres_subdir: str = "super_categories"
     uid_prefix: str = "super_category"
-    script_paths: dict[str, str] = field(default_factory=lambda: {
-        "super_category_data": "res://data/definitions/super_category_data.gd",
-    })
+    script_paths: dict[str, str] = field(
+        default_factory=lambda: {
+            "super_category_data": "res://data/definitions/super_category_data.gd",
+        }
+    )
 
     def entity_id(self, entry: dict) -> str:
         if isinstance(entry, str):
@@ -84,9 +86,7 @@ class SuperCategorySpec:
         market_mean_min = float(tres_field(text, "market_mean_min") or 0.7)
         market_mean_max = float(tres_field(text, "market_mean_max") or 1.3)
         market_stddev = float(tres_field(text, "market_stddev") or 0.02)
-        market_drift_per_day = float(
-            tres_field(text, "market_drift_per_day") or 0.05
-        )
+        market_drift_per_day = float(tres_field(text, "market_drift_per_day") or 0.05)
 
         return {
             "super_category_id": super_cat_id,
@@ -132,8 +132,7 @@ class SuperCategorySpec:
                 mean_max, (int, float)
             ):
                 errors.append(
-                    f"super_category '{sc_id}': market_mean_min/max must be "
-                    "numeric"
+                    f"super_category '{sc_id}': market_mean_min/max must be " "numeric"
                 )
             elif mean_min >= mean_max:
                 errors.append(

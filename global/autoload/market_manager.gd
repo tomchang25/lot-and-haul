@@ -4,8 +4,8 @@
 # Persisted via SaveManager; advanced via advance_market() on day pass.
 extends Node
 
-const MIN_CATEGORY_FACTOR := 0.5
-const MAX_CATEGORY_FACTOR := 2.0
+const MIN_CATEGORY_FACTOR := 0.1
+const MAX_CATEGORY_FACTOR := 4.0
 
 # { super_category_id: String → float } — drifting mean per super-category.
 var super_cat_means: Dictionary = { }
