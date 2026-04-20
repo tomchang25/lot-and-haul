@@ -199,7 +199,9 @@ func is_fully_resolved() -> bool:
 
 
 func apply_inspect(delta: float) -> void:
-    inspection_level += delta
+    var max_threshold: float = _rarity_thresholds().back()
+    var cap: float = maxf(max_threshold, CONDITION_THRESHOLDS.back())
+    inspection_level = minf(cap, inspection_level + delta)
     KnowledgeManager.add_category_points(
         item_data.category_data.category_id,
         item_data.rarity,
@@ -209,7 +211,9 @@ func apply_inspect(delta: float) -> void:
 
 func apply_study(speed_factor: float = 1.0) -> void:
     var delta: float = STUDY_BASE_DELTA * speed_factor
-    inspection_level += delta
+    var max_threshold: float = _rarity_thresholds().back()
+    var cap: float = maxf(max_threshold, CONDITION_THRESHOLDS.back())
+    inspection_level = minf(cap, inspection_level + delta)
     KnowledgeManager.add_category_points(
         item_data.category_data.category_id,
         item_data.rarity,
@@ -230,7 +234,11 @@ func apply_repair(speed_factor: float = 1.0) -> void:
 
 
 func add_unlock_effort(speed_factor: float = 1.0) -> void:
-    unlock_progress += UNLOCK_BASE_EFFORT * speed_factor
+    var action: LayerUnlockAction = current_unlock_action()
+    if action:
+        unlock_progress = minf(action.difficulty, unlock_progress + UNLOCK_BASE_EFFORT * speed_factor)
+    else:
+        push_warning("ItemEntry: add_unlock_effort called with no unlock action available")
 
 
 func advance_layer() -> void:
