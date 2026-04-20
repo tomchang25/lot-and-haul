@@ -13,6 +13,8 @@ const STORAGE_COLUMNS: Array = [
     ItemRow.Column.CONDITION,
     ItemRow.Column.ESTIMATED_VALUE,
     ItemRow.Column.RARITY,
+    ItemRow.Column.INSPECTION,
+    ItemRow.Column.UNLOCK,
     ItemRow.Column.RESEARCH_STATUS,
 ]
 
@@ -140,8 +142,8 @@ func _show_action_popup(entry: ItemEntry) -> void:
         current_slot = ResearchSlot.from_dict(SaveManager.research_slots[slot_index])
 
     var slots_available: bool = in_slot \
-            or _empty_slot_index() >= 0 \
-            or SaveManager.research_slots.size() < SaveManager.max_research_slots
+    or _empty_slot_index() >= 0 \
+    or SaveManager.research_slots.size() < SaveManager.max_research_slots
 
     if not slots_available:
         _status_label.text = "No research slots available"

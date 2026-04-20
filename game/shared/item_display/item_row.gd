@@ -31,6 +31,8 @@ enum Column {
     GRID,
     MARKET_FACTOR,
     RESEARCH_STATUS,
+    INSPECTION,
+    UNLOCK,
 }
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -48,6 +50,8 @@ const COLUMN_HEADERS: Dictionary = {
     Column.GRID: "Grid",
     Column.MARKET_FACTOR: "Market",
     Column.RESEARCH_STATUS: "Research",
+    Column.INSPECTION: "Inspection",
+    Column.UNLOCK: "Unlock",
 }
 
 const COLUMN_MIN_WIDTH: Dictionary = {
@@ -62,6 +66,8 @@ const COLUMN_MIN_WIDTH: Dictionary = {
     Column.GRID: 80,
     Column.MARKET_FACTOR: 100,
     Column.RESEARCH_STATUS: 100,
+    Column.INSPECTION: 100,
+    Column.UNLOCK: 80,
 }
 
 # ── State ─────────────────────────────────────────────────────────────────────
@@ -85,6 +91,8 @@ var _selection_state: SelectionState = SelectionState.NONE
 @onready var _grid_label: Label = $HBoxContainer/GridLabel
 @onready var _market_factor_label: Label = $HBoxContainer/MarketFactorLabel
 @onready var _research_status_label: Label = $HBoxContainer/ResearchStatusLabel
+@onready var _inspection_label: Label = $HBoxContainer/InspectionLabel
+@onready var _unlock_label: Label = $HBoxContainer/UnlockLabel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -183,6 +191,8 @@ func _refresh() -> void:
     _grid_label.visible = Column.GRID in _columns
     _market_factor_label.visible = Column.MARKET_FACTOR in _columns
     _research_status_label.visible = Column.RESEARCH_STATUS in _columns
+    _inspection_label.visible = Column.INSPECTION in _columns
+    _unlock_label.visible = Column.UNLOCK in _columns
 
     # ── Column order ──────────────────────────────────────────────────────────
     _apply_column_order()
@@ -225,6 +235,12 @@ func _refresh() -> void:
     # ── RESEARCH STATUS ───────────────────────────────────────────────────────
     _research_status_label.text = _research_status_text()
 
+    # ── INSPECTION ────────────────────────────────────────────────────────────
+    _inspection_label.text = _entry.inspection_stars_display
+
+    # ── UNLOCK ────────────────────────────────────────────────────────────────
+    _unlock_label.text = _unlock_display_text()
+
 # ══ Research status lookup ════════════════════════════════════════════════════
 
 
@@ -249,6 +265,16 @@ func _research_status_text() -> String:
                 return "?"
     return ""
 
+
+func _unlock_display_text() -> String:
+    if _entry.is_at_final_layer():
+        return "✓"
+    if _entry.current_unlock_action() == null:
+        return "-"
+    if _entry.unlock_progress == 0.0:
+        return " "
+    return "%d%%" % int(_entry.unlock_ratio * 100)
+
 # ══ Column ordering ═══════════════════════════════════════════════════════════
 
 
@@ -268,6 +294,8 @@ func _apply_column_order() -> void:
         Column.GRID: _grid_label,
         Column.MARKET_FACTOR: _market_factor_label,
         Column.RESEARCH_STATUS: _research_status_label,
+        Column.INSPECTION: _inspection_label,
+        Column.UNLOCK: _unlock_label,
     }
 
     for i in _columns.size():
