@@ -6,12 +6,14 @@ extends Control
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _buttons_container: VBoxContainer = $RootVBox/ButtonsVBox
+@onready var _market_btn: Button = $RootVBox/Footer/MarketButton
 @onready var _back_btn: Button = $RootVBox/Footer/BackButton
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
 func _ready() -> void:
+    _market_btn.pressed.connect(_on_market_pressed)
     _back_btn.pressed.connect(_on_back_pressed)
     _populate_merchants()
 
@@ -20,6 +22,10 @@ func _ready() -> void:
 
 func _on_back_pressed() -> void:
     GameManager.go_to_hub()
+
+
+func _on_market_pressed() -> void:
+    GameManager.go_to_market_board()
 
 
 func _on_merchant_pressed(merchant: MerchantData) -> void:

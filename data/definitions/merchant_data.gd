@@ -90,7 +90,7 @@ func offer_for(entry: ItemEntry) -> int:
     if accepted_super_categories.has(entry.item_data.category_data.super_category):
         return int(base * price_multiplier)
     elif accepts_off_category:
-        return int(base * off_category_multiplier)
+        return int(base * price_multiplier * off_category_multiplier)
     else:
         return 0
 
