@@ -265,11 +265,14 @@ func _research_status_text() -> String:
                 return "?"
     return ""
 
+
 func _unlock_display_text() -> String:
     if _entry.is_at_final_layer():
         return "✓"
     if _entry.current_unlock_action() == null:
         return "-"
+    if _entry.unlock_progress == 0.0:
+        return " "
     return "%d%%" % int(_entry.unlock_ratio * 100)
 
 # ══ Column ordering ═══════════════════════════════════════════════════════════

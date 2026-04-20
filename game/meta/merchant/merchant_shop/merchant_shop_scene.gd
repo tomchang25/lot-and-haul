@@ -153,7 +153,7 @@ func _populate_pricing_info() -> void:
         lines.append("Price: \u00d7%.2f" % _merchant.price_multiplier)
         if _merchant.accepts_off_category:
             lines.append(
-                "Other: \u00d7%.2f" % (_merchant.price_multiplier * _merchant.off_category_multiplier)
+                "Other: \u00d7%.2f" % (_merchant.price_multiplier * _merchant.off_category_multiplier),
             )
         _pricing_info_label.text = "\n".join(lines)
     elif _merchant.accepts_off_category:
@@ -164,7 +164,7 @@ func _populate_pricing_info() -> void:
     else:
         push_error(
             "merchant_shop_scene: merchant '%s' has no accepted_super_categories and accepts_off_category=false"
-            % _merchant.merchant_id
+            % _merchant.merchant_id,
         )
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════

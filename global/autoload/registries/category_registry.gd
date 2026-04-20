@@ -22,6 +22,10 @@ func migrate() -> void:
             push_warning("CategoryRegistry.migrate: dropping unknown category_points key '%s'" % key)
             SaveManager.category_points.erase(key)
 
+    for key: String in MarketManager.category_factors_today.keys():
+        if get_category(key) == null:
+            push_warning("CategoryRegistry.migrate: dropping unknown category_points key '%s'" % key)
+            MarketManager.category_factors_today.erase(key)
 
 func validate() -> bool:
     var ok := true
