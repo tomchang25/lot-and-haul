@@ -197,6 +197,11 @@ func _read_save_file() -> void:
                     if cid is String:
                         m.completed_order_ids.append(cid)
 
+    var valid_ids: Array = []
+    for entry: ItemEntry in storage_items:
+        valid_ids.append(entry.id)
+    ResearchSlot.purge_orphaned(research_slots, valid_ids)
+
 
 # Attempts to purchase `car` using `SaveManager.cash`.
 # Returns false if the player cannot afford it or already owns it.
