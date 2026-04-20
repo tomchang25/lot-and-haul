@@ -31,6 +31,7 @@ var _negotiation_dialog: Control = null
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _title_label: Label = $RootVBox/TitleLabel
+@onready var _pricing_info_label: Label = $RootVBox/PricingInfoLabel
 @onready var _item_list_panel: ItemListPanel = $RootVBox/ListCenter/OuterVBox/ItemListPanel
 @onready var _sell_btn: Button = $RootVBox/Footer/SellButton
 @onready var _back_btn: Button = $RootVBox/Footer/BackButton
@@ -47,6 +48,7 @@ func _ready() -> void:
     add_child(_tooltip)
 
     _title_label.text = _merchant.display_name if _merchant else "Merchant"
+    _populate_pricing_info()
 
     _back_btn.pressed.connect(_on_back_pressed)
     _sell_btn.pressed.connect(_on_sell_pressed)
@@ -136,6 +138,33 @@ func _on_negotiation_cancelled() -> void:
     MerchantRegistry.increment_negotiation(_merchant)
     SaveManager.save()
     GameManager.go_to_merchant_hub()
+
+# ══ Pricing info ══════════════════════════════════════════════════════════════
+
+
+func _populate_pricing_info() -> void:
+    if _merchant.accepted_super_categories.size() > 0:
+        var names: Array[String] = []
+        for sc: SuperCategoryData in _merchant.accepted_super_categories:
+            names.append(sc.display_name)
+        var lines: PackedStringArray = PackedStringArray()
+        lines.append("Main: %s" % ", ".join(names))
+        lines.append("Price: \u00d7%.2f" % _merchant.price_multiplier)
+        if _merchant.accepts_off_category:
+            lines.append(
+                "Other: \u00d7%.2f" % (_merchant.price_multiplier * _merchant.off_category_multiplier)
+            )
+        _pricing_info_label.text = "\n".join(lines)
+    elif _merchant.accepts_off_category:
+        _pricing_info_label.text = (
+            "Accepts: All\nPrice: \u00d7%.2f"
+            % (_merchant.price_multiplier * _merchant.off_category_multiplier)
+        )
+    else:
+        push_error(
+            "merchant_shop_scene: merchant '%s' has no accepted_super_categories and accepts_off_category=false"
+            % _merchant.merchant_id
+        )
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 

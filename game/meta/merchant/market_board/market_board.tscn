@@ -1,15 +1,15 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://game/meta/merchant/merchant_hub.gd" id="1_script"]
+[ext_resource type="Script" path="res://game/meta/merchant/market_board/market_board.gd" id="1_mbgd"]
 
-[node name="MerchantHub" type="Control"]
+[node name="MarketBoard" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_script")
+script = ExtResource("1_mbgd")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 0
@@ -27,36 +27,32 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 24
-alignment = 1
 
 [node name="TitleLabel" type="Label" parent="RootVBox"]
-custom_minimum_size = Vector2(0, 48)
+custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Merchants"
+text = "Market Board"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ButtonsVBox" type="VBoxContainer" parent="RootVBox"]
+[node name="ScrollContainer" type="ScrollContainer" parent="RootVBox"]
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_constants/separation = 12
-alignment = 1
+size_flags_vertical = 3
+
+[node name="CategoryVBox" type="VBoxContainer" parent="RootVBox/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
 
 [node name="Footer" type="HBoxContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 24
 alignment = 1
 
-[node name="MarketButton" type="Button" parent="RootVBox/Footer"]
-custom_minimum_size = Vector2(160, 44)
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Market"
-
 [node name="BackButton" type="Button" parent="RootVBox/Footer"]
-custom_minimum_size = Vector2(200, 44)
+custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Back"

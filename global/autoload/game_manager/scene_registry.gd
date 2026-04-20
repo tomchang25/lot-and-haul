@@ -22,3 +22,4 @@ extends Resource
 @export var car_select: PackedScene
 @export var car_shop: PackedScene
 @export var fulfillment_panel: PackedScene
+@export var market_board: PackedScene

@@ -37,6 +37,12 @@ text = "Merchant"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="PricingInfoLabel" type="Label" parent="RootVBox" unique_id=312845601]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = " - "
+horizontal_alignment = 1
+
 [node name="ListCenter" type="CenterContainer" parent="RootVBox" unique_id=2138403240]
 layout_mode = 2
 size_flags_vertical = 3
