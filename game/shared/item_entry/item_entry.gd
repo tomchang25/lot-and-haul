@@ -13,7 +13,7 @@ const CONDITION_THRESHOLDS: Array[float] = [0.0, 1.0, 2.0]
 const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
 
 # Per-rarity inspection threshold ladders. Each entry feeds _bucket_index.
-# Add a new rarity by adding one entry here (and one in MAX_SPREADS).
+# Add a new rarity by adding one entry here.
 const RARITY_THRESHOLDS: Dictionary = {
     ItemData.Rarity.COMMON: [0.0, 1.0],
     ItemData.Rarity.UNCOMMON: [0.0, 1.0, 2.0],
@@ -22,15 +22,8 @@ const RARITY_THRESHOLDS: Dictionary = {
     ItemData.Rarity.LEGENDARY: [0.0, 1.0, 2.0, 4.0],
 }
 
-# Per-rarity maximum range spread, in multiplier units around 1.0.
-# Tuning knobs — adjust to taste.
-const MAX_SPREADS: Dictionary = {
-    ItemData.Rarity.COMMON: 0.0,
-    ItemData.Rarity.UNCOMMON: 0.5,
-    ItemData.Rarity.RARE: 1.0,
-    ItemData.Rarity.EPIC: 1.5,
-    ItemData.Rarity.LEGENDARY: 2.0,
-}
+# Uniform maximum range spread, in multiplier units around 1.0.
+const PRICE_MAX_SPREAD: float = 1.0
 
 # Inspection-level head-start formula: INSPECTION_BASE + rank * INSPECTION_PER_RANK.
 const INSPECTION_BASE: float = 0.75
@@ -132,7 +125,7 @@ var potential_label: String:
 
 
 func is_condition_inspectable() -> bool:
-    if is_veiled() or is_condition_maxed():
+    if is_veiled() or is_condition_resolved():
         return false
 
     if get_condition_bucket() == 1 and condition < 0.3:
@@ -194,16 +187,16 @@ func get_rarity_bucket() -> int:
     return _bucket_index(inspection_level, _rarity_thresholds())
 
 
-func is_condition_maxed() -> bool:
+func is_condition_resolved() -> bool:
     return get_condition_bucket() >= CONDITION_THRESHOLDS.size() - 1
 
 
-func is_rarity_maxed() -> bool:
+func is_rarity_resolved() -> bool:
     return get_rarity_bucket() >= _rarity_thresholds().size() - 1
 
 
 func is_fully_inspected() -> bool:
-    return is_condition_maxed() and is_rarity_maxed()
+    return is_condition_resolved() and is_rarity_resolved()
 
 
 func apply_inspect(delta: float) -> void:
@@ -272,33 +265,19 @@ func is_unlock_ready() -> bool:
     return unlock_progress >= action.difficulty
 
 
+var price_convergence_ratio: float:
+    get:
+        if PRICE_MAX_SPREAD == 0.0:
+            return 1.0
+        var thresholds: Array[float] = _rarity_thresholds()
+        var max_threshold: float = thresholds[thresholds.size() - 1]
+        if max_threshold <= 0.0:
+            return 1.0
+        return clampf(inspection_level / max_threshold, 0.0, 1.0)
+
+
 func is_price_converged() -> bool:
-    var thresholds: Array[float] = _rarity_thresholds()
-    var max_threshold: float = thresholds[thresholds.size() - 1]
-    return _max_spread() == 0.0 or inspection_level >= max_threshold
-
-
-var inspection_stars: int:
-    get:
-        if is_veiled():
-            return 0
-        var stars: int = 0
-        if is_condition_maxed():
-            stars += 1
-        if is_rarity_maxed():
-            stars += 1
-        if is_price_converged():
-            stars += 1
-        return stars
-
-var inspection_stars_display: String:
-    get:
-        if is_veiled():
-            return "☆☆☆"
-        var result: String = ""
-        for i: int in range(3):
-            result += "★" if i < inspection_stars else "☆"
-        return result
+    return price_convergence_ratio >= 1.0
 
 var unlock_ratio: float:
     get:
@@ -395,11 +374,7 @@ func compute_price(config: PriceConfig) -> int:
 # shows $0 or a negative price.
 func compute_price_range(config: PriceConfig) -> Array[int]:
     var base: float = float(compute_price(config))
-    var thresholds: Array[float] = _rarity_thresholds()
-    var max_threshold: float = thresholds[thresholds.size() - 1]
-    var progress: float = 1.0
-    if max_threshold > 0.0:
-        progress = clampf(inspection_level / max_threshold, 0.0, 1.0)
+    var progress: float = price_convergence_ratio
     var spread: float = _max_spread() * (1.0 - progress)
     var offset: float = center_offset * (1.0 - progress)
     var range_min: float = 1.0 - spread + offset
@@ -411,11 +386,7 @@ func compute_price_range(config: PriceConfig) -> Array[int]:
 
 
 func _max_spread() -> float:
-    var key: int = item_data.rarity
-    if not MAX_SPREADS.has(key):
-        push_warning("ItemEntry: unexpected rarity %d" % key)
-        return 0.0
-    return MAX_SPREADS[key]
+    return PRICE_MAX_SPREAD
 
 
 var market_price: int:

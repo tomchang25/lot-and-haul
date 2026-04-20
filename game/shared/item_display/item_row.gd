@@ -236,7 +236,7 @@ func _refresh() -> void:
     _research_status_label.text = _research_status_text()
 
     # ── INSPECTION ────────────────────────────────────────────────────────────
-    _inspection_label.text = _entry.inspection_stars_display
+    _inspection_label.text = "???" if _entry.is_veiled() else "%d%%" % int(_entry.price_convergence_ratio * 100)
 
     # ── UNLOCK ────────────────────────────────────────────────────────────────
     _unlock_label.text = _unlock_display_text()
