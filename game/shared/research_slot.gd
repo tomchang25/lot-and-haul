@@ -80,7 +80,7 @@ static func clear_for_item(slots: Array, item_id: int) -> void:
     var idx: int = find_index(slots, item_id)
     if idx < 0:
         return
-    slots[idx] = {"item_id": -1, "action": "study", "completed": false}
+    slots[idx] = { "item_id": -1, "action": "study", "completed": false }
 
 
 static func purge_orphaned(slots: Array, valid_ids: Array) -> void:
@@ -90,7 +90,7 @@ static func purge_orphaned(slots: Array, valid_ids: Array) -> void:
         if sid == -1:
             continue
         if not valid_ids.has(sid):
-            slots[i] = {"item_id": -1, "action": "study", "completed": false}
+            slots[i] = { "item_id": -1, "action": "study", "completed": false }
 
 
 func to_dict() -> Dictionary:

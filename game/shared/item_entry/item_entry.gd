@@ -283,7 +283,6 @@ var inspection_stars: int:
             stars += 1
         return stars
 
-
 var inspection_stars_display: String:
     get:
         if is_veiled():
@@ -292,7 +291,6 @@ var inspection_stars_display: String:
         for i: int in range(3):
             result += "★" if i < inspection_stars else "☆"
         return result
-
 
 var unlock_ratio: float:
     get:
