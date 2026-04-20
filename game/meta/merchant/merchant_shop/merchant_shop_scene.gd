@@ -18,6 +18,7 @@ const SHOP_COLUMNS: Array = [
     ItemRow.Column.MERCHANT_OFFER,
     ItemRow.Column.MARKET_FACTOR,
     ItemRow.Column.RARITY,
+    ItemRow.Column.INSPECTION,
 ]
 
 # ── State ─────────────────────────────────────────────────────────────────────

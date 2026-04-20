@@ -262,6 +262,46 @@ func is_unlock_ready() -> bool:
     return unlock_progress >= action.difficulty
 
 
+func is_price_converged() -> bool:
+    var thresholds: Array[float] = _rarity_thresholds()
+    var max_threshold: float = thresholds[thresholds.size() - 1]
+    return _max_spread() == 0.0 or inspection_level >= max_threshold
+
+
+var inspection_stars: int:
+    get:
+        if is_veiled():
+            return 0
+        var stars: int = 0
+        if is_condition_maxed():
+            stars += 1
+        if is_rarity_maxed():
+            stars += 1
+        if is_price_converged():
+            stars += 1
+        return stars
+
+
+var inspection_stars_display: String:
+    get:
+        if is_veiled():
+            return "☆☆☆"
+        var result: String = ""
+        for i: int in range(3):
+            result += "★" if i < inspection_stars else "☆"
+        return result
+
+
+var unlock_ratio: float:
+    get:
+        if is_at_final_layer():
+            return 1.0
+        var action: LayerUnlockAction = current_unlock_action()
+        if action == null:
+            return 1.0
+        return clampf(unlock_progress / action.difficulty, 0.0, 1.0)
+
+
 func _rarity_thresholds() -> Array[float]:
     var key: int = item_data.rarity
     if not RARITY_THRESHOLDS.has(key):

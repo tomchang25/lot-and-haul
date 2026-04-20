@@ -151,6 +151,14 @@ static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewC
                         return 2
                     return 1
             return 0
+        ItemRow.Column.INSPECTION:
+            return entry.inspection_stars
+        ItemRow.Column.UNLOCK:
+            if entry.is_at_final_layer():
+                return 1.0
+            if entry.current_unlock_action() == null:
+                return 0
+            return entry.unlock_ratio
         _:
             push_warning("Unknown Column: %d" % col)
             return 0

@@ -14,6 +14,8 @@ const STORAGE_COLUMNS: Array = [
     ItemRow.Column.ESTIMATED_VALUE,
     ItemRow.Column.RARITY,
     ItemRow.Column.RESEARCH_STATUS,
+    ItemRow.Column.INSPECTION,
+    ItemRow.Column.UNLOCK,
 ]
 
 # ── State ─────────────────────────────────────────────────────────────────────

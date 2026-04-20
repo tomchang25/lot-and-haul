@@ -13,6 +13,7 @@ const PANEL_COLUMNS: Array = [
     ItemRow.Column.CONDITION,
     ItemRow.Column.ESTIMATED_VALUE,
     ItemRow.Column.SPECIAL_ORDER,
+    ItemRow.Column.INSPECTION,
 ]
 
 const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
