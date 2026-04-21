@@ -32,16 +32,3 @@ skills:
         required_super_category_ranks:
           fine_art: 4
           decorative: 3
-
-  - skill_id: mechanical
-    display_name: Mechanical
-    levels:
-      - cash_cost: 300
-        required_mastery_rank: 0
-        required_super_category_ranks:
-          vehicle: 1
-
-      - cash_cost: 1200
-        required_mastery_rank: 3
-        required_super_category_ranks:
-          vehicle: 3
