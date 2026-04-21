@@ -100,7 +100,7 @@ identity_layers:
     base_value: 200
     unlock_action:
       difficulty: 2.0
-      required_skill: mechanical
+      required_skill: maintenance
       required_level: 1
 
   - layer_id: watch_leaf_quartz

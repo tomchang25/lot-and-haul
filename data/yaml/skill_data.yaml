@@ -32,3 +32,14 @@ skills:
         required_super_category_ranks:
           fine_art: 4
           decorative: 3
+
+  - skill_id: maintenance
+    display_name: Maintenance
+    levels:
+      - cash_cost: 300
+        required_mastery_rank: 0
+        required_super_category_ranks: {}
+
+      - cash_cost: 1200
+        required_mastery_rank: 3
+        required_super_category_ranks: {}
