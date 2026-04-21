@@ -91,7 +91,7 @@ identity_layers:
     base_value: 420
     unlock_action:
       difficulty: 3.0
-      required_skill: mechanical
+      required_skill: maintenance
       required_level: 1
 
   - layer_id: clock_leaf_carriage
@@ -215,34 +215,6 @@ items:
       - lamp_authenticated_maker
       - lamp_leaf_hinks
 
-  - item_id: clock_ansonia_mantel
-    category_id: clock
-    rarity: 1
-    layer_ids:
-      - clock_veil
-      - clock_wooden_case
-      - clock_brass_movement
-      - clock_leaf_ansonia
-
-  - item_id: clock_sessions_shelf
-    category_id: clock
-    rarity: 1
-    layer_ids:
-      - clock_veil
-      - clock_wooden_case
-      - clock_brass_movement
-      - clock_leaf_sessions
-
-  - item_id: clock_french_carriage
-    category_id: clock
-    rarity: 2
-    layer_ids:
-      - clock_veil
-      - clock_wooden_case
-      - clock_enamel_dial
-      - clock_platform_escapement
-      - clock_leaf_carriage
-
   - item_id: clock_boulle_mantel
     category_id: clock
     rarity: 3
@@ -252,32 +224,3 @@ items:
       - clock_gilded_case
       - clock_signed_movement
       - clock_leaf_boulle
-
-  - item_id: vase_modern_repro
-    category_id: vase
-    rarity: 0
-    layer_ids:
-      - vase_veil
-      - vase_ceramic_body
-      - vase_leaf_modern
-
-  - item_id: vase_spode_blue_italian
-    category_id: vase
-    rarity: 2
-    layer_ids:
-      - vase_veil
-      - vase_ceramic_body
-      - vase_painted_surface
-      - vase_transfer_pattern
-      - vase_leaf_spode
-
-  - item_id: vase_royal_vienna
-    category_id: vase
-    rarity: 4
-    layer_ids:
-      - vase_veil
-      - vase_porcelain_body
-      - vase_cobalt_gilding
-      - vase_factory_mark
-      - vase_archive_provenance
-      - vase_leaf_royal_vienna
