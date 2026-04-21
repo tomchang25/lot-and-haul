@@ -79,8 +79,8 @@ extends Resource
 # ── Access gate ──────────────────────────────────────────────────────────────
 
 # Perk required to access this merchant.
-# Empty string = no gate (accessible to all players).
-@export var required_perk_id: String = ""
+# null = no gate (accessible to all players).
+@export var required_perk: PerkData = null
 
 # ── Offer logic ──────────────────────────────────────────────────────────────
 

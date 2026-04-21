@@ -39,7 +39,7 @@ func _add_skill_row(skill: SkillData) -> void:
 
 
 func _build_row_content(skill: SkillData, row: VBoxContainer) -> void:
-    var current: int = KnowledgeManager.get_level(skill.skill_id)
+    var current: int = KnowledgeManager.get_level(skill)
     var max_level: int = skill.levels.size()
 
     # Header
@@ -92,7 +92,7 @@ func _build_row_content(skill: SkillData, row: VBoxContainer) -> void:
     # Upgrade button
     var upgrade_btn := Button.new()
     upgrade_btn.name = "UpgradeBtn"
-    var peek: KnowledgeManager.UpgradeResult = KnowledgeManager.peek_upgrade(skill.skill_id)
+    var peek: KnowledgeManager.UpgradeResult = KnowledgeManager.peek_upgrade(skill)
     if current >= max_level:
         upgrade_btn.text = "Maxed"
         upgrade_btn.disabled = true
@@ -114,27 +114,23 @@ func _build_row_content(skill: SkillData, row: VBoxContainer) -> void:
             _:
                 upgrade_btn.tooltip_text = "Cannot upgrade"
 
-    upgrade_btn.pressed.connect(_on_upgrade_pressed.bind(skill.skill_id, row))
+    upgrade_btn.pressed.connect(_on_upgrade_pressed.bind(skill, row))
     row.add_child(upgrade_btn)
 
     # Separator
     row.add_child(HSeparator.new())
 
 
-func _on_upgrade_pressed(skill_id: String, row: VBoxContainer) -> void:
-    var result: KnowledgeManager.UpgradeResult = KnowledgeManager.try_upgrade_skill(skill_id)
+func _on_upgrade_pressed(skill: SkillData, row: VBoxContainer) -> void:
+    var result: KnowledgeManager.UpgradeResult = KnowledgeManager.try_upgrade_skill(skill)
     if result != KnowledgeManager.UpgradeResult.OK:
-        push_warning("SkillPanel: upgrade failed for %s: %s" % [skill_id, result])
+        push_warning("SkillPanel: upgrade failed for %s: %s" % [skill.skill_id, result])
         return
-    _refresh_row(skill_id, row)
+    _refresh_row(skill, row)
 
 
-func _refresh_row(skill_id: String, row: VBoxContainer) -> void:
+func _refresh_row(skill: SkillData, row: VBoxContainer) -> void:
     for child in row.get_children():
         child.queue_free()
     await get_tree().process_frame
-
-    var skill: SkillData = KnowledgeManager.get_skill(skill_id)
-    if skill == null:
-        return
     _build_row_content(skill, row)

@@ -21,5 +21,5 @@ extends Resource
 # Minimum category rank for the item's category. 0 = no gate.
 @export var required_category_rank: int = 0
 
-# Perk required before this action is available. "" = no gate.
-@export var required_perk_id: String = ""
+# Perk required before this action is available. null = no gate.
+@export var required_perk: PerkData = null

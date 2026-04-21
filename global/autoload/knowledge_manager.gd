@@ -53,14 +53,14 @@ func validate() -> bool:
         push_error("KnowledgeManager: skill registry is empty")
         ok = false
     for perk_id: String in SaveManager.unlocked_perks:
-        if get_perk(perk_id) == null:
+        if get_perk_by_id(perk_id) == null:
             push_error(
                 "KnowledgeManager: SaveManager.unlocked_perks '%s' not found"
                 % perk_id,
             )
             ok = false
     for skill_id: String in SaveManager.skill_levels.keys():
-        if get_skill(skill_id) == null:
+        if get_skill_by_id(skill_id) == null:
             push_error(
                 "KnowledgeManager: SaveManager.skill_levels key '%s' not found"
                 % skill_id,
@@ -108,11 +108,11 @@ func get_mastery_rank() -> int:
     return total
 
 
-func get_level(skill_id: String) -> int:
-    return SaveManager.skill_levels.get(skill_id, 0)
+func get_level(skill: SkillData) -> int:
+    return SaveManager.skill_levels.get(skill.skill_id, 0)
 
 
-func get_skill(skill_id: String) -> SkillData:
+func get_skill_by_id(skill_id: String) -> SkillData:
     return _skill_registry.get(skill_id, null)
 
 
@@ -123,11 +123,10 @@ func get_all_skills() -> Array[SkillData]:
     return result
 
 
-func _check_upgrade(skill_id: String) -> UpgradeResult:
-    var skill: SkillData = _skill_registry.get(skill_id, null)
+func _check_upgrade(skill: SkillData) -> UpgradeResult:
     if skill == null:
         return UpgradeResult.MAX_LEVEL
-    var current: int = get_level(skill_id)
+    var current: int = get_level(skill)
     if current >= skill.levels.size():
         return UpgradeResult.MAX_LEVEL
     var next: SkillLevelData = skill.levels[current]
@@ -142,19 +141,18 @@ func _check_upgrade(skill_id: String) -> UpgradeResult:
     return UpgradeResult.OK
 
 
-func peek_upgrade(skill_id: String) -> UpgradeResult:
-    return _check_upgrade(skill_id)
+func peek_upgrade(skill: SkillData) -> UpgradeResult:
+    return _check_upgrade(skill)
 
 
-func try_upgrade_skill(skill_id: String) -> UpgradeResult:
-    var result: UpgradeResult = _check_upgrade(skill_id)
+func try_upgrade_skill(skill: SkillData) -> UpgradeResult:
+    var result: UpgradeResult = _check_upgrade(skill)
     if result != UpgradeResult.OK:
         return result
-    var skill: SkillData = _skill_registry[skill_id]
-    var current: int = get_level(skill_id)
+    var current: int = get_level(skill)
     var next: SkillLevelData = skill.levels[current]
     SaveManager.cash -= next.cash_cost
-    SaveManager.skill_levels[skill_id] = current + 1
+    SaveManager.skill_levels[skill.skill_id] = current + 1
     SaveManager.save()
     return UpgradeResult.OK
 
@@ -169,11 +167,11 @@ func can_advance(entry: ItemEntry) -> AdvanceCheck:
             return AdvanceCheck.INSUFFICIENT_CATEGORY_RANK
 
     if action.required_skill != null:
-        if get_level(action.required_skill.skill_id) < action.required_level:
+        if get_level(action.required_skill) < action.required_level:
             return AdvanceCheck.INSUFFICIENT_SKILL
 
-    if action.required_perk_id != "":
-        if not has_perk(action.required_perk_id):
+    if action.required_perk != null:
+        if not has_perk(action.required_perk):
             return AdvanceCheck.MISSING_PERK
 
     return AdvanceCheck.OK
@@ -181,18 +179,18 @@ func can_advance(entry: ItemEntry) -> AdvanceCheck:
 # ══ Perk registry ════════════════════════════════════════════════════════════
 
 
-func unlock_perk(perk_id: String) -> void:
-    if SaveManager.unlocked_perks.has(perk_id):
+func unlock_perk(perk: PerkData) -> void:
+    if SaveManager.unlocked_perks.has(perk.perk_id):
         return
-    SaveManager.unlocked_perks.append(perk_id)
+    SaveManager.unlocked_perks.append(perk.perk_id)
     SaveManager.save()
 
 
-func has_perk(perk_id: String) -> bool:
-    return SaveManager.unlocked_perks.has(perk_id)
+func has_perk(perk: PerkData) -> bool:
+    return perk.perk_id in SaveManager.unlocked_perks
 
 
-func get_perk(perk_id: String) -> PerkData:
+func get_perk_by_id(perk_id: String) -> PerkData:
     return _perk_registry.get(perk_id, null)
 
 

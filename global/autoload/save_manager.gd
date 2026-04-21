@@ -344,24 +344,33 @@ func _slot_effect_label(action: ResearchSlot.SlotAction) -> String:
             return "Done"
 
 
+var _appraisal_skill: SkillData = null
+var _maintenance_skill: SkillData = null
+
 # Shared skill-driven speed formula, same shape as inspection_scene's
 # inspect multiplier.
-func _skill_speed_factor(skill_id: String) -> float:
-    var skill_level: int = KnowledgeManager.get_level(skill_id)
+func _skill_speed_factor(skill: SkillData) -> float:
+    var skill_level: int = KnowledgeManager.get_level(skill)
     var mastery_rank: int = KnowledgeManager.get_mastery_rank()
     return 1.0 + pow(1.1, skill_level) * mastery_rank * 0.2
 
 
 func _study_speed_factor() -> float:
-    return _skill_speed_factor("appraisal")
+    if _appraisal_skill == null:
+        _appraisal_skill = KnowledgeManager.get_skill_by_id("appraisal")
+    return _skill_speed_factor(_appraisal_skill)
 
 
 func _repair_speed_factor() -> float:
-    return _skill_speed_factor("maintenance")
+    if _maintenance_skill == null:
+        _maintenance_skill = KnowledgeManager.get_skill_by_id("maintenance")
+    return _skill_speed_factor(_maintenance_skill)
 
 
 func _unlock_speed_factor() -> float:
-    return _skill_speed_factor("appraisal")
+    if _appraisal_skill == null:
+        _appraisal_skill = KnowledgeManager.get_skill_by_id("appraisal")
+    return _skill_speed_factor(_appraisal_skill)
 
 
 func _build_negotiation_dict() -> Dictionary:

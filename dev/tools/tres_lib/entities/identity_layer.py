@@ -71,6 +71,19 @@ class IdentityLayerSpec:
                     )
                     skill_tag = "3_skill"
 
+            perk_tag: str | None = None
+            pid = unlock.get("required_perk")
+            if pid:
+                puid = ctx.uid_cache.get(pid)
+                if puid:
+                    w.add_ext_resource(
+                        "4_perk",
+                        "Resource",
+                        f"res://data/tres/perks/{pid}.tres",
+                        puid,
+                    )
+                    perk_tag = "4_perk"
+
             skill_ref = f'ExtResource("{skill_tag}")' if skill_tag else "null"
             sub_fields = [
                 'script = ExtResource("2_unlock")',
@@ -89,10 +102,8 @@ class IdentityLayerSpec:
                 sub_fields.append(
                     f'required_category_rank = {int(unlock["required_category_rank"])}'
                 )
-            if unlock.get("required_perk_id", ""):
-                sub_fields.append(
-                    f'required_perk_id = "{unlock["required_perk_id"]}"'
-                )
+            if perk_tag:
+                sub_fields.append(f'required_perk = ExtResource("{perk_tag}")')
 
             w.add_sub_resource("unlock", "Resource", sub_fields)
 
@@ -149,9 +160,13 @@ class IdentityLayerSpec:
                 if required_category_rank:
                     unlock["required_category_rank"] = required_category_rank
 
-                required_perk_id = fields.get("required_perk_id", "").strip('"')
-                if required_perk_id:
-                    unlock["required_perk_id"] = required_perk_id
+                perk_raw = fields.get("required_perk", "null")
+                pm = re.match(r'ExtResource\("([^"]+)"\)', perk_raw)
+                if pm:
+                    perk_uid = ext_res.get(pm.group(1), {}).get("uid", "")
+                    perk_id = ctx.uid_to_id.get(perk_uid, "")
+                    if perk_id:
+                        unlock["required_perk"] = perk_id
 
         return {
             "layer_id": layer_id,
@@ -164,6 +179,9 @@ class IdentityLayerSpec:
         errors: list[str] = []
         known_skill_ids: set[str] = {
             s["skill_id"] for s in all_data.get("skills", []) if s.get("skill_id")
+        }
+        known_perk_ids: set[str] = {
+            p["perk_id"] for p in all_data.get("perks", []) if p.get("perk_id")
         }
 
         for layer in entries:
@@ -184,6 +202,10 @@ class IdentityLayerSpec:
             sid = unlock.get("required_skill")
             if sid and known_skill_ids and sid not in known_skill_ids:
                 errors.append(f"layer '{lid}': unknown required_skill '{sid}'")
+
+            pid = unlock.get("required_perk")
+            if pid and known_perk_ids and pid not in known_perk_ids:
+                errors.append(f"layer '{lid}': unknown required_perk '{pid}'")
 
         return errors
 
