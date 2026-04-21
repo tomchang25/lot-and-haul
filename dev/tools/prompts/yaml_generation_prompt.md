@@ -70,7 +70,7 @@ unlock_action: How the player advances PAST this layer.
                         5.0 = archival research or expert consultation
 
         required_skill: skill_id string. OMIT this key entirely if no skill is needed.
-                        Valid values: "appraisal", "authentication", "mechanical"
+                        Valid values: "appraisal", "authentication", "maintenance"
         required_level: int 1–5. ONLY include when required_skill is present.
         required_condition: float 0.0–1.0. ONLY include when item condition gates the
                             action. Omit entirely if 0.
@@ -265,7 +265,7 @@ Output the complete YAML block starting with 'categories:'.
 [ ] base_value strictly increases along each item's layer chain
 [ ] difficulty is a positive float (typically 1.0–5.0)
 [ ] No required_level without required_skill on the same unlock_action
-[ ] required_skill values are only: appraisal, authentication, mechanical
+[ ] required_skill values are only: appraisal, authentication, maintenance
 [ ] Shared layers appear exactly once in identity_layers
 [ ] shape_id is a valid key: s1x1, s1x2, s1x3, s1x4, s2x2, s2x3, s2x4, sL11, sL12, sT3
 [ ] Layer depth matches rarity band (Common=2, Uncommon=2–3, Rare=3–4, Epic=4–5)

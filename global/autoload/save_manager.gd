@@ -149,6 +149,9 @@ func _read_save_file() -> void:
                 skill_levels[key] = int(parsed["skill_levels"][key])
     else:
         skill_levels = { }
+    if skill_levels.has("mechanical"):
+        skill_levels["maintenance"] = skill_levels["mechanical"]
+        skill_levels.erase("mechanical")
 
     if parsed.has("super_cat_means") and parsed["super_cat_means"] is Dictionary:
         MarketManager.super_cat_means = { }
@@ -354,7 +357,7 @@ func _study_speed_factor() -> float:
 
 
 func _repair_speed_factor() -> float:
-    return _skill_speed_factor("mechanical")
+    return _skill_speed_factor("maintenance")
 
 
 func _unlock_speed_factor() -> float:

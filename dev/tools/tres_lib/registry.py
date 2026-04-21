@@ -1,6 +1,7 @@
 """Entity registry — processing order matters (dependency order)."""
 
 from tres_lib.entities.skill import SPEC as skill_spec
+from tres_lib.entities.perk import SPEC as perk_spec
 from tres_lib.entities.super_category import SPEC as super_category_spec
 from tres_lib.entities.category import SPEC as category_spec
 from tres_lib.entities.identity_layer import SPEC as identity_layer_spec
@@ -15,6 +16,7 @@ from tres_lib.entities.merchant import SPEC as merchant_spec
 # that later entities need for cross-references.
 REGISTRY = [
     skill_spec,
+    perk_spec,
     super_category_spec,
     category_spec,
     identity_layer_spec,
