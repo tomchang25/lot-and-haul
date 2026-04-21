@@ -63,7 +63,7 @@ func get_all_merchants() -> Array[MerchantData]:
 func get_available_merchants() -> Array[MerchantData]:
     var result: Array[MerchantData] = []
     for m: MerchantData in _merchants.values():
-        if m.required_perk_id == "" or KnowledgeManager.has_perk(m.required_perk_id):
+        if m.required_perk == null or KnowledgeManager.has_perk(m.required_perk):
             result.append(m)
     return result
 

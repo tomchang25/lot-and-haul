@@ -123,7 +123,22 @@ class MerchantSpec:
             "max_active_orders",
             int(entry.get("max_active_orders", 1)),
         )
-        w.add_field_str("required_perk_id", entry.get("required_perk_id", ""))
+
+        req_perk = entry.get("required_perk", "")
+        if req_perk:
+            ext_idx += 1
+            perk_tag = f"{ext_idx}_perk"
+            perk_uid = ctx.uid_cache.get(req_perk, "")
+            w.add_ext_resource(
+                perk_tag,
+                "Resource",
+                f"res://data/tres/perks/{req_perk}.tres",
+                perk_uid,
+            )
+            w.add_field_ext_ref("required_perk", perk_tag)
+        else:
+            w.add_field("required_perk = null")
+
         return w.render()
 
     def parse_tres(self, text: str, ctx: ParseCtx) -> None:
@@ -138,6 +153,10 @@ class MerchantSpec:
                 known_super_cat_ids.add(sc["super_category_id"])
             else:
                 known_super_cat_ids.add(str(sc).lower().replace(" ", "_"))
+
+        known_perk_ids: set[str] = {
+            p["perk_id"] for p in all_data.get("perks", []) if isinstance(p, dict) and p.get("perk_id")
+        }
 
         for merchant in entries:
             mid = merchant.get("merchant_id", "")
@@ -283,6 +302,13 @@ class MerchantSpec:
                             f"merchant '{mid}': special_order '{so_ref}'"
                             f" not defined in special_orders"
                         )
+
+            req_perk = merchant.get("required_perk", "")
+            if req_perk and known_perk_ids and req_perk not in known_perk_ids:
+                errors.append(
+                    f"merchant '{mid}': required_perk '{req_perk}'"
+                    f" not defined in perks"
+                )
 
         return errors
 

@@ -40,7 +40,7 @@ func _on_orders_pressed(merchant: MerchantData) -> void:
 
 func _populate_merchants() -> void:
     for m: MerchantData in MerchantRegistry.get_all_merchants():
-        var available: bool = m.required_perk_id == "" or KnowledgeManager.has_perk(m.required_perk_id)
+        var available: bool = m.required_perk == null or KnowledgeManager.has_perk(m.required_perk)
         var can_negotiate: bool = MerchantRegistry.can_negotiate(m)
 
         var row := HBoxContainer.new()
@@ -55,7 +55,7 @@ func _populate_merchants() -> void:
 
         shop_btn.disabled = not available or not can_negotiate
         if not available:
-            shop_btn.tooltip_text = "Requires perk: %s" % m.required_perk_id
+            shop_btn.tooltip_text = "Requires perk: %s" % m.required_perk.display_name
         elif not can_negotiate:
             shop_btn.tooltip_text = "Closed — come back tomorrow"
 
@@ -72,7 +72,7 @@ func _populate_merchants() -> void:
             orders_btn.text = "Orders (%d)" % order_count
             orders_btn.disabled = order_count == 0 or not available
             if not available:
-                orders_btn.tooltip_text = "Requires perk: %s" % m.required_perk_id
+                orders_btn.tooltip_text = "Requires perk: %s" % m.required_perk.display_name
 
             orders_btn.pressed.connect(func() -> void: _on_orders_pressed(captured))
             row.add_child(orders_btn)

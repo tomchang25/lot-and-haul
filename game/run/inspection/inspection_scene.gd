@@ -21,6 +21,9 @@ const ItemCardScene := preload("uid://bw23cjkf40y5r")
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
+var _appraisal_skill: SkillData = null
+var _xray_perk: PerkData = null
+
 var _item_displays: Array[ItemCard] = []
 
 # Maps each ItemEntry to its corresponding ItemCard for reverse lookup.
@@ -48,6 +51,8 @@ var _pulse_tween: Tween = null
 
 func _ready() -> void:
     _ctx = ItemViewContext.for_inspection()
+    _appraisal_skill = KnowledgeManager.get_skill_by_id("appraisal")
+    _xray_perk = KnowledgeManager.get_perk_by_id("xray_inspect")
 
     _action_bar.inspect_requested.connect(_on_inspect_requested)
     _action_bar.peek_requested.connect(_on_peek_requested)
@@ -111,7 +116,7 @@ func _on_peek_requested() -> void:
     RunManager.run_record.stamina -= LotActionBar.PEEK_COST
     RunManager.run_record.actions_remaining -= 1
 
-    var success_chance: float = 1.0 if KnowledgeManager.has_perk("xray_inspect") else 0.5
+    var success_chance: float = 1.0 if (_xray_perk != null and KnowledgeManager.has_perk(_xray_perk)) else 0.5
 
     for entry: ItemEntry in RunManager.run_record.lot_items:
         if not entry.is_veiled():
@@ -189,7 +194,7 @@ func _refresh_action_bar() -> void:
 
 
 func _inspect_multiplier() -> float:
-    var appraisal_level: int = KnowledgeManager.get_level("appraisal")
+    var appraisal_level: int = KnowledgeManager.get_level(_appraisal_skill) if _appraisal_skill != null else 0
     var mastery_rank: int = KnowledgeManager.get_mastery_rank()
     return 1.0 + pow(1.1, appraisal_level) * mastery_rank * 0.2
 

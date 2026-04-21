@@ -33,7 +33,7 @@ func _build_content() -> void:
         return
 
     for perk: PerkData in perks:
-        var unlocked: bool = KnowledgeManager.has_perk(perk.perk_id)
+        var unlocked: bool = KnowledgeManager.has_perk(perk)
         var perk_label := Label.new()
         perk_label.add_theme_font_size_override("font_size", 18)
 

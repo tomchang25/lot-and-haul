@@ -18,7 +18,7 @@ merchants:
     special_orders: []
     order_roll_cadence: 0
     max_active_orders: 0
-    required_perk_id: ""
+    required_perk: ""
 
   - merchant_id: antique_dealer
     display_name: Antique Dealer
@@ -39,4 +39,4 @@ merchants:
     special_orders: [antique_dealer_premium, antique_dealer_bulk]
     order_roll_cadence: 3
     max_active_orders: 2
-    required_perk_id: ""
+    required_perk: ""
