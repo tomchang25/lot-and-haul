@@ -1,8 +1,8 @@
 # car_select_scene.gd
 # Car Select (Garage) — Lists every owned car and lets the player pick which
 # one to drive on the next run.
-# Reads:  SaveManager.owned_cars, SaveManager.active_car_id
-# Writes: SaveManager.active_car_id
+# Reads:  SaveManager.owned_cars, SaveManager.active_car
+# Writes: SaveManager.active_car
 extends Control
 
 # ── Constants ──────────────────────────────────────────────────────────────────
@@ -33,9 +33,9 @@ func _on_back_pressed() -> void:
 
 
 func _on_select_pressed(car: CarData) -> void:
-    if car.car_id == SaveManager.active_car_id:
+    if car == SaveManager.active_car:
         return
-    SaveManager.active_car_id = car.car_id
+    SaveManager.active_car = car
     SaveManager.save()
     _refresh_active_state()
 
@@ -49,7 +49,7 @@ func _populate_rows() -> void:
 
     for car: CarData in SaveManager.owned_cars:
         var row: CarRow = CarRowScene.instantiate()
-        row.setup(car, car.car_id == SaveManager.active_car_id)
+        row.setup(car, car == SaveManager.active_car)
         row.select_pressed.connect(_on_select_pressed)
         _rows_container.add_child(row)
         _rows.append(row)
@@ -57,4 +57,4 @@ func _populate_rows() -> void:
 
 func _refresh_active_state() -> void:
     for row: CarRow in _rows:
-        row.setup(row.get_car(), row.get_car().car_id == SaveManager.active_car_id)
+        row.setup(row.get_car(), row.get_car() == SaveManager.active_car)

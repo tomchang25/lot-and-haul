@@ -1,9 +1,9 @@
 # car_shop_scene.gd
 # Car Shop — Lists every car the player does not yet own and lets them buy
 # one with cash. Shop inventory is simply `CarRegistry.get_all_cars()` filtered
-# against `SaveManager.owned_car_ids`.
-# Reads:  SaveManager.cash, SaveManager.owned_car_ids, CarRegistry
-# Writes: SaveManager.cash, SaveManager.owned_car_ids
+# against `SaveManager.owned_cars`.
+# Reads:  SaveManager.cash, SaveManager.owned_cars, CarRegistry
+# Writes: SaveManager.cash, SaveManager.owned_cars (via SaveManager.buy_car)
 extends Control
 
 # ── Constants ──────────────────────────────────────────────────────────────────
@@ -48,7 +48,7 @@ func _populate_rows() -> void:
 
     var inventory: Array[CarData] = []
     for car: CarData in CarRegistry.get_all_cars():
-        if not SaveManager.owned_car_ids.has(car.car_id):
+        if not SaveManager.owned_cars.has(car):
             inventory.append(car)
 
     if inventory.is_empty():

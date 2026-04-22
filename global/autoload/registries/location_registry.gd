@@ -21,11 +21,11 @@ func validate() -> bool:
     if size() == 0:
         push_error("LocationRegistry: registry is empty")
         ok = false
-    for location_id: String in SaveManager.available_location_ids:
-        if get_location_by_id(location_id) == null:
+    for location: LocationData in SaveManager.available_locations:
+        if get_location_by_id(location.location_id) == null:
             push_error(
-                "LocationRegistry: SaveManager.available_location_ids '%s' not found"
-                % location_id,
+                "LocationRegistry: SaveManager.available_locations entry '%s' not found"
+                % location.location_id,
             )
             ok = false
     for location: LocationData in _locations.values():

@@ -359,9 +359,7 @@ func compute_price(config: PriceConfig) -> int:
         value *= 1.0 + 0.01 * rank
 
     if config.market:
-        value *= MarketManager.get_category_factor(
-            item_data.category_data.category_id,
-        )
+        value *= MarketManager.get_category_factor(item_data.category_data)
 
     value *= config.multiplier
     return int(value)
@@ -395,9 +393,7 @@ var market_price: int:
 
 var market_factor_delta: float:
     get:
-        return MarketManager.get_category_factor(
-            item_data.category_data.category_id,
-        ) - 1.0
+        return MarketManager.get_category_factor(item_data.category_data) - 1.0
 
 # ── Display colors ────────────────────────────────────────────────────────────
 
