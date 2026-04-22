@@ -8,11 +8,11 @@ Keep prompts short. Trust the plan review step to catch the rest.
 
 ## Global Must-Haves
 
-Every prompt must include these two constraints:
+Every prompt must include these constraints:
 
 - Follow `dev/standards/naming_conventions.md`.
 - Use 4-space indentation throughout.
-- Word limit: 100 words. Use the conventional commit format. For example: 'feat: add user authentication'.
+- Commit: Write up to 100 words. Use the conventional commit format. For example: 'feat: add user authentication'. Only say necessary things — don't pad to reach the word limit or guess the reason for the edit.
 
 ## Template
 
