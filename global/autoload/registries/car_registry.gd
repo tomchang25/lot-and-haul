@@ -17,13 +17,15 @@ func _ready() -> void:
 
 
 # Idempotent migration: guarantees a fresh save gets the starter van, and
-# repairs saves whose `active_car_id` no longer resolves (e.g. the car was
+# repairs saves whose active_car no longer resolves (e.g. the car was
 # removed from the data pipeline). Safe to re-run.
 func migrate() -> void:
-    if SaveManager.owned_car_ids.is_empty():
-        SaveManager.owned_car_ids.append("van_basic")
-    if SaveManager.active_car_id.is_empty() or get_car_by_id(SaveManager.active_car_id) == null:
-        SaveManager.active_car_id = SaveManager.owned_car_ids[0]
+    if SaveManager.owned_cars.is_empty():
+        var van: CarData = get_car_by_id("van_basic")
+        if van != null:
+            SaveManager.owned_cars.append(van)
+    if SaveManager.active_car == null and not SaveManager.owned_cars.is_empty():
+        SaveManager.active_car = SaveManager.owned_cars[0]
 
 
 func validate() -> bool:
@@ -31,18 +33,12 @@ func validate() -> bool:
     if size() == 0:
         push_error("CarRegistry: registry is empty")
         ok = false
-    if get_car_by_id(SaveManager.active_car_id) == null:
-        push_error(
-            "CarRegistry: SaveManager.active_car_id '%s' not found"
-            % SaveManager.active_car_id,
-        )
+    if SaveManager.active_car == null:
+        push_error("CarRegistry: SaveManager.active_car is null")
         ok = false
-    for car_id: String in SaveManager.owned_car_ids:
-        if get_car_by_id(car_id) == null:
-            push_error(
-                "CarRegistry: SaveManager.owned_car_ids '%s' not found"
-                % car_id,
-            )
+    for car: CarData in SaveManager.owned_cars:
+        if car == null:
+            push_error("CarRegistry: SaveManager.owned_cars contains a null entry")
             ok = false
     return ok
 
