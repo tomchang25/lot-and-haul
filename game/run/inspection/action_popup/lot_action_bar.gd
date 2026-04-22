@@ -28,9 +28,14 @@ func refresh_lot(selected_entry: ItemEntry) -> void:
         and stamina >= INSPECT_COST
         and actions_ok
     )
+    var has_veiled: bool = false
+    for entry: ItemEntry in RunManager.run_record.lot_items:
+        if entry.is_veiled():
+            has_veiled = true
+            break
+
     var can_peek: bool = (
-        selected_entry != null
-        and selected_entry.is_veiled()
+        has_veiled
         and stamina >= PEEK_COST
         and actions_ok
     )
@@ -38,9 +43,9 @@ func refresh_lot(selected_entry: ItemEntry) -> void:
     _inspect_button.disabled = not can_inspect
     _inspect_button.text = "Inspect (%d SP)" % INSPECT_COST
 
-    _peek_button.visible = selected_entry != null and selected_entry.is_veiled()
+    _peek_button.visible = true
     _peek_button.disabled = not can_peek
-    _peek_button.text = "Try to Peek (%d SP)" % PEEK_COST
+    _peek_button.text = "Peek (%d SP)" % PEEK_COST
 
     reset_size()
 
