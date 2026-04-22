@@ -77,8 +77,7 @@ var condition: float = 1.0
 # Per-item inspection effort, advanced by Inspect and Study actions.
 var scrutiny: float = 0.0
 
-# Set by a future Intuition system. For now, nothing sets it.
-var intuition_flag: bool = false
+var intuition_level: int = 0
 
 # Unique persistent ID assigned when this entry enters storage.
 # -1 = not yet in storage. Assigned by SaveManager
@@ -115,8 +114,12 @@ var inspection_level: float:
             + appraisal_level * COMPUTED_BASE_SKILL_WEIGHT
         )
         var rarity_divisor: float = float(RARITY_DIVISORS.get(item_data.rarity, 1))
-        var intuition_bonus: float = INTUITION_INSPECTION_BONUS if intuition_flag else 0.0
+        var intuition_bonus: float = INTUITION_INSPECTION_BONUS if intuition_level >= 1 else 0.0
         return clampf(computed_base / rarity_divisor + scrutiny + intuition_bonus, 0.0, 1.0)
+
+var max_intuition_level: int:
+    get:
+        return item_data.identity_layers.size() - 1 - layer_index
 
 var display_name: String:
     get:
@@ -204,10 +207,10 @@ func get_known_condition_multiplier() -> float:
         _:
             return 0.0
 
-# Rarity label the player can see, driven by layer depth (+ intuition_flag).
+# Rarity label the player can see, driven by layer depth (+ intuition_level).
 var perceived_rarity_label: String:
     get:
-        var effective_layer: int = (layer_index + 1) if intuition_flag else layer_index
+        var effective_layer: int = layer_index + intuition_level
         var rarity_value: int = item_data.rarity
 
         # effective_layer 0 (veiled): no rarity shown.
@@ -242,7 +245,7 @@ var perceived_rarity: float:
     get:
         if is_veiled():
             return -1.0
-        var effective_layer: int = (layer_index + 1) if intuition_flag else layer_index
+        var effective_layer: int = layer_index + intuition_level
         var rarity_value: int = item_data.rarity
 
         if effective_layer <= 0:
@@ -646,7 +649,7 @@ static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
 
     # scrutiny starts at 0; inspection_level is computed from knowledge + scrutiny.
     entry.scrutiny = 0.0
-    entry.intuition_flag = false
+    entry.intuition_level = 0
 
     return entry
 
@@ -660,7 +663,7 @@ func to_dict() -> Dictionary:
         "layer_index": layer_index,
         "condition": condition,
         "scrutiny": scrutiny,
-        "intuition_flag": intuition_flag,
+        "intuition_level": intuition_level,
         "center_offset": center_offset,
         "unlock_progress": unlock_progress,
     }
@@ -677,7 +680,10 @@ static func from_dict(d: Dictionary) -> ItemEntry:
     entry.condition = float(d["condition"])
     # New fields — default gracefully if missing (migration-safe).
     entry.scrutiny = float(d.get("scrutiny", 0.0))
-    entry.intuition_flag = bool(d.get("intuition_flag", false))
+    if d.has("intuition_level"):
+        entry.intuition_level = int(d["intuition_level"])
+    elif bool(d.get("intuition_flag", false)):
+        entry.intuition_level = 1
     if d.has("center_offset"):
         entry.center_offset = float(d["center_offset"])
     else:

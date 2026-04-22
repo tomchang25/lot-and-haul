@@ -18,3 +18,7 @@ text = "Inspect (2 SP)"
 [node name="PeekButton" type="Button" parent="HBoxContainer" unique_id=2098776471]
 layout_mode = 2
 text = "Try to Peek (3 SP)"
+
+[node name="AppraiseButton" type="Button" parent="HBoxContainer" unique_id=3041882754]
+layout_mode = 2
+text = "Appraise (2 SP)"

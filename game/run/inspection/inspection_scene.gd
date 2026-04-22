@@ -54,6 +54,7 @@ func _ready() -> void:
 
     _action_bar.inspect_requested.connect(_on_inspect_requested)
     _action_bar.peek_requested.connect(_on_peek_requested)
+    _action_bar.appraise_requested.connect(_on_appraise_requested)
     _start_btn.pressed.connect(_on_start_auction_pressed)
     _pass_btn.pressed.connect(_on_pass_pressed)
     _list_review.back_requested.connect(_on_list_review_back)
@@ -120,6 +121,34 @@ func _on_peek_requested() -> void:
             var card: ItemCard = _card_for_entry[entry]
             card.refresh(&"unveil")
             card.flash_border()
+
+    _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
+    _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
+    _refresh_action_bar()
+
+
+func _on_appraise_requested() -> void:
+    if _selected_entry == null:
+        return
+    if _selected_entry.is_veiled():
+        return
+    if _selected_entry.intuition_level >= _selected_entry.max_intuition_level:
+        return
+    if RunManager.run_record.stamina < LotActionBar.APPRAISE_COST:
+        return
+    if RunManager.run_record.actions_remaining <= 0:
+        return
+
+    RunManager.run_record.stamina -= LotActionBar.APPRAISE_COST
+    RunManager.run_record.actions_remaining -= 1
+
+    var base_chance: float = 0.5
+    var success_chance: float = base_chance / (_selected_entry.intuition_level + 1)
+    if randf() < success_chance:
+        _selected_entry.intuition_level += 1
+        var card: ItemCard = _card_for_entry[_selected_entry]
+        card.refresh(&"potential")
+        card.flash_border()
 
     _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
     _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
@@ -199,7 +228,7 @@ func _run_intuition() -> void:
     for entry: ItemEntry in RunManager.run_record.lot_items:
         if entry.is_veiled():
             continue
-        if entry.intuition_flag:
+        if entry.intuition_level >= 1:
             continue
 
         var category_rank: int = KnowledgeManager.get_category_rank(entry.item_data.category_data)
@@ -215,7 +244,7 @@ func _run_intuition() -> void:
         var chance: float = 0.1 + computed_base * 0.15
 
         if randf() < chance:
-            entry.intuition_flag = true
+            entry.intuition_level = max(entry.intuition_level, 1)
             var card: ItemCard = _card_for_entry[entry]
             card.play_intuition_shimmer()
 
