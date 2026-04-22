@@ -297,7 +297,7 @@ func _refresh_detail() -> void:
         _detail_category_label.text = "#%d" % entry.id
 
     # ── Rarity ─────────────────────────────────────────────────────────────────
-    _detail_rarity_label.text = entry.potential_label
+    _detail_rarity_label.text = entry.perceived_rarity_label
 
     # ── Condition ─────────────────────────────────────────────────────────────
     _detail_cond_value.text = entry.condition_label
@@ -376,6 +376,8 @@ func _disabled_reason(entry: ItemEntry, action: ResearchSlot.SlotAction) -> Stri
         ResearchSlot.SlotAction.STUDY:
             if entry.is_fully_inspected():
                 return "Fully inspected"
+            if not entry.is_condition_inspectable():
+                return "Scrutiny already maxed"
             return ""
         ResearchSlot.SlotAction.REPAIR:
             if entry.is_repair_complete():
@@ -398,7 +400,7 @@ func _progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
         ResearchSlot.SlotAction.STUDY:
             if slot.completed or entry.is_fully_inspected():
                 return "Fully Inspected"
-            return "Rarity: %s   Condition: %s" % [entry.get_potential_rating(), entry.condition_label]
+            return "Rarity: %s   Condition: %s" % [entry.perceived_rarity_label, entry.condition_label]
         ResearchSlot.SlotAction.REPAIR:
             if slot.completed or entry.is_repair_complete():
                 return "Condition: 100%"

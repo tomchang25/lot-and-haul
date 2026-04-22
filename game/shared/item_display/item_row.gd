@@ -221,7 +221,7 @@ func _refresh() -> void:
     _special_order_label.add_theme_color_override(&"font_color", _entry.price_color)
 
     # ── RARITY ────────────────────────────────────────────────────────────────
-    _rarity_label.text = "???" if _entry.is_veiled() else _entry.get_potential_rating()
+    _rarity_label.text = "???" if _entry.is_veiled() else _entry.perceived_rarity_label
 
     # ── WEIGHT / GRID ─────────────────────────────────────────────────────────
     if _entry.item_data != null and _entry.item_data.category_data != null:

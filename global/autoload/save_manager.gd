@@ -281,8 +281,8 @@ func _tick_research_slots(days: int) -> Array[Dictionary]:
                 break
             match slot.action:
                 ResearchSlot.SlotAction.STUDY:
-                    entry.apply_study(_study_speed_factor())
-                    slot.completed = entry.is_fully_inspected()
+                    entry.advance_scrutiny()
+                    slot.completed = entry.is_study_complete()
                 ResearchSlot.SlotAction.REPAIR:
                     entry.apply_repair(_repair_speed_factor())
                     slot.completed = entry.is_repair_complete()
@@ -340,12 +340,6 @@ func _skill_speed_factor(skill: SkillData) -> float:
     var skill_level: int = KnowledgeManager.get_level(skill)
     var mastery_rank: int = KnowledgeManager.get_mastery_rank()
     return 1.0 + pow(1.1, skill_level) * mastery_rank * 0.2
-
-
-func _study_speed_factor() -> float:
-    if _appraisal_skill == null:
-        _appraisal_skill = KnowledgeManager.get_skill_by_id("appraisal")
-    return _skill_speed_factor(_appraisal_skill)
 
 
 func _repair_speed_factor() -> float:

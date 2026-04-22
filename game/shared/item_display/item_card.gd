@@ -78,7 +78,7 @@ func _apply_unveiled() -> void:
         _super_category_label.hide()
         _category_label.hide()
 
-    _potential_label.text = _entry.potential_label
+    _potential_label.text = _entry.perceived_rarity_label
     _potential_label.show()
 
     _condition_label.text = _entry.condition_label

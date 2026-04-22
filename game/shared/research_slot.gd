@@ -58,6 +58,7 @@ static func action_from_string(s: String) -> SlotAction:
             return SlotAction.STUDY
 
 
+@warning_ignore("shadowed_variable")
 static func find_index(slots: Array, item_id: int) -> int:
     for i in range(slots.size()):
         var d: Dictionary = slots[i]
@@ -66,6 +67,7 @@ static func find_index(slots: Array, item_id: int) -> int:
     return -1
 
 
+@warning_ignore("shadowed_variable")
 static func action_for_item(slots: Array, item_id: int) -> String:
     for d: Dictionary in slots:
         if int(d.get("item_id", -1)) != item_id:
@@ -76,6 +78,7 @@ static func action_for_item(slots: Array, item_id: int) -> String:
     return ""
 
 
+@warning_ignore("shadowed_variable")
 static func clear_for_item(slots: Array, item_id: int) -> void:
     var idx: int = find_index(slots, item_id)
     if idx < 0:

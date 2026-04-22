@@ -3,35 +3,42 @@
 class_name ItemEntry
 extends RefCounted
 
-# ── Inspection bucket tables ──────────────────────────────────────────────────
+# ── Inspection constants ─────────────────────────────────────────────────────
 
-# Shared across all items. Maps inspection_level to a resolution bucket:
-# 0 = rough, 1 = mid, 2 = fine.
-const CONDITION_THRESHOLDS: Array[float] = [0.0, 1.0, 2.0]
+# Condition display thresholds against inspection_level (0–1).
+const CONDITION_THRESHOLDS: Array[float] = [0.0, 0.33, 0.66]
 
 # Display names indexed by ItemData.Rarity enum value.
 const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
 
-# Per-rarity inspection threshold ladders. Each entry feeds _bucket_index.
-# Add a new rarity by adding one entry here.
-const RARITY_THRESHOLDS: Dictionary = {
-    ItemData.Rarity.COMMON: [0.0, 1.0],
-    ItemData.Rarity.UNCOMMON: [0.0, 1.0, 2.0],
-    ItemData.Rarity.RARE: [0.0, 1.0, 2.0, 4.0],
-    ItemData.Rarity.EPIC: [0.0, 1.0, 2.0, 4.0],
-    ItemData.Rarity.LEGENDARY: [0.0, 1.0, 2.0, 4.0],
-}
-
 # Uniform maximum range spread, in multiplier units around 1.0.
 const PRICE_MAX_SPREAD: float = 1.0
 
-# Inspection-level head-start formula: INSPECTION_BASE + rank * INSPECTION_PER_RANK.
-const INSPECTION_BASE: float = 0.75
-const INSPECTION_PER_RANK: float = 0.25
+# ── Scrutiny tuning knobs ────────────────────────────────────────────────────
 
-# ── Research tuning knobs ─────────────────────────────────────────────────────
+const SCRUTINY_BASE_DELTA: float = 0.1
+const MAX_SCRUTINY: float = 0.6
+const SCRUTINY_SKILL_COEFF: float = 0.35
 
-const STUDY_BASE_DELTA: float = 0.25
+# ── Computed-base weights ────────────────────────────────────────────────────
+
+const COMPUTED_BASE_CAT_WEIGHT: float = 0.15
+const COMPUTED_BASE_SC_WEIGHT: float = 0.03
+const COMPUTED_BASE_SKILL_WEIGHT: float = 0.05
+
+# ── Rarity divisors keyed by ItemData.Rarity enum ────────────────────────────
+
+const RARITY_DIVISORS: Dictionary = {
+    ItemData.Rarity.COMMON: 1,
+    ItemData.Rarity.UNCOMMON: 2,
+    ItemData.Rarity.RARE: 3,
+    ItemData.Rarity.EPIC: 4,
+    ItemData.Rarity.LEGENDARY: 5,
+}
+
+const INTUITION_INSPECTION_BONUS: float = 0.1
+
+# ── Research tuning knobs (non-inspection) ───────────────────────────────────
 
 const REPAIR_BASE: float = 0.15
 const REPAIR_POWER: float = 0.5
@@ -49,9 +56,11 @@ var layer_index: int = 0
 
 var condition: float = 1.0
 
-# Unified inspection progress for both condition resolution and rarity resolution.
-# Bumped by inspection actions; mapped to discrete buckets via the tables below.
-var inspection_level: float = 0.0
+# Per-item inspection effort, advanced by Inspect and Study actions.
+var scrutiny: float = 0.0
+
+# Set by a future Intuition system. For now, nothing sets it.
+var intuition_flag: bool = false
 
 # Unique persistent ID assigned when this entry enters storage.
 # -1 = not yet in storage. Assigned by SaveManager
@@ -68,7 +77,28 @@ var center_offset: float = 0.0
 # cannot be derived from layer_index alone.
 var unlock_progress: float = 0.0
 
+# Lazy-cached appraisal skill reference.
+var _appraisal_skill: SkillData = null
+
 # ══ Computed properties ═══════════════════════════════════════════════════════
+
+# inspection_level is now fully computed, not stored.
+var inspection_level: float:
+    get:
+        var category_rank: int = KnowledgeManager.get_category_rank(item_data.category_data)
+        var sc: SuperCategoryData = item_data.category_data.super_category
+        var sc_rank: int = KnowledgeManager.get_super_category_rank(sc)
+        var cat_count: int = SuperCategoryRegistry.get_categories_for_super(sc).size()
+        var sc_average: float = float(sc_rank) / maxf(cat_count, 1.0)
+        var appraisal_level: int = _get_appraisal_level()
+        var computed_base: float = (
+            category_rank * COMPUTED_BASE_CAT_WEIGHT
+            + sc_average * COMPUTED_BASE_SC_WEIGHT
+            + appraisal_level * COMPUTED_BASE_SKILL_WEIGHT
+        )
+        var rarity_divisor: float = float(RARITY_DIVISORS.get(item_data.rarity, 1))
+        var intuition_bonus: float = INTUITION_INSPECTION_BONUS if intuition_flag else 0.0
+        return clampf(computed_base / rarity_divisor + scrutiny + intuition_bonus, 0.0, 1.0)
 
 var display_name: String:
     get:
@@ -89,16 +119,19 @@ var condition_label: String:
             0:
                 return "???"
             1:
-                if condition < 0.3:
+                if condition < 0.5:
                     return "Poor"
-                elif condition < 0.6:
+                else:
+                    return "Good"
+            2:
+                if condition < 0.25:
+                    return "Poor"
+                elif condition < 0.5:
                     return "Fair"
-                elif condition < 0.8:
+                elif condition < 0.75:
                     return "Good"
                 else:
                     return "Excellent"
-            2:
-                return "%d%%" % int(condition * 100)
             _:
                 return "?????????"
 
@@ -117,64 +150,104 @@ var condition_mult_label: String:
                 push_warning("condition bucket out of range: %d" % get_condition_bucket())
                 return "×?"
 
-var potential_label: String:
-    get:
-        if is_veiled():
-            return "Veiled"
-        return get_potential_rating()
-
 
 func is_condition_inspectable() -> bool:
-    if is_veiled() or is_condition_resolved():
-        return false
-
-    if get_condition_bucket() == 1 and condition < 0.3:
-        return false
-
-    return true
+    return scrutiny < MAX_SCRUTINY
 
 
 func get_condition_multiplier() -> float:
-    if condition <= 0.6:
-        return remap(condition, 0.0, 0.6, 0.5, 1.0)
-    elif condition <= 0.8:
-        return remap(condition, 0.6, 0.8, 1.0, 2.0)
+    if condition <= 0.25:
+        return remap(condition, 0.0, 0.25, 0.25, 0.5)
+    elif condition <= 0.5:
+        return remap(condition, 0.25, 0.5, 0.5, 1.0)
+    elif condition <= 0.75:
+        return remap(condition, 0.5, 0.75, 1.0, 2.0)
     else:
-        return remap(condition, 0.8, 1.0, 2.0, 4.0)
+        return remap(condition, 0.75, 1.0, 2.0, 4.0)
 
 
 # Returns the condition multiplier the player can infer from their current inspect bucket.
 # bucket 0 → neutral 1.0 (unknown)
-# bucket 1 → midpoint of the visible 4-band (Poor / Fair / Good / Excellent)
+# bucket 1 → midpoint of the visible 2-band (Poor / Good)
 # bucket 2 → the precise true multiplier
 func get_known_condition_multiplier() -> float:
     match get_condition_bucket():
         0:
             return 1.0
         1:
-            if condition < 0.3:
+            if condition < 0.5:
+                # Poor band midpoint: condition ~0.25 → multiplier ~0.5
                 return 0.5
-            elif condition < 0.6:
-                return 1.0
-            elif condition < 0.8:
-                return 1.5
             else:
-                return 3.0
+                # Good band midpoint: condition ~0.75 → multiplier ~2.0
+                return 2.0
         2:
             return get_condition_multiplier()
         _:
             return 0.0
 
+# Rarity label the player can see, driven by layer depth (+ intuition_flag).
+var perceived_rarity_label: String:
+    get:
+        var effective_layer: int = (layer_index + 1) if intuition_flag else layer_index
+        var rarity_value: int = item_data.rarity
 
-# Rarity rating the player can see at the current inspection bucket.
-# Non-final buckets show "<Common|Uncommon|Rare>+" ("at least this rarity").
-# The final bucket shows the bare true rarity name.
-func get_potential_rating() -> String:
-    var thresholds: Array[float] = _rarity_thresholds()
-    var bucket: int = get_rarity_bucket()
-    if bucket >= thresholds.size() - 1:
-        return _true_rarity_name()
-    return "%s+" % RARITY_NAMES[bucket]
+        # effective_layer 0 (veiled): no rarity shown.
+        if effective_layer <= 0:
+            return "Veiled"
+
+        # Layer-based rarity reveal table
+        match effective_layer:
+            1:
+                if rarity_value == ItemData.Rarity.COMMON:
+                    return "Common"
+                else:
+                    return "Uncommon+"
+            2:
+                if rarity_value <= ItemData.Rarity.UNCOMMON:
+                    return _true_rarity_name()
+                else:
+                    return "Rare+"
+            3:
+                if rarity_value <= ItemData.Rarity.RARE:
+                    return _true_rarity_name()
+                else:
+                    return "Epic+"
+            _:
+                # 4+ → all show true name
+                return _true_rarity_name()
+
+# Sort-safe rarity value based on what the player can actually see.
+# Confirmed rarity → enum int (0–4). Unconfirmed floor ("X+") → enum + 0.5.
+# Veiled → -1.
+var perceived_rarity: float:
+    get:
+        if is_veiled():
+            return -1.0
+        var effective_layer: int = (layer_index + 1) if intuition_flag else layer_index
+        var rarity_value: int = item_data.rarity
+
+        if effective_layer <= 0:
+            return -1.0
+
+        match effective_layer:
+            1:
+                if rarity_value == ItemData.Rarity.COMMON:
+                    return float(ItemData.Rarity.COMMON)
+                else:
+                    return float(ItemData.Rarity.UNCOMMON) + 0.5
+            2:
+                if rarity_value <= ItemData.Rarity.UNCOMMON:
+                    return float(rarity_value)
+                else:
+                    return float(ItemData.Rarity.RARE) + 0.5
+            3:
+                if rarity_value <= ItemData.Rarity.RARE:
+                    return float(rarity_value)
+                else:
+                    return float(ItemData.Rarity.EPIC) + 0.5
+            _:
+                return float(rarity_value)
 
 # ── Bucket helpers ────────────────────────────────────────────────────────────
 
@@ -183,38 +256,19 @@ func get_condition_bucket() -> int:
     return _bucket_index(inspection_level, CONDITION_THRESHOLDS)
 
 
-func get_rarity_bucket() -> int:
-    return _bucket_index(inspection_level, _rarity_thresholds())
-
-
-func is_condition_resolved() -> bool:
-    return get_condition_bucket() >= CONDITION_THRESHOLDS.size() - 1
-
-
-func is_rarity_resolved() -> bool:
-    return get_rarity_bucket() >= _rarity_thresholds().size() - 1
-
-
 func is_fully_inspected() -> bool:
-    return is_condition_resolved() and is_rarity_resolved()
+    return inspection_level >= 1.0
 
 
-func apply_inspect(delta: float) -> void:
-    var max_threshold: float = _rarity_thresholds().back()
-    var cap: float = maxf(max_threshold, CONDITION_THRESHOLDS.back())
-    inspection_level = minf(cap, inspection_level + delta)
-    KnowledgeManager.add_category_points(
-        item_data.category_data,
-        item_data.rarity,
-        KnowledgeManager.KnowledgeAction.INSPECT,
-    )
+func is_study_complete() -> bool:
+    return scrutiny >= MAX_SCRUTINY
 
 
-func apply_study(speed_factor: float = 1.0) -> void:
-    var delta: float = STUDY_BASE_DELTA * speed_factor
-    var max_threshold: float = _rarity_thresholds().back()
-    var cap: float = maxf(max_threshold, CONDITION_THRESHOLDS.back())
-    inspection_level = minf(cap, inspection_level + delta)
+func advance_scrutiny() -> void:
+    var appraisal_level: int = _get_appraisal_level()
+    var skill_multiplier: float = 1.0 + appraisal_level * SCRUTINY_SKILL_COEFF
+    var delta: float = SCRUTINY_BASE_DELTA * skill_multiplier
+    scrutiny = minf(scrutiny + delta, MAX_SCRUTINY)
     KnowledgeManager.add_category_points(
         item_data.category_data,
         item_data.rarity,
@@ -267,17 +321,12 @@ func is_unlock_ready() -> bool:
 
 var price_convergence_ratio: float:
     get:
-        if PRICE_MAX_SPREAD == 0.0:
-            return 1.0
-        var thresholds: Array[float] = _rarity_thresholds()
-        var max_threshold: float = thresholds[thresholds.size() - 1]
-        if max_threshold <= 0.0:
-            return 1.0
-        return clampf(inspection_level / max_threshold, 0.0, 1.0)
+        return inspection_level
 
 
 func is_price_converged() -> bool:
     return price_convergence_ratio >= 1.0
+
 
 var unlock_ratio: float:
     get:
@@ -287,16 +336,6 @@ var unlock_ratio: float:
         if action == null:
             return 1.0
         return clampf(unlock_progress / action.difficulty, 0.0, 1.0)
-
-
-func _rarity_thresholds() -> Array[float]:
-    var key: int = item_data.rarity
-    if not RARITY_THRESHOLDS.has(key):
-        push_warning("ItemEntry: unexpected rarity %d" % key)
-        return [0.0]
-    var result: Array[float] = []
-    result.assign(RARITY_THRESHOLDS[key])
-    return result
 
 
 func _true_rarity_name() -> String:
@@ -374,9 +413,8 @@ func compute_price(config: PriceConfig) -> int:
 # shows $0 or a negative price.
 func compute_price_range(config: PriceConfig) -> Array[int]:
     var base: float = float(compute_price(config))
-    var progress: float = price_convergence_ratio
-    var spread: float = _max_spread() * (1.0 - progress)
-    var offset: float = center_offset * (1.0 - progress)
+    var spread: float = _max_spread() * (1.0 - inspection_level)
+    var offset: float = center_offset * (1.0 - inspection_level)
     var range_min: float = 1.0 - spread + offset
     var range_max: float = 1.0 + spread + offset
     var result: Array[int] = []
@@ -533,14 +571,19 @@ func unveil() -> void:
 
 
 func reveal() -> void:
-    var rank: int = KnowledgeManager.get_super_category_rank(item_data.category_data.super_category)
-    inspection_level = maxf(_rank_inspection_level(rank), inspection_level)
+    # reveal no longer sets inspection_level directly — layer advancement
+    # is the primary mechanism. Keep category point grant via advance_layer caller.
+    pass
+
+# ── Private helpers ──────────────────────────────────────────────────────────
 
 
-# Head-start inspection level granted by the player's category rank. Shared by
-# create() (initial value) and reveal() (post-unveil floor).
-static func _rank_inspection_level(rank: int) -> float:
-    return INSPECTION_BASE + float(rank) * INSPECTION_PER_RANK
+func _get_appraisal_level() -> int:
+    if _appraisal_skill == null:
+        _appraisal_skill = KnowledgeManager.get_skill_by_id("appraisal")
+    if _appraisal_skill == null:
+        return 0
+    return KnowledgeManager.get_level(_appraisal_skill)
 
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
@@ -556,9 +599,9 @@ static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
     var start_veiled := randf() < veil_chance
     entry.layer_index = 0 if start_veiled else 1
 
-    # Head start from category experience. Tunable — higher rank = more known.
-    var rank: int = KnowledgeManager.get_super_category_rank(data.category_data.super_category)
-    entry.inspection_level = _rank_inspection_level(rank)
+    # scrutiny starts at 0; inspection_level is computed from knowledge + scrutiny.
+    entry.scrutiny = 0.0
+    entry.intuition_flag = false
 
     return entry
 
@@ -571,7 +614,8 @@ func to_dict() -> Dictionary:
         "id": id,
         "layer_index": layer_index,
         "condition": condition,
-        "inspection_level": inspection_level,
+        "scrutiny": scrutiny,
+        "intuition_flag": intuition_flag,
         "center_offset": center_offset,
         "unlock_progress": unlock_progress,
     }
@@ -586,37 +630,16 @@ static func from_dict(d: Dictionary) -> ItemEntry:
     entry.item_data = data
     entry.layer_index = int(d["layer_index"])
     entry.condition = float(d["condition"])
-    entry.inspection_level = _read_inspection_level(d)
+    # New fields — default gracefully if missing (migration-safe).
+    entry.scrutiny = float(d.get("scrutiny", 0.0))
+    entry.intuition_flag = bool(d.get("intuition_flag", false))
     if d.has("center_offset"):
         entry.center_offset = float(d["center_offset"])
     else:
-        # Migrate pre-range saves: roll a fresh offset so old items behave like
-        # new ones. Old knowledge_min/max are discarded.
         entry.center_offset = randf_range(-0.5, 0.5)
     if d.has("unlock_progress"):
         entry.unlock_progress = float(d["unlock_progress"])
     if d.has("id"):
         entry.id = int(d["id"])
+    # Legacy inspection_level key is intentionally ignored — clean break.
     return entry
-
-
-# Reads inspection_level from the save dict, migrating from the old schema
-# (condition_inspect_level + potential_inspect_level as ints) when needed.
-# Old → new mapping uses max(old_condition, old_potential): 0 → 0.0, 1 → 1.0, 2 → 4.0.
-# The 2 → 4.0 mapping is deliberately generous so fully-inspected items land
-# at the finest rarity bucket for every rarity threshold table.
-static func _read_inspection_level(d: Dictionary) -> float:
-    if d.has("inspection_level"):
-        return float(d["inspection_level"])
-    var old_cond: int = int(d.get("condition_inspect_level", 0))
-    var old_pot: int = int(d.get("potential_inspect_level", 0))
-    var old_max: int = maxi(old_cond, old_pot)
-    match old_max:
-        0:
-            return 0.0
-        1:
-            return 1.0
-        2:
-            return 4.0
-        _:
-            return 0.0

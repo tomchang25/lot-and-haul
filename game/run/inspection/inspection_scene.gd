@@ -21,7 +21,6 @@ const ItemCardScene := preload("uid://bw23cjkf40y5r")
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _appraisal_skill: SkillData = null
 var _xray_perk: PerkData = null
 
 var _item_displays: Array[ItemCard] = []
@@ -51,7 +50,6 @@ var _pulse_tween: Tween = null
 
 func _ready() -> void:
     _ctx = ItemViewContext.for_inspection()
-    _appraisal_skill = KnowledgeManager.get_skill_by_id("appraisal")
     _xray_perk = KnowledgeManager.get_perk_by_id("xray_inspect")
 
     _action_bar.inspect_requested.connect(_on_inspect_requested)
@@ -80,7 +78,6 @@ func _on_inspect_requested() -> void:
     RunManager.run_record.stamina -= LotActionBar.INSPECT_COST
     RunManager.run_record.actions_remaining -= 1
 
-    var delta: float = 0.5 * _inspect_multiplier()
     var hits: int = randi_range(1, MAX_INSPECT_HITS)
 
     var pool: Array[ItemEntry] = []
@@ -93,7 +90,7 @@ func _on_inspect_requested() -> void:
             break
         var idx: int = randi() % pool.size()
         var entry: ItemEntry = pool[idx]
-        entry.apply_inspect(delta)
+        entry.advance_scrutiny()
 
         var card: ItemCard = _card_for_entry[entry]
         card.refresh(&"condition")
@@ -192,11 +189,6 @@ func _refresh_action_bar() -> void:
             has_inspectable = true
     _action_bar.refresh_lot(has_inspectable, has_veiled)
 
-
-func _inspect_multiplier() -> float:
-    var appraisal_level: int = KnowledgeManager.get_level(_appraisal_skill) if _appraisal_skill != null else 0
-    var mastery_rank: int = KnowledgeManager.get_mastery_rank()
-    return 1.0 + pow(1.1, appraisal_level) * mastery_rank * 0.2
 
 # ══ Exit pulse ════════════════════════════════════════════════════════════════
 
