@@ -284,13 +284,16 @@ func _tick_research_slots(days: int) -> Array[Dictionary]:
                     entry.advance_scrutiny()
                     slot.completed = entry.is_study_complete()
                 ResearchSlot.SlotAction.REPAIR:
-                    entry.apply_repair(_repair_speed_factor())
+                    entry.apply_repair()
                     slot.completed = entry.is_repair_complete()
                 ResearchSlot.SlotAction.UNLOCK:
-                    entry.add_unlock_effort(_unlock_speed_factor())
+                    entry.add_unlock_effort()
                     if entry.is_unlock_ready():
                         entry.advance_layer()
                         slot.completed = true
+                ResearchSlot.SlotAction.RESTORE:
+                    entry.apply_restore()
+                    slot.completed = entry.is_restore_complete()
                 _:
                     push_warning("SaveManager: unknown SlotAction %d" % slot.action)
                     break
@@ -326,32 +329,11 @@ func _slot_effect_label(action: ResearchSlot.SlotAction) -> String:
             return "Repair complete"
         ResearchSlot.SlotAction.UNLOCK:
             return "Layer unlocked"
+        ResearchSlot.SlotAction.RESTORE:
+            return "Fully restored"
         _:
             push_warning("SaveManager: unknown SlotAction %d" % action)
             return "Done"
-
-
-var _appraisal_skill: SkillData = null
-var _maintenance_skill: SkillData = null
-
-# Shared skill-driven speed formula, same shape as inspection_scene's
-# inspect multiplier.
-func _skill_speed_factor(skill: SkillData) -> float:
-    var skill_level: int = KnowledgeManager.get_level(skill)
-    var mastery_rank: int = KnowledgeManager.get_mastery_rank()
-    return 1.0 + pow(1.1, skill_level) * mastery_rank * 0.2
-
-
-func _repair_speed_factor() -> float:
-    if _maintenance_skill == null:
-        _maintenance_skill = KnowledgeManager.get_skill_by_id("maintenance")
-    return _skill_speed_factor(_maintenance_skill)
-
-
-func _unlock_speed_factor() -> float:
-    if _appraisal_skill == null:
-        _appraisal_skill = KnowledgeManager.get_skill_by_id("appraisal")
-    return _skill_speed_factor(_appraisal_skill)
 
 
 func _build_negotiation_dict() -> Dictionary:
