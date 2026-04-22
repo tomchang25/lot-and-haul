@@ -36,7 +36,7 @@ OUTPUT FORMAT RULES:
 Output structure:
 
 categories: - category_id: snake_case string, unique. Matches .tres filename stem.
-super_category: Broad type shown in UI (e.g. "Fine Art", "Vehicle", "Weapon", "Furniture").
+super_category: Broad type shown in UI (e.g. "Fine Art", "Weapon", "Furniture").
 display_name: Fine-grained player-facing label (e.g. "Oil Lamp", "Pocket Watch").
 weight: float, kilograms.
 shape_id: string. The cargo grid footprint. Must be one of:
