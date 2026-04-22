@@ -69,17 +69,18 @@ func validate() -> bool:
     return ok
 
 
-func add_category_points(category_id: String, rarity: ItemData.Rarity, action: KnowledgeAction) -> void:
+func add_category_points(category: CategoryData, rarity: ItemData.Rarity, action: KnowledgeAction) -> void:
     var base: int = _BASE_MASTERY[action]
     var rarity_mult: int = rarity + 1 # COMMON=0→1, UNCOMMON=1→2, …, LEGENDARY=4→5
     var gain: int = base * rarity_mult
+    var category_id: String = category.category_id
     if not SaveManager.category_points.has(category_id):
         SaveManager.category_points[category_id] = 0
     SaveManager.category_points[category_id] += gain
 
 
-func get_category_rank(category_id: String) -> int:
-    var points: int = SaveManager.category_points.get(category_id, 0)
+func get_category_rank(category: CategoryData) -> int:
+    var points: int = SaveManager.category_points.get(category.category_id, 0)
     if points >= 25600:
         return 5
     elif points >= 6400:
@@ -94,17 +95,17 @@ func get_category_rank(category_id: String) -> int:
         return 0
 
 
-func get_super_category_rank(super_category_id: String) -> int:
+func get_super_category_rank(sc: SuperCategoryData) -> int:
     var total: int = 0
-    for cat: CategoryData in SuperCategoryRegistry.get_categories_for_super(super_category_id):
-        total += get_category_rank(cat.category_id)
+    for cat: CategoryData in SuperCategoryRegistry.get_categories_for_super(sc):
+        total += get_category_rank(cat)
     return total
 
 
 func get_mastery_rank() -> int:
     var total: int = 0
     for sc: SuperCategoryData in SuperCategoryRegistry.get_all_super_categories():
-        total += get_super_category_rank(sc.super_category_id)
+        total += get_super_category_rank(sc)
     return total
 
 
@@ -132,7 +133,8 @@ func _check_upgrade(skill: SkillData) -> UpgradeResult:
     var next: SkillLevelData = skill.levels[current]
     for super_id: String in next.required_super_category_ranks:
         var min_rank: int = int(next.required_super_category_ranks[super_id])
-        if get_super_category_rank(super_id) < min_rank:
+        var sc: SuperCategoryData = SuperCategoryRegistry.get_super_category_by_id(super_id)
+        if sc == null or get_super_category_rank(sc) < min_rank:
             return UpgradeResult.INSUFFICIENT_SUPER_CATEGORY_RANK
     if get_mastery_rank() < next.required_mastery_rank:
         return UpgradeResult.INSUFFICIENT_MASTERY_RANK
@@ -163,7 +165,7 @@ func can_advance(entry: ItemEntry) -> AdvanceCheck:
         return AdvanceCheck.NO_ACTION
 
     if action.required_category_rank > 0:
-        if get_category_rank(entry.item_data.category_data.category_id) < action.required_category_rank:
+        if get_category_rank(entry.item_data.category_data) < action.required_category_rank:
             return AdvanceCheck.INSUFFICIENT_CATEGORY_RANK
 
     if action.required_skill != null:

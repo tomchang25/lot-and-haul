@@ -61,7 +61,10 @@ func _apply() -> void:
     # Build the set of category IDs already covered by super-category weights.
     var covered: Dictionary = { }
     for sc_id in _lot_data.super_category_weights.keys():
-        for cat: CategoryData in SuperCategoryRegistry.get_categories_for_super(sc_id):
+        var sc: SuperCategoryData = SuperCategoryRegistry.get_super_category_by_id(sc_id)
+        if sc == null:
+            continue
+        for cat: CategoryData in SuperCategoryRegistry.get_categories_for_super(sc):
             covered[cat.category_id] = true
 
     # Extra Category row — only categories NOT covered by any super-category.

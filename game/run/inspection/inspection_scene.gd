@@ -124,7 +124,7 @@ func _on_peek_requested() -> void:
         if randf() < success_chance:
             entry.unveil()
             KnowledgeManager.add_category_points(
-                entry.item_data.category_data.category_id,
+                entry.item_data.category_data,
                 entry.item_data.rarity,
                 KnowledgeManager.KnowledgeAction.REVEAL,
             )

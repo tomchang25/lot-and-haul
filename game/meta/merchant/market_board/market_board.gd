@@ -31,7 +31,7 @@ func _populate_board() -> void:
     )
     for sc: SuperCategoryData in super_cats:
         _add_super_category_row(sc)
-        var categories: Array[CategoryData] = SuperCategoryRegistry.get_categories_for_super(sc.super_category_id)
+        var categories: Array[CategoryData] = SuperCategoryRegistry.get_categories_for_super(sc)
         categories.sort_custom(func(a: CategoryData, b: CategoryData) -> bool:
             return a.display_name < b.display_name
         )

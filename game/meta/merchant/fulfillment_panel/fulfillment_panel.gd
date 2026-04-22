@@ -163,7 +163,7 @@ func _execute_delivery() -> void:
         SaveManager.storage_items.erase(entry)
         ResearchSlot.clear_for_item(SaveManager.research_slots, entry.id)
         KnowledgeManager.add_category_points(
-            entry.item_data.category_data.category_id,
+            entry.item_data.category_data,
             entry.item_data.rarity,
             KnowledgeManager.KnowledgeAction.SELL,
         )

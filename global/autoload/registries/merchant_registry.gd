@@ -1,6 +1,6 @@
 # merchant_registry.gd
 # Autoload that loads all MerchantData resources at startup and provides query
-# access. Access globally via MerchantRegistry.get_merchant(merchant_id) /
+# access. Access globally via MerchantRegistry.get_merchant_by_id(merchant_id) /
 # MerchantRegistry.get_all_merchants().
 extends Node
 
@@ -48,7 +48,7 @@ func validate() -> bool:
 
 
 # Returns the MerchantData with the given merchant_id, or null if not found.
-func get_merchant(merchant_id: String) -> MerchantData:
+func get_merchant_by_id(merchant_id: String) -> MerchantData:
     return _merchants.get(merchant_id, null)
 
 

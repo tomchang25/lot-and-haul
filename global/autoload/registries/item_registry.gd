@@ -1,6 +1,6 @@
 # item_registry.gd
 # Autoload that loads all ItemData resources at startup and provides query access.
-# Access globally via ItemRegistry.get_item(item_id) / ItemRegistry.get_items(rarity, category_id).
+# Access globally via ItemRegistry.get_item_by_id(item_id) / ItemRegistry.get_items(rarity, category_id).
 # Category and super-category lookups live in CategoryRegistry and SuperCategoryRegistry.
 extends Node
 
@@ -57,7 +57,7 @@ func get_all_items() -> Array[ItemData]:
     return result
 
 
-func get_item(item_id: String) -> ItemData:
+func get_item_by_id(item_id: String) -> ItemData:
     return _items_by_id.get(item_id, null)
 
 

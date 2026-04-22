@@ -1,6 +1,6 @@
 # car_registry.gd
 # Autoload that loads all CarData resources at startup and provides query
-# access. Access globally via CarRegistry.get_car(car_id) /
+# access. Access globally via CarRegistry.get_car_by_id(car_id) /
 # CarRegistry.get_all_cars().
 extends Node
 
@@ -22,7 +22,7 @@ func _ready() -> void:
 func migrate() -> void:
     if SaveManager.owned_car_ids.is_empty():
         SaveManager.owned_car_ids.append("van_basic")
-    if SaveManager.active_car_id.is_empty() or get_car(SaveManager.active_car_id) == null:
+    if SaveManager.active_car_id.is_empty() or get_car_by_id(SaveManager.active_car_id) == null:
         SaveManager.active_car_id = SaveManager.owned_car_ids[0]
 
 
@@ -31,14 +31,14 @@ func validate() -> bool:
     if size() == 0:
         push_error("CarRegistry: registry is empty")
         ok = false
-    if get_car(SaveManager.active_car_id) == null:
+    if get_car_by_id(SaveManager.active_car_id) == null:
         push_error(
             "CarRegistry: SaveManager.active_car_id '%s' not found"
             % SaveManager.active_car_id,
         )
         ok = false
     for car_id: String in SaveManager.owned_car_ids:
-        if get_car(car_id) == null:
+        if get_car_by_id(car_id) == null:
             push_error(
                 "CarRegistry: SaveManager.owned_car_ids '%s' not found"
                 % car_id,
@@ -48,7 +48,7 @@ func validate() -> bool:
 
 
 # Returns the CarData with the given car_id, or null if not found.
-func get_car(car_id: String) -> CarData:
+func get_car_by_id(car_id: String) -> CarData:
     return _cars.get(car_id, null)
 
 

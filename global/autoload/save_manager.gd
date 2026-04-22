@@ -18,7 +18,7 @@ var owned_car_ids: Array[String] = []
 # CarRegistry so the save file only has to persist the id.
 var active_car: CarData:
     get:
-        return CarRegistry.get_car(active_car_id)
+        return CarRegistry.get_car_by_id(active_car_id)
 
 # Mirrors `active_car`: resolve each owned id via CarRegistry, skipping any
 # that fail to resolve (e.g. if a car was removed from the data pipeline).
@@ -26,7 +26,7 @@ var owned_cars: Array[CarData]:
     get:
         var result: Array[CarData] = []
         for id: String in owned_car_ids:
-            var car: CarData = CarRegistry.get_car(id)
+            var car: CarData = CarRegistry.get_car_by_id(id)
             if car != null:
                 result.append(car)
         return result
@@ -169,7 +169,7 @@ func _read_save_file() -> void:
         var neg_dict: Dictionary = parsed["merchant_negotiations_used_today"]
         for key: Variant in neg_dict:
             if key is String and neg_dict[key] is float:
-                var m: MerchantData = MerchantRegistry.get_merchant(key)
+                var m: MerchantData = MerchantRegistry.get_merchant_by_id(key)
                 if m != null:
                     m.negotiations_used_today = int(neg_dict[key])
 
@@ -181,7 +181,7 @@ func _read_save_file() -> void:
         for key: Variant in orders_dict:
             if not key is String:
                 continue
-            var m: MerchantData = MerchantRegistry.get_merchant(key)
+            var m: MerchantData = MerchantRegistry.get_merchant_by_id(key)
             if m == null:
                 continue
             var entry: Variant = orders_dict[key]

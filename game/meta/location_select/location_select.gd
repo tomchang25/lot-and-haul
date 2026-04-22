@@ -27,7 +27,7 @@ func _populate_cards() -> void:
     if SaveManager.available_location_ids.is_empty():
         SaveManager.roll_available_locations()
     for loc_id: String in SaveManager.available_location_ids:
-        var location := LocationRegistry.get_location(loc_id)
+        var location := LocationRegistry.get_location_by_id(loc_id)
         if location == null:
             push_warning("LocationSelect: unknown location id '%s'" % loc_id)
             continue

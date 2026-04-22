@@ -1,6 +1,6 @@
 # category_registry.gd
 # Autoload that loads all CategoryData resources at startup and provides query
-# access. Access globally via CategoryRegistry.get_category(category_id) /
+# access. Access globally via CategoryRegistry.get_category_by_id(category_id) /
 # CategoryRegistry.get_all_categories().
 extends Node
 
@@ -18,12 +18,12 @@ func _ready() -> void:
 
 func migrate() -> void:
     for key in SaveManager.category_points.keys():
-        if get_category(key) == null:
+        if get_category_by_id(key) == null:
             push_warning("CategoryRegistry.migrate: dropping unknown category_points key '%s'" % key)
             SaveManager.category_points.erase(key)
 
     for key: String in MarketManager.category_factors_today.keys():
-        if get_category(key) == null:
+        if get_category_by_id(key) == null:
             push_warning("CategoryRegistry.migrate: dropping unknown category_points key '%s'" % key)
             MarketManager.category_factors_today.erase(key)
 
@@ -33,14 +33,14 @@ func validate() -> bool:
         push_error("CategoryRegistry: registry is empty")
         ok = false
     for category_id: String in SaveManager.category_points.keys():
-        if get_category(category_id) == null:
+        if get_category_by_id(category_id) == null:
             push_error(
                 "CategoryRegistry: SaveManager.category_points key '%s' not found"
                 % category_id,
             )
             ok = false
     for category_id: String in MarketManager.category_factors_today.keys():
-        if get_category(category_id) == null:
+        if get_category_by_id(category_id) == null:
             push_error(
                 "CategoryRegistry: MarketManager.category_factors_today key '%s' not found"
                 % category_id,
@@ -50,7 +50,7 @@ func validate() -> bool:
 
 
 # Returns the CategoryData with the given category_id, or null if not found.
-func get_category(category_id: String) -> CategoryData:
+func get_category_by_id(category_id: String) -> CategoryData:
     return _categories.get(category_id, null)
 
 
@@ -66,16 +66,6 @@ func get_all_category_ids() -> Array[String]:
     for key: String in _categories.keys():
         result.append(key)
     return result
-
-
-# Looks up the super-category for the given category_id via the direct
-# CategoryData.super_category reference. Returns null if the category is
-# missing or has no super-category reference.
-func get_super_category_for(category_id: String) -> SuperCategoryData:
-    var cat: CategoryData = _categories.get(category_id, null)
-    if cat == null:
-        return null
-    return cat.super_category
 
 
 func size() -> int:

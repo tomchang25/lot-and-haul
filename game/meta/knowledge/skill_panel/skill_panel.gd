@@ -68,7 +68,8 @@ func _build_row_content(skill: SkillData, row: VBoxContainer) -> void:
 
         for super_id: String in next.required_super_category_ranks:
             var min_rank: int = int(next.required_super_category_ranks[super_id])
-            var actual: int = KnowledgeManager.get_super_category_rank(super_id)
+            var sc: SuperCategoryData = SuperCategoryRegistry.get_super_category_by_id(super_id)
+            var actual: int = KnowledgeManager.get_super_category_rank(sc) if sc != null else 0
             var gate_label := Label.new()
             gate_label.text = "  %s rank %d / %d" % [super_id, actual, min_rank]
             if actual >= min_rank:
