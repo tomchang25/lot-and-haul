@@ -618,9 +618,7 @@ func unveil() -> void:
 
 
 func reveal() -> void:
-    # reveal no longer sets inspection_level directly — layer advancement
-    # is the primary mechanism. Keep category point grant via advance_layer caller.
-    pass
+    advance_scrutiny()
 
 # ── Private helpers ──────────────────────────────────────────────────────────
 

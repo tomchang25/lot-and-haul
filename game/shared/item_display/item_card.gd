@@ -7,6 +7,8 @@ signal clicked(card: ItemCard)
 
 var _entry: ItemEntry = null
 var _ctx: ItemViewContext = null
+var _is_selected: bool = false
+var _has_intuition_mark: bool = false
 
 @onready var _name_label: Label = $VBox/NameLabel
 @onready var _super_category_label: Label = $VBox/SuperCategoryLabel
@@ -116,6 +118,29 @@ func flash_border() -> void:
     var tween := create_tween()
     tween.tween_property(self, "modulate", Color(1.6, 1.4, 0.6, 1.0), 0.08)
     tween.tween_property(self, "modulate", Color.WHITE, 0.22)
+
+
+func _draw() -> void:
+    if _is_selected:
+        draw_rect(Rect2(Vector2.ZERO, size), Color(0.3, 0.5, 1.0, 0.10))
+    if _has_intuition_mark:
+        draw_rect(Rect2(Vector2(size.x - 12.0, 4.0), Vector2(8.0, 8.0)), Color(1.0, 0.85, 0.2, 0.9))
+
+
+func set_selected(selected: bool) -> void:
+    _is_selected = selected
+    queue_redraw()
+
+
+func play_intuition_shimmer() -> void:
+    var tween := create_tween()
+    tween.tween_property(self, "modulate", Color(1.3, 1.1, 0.4, 1.0), 0.1)
+    tween.tween_property(self, "modulate", Color.WHITE, 0.4)
+    tween.tween_callback(
+        func() -> void:
+            _has_intuition_mark = true
+            queue_redraw()
+    )
 
 
 func _gui_input(event: InputEvent) -> void:

@@ -13,10 +13,6 @@ const ITEM_GAP := Vector2(32.0, 28.0)
 # Top-left corner of the grid — centred horizontally, leaving room for the HUD row
 const GRID_ORIGIN := Vector2(376.0, 90.0)
 
-# Upper bound on the number of cards a single Inspect action can hit.
-# Hook point for future perk modification.
-const MAX_INSPECT_HITS := 3
-
 const ItemCardScene := preload("uid://bw23cjkf40y5r")
 
 # ── State ─────────────────────────────────────────────────────────────────────
@@ -27,8 +23,12 @@ var _item_displays: Array[ItemCard] = []
 
 # Maps each ItemEntry to its corresponding ItemCard for reverse lookup.
 var _card_for_entry: Dictionary = { }
+var _entry_for_card: Dictionary = { }
 
 var _ctx: ItemViewContext = null
+
+var _selected_entry: ItemEntry = null
+var _selected_card: ItemCard = null
 
 # ── Timer / tween handles ─────────────────────────────────────────────────────
 
@@ -64,12 +64,19 @@ func _ready() -> void:
     _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
 
     _populate_item_displays()
+    _run_intuition()
     _refresh_action_bar()
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
 func _on_inspect_requested() -> void:
+    if _selected_entry == null:
+        return
+    if _selected_entry.is_veiled():
+        return
+    if not _selected_entry.is_condition_inspectable():
+        return
     if RunManager.run_record.stamina < LotActionBar.INSPECT_COST:
         return
     if RunManager.run_record.actions_remaining <= 0:
@@ -78,26 +85,11 @@ func _on_inspect_requested() -> void:
     RunManager.run_record.stamina -= LotActionBar.INSPECT_COST
     RunManager.run_record.actions_remaining -= 1
 
-    var hits: int = randi_range(1, MAX_INSPECT_HITS)
+    _selected_entry.advance_scrutiny()
 
-    var pool: Array[ItemEntry] = []
-    for entry: ItemEntry in RunManager.run_record.lot_items:
-        if not entry.is_veiled() and not entry.is_fully_inspected():
-            pool.append(entry)
-
-    for i in range(hits):
-        if pool.is_empty():
-            break
-        var idx: int = randi() % pool.size()
-        var entry: ItemEntry = pool[idx]
-        entry.advance_scrutiny()
-
-        var card: ItemCard = _card_for_entry[entry]
-        card.refresh(&"condition")
-        card.flash_border()
-
-        if entry.is_fully_inspected():
-            pool.remove_at(idx)
+    var card: ItemCard = _card_for_entry[_selected_entry]
+    card.refresh(&"condition")
+    card.flash_border()
 
     _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
     _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
@@ -171,24 +163,61 @@ func _populate_item_displays() -> void:
         var display: ItemCard = ItemCardScene.instantiate()
         display.custom_minimum_size = ITEM_SIZE
         display.setup(entry, _ctx)
+        display.clicked.connect(_on_card_clicked)
 
         _items_grid.add_child(display)
         _item_displays.append(display)
         _card_for_entry[entry] = display
+        _entry_for_card[display] = entry
+
+# ══ Selection ═════════════════════════════════════════════════════════════════
+
+
+func _on_card_clicked(card: ItemCard) -> void:
+    if _selected_card != null:
+        _selected_card.set_selected(false)
+    _selected_card = card
+    _selected_entry = _entry_for_card.get(card) as ItemEntry
+    _selected_card.set_selected(true)
+    _refresh_action_bar()
 
 # ══ Action bar ════════════════════════════════════════════════════════════════
 
 
 func _refresh_action_bar() -> void:
-    var has_inspectable: bool = false
-    var has_veiled: bool = false
+    _action_bar.refresh_lot(_selected_entry)
+
+# ══ Intuition ═════════════════════════════════════════════════════════════════
+
+
+func _run_intuition() -> void:
+    var appraisal_skill: SkillData = KnowledgeManager.get_skill_by_id("appraisal")
+    var appraisal_level: int = 0
+    if appraisal_skill != null:
+        appraisal_level = KnowledgeManager.get_level(appraisal_skill)
+
     for entry: ItemEntry in RunManager.run_record.lot_items:
         if entry.is_veiled():
-            has_veiled = true
-        elif not entry.is_fully_inspected():
-            has_inspectable = true
-    _action_bar.refresh_lot(has_inspectable, has_veiled)
+            continue
+        if entry.intuition_flag:
+            continue
 
+        var category_rank: int = KnowledgeManager.get_category_rank(entry.item_data.category_data)
+        var sc: SuperCategoryData = entry.item_data.category_data.super_category
+        var sc_rank: int = KnowledgeManager.get_super_category_rank(sc)
+        var cat_count: int = SuperCategoryRegistry.get_categories_for_super(sc).size()
+        var sc_average: float = float(sc_rank) / maxf(cat_count, 1.0)
+        var computed_base: float = (
+            category_rank * ItemEntry.COMPUTED_BASE_CAT_WEIGHT
+            + sc_average * ItemEntry.COMPUTED_BASE_SC_WEIGHT
+            + appraisal_level * ItemEntry.COMPUTED_BASE_SKILL_WEIGHT
+        )
+        var chance: float = 0.1 + computed_base * 0.15
+
+        if randf() < chance:
+            entry.intuition_flag = true
+            var card: ItemCard = _card_for_entry[entry]
+            card.play_intuition_shimmer()
 
 # ══ Exit pulse ════════════════════════════════════════════════════════════════
 
