@@ -358,6 +358,20 @@ func _refresh_detail() -> void:
         _unlock_btn.tooltip_text = "No research slots available"
         _restore_btn.tooltip_text = "No research slots available"
 
+    # Repair / Restore: only show one at a time; never both visible.
+    var repair_available: bool = not _repair_btn.disabled
+    var restore_available: bool = not _restore_btn.disabled
+    if repair_available:
+        _repair_btn.visible = true
+        _restore_btn.visible = false
+    elif restore_available:
+        _repair_btn.visible = false
+        _restore_btn.visible = true
+    else:
+        # Neither available — show Restore (disabled) as fallback
+        _repair_btn.visible = false
+        _restore_btn.visible = true
+
     _remove_btn.visible = in_slot
     _remove_btn.text = "Remove"
 
