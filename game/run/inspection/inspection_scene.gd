@@ -142,7 +142,7 @@ func _on_appraise_requested() -> void:
     RunManager.run_record.stamina -= LotActionBar.APPRAISE_COST
     RunManager.run_record.actions_remaining -= 1
 
-    var base_chance: float = 0.5
+    var base_chance: float = 0.20
     var success_chance: float = base_chance / (_selected_entry.intuition_level + 1)
     if randf() < success_chance:
         _selected_entry.intuition_level += 1

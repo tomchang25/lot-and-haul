@@ -6,7 +6,7 @@ signal peek_requested
 signal appraise_requested
 
 const INSPECT_COST := 1
-const PEEK_COST := 3
+const PEEK_COST := 2
 const APPRAISE_COST := 2
 
 @onready var _inspect_button: Button = $HBoxContainer/InspectButton
