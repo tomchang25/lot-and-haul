@@ -43,3 +43,58 @@ skills:
       - cash_cost: 1200
         required_mastery_rank: 3
         required_super_category_ranks: {}
+
+  - skill_id: restoration
+    display_name: Restoration
+    levels:
+      - cash_cost: 500
+        required_mastery_rank: 2
+        required_super_category_ranks: {}
+
+      - cash_cost: 2000
+        required_mastery_rank: 5
+        required_super_category_ranks: {}
+
+  - skill_id: textile_care
+    display_name: Textile Care
+    levels:
+      - cash_cost: 800
+        required_mastery_rank: 3
+        required_super_category_ranks: {}
+
+      - cash_cost: 3000
+        required_mastery_rank: 6
+        required_super_category_ranks: {}
+
+  - skill_id: conservation
+    display_name: Conservation
+    levels:
+      - cash_cost: 800
+        required_mastery_rank: 3
+        required_super_category_ranks: {}
+
+      - cash_cost: 3000
+        required_mastery_rank: 6
+        required_super_category_ranks: {}
+
+  - skill_id: art_restoration
+    display_name: Art Restoration
+    levels:
+      - cash_cost: 800
+        required_mastery_rank: 3
+        required_super_category_ranks: {}
+
+      - cash_cost: 3000
+        required_mastery_rank: 6
+        required_super_category_ranks: {}
+
+  - skill_id: gunsmithing
+    display_name: Gunsmithing
+    levels:
+      - cash_cost: 800
+        required_mastery_rank: 3
+        required_super_category_ranks: {}
+
+      - cash_cost: 3000
+        required_mastery_rank: 6
+        required_super_category_ranks: {}

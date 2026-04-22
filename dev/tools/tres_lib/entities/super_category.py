@@ -8,7 +8,11 @@ from dataclasses import dataclass, field
 from tres_lib.spec import BuildCtx, ParseCtx
 from tres_lib.uid import deterministic_uid
 from tres_lib.tres_writer import TresWriter
-from tres_lib.tres_format import header_uid, field as tres_field
+from tres_lib.tres_format import (
+    ext_resources,
+    field as tres_field,
+    header_uid,
+)
 
 
 _SNAKE_RE = re.compile(r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$")
@@ -44,6 +48,7 @@ class SuperCategorySpec:
             )
         super_category_id = entry["super_category_id"]
         display_name = entry.get("display_name", super_category_id)
+        restore_skill = str(entry.get("restore_skill", "") or "").strip()
         uid = deterministic_uid(self.uid_prefix, super_category_id)
         ctx.uid_cache[super_category_id] = uid
 
@@ -54,9 +59,20 @@ class SuperCategorySpec:
             "res://data/definitions/super_category_data.gd",
             ctx.script_uids["super_category_data"],
         )
+        restore_skill_tag: str | None = None
+        if restore_skill:
+            restore_skill_uid = ctx.uid_cache.get(restore_skill, "")
+            restore_skill_tag = "2_restore_skill"
+            w.add_ext_resource(
+                restore_skill_tag,
+                "Resource",
+                f"res://data/tres/skills/{restore_skill}.tres",
+                restore_skill_uid,
+            )
         w.add_field('script = ExtResource("1_superdef")')
         w.add_field_str("super_category_id", super_category_id)
         w.add_field_str("display_name", display_name)
+        w.add_field_ext_ref("restore_skill", restore_skill_tag)
         w.add_field_float(
             "market_mean_min",
             float(entry.get("market_mean_min", 0.7)),
@@ -82,6 +98,20 @@ class SuperCategorySpec:
         if uid:
             ctx.uid_to_id[uid] = super_cat_id
         ctx.super_cat_display_by_id[super_cat_id] = display_name
+        ext_res = ext_resources(text)
+
+        restore_skill = ""
+        restore_skill_raw = tres_field(text, "restore_skill") or "null"
+        restore_skill_match = re.match(
+            r'ExtResource\("([^"]+)"\)',
+            restore_skill_raw,
+        )
+        if restore_skill_match:
+            restore_skill_uid = ext_res.get(
+                restore_skill_match.group(1),
+                {},
+            ).get("uid", "")
+            restore_skill = ctx.uid_to_id.get(restore_skill_uid, "")
 
         market_mean_min = float(tres_field(text, "market_mean_min") or 0.7)
         market_mean_max = float(tres_field(text, "market_mean_max") or 1.3)
@@ -91,6 +121,7 @@ class SuperCategorySpec:
         return {
             "super_category_id": super_cat_id,
             "display_name": display_name,
+            "restore_skill": restore_skill,
             "market_mean_min": market_mean_min,
             "market_mean_max": market_mean_max,
             "market_stddev": market_stddev,
@@ -100,6 +131,11 @@ class SuperCategorySpec:
     def validate(self, entries: list, all_data: dict) -> list[str]:
         errors: list[str] = []
         seen_ids: set[str] = set()
+        known_skill_ids: set[str] = {
+            skill["skill_id"]
+            for skill in all_data.get("skills", [])
+            if skill.get("skill_id")
+        }
         for entry in entries:
             if isinstance(entry, str):
                 errors.append(
@@ -122,6 +158,17 @@ class SuperCategorySpec:
             if sc_id in seen_ids:
                 errors.append(f"Duplicate super_category_id: '{sc_id}'")
             seen_ids.add(sc_id)
+
+            restore_skill = str(entry.get("restore_skill", "") or "").strip()
+            if (
+                restore_skill
+                and known_skill_ids
+                and restore_skill not in known_skill_ids
+            ):
+                errors.append(
+                    f"super_category '{sc_id}': unknown restore_skill "
+                    f"'{restore_skill}'"
+                )
 
             mean_min = entry.get("market_mean_min", 0.7)
             mean_max = entry.get("market_mean_max", 1.3)

@@ -10,6 +10,9 @@ extends Resource
 # Human-readable label shown to the player.
 @export var display_name: String = ""
 
+# Skill that governs Restore speed for this super-category.
+@export var restore_skill: SkillData = null
+
 # ── Market tuning ────────────────────────────────────────────────────────────
 
 # Bounds for the super-category's drifting mean (MarketManager random walk).
