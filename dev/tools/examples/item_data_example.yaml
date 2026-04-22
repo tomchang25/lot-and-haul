@@ -28,7 +28,7 @@
 #                 5.0 = archival research or expert consultation
 #
 #   required_skill:  skill_id string. Omit entirely if no skill is needed.
-#                    Valid values: "appraisal", "authentication", "mechanical"
+#                    Valid values: "appraisal", "authentication", "maintenance"
 #   required_level:  int 1–5. Include only when required_skill is present.
 #   required_condition: float 0.0–1.0. Minimum item condition to attempt this action.
 #                       Omit entirely if 0.
