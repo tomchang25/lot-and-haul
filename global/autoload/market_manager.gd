@@ -46,7 +46,7 @@ func _initialise_means() -> void:
 
 func _walk_means(days: int, start_day: int) -> void:
     for sc_id: String in super_cat_means.keys():
-        var sc: SuperCategoryData = SuperCategoryRegistry.get_super_category(sc_id)
+        var sc: SuperCategoryData = SuperCategoryRegistry.get_super_category_by_id(sc_id)
         if sc == null:
             continue
         var mean: float = super_cat_means[sc_id]

@@ -204,7 +204,7 @@ func apply_inspect(delta: float) -> void:
     var cap: float = maxf(max_threshold, CONDITION_THRESHOLDS.back())
     inspection_level = minf(cap, inspection_level + delta)
     KnowledgeManager.add_category_points(
-        item_data.category_data.category_id,
+        item_data.category_data,
         item_data.rarity,
         KnowledgeManager.KnowledgeAction.INSPECT,
     )
@@ -216,7 +216,7 @@ func apply_study(speed_factor: float = 1.0) -> void:
     var cap: float = maxf(max_threshold, CONDITION_THRESHOLDS.back())
     inspection_level = minf(cap, inspection_level + delta)
     KnowledgeManager.add_category_points(
-        item_data.category_data.category_id,
+        item_data.category_data,
         item_data.rarity,
         KnowledgeManager.KnowledgeAction.APPRAISE,
     )
@@ -228,7 +228,7 @@ func apply_repair(speed_factor: float = 1.0) -> void:
     var delta: float = maxf(raw, REPAIR_MIN_STEP * speed_factor)
     condition = minf(1.0, condition + delta)
     KnowledgeManager.add_category_points(
-        item_data.category_data.category_id,
+        item_data.category_data,
         item_data.rarity,
         KnowledgeManager.KnowledgeAction.REPAIR,
     )
@@ -246,7 +246,7 @@ func advance_layer() -> void:
     layer_index += 1
     unlock_progress = 0.0
     KnowledgeManager.add_category_points(
-        item_data.category_data.category_id,
+        item_data.category_data,
         item_data.rarity,
         KnowledgeManager.KnowledgeAction.REVEAL,
     )
@@ -354,7 +354,7 @@ func compute_price(config: PriceConfig) -> int:
 
     if config.knowledge:
         var rank: int = KnowledgeManager.get_super_category_rank(
-            item_data.category_data.super_category.super_category_id,
+            item_data.category_data.super_category,
         )
         value *= 1.0 + 0.01 * rank
 
@@ -533,7 +533,7 @@ func unveil() -> void:
 
 
 func reveal() -> void:
-    var rank: int = KnowledgeManager.get_super_category_rank(item_data.category_data.super_category.super_category_id)
+    var rank: int = KnowledgeManager.get_super_category_rank(item_data.category_data.super_category)
     inspection_level = maxf(_rank_inspection_level(rank), inspection_level)
 
 
@@ -557,8 +557,7 @@ static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
     entry.layer_index = 0 if start_veiled else 1
 
     # Head start from category experience. Tunable — higher rank = more known.
-    var super_cat_id: String = data.category_data.super_category.super_category_id
-    var rank: int = KnowledgeManager.get_super_category_rank(super_cat_id)
+    var rank: int = KnowledgeManager.get_super_category_rank(data.category_data.super_category)
     entry.inspection_level = _rank_inspection_level(rank)
 
     return entry
@@ -579,7 +578,7 @@ func to_dict() -> Dictionary:
 
 
 static func from_dict(d: Dictionary) -> ItemEntry:
-    var data: ItemData = ItemRegistry.get_item(d["item_id"])
+    var data: ItemData = ItemRegistry.get_item_by_id(d["item_id"])
     if data == null:
         push_error("ItemEntry: item not found for id '%s'" % d["item_id"])
         return null

@@ -75,7 +75,7 @@ static func from_dict(d: Dictionary) -> OrderSlot:
     var slot := OrderSlot.new()
     var cat_id: String = d.get("category_id", "")
     if cat_id != "":
-        slot.category = CategoryRegistry.get_category(cat_id)
+        slot.category = CategoryRegistry.get_category_by_id(cat_id)
     slot.min_rarity = int(d.get("min_rarity", -1))
     slot.min_condition = float(d.get("min_condition", 0.0))
     slot.required_count = int(d.get("required_count", 1))

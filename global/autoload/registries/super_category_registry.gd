@@ -1,9 +1,9 @@
 # super_category_registry.gd
 # Autoload that loads all SuperCategoryData resources at startup and provides
 # query access, plus a pre-built super_category_id → Array[CategoryData] index.
-# Access globally via SuperCategoryRegistry.get_super_category(id) /
+# Access globally via SuperCategoryRegistry.get_super_category_by_id(id) /
 # SuperCategoryRegistry.get_all_super_categories() /
-# SuperCategoryRegistry.get_categories_for_super(id).
+# SuperCategoryRegistry.get_categories_for_super(sc).
 #
 # Load-order note: depends on CategoryRegistry loading first. The assert in
 # _ready will fire if project.godot is reordered incorrectly.
@@ -30,7 +30,7 @@ func validate() -> bool:
         push_error("SuperCategoryRegistry: registry is empty")
         ok = false
     for super_cat_id: String in MarketManager.super_cat_means.keys():
-        if get_super_category(super_cat_id) == null:
+        if get_super_category_by_id(super_cat_id) == null:
             push_error(
                 "SuperCategoryRegistry: MarketManager.super_cat_means key '%s' not found"
                 % super_cat_id,
@@ -50,7 +50,7 @@ func _build_categories_by_super_index() -> void:
 
 
 # Returns the SuperCategoryData with the given super_category_id, or null.
-func get_super_category(super_category_id: String) -> SuperCategoryData:
+func get_super_category_by_id(super_category_id: String) -> SuperCategoryData:
     return _super_categories.get(super_category_id, null)
 
 
@@ -70,9 +70,9 @@ func get_all_super_category_ids() -> Array[String]:
 
 # Returns a duplicate of the member-category list for the given super-category,
 # or an empty typed array if the super-category is unknown.
-func get_categories_for_super(super_category_id: String) -> Array[CategoryData]:
+func get_categories_for_super(sc: SuperCategoryData) -> Array[CategoryData]:
     var list: Array[CategoryData] = _categories_by_super.get(
-        super_category_id,
+        sc.super_category_id,
         [] as Array[CategoryData],
     )
     return list.duplicate()

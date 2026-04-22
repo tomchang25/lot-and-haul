@@ -33,17 +33,17 @@ func _build_content() -> void:
     _content.add_child(HSeparator.new())
 
     for sc: SuperCategoryData in SuperCategoryRegistry.get_all_super_categories():
-        var sc_rank: int = KnowledgeManager.get_super_category_rank(sc.super_category_id)
+        var sc_rank: int = KnowledgeManager.get_super_category_rank(sc)
 
         var sc_label := Label.new()
         sc_label.add_theme_font_size_override("font_size", 18)
         sc_label.text = "%s — rank %d" % [sc.display_name, sc_rank]
         _content.add_child(sc_label)
 
-        for cat: CategoryData in SuperCategoryRegistry.get_categories_for_super(sc.super_category_id):
+        for cat: CategoryData in SuperCategoryRegistry.get_categories_for_super(sc):
             var cat_id: String = cat.category_id
             var points: int = int(SaveManager.category_points.get(cat_id, 0))
-            var rank: int = KnowledgeManager.get_category_rank(cat_id)
+            var rank: int = KnowledgeManager.get_category_rank(cat)
 
             var progress_text: String
             if rank >= 5:

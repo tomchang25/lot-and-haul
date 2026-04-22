@@ -83,7 +83,10 @@ static func _draw_item(data: LotData) -> ItemData:
                 push_warning("Super-category roll failed")
                 return null
             var super_category_id: String = sc_keys[sc_idx]
-            var member_cats: Array[CategoryData] = SuperCategoryRegistry.get_categories_for_super(super_category_id)
+            var sc_ref: SuperCategoryData = SuperCategoryRegistry.get_super_category_by_id(super_category_id)
+            if sc_ref == null:
+                continue
+            var member_cats: Array[CategoryData] = SuperCategoryRegistry.get_categories_for_super(sc_ref)
             if member_cats.is_empty():
                 continue
             category_id = member_cats[randi() % member_cats.size()].category_id
