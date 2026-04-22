@@ -12,6 +12,7 @@ Every prompt must include these two constraints:
 
 - Follow `dev/standards/naming_conventions.md`.
 - Use 4-space indentation throughout.
+- Word limit: 100 words. Use the conventional commit format. For example: 'feat: add user authentication'.
 
 ## Template
 
