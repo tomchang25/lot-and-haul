@@ -40,7 +40,7 @@ func _populate_board() -> void:
 
 
 func _add_super_category_row(sc: SuperCategoryData) -> void:
-    var trend: float = MarketManager.get_super_category_trend(sc.super_category_id)
+    var trend: float = MarketManager.get_super_category_trend(sc)
     var arrow: String
     var arrow_color: Color
     if trend > 1.02:
@@ -77,7 +77,7 @@ func _add_super_category_row(sc: SuperCategoryData) -> void:
 
 
 func _add_category_row(cat: CategoryData) -> void:
-    var factor: float = MarketManager.get_category_factor(cat.category_id)
+    var factor: float = MarketManager.get_category_factor(cat)
     var delta_pct: int = roundi((factor - 1.0) * 100.0)
     var delta_color: Color
     if delta_pct > 0:

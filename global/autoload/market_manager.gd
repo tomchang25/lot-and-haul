@@ -21,12 +21,12 @@ func _ready() -> void:
         _resample_today()
 
 
-func get_category_factor(category_id: String) -> float:
-    return category_factors_today.get(category_id, 1.0)
+func get_category_factor(cat: CategoryData) -> float:
+    return category_factors_today.get(cat.category_id, 1.0)
 
 
-func get_super_category_trend(super_cat_id: String) -> float:
-    return super_cat_means.get(super_cat_id, 1.0)
+func get_super_category_trend(sc: SuperCategoryData) -> float:
+    return super_cat_means.get(sc.super_category_id, 1.0)
 
 
 func advance_market(days: int) -> void:

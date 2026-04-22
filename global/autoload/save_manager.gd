@@ -5,31 +5,8 @@ const SAVE_PATH := "user://save.json"
 # Per-category points store. Keys are category IDs (String), values are int.
 var category_points: Dictionary = { }
 var cash: int = 0
-var active_car_id: String = "van_basic"
-
-# Ids of every car the player owns. The starter "van_basic" is appended on
-# first load (and as a migration for saves that predate this field) by
-# `CarRegistry.migrate()`, which `RegistryCoordinator.run_migrations()`
-# drives after `load()`. Follows the same id-string pattern as
-# active_car_id; resolve to CarData through `owned_cars` below.
-var owned_car_ids: Array[String] = []
-
-# The CarData resource for the currently active car. Resolved lazily via
-# CarRegistry so the save file only has to persist the id.
-var active_car: CarData:
-    get:
-        return CarRegistry.get_car_by_id(active_car_id)
-
-# Mirrors `active_car`: resolve each owned id via CarRegistry, skipping any
-# that fail to resolve (e.g. if a car was removed from the data pipeline).
-var owned_cars: Array[CarData]:
-    get:
-        var result: Array[CarData] = []
-        for id: String in owned_car_ids:
-            var car: CarData = CarRegistry.get_car_by_id(id)
-            if car != null:
-                result.append(car)
-        return result
+var active_car: CarData = null
+var owned_cars: Array[CarData] = []
 
 # Array of Dictionary on disk; deserialized to Array[ItemEntry] on load.
 var storage_items: Array = []
@@ -38,7 +15,7 @@ var current_day: int = 0
 var max_research_slots: int = 4
 var next_entry_id: int = 0 # monotonically increasing; never reset
 var research_slots: Array = [] # Array of plain Dictionaries (ResearchSlot)
-var available_location_ids: Array[String] = []
+var available_locations: Array[LocationData] = []
 var unlocked_perks: Array[String] = []
 var skill_levels: Dictionary = { } # skill_id (String) → int
 
@@ -48,17 +25,24 @@ func save() -> void:
     for entry: ItemEntry in storage_items:
         serialized_items.append(entry.to_dict())
 
+    var serialized_owned_car_ids: Array[String] = []
+    for car: CarData in owned_cars:
+        serialized_owned_car_ids.append(car.car_id)
+    var serialized_available_location_ids: Array[String] = []
+    for loc: LocationData in available_locations:
+        serialized_available_location_ids.append(loc.location_id)
+
     var data := {
         "category_points": category_points,
         "cash": cash,
-        "active_car_id": active_car_id,
-        "owned_car_ids": owned_car_ids,
+        "active_car_id": active_car.car_id if active_car != null else "",
+        "owned_car_ids": serialized_owned_car_ids,
         "storage_items": serialized_items,
         "current_day": current_day,
         "max_research_slots": max_research_slots,
         "next_entry_id": next_entry_id,
         "research_slots": research_slots,
-        "available_location_ids": available_location_ids,
+        "available_location_ids": serialized_available_location_ids,
         "unlocked_perks": unlocked_perks,
         "skill_levels": skill_levels,
         "super_cat_means": MarketManager.super_cat_means,
@@ -95,12 +79,15 @@ func _read_save_file() -> void:
     if parsed.has("cash") and parsed["cash"] is float:
         cash = int(parsed["cash"])
     if parsed.has("active_car_id") and parsed["active_car_id"] is String:
-        active_car_id = parsed["active_car_id"]
+        active_car = CarRegistry.get_car_by_id(parsed["active_car_id"])
     if parsed.has("owned_car_ids") and parsed["owned_car_ids"] is Array:
-        owned_car_ids = []
+        owned_cars = []
         for id: Variant in parsed["owned_car_ids"]:
-            if id is String:
-                owned_car_ids.append(id)
+            if not id is String:
+                continue
+            var car: CarData = CarRegistry.get_car_by_id(id)
+            if car != null:
+                owned_cars.append(car)
     if parsed.has("storage_items") and parsed["storage_items"] is Array:
         storage_items = []
         for d: Variant in parsed["storage_items"]:
@@ -133,10 +120,13 @@ func _read_save_file() -> void:
             )
             research_slots.append(slot.to_dict())
     if parsed.has("available_location_ids") and parsed["available_location_ids"] is Array:
-        available_location_ids = []
+        available_locations = []
         for id: Variant in parsed["available_location_ids"]:
-            if id is String:
-                available_location_ids.append(id)
+            if not id is String:
+                continue
+            var loc: LocationData = LocationRegistry.get_location_by_id(id)
+            if loc != null:
+                available_locations.append(loc)
     if parsed.has("unlocked_perks") and parsed["unlocked_perks"] is Array:
         unlocked_perks = []
         for s: Variant in parsed["unlocked_perks"]:
@@ -212,12 +202,12 @@ func _read_save_file() -> void:
 func buy_car(car: CarData) -> bool:
     if car == null:
         return false
-    if owned_car_ids.has(car.car_id):
+    if owned_cars.has(car):
         return false
     if cash < car.price:
         return false
     cash -= car.price
-    owned_car_ids.append(car.car_id)
+    owned_cars.append(car)
     save()
     return true
 
@@ -241,11 +231,8 @@ func register_storage_items(entries: Array[ItemEntry]) -> void:
 
 func roll_available_locations() -> void:
     var all := LocationRegistry.get_all_locations()
-    var ids: Array[String] = []
-    for loc: LocationData in all:
-        ids.append(loc.location_id)
-    ids.shuffle()
-    available_location_ids = ids.slice(0, mini(Economy.LOCATION_SAMPLE_SIZE, ids.size()))
+    all.shuffle()
+    available_locations = all.slice(0, mini(Economy.LOCATION_SAMPLE_SIZE, all.size()))
 
 # ══ Day advancement (sole chokepoint) ════════════════════════════════════════
 
@@ -270,7 +257,7 @@ func advance_days(days: int) -> DaySummary:
 
     MarketManager.advance_market(days)
     MerchantRegistry.advance_day()
-    available_location_ids.clear()
+    available_locations.clear()
 
     save()
     return summary
