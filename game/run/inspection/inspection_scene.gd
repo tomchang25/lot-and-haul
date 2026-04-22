@@ -22,8 +22,8 @@ var _xray_perk: PerkData = null
 var _item_displays: Array[ItemCard] = []
 
 # Maps each ItemEntry to its corresponding ItemCard for reverse lookup.
-var _card_for_entry: Dictionary = {}
-var _entry_for_card: Dictionary = {}
+var _card_for_entry: Dictionary = { }
+var _entry_for_card: Dictionary = { }
 
 var _ctx: ItemViewContext = null
 
@@ -218,7 +218,6 @@ func _run_intuition() -> void:
             entry.intuition_flag = true
             var card: ItemCard = _card_for_entry[entry]
             card.play_intuition_shimmer()
-
 
 # ══ Exit pulse ════════════════════════════════════════════════════════════════
 

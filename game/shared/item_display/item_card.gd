@@ -136,9 +136,10 @@ func play_intuition_shimmer() -> void:
     var tween := create_tween()
     tween.tween_property(self, "modulate", Color(1.3, 1.1, 0.4, 1.0), 0.1)
     tween.tween_property(self, "modulate", Color.WHITE, 0.4)
-    tween.tween_callback(func() -> void:
-        _has_intuition_mark = true
-        queue_redraw()
+    tween.tween_callback(
+        func() -> void:
+            _has_intuition_mark = true
+            queue_redraw()
     )
 
 
