@@ -8,6 +8,7 @@ enum SlotAction {
     STUDY,
     REPAIR,
     UNLOCK,
+    RESTORE,
 }
 
 enum SlotCheck {
@@ -17,6 +18,8 @@ enum SlotCheck {
     REPAIR_COMPLETE,
     NO_UNLOCK_ACTION,
     ADVANCE_BLOCKED,
+    RESTORE_COMPLETE,
+    RESTORE_NOT_READY,
 }
 
 # -1 means the slot is empty.
@@ -49,6 +52,8 @@ static func action_to_string(a: SlotAction) -> String:
             return "repair"
         SlotAction.UNLOCK:
             return "unlock"
+        SlotAction.RESTORE:
+            return "restore"
         _:
             push_error("ResearchSlot: unknown SlotAction %d" % a)
             return "unknown"
@@ -62,6 +67,8 @@ static func action_from_string(s: String) -> SlotAction:
             return SlotAction.REPAIR
         "unlock":
             return SlotAction.UNLOCK
+        "restore":
+            return SlotAction.RESTORE
         _:
             push_error("ResearchSlot: unrecognised action string '%s'" % s)
             return SlotAction.STUDY
@@ -143,6 +150,12 @@ static func check_assignable(entry: ItemEntry, action: SlotAction) -> SlotCheck:
                     return SlotCheck.OK
                 _:
                     return SlotCheck.ADVANCE_BLOCKED
+        SlotAction.RESTORE:
+            if entry.is_restore_complete():
+                return SlotCheck.RESTORE_COMPLETE
+            if entry.condition < 0.5:
+                return SlotCheck.RESTORE_NOT_READY
+            return SlotCheck.OK
         _:
             push_warning("ResearchSlot: unknown SlotAction %d" % action)
             return SlotCheck.OK
@@ -157,7 +170,7 @@ static func describe_blocked(check: SlotCheck, entry: ItemEntry) -> String:
         SlotCheck.SCRUTINY_MAXED:
             return "Scrutiny already maxed"
         SlotCheck.REPAIR_COMPLETE:
-            return "Condition already maxed"
+            return "Condition already at 50% — use Restore to continue"
         SlotCheck.NO_UNLOCK_ACTION:
             return "No further layers to unlock"
         SlotCheck.ADVANCE_BLOCKED:
@@ -166,4 +179,8 @@ static func describe_blocked(check: SlotCheck, entry: ItemEntry) -> String:
                 entry.current_unlock_action(),
                 entry,
             )
+        SlotCheck.RESTORE_COMPLETE:
+            return "Condition already fully restored"
+        SlotCheck.RESTORE_NOT_READY:
+            return "Repair to 50% before restoring"
     return ""

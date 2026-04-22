@@ -311,6 +311,13 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
 text = "Unlock"
 
+[node name="RestoreButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1111111111]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 13
+text = "Restore"
+
 [node name="RemoveButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1949861252]
 visible = false
 custom_minimum_size = Vector2(0, 36)

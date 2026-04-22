@@ -54,6 +54,7 @@ var _selected_entry: ItemEntry = null
 @onready var _study_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/StudyButton
 @onready var _repair_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/RepairButton
 @onready var _unlock_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/UnlockButton
+@onready var _restore_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/RestoreButton
 @onready var _remove_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/RemoveButton
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
@@ -68,6 +69,7 @@ func _ready() -> void:
     _study_btn.pressed.connect(_on_study_pressed)
     _repair_btn.pressed.connect(_on_repair_pressed)
     _unlock_btn.pressed.connect(_on_unlock_pressed)
+    _restore_btn.pressed.connect(_on_restore_pressed)
     _remove_btn.pressed.connect(_on_remove_pressed)
 
     _item_list_panel.row_pressed.connect(_on_row_pressed)
@@ -107,6 +109,10 @@ func _on_repair_pressed() -> void:
 
 func _on_unlock_pressed() -> void:
     _assign_action(ResearchSlot.SlotAction.UNLOCK)
+
+
+func _on_restore_pressed() -> void:
+    _assign_action(ResearchSlot.SlotAction.RESTORE)
 
 
 func _on_remove_pressed() -> void:
@@ -240,8 +246,8 @@ func _task_progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
                 return "Fully Inspected"
             return "In progress"
         ResearchSlot.SlotAction.REPAIR:
-            if entry.is_repair_complete():
-                return "Condition: 100%"
+            return "Condition: %d%%" % int(entry.condition * 100)
+        ResearchSlot.SlotAction.RESTORE:
             return "Condition: %d%%" % int(entry.condition * 100)
         ResearchSlot.SlotAction.UNLOCK:
             var action_def: LayerUnlockAction = entry.current_unlock_action()
@@ -340,14 +346,17 @@ func _refresh_detail() -> void:
     _configure_action_btn(_study_btn, "Study", entry, ResearchSlot.SlotAction.STUDY, current_slot)
     _configure_action_btn(_repair_btn, "Repair", entry, ResearchSlot.SlotAction.REPAIR, current_slot)
     _configure_action_btn(_unlock_btn, "Unlock", entry, ResearchSlot.SlotAction.UNLOCK, current_slot)
+    _configure_action_btn(_restore_btn, "Restore", entry, ResearchSlot.SlotAction.RESTORE, current_slot)
 
     if not slots_available:
         _study_btn.disabled = true
         _repair_btn.disabled = true
         _unlock_btn.disabled = true
+        _restore_btn.disabled = true
         _study_btn.tooltip_text = "No research slots available"
         _repair_btn.tooltip_text = "No research slots available"
         _unlock_btn.tooltip_text = "No research slots available"
+        _restore_btn.tooltip_text = "No research slots available"
 
     _remove_btn.visible = in_slot
     _remove_btn.text = "Remove"
@@ -378,8 +387,8 @@ func _progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
                 return "Fully Inspected"
             return "Rarity: %s   Condition: %s" % [entry.perceived_rarity_label, entry.condition_label]
         ResearchSlot.SlotAction.REPAIR:
-            if slot.completed or entry.is_repair_complete():
-                return "Condition: 100%"
+            return "Condition: %d%%" % int(entry.condition * 100)
+        ResearchSlot.SlotAction.RESTORE:
             return "Condition: %d%%" % int(entry.condition * 100)
         ResearchSlot.SlotAction.UNLOCK:
             if slot.completed:

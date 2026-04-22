@@ -41,8 +41,26 @@ const INTUITION_INSPECTION_BONUS: float = 0.1
 # ── Research tuning knobs (non-inspection) ───────────────────────────────────
 
 const REPAIR_BASE: float = 0.15
-const REPAIR_POWER: float = 0.5
-const REPAIR_MIN_STEP: float = 0.02
+const REPAIR_ZONE_FACTORS: Dictionary = { 0.25: 1.0, 0.50: 0.35 }
+const REPAIR_RARITY_FACTOR: Dictionary = {
+    ItemData.Rarity.COMMON: 1.0,
+    ItemData.Rarity.UNCOMMON: 0.9,
+    ItemData.Rarity.RARE: 0.8,
+    ItemData.Rarity.EPIC: 0.7,
+    ItemData.Rarity.LEGENDARY: 0.6,
+}
+
+const RESTORE_BASE: float = 0.10
+const RESTORE_ZONE_FACTORS: Dictionary = { 0.75: 0.12, 1.0: 0.02 }
+const RESTORE_RARITY_FACTOR: Dictionary = {
+    ItemData.Rarity.COMMON: 1.0,
+    ItemData.Rarity.UNCOMMON: 0.8,
+    ItemData.Rarity.RARE: 0.6,
+    ItemData.Rarity.EPIC: 0.4,
+    ItemData.Rarity.LEGENDARY: 0.2,
+}
+const RESTORE_SKILL_COEFF: float = 0.4
+const RESTORE_CAT_SKILL_COEFF: float = 0.5
 
 const UNLOCK_BASE_EFFORT: float = 1.0
 
@@ -276,11 +294,13 @@ func advance_scrutiny() -> void:
     )
 
 
-func apply_repair(speed_factor: float = 1.0) -> void:
-    var gap: float = 1.0 - condition
-    var raw: float = REPAIR_BASE * speed_factor * pow(gap, REPAIR_POWER)
-    var delta: float = maxf(raw, REPAIR_MIN_STEP * speed_factor)
-    condition = minf(1.0, condition + delta)
+func apply_repair() -> void:
+    var zone_factor: float = REPAIR_ZONE_FACTORS[0.50]
+    if condition < 0.25:
+        zone_factor = REPAIR_ZONE_FACTORS[0.25]
+    var rarity_factor: float = REPAIR_RARITY_FACTOR[item_data.rarity]
+    var delta: float = REPAIR_BASE * zone_factor * rarity_factor
+    condition = minf(condition + delta, 0.5)
     KnowledgeManager.add_category_points(
         item_data.category_data,
         item_data.rarity,
@@ -288,10 +308,33 @@ func apply_repair(speed_factor: float = 1.0) -> void:
     )
 
 
-func add_unlock_effort(speed_factor: float = 1.0) -> void:
+func apply_restore() -> void:
+    var zone_factor: float = RESTORE_ZONE_FACTORS[1.0]
+    if condition < 0.75:
+        zone_factor = RESTORE_ZONE_FACTORS[0.75]
+    var rarity_factor: float = RESTORE_RARITY_FACTOR[item_data.rarity]
+    var restoration_skill: SkillData = KnowledgeManager.get_skill_by_id("restoration")
+    var restoration_level: int = 0
+    if restoration_skill != null:
+        restoration_level = KnowledgeManager.get_level(restoration_skill)
+    var restore_skill_mult: float = 1.0 + restoration_level * RESTORE_SKILL_COEFF
+    var cat_skill: SkillData = item_data.category_data.super_category.restore_skill
+    var cat_skill_mult: float = 1.0
+    if cat_skill != null:
+        cat_skill_mult = 1.0 + KnowledgeManager.get_level(cat_skill) * RESTORE_CAT_SKILL_COEFF
+    var delta: float = RESTORE_BASE * zone_factor * rarity_factor * restore_skill_mult * cat_skill_mult
+    condition = minf(condition + delta, 1.0)
+    KnowledgeManager.add_category_points(
+        item_data.category_data,
+        item_data.rarity,
+        KnowledgeManager.KnowledgeAction.REPAIR,
+    )
+
+
+func add_unlock_effort() -> void:
     var action: LayerUnlockAction = current_unlock_action()
     if action:
-        unlock_progress = minf(action.difficulty, unlock_progress + UNLOCK_BASE_EFFORT * speed_factor)
+        unlock_progress = minf(action.difficulty, unlock_progress + UNLOCK_BASE_EFFORT)
     else:
         push_warning("ItemEntry: add_unlock_effort called with no unlock action available")
 
@@ -307,6 +350,10 @@ func advance_layer() -> void:
 
 
 func is_repair_complete() -> bool:
+    return condition >= 0.5
+
+
+func is_restore_complete() -> bool:
     return condition >= 1.0
 
 
