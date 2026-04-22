@@ -360,39 +360,15 @@ func _configure_action_btn(
         action: ResearchSlot.SlotAction,
         current_slot: ResearchSlot,
 ) -> void:
-    var reason: String = _disabled_reason(entry, action)
-    btn.disabled = reason != ""
-    btn.tooltip_text = reason
+    var check: ResearchSlot.SlotCheck = ResearchSlot.check_assignable(entry, action)
+    btn.disabled = check != ResearchSlot.SlotCheck.OK
+    btn.tooltip_text = ResearchSlot.describe_blocked(check, entry)
 
     var is_current: bool = current_slot != null and current_slot.action == action
     if is_current:
         btn.text = "✓ %s" % label
     else:
         btn.text = label
-
-
-func _disabled_reason(entry: ItemEntry, action: ResearchSlot.SlotAction) -> String:
-    match action:
-        ResearchSlot.SlotAction.STUDY:
-            if entry.is_fully_inspected():
-                return "Fully inspected"
-            if not entry.is_condition_inspectable():
-                return "Scrutiny already maxed"
-            return ""
-        ResearchSlot.SlotAction.REPAIR:
-            if entry.is_repair_complete():
-                return "Condition already maxed"
-            return ""
-        ResearchSlot.SlotAction.UNLOCK:
-            if entry.is_at_final_layer():
-                return "No further layers to unlock"
-            var check: KnowledgeManager.AdvanceCheck = KnowledgeManager.can_advance(entry)
-            if check != KnowledgeManager.AdvanceCheck.OK:
-                return AdvanceCheckLabel.describe(check, entry.current_unlock_action(), entry)
-            return ""
-        _:
-            push_warning("StorageScene: unknown SlotAction %d" % action)
-            return ""
 
 
 func _progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
