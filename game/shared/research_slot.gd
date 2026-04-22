@@ -10,6 +10,15 @@ enum SlotAction {
     UNLOCK,
 }
 
+enum SlotCheck {
+    OK,
+    FULLY_INSPECTED,
+    SCRUTINY_MAXED,
+    REPAIR_COMPLETE,
+    NO_UNLOCK_ACTION,
+    ADVANCE_BLOCKED,
+}
+
 # -1 means the slot is empty.
 var item_id: int = -1
 var action: SlotAction = SlotAction.STUDY
@@ -110,3 +119,51 @@ static func from_dict(d: Dictionary) -> ResearchSlot:
     slot.action = action_from_string(d.get("action", "study"))
     slot.completed = bool(d.get("completed", false))
     return slot
+
+
+@warning_ignore("shadowed_variable")
+static func check_assignable(entry: ItemEntry, action: SlotAction) -> SlotCheck:
+    match action:
+        SlotAction.STUDY:
+            if entry.is_fully_inspected():
+                return SlotCheck.FULLY_INSPECTED
+            if not entry.is_condition_inspectable():
+                return SlotCheck.SCRUTINY_MAXED
+            return SlotCheck.OK
+        SlotAction.REPAIR:
+            if entry.is_repair_complete():
+                return SlotCheck.REPAIR_COMPLETE
+            return SlotCheck.OK
+        SlotAction.UNLOCK:
+            var advance: KnowledgeManager.AdvanceCheck = KnowledgeManager.can_advance(entry)
+            match advance:
+                KnowledgeManager.AdvanceCheck.NO_ACTION:
+                    return SlotCheck.NO_UNLOCK_ACTION
+                KnowledgeManager.AdvanceCheck.OK:
+                    return SlotCheck.OK
+                _:
+                    return SlotCheck.ADVANCE_BLOCKED
+        _:
+            push_warning("ResearchSlot: unknown SlotAction %d" % action)
+            return SlotCheck.OK
+
+
+static func describe_blocked(check: SlotCheck, entry: ItemEntry) -> String:
+    match check:
+        SlotCheck.OK:
+            return ""
+        SlotCheck.FULLY_INSPECTED:
+            return "Fully inspected"
+        SlotCheck.SCRUTINY_MAXED:
+            return "Scrutiny already maxed"
+        SlotCheck.REPAIR_COMPLETE:
+            return "Condition already maxed"
+        SlotCheck.NO_UNLOCK_ACTION:
+            return "No further layers to unlock"
+        SlotCheck.ADVANCE_BLOCKED:
+            return AdvanceCheckLabel.describe(
+                KnowledgeManager.can_advance(entry),
+                entry.current_unlock_action(),
+                entry,
+            )
+    return ""
