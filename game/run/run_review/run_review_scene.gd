@@ -92,28 +92,7 @@ func _apply_trailer_damage() -> int:
 
 
 func _resolve_run_and_navigate() -> void:
-    var r: RunRecord = RunManager.run_record
-
-    # 1. Mutate sale-side cash
-    SaveManager.cash += r.onsite_proceeds - r.paid_price - r.entry_fee - r.fuel_cost
-
-    # 2. Register cargo into storage
-    SaveManager.register_storage_items(r.cargo_items)
-
-    # 3. Advance days (living cost, action ticking, save)
-    var summary := SaveManager.advance_days(r.location_data.travel_days)
-
-    # 4. Layer run-specific fields onto the summary
-    summary.onsite_proceeds = r.onsite_proceeds
-    summary.paid_price = r.paid_price
-    summary.entry_fee = r.entry_fee
-    summary.fuel_cost = r.fuel_cost
-    summary.cargo_count = r.cargo_items.size()
-
-    # 5. Clear run state
-    RunManager.clear_run_state()
-
-    # 6. Navigate to day summary scene
+    var summary := MetaManager.resolve_run(RunManager.run_record)
     GameManager.go_to_day_summary(summary)
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════

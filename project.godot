@@ -30,6 +30,7 @@ MarketManager="*res://global/autoload/market_manager.gd"
 MerchantRegistry="*res://global/autoload/registries/merchant_registry.gd"
 KnowledgeManager="*uid://bqosi6h0xps2v"
 SaveManager="*uid://bi0oymqq1g433"
+MetaManager="*res://global/autoload/meta_manager.gd"
 GameManager="*uid://bnj3y0a2848to"
 
 [debug]

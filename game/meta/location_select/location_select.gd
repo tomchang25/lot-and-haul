@@ -25,7 +25,7 @@ func _ready() -> void:
 
 func _populate_cards() -> void:
     if SaveManager.available_locations.is_empty():
-        SaveManager.roll_available_locations()
+        MetaManager.roll_available_locations()
     for location: LocationData in SaveManager.available_locations:
         var card: LocationCard = LocationCardScene.instantiate()
         card.setup(location)

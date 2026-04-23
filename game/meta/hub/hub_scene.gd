@@ -65,7 +65,7 @@ func _on_day_pass_confirmed() -> void:
 
 
 func _do_day_pass() -> void:
-    var summary := SaveManager.advance_days(1)
+    var summary := MetaManager.advance_days(1)
     GameManager.go_to_day_summary(summary)
 
 # ══ Display ═══════════════════════════════════════════════════════════════════
