@@ -1,0 +1,113 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/meta/hub/day_pass_dialog/day_pass_dialog.gd" id="1_dpdlg"]
+
+[node name="DayPassDialog" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dpdlg")
+
+[node name="Overlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0, 0, 0, 0.6)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Rest & Wait"
+horizontal_alignment = 1
+
+[node name="Sep1" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="SliderRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DaysSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/VBox/SliderRow"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 7.0
+step = 1.0
+value = 1.0
+
+[node name="DaysLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBox/SliderRow"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "1 day(s)"
+horizontal_alignment = 2
+
+[node name="Sep2" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="PreviewVBox" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CostLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBox/PreviewVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Living cost: $0"
+horizontal_alignment = 1
+
+[node name="BalanceLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBox/PreviewVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Balance after: $0"
+horizontal_alignment = 1
+
+[node name="Sep3" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="ButtonRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="ConfirmButton" type="Button" parent="CenterContainer/Panel/MarginContainer/VBox/ButtonRow"]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Confirm"
+
+[node name="CancelButton" type="Button" parent="CenterContainer/Panel/MarginContainer/VBox/ButtonRow"]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Cancel"

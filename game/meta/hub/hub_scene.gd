@@ -3,6 +3,8 @@
 # Reads: SaveManager.cash, SaveManager.storage_items
 extends Control
 
+const DayPassDialogGd = preload("res://game/meta/hub/day_pass_dialog/day_pass_dialog.gd")
+
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _mastery_rank_label: Label = $RootVBox/MasteryRankLabel
@@ -14,7 +16,7 @@ extends Control
 @onready var _vehicle_btn: Button = $RootVBox/ButtonsVBox/VehicleButton
 @onready var _knowledge_btn: Button = $RootVBox/ButtonsVBox/KnowledgeButton
 @onready var _day_pass_btn: Button = $RootVBox/ButtonsVBox/DayPassButton
-@onready var _day_pass_confirm: ConfirmationDialog = $DayPassConfirm
+@onready var _day_pass_dialog: DayPassDialogGd = $DayPassDialog
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -27,7 +29,7 @@ func _ready() -> void:
     _knowledge_btn.pressed.connect(_on_knowledge_pressed)
     _day_pass_btn.pressed.connect(_on_day_pass_pressed)
 
-    _day_pass_confirm.confirmed.connect(_on_day_pass_confirmed)
+    _day_pass_dialog.confirmed.connect(_on_day_pass_confirmed)
 
     _refresh_display()
 
@@ -55,17 +57,11 @@ func _on_knowledge_pressed() -> void:
 
 
 func _on_day_pass_pressed() -> void:
-    _day_pass_confirm.popup_centered()
+    _day_pass_dialog.open()
 
 
-func _on_day_pass_confirmed() -> void:
-    _do_day_pass()
-
-# ══ Day Pass ══════════════════════════════════════════════════════════════════
-
-
-func _do_day_pass() -> void:
-    var summary := MetaManager.advance_days(1)
+func _on_day_pass_confirmed(days: int) -> void:
+    var summary := MetaManager.advance_days(days)
     GameManager.go_to_day_summary(summary)
 
 # ══ Display ═══════════════════════════════════════════════════════════════════

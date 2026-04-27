@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bhubscene0001"]
 
 [ext_resource type="Script" uid="uid://cpdf8haohlsir" path="res://game/meta/hub/hub_scene.gd" id="1_hubgd"]
+[ext_resource type="PackedScene" path="res://game/meta/hub/day_pass_dialog/day_pass_dialog.tscn" id="2_dpdlg"]
 
 [node name="HubScene" type="Control" unique_id=1000000001]
 layout_mode = 3
@@ -110,7 +111,4 @@ size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
 text = "Day Pass"
 
-[node name="DayPassConfirm" type="ConfirmationDialog" parent="." unique_id=1205180003]
-oversampling_override = 1.0
-title = "Pass a Day?"
-dialog_text = "Skip one day? Daily living cost will be deducted."
+[node name="DayPassDialog" parent="." instance=ExtResource("2_dpdlg")]
