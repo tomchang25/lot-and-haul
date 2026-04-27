@@ -2,7 +2,7 @@
 # Storage — Displays stored items and assigns them to research slots.
 # V1 layout: dense table (left) + detail rail (right) with task cards.
 # Reads:  SaveManager.storage_items, SaveManager.research_slots
-# Writes: SaveManager.research_slots
+# Writes: MetaManager.assign_research_slot, MetaManager.remove_research_slot
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -118,11 +118,7 @@ func _on_restore_pressed() -> void:
 func _on_remove_pressed() -> void:
     if _selected_entry == null:
         return
-    var idx: int = _find_slot_index(_selected_entry)
-    if idx >= 0:
-        var cleared := ResearchSlot.new()
-        SaveManager.research_slots[idx] = cleared.to_dict()
-        SaveManager.save()
+    MetaManager.remove_research_slot(_selected_entry)
     _refresh_row(_selected_entry)
     _populate_tasks()
     _refresh_detail()
@@ -420,21 +416,8 @@ func _progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
 func _assign_action(action: ResearchSlot.SlotAction) -> void:
     if _selected_entry == null:
         return
-
-    var new_slot := ResearchSlot.create(action, _selected_entry.id)
-    var existing_idx: int = _find_slot_index(_selected_entry)
-    if existing_idx >= 0:
-        SaveManager.research_slots[existing_idx] = new_slot.to_dict()
-    else:
-        var empty_idx: int = _empty_slot_index()
-        if empty_idx >= 0:
-            SaveManager.research_slots[empty_idx] = new_slot.to_dict()
-        elif SaveManager.research_slots.size() < SaveManager.max_research_slots:
-            SaveManager.research_slots.append(new_slot.to_dict())
-        else:
-            return
-
-    SaveManager.save()
+    if not MetaManager.assign_research_slot(_selected_entry, action):
+        return
     _refresh_row(_selected_entry)
     _populate_tasks()
     _refresh_detail()

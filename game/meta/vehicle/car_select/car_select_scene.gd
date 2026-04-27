@@ -2,7 +2,7 @@
 # Car Select (Garage) — Lists every owned car and lets the player pick which
 # one to drive on the next run.
 # Reads:  SaveManager.owned_cars, SaveManager.active_car
-# Writes: SaveManager.active_car
+# Writes: MetaManager.set_active_car
 extends Control
 
 # ── Constants ──────────────────────────────────────────────────────────────────
@@ -35,8 +35,7 @@ func _on_back_pressed() -> void:
 func _on_select_pressed(car: CarData) -> void:
     if car == SaveManager.active_car:
         return
-    SaveManager.active_car = car
-    SaveManager.save()
+    MetaManager.set_active_car(car)
     _refresh_active_state()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
