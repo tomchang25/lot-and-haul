@@ -192,6 +192,59 @@ func buy_car(car: CarData) -> bool:
     return true
 
 
+func set_active_car(car: CarData) -> void:
+    if car == SaveManager.active_car:
+        return
+    SaveManager.active_car = car
+    SaveManager.save()
+
+
+# ══ Research slot assignment ═════════════════════════════════════════════════
+
+
+func assign_research_slot(entry: ItemEntry, action: ResearchSlot.SlotAction) -> bool:
+    if entry == null:
+        return false
+
+    var new_slot := ResearchSlot.create(action, entry.id)
+    var existing_idx: int = ResearchSlot.find_index(SaveManager.research_slots, entry.id)
+    if existing_idx >= 0:
+        SaveManager.research_slots[existing_idx] = new_slot.to_dict()
+        SaveManager.save()
+        return true
+
+    var empty_idx: int = _find_empty_slot_index()
+    if empty_idx >= 0:
+        SaveManager.research_slots[empty_idx] = new_slot.to_dict()
+        SaveManager.save()
+        return true
+
+    if SaveManager.research_slots.size() < SaveManager.max_research_slots:
+        SaveManager.research_slots.append(new_slot.to_dict())
+        SaveManager.save()
+        return true
+
+    return false
+
+
+func remove_research_slot(entry: ItemEntry) -> void:
+    if entry == null:
+        return
+    var idx: int = ResearchSlot.find_index(SaveManager.research_slots, entry.id)
+    if idx < 0:
+        return
+    SaveManager.research_slots[idx] = ResearchSlot.new().to_dict()
+    SaveManager.save()
+
+
+func _find_empty_slot_index() -> int:
+    for i: int in range(SaveManager.research_slots.size()):
+        var d: Dictionary = SaveManager.research_slots[i]
+        if int(d.get("item_id", -1)) == -1:
+            return i
+    return -1
+
+
 # ══ Run resolution ════════════════════════════════════════════════════════════
 
 
