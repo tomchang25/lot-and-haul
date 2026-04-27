@@ -21,6 +21,9 @@ func migrate() -> void:
     for m: MerchantData in _merchants.values():
         m.active_orders = m.active_orders.filter(
             func(order: SpecialOrder) -> bool:
+                if order.merchant == null:
+                    push_warning("MerchantRegistry.migrate: dropping order '%s' (unresolved merchant)" % order.id)
+                    return false
                 for slot in order.slots:
                     if slot.category == null:
                         push_warning("MerchantRegistry.migrate: dropping order '%s' (slot has unresolved category)" % order.id)
@@ -36,12 +39,21 @@ func validate() -> bool:
         ok = false
     for merchant: MerchantData in get_all_merchants():
         for order: SpecialOrder in merchant.active_orders:
+            if order.merchant == null:
+                push_error(
+                    "MerchantRegistry: merchant '%s' order '%s' has unresolved merchant ref"
+                    % [merchant.merchant_id, order.id],
+                )
+                ok = false
             for i in range(order.slots.size()):
                 var slot: OrderSlot = order.slots[i]
                 if slot.category == null:
+                    var order_merchant_id: String = (
+                        order.merchant.merchant_id if order.merchant != null else "<null>"
+                    )
                     push_error(
                         "MerchantRegistry: merchant '%s' order '%s' slot %d category_id not found in CategoryRegistry"
-                        % [merchant.merchant_id, order.id, i],
+                        % [order_merchant_id, order.id, i],
                     )
                     ok = false
     return ok
@@ -133,4 +145,4 @@ func _generate_order(m: MerchantData) -> SpecialOrder:
 
     var id_string: String = "%s_%d" % [m.merchant_id, next_order_id]
     next_order_id += 1
-    return SpecialOrder.create(template, m.merchant_id, id_string)
+    return SpecialOrder.create(template, m, id_string)

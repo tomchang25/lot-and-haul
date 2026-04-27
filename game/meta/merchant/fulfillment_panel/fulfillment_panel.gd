@@ -147,35 +147,7 @@ func _execute_delivery() -> void:
     if _selected_order == null:
         return
 
-    var total_payout: int = 0
-    var consumed: Array[ItemEntry] = []
-
-    for slot_idx: Variant in _session_assignments:
-        var assigned: Array = _session_assignments[slot_idx]
-        var slot: OrderSlot = _selected_order.slots[int(slot_idx)]
-        for entry: ItemEntry in assigned:
-            total_payout += _selected_order.compute_item_price(entry)
-            consumed.append(entry)
-            slot.filled_count += 1
-
-    # Remove consumed items from storage and award knowledge
-    for entry: ItemEntry in consumed:
-        SaveManager.storage_items.erase(entry)
-        ResearchSlot.clear_for_item(SaveManager.research_slots, entry.id)
-        KnowledgeManager.add_category_points(
-            entry.item_data.category_data,
-            entry.item_data.rarity,
-            KnowledgeManager.KnowledgeAction.SELL,
-        )
-
-    # Check completion
-    if _selected_order.is_complete():
-        total_payout += _selected_order.completion_bonus
-        _merchant.completed_order_ids.append(_selected_order.id)
-        _merchant.active_orders.erase(_selected_order)
-
-    SaveManager.cash += total_payout
-    SaveManager.save()
+    MetaManager.fulfill_order(_selected_order, _session_assignments)
     GameManager.go_to_merchant_hub()
 
 # ══ Order list ═══════════════════════════════════════════════════════════════

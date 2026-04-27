@@ -31,7 +31,7 @@ func _on_back_pressed() -> void:
 
 
 func _on_buy_pressed(car: CarData) -> void:
-    if SaveManager.buy_car(car):
+    if MetaManager.buy_car(car):
         _refresh()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════

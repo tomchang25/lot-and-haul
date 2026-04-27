@@ -6,7 +6,7 @@ extends RefCounted
 
 var id: String # "{merchant_id}_{counter}"
 var special_order_id: String # source SpecialOrderData.special_order_id
-var merchant_id: String
+var merchant: MerchantData = null
 var slots: Array[OrderSlot] = []
 var buff: float = 1.0
 var completion_bonus: int = 0
@@ -33,13 +33,13 @@ enum Eligibility {
 
 static func create(
         template: SpecialOrderData,
-        new_merchant_id: String,
+        new_merchant: MerchantData,
         order_id: String,
 ) -> SpecialOrder:
     var order := SpecialOrder.new()
     order.id = order_id
     order.special_order_id = template.special_order_id
-    order.merchant_id = new_merchant_id
+    order.merchant = new_merchant
     order.buff = randf_range(template.buff_min, template.buff_max)
     order.completion_bonus = template.completion_bonus
     order.deadline_day = SaveManager.current_day + template.deadline_days
@@ -119,7 +119,7 @@ func to_dict() -> Dictionary:
     return {
         "id": id,
         "special_order_id": special_order_id,
-        "merchant_id": merchant_id,
+        "merchant_id": merchant.merchant_id if merchant else "",
         "slots": slot_dicts,
         "buff": buff,
         "completion_bonus": completion_bonus,
@@ -135,7 +135,7 @@ static func from_dict(d: Dictionary) -> SpecialOrder:
     var order := SpecialOrder.new()
     order.id = str(d.get("id", ""))
     order.special_order_id = str(d.get("special_order_id", ""))
-    order.merchant_id = str(d.get("merchant_id", ""))
+    order.merchant = MerchantRegistry.get_merchant_by_id(str(d.get("merchant_id", "")))
     order.buff = float(d.get("buff", 1.0))
     order.completion_bonus = int(d.get("completion_bonus", 0))
     order.deadline_day = int(d.get("deadline_day", 0))

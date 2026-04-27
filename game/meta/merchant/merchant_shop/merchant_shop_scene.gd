@@ -141,18 +141,7 @@ func _on_negotiation_accepted(final_price: int) -> void:
         if _selected[entry]:
             sold.append(entry)
 
-    SaveManager.cash += final_price
-    for entry: ItemEntry in sold:
-        SaveManager.storage_items.erase(entry)
-        ResearchSlot.clear_for_item(SaveManager.research_slots, entry.id)
-        KnowledgeManager.add_category_points(
-            entry.item_data.category_data,
-            entry.item_data.rarity,
-            KnowledgeManager.KnowledgeAction.SELL,
-        )
-
-    MerchantRegistry.increment_negotiation(_merchant)
-    SaveManager.save()
+    MetaManager.sell_items(sold, final_price, _merchant)
 
     _trade_summary_popup.dialog_text = "Sold %d item%s for $%d." % [
         sold.size(),

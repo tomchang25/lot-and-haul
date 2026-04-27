@@ -196,22 +196,6 @@ func _read_save_file() -> void:
     ResearchSlot.purge_orphaned(research_slots, valid_ids)
 
 
-# Attempts to purchase `car` using `SaveManager.cash`.
-# Returns false if the player cannot afford it or already owns it.
-# On success, debits the price, appends the id, persists, and returns true.
-func buy_car(car: CarData) -> bool:
-    if car == null:
-        return false
-    if owned_cars.has(car):
-        return false
-    if cash < car.price:
-        return false
-    cash -= car.price
-    owned_cars.append(car)
-    save()
-    return true
-
-
 func _build_negotiation_dict() -> Dictionary:
     var result: Dictionary = { }
     for m: MerchantData in MerchantRegistry.get_all_merchants():
