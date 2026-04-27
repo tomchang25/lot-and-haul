@@ -2,7 +2,6 @@ extends Node
 
 # ══ Storage registration ══════════════════════════════════════════════════════
 
-
 func register_storage_item(entry: ItemEntry) -> void:
     entry.id = SaveManager.next_entry_id
     SaveManager.next_entry_id += 1
@@ -14,7 +13,6 @@ func register_storage_items(entries: Array[ItemEntry]) -> void:
         register_storage_item(entry)
     SaveManager.save()
 
-
 # ══ Location sampling ════════════════════════════════════════════════════════
 
 
@@ -22,7 +20,6 @@ func roll_available_locations() -> void:
     var all := LocationRegistry.get_all_locations()
     all.shuffle()
     SaveManager.available_locations = all.slice(0, mini(Economy.LOCATION_SAMPLE_SIZE, all.size()))
-
 
 # ══ Day advancement ═══════════════════════════════════════════════════════════
 
@@ -129,7 +126,6 @@ func _slot_effect_label(action: ResearchSlot.SlotAction) -> String:
             push_warning("MetaManager: unknown SlotAction %d" % action)
             return "Done"
 
-
 # ══ Trade operations ══════════════════════════════════════════════════════════
 
 
@@ -198,7 +194,6 @@ func set_active_car(car: CarData) -> void:
     SaveManager.active_car = car
     SaveManager.save()
 
-
 # ══ Research slot assignment ═════════════════════════════════════════════════
 
 
@@ -243,7 +238,6 @@ func _find_empty_slot_index() -> int:
         if int(d.get("item_id", -1)) == -1:
             return i
     return -1
-
 
 # ══ Run resolution ════════════════════════════════════════════════════════════
 

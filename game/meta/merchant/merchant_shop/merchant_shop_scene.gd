@@ -157,9 +157,6 @@ func _on_trade_summary_dismissed() -> void:
 
 func _on_negotiation_cancelled() -> void:
     MerchantRegistry.increment_negotiation(_merchant)
-    # Persist merchant negotiation count; the cancel path mutates merchant
-    # state via MerchantRegistry rather than SaveManager fields, so it does
-    # not fit a MetaManager wrapper without inventing a single-call helper.
     SaveManager.save()
     GameManager.go_to_merchant_hub()
 
