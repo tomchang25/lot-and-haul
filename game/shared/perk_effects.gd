@@ -9,7 +9,6 @@ extends RefCounted
 
 # ══ Inspection ════════════════════════════════════════════════════════════════
 
-
 # Peek action's per-item unveil success chance.
 static func get_peek_success_chance() -> float:
     return 1.0 if _has("xray_inspect") else 0.5
