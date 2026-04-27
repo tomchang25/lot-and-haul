@@ -17,8 +17,6 @@ const ItemCardScene := preload("uid://bw23cjkf40y5r")
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _xray_perk: PerkData = null
-
 var _item_displays: Array[ItemCard] = []
 
 # Maps each ItemEntry to its corresponding ItemCard for reverse lookup.
@@ -50,7 +48,6 @@ var _pulse_tween: Tween = null
 
 func _ready() -> void:
     _ctx = ItemViewContext.for_inspection()
-    _xray_perk = KnowledgeManager.get_perk_by_id("xray_inspect")
 
     _action_bar.inspect_requested.connect(_on_inspect_requested)
     _action_bar.peek_requested.connect(_on_peek_requested)
@@ -106,7 +103,7 @@ func _on_peek_requested() -> void:
     RunManager.run_record.stamina -= LotActionBar.PEEK_COST
     RunManager.run_record.actions_remaining -= 1
 
-    var success_chance: float = 1.0 if (_xray_perk != null and KnowledgeManager.has_perk(_xray_perk)) else 0.5
+    var success_chance: float = PerkEffects.get_peek_success_chance()
 
     for entry: ItemEntry in RunManager.run_record.lot_items:
         if not entry.is_veiled():
