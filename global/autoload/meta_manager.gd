@@ -130,6 +130,68 @@ func _slot_effect_label(action: ResearchSlot.SlotAction) -> String:
             return "Done"
 
 
+# ══ Trade operations ══════════════════════════════════════════════════════════
+
+
+func sell_items(items: Array[ItemEntry], price: int, merchant: MerchantData) -> void:
+    for entry: ItemEntry in items:
+        SaveManager.storage_items.erase(entry)
+        ResearchSlot.clear_for_item(SaveManager.research_slots, entry.id)
+        KnowledgeManager.add_category_points(
+            entry.item_data.category_data,
+            entry.item_data.rarity,
+            KnowledgeManager.KnowledgeAction.SELL,
+        )
+    SaveManager.cash += price
+    MerchantRegistry.increment_negotiation(merchant)
+    SaveManager.save()
+
+
+func fulfill_order(order: SpecialOrder, assignments: Dictionary) -> int:
+    var merchant: MerchantData = order.merchant
+    var total_payout: int = 0
+    var consumed: Array[ItemEntry] = []
+
+    for slot_idx: Variant in assignments:
+        var assigned: Array = assignments[slot_idx]
+        var slot: OrderSlot = order.slots[int(slot_idx)]
+        for entry: ItemEntry in assigned:
+            total_payout += order.compute_item_price(entry)
+            consumed.append(entry)
+            slot.filled_count += 1
+
+    for entry: ItemEntry in consumed:
+        SaveManager.storage_items.erase(entry)
+        ResearchSlot.clear_for_item(SaveManager.research_slots, entry.id)
+        KnowledgeManager.add_category_points(
+            entry.item_data.category_data,
+            entry.item_data.rarity,
+            KnowledgeManager.KnowledgeAction.SELL,
+        )
+
+    if order.is_complete():
+        total_payout += order.completion_bonus
+        merchant.completed_order_ids.append(order.id)
+        merchant.active_orders.erase(order)
+
+    SaveManager.cash += total_payout
+    SaveManager.save()
+    return total_payout
+
+
+func buy_car(car: CarData) -> bool:
+    if car == null:
+        return false
+    if SaveManager.owned_cars.has(car):
+        return false
+    if SaveManager.cash < car.price:
+        return false
+    SaveManager.cash -= car.price
+    SaveManager.owned_cars.append(car)
+    SaveManager.save()
+    return true
+
+
 # ══ Run resolution ════════════════════════════════════════════════════════════
 
 
