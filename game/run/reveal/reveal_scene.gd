@@ -1,9 +1,9 @@
 # reveal_scene.gd
 # Block 05a — Reveal won items before cargo loading.
-# Auto-advances layer 0 items to layer 1 on reveal.
+# Marks uninspected items as inspected on reveal.
 # One button press reveals ALL items at once instead of one-at-a-time.
 # Reads:  RunManager.run_record.won_items
-# Writes: (none — mutates ItemEntry.layer_index in place)
+# Writes: ItemEntry.inspected, ItemEntry.scrutiny
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────

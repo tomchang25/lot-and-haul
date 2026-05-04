@@ -69,8 +69,12 @@ const UNLOCK_BASE_EFFORT: float = 1.0
 var item_data: ItemData = null
 
 # How far the player has advanced the identity chain this run.
-# 0 = base layer (always visible); max = identity_layers.size() - 1.
-var layer_index: int = 0
+# Runtime entries start at layer 1 while legacy YAML still carries a layer-0
+# veil. Phase 0 keeps that data but uses inspected to gate visibility.
+var layer_index: int = 1
+
+# False until the player has inspected/revealed this entry.
+var inspected: bool = false
 
 var condition: float = 1.0
 
@@ -123,6 +127,8 @@ var max_intuition_level: int:
 
 var display_name: String:
     get:
+        if is_veiled():
+            return "Unknown Item"
         var name: String = active_layer().display_name
         if is_at_final_layer() and not is_veiled():
             name = "%s ·" % name
@@ -591,33 +597,38 @@ func special_order_value(order: SpecialOrder) -> int:
 
 # Returns the layer currently visible to the player.
 func active_layer() -> IdentityLayer:
-    return item_data.identity_layers[layer_index]
+    if item_data == null or item_data.identity_layers.is_empty():
+        return null
+    return item_data.identity_layers[_safe_layer_index()]
 
 
 # Returns the unlock_action for advancing beyond the current layer.
 # Null if already at the final layer.
 func current_unlock_action() -> LayerUnlockAction:
-    return item_data.identity_layers[layer_index].unlock_action
+    if item_data == null or item_data.identity_layers.is_empty():
+        return null
+    return item_data.identity_layers[_safe_layer_index()].unlock_action
 
 
-# True if the item is at the base layer — inspection was not performed.
+# True if the item has not been inspected yet. Kept as the compatibility API
+# for existing display and auction/list-review logic.
 func is_veiled() -> bool:
-    return layer_index == 0
+    return not inspected
 
 
 # True if no further layers exist.
 func is_at_final_layer() -> bool:
-    return layer_index == item_data.identity_layers.size() - 1
+    if item_data == null or item_data.identity_layers.is_empty():
+        return true
+    return _safe_layer_index() == item_data.identity_layers.size() - 1
 
 
-# Advances a veiled item (layer 0) to layer 1. Shared by the reveal scene, the
-# X-Ray inspect action, and any other caller that needs to unveil an item
-# mid-run. The inspection-driven range already handles price resolution; this
-# function only moves the identity pointer.
+# Marks an uninspected item as inspected. Shared by the reveal scene and the
+# inspection action. Runtime entries already start at layer 1.
 func unveil() -> void:
     if not is_veiled():
         return
-    layer_index = 1
+    inspected = true
 
 
 func reveal() -> void:
@@ -633,19 +644,27 @@ func _get_appraisal_level() -> int:
         return 0
     return KnowledgeManager.get_level(_appraisal_skill)
 
+
+func _safe_layer_index() -> int:
+    if item_data == null or item_data.identity_layers.is_empty():
+        return 0
+    if item_data.identity_layers.size() == 1:
+        return 0
+    return clampi(layer_index, 1, item_data.identity_layers.size() - 1)
+
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
 
-static func create(data: ItemData, veil_chance: float = 0.0) -> ItemEntry:
+static func create(data: ItemData, _veil_chance: float = 0.0) -> ItemEntry:
     var entry := ItemEntry.new()
     entry.item_data = data
 
     entry.condition = randf()
     entry.center_offset = randf_range(-0.5, 0.5)
 
-    # Layer 0 = veiled. If veil does not apply, auto-advance to layer 1.
-    var start_veiled := randf() < veil_chance
-    entry.layer_index = 0 if start_veiled else 1
+    # Layer 0 remains in legacy data, but new runtime entries start at layer 1.
+    entry.layer_index = 1
+    entry.inspected = false
 
     # scrutiny starts at 0; inspection_level is computed from knowledge + scrutiny.
     entry.scrutiny = 0.0
@@ -661,6 +680,7 @@ func to_dict() -> Dictionary:
         "item_id": item_data.item_id,
         "id": id,
         "layer_index": layer_index,
+        "inspected": inspected,
         "condition": condition,
         "scrutiny": scrutiny,
         "intuition_level": intuition_level,
@@ -676,7 +696,9 @@ static func from_dict(d: Dictionary) -> ItemEntry:
         return null
     var entry := ItemEntry.new()
     entry.item_data = data
-    entry.layer_index = int(d["layer_index"])
+    var saved_layer_index := int(d.get("layer_index", 1))
+    entry.inspected = bool(d.get("inspected", saved_layer_index > 0))
+    entry.layer_index = max(1, saved_layer_index)
     entry.condition = float(d["condition"])
     # New fields — default gracefully if missing (migration-safe).
     entry.scrutiny = float(d.get("scrutiny", 0.0))

@@ -7,14 +7,7 @@
 class_name PerkEffects
 extends RefCounted
 
-# ══ Inspection ════════════════════════════════════════════════════════════════
-
-# Peek action's per-item unveil success chance.
-static func get_peek_success_chance() -> float:
-    return 1.0 if _has("xray_inspect") else 0.5
-
 # ══ Internals ═════════════════════════════════════════════════════════════════
-
 
 static func _has(perk_id: String) -> bool:
     var perk: PerkData = KnowledgeManager.get_perk_by_id(perk_id)

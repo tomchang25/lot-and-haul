@@ -39,7 +39,8 @@ extends Resource
 
 # ── Item pool ─────────────────────────────────────────────────────────────────
 
-# Chance (0.0–1.0) that any item in this lot spawns veiled.
+# Deprecated in Phase 0 runtime-first cleanup. Kept for YAML/TRES compatibility;
+# ItemEntry now starts uninspected regardless of this value.
 @export var veiled_chance: float = 0.4
 
 # Number of items drawn for this lot. Actual count is randi_range(min, max).

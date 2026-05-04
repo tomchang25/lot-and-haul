@@ -45,7 +45,7 @@ static func create(data: LotData) -> LotEntry:
         var item := _draw_item(data)
 
         if item != null:
-            entry.item_entries.append(ItemEntry.create(item, data.veiled_chance))
+            entry.item_entries.append(ItemEntry.create(item))
 
     # Cache after item_entries are populated — get_npc_estimate() reads them.
     entry.npc_estimate = entry.roll_npc_estimate()

@@ -40,6 +40,8 @@ func refresh(changed: StringName = &"") -> void:
             _animate_pop(_potential_label)
         &"condition":
             _animate_pop(_condition_label)
+        &"unveil":
+            _animate_pop(_name_label)
 
 
 func _apply() -> void:
@@ -52,7 +54,7 @@ func _apply() -> void:
 
 
 func _apply_veiled() -> void:
-    # Veiled rows show only the layer-0 display name and base value.
+    # Uninspected rows must not depend on legacy layer-0 veil data.
     _super_category_label.hide()
     _category_label.hide()
     _potential_label.hide()
@@ -61,7 +63,7 @@ func _apply_veiled() -> void:
     _weight_label.hide()
     _grid_label.hide()
 
-    _price_label.text = "$%d" % _entry.active_layer().base_value
+    _price_label.text = "???"
     _price_label.add_theme_color_override(&"font_color", _entry.price_color)
     _price_label.show()
 

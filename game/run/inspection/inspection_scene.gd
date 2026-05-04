@@ -1,7 +1,7 @@
 # inspection_scene.gd
-# Block 02 — Inspection phase; player spends stamina to advance item identity layers.
+# Block 02 — Inspection phase; player spends stamina to inspect items and advance identity layers.
 # Reads:  GameManager.item_entries
-# Writes: ItemEntry.layer_index, ItemEntry.inspection_level
+# Writes: ItemEntry.inspected, ItemEntry.scrutiny
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -50,7 +50,6 @@ func _ready() -> void:
     _ctx = ItemViewContext.for_inspection()
 
     _action_bar.inspect_requested.connect(_on_inspect_requested)
-    _action_bar.peek_requested.connect(_on_peek_requested)
     _action_bar.appraise_requested.connect(_on_appraise_requested)
     _start_btn.pressed.connect(_on_start_auction_pressed)
     _pass_btn.pressed.connect(_on_pass_pressed)
@@ -71,9 +70,7 @@ func _ready() -> void:
 func _on_inspect_requested() -> void:
     if _selected_entry == null:
         return
-    if _selected_entry.is_veiled():
-        return
-    if not _selected_entry.is_condition_inspectable():
+    if not _selected_entry.is_veiled() and not _selected_entry.is_condition_inspectable():
         return
     if RunManager.run_record.stamina < LotActionBar.INSPECT_COST:
         return
@@ -83,41 +80,21 @@ func _on_inspect_requested() -> void:
     RunManager.run_record.stamina -= LotActionBar.INSPECT_COST
     RunManager.run_record.actions_remaining -= 1
 
-    _selected_entry.advance_scrutiny()
+    var changed := &"condition"
+    if _selected_entry.is_veiled():
+        _selected_entry.unveil()
+        KnowledgeManager.add_category_points(
+            _selected_entry.item_data.category_data,
+            _selected_entry.item_data.rarity,
+            KnowledgeManager.KnowledgeAction.REVEAL,
+        )
+        changed = &"unveil"
+    else:
+        _selected_entry.advance_scrutiny()
 
     var card: ItemCard = _card_for_entry[_selected_entry]
-    card.refresh(&"condition")
+    card.refresh(changed)
     card.flash_border()
-
-    _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
-    _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
-    _refresh_action_bar()
-
-
-func _on_peek_requested() -> void:
-    if RunManager.run_record.stamina < LotActionBar.PEEK_COST:
-        return
-    if RunManager.run_record.actions_remaining <= 0:
-        return
-
-    RunManager.run_record.stamina -= LotActionBar.PEEK_COST
-    RunManager.run_record.actions_remaining -= 1
-
-    var success_chance: float = PerkEffects.get_peek_success_chance()
-
-    for entry: ItemEntry in RunManager.run_record.lot_items:
-        if not entry.is_veiled():
-            continue
-        if randf() < success_chance:
-            entry.unveil()
-            KnowledgeManager.add_category_points(
-                entry.item_data.category_data,
-                entry.item_data.rarity,
-                KnowledgeManager.KnowledgeAction.REVEAL,
-            )
-            var card: ItemCard = _card_for_entry[entry]
-            card.refresh(&"unveil")
-            card.flash_border()
 
     _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
     _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
