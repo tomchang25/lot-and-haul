@@ -1,0 +1,33 @@
+# ============================================================
+# Lot & Haul — Commodity Data
+# data/yaml/commodity_data.yaml
+#
+# Commodities are fixed-market-value goods. They auto-sell after Reveal and do
+# not enter Cargo, Storage, Research, or Merchant negotiation.
+# ============================================================
+
+commodities:
+  - commodity_id: used_handbag_bundle
+    display_name: Used Handbag Bundle
+    category_id: handbag
+    base_value: 45
+
+  - commodity_id: costume_watch_lot
+    display_name: Costume Watch Lot
+    category_id: wristwatch
+    base_value: 70
+
+  - commodity_id: working_oil_lamp
+    display_name: Working Oil Lamp
+    category_id: oil_lamp
+    base_value: 55
+
+  - commodity_id: framed_poster_stack
+    display_name: Framed Poster Stack
+    category_id: poster
+    base_value: 35
+
+  - commodity_id: surplus_tool_case
+    display_name: Surplus Range Case
+    category_id: pistol
+    base_value: 90

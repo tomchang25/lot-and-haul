@@ -16,22 +16,25 @@ func _ready() -> void:
     _appraise_button.pressed.connect(_on_appraise_pressed)
 
 
-func refresh_lot(selected_entry: ItemEntry) -> void:
+func refresh_lot(selected_entry) -> void:
     var stamina: int = RunManager.run_record.stamina
     var actions: int = RunManager.run_record.actions_remaining
     var actions_ok: bool = actions > 0
+    var entry := selected_entry as LotObjectEntry
 
     var can_inspect: bool = (
-        selected_entry != null
-        and (selected_entry.is_veiled() or selected_entry.is_condition_inspectable())
+        entry != null
+        and entry.can_inspect()
+    )
+    can_inspect = (
+        can_inspect
         and stamina >= INSPECT_COST
         and actions_ok
     )
 
     var can_appraise: bool = (
-        selected_entry != null
-        and not selected_entry.is_veiled()
-        and selected_entry.intuition_level < selected_entry.max_intuition_level
+        entry != null
+        and entry.can_appraise()
         and stamina >= APPRAISE_COST
         and actions_ok
     )

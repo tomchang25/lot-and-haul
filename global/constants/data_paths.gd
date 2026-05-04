@@ -7,6 +7,7 @@ class_name DataPaths
 extends RefCounted
 
 const ITEMS_DIR: String = "res://data/tres/items"
+const COMMODITIES_DIR: String = "res://data/tres/commodities"
 const CATEGORIES_DIR: String = "res://data/tres/categories"
 const SUPER_CATEGORIES_DIR: String = "res://data/tres/super_categories"
 const PERKS_DIR: String = "res://data/tres/perks"

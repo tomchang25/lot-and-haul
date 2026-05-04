@@ -243,13 +243,14 @@ func _find_empty_slot_index() -> int:
 
 
 func resolve_run(record: RunRecord) -> DaySummary:
-    SaveManager.cash += record.onsite_proceeds - record.paid_price - record.entry_fee - record.fuel_cost
+    SaveManager.cash += record.onsite_proceeds + record.commodity_sales - record.paid_price - record.entry_fee - record.fuel_cost
 
     register_storage_items(record.cargo_items)
 
     var summary := advance_days(record.location_data.travel_days)
 
     summary.onsite_proceeds = record.onsite_proceeds
+    summary.commodity_sales = record.commodity_sales
     summary.paid_price = record.paid_price
     summary.entry_fee = record.entry_fee
     summary.fuel_cost = record.fuel_cost

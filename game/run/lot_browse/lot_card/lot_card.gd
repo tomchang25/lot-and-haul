@@ -48,7 +48,12 @@ func setup(lot_data: LotData, index: int, total: int) -> void:
 
 func _apply() -> void:
     _index_label.text = "Lot %d / %d" % [_index + 1, _total]
-    _item_count_label.text = "%d–%d items" % [_lot_data.item_count_min, _lot_data.item_count_max]
+    var min_count := _lot_data.item_count_min + _lot_data.commodity_count_min
+    var max_count := _lot_data.item_count_max + _lot_data.commodity_count_max
+    if min_count == max_count:
+        _item_count_label.text = "%d items" % min_count
+    else:
+        _item_count_label.text = "%d–%d items" % [min_count, max_count]
     _rarity_label.text = "Rarity: %s" % _rarity_range_text(_lot_data.rarity_weights)
 
     # Super Category row

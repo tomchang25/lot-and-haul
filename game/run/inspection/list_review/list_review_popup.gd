@@ -1,7 +1,7 @@
 # list_review_popup.gd
 # Block 03 — static summary overlay shown between Inspection and Auction.
 # Call populate() before showing to rebuild the item list from GameManager state.
-# Reads:  RunManager.run_record.lot_entry, RunManager.run_record.lot_items
+# Reads:  RunManager.run_record.lot_entry, RunManager.run_record.lot_objects
 class_name ListReviewPopup
 extends Control
 
@@ -53,7 +53,12 @@ func populate() -> void:
     var lot_items: Array[ItemEntry] = RunManager.run_record.lot_items
 
     _item_list_panel.setup(_ctx, LIST_REVIEW_COLUMNS)
-    _item_list_panel.populate(lot_items)
+    _item_list_panel.populate(RunManager.run_record.lot_objects)
+
+    var known_commodity_sales := 0
+    for commodity: CommodityEntry in RunManager.run_record.lot_commodities:
+        if commodity.inspected:
+            known_commodity_sales += commodity.compute_sale_price()
 
     var total_min := 0
     var total_max := 0
@@ -64,6 +69,9 @@ func populate() -> void:
         else:
             total_min += entry.estimated_value_min
             total_max += entry.estimated_value_max
+
+    total_min += known_commodity_sales
+    total_max += known_commodity_sales
 
     var total_text: String
     if total_min == total_max:
@@ -88,7 +96,7 @@ func _on_enter_auction_pressed() -> void:
 
 
 func _on_row_tooltip_requested(
-        entry: ItemEntry,
+        entry,
         ctx: ItemViewContext,
         anchor: Rect2,
 ) -> void:

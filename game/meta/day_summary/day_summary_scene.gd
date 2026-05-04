@@ -10,6 +10,7 @@ extends Control
 
 @onready var _trip_group: VBoxContainer = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup
 @onready var _onsite_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup/OnsiteLabel
+@onready var _commodity_sales_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup/CommoditySalesLabel
 @onready var _entry_fee_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup/EntryFeeLabel
 @onready var _fuel_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup/FuelLabel
 @onready var _paid_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup/PaidLabel
@@ -54,6 +55,8 @@ func _render(summary: DaySummary) -> void:
     _trip_group.visible = summary.has_run_data()
     if summary.has_run_data():
         _onsite_label.text = "Sold On-site:   $%d" % summary.onsite_proceeds
+        _commodity_sales_label.visible = summary.commodity_sales != 0
+        _commodity_sales_label.text = "Commodity Sales:   $%d" % summary.commodity_sales
         _entry_fee_label.visible = summary.entry_fee != 0
         _entry_fee_label.text = "Entry Fee:   -$%d" % summary.entry_fee
         _fuel_label.visible = summary.fuel_cost != 0

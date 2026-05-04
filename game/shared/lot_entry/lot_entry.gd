@@ -21,6 +21,13 @@ var price_variance: float = 1.0
 # One entry per item in this lot. Generated from lot_data.item_pool at creation.
 var item_entries: Array[ItemEntry] = []
 
+# One entry per commodity in this lot. Generated from lot_data.commodity_weights.
+var commodity_entries: Array[CommodityEntry] = []
+
+# Mixed ItemEntry/CommodityEntry order. Created once per lot so inspection
+# cannot leak which unknowns are commodities by grouping.
+var lot_objects: Array[LotObjectEntry] = []
+
 # Cached NPC estimate rolled once at creation.
 # Both get_opening_bid() and auction rolled_price derive from this value.
 var npc_estimate: int = 0
@@ -47,7 +54,20 @@ static func create(data: LotData) -> LotEntry:
         if item != null:
             entry.item_entries.append(ItemEntry.create(item))
 
-    # Cache after item_entries are populated — get_npc_estimate() reads them.
+    var commodity_count := randi_range(data.commodity_count_min, data.commodity_count_max)
+    for i in range(commodity_count):
+        var commodity := _draw_commodity(data)
+        if commodity != null:
+            entry.commodity_entries.append(CommodityEntry.create(commodity))
+
+    entry.lot_objects = []
+    for item_entry: ItemEntry in entry.item_entries:
+        entry.lot_objects.append(item_entry)
+    for commodity_entry: CommodityEntry in entry.commodity_entries:
+        entry.lot_objects.append(commodity_entry)
+    entry.lot_objects.shuffle()
+
+    # Cache after entries are populated — get_npc_estimate() reads them.
     entry.npc_estimate = entry.roll_npc_estimate()
 
     return entry
@@ -111,6 +131,27 @@ static func _draw_item(data: LotData) -> ItemData:
     return null
 
 
+static func _draw_commodity(data: LotData) -> CommodityData:
+    if data.commodity_weights.is_empty():
+        return null
+
+    var commodity_keys: Array = data.commodity_weights.keys()
+    var commodity_values: Array[int] = []
+    for k in commodity_keys:
+        commodity_values.append(data.commodity_weights[k])
+
+    var commodity_idx := RandomUtils.pick_weighted_index(commodity_values)
+    if commodity_idx < 0:
+        push_warning("Commodity roll failed")
+        return null
+
+    var commodity_id: String = commodity_keys[commodity_idx]
+    var commodity: CommodityData = CommodityRegistry.get_commodity_by_id(commodity_id)
+    if commodity == null:
+        push_warning("_draw_commodity: commodity_id '%s' not found" % commodity_id)
+    return commodity
+
+
 # Returns the cached NPC estimate. Stable across calls.
 func get_npc_estimate() -> int:
     return npc_estimate
@@ -133,6 +174,9 @@ func roll_npc_estimate() -> int:
         while npc_layer < entry.item_data.identity_layers.size() - 1 and randf() < lot_data.npc_layer_sight_chance ** (npc_layer - entry.layer_index + 1):
             npc_layer += 1
         total += entry.item_data.identity_layers[npc_layer].base_value
+
+    for commodity: CommodityEntry in commodity_entries:
+        total += commodity.compute_sale_price()
 
     return total
 

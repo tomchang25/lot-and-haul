@@ -25,6 +25,9 @@ lots:
     veiled_chance: 0.3
     item_count_min: 3
     item_count_max: 5
+    commodity_count_min: 1
+    commodity_count_max: 3
+    commodity_weights: { used_handbag_bundle: 3, costume_watch_lot: 1, working_oil_lamp: 2 }
     rarity_weights: { 0: 60, 1: 25, 2: 10, 3: 4, 4: 1 }
     super_category_weights: {}
     category_weights: { handbag: 2, wristwatch: 1, oil_lamp: 2 }
@@ -44,6 +47,9 @@ lots:
     veiled_chance: 0.35
     item_count_min: 3
     item_count_max: 5
+    commodity_count_min: 1
+    commodity_count_max: 2
+    commodity_weights: { surplus_tool_case: 2, costume_watch_lot: 1 }
     rarity_weights: { 0: 55, 1: 28, 2: 12, 3: 4, 4: 1 }
     super_category_weights: {}
     category_weights: { pistol: 1, crossbow: 1 }
@@ -63,6 +69,9 @@ lots:
     veiled_chance: 0.3
     item_count_min: 3
     item_count_max: 4
+    commodity_count_min: 1
+    commodity_count_max: 2
+    commodity_weights: { used_handbag_bundle: 2, working_oil_lamp: 1, framed_poster_stack: 2 }
     rarity_weights: { 0: 65, 1: 22, 2: 10, 3: 2, 4: 1 }
     super_category_weights: {}
     category_weights: { handbag: 1, pistol: 1, oil_lamp: 1 }
@@ -83,6 +92,9 @@ lots:
     veiled_chance: 0.45
     item_count_min: 4
     item_count_max: 6
+    commodity_count_min: 1
+    commodity_count_max: 3
+    commodity_weights: { surplus_tool_case: 4, costume_watch_lot: 1 }
     rarity_weights: { 0: 40, 1: 30, 2: 18, 3: 9, 4: 3 }
     super_category_weights: {}
     category_weights: { pistol: 3, rifle: 2, crossbow: 1 }
@@ -102,6 +114,9 @@ lots:
     veiled_chance: 0.4
     item_count_min: 4
     item_count_max: 6
+    commodity_count_min: 1
+    commodity_count_max: 3
+    commodity_weights: { working_oil_lamp: 3, framed_poster_stack: 2, used_handbag_bundle: 1 }
     rarity_weights: { 0: 40, 1: 30, 2: 18, 3: 9, 4: 3 }
     super_category_weights: { decorative: 1 }
     category_weights: {}
@@ -121,6 +136,9 @@ lots:
     veiled_chance: 0.45
     item_count_min: 4
     item_count_max: 6
+    commodity_count_min: 1
+    commodity_count_max: 3
+    commodity_weights: { used_handbag_bundle: 1, costume_watch_lot: 1, working_oil_lamp: 1, surplus_tool_case: 1 }
     rarity_weights: { 0: 42, 1: 30, 2: 17, 3: 8, 4: 3 }
     super_category_weights: {}
     category_weights: { handbag: 1, wristwatch: 1, pistol: 1, oil_lamp: 1 }

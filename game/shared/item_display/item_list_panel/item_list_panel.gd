@@ -1,13 +1,13 @@
 # item_list_panel.gd
-# Reusable header + scrollable rows panel for displaying a list of ItemEntries.
+# Reusable header + scrollable rows panel for displaying lot objects.
 # Consumers choose which columns to show via the columns array passed to setup().
 # Header buttons are built at runtime (count depends on columns) and support
 # click-to-sort with an ascending/descending toggle per column.
 class_name ItemListPanel
 extends PanelContainer
 
-signal row_pressed(entry: ItemEntry)
-signal tooltip_requested(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2)
+signal row_pressed(entry)
+signal tooltip_requested(entry, ctx: ItemViewContext, anchor: Rect2)
 signal tooltip_dismissed
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -20,7 +20,7 @@ var _ctx: ItemViewContext = null
 var _columns: Array = [] # Array of ItemRow.Column
 var _sort_column: ItemRow.Column = ItemRow.Column.NAME
 var _sort_ascending: bool = true
-var _rows: Dictionary = { } # ItemEntry → ItemRow
+var _rows: Dictionary = { } # lot object -> ItemRow
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -48,7 +48,7 @@ func setup(
 func populate(entries: Array) -> void:
     clear()
 
-    for entry: ItemEntry in entries:
+    for entry in entries:
         var row: ItemRow = ItemRowScene.instantiate()
         row.setup(entry, _ctx, _columns)
         row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -63,7 +63,7 @@ func populate(entries: Array) -> void:
     apply_sort()
 
 
-func get_row(entry: ItemEntry) -> ItemRow:
+func get_row(entry) -> ItemRow:
     return _rows.get(entry, null)
 
 
@@ -77,7 +77,7 @@ func clear() -> void:
     _rows.clear()
 
 
-func refresh_row(entry: ItemEntry) -> void:
+func refresh_row(entry) -> void:
     if _rows.has(entry):
         _rows[entry].refresh()
 
@@ -99,7 +99,7 @@ func apply_sort() -> void:
     var ascending: bool = _sort_ascending
 
     entries.sort_custom(
-        func(a: ItemEntry, b: ItemEntry) -> bool:
+        func(a, b) -> bool:
             var va: Variant = get_sort_value(a, col, ctx)
             var vb: Variant = get_sort_value(b, col, ctx)
             if ascending:
@@ -112,52 +112,11 @@ func apply_sort() -> void:
         _row_container.move_child(row, i)
 
 
-static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewContext) -> Variant:
-    match col:
-        ItemRow.Column.NAME:
-            return entry.display_name
-        ItemRow.Column.CONDITION:
-            if entry.is_veiled() or entry.get_condition_bucket() == 0:
-                return 0.0
-            return entry.get_known_condition_multiplier()
-        ItemRow.Column.ESTIMATED_VALUE:
-            return entry.estimated_value_sort_value()
-        ItemRow.Column.BASE_VALUE:
-            return entry.base_value_sort_value()
-        ItemRow.Column.MERCHANT_OFFER:
-            return entry.merchant_offer_value(ctx.merchant)
-        ItemRow.Column.SPECIAL_ORDER:
-            return entry.special_order_value(ctx.order)
-        ItemRow.Column.RARITY:
-            return entry.perceived_rarity
-        ItemRow.Column.WEIGHT:
-            if entry.item_data == null or entry.item_data.category_data == null:
-                return 0.0
-            return entry.item_data.category_data.weight
-        ItemRow.Column.GRID:
-            if entry.item_data == null or entry.item_data.category_data == null:
-                return 0
-            return entry.item_data.category_data.get_cells().size()
-        ItemRow.Column.MARKET_FACTOR:
-            return entry.market_factor_delta
-        ItemRow.Column.RESEARCH_STATUS:
-            for d: Dictionary in SaveManager.research_slots:
-                if int(d.get("item_id", -1)) == entry.id:
-                    if bool(d.get("completed", false)):
-                        return 2
-                    return 1
-            return 0
-        ItemRow.Column.INSPECTION:
-            return entry.price_convergence_ratio
-        ItemRow.Column.UNLOCK:
-            if entry.is_at_final_layer():
-                return 1.0
-            if entry.current_unlock_action() == null:
-                return 0
-            return entry.unlock_ratio
-        _:
-            push_warning("Unknown Column: %d" % col)
-            return 0
+static func get_sort_value(entry, col: ItemRow.Column, ctx: ItemViewContext) -> Variant:
+    var lot_object := entry as LotObjectEntry
+    if lot_object == null:
+        return 0
+    return lot_object.sort_value(col, ctx)
 
 # ══ Header ════════════════════════════════════════════════════════════════════
 
@@ -210,12 +169,12 @@ func _on_header_pressed(column: ItemRow.Column) -> void:
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
-func _on_row_pressed(entry: ItemEntry) -> void:
+func _on_row_pressed(entry) -> void:
     row_pressed.emit(entry)
 
 
 func _on_row_tooltip_requested(
-        entry: ItemEntry,
+        entry,
         ctx: ItemViewContext,
         anchor: Rect2,
 ) -> void:

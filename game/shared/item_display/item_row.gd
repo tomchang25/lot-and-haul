@@ -6,9 +6,9 @@
 class_name ItemRow
 extends PanelContainer
 
-signal tooltip_requested(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2)
+signal tooltip_requested(entry, ctx: ItemViewContext, anchor: Rect2)
 signal tooltip_dismissed
-signal row_pressed(entry: ItemEntry)
+signal row_pressed(entry)
 
 # ── Enums ─────────────────────────────────────────────────────────────────────
 
@@ -72,7 +72,7 @@ const COLUMN_MIN_WIDTH: Dictionary = {
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _entry: ItemEntry = null
+var _entry: LotObjectEntry = null
 var _ctx: ItemViewContext = null
 var _columns: Array = []
 var _selection_state: SelectionState = SelectionState.NONE
@@ -106,7 +106,7 @@ func _ready() -> void:
 # ══ Common API ════════════════════════════════════════════════════════════════
 
 
-func setup(entry: ItemEntry, ctx: ItemViewContext, columns: Array = []) -> void:
+func setup(entry, ctx: ItemViewContext, columns: Array = []) -> void:
     _entry = entry
     _ctx = ctx
     _columns = columns
@@ -198,82 +198,46 @@ func _refresh() -> void:
     _apply_column_order()
 
     # ── NAME ──────────────────────────────────────────────────────────────────
-    _name_label.text = _entry.display_name
+    _name_label.text = _entry.display_name_text()
 
     # ── CONDITION ─────────────────────────────────────────────────────────────
-    _condition_label.text = _entry.condition_label
-    _condition_label.modulate = _entry.condition_color
+    _condition_label.text = _entry.condition_text()
+    _condition_label.modulate = _entry.condition_display_color()
 
     # ── ESTIMATED_VALUE ────────────────────────────────────────────────────────
-    _estimated_value_label.text = _entry.estimated_value_label
-    _estimated_value_label.add_theme_color_override(&"font_color", _entry.price_color)
+    _estimated_value_label.text = _entry.estimated_value_text(_ctx)
+    _estimated_value_label.add_theme_color_override(&"font_color", _entry.price_display_color())
 
     # ── BASE_VALUE ─────────────────────────────────────────────────────────────
-    _base_value_label.text = _entry.base_value_label_text()
-    _base_value_label.add_theme_color_override(&"font_color", _entry.price_color)
+    _base_value_label.text = _entry.base_value_text()
+    _base_value_label.add_theme_color_override(&"font_color", _entry.price_display_color())
 
     # ── MERCHANT_OFFER ─────────────────────────────────────────────────────────
-    _merchant_offer_label.text = _entry.merchant_offer_label(_ctx.merchant)
-    _merchant_offer_label.add_theme_color_override(&"font_color", _entry.price_color)
+    _merchant_offer_label.text = _entry.merchant_offer_text(_ctx.merchant)
+    _merchant_offer_label.add_theme_color_override(&"font_color", _entry.price_display_color())
 
     # ── SPECIAL_ORDER ──────────────────────────────────────────────────────────
-    _special_order_label.text = _entry.special_order_label(_ctx.order)
-    _special_order_label.add_theme_color_override(&"font_color", _entry.price_color)
+    _special_order_label.text = _entry.special_order_text(_ctx.order)
+    _special_order_label.add_theme_color_override(&"font_color", _entry.price_display_color())
 
     # ── RARITY ────────────────────────────────────────────────────────────────
-    _rarity_label.text = "???" if _entry.is_veiled() else _entry.perceived_rarity_label
+    _rarity_label.text = _entry.rarity_text()
 
     # ── WEIGHT / GRID ─────────────────────────────────────────────────────────
-    if _entry.item_data != null and _entry.item_data.category_data != null:
-        var category: CategoryData = _entry.item_data.category_data
-        _weight_label.text = "%.1f kg" % category.weight
-        _grid_label.text = "%d  %s" % [category.get_cells().size(), category.shape_id]
+    _weight_label.text = _entry.weight_text()
+    _grid_label.text = _entry.grid_text()
 
     # ── MARKET FACTOR ─────────────────────────────────────────────────────────
-    _market_factor_label.text = "%+d%%" % int(round(_entry.market_factor_delta * 100))
+    _market_factor_label.text = _entry.market_factor_text()
 
     # ── RESEARCH STATUS ───────────────────────────────────────────────────────
-    _research_status_label.text = _research_status_text()
+    _research_status_label.text = _entry.research_status_text()
 
     # ── INSPECTION ────────────────────────────────────────────────────────────
-    _inspection_label.text = "???" if _entry.is_veiled() else "%d%%" % int(_entry.price_convergence_ratio * 100)
+    _inspection_label.text = _entry.inspection_text()
 
     # ── UNLOCK ────────────────────────────────────────────────────────────────
-    _unlock_label.text = _unlock_display_text()
-
-# ══ Research status lookup ════════════════════════════════════════════════════
-
-
-func _research_status_text() -> String:
-    if _entry == null or _entry.id == -1:
-        return ""
-    for d: Dictionary in SaveManager.research_slots:
-        var slot_item_id: int = int(d.get("item_id", -1))
-        if slot_item_id == -1 or slot_item_id != _entry.id:
-            continue
-        if bool(d.get("completed", false)):
-            return "✓"
-        var action_string: String = String(d.get("action", ""))
-        match action_string:
-            "study":
-                return "S"
-            "repair":
-                return "R"
-            "unlock":
-                return "U"
-            _:
-                return "?"
-    return ""
-
-
-func _unlock_display_text() -> String:
-    if _entry.is_at_final_layer():
-        return "✓"
-    if _entry.current_unlock_action() == null:
-        return "-"
-    if _entry.unlock_progress == 0.0:
-        return " "
-    return "%d%%" % int(_entry.unlock_ratio * 100)
+    _unlock_label.text = _entry.unlock_text()
 
 # ══ Column ordering ═══════════════════════════════════════════════════════════
 

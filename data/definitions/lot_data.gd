@@ -64,6 +64,15 @@ extends Resource
 # Example: { "bicycle": 1, "handbag": 1, "oil_lamp": 1, "painting": 1 }
 @export var category_weights: Dictionary = { }
 
+# Number of commodities drawn for this lot. These are fixed-market-value filler
+# goods that auto-sell after Reveal and never enter Cargo or Storage.
+@export var commodity_count_min: int = 0
+@export var commodity_count_max: int = 0
+
+# Weighted commodity table.
+# Key: commodity_id (String), Value: weight (int).
+@export var commodity_weights: Dictionary = { }
+
 # ── Price estimation ──────────────────────────────────────────────────────────
 # Multiplier bounds applied to npc_estimate when rolling the final price.
 # rolled_price is clamped to [npc_estimate * price_floor, npc_estimate * price_ceiling].
