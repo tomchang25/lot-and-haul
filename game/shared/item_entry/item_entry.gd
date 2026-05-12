@@ -1,7 +1,7 @@
 # item_entry.gd
 # Runtime context for one item within a single warehouse run.
 class_name ItemEntry
-extends RefCounted
+extends LotObjectEntry
 
 # ── Inspection constants ─────────────────────────────────────────────────────
 
@@ -593,6 +593,195 @@ func special_order_label(order: SpecialOrder) -> String:
 
 func special_order_value(order: SpecialOrder) -> int:
     return order.compute_item_price(self) if order else 0
+
+# ── LotObjectEntry display API ───────────────────────────────────────────────
+
+
+func is_known() -> bool:
+    return not is_veiled()
+
+
+func display_name_text() -> String:
+    return display_name
+
+
+func condition_text() -> String:
+    var text := condition_label
+    return LotObjectEntry.UNKNOWN_TEXT if text == "" else text
+
+
+func condition_detail_text() -> String:
+    var text := condition_text()
+    if text == LotObjectEntry.UNKNOWN_TEXT:
+        return ""
+    return "Condition:  %s (%s)" % [text, condition_mult_label]
+
+
+func condition_secondary_text() -> String:
+    return "" if condition_text() == LotObjectEntry.UNKNOWN_TEXT else condition_mult_label
+
+
+func estimated_value_text(ctx: ItemViewContext) -> String:
+    return price_label_for(ctx)
+
+
+func base_value_text() -> String:
+    return base_value_label_text()
+
+
+func merchant_offer_text(merchant: MerchantData) -> String:
+    return merchant_offer_label(merchant)
+
+
+func special_order_text(order: SpecialOrder) -> String:
+    return special_order_label(order)
+
+
+func rarity_text() -> String:
+    return LotObjectEntry.UNKNOWN_TEXT if is_veiled() else perceived_rarity_label
+
+
+func weight_text() -> String:
+    var category := category_data()
+    if is_veiled() or category == null:
+        return LotObjectEntry.UNKNOWN_TEXT
+    return "%.1f kg" % category.weight
+
+
+func grid_text() -> String:
+    var category := category_data()
+    if is_veiled() or category == null:
+        return LotObjectEntry.UNKNOWN_TEXT
+    return "%d  %s" % [category.get_cells().size(), category.shape_id]
+
+
+func market_factor_text() -> String:
+    return LotObjectEntry.UNKNOWN_TEXT if is_veiled() else "%+d%%" % int(round(market_factor_delta * 100))
+
+
+func research_status_text() -> String:
+    if id == -1:
+        return ""
+    for d: Dictionary in SaveManager.research_slots:
+        var slot_item_id: int = int(d.get("item_id", -1))
+        if slot_item_id == -1 or slot_item_id != id:
+            continue
+        if bool(d.get("completed", false)):
+            return "✓"
+        var action_string: String = String(d.get("action", ""))
+        match action_string:
+            "study":
+                return "S"
+            "repair":
+                return "R"
+            "unlock":
+                return "U"
+            _:
+                return "?"
+    return ""
+
+
+func inspection_text() -> String:
+    return LotObjectEntry.UNKNOWN_TEXT if is_veiled() else "%d%%" % int(price_convergence_ratio * 100)
+
+
+func unlock_text() -> String:
+    if is_veiled():
+        return LotObjectEntry.UNKNOWN_TEXT
+    if is_at_final_layer():
+        return "✓"
+    if current_unlock_action() == null:
+        return "-"
+    if unlock_progress == 0.0:
+        return " "
+    return "%d%%" % int(unlock_ratio * 100)
+
+
+func price_display_color() -> Color:
+    return price_color
+
+
+func condition_display_color() -> Color:
+    return condition_color
+
+
+func category_data() -> CategoryData:
+    return item_data.category_data if item_data != null else null
+
+
+func can_inspect() -> bool:
+    return is_veiled() or is_condition_inspectable()
+
+
+func can_appraise() -> bool:
+    return not is_veiled() and intuition_level < max_intuition_level
+
+
+func perform_inspect() -> StringName:
+    if is_veiled():
+        unveil()
+        KnowledgeManager.add_category_points(
+            item_data.category_data,
+            item_data.rarity,
+            KnowledgeManager.KnowledgeAction.REVEAL,
+        )
+        return &"unveil"
+    advance_scrutiny()
+    return &"condition"
+
+
+func perform_appraise() -> bool:
+    var success_chance: float = 0.20 / (intuition_level + 1)
+    if randf() >= success_chance:
+        return false
+    intuition_level += 1
+    return true
+
+
+func sort_value(column: int, ctx: ItemViewContext) -> Variant:
+    match column:
+        LotObjectEntry.COLUMN_NAME:
+            return display_name
+        LotObjectEntry.COLUMN_CONDITION:
+            if is_veiled() or get_condition_bucket() == 0:
+                return 0.0
+            return get_known_condition_multiplier()
+        LotObjectEntry.COLUMN_ESTIMATED_VALUE:
+            return estimated_value_sort_value()
+        LotObjectEntry.COLUMN_BASE_VALUE:
+            return base_value_sort_value()
+        LotObjectEntry.COLUMN_MERCHANT_OFFER:
+            return merchant_offer_value(ctx.merchant)
+        LotObjectEntry.COLUMN_SPECIAL_ORDER:
+            return special_order_value(ctx.order)
+        LotObjectEntry.COLUMN_RARITY:
+            return perceived_rarity
+        LotObjectEntry.COLUMN_WEIGHT:
+            var weight_category := category_data()
+            return weight_category.weight if weight_category != null else 0.0
+        LotObjectEntry.COLUMN_GRID:
+            var grid_category := category_data()
+            return grid_category.get_cells().size() if grid_category != null else 0
+        LotObjectEntry.COLUMN_MARKET_FACTOR:
+            return market_factor_delta
+        LotObjectEntry.COLUMN_RESEARCH_STATUS:
+            for d: Dictionary in SaveManager.research_slots:
+                if int(d.get("item_id", -1)) == id:
+                    if bool(d.get("completed", false)):
+                        return 2
+                    return 1
+            return 0
+        LotObjectEntry.COLUMN_INSPECTION:
+            return price_convergence_ratio
+        LotObjectEntry.COLUMN_UNLOCK:
+            if is_at_final_layer():
+                return 1.0
+            if current_unlock_action() == null:
+                return 0
+            return unlock_ratio
+        _:
+            push_warning("Unknown Column: %d" % column)
+            return 0
 
 
 # Returns the layer currently visible to the player.

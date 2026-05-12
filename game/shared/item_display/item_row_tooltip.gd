@@ -18,37 +18,44 @@ extends PanelContainer
 @onready var _grid_label: Label = $VBox/GridLabel
 
 
-func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
+func show_for(entry, ctx: ItemViewContext, anchor: Rect2) -> void:
+    var lot_object := entry as LotObjectEntry
+    if lot_object == null:
+        return
+    _show_for_lot_object(lot_object, ctx, anchor)
+
+
+func _show_for_lot_object(entry: LotObjectEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
     # ── Display name (at the top) ────────────────────────────────────────────
-    _display_name_label.text = entry.display_name
+    _display_name_label.text = entry.display_name_text()
     _display_name_label.show()
 
     # ── Always-visible: category identity ────────────────────────────────────
-    if entry.item_data != null and entry.item_data.category_data != null:
-        var cat := entry.item_data.category_data
-        _super_category_label.text = cat.super_category.display_name \
-        if cat.super_category != null else ""
-        _super_category_label.visible = cat.super_category != null
-        _category_label.text = cat.display_name
+    var super_category := entry.super_category_text()
+    var category := entry.category_text()
+    if entry.is_known() and category != "":
+        _super_category_label.text = super_category
+        _super_category_label.visible = super_category != ""
+        _category_label.text = category
         _category_label.visible = true
     else:
         _super_category_label.hide()
         _category_label.hide()
 
     # ── Conditional: condition detail ────────────────────────────────────────
-    var cond_text := entry.condition_label
-    if cond_text != "???":
-        _condition_label.text = "Condition:  %s (%s)" % [cond_text, entry.condition_mult_label]
-        _condition_label.modulate = entry.condition_color
+    var cond_text := entry.condition_detail_text()
+    if cond_text != "":
+        _condition_label.text = cond_text
+        _condition_label.modulate = entry.condition_display_color()
         _condition_label.show()
     else:
         _condition_label.hide()
 
     # ── Conditional: price ───────────────────────────────────────────────────
-    var price_text := entry.price_label_for(ctx)
-    if price_text != "???":
+    var price_text := entry.estimated_value_text(ctx)
+    if price_text != LotObjectEntry.UNKNOWN_TEXT:
         _price_label.text = "%s: %s" % [ItemRow.get_price_header(ctx), price_text]
-        _price_label.add_theme_color_override(&"font_color", entry.price_color)
+        _price_label.add_theme_color_override(&"font_color", entry.price_display_color())
         _price_label.show()
     else:
         _price_label.hide()
@@ -58,15 +65,11 @@ func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
 
     _cargo_separator.visible = has_inspect_data # only show divider when above rows exist
 
-    if entry.item_data != null and entry.item_data.category_data != null:
-        var cat := entry.item_data.category_data
-        var cell_count: int = cat.get_cells().size()
-        _weight_label.text = "Weight:  %.1f kg" % cat.weight
-        _grid_label.text = "Grid:  %d slot%s  (%s)" % [
-            cell_count,
-            "s" if cell_count != 1 else "",
-            cat.shape_id,
-        ]
+    var weight := entry.weight_text()
+    var grid := entry.grid_text()
+    if entry.is_known() and weight != LotObjectEntry.UNKNOWN_TEXT and grid != LotObjectEntry.UNKNOWN_TEXT:
+        _weight_label.text = "Weight:  %s" % weight
+        _grid_label.text = "Grid:  %s" % grid
         _weight_label.show()
         _grid_label.show()
     else:

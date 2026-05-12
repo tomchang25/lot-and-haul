@@ -5,7 +5,7 @@ extends PanelContainer
 
 signal clicked(card: ItemCard)
 
-var _entry: ItemEntry = null
+var _entry: LotObjectEntry = null
 var _ctx: ItemViewContext = null
 var _is_selected: bool = false
 var _has_intuition_mark: bool = false
@@ -25,7 +25,7 @@ func _ready() -> void:
     _apply()
 
 
-func setup(entry: ItemEntry, ctx: ItemViewContext) -> void:
+func setup(entry, ctx: ItemViewContext) -> void:
     _entry = entry
     _ctx = ctx
 
@@ -42,18 +42,23 @@ func refresh(changed: StringName = &"") -> void:
             _animate_pop(_condition_label)
         &"unveil":
             _animate_pop(_name_label)
+        &"commodity":
+            _animate_pop(_name_label)
 
 
 func _apply() -> void:
-    _name_label.text = _entry.display_name
+    if _entry == null:
+        return
 
-    if _entry.is_veiled():
-        _apply_veiled()
+    _name_label.text = _entry.display_name_text()
+
+    if not _entry.is_known():
+        _apply_unknown()
     else:
-        _apply_unveiled()
+        _apply_known()
 
 
-func _apply_veiled() -> void:
+func _apply_unknown() -> void:
     # Uninspected rows must not depend on legacy layer-0 veil data.
     _super_category_label.hide()
     _category_label.hide()
@@ -64,49 +69,54 @@ func _apply_veiled() -> void:
     _grid_label.hide()
 
     _price_label.text = "???"
-    _price_label.add_theme_color_override(&"font_color", _entry.price_color)
+    _price_label.add_theme_color_override(&"font_color", _entry.price_display_color())
     _price_label.show()
 
 
-func _apply_unveiled() -> void:
-    if _entry.item_data != null and _entry.item_data.category_data != null:
-        var cat := _entry.item_data.category_data
-        if cat.super_category != null:
-            _super_category_label.text = cat.super_category.display_name
-            _super_category_label.show()
-        else:
-            _super_category_label.hide()
-        _category_label.text = cat.display_name
-        _category_label.show()
+func _apply_known() -> void:
+    var super_category := _entry.super_category_text()
+    if super_category != "":
+        _super_category_label.text = super_category
+        _super_category_label.show()
     else:
         _super_category_label.hide()
+
+    var category := _entry.category_text()
+    if category != "":
+        _category_label.text = category
+        _category_label.show()
+    else:
         _category_label.hide()
 
-    _potential_label.text = _entry.perceived_rarity_label
+    _potential_label.text = _entry.rarity_text()
     _potential_label.show()
 
-    _condition_label.text = _entry.condition_label
-    _condition_label.modulate = _entry.condition_color
+    _condition_label.text = _entry.condition_text()
+    _condition_label.modulate = _entry.condition_display_color()
     _condition_label.show()
-    _condition_mult_label.text = _entry.condition_mult_label
-    _condition_mult_label.show()
-    _price_label.text = _entry.price_label_for(_ctx)
-    _price_label.add_theme_color_override(&"font_color", _entry.price_color)
+
+    var condition_secondary := _entry.condition_secondary_text()
+    if condition_secondary != "":
+        _condition_mult_label.text = condition_secondary
+        _condition_mult_label.show()
+    else:
+        _condition_mult_label.hide()
+
+    _price_label.text = _entry.estimated_value_text(_ctx)
+    _price_label.add_theme_color_override(&"font_color", _entry.price_display_color())
     _price_label.show()
 
-    if _entry.item_data != null and _entry.item_data.category_data != null:
-        var cat := _entry.item_data.category_data
-        var cell_count: int = cat.get_cells().size()
-        _weight_label.text = "%.1f kg" % cat.weight
-        _grid_label.text = "%d slot%s  (%s)" % [
-            cell_count,
-            "s" if cell_count != 1 else "",
-            cat.shape_id,
-        ]
+    var weight := _entry.weight_text()
+    var grid := _entry.grid_text()
+    if weight != LotObjectEntry.UNKNOWN_TEXT:
+        _weight_label.text = weight
         _weight_label.show()
-        _grid_label.show()
     else:
         _weight_label.hide()
+    if grid != LotObjectEntry.UNKNOWN_TEXT:
+        _grid_label.text = grid
+        _grid_label.show()
+    else:
         _grid_label.hide()
 
 

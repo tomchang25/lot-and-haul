@@ -10,12 +10,22 @@ var lot_entry: LotEntry # null until set_lot() is called
 var lot_items: Array[ItemEntry]:
     get:
         return lot_entry.item_entries if lot_entry else []
+var lot_commodities: Array[CommodityEntry]:
+    get:
+        return lot_entry.commodity_entries if lot_entry else []
+var lot_objects: Array[LotObjectEntry]:
+    get:
+        return lot_entry.lot_objects if lot_entry else []
 var won_items: Array[ItemEntry] = []
+var won_commodities: Array[CommodityEntry] = []
 var cargo_items: Array[ItemEntry] = []
 var trailer_items: Array[ItemEntry] = []
 var last_lot_won_items: Array[ItemEntry] = []
+var last_lot_won_commodities: Array[CommodityEntry] = []
+var last_lot_won_objects: Array[LotObjectEntry] = []
 
 var onsite_proceeds: int = 0
+var commodity_sales: int = 0
 var paid_price: int = 0
 var net: int = 0
 var entry_fee: int = 0
@@ -64,3 +74,5 @@ func set_lot(entry: LotEntry) -> void:
     lot_entry = entry
     actions_remaining = entry.lot_data.action_quota
     last_lot_won_items.clear()
+    last_lot_won_commodities.clear()
+    last_lot_won_objects.clear()

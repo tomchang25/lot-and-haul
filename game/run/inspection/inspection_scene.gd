@@ -1,7 +1,7 @@
 # inspection_scene.gd
 # Block 02 — Inspection phase; player spends stamina to inspect items and advance identity layers.
-# Reads:  GameManager.item_entries
-# Writes: ItemEntry.inspected, ItemEntry.scrutiny
+# Reads:  RunManager.run_record.lot_objects
+# Writes: LotObjectEntry inspection state
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -19,13 +19,13 @@ const ItemCardScene := preload("uid://bw23cjkf40y5r")
 
 var _item_displays: Array[ItemCard] = []
 
-# Maps each ItemEntry to its corresponding ItemCard for reverse lookup.
+# Maps each lot object to its corresponding ItemCard for reverse lookup.
 var _card_for_entry: Dictionary = { }
 var _entry_for_card: Dictionary = { }
 
 var _ctx: ItemViewContext = null
 
-var _selected_entry: ItemEntry = null
+var _selected_entry = null
 var _selected_card: ItemCard = null
 
 # ── Timer / tween handles ─────────────────────────────────────────────────────
@@ -68,9 +68,10 @@ func _ready() -> void:
 
 
 func _on_inspect_requested() -> void:
-    if _selected_entry == null:
+    var selected_object := _selected_entry as LotObjectEntry
+    if selected_object == null:
         return
-    if not _selected_entry.is_veiled() and not _selected_entry.is_condition_inspectable():
+    if not selected_object.can_inspect():
         return
     if RunManager.run_record.stamina < LotActionBar.INSPECT_COST:
         return
@@ -80,19 +81,8 @@ func _on_inspect_requested() -> void:
     RunManager.run_record.stamina -= LotActionBar.INSPECT_COST
     RunManager.run_record.actions_remaining -= 1
 
-    var changed := &"condition"
-    if _selected_entry.is_veiled():
-        _selected_entry.unveil()
-        KnowledgeManager.add_category_points(
-            _selected_entry.item_data.category_data,
-            _selected_entry.item_data.rarity,
-            KnowledgeManager.KnowledgeAction.REVEAL,
-        )
-        changed = &"unveil"
-    else:
-        _selected_entry.advance_scrutiny()
-
-    var card: ItemCard = _card_for_entry[_selected_entry]
+    var changed := selected_object.perform_inspect()
+    var card: ItemCard = _card_for_entry[selected_object]
     card.refresh(changed)
     card.flash_border()
 
@@ -102,11 +92,10 @@ func _on_inspect_requested() -> void:
 
 
 func _on_appraise_requested() -> void:
-    if _selected_entry == null:
+    var selected_object := _selected_entry as LotObjectEntry
+    if selected_object == null:
         return
-    if _selected_entry.is_veiled():
-        return
-    if _selected_entry.intuition_level >= _selected_entry.max_intuition_level:
+    if not selected_object.can_appraise():
         return
     if RunManager.run_record.stamina < LotActionBar.APPRAISE_COST:
         return
@@ -116,11 +105,8 @@ func _on_appraise_requested() -> void:
     RunManager.run_record.stamina -= LotActionBar.APPRAISE_COST
     RunManager.run_record.actions_remaining -= 1
 
-    var base_chance: float = 0.20
-    var success_chance: float = base_chance / (_selected_entry.intuition_level + 1)
-    if randf() < success_chance:
-        _selected_entry.intuition_level += 1
-        var card: ItemCard = _card_for_entry[_selected_entry]
+    if selected_object.perform_appraise():
+        var card: ItemCard = _card_for_entry[selected_object]
         card.refresh(&"potential")
         card.flash_border()
 
@@ -159,10 +145,7 @@ func _populate_item_displays() -> void:
     for child in _items_grid.get_children():
         child.queue_free()
 
-    var item_entries: Array[ItemEntry] = RunManager.run_record.lot_items
-    for i: int in item_entries.size():
-        var entry: ItemEntry = item_entries[i]
-
+    for entry in RunManager.run_record.lot_objects:
         var display: ItemCard = ItemCardScene.instantiate()
         display.custom_minimum_size = ITEM_SIZE
         display.setup(entry, _ctx)
@@ -180,7 +163,7 @@ func _on_card_clicked(card: ItemCard) -> void:
     if _selected_card != null:
         _selected_card.set_selected(false)
     _selected_card = card
-    _selected_entry = _entry_for_card.get(card) as ItemEntry
+    _selected_entry = _entry_for_card.get(card)
     _selected_card.set_selected(true)
     _refresh_action_bar()
 
