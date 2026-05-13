@@ -35,7 +35,7 @@ lots:
     price_ceiling_factor: 1.3
     price_variance_min: 0.9
     price_variance_max: 1.1
-    action_quota: 6
+    action_quota: 15
 
   - lot_id: beginner_mixed_b
     aggressive_factor_min: 0.25
@@ -57,7 +57,7 @@ lots:
     price_ceiling_factor: 1.3
     price_variance_min: 0.9
     price_variance_max: 1.1
-    action_quota: 6
+    action_quota: 15
 
   - lot_id: beginner_mixed_c
     aggressive_factor_min: 0.2
@@ -79,7 +79,7 @@ lots:
     price_ceiling_factor: 1.25
     price_variance_min: 0.9
     price_variance_max: 1.1
-    action_quota: 5
+    action_quota: 15
 
   # ── Intermediate lots — higher aggression, better loot ─────
   - lot_id: midtown_weapons
@@ -102,7 +102,7 @@ lots:
     price_ceiling_factor: 1.4
     price_variance_min: 0.85
     price_variance_max: 1.15
-    action_quota: 7
+    action_quota: 15
 
   - lot_id: midtown_decor
     aggressive_factor_min: 0.3
@@ -124,7 +124,7 @@ lots:
     price_ceiling_factor: 1.4
     price_variance_min: 0.85
     price_variance_max: 1.15
-    action_quota: 7
+    action_quota: 15
 
   - lot_id: midtown_mixed
     aggressive_factor_min: 0.35
@@ -146,7 +146,7 @@ lots:
     price_ceiling_factor: 1.4
     price_variance_min: 0.85
     price_variance_max: 1.15
-    action_quota: 7
+    action_quota: 15
 
 locations:
   # ── Starter location — cheap, short trip, forgiving lots ───

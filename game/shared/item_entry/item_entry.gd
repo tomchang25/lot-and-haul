@@ -415,13 +415,32 @@ var estimated_value_min: int:
     get:
         if is_veiled():
             return 0
-        return compute_price_range(ItemRegistry.price_config_with_estimated)[0]
+        var layer := active_layer()
+        if layer == null:
+            return 0
+        var spread: float = 0.5 * (1.0 - inspection_level)
+        var offset: float = center_offset * (1.0 - inspection_level)
+        var mult: float = 1.0 - spread + offset
+        return maxi(1, int(layer.base_value * mult))
 
 var estimated_value_max: int:
     get:
         if is_veiled():
             return 0
-        return compute_price_range(ItemRegistry.price_config_with_estimated)[1]
+        var layer := active_layer()
+        if layer == null:
+            return 0
+        var spread: float = 0.0
+        var offset: float = center_offset * (1.0 - inspection_level)
+        var base_value: int = layer.base_value
+        if not is_at_final_layer() and item_data != null:
+            var next_layer: IdentityLayer = item_data.identity_layers[_safe_layer_index() + 1]
+            base_value = next_layer.base_value
+            spread = 0.5 * (1.0 - inspection_level)
+        else:
+            spread = 0.3 * (1.0 - inspection_level)
+        var mult: float = 1.0 + spread + offset
+        return maxi(1, int(base_value * mult))
 
 var estimated_value_label: String:
     get:
@@ -430,7 +449,7 @@ var estimated_value_label: String:
         var suffix: String = "" if is_at_final_layer() else "+"
         var lo: int = estimated_value_min
         var hi: int = estimated_value_max
-        if lo == hi:
+        if hi <= lo:
             return "$%d%s" % [lo, suffix]
         return "$%d - $%d%s" % [lo, hi, suffix]
 
@@ -461,22 +480,21 @@ func compute_price(config: PriceConfig) -> int:
     value *= config.multiplier
     return int(value)
 
-
-# Returns the estimated price range as [min, max] for the given config. The
-# midpoint is compute_price(config); the spread widens with lower
-# inspection_level and is biased by center_offset so identical items diverge
-# until inspected. Both ends are clamped to a minimum of 1 so the UI never
-# shows $0 or a negative price.
-func compute_price_range(config: PriceConfig) -> Array[int]:
-    var base: float = float(compute_price(config))
-    var spread: float = _max_spread() * (1.0 - inspection_level)
-    var offset: float = center_offset * (1.0 - inspection_level)
-    var range_min: float = 1.0 - spread + offset
-    var range_max: float = 1.0 + spread + offset
-    var result: Array[int] = []
-    result.append(maxi(1, int(base * range_min)))
-    result.append(maxi(1, int(base * range_max)))
-    return result
+# # Returns the estimated price range as [min, max] for the given config. The
+# # midpoint is compute_price(config); the spread widens with lower
+# # inspection_level and is biased by center_offset so identical items diverge
+# # until inspected. Both ends are clamped to a minimum of 1 so the UI never
+# # shows $0 or a negative price.
+# func compute_price_range(config: PriceConfig) -> Array[int]:
+#     var base: float = float(compute_price(config))
+#     var spread: float = _max_spread() * (1.0 - inspection_level)
+#     var offset: float = center_offset * (1.0 - inspection_level)
+#     var range_min: float = 1.0 - spread + offset
+#     var range_max: float = 1.0 + spread + offset
+#     var result: Array[int] = []
+#     result.append(maxi(1, int(base * range_min)))
+#     result.append(maxi(1, int(base * range_max)))
+#     return result
 
 
 func _max_spread() -> float:
@@ -715,6 +733,10 @@ func can_inspect() -> bool:
 
 func can_appraise() -> bool:
     return not is_veiled() and intuition_level < max_intuition_level
+
+
+func can_advance() -> bool:
+    return not is_veiled() and not is_at_final_layer()
 
 
 func perform_inspect() -> StringName:

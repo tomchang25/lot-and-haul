@@ -85,4 +85,4 @@ extends Resource
 @export var price_variance_max: float = 1.15
 
 # ── Action limits ─────────────────────────────────────────────────────────────
-@export var action_quota: int = 6 # per-lot action limit
+@export var action_quota: int = 15 # per-lot action limit

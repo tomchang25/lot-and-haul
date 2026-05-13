@@ -7,6 +7,7 @@ extends Control
 
 signal auction_entered
 signal back_requested
+signal back_to_inspection_requested
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -29,11 +30,13 @@ var _tooltip: ItemRowTooltip = null
 @onready var _item_list_panel: ItemListPanel = $Panel/VBox/ItemListPanel
 @onready var _total_label: Label = $Panel/VBox/TotalEstimateLabel
 @onready var _opening_bid_label: Label = $Panel/VBox/OpeningBidLabel
+@onready var _back_to_inspection_button: Button = $Panel/VBox/Buttons/BackToInspectionButton
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
 func _ready() -> void:
+    _back_to_inspection_button.pressed.connect(_on_back_to_inspection_pressed)
     $Panel/VBox/Buttons/BackButton.pressed.connect(_on_back_pressed)
     $Panel/VBox/Buttons/EnterAuctionButton.pressed.connect(_on_enter_auction_pressed)
 
@@ -74,7 +77,7 @@ func populate() -> void:
     total_max += known_commodity_sales
 
     var total_text: String
-    if total_min == total_max:
+    if total_max <= total_min:
         total_text = "Total Est: $%d" % total_min
     else:
         total_text = "Total Est: $%d – $%d" % [total_min, total_max]
@@ -83,12 +86,21 @@ func populate() -> void:
     _total_label.text = total_text
 
     _opening_bid_label.text = "Opening Bid:   $%d" % lot.get_opening_bid()
+    set_back_enabled(RunManager.run_record.actions_remaining > 0)
+
+
+func set_back_enabled(enabled: bool) -> void:
+    _back_to_inspection_button.disabled = not enabled
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
 func _on_back_pressed() -> void:
     back_requested.emit()
+
+
+func _on_back_to_inspection_pressed() -> void:
+    back_to_inspection_requested.emit()
 
 
 func _on_enter_auction_pressed() -> void:

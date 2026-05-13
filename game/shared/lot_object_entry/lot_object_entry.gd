@@ -116,6 +116,10 @@ func can_appraise() -> bool:
     return false
 
 
+func can_advance() -> bool:
+    return false
+
+
 func perform_inspect() -> StringName:
     return &""
 

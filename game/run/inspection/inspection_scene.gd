@@ -1,46 +1,56 @@
 # inspection_scene.gd
-# Block 02 — Inspection phase; player spends stamina to inspect items and advance identity layers.
-# Reads:  RunManager.run_record.lot_objects
-# Writes: LotObjectEntry inspection state
+# Block 02 — AP-limited Inspection phase; player searches unknown grid shapes before Auction.
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-const ITEM_COLS := 2
-const ITEM_SIZE := Vector2(200.0, 250.0)
-const ITEM_GAP := Vector2(32.0, 28.0)
+const GRID_COLS := 8
+const GRID_ROWS := 8
+const CELL_SIZE := Vector2(64.0, 64.0)
 
-# Top-left corner of the grid — centred horizontally, leaving room for the HUD row
-const GRID_ORIGIN := Vector2(376.0, 90.0)
+const SEARCH_BASE_SECONDS := 2.0
+const SEARCH_MAX_SECONDS := 5.0
 
-const ItemCardScene := preload("uid://bw23cjkf40y5r")
+const SHAPE_COLORS: Array[Color] = [
+    Color(0.20, 0.28, 0.40, 1.0),
+    Color(0.30, 0.22, 0.38, 1.0),
+    Color(0.22, 0.34, 0.27, 1.0),
+    Color(0.40, 0.27, 0.18, 1.0),
+    Color(0.34, 0.22, 0.24, 1.0),
+    Color(0.20, 0.34, 0.36, 1.0),
+    Color(0.36, 0.33, 0.20, 1.0),
+    Color(0.27, 0.27, 0.40, 1.0),
+]
+
+const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
+
+enum ActionType { SEARCH, ADVANCE }
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _item_displays: Array[ItemCard] = []
-
-# Maps each lot object to its corresponding ItemCard for reverse lookup.
-var _card_for_entry: Dictionary = { }
-var _entry_for_card: Dictionary = { }
-
 var _ctx: ItemViewContext = null
+var _tooltip: ItemRowTooltip = null
 
-var _selected_entry = null
-var _selected_card: ItemCard = null
+var _cell_buttons: Dictionary = { }
+var _cell_entry: Dictionary = { }
+var _entry_cells: Dictionary = { }
+var _entry_origin: Dictionary = { }
+var _entry_color_by_entry: Dictionary = { }
+var _search_duration_by_entry: Dictionary = { }
 
-# ── Timer / tween handles ─────────────────────────────────────────────────────
-
-var _pulse_tween: Tween = null
+var _active_entry: LotObjectEntry = null
+var _active_action_type: int = -1
+var _active_action_cost: int = 0
+var _active_action_remaining: float = 0.0
+var _inspection_finished: bool = false
 
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _items_grid: GridContainer = $HUD/Panel/MarginContainer/ScrollContainer/ItemsGrid
 @onready var _action_bar: LotActionBar = $HUD/LotActionBar
-@onready var _start_btn: Button = $HUD/Footer/StartAuctionButton
-@onready var _pass_btn: Button = $HUD/Footer/PassButton
+@onready var _footer: HBoxContainer = $HUD/Footer
+@onready var _review_button: Button = $HUD/Footer/ReviewButton
 @onready var _list_review: ListReviewPopup = $ListReviewPopup
-@onready var _confirm_popup: AcceptDialog = $ConfirmPopup
-
 @onready var _stamina_hud: StaminaHUD = $StaminaHUD
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
@@ -48,179 +58,433 @@ var _pulse_tween: Tween = null
 
 func _ready() -> void:
     _ctx = ItemViewContext.for_inspection()
+    _tooltip = ItemRowTooltipScene.instantiate()
+    add_child(_tooltip)
 
-    _action_bar.inspect_requested.connect(_on_inspect_requested)
-    _action_bar.appraise_requested.connect(_on_appraise_requested)
-    _start_btn.pressed.connect(_on_start_auction_pressed)
-    _pass_btn.pressed.connect(_on_pass_pressed)
-    _list_review.back_requested.connect(_on_list_review_back)
+    _action_bar.hide()
+    _footer.show()
+    $HUD/Footer/PassButton.hide()
+    $HUD/Footer/StartAuctionButton.hide()
+    _review_button.show()
+    _review_button.pressed.connect(_on_review_pressed)
+
+    _list_review.back_requested.connect(_on_list_review_pass)
+    _list_review.back_to_inspection_requested.connect(_on_back_to_inspection)
     _list_review.auction_entered.connect(_on_auction_entered)
-    _confirm_popup.confirmed.connect(_on_confirm_popup_confirmed)
 
-    _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
-    _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
-
-    _populate_item_displays()
-    _run_intuition()
-    _refresh_action_bar()
-
-# ══ Signal handlers ════════════════════════════════════════════════════════════
+    _build_grid_controls()
+    _place_lot_objects()
+    _refresh_grid_cells()
+    _refresh_hud()
+    set_process(true)
 
 
-func _on_inspect_requested() -> void:
-    var selected_object := _selected_entry as LotObjectEntry
-    if selected_object == null:
+func _process(delta: float) -> void:
+    if _inspection_finished or _active_entry == null:
         return
-    if not selected_object.can_inspect():
+
+    _active_action_remaining -= delta
+    if _active_action_remaining <= 0.0:
+        _complete_active_action()
         return
-    if RunManager.run_record.stamina < LotActionBar.INSPECT_COST:
+
+    _refresh_grid_cells()
+    _refresh_hud()
+
+# ══ Grid setup ════════════════════════════════════════════════════════════════
+
+
+func _build_grid_controls() -> void:
+    for child in _items_grid.get_children():
+        child.queue_free()
+
+    _items_grid.columns = GRID_COLS
+    _items_grid.add_theme_constant_override(&"h_separation", 6)
+    _items_grid.add_theme_constant_override(&"v_separation", 6)
+
+    _cell_buttons.clear()
+    for row in GRID_ROWS:
+        for col in GRID_COLS:
+            var coord := Vector2i(col, row)
+            var button := Button.new()
+            button.custom_minimum_size = CELL_SIZE
+            button.focus_mode = Control.FOCUS_NONE
+            button.text = ""
+            button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+            button.add_theme_font_size_override(&"font_size", 12)
+            button.clip_text = true
+            button.pressed.connect(_on_grid_cell_pressed.bind(coord))
+            button.gui_input.connect(_on_cell_gui_input.bind(coord))
+            button.mouse_entered.connect(_on_grid_cell_mouse_entered.bind(coord))
+            button.mouse_exited.connect(_on_grid_cell_mouse_exited)
+            _items_grid.add_child(button)
+            _cell_buttons[coord] = button
+
+
+func _place_lot_objects() -> void:
+    _cell_entry.clear()
+    _entry_cells.clear()
+    _entry_origin.clear()
+    _entry_color_by_entry.clear()
+    _search_duration_by_entry.clear()
+
+    for entry: LotObjectEntry in RunManager.run_record.lot_objects:
+        _place_entry(entry)
+
+
+func _place_entry(entry: LotObjectEntry) -> void:
+    var shape_cells := _get_shape_cells(entry)
+    var origins := _candidate_origins()
+    origins.shuffle()
+
+    for origin: Vector2i in origins:
+        if _can_place_shape(shape_cells, origin):
+            _commit_shape_placement(entry, shape_cells, origin)
+            return
+
+    push_warning("Inspection grid could not place lot object: %s" % entry.display_name_text())
+
+
+func _candidate_origins() -> Array[Vector2i]:
+    var origins: Array[Vector2i] = []
+    for row in GRID_ROWS:
+        for col in GRID_COLS:
+            origins.append(Vector2i(col, row))
+    return origins
+
+
+func _get_shape_cells(entry: LotObjectEntry) -> Array[Vector2i]:
+    var category := entry.category_data()
+    var fallback: Array[Vector2i] = [Vector2i.ZERO]
+    if category == null:
+        return fallback
+
+    var cells := category.get_cells()
+    if cells.is_empty():
+        return fallback
+    return cells
+
+
+func _can_place_shape(shape_cells: Array[Vector2i], origin: Vector2i) -> bool:
+    for local_cell: Vector2i in shape_cells:
+        var world := origin + local_cell
+        if world.x < 0 or world.x >= GRID_COLS or world.y < 0 or world.y >= GRID_ROWS:
+            return false
+        if _cell_entry.has(world):
+            return false
+    return true
+
+
+func _commit_shape_placement(
+        entry: LotObjectEntry,
+        shape_cells: Array[Vector2i],
+        origin: Vector2i,
+) -> void:
+    var occupied_cells: Array[Vector2i] = []
+    for local_cell: Vector2i in shape_cells:
+        var world := origin + local_cell
+        occupied_cells.append(world)
+        _cell_entry[world] = entry
+
+    _entry_cells[entry] = occupied_cells
+    _entry_origin[entry] = origin
+    _entry_color_by_entry[entry] = SHAPE_COLORS[_entry_color_by_entry.size() % SHAPE_COLORS.size()]
+    _search_duration_by_entry[entry] = _compute_search_duration(occupied_cells.size())
+
+# ══ Search interaction ════════════════════════════════════════════════════════
+
+
+func _on_grid_cell_pressed(coord: Vector2i) -> void:
+    if _inspection_finished:
         return
+    if _active_entry != null:
+        return
+
+    var entry := _cell_entry.get(coord) as LotObjectEntry
+    if entry == null:
+        return
+
+    if not entry.is_known():
+        var cost_seconds := _search_cost_for_entry(entry)
+        if cost_seconds > RunManager.run_record.actions_remaining:
+            return
+        _start_action(entry, ActionType.SEARCH, cost_seconds)
+        return
+
+    var item := entry as ItemEntry
+    if item != null and item.can_advance():
+        if RunManager.run_record.actions_remaining < 1:
+            return
+        _start_action(entry, ActionType.ADVANCE, 1)
+        return
+
+
+func _start_action(entry: LotObjectEntry, action_type: int, cost_seconds: int) -> void:
+    _active_entry = entry
+    _active_action_type = action_type
+    _active_action_cost = cost_seconds
+    _active_action_remaining = float(cost_seconds)
+    _refresh_grid_cells()
+    _refresh_hud()
+
+
+func _complete_active_action() -> void:
+    var completed_entry := _active_entry
+    var action_type := _active_action_type
+    var action_cost := _active_action_cost
+    _clear_active_action()
+
+    if completed_entry == null:
+        return
+
+    RunManager.run_record.actions_remaining -= action_cost
+
+    match action_type:
+        ActionType.SEARCH:
+            if not completed_entry.is_known():
+                _reveal_lot_object(completed_entry)
+        ActionType.ADVANCE:
+            var item := completed_entry as ItemEntry
+            if item != null and item.can_advance():
+                item.advance_layer()
+
+    _refresh_grid_cells()
+    _refresh_hud()
+
     if RunManager.run_record.actions_remaining <= 0:
+        _finish_inspection()
+
+
+func _on_cell_gui_input(event: InputEvent, coord: Vector2i) -> void:
+    var mouse_event := event as InputEventMouseButton
+    if mouse_event == null or not mouse_event.pressed:
+        return
+    if mouse_event.button_index != MOUSE_BUTTON_RIGHT:
+        return
+    if _active_entry == null:
+        return
+    if (_cell_entry.get(coord) as LotObjectEntry) != _active_entry:
+        return
+    _cancel_active_action()
+
+
+func _cancel_active_action() -> void:
+    _clear_active_action()
+    _refresh_grid_cells()
+    _refresh_hud()
+
+
+func _clear_active_action() -> void:
+    _active_entry = null
+    _active_action_type = -1
+    _active_action_cost = 0
+    _active_action_remaining = 0.0
+
+
+func _search_cost_for_entry(entry: LotObjectEntry) -> int:
+    return ceili(float(_search_duration_by_entry.get(entry, SEARCH_BASE_SECONDS)))
+
+
+func _compute_search_duration(cell_count: int) -> float:
+    var size_factor: float = minf(maxi(cell_count - 1, 0) * 0.35, 1.4)
+    var random_factor: float = randf_range(0.0, 1.2)
+    return clampf(SEARCH_BASE_SECONDS + size_factor + random_factor, SEARCH_BASE_SECONDS, SEARCH_MAX_SECONDS)
+
+
+func _reveal_lot_object(entry: LotObjectEntry) -> void:
+    var item := entry as ItemEntry
+    if item != null:
+        _reveal_item_at_random_layer(item)
         return
 
-    RunManager.run_record.stamina -= LotActionBar.INSPECT_COST
-    RunManager.run_record.actions_remaining -= 1
-
-    var changed := selected_object.perform_inspect()
-    var card: ItemCard = _card_for_entry[selected_object]
-    card.refresh(changed)
-    card.flash_border()
-
-    _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
-    _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
-    _refresh_action_bar()
-
-
-func _on_appraise_requested() -> void:
-    var selected_object := _selected_entry as LotObjectEntry
-    if selected_object == null:
-        return
-    if not selected_object.can_appraise():
-        return
-    if RunManager.run_record.stamina < LotActionBar.APPRAISE_COST:
-        return
-    if RunManager.run_record.actions_remaining <= 0:
+    var commodity := entry as CommodityEntry
+    if commodity != null:
+        commodity.perform_inspect()
         return
 
-    RunManager.run_record.stamina -= LotActionBar.APPRAISE_COST
-    RunManager.run_record.actions_remaining -= 1
-
-    if selected_object.perform_appraise():
-        var card: ItemCard = _card_for_entry[selected_object]
-        card.refresh(&"potential")
-        card.flash_border()
-
-    _stamina_hud.update_stamina(RunManager.run_record.stamina, RunManager.run_record.max_stamina)
-    _stamina_hud.update_actions(RunManager.run_record.actions_remaining)
-    _refresh_action_bar()
+    entry.perform_inspect()
 
 
-func _on_start_auction_pressed() -> void:
+func _reveal_item_at_random_layer(item: ItemEntry) -> void:
+    if item.is_veiled():
+        item.unveil()
+        if item.item_data != null and item.item_data.category_data != null:
+            KnowledgeManager.add_category_points(
+                item.item_data.category_data,
+                item.item_data.rarity,
+                KnowledgeManager.KnowledgeAction.REVEAL,
+            )
+
+    item.layer_index = _roll_random_layer_index(item)
+
+
+func _roll_random_layer_index(item: ItemEntry) -> int:
+    if item.item_data == null or item.item_data.identity_layers.is_empty():
+        return item.layer_index
+
+    var max_index := item.item_data.identity_layers.size() - 1
+    if max_index <= 0:
+        return 0
+    if max_index == 1:
+        return 1
+
+    var total_weight := 0.0
+    for layer_index in range(1, max_index + 1):
+        total_weight += 1.0 / float(layer_index * layer_index)
+
+    var roll := randf_range(0.0, total_weight)
+    var running := 0.0
+    for layer_index in range(1, max_index + 1):
+        running += 1.0 / float(layer_index * layer_index)
+        if roll <= running:
+            return layer_index
+
+    return max_index
+
+# ══ Display refresh ═══════════════════════════════════════════════════════════
+
+
+func _refresh_grid_cells() -> void:
+    for coord in _cell_buttons:
+        var button := _cell_buttons[coord] as Button
+        var entry := _cell_entry.get(coord) as LotObjectEntry
+        _refresh_grid_cell(button, coord, entry)
+
+
+func _refresh_grid_cell(button: Button, coord: Vector2i, entry: LotObjectEntry) -> void:
+    button.disabled = _active_entry != null and entry != _active_entry
+
+    if entry == null:
+        button.text = ""
+        button.mouse_default_cursor_shape = Control.CURSOR_ARROW
+        _apply_cell_style(button, Color(0.18, 0.19, 0.18, 0.55))
+        return
+
+    button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+    var is_origin: bool = coord == _entry_origin.get(entry, Vector2i(-1, -1))
+    var base_color := _entry_grid_color(entry)
+
+    if entry == _active_entry:
+        if _active_action_type == ActionType.ADVANCE:
+            _apply_cell_style(button, base_color.lerp(Color(1.0, 0.55, 0.26, 1.0), 0.45))
+        else:
+            _apply_cell_style(button, base_color.lerp(Color(1.0, 0.82, 0.35, 1.0), 0.45))
+        button.text = _active_origin_text() if is_origin else ""
+    elif entry.is_known():
+        var item := entry as ItemEntry
+        var is_final_item: bool = item != null and not item.can_advance()
+        _apply_cell_style(button, base_color.lightened(0.16 if is_final_item else 0.28))
+        button.text = _origin_ap_text(entry) if is_origin else ""
+    else:
+        _apply_cell_style(button, base_color)
+        button.text = _origin_ap_text(entry) if is_origin else ""
+
+
+func _entry_grid_color(entry: LotObjectEntry) -> Color:
+    return _entry_color_by_entry.get(entry, Color(0.08, 0.08, 0.10, 1.0))
+
+
+func _origin_ap_text(entry: LotObjectEntry) -> String:
+    if not entry.is_known():
+        return "%d AP" % _search_cost_for_entry(entry)
+
+    var item := entry as ItemEntry
+    if item != null and item.can_advance():
+        return "1 AP"
+    return "✓"
+
+
+func _active_origin_text() -> String:
+    return "%d AP\n%0.1fs" % [_active_action_cost, _active_action_remaining]
+
+
+func _apply_cell_style(button: Button, color: Color) -> void:
+    button.modulate = Color.WHITE
+    button.add_theme_color_override(&"font_color", Color.WHITE)
+    button.add_theme_color_override(&"font_hover_color", Color.WHITE)
+    button.add_theme_color_override(&"font_pressed_color", Color.WHITE)
+    button.add_theme_color_override(&"font_disabled_color", Color(0.74, 0.74, 0.74, 1.0))
+    button.add_theme_stylebox_override(&"normal", _cell_style(color))
+    button.add_theme_stylebox_override(&"hover", _cell_style(color.lightened(0.08)))
+    button.add_theme_stylebox_override(&"pressed", _cell_style(color.darkened(0.08)))
+    button.add_theme_stylebox_override(&"disabled", _cell_style(color.darkened(0.25)))
+
+
+func _cell_style(color: Color) -> StyleBoxFlat:
+    var style := StyleBoxFlat.new()
+    style.bg_color = color
+    style.corner_radius_top_left = 6
+    style.corner_radius_top_right = 6
+    style.corner_radius_bottom_left = 6
+    style.corner_radius_bottom_right = 6
+    style.border_width_top = 1
+    style.border_width_right = 1
+    style.border_width_bottom = 1
+    style.border_width_left = 1
+    style.border_color = color.lightened(0.16)
+    return style
+
+
+func _refresh_hud() -> void:
+    var ap: int = RunManager.run_record.actions_remaining
+    var quota: int = RunManager.run_record.lot_entry.lot_data.action_quota
+    _stamina_hud.update_ap(ap, quota)
+
+# ══ Tooltip ═══════════════════════════════════════════════════════════════════
+
+
+func _on_grid_cell_mouse_entered(coord: Vector2i) -> void:
+    var entry := _cell_entry.get(coord) as LotObjectEntry
+    var button := _cell_buttons.get(coord) as Button
+    if entry == null or button == null:
+        _tooltip.hide_tooltip()
+        return
+
+    _tooltip.show_for(entry, _ctx, Rect2(button.global_position, button.size))
+
+
+func _on_grid_cell_mouse_exited() -> void:
+    _tooltip.hide_tooltip()
+
+# ══ Summary / exit ════════════════════════════════════════════════════════════
+
+
+func _finish_inspection() -> void:
+    if _inspection_finished:
+        return
+
+    _inspection_finished = true
+    _clear_active_action()
+    set_process(false)
+
+    _tooltip.hide_tooltip()
+    _refresh_grid_cells()
+    _refresh_hud()
     _list_review.populate()
     _list_review.show()
 
 
-func _on_pass_pressed() -> void:
-    _confirm_popup.dialog_text = "Skip inspection and go back to lot browse?\n"
-    _confirm_popup.popup_centered()
+func _on_review_pressed() -> void:
+    if _inspection_finished:
+        return
+    _cancel_active_action()
+    set_process(false)
+    _list_review.populate()
+    _list_review.show()
 
 
-func _on_list_review_back() -> void:
+func _on_back_to_inspection() -> void:
     _list_review.hide()
+    if _inspection_finished:
+        return
+    set_process(true)
+    _refresh_grid_cells()
+    _refresh_hud()
+
+
+func _on_list_review_pass() -> void:
+    GameManager.go_to_lot_browse()
 
 
 func _on_auction_entered() -> void:
     GameManager.go_to_auction()
-
-
-func _on_confirm_popup_confirmed() -> void:
-    if _pulse_tween:
-        _pulse_tween.kill()
-    GameManager.go_to_lot_browse()
-
-# ══ Item display ══════════════════════════════════════════════════════════════
-
-
-func _populate_item_displays() -> void:
-    for child in _items_grid.get_children():
-        child.queue_free()
-
-    for entry in RunManager.run_record.lot_objects:
-        var display: ItemCard = ItemCardScene.instantiate()
-        display.custom_minimum_size = ITEM_SIZE
-        display.setup(entry, _ctx)
-        display.clicked.connect(_on_card_clicked)
-
-        _items_grid.add_child(display)
-        _item_displays.append(display)
-        _card_for_entry[entry] = display
-        _entry_for_card[display] = entry
-
-# ══ Selection ═════════════════════════════════════════════════════════════════
-
-
-func _on_card_clicked(card: ItemCard) -> void:
-    if _selected_card != null:
-        _selected_card.set_selected(false)
-    _selected_card = card
-    _selected_entry = _entry_for_card.get(card)
-    _selected_card.set_selected(true)
-    _refresh_action_bar()
-
-# ══ Action bar ════════════════════════════════════════════════════════════════
-
-
-func _refresh_action_bar() -> void:
-    _action_bar.refresh_lot(_selected_entry)
-
-# ══ Intuition ═════════════════════════════════════════════════════════════════
-
-
-func _run_intuition() -> void:
-    var appraisal_skill: SkillData = KnowledgeManager.get_skill_by_id("appraisal")
-    var appraisal_level: int = 0
-    if appraisal_skill != null:
-        appraisal_level = KnowledgeManager.get_level(appraisal_skill)
-
-    for entry: ItemEntry in RunManager.run_record.lot_items:
-        if entry.is_veiled():
-            continue
-        if entry.intuition_level >= 1:
-            continue
-
-        var category_rank: int = KnowledgeManager.get_category_rank(entry.item_data.category_data)
-        var sc: SuperCategoryData = entry.item_data.category_data.super_category
-        var sc_rank: int = KnowledgeManager.get_super_category_rank(sc)
-        var cat_count: int = SuperCategoryRegistry.get_categories_for_super(sc).size()
-        var sc_average: float = float(sc_rank) / maxf(cat_count, 1.0)
-        var computed_base: float = (
-            category_rank * ItemEntry.COMPUTED_BASE_CAT_WEIGHT
-            + sc_average * ItemEntry.COMPUTED_BASE_SC_WEIGHT
-            + appraisal_level * ItemEntry.COMPUTED_BASE_SKILL_WEIGHT
-        )
-        var chance: float = 0.1 + computed_base * 0.15
-
-        if randf() < chance:
-            entry.intuition_level = max(entry.intuition_level, 1)
-            var card: ItemCard = _card_for_entry[entry]
-            card.play_intuition_shimmer()
-
-# ══ Exit pulse ════════════════════════════════════════════════════════════════
-
-
-func _begin_exit_pulse() -> void:
-    if _pulse_tween:
-        _pulse_tween.kill()
-    _pulse_tween = create_tween().set_loops()
-    _pulse_tween.tween_property(
-        _start_btn,
-        "modulate",
-        Color(1.5, 1.25, 0.3, 1.0),
-        0.5,
-    ).set_ease(Tween.EASE_IN_OUT)
-    _pulse_tween.tween_property(
-        _start_btn,
-        "modulate",
-        Color.WHITE,
-        0.5,
-    ).set_ease(Tween.EASE_IN_OUT)

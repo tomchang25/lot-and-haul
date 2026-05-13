@@ -99,6 +99,11 @@ grow_horizontal = 2
 grow_vertical = 0
 alignment = 1
 
+[node name="ReviewButton" type="Button" parent="HUD/Footer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Review"
+
 [node name="PassButton" type="Button" parent="HUD/Footer" unique_id=1473063044]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
