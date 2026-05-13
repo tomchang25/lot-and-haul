@@ -53,37 +53,11 @@ func _ready() -> void:
 # Rebuild rows from current GameManager state, then call show().
 func populate() -> void:
     var lot: LotEntry = RunManager.run_record.lot_entry
-    var lot_items: Array[ItemEntry] = RunManager.run_record.lot_items
 
     _item_list_panel.setup(_ctx, LIST_REVIEW_COLUMNS)
     _item_list_panel.populate(RunManager.run_record.lot_objects)
 
-    var known_commodity_sales := 0
-    for commodity: CommodityEntry in RunManager.run_record.lot_commodities:
-        if commodity.inspected:
-            known_commodity_sales += commodity.compute_sale_price()
-
-    var total_min := 0
-    var total_max := 0
-    var has_veiled: bool = false
-    for entry: ItemEntry in lot_items:
-        if entry.is_veiled():
-            has_veiled = true
-        else:
-            total_min += entry.estimated_value_min
-            total_max += entry.estimated_value_max
-
-    total_min += known_commodity_sales
-    total_max += known_commodity_sales
-
-    var total_text: String
-    if total_max <= total_min:
-        total_text = "Total Est: $%d" % total_min
-    else:
-        total_text = "Total Est: $%d – $%d" % [total_min, total_max]
-    if has_veiled:
-        total_text += "+"
-    _total_label.text = total_text
+    _total_label.text = lot.get_player_estimate_label()
 
     _opening_bid_label.text = "Opening Bid:   $%d" % lot.get_opening_bid()
     set_back_enabled(RunManager.run_record.actions_remaining > 0)

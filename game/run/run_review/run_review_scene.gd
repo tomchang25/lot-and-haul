@@ -98,8 +98,8 @@ func _apply_trailer_damage() -> int:
 
 
 func _resolve_run_and_navigate() -> void:
-    var summary := MetaManager.resolve_run(RunManager.run_record)
-    GameManager.go_to_day_summary(summary)
+    MetaManager.resolve_run(RunManager.run_record)
+    GameManager.go_to_hub()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 
@@ -130,7 +130,7 @@ func _populate_finance() -> void:
 
     var estimate_price: int = 0
     for entry: ItemEntry in _cargo_items:
-        estimate_price += entry.compute_price(ItemRegistry.price_config_with_estimated)
+        estimate_price += (entry.estimated_value_min + entry.estimated_value_max) / 2
     _estimate_price_label.text = "Est. Cargo Value:   $%d" % estimate_price
 
     var estimate_profit := overall + estimate_price

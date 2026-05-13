@@ -186,7 +186,6 @@ func _on_pass_pressed() -> void:
 
 func _init_auction() -> void:
     var lot: LotEntry = RunManager.run_record.lot_entry
-    var lot_items: Array[ItemEntry] = RunManager.run_record.lot_items
 
     _rolled_price = max(lot.get_rolled_price(), MIN_STEP)
 
@@ -195,23 +194,19 @@ func _init_auction() -> void:
     _displayed_price = opening_bid
     _price_label.text = "$%d" % opening_bid
 
-    _build_lot_summary(lot_items)
+    _build_lot_summary()
     _init_debug_overlay()
 
 
-func _build_lot_summary(lot_items: Array[ItemEntry]) -> void:
-    var total_min := 0
-    var total_max := 0
-    var has_veiled: bool = false
-    for entry: ItemEntry in lot_items:
-        if entry.is_veiled():
-            has_veiled = true
-        else:
-            total_min += entry.estimated_value_min
-            total_max += entry.estimated_value_max
+func _build_lot_summary() -> void:
+    var lot: LotEntry = RunManager.run_record.lot_entry
 
+    for entry: LotObjectEntry in lot.lot_objects:
         var label := Label.new()
-        label.text = "%s (%s)" % [entry.display_name, entry.estimated_value_label]
+        if entry is ItemEntry:
+            label.text = "%s (%s)" % [entry.display_name, entry.estimated_value_label]
+        elif entry is CommodityEntry:
+            label.text = ("%s ($%d)" % [entry.display_name, entry.compute_sale_price()]) if entry.inspected else ("%s (???)" % entry.display_name)
         label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         label.add_theme_font_size_override(&"font_size", 15)
         _lot_summary.add_child(label)
@@ -222,15 +217,7 @@ func _build_lot_summary(lot_items: Array[ItemEntry]) -> void:
     total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     total_label.add_theme_font_size_override(&"font_size", 16)
     total_label.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
-
-    var total_text: String
-    if total_min == total_max:
-        total_text = "Total Est: $%d" % total_min
-    else:
-        total_text = "Total Est: $%d – $%d" % [total_min, total_max]
-    if has_veiled:
-        total_text += "+"
-    total_label.text = total_text
+    total_label.text = lot.get_player_estimate_label()
 
     _lot_summary.add_child(total_label)
 

@@ -223,7 +223,7 @@ func _start_action(entry: LotObjectEntry, action_type: int, cost_seconds: int) -
     _active_entry = entry
     _active_action_type = action_type
     _active_action_cost = cost_seconds
-    _active_action_remaining = float(cost_seconds)
+    _active_action_remaining = max(0.5, float(cost_seconds) * 0.25)
     _refresh_grid_cells()
     _refresh_hud()
 

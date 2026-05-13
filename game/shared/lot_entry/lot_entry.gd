@@ -191,3 +191,45 @@ func get_rolled_price() -> int:
     var floor_val := npc_estimate * lot_data.price_floor_factor
     var ceil_val := npc_estimate * lot_data.price_ceiling_factor
     return roundi(clampf(raw, floor_val, ceil_val))
+
+
+# Returns [total_min, total_max] based on player's current knowledge.
+# Used by inspection review, auction summary, and storage display.
+func get_player_estimate() -> Array[int]:
+    var total_min := 0
+    var total_max := 0
+
+    for entry: ItemEntry in item_entries:
+        if not entry.is_veiled():
+            total_min += entry.estimated_value_min
+            total_max += entry.estimated_value_max
+
+    for commodity: CommodityEntry in commodity_entries:
+        if commodity.inspected:
+            var price := commodity.compute_sale_price()
+            total_min += price
+            total_max += price
+
+    return [total_min, total_max]
+
+
+# Returns a formatted price label string based on player's current knowledge.
+func get_player_estimate_label(prefix: String = "Total Est:") -> String:
+    var estimate := get_player_estimate()
+    var total_min: int = estimate[0]
+    var total_max: int = estimate[1]
+
+    var has_veiled: bool = false
+    for entry: ItemEntry in item_entries:
+        if entry.is_veiled():
+            has_veiled = true
+            break
+
+    var text: String
+    if total_max <= total_min:
+        text = "%s $%d" % [prefix, total_min]
+    else:
+        text = "%s $%d – $%d" % [prefix, total_min, total_max]
+    if has_veiled:
+        text += "+"
+    return text

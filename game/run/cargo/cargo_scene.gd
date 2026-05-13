@@ -110,6 +110,9 @@ var _hovered_item: ItemEntry = null
 @onready var _extra_slot_section: VBoxContainer = $RootVBox/ExtraSlotSection
 @onready var _extra_slot_container: HBoxContainer = $RootVBox/ExtraSlotSection/ExtraSlotContainer
 
+@onready var _commodity_list: VBoxContainer = $CommodityPanel/CommodityList
+@onready var _commodity_total_label: Label = $CommodityPanel/CommodityTotalLabel
+
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
@@ -137,6 +140,7 @@ func _ready() -> void:
     _populate_temp_storage()
     _recalc_totals()
     _refresh_ui()
+    _populate_commodity_panel()
 
 
 func _input(event: InputEvent) -> void:
@@ -669,6 +673,26 @@ func _refresh_cargo_cell_visuals() -> void:
                 Color(0.35, 0.35, 0.38, 1.0),
             )
         cell.add_theme_stylebox_override("panel", style)
+
+
+func _populate_commodity_panel() -> void:
+    for child in _commodity_list.get_children():
+        child.queue_free()
+
+    var total_sales := 0
+    for commodity: CommodityEntry in RunManager.run_record.won_commodities:
+        if not commodity.inspected:
+            push_warning("Cargo: Commodity not inspected: %s" % commodity.display_name)
+            continue
+        var price := commodity.compute_sale_price()
+        total_sales += price
+        var label := Label.new()
+        label.text = "%s   $%d" % [commodity.display_name, price]
+        label.add_theme_font_size_override("font_size", 13)
+        label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+        _commodity_list.add_child(label)
+
+    _commodity_total_label.text = "Commodities sold:   +$%d" % total_sales
 
 
 func _refresh_temp_cell_visuals() -> void:
