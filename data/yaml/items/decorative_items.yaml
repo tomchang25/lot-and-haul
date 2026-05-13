@@ -17,7 +17,7 @@ identity_layers:
       difficulty: 2.0
 
   - layer_id: lamp_leaf_moser
-    display_name: Moser Bohemian Lamp
+    display_name: Bohemian Art Glass Lamp
     base_value: 950
     unlock_action: null
 
@@ -28,7 +28,7 @@ identity_layers:
       difficulty: 2.0
 
   - layer_id: lamp_leaf_baccarat
-    display_name: Baccarat Crystal Lamp
+    display_name: French Crystal Oil Lamp
     base_value: 1600
     unlock_action: null
 
@@ -49,7 +49,7 @@ identity_layers:
       required_level: 2
 
   - layer_id: lamp_leaf_hinks
-    display_name: Hinks & Son Duplex Lamp
+    display_name: Hallmarked Duplex Oil Lamp
     base_value: 3200
     unlock_action: null
 
@@ -71,12 +71,12 @@ identity_layers:
       difficulty: 2.0
 
   - layer_id: clock_leaf_ansonia
-    display_name: Ansonia Mantel Clock
+    display_name: American Mantel Clock
     base_value: 480
     unlock_action: null
 
   - layer_id: clock_leaf_sessions
-    display_name: Sessions Co. Shelf Clock
+    display_name: American Shelf Clock
     base_value: 320
     unlock_action: null
 
@@ -95,7 +95,7 @@ identity_layers:
       required_level: 1
 
   - layer_id: clock_leaf_carriage
-    display_name: French Carriage Clock
+    display_name: French Brass Carriage Clock
     base_value: 1400
     unlock_action: null
 
@@ -114,7 +114,7 @@ identity_layers:
       required_level: 2
 
   - layer_id: clock_leaf_boulle
-    display_name: Boulle Mantel Clock
+    display_name: Gilded Boulle-Style Mantel Clock
     base_value: 4500
     unlock_action: null
 
@@ -147,7 +147,7 @@ identity_layers:
       difficulty: 2.0
 
   - layer_id: vase_leaf_spode
-    display_name: Spode Blue Italian Vase
+    display_name: Blue Transferware Vase
     base_value: 750
     unlock_action: null
 
@@ -182,12 +182,14 @@ identity_layers:
       required_level: 3
 
   - layer_id: vase_leaf_royal_vienna
-    display_name: Royal Vienna Vase, c.1880
+    display_name: Viennese Porcelain Vase
     base_value: 12000
     unlock_action: null
 
 items:
   - item_id: lamp_moser_bohemian
+    item_name: Moser Bohemian Lamp
+    base_price: 1250
     category_id: oil_lamp
     rarity: 2
     layer_ids:
@@ -197,6 +199,8 @@ items:
       - lamp_leaf_moser
 
   - item_id: lamp_baccarat_crystal
+    item_name: Baccarat Crystal Lamp
+    base_price: 2100
     category_id: oil_lamp
     rarity: 2
     layer_ids:
@@ -206,6 +210,8 @@ items:
       - lamp_leaf_baccarat
 
   - item_id: lamp_hinks_duplex
+    item_name: Hinks & Son Duplex Lamp
+    base_price: 4200
     category_id: oil_lamp
     rarity: 3
     layer_ids:
@@ -216,6 +222,8 @@ items:
       - lamp_leaf_hinks
 
   - item_id: clock_boulle_mantel
+    item_name: Boulle Mantel Clock
+    base_price: 6000
     category_id: clock
     rarity: 3
     layer_ids:

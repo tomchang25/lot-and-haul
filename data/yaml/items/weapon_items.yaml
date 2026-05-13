@@ -41,22 +41,22 @@ identity_layers:
       required_level: 1
 
   - layer_id: pistol_leaf_dutch
-    display_name: Dutch Holster Pistol
+    display_name: Continental Holster Pistol
     base_value: 450
     unlock_action: null
 
   - layer_id: pistol_leaf_naval
-    display_name: British Naval Pistol
+    display_name: Naval Service Pistol
     base_value: 1200
     unlock_action: null
 
   - layer_id: pistol_leaf_cavalry
-    display_name: French Cavalry Pistol
+    display_name: Cavalry Officer's Pistol
     base_value: 4500
     unlock_action: null
 
   - layer_id: pistol_leaf_boutet
-    display_name: Boutet Pistol, c.1800
+    display_name: Presentation Flintlock Pistol
     base_value: 12000
     unlock_action: null
 
@@ -102,22 +102,22 @@ identity_layers:
       required_level: 1
 
   - layer_id: rifle_leaf_charleville
-    display_name: Charleville Musket
+    display_name: Continental Infantry Musket
     base_value: 700
     unlock_action: null
 
   - layer_id: rifle_leaf_springfield
-    display_name: Springfield M1861
+    display_name: American Civil War Rifle-Musket
     base_value: 1800
     unlock_action: null
 
   - layer_id: rifle_leaf_regiment
-    display_name: Crimea Enfield Rifle
+    display_name: Regiment-Marked Service Rifle
     base_value: 5000
     unlock_action: null
 
   - layer_id: rifle_leaf_whitworth
-    display_name: Whitworth Rifle, c.1860
+    display_name: Precision Target Rifle
     base_value: 15000
     unlock_action: null
 
@@ -154,17 +154,17 @@ identity_layers:
     unlock_action: null
 
   - layer_id: crossbow_leaf_hunting
-    display_name: German Hunting Bow
+    display_name: European Hunting Crossbow
     base_value: 500
     unlock_action: null
 
   - layer_id: crossbow_leaf_military
-    display_name: Swiss Military Bow
+    display_name: Military Pattern Crossbow
     base_value: 1600
     unlock_action: null
 
   - layer_id: crossbow_leaf_noble
-    display_name: Noble Presentation Bow
+    display_name: Noble Presentation Crossbow
     base_value: 5500
     unlock_action: null
 
@@ -175,6 +175,8 @@ items:
   # Item 4 diverges at layer 2 via pistol_carved_grip.
 
   - item_id: pistol_dutch_holster
+    item_name: Dutch Holster Pistol
+    base_price: 560
     category_id: pistol
     rarity: 1
     layer_ids:
@@ -183,6 +185,8 @@ items:
       - pistol_leaf_dutch
 
   - item_id: pistol_british_naval
+    item_name: British Naval Pistol
+    base_price: 1500
     category_id: pistol
     rarity: 2
     layer_ids:
@@ -192,6 +196,8 @@ items:
       - pistol_leaf_naval
 
   - item_id: pistol_french_cavalry
+    item_name: French Cavalry Pistol
+    base_price: 5600
     category_id: pistol
     rarity: 3
     layer_ids:
@@ -202,6 +208,8 @@ items:
       - pistol_leaf_cavalry
 
   - item_id: pistol_boutet_versailles
+    item_name: Boutet Pistol, c.1800
+    base_price: 14500
     category_id: pistol
     rarity: 4
     layer_ids:
@@ -217,6 +225,8 @@ items:
   # Item 4 diverges at layer 2 via rifle_engraved_action.
 
   - item_id: rifle_charleville_repro
+    item_name: Charleville Musket
+    base_price: 900
     category_id: rifle
     rarity: 1
     layer_ids:
@@ -225,6 +235,8 @@ items:
       - rifle_leaf_charleville
 
   - item_id: rifle_springfield_1861
+    item_name: Springfield M1861
+    base_price: 2300
     category_id: rifle
     rarity: 2
     layer_ids:
@@ -234,6 +246,8 @@ items:
       - rifle_leaf_springfield
 
   - item_id: rifle_crimea_enfield
+    item_name: Crimea Enfield Rifle
+    base_price: 6400
     category_id: rifle
     rarity: 3
     layer_ids:
@@ -244,6 +258,8 @@ items:
       - rifle_leaf_regiment
 
   - item_id: rifle_whitworth_sniper
+    item_name: Whitworth Rifle, c.1860
+    base_price: 18000
     category_id: rifle
     rarity: 4
     layer_ids:
@@ -259,6 +275,8 @@ items:
   # Items 3+4 share crossbow_mechanism (layer 2), then fork.
 
   - item_id: crossbow_german_hunting
+    item_name: German Hunting Bow
+    base_price: 650
     category_id: crossbow
     rarity: 1
     layer_ids:
@@ -267,6 +285,8 @@ items:
       - crossbow_leaf_hunting
 
   - item_id: crossbow_swiss_military
+    item_name: Swiss Military Bow
+    base_price: 2100
     category_id: crossbow
     rarity: 2
     layer_ids:
@@ -276,6 +296,8 @@ items:
       - crossbow_leaf_military
 
   - item_id: crossbow_noble_presentation
+    item_name: Noble Presentation Bow
+    base_price: 7000
     category_id: crossbow
     rarity: 3
     layer_ids:

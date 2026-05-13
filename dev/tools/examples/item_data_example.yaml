@@ -14,7 +14,7 @@
 
 # ────────────────────────────────────────────────────────────
 # IDENTITY LAYERS
-# Each layer is a reusable node. Multiple items may reference the same layer_id.
+# Each layer is a reusable perceived-identity node. Multiple items may reference the same layer_id.
 # A layer_id appears ONCE in this list; items reference it by name.
 #
 # unlock_action: describes how the player advances PAST this layer.
@@ -95,19 +95,23 @@ identity_layers:
       required_level: 1
 
   - layer_id: french_empire_lamp
-    display_name: French Empire Ormolu Lamp
+    display_name: French Empire-Style Lamp
     base_value: 2400
     unlock_action: null # FINAL — Item C leaf
 
   - layer_id: authenticated_meissen_lamp
-    display_name: Authenticated Meissen Porcelain Lamp
+    display_name: Authenticated Porcelain Lamp
     base_value: 5800
     unlock_action: null # FINAL — Item D leaf
 
 # ────────────────────────────────────────────────────────────
 # ITEMS
 #
-# layer_ids: ordered list of layer_id references, vague → specific.
+# item_name: exact true item name, shown only after verification/authentication.
+# base_price: exact true item value, shown only after verification/authentication.
+#   Must be greater than the final perceived layer's base_value.
+#
+# layer_ids: ordered list of layer_id references, vague → specific perceived identity.
 #   layer[0]  = always the veil layer. unlock_action is null (auto-resolves on reveal).
 #   layer[-1] = always the final layer. unlock_action must be null.
 #   Minimum 2 layers. Typical range: 3–5.
@@ -125,6 +129,8 @@ items:
   # Player cannot distinguish A from B until they complete HOME work at layer[1].
 
   - item_id: brass_duplex_lamp
+    item_name: Brass Duplex Lamp
+    base_price: 1250
     category_id: oil_lamp
     rarity: 2 # RARE
     layer_ids:
@@ -133,6 +139,8 @@ items:
       - signed_duplex_burner_lamp # [2] FINAL
 
   - item_id: viennese_chandelier
+    item_name: Viennese Iron Chandelier
+    base_price: 1800
     category_id: oil_lamp
     rarity: 3 # EPIC
     layer_ids:
@@ -149,6 +157,8 @@ items:
   # Only completing the appraisal skill check will reveal which path they are on.
 
   - item_id: french_empire_lamp
+    item_name: French Empire Ormolu Lamp
+    base_price: 3200
     category_id: oil_lamp
     rarity: 3 # EPIC
     layer_ids:
@@ -158,6 +168,8 @@ items:
       - french_empire_lamp # [3] FINAL
 
   - item_id: meissen_porcelain_lamp
+    item_name: Meissen Porcelain Lamp
+    base_price: 7200
     category_id: oil_lamp
     rarity: 4 # LEGENDARY
     layer_ids:

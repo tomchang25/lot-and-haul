@@ -15,6 +15,12 @@ enum Rarity {
 # Internal identifier. Never displayed to the player.
 @export var item_id: String = ""
 
+# True item name. Shown only after verification/authentication.
+@export var item_name: String = ""
+
+# True item base price. Must stay above the final perceived layer value.
+@export var base_price: int = 0
+
 # Physical classification. Holds super_category, category, weight, grid_size.
 @export var category_data: CategoryData = null
 

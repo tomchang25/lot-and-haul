@@ -70,12 +70,12 @@ identity_layers:
     unlock_action: null
 
   - layer_id: bag_leaf_lv
-    display_name: Louis Vuitton Speedy
+    display_name: Monogram Luxury Speedy Bag
     base_value: 1400
     unlock_action: null
 
   - layer_id: bag_leaf_hermes
-    display_name: "Herm\xE8s Birkin 30"
+    display_name: Structured High-End Leather Bag
     base_value: 4800
     unlock_action: null
 
@@ -134,27 +134,29 @@ identity_layers:
     unlock_action: null
 
   - layer_id: watch_leaf_seiko
-    display_name: Seiko 5 Auto, 1970s
+    display_name: Japanese Automatic Watch
     base_value: 450
     unlock_action: null
 
   - layer_id: watch_leaf_bulova
-    display_name: Bulova Accutron
+    display_name: Tuning-Fork Dress Watch
     base_value: 650
     unlock_action: null
 
   - layer_id: watch_leaf_citizen
-    display_name: Citizen Chrono, 1980s
+    display_name: Quartz Chronograph Watch
     base_value: 380
     unlock_action: null
 
   - layer_id: watch_leaf_longines
-    display_name: Longines 13ZN, c.1948
+    display_name: Vintage Column-Wheel Chronograph
     base_value: 1100
     unlock_action: null
 
 items:
   - item_id: handbag_canvas_tote
+    item_name: Canvas Tote Bag
+    base_price: 95
     category_id: handbag
     rarity: 0
     layer_ids:
@@ -162,6 +164,8 @@ items:
       - bag_leaf_canvas_tote
 
   - item_id: handbag_vinyl_clutch
+    item_name: Vinyl Clutch Purse
+    base_price: 115
     category_id: handbag
     rarity: 0
     layer_ids:
@@ -169,6 +173,8 @@ items:
       - bag_leaf_vinyl_clutch
 
   - item_id: handbag_nylon_crossbody
+    item_name: Nylon Crossbody
+    base_price: 80
     category_id: handbag
     rarity: 0
     layer_ids:
@@ -176,6 +182,8 @@ items:
       - bag_leaf_nylon
 
   - item_id: handbag_straw_bag
+    item_name: Woven Straw Bag
+    base_price: 70
     category_id: handbag
     rarity: 0
     layer_ids:
@@ -183,6 +191,8 @@ items:
       - bag_leaf_straw
 
   - item_id: handbag_faux_leather
+    item_name: Faux Leather Purse
+    base_price: 75
     category_id: handbag
     rarity: 0
     layer_ids:
@@ -190,6 +200,8 @@ items:
       - bag_leaf_faux_leather
 
   - item_id: handbag_cotton_satchel
+    item_name: Cotton Canvas Satchel
+    base_price: 105
     category_id: handbag
     rarity: 0
     layer_ids:
@@ -197,6 +209,8 @@ items:
       - bag_leaf_cotton
 
   - item_id: handbag_replica_designer
+    item_name: Well-Made Replica Bag
+    base_price: 380
     category_id: handbag
     rarity: 1
     layer_ids:
@@ -205,6 +219,8 @@ items:
       - bag_leaf_replica
 
   - item_id: handbag_coach_leather
+    item_name: Coach Leather Bag
+    base_price: 540
     category_id: handbag
     rarity: 1
     layer_ids:
@@ -213,6 +229,8 @@ items:
       - bag_leaf_coach
 
   - item_id: handbag_louis_vuitton
+    item_name: Louis Vuitton Speedy
+    base_price: 1700
     category_id: handbag
     rarity: 2
     layer_ids:
@@ -222,6 +240,8 @@ items:
       - bag_leaf_lv
 
   - item_id: handbag_hermes_birkin
+    item_name: "Herm\xE8s Birkin 30"
+    base_price: 5800
     category_id: handbag
     rarity: 3
     layer_ids:
@@ -232,6 +252,8 @@ items:
       - bag_leaf_hermes
 
   - item_id: wristwatch_quartz_dress
+    item_name: Quartz Dress Watch
+    base_price: 80
     category_id: wristwatch
     rarity: 0
     layer_ids:
@@ -239,6 +261,8 @@ items:
       - watch_leaf_quartz
 
   - item_id: wristwatch_digital_lcd
+    item_name: Digital LCD Watch
+    base_price: 70
     category_id: wristwatch
     rarity: 0
     layer_ids:
@@ -246,6 +270,8 @@ items:
       - watch_leaf_digital
 
   - item_id: wristwatch_timex_windup
+    item_name: Timex Wind-Up
+    base_price: 105
     category_id: wristwatch
     rarity: 0
     layer_ids:
@@ -253,6 +279,8 @@ items:
       - watch_leaf_timex
 
   - item_id: wristwatch_russian_field
+    item_name: Russian Field Watch
+    base_price: 150
     category_id: wristwatch
     rarity: 0
     layer_ids:
@@ -260,6 +288,8 @@ items:
       - watch_leaf_russian
 
   - item_id: wristwatch_ladies_cocktail
+    item_name: Ladies' Cocktail Watch
+    base_price: 115
     category_id: wristwatch
     rarity: 0
     layer_ids:
@@ -267,6 +297,8 @@ items:
       - watch_leaf_cocktail
 
   - item_id: wristwatch_fashion_brand
+    item_name: Fashion Brand Watch
+    base_price: 95
     category_id: wristwatch
     rarity: 0
     layer_ids:
@@ -274,6 +306,8 @@ items:
       - watch_leaf_fashion
 
   - item_id: wristwatch_seiko_auto
+    item_name: Seiko 5 Auto, 1970s
+    base_price: 560
     category_id: wristwatch
     rarity: 1
     layer_ids:
@@ -282,6 +316,8 @@ items:
       - watch_leaf_seiko
 
   - item_id: wristwatch_bulova_accutron
+    item_name: Bulova Accutron
+    base_price: 820
     category_id: wristwatch
     rarity: 1
     layer_ids:
@@ -290,6 +326,8 @@ items:
       - watch_leaf_bulova
 
   - item_id: wristwatch_citizen_chrono
+    item_name: Citizen Chrono, 1980s
+    base_price: 480
     category_id: wristwatch
     rarity: 1
     layer_ids:
@@ -298,6 +336,8 @@ items:
       - watch_leaf_citizen
 
   - item_id: wristwatch_longines_13zn
+    item_name: Longines 13ZN, c.1948
+    base_price: 1450
     category_id: wristwatch
     rarity: 2
     layer_ids:

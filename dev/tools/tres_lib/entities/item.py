@@ -74,6 +74,8 @@ class ItemSpec:
         cat_tag = "2_cat" if (cat_uid and cat_id) else None
         w.add_field('script = ExtResource("1_jyqit")')
         w.add_field_str("item_id", item_id)
+        w.add_field_str("item_name", entry["item_name"])
+        w.add_field_int("base_price", int(entry["base_price"]))
         w.add_field_ext_ref("category_data", cat_tag)
         w.add_field_ext_ref_array("identity_layers", layer_tags)
         w.add_field_int("rarity", int(entry.get("rarity", 0)))
@@ -82,6 +84,8 @@ class ItemSpec:
     def parse_tres(self, text: str, ctx: ParseCtx) -> dict:
         uid = header_uid(text)
         item_id = tres_field(text, "item_id") or ""
+        item_name = tres_field(text, "item_name") or ""
+        base_price = int(tres_field(text, "base_price") or 0)
         if uid:
             ctx.uid_to_id[uid] = item_id
 
@@ -105,6 +109,8 @@ class ItemSpec:
 
         return {
             "item_id": item_id,
+            "item_name": item_name,
+            "base_price": base_price,
             "category_id": category_id,
             "rarity": rarity,
             "layer_ids": layer_ids,
@@ -122,6 +128,14 @@ class ItemSpec:
             iid = item.get("item_id", "?")
             layer_ids = item.get("layer_ids", [])
             rarity = int(item.get("rarity", 0))
+            item_name = item.get("item_name")
+            base_price = item.get("base_price")
+
+            if not isinstance(item_name, str) or not item_name.strip():
+                errors.append(f"item '{iid}': item_name is required")
+
+            if type(base_price) is not int or base_price <= 0:
+                errors.append(f"item '{iid}': base_price must be a positive int")
 
             if item.get("category_id") not in known_cat_ids:
                 errors.append(
@@ -155,6 +169,17 @@ class ItemSpec:
                 if last and last.get("unlock_action") is not None:
                     errors.append(
                         f"item '{iid}': final layer '{layer_ids[-1]}' must have unlock_action: null"
+                    )
+
+                final_base_value = last.get("base_value") if last else None
+                if (
+                    type(base_price) is int
+                    and isinstance(final_base_value, int)
+                    and base_price <= final_base_value
+                ):
+                    errors.append(
+                        f"item '{iid}': base_price {base_price} must be greater than"
+                        f" final layer '{layer_ids[-1]}' base_value {final_base_value}"
                     )
 
                 prev_base_value: int | None = None

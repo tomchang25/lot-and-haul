@@ -12,7 +12,7 @@ extends Resource
 
 # Base market value at this layer of understanding.
 # Used as the anchor for price estimates at inspection and auction.
-# The last layer's base_value is the item's true value.
+# The last layer's base_value is the final perceived value before verification.
 @export var base_value: int = 0
 
 # Action required to advance from this layer to the next one.
