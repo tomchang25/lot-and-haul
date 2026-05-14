@@ -15,7 +15,7 @@ const STORAGE_COLUMNS: Array = [
     ItemRow.Column.ESTIMATED_VALUE,
     ItemRow.Column.RARITY,
     ItemRow.Column.INSPECTION,
-    ItemRow.Column.UNLOCK,
+    ItemRow.Column.STATUS,
 ]
 
 # ── State ─────────────────────────────────────────────────────────────────────
@@ -27,36 +27,37 @@ var _selected_entry: ItemEntry = null
 # ── Node references ───────────────────────────────────────────────────────────
 
 # Left — table
-@onready var _item_list_panel: ItemListPanel = $RootHBox/LeftVBox/TableMargin/TableVBox/ItemListPanel
-@onready var _empty_label: Label = $RootHBox/LeftVBox/TableMargin/TableVBox/EmptyLabel
+@onready var _item_list_panel: ItemListPanel = %ItemListPanel
+@onready var _empty_label: Label = %EmptyLabel
 
 # Left — footer
-@onready var _footer_status_label: Label = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/FooterStatusLabel
-@onready var _back_btn: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/BackButton
+@onready var _footer_status_label: Label = %FooterStatusLabel
+@onready var _back_btn: Button = %BackButton
 
 # Right — tasks
-@onready var _task_ready_label: Label = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection/TaskHeaderHBox/TaskReadyLabel
-@onready var _task_container: VBoxContainer = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection/TaskContainer
+@onready var _task_ready_label: Label = %TaskReadyLabel
+@onready var _task_container: VBoxContainer = %TaskContainer
 
 # Right — detail
-@onready var _detail_section: VBoxContainer = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection
-@onready var _detail_name_label: Label = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailNameLabel
-@onready var _detail_category_label: Label = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailCategoryLabel
-@onready var _detail_rarity_label: Label = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailRarityHBox/DetailRarityLabel
-@onready var _detail_cond_value: Label = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox/ConditionPanel/CondMargin/CondVBox/CondValueLabel
-@onready var _detail_est_value: Label = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox/ValuePanel/ValueMargin/ValueVBox/ValueValueLabel
-@onready var _detail_conv_ratio: Label = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ConvergencePanel/ConvMargin/ConvVBox/ConvHBox/ConvRatioLabel
-@onready var _progress_label: Label = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ProgressLabel
-@onready var _no_selection_label: Label = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/NoSelectionLabel
+@onready var _detail_section: VBoxContainer = %DetailSection
+@onready var _detail_name_label: Label = %DetailNameLabel
+@onready var _auth_tag_label: Label = %AuthTagLabel
+@onready var _detail_category_label: Label = %DetailCategoryLabel
+@onready var _detail_rarity_label: Label = %DetailRarityLabel
+@onready var _detail_cond_value: Label = %CondValueLabel
+@onready var _detail_est_value: Label = %ValueValueLabel
+@onready var _detail_conv_ratio: Label = %ConvRatioLabel
+@onready var _progress_label: Label = %ProgressLabel
+@onready var _no_selection_label: Label = %NoSelectionLabel
 
 # Right — action buttons
-@onready var _action_grid: GridContainer = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid
-@onready var _study_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/StudyButton
-@onready var _repair_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/RepairButton
-@onready var _authenticate_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/AuthenticateButton
-@onready var _restore_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/RestoreButton
-@onready var _remove_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/RemoveButton
-@onready var _value_title_label: Label = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox/ValuePanel/ValueMargin/ValueVBox/ValueTitleLabel
+@onready var _action_grid: GridContainer = %ActionGrid
+@onready var _study_btn: Button = %StudyButton
+@onready var _repair_btn: Button = %RepairButton
+@onready var _authenticate_btn: Button = %AuthenticateButton
+@onready var _restore_btn: Button = %RestoreButton
+@onready var _remove_btn: Button = %RemoveButton
+@onready var _value_title_label: Label = %ValueTitleLabel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -291,6 +292,7 @@ func _refresh_detail() -> void:
 
     # Hide detail content when nothing selected
     _detail_name_label.visible = has_selection
+    _auth_tag_label.visible = false
     _detail_category_label.visible = has_selection
     _detail_section.get_node("DetailRarityHBox").visible = has_selection
     _detail_section.get_node("DetailStatsHBox").visible = has_selection
@@ -305,6 +307,7 @@ func _refresh_detail() -> void:
 
     # ── Name and category ─────────────────────────────────────────────────────
     _detail_name_label.text = entry.display_name
+    _auth_tag_label.visible = entry.verified
     if entry.item_data != null and entry.item_data.category_data != null:
         _detail_category_label.text = "%s · #%d" % [
             entry.item_data.category_data.display_name,

@@ -23,6 +23,7 @@ enum SlotCheck {
     RESTORE_NOT_READY,
     NOT_FINAL_LAYER,
     ALREADY_VERIFIED,
+    CONDITION_TOO_LOW,
 }
 
 # -1 means the slot is empty.
@@ -178,6 +179,8 @@ static func check_assignable(entry: ItemEntry, action: SlotAction) -> SlotCheck:
                 return SlotCheck.NOT_FINAL_LAYER
             if entry.verified:
                 return SlotCheck.ALREADY_VERIFIED
+            if entry.condition <= 0.5:
+                return SlotCheck.CONDITION_TOO_LOW
             return SlotCheck.OK
         _:
             push_warning("ResearchSlot: unknown SlotAction %d" % action)
@@ -210,4 +213,6 @@ static func describe_blocked(check: SlotCheck, entry: ItemEntry) -> String:
             return "Must be at final perceived layer"
         SlotCheck.ALREADY_VERIFIED:
             return "Already verified"
+        SlotCheck.CONDITION_TOO_LOW:
+            return "Repair before authenticating"
     return ""

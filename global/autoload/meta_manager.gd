@@ -99,7 +99,13 @@ func _tick_research_slots(days: int) -> Array[Dictionary]:
             if slot.completed and not completed_during_tick:
                 completed_during_tick = true
 
-        SaveManager.research_slots[i] = slot.to_dict()
+        # AUTHENTICATE auto-clears on completion — entry.verified is the
+        # source of truth; the slot has no further use once verified is set.
+        # All other actions keep the completed slot until the player removes it.
+        if slot.action == ResearchSlot.SlotAction.AUTHENTICATE and slot.completed:
+            SaveManager.research_slots[i] = ResearchSlot.new().to_dict()
+        else:
+            SaveManager.research_slots[i] = slot.to_dict()
 
         if completed_during_tick:
             completions.append(

@@ -32,7 +32,7 @@ enum Column {
     MARKET_FACTOR,
     RESEARCH_STATUS,
     INSPECTION,
-    UNLOCK,
+    STATUS,
 }
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ const COLUMN_HEADERS: Dictionary = {
     Column.MARKET_FACTOR: "Market",
     Column.RESEARCH_STATUS: "Research",
     Column.INSPECTION: "Inspection",
-    Column.UNLOCK: "Unlock",
+    Column.STATUS: "Status",
 }
 
 const COLUMN_MIN_WIDTH: Dictionary = {
@@ -67,7 +67,7 @@ const COLUMN_MIN_WIDTH: Dictionary = {
     Column.MARKET_FACTOR: 100,
     Column.RESEARCH_STATUS: 100,
     Column.INSPECTION: 100,
-    Column.UNLOCK: 80,
+    Column.STATUS: 80,
 }
 
 # ── State ─────────────────────────────────────────────────────────────────────
@@ -80,7 +80,8 @@ var _selection_state: SelectionState = SelectionState.NONE
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _h_box_container: HBoxContainer = $HBoxContainer
-@onready var _name_label: Label = $HBoxContainer/NameLabel
+@onready var _name_cell: HBoxContainer = $HBoxContainer/NameHBox
+@onready var _name_label: Label = $HBoxContainer/NameHBox/NameLabel
 @onready var _condition_label: Label = $HBoxContainer/ConditionLabel
 @onready var _estimated_value_label: Label = $HBoxContainer/EstimatedValueLabel
 @onready var _base_value_label: Label = $HBoxContainer/BaseValueLabel
@@ -92,7 +93,8 @@ var _selection_state: SelectionState = SelectionState.NONE
 @onready var _market_factor_label: Label = $HBoxContainer/MarketFactorLabel
 @onready var _research_status_label: Label = $HBoxContainer/ResearchStatusLabel
 @onready var _inspection_label: Label = $HBoxContainer/InspectionLabel
-@onready var _unlock_label: Label = $HBoxContainer/UnlockLabel
+@onready var _auth_tag_label: Label = $HBoxContainer/NameHBox/AuthTagLabel
+@onready var _status_label: Label = $HBoxContainer/StatusLabel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -180,7 +182,7 @@ func _refresh() -> void:
         return
 
     # ── Column visibility ─────────────────────────────────────────────────────
-    _name_label.visible = Column.NAME in _columns
+    _name_cell.visible = Column.NAME in _columns
     _condition_label.visible = Column.CONDITION in _columns
     _estimated_value_label.visible = Column.ESTIMATED_VALUE in _columns
     _base_value_label.visible = Column.BASE_VALUE in _columns
@@ -192,7 +194,7 @@ func _refresh() -> void:
     _market_factor_label.visible = Column.MARKET_FACTOR in _columns
     _research_status_label.visible = Column.RESEARCH_STATUS in _columns
     _inspection_label.visible = Column.INSPECTION in _columns
-    _unlock_label.visible = Column.UNLOCK in _columns
+    _status_label.visible = Column.STATUS in _columns
 
     # ── Column order ──────────────────────────────────────────────────────────
     _apply_column_order()
@@ -200,6 +202,11 @@ func _refresh() -> void:
     # ── NAME ──────────────────────────────────────────────────────────────────
     _name_label.text = _entry.display_name_text()
     _name_label.add_theme_color_override(&"font_color", _entry.display_name_color())
+
+    var item_entry := _entry as ItemEntry
+    _auth_tag_label.visible = Column.NAME in _columns \
+    and item_entry != null \
+    and item_entry.verified
 
     # ── CONDITION ─────────────────────────────────────────────────────────────
     _condition_label.text = _entry.condition_text()
@@ -237,8 +244,8 @@ func _refresh() -> void:
     # ── INSPECTION ────────────────────────────────────────────────────────────
     _inspection_label.text = _entry.inspection_text()
 
-    # ── UNLOCK ────────────────────────────────────────────────────────────────
-    _unlock_label.text = _entry.unlock_text()
+    # ── STATUS ────────────────────────────────────────────────────────────────
+    _status_label.text = _entry.unlock_text()
 
 # ══ Column ordering ═══════════════════════════════════════════════════════════
 
@@ -248,7 +255,7 @@ func _apply_column_order() -> void:
         return
 
     var column_to_label: Dictionary = {
-        Column.NAME: _name_label,
+        Column.NAME: _name_cell,
         Column.CONDITION: _condition_label,
         Column.ESTIMATED_VALUE: _estimated_value_label,
         Column.BASE_VALUE: _base_value_label,
@@ -260,7 +267,7 @@ func _apply_column_order() -> void:
         Column.MARKET_FACTOR: _market_factor_label,
         Column.RESEARCH_STATUS: _research_status_label,
         Column.INSPECTION: _inspection_label,
-        Column.UNLOCK: _unlock_label,
+        Column.STATUS: _status_label,
     }
 
     for i in _columns.size():
