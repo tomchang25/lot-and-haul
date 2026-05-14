@@ -199,6 +199,7 @@ func _refresh() -> void:
 
     # ── NAME ──────────────────────────────────────────────────────────────────
     _name_label.text = _entry.display_name_text()
+    _name_label.add_theme_color_override(&"font_color", _entry.display_name_color())
 
     # ── CONDITION ─────────────────────────────────────────────────────────────
     _condition_label.text = _entry.condition_text()

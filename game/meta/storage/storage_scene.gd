@@ -317,7 +317,7 @@ func _refresh_detail() -> void:
     if entry.verified:
         _detail_rarity_label.text = "%s ✓" % entry.confirmed_rarity_label
     else:
-        _detail_rarity_label.text = entry.perceived_rarity_label
+        _detail_rarity_label.text = entry.storage_rarity_label
 
     # ── Condition ─────────────────────────────────────────────────────────────
     _detail_cond_value.text = entry.condition_label
@@ -420,7 +420,7 @@ func _progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
         ResearchSlot.SlotAction.STUDY:
             if slot.completed or entry.is_fully_inspected():
                 return "Fully Inspected"
-            return "Rarity: %s   Condition: %s" % [entry.perceived_rarity_label, entry.condition_label]
+            return "Rarity: %s   Condition: %s" % [entry.storage_rarity_label, entry.condition_label]
         ResearchSlot.SlotAction.REPAIR:
             return "Condition: %d%%" % int(entry.condition * 100)
         ResearchSlot.SlotAction.RESTORE:

@@ -222,42 +222,49 @@ func get_known_condition_multiplier() -> float:
         _:
             return 0.0
 
-# Rarity label the player can see, driven by layer depth (+ intuition_level).
-var perceived_rarity_label: String:
-    get:
-        var effective_layer: int = layer_index + intuition_level
-        var rarity_value: int = item_data.rarity
+# [LEGACY] Rarity hint once shown to players based on layer depth (+ intuition_level).
+# Kept for older call sites/data inspection; verified rarity is now gated by Authenticate.
+# var perceived_rarity_label: String:
+#     get:
+#         var effective_layer: int = layer_index + intuition_level
+#         var rarity_value: int = item_data.rarity
 
-        # effective_layer 0 (veiled): no rarity shown.
-        if effective_layer <= 0:
-            return "Veiled"
+#         # effective_layer 0 (veiled): no rarity shown.
+#         if effective_layer <= 0:
+#             return "Veiled"
 
-        # Layer-based rarity reveal table
-        match effective_layer:
-            1:
-                if rarity_value == ItemData.Rarity.COMMON:
-                    return "Common"
-                else:
-                    return "Uncommon+"
-            2:
-                if rarity_value <= ItemData.Rarity.UNCOMMON:
-                    return _true_rarity_name()
-                else:
-                    return "Rare+"
-            3:
-                if rarity_value <= ItemData.Rarity.RARE:
-                    return _true_rarity_name()
-                else:
-                    return "Epic+"
-            _:
-                # 4+ → all show true name
-                return _true_rarity_name()
+#         # Layer-based rarity reveal table
+#         match effective_layer:
+#             1:
+#                 if rarity_value == ItemData.Rarity.COMMON:
+#                     return "Common"
+#                 else:
+#                     return "Uncommon+"
+#             2:
+#                 if rarity_value <= ItemData.Rarity.UNCOMMON:
+#                     return _true_rarity_name()
+#                 else:
+#                     return "Rare+"
+#             3:
+#                 if rarity_value <= ItemData.Rarity.RARE:
+#                     return _true_rarity_name()
+#                 else:
+#                     return "Epic+"
+#             _:
+#                 # 4+ → all show true name
+#                 return _true_rarity_name()
 
 var confirmed_rarity_label: String:
     get:
         return _true_rarity_name()
 
-# Sort-safe rarity value based on what the player can actually see.
+var storage_rarity_label: String:
+    get:
+        if is_veiled() or item_data == null:
+            return LotObjectEntry.UNKNOWN_TEXT
+        return _true_rarity_name() if verified else LotObjectEntry.UNKNOWN_TEXT
+
+# [LEGACY] Sort-safe rarity hint based on the old perceived rarity reveal.
 # Confirmed rarity → enum int (0–4). Unconfirmed floor ("X+") → enum + 0.5.
 # Veiled → -1.
 var perceived_rarity: float:
@@ -703,7 +710,9 @@ func special_order_text(order: SpecialOrder) -> String:
 
 
 func rarity_text() -> String:
-    return LotObjectEntry.UNKNOWN_TEXT if is_veiled() else perceived_rarity_label
+    if is_veiled() or item_data == null:
+        return LotObjectEntry.UNKNOWN_TEXT
+    return _true_rarity_name() if verified else LotObjectEntry.UNKNOWN_TEXT
 
 
 func weight_text() -> String:
@@ -774,6 +783,22 @@ func condition_display_color() -> Color:
     return condition_color
 
 
+func display_name_color() -> Color:
+    if is_veiled() or not verified or item_data == null:
+        return Color.WHITE
+    match item_data.rarity:
+        ItemData.Rarity.UNCOMMON:
+            return Color(0.4, 0.8, 0.4)
+        ItemData.Rarity.RARE:
+            return Color(0.3, 0.6, 1.0)
+        ItemData.Rarity.EPIC:
+            return Color(0.7, 0.4, 1.0)
+        ItemData.Rarity.LEGENDARY:
+            return Color(1.0, 0.75, 0.2)
+        _:
+            return Color(0.85, 0.85, 0.85)
+
+
 func category_data() -> CategoryData:
     return item_data.category_data if item_data != null else null
 
@@ -828,7 +853,7 @@ func sort_value(column: int, ctx: ItemViewContext) -> Variant:
         LotObjectEntry.COLUMN_SPECIAL_ORDER:
             return special_order_value(ctx.order)
         LotObjectEntry.COLUMN_RARITY:
-            return perceived_rarity
+            return float(item_data.rarity) if verified and item_data != null else -1.0
         LotObjectEntry.COLUMN_WEIGHT:
             var weight_category := category_data()
             return weight_category.weight if weight_category != null else 0.0

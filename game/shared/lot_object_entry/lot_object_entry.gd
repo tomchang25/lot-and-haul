@@ -92,6 +92,10 @@ func condition_display_color() -> Color:
     return Color.WHITE
 
 
+func display_name_color() -> Color:
+    return Color.WHITE
+
+
 func category_data() -> CategoryData:
     return null
 
