@@ -53,9 +53,10 @@ var _selected_entry: ItemEntry = null
 @onready var _action_grid: GridContainer = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid
 @onready var _study_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/StudyButton
 @onready var _repair_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/RepairButton
-@onready var _unlock_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/UnlockButton
+@onready var _authenticate_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/AuthenticateButton
 @onready var _restore_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/RestoreButton
 @onready var _remove_btn: Button = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid/RemoveButton
+@onready var _value_title_label: Label = $RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox/ValuePanel/ValueMargin/ValueVBox/ValueTitleLabel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -68,7 +69,7 @@ func _ready() -> void:
     _back_btn.pressed.connect(_on_back_pressed)
     _study_btn.pressed.connect(_on_study_pressed)
     _repair_btn.pressed.connect(_on_repair_pressed)
-    _unlock_btn.pressed.connect(_on_unlock_pressed)
+    _authenticate_btn.pressed.connect(_on_authenticate_pressed)
     _restore_btn.pressed.connect(_on_restore_pressed)
     _remove_btn.pressed.connect(_on_remove_pressed)
 
@@ -107,8 +108,8 @@ func _on_repair_pressed() -> void:
     _assign_action(ResearchSlot.SlotAction.REPAIR)
 
 
-func _on_unlock_pressed() -> void:
-    _assign_action(ResearchSlot.SlotAction.UNLOCK)
+func _on_authenticate_pressed() -> void:
+    _assign_action(ResearchSlot.SlotAction.AUTHENTICATE)
 
 
 func _on_restore_pressed() -> void:
@@ -192,10 +193,13 @@ func _build_task_card(slot: ResearchSlot, entry: ItemEntry) -> PanelContainer:
     var kind_label := Label.new()
     kind_label.add_theme_font_size_override("font_size", 10)
     kind_label.text = ResearchSlot.action_to_string(slot.action).to_upper()
-    if slot.action == ResearchSlot.SlotAction.UNLOCK:
-        kind_label.add_theme_color_override("font_color", Color(0.95, 0.75, 0.3))
-    else:
-        kind_label.add_theme_color_override("font_color", Color(0.42, 0.75, 0.85))
+    match slot.action:
+        ResearchSlot.SlotAction.UNLOCK:
+            kind_label.add_theme_color_override("font_color", Color(0.95, 0.75, 0.3))
+        ResearchSlot.SlotAction.AUTHENTICATE:
+            kind_label.add_theme_color_override("font_color", Color(0.6, 0.9, 0.4))
+        _:
+            kind_label.add_theme_color_override("font_color", Color(0.42, 0.75, 0.85))
     kind_label.custom_minimum_size.x = 52
     hbox.add_child(kind_label)
 
@@ -233,6 +237,15 @@ func _build_task_card(slot: ResearchSlot, entry: ItemEntry) -> PanelContainer:
     return card
 
 
+func _authenticate_progress_text(slot: ResearchSlot, entry: ItemEntry) -> String:
+    if slot.completed:
+        return "Verified"
+    return "Authenticating… Day %d/%d" % [
+        slot.authenticate_days_spent,
+        Economy.AUTHENTICATE_DAYS.get(entry.item_data.rarity, 3),
+    ]
+
+
 func _task_progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
     if entry == null:
         return ""
@@ -249,6 +262,8 @@ func _task_progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
             var action_def: LayerUnlockAction = entry.current_unlock_action()
             var difficulty: float = action_def.difficulty if action_def != null else 0.0
             return "Progress: %.1f / %.1f" % [entry.unlock_progress, difficulty]
+        ResearchSlot.SlotAction.AUTHENTICATE:
+            return _authenticate_progress_text(slot, entry)
         _:
             return ""
 
@@ -299,7 +314,10 @@ func _refresh_detail() -> void:
         _detail_category_label.text = "#%d" % entry.id
 
     # ── Rarity ─────────────────────────────────────────────────────────────────
-    _detail_rarity_label.text = entry.perceived_rarity_label
+    if entry.verified:
+        _detail_rarity_label.text = "%s ✓" % entry.confirmed_rarity_label
+    else:
+        _detail_rarity_label.text = entry.perceived_rarity_label
 
     # ── Condition ─────────────────────────────────────────────────────────────
     _detail_cond_value.text = entry.condition_label
@@ -309,19 +327,26 @@ func _refresh_detail() -> void:
     _detail_est_value.text = entry.estimated_value_label
     _detail_est_value.add_theme_color_override(&"font_color", entry.price_color)
 
-    # ── Price convergence ─────────────────────────────────────────────────────
-    if entry.is_veiled():
+    # ── Price convergence / verified value title ─────────────────────────────
+    if entry.verified:
+        _detail_conv_ratio.text = "Verified"
+        _detail_conv_ratio.modulate = Color(0.4, 1.0, 0.5)
+        _value_title_label.text = "True Value"
+    elif entry.is_veiled():
         _detail_conv_ratio.text = "???"
         _detail_conv_ratio.modulate = Color(0.5, 0.5, 0.5)
+        _value_title_label.text = "Est. Value"
     elif entry.is_price_converged():
         _detail_conv_ratio.text = "Converged"
         _detail_conv_ratio.modulate = Color(0.4, 1.0, 0.5)
+        _value_title_label.text = "Est. Value"
     else:
         var lo: int = entry.estimated_value_min
         var hi: int = entry.estimated_value_max
         var ratio: float = float(lo) / float(hi) * 100.0 if hi > 0 else 0.0
         _detail_conv_ratio.text = "%d%%" % int(ratio)
         _detail_conv_ratio.modulate = Color(0.95, 0.75, 0.3) if ratio < 60.0 else Color.WHITE
+        _value_title_label.text = "Est. Value"
 
     # ── Slot status ───────────────────────────────────────────────────────────
     var slot_index: int = _find_slot_index(entry)
@@ -341,17 +366,17 @@ func _refresh_detail() -> void:
 
     _configure_action_btn(_study_btn, "Study", entry, ResearchSlot.SlotAction.STUDY, current_slot)
     _configure_action_btn(_repair_btn, "Repair", entry, ResearchSlot.SlotAction.REPAIR, current_slot)
-    _configure_action_btn(_unlock_btn, "Unlock", entry, ResearchSlot.SlotAction.UNLOCK, current_slot)
+    _configure_action_btn(_authenticate_btn, "Authenticate", entry, ResearchSlot.SlotAction.AUTHENTICATE, current_slot)
     _configure_action_btn(_restore_btn, "Restore", entry, ResearchSlot.SlotAction.RESTORE, current_slot)
 
     if not slots_available:
         _study_btn.disabled = true
         _repair_btn.disabled = true
-        _unlock_btn.disabled = true
+        _authenticate_btn.disabled = true
         _restore_btn.disabled = true
         _study_btn.tooltip_text = "No research slots available"
         _repair_btn.tooltip_text = "No research slots available"
-        _unlock_btn.tooltip_text = "No research slots available"
+        _authenticate_btn.tooltip_text = "No research slots available"
         _restore_btn.tooltip_text = "No research slots available"
 
     # Repair / Restore: only show one at a time; never both visible.
@@ -406,6 +431,8 @@ func _progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
             var action_def: LayerUnlockAction = entry.current_unlock_action()
             var difficulty: float = action_def.difficulty if action_def != null else 0.0
             return "Progress: %.1f / %.1f" % [entry.unlock_progress, difficulty]
+        ResearchSlot.SlotAction.AUTHENTICATE:
+            return _authenticate_progress_text(slot, entry)
         _:
             push_warning("StorageScene: unknown SlotAction %d" % slot.action)
             return ""

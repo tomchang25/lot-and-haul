@@ -85,6 +85,14 @@ func _tick_research_slots(days: int) -> Array[Dictionary]:
                 ResearchSlot.SlotAction.RESTORE:
                     entry.apply_restore()
                     slot.completed = entry.is_restore_complete()
+                ResearchSlot.SlotAction.AUTHENTICATE:
+                    slot.authenticate_days_spent += 1
+                    var duration: int = Economy.AUTHENTICATE_DAYS.get(
+                        entry.item_data.rarity, 3,
+                    )
+                    if slot.authenticate_days_spent >= duration:
+                        entry.verified = true
+                        slot.completed = true
                 _:
                     push_warning("MetaManager: unknown SlotAction %d" % slot.action)
                     break
@@ -122,6 +130,8 @@ func _slot_effect_label(action: ResearchSlot.SlotAction) -> String:
             return "Layer unlocked"
         ResearchSlot.SlotAction.RESTORE:
             return "Fully restored"
+        ResearchSlot.SlotAction.AUTHENTICATE:
+            return "Verified"
         _:
             push_warning("MetaManager: unknown SlotAction %d" % action)
             return "Done"
@@ -244,6 +254,11 @@ func _find_empty_slot_index() -> int:
 
 func resolve_run(record: RunRecord) -> DaySummary:
     SaveManager.cash += record.onsite_proceeds + record.commodity_sales - record.paid_price - record.entry_fee - record.fuel_cost
+
+    # Phase 5: Auto-advance all incoming items to final perceived layer
+    # before registering, so the first save already has correct state.
+    for entry: ItemEntry in record.cargo_items:
+        entry.advance_to_final_layer()
 
     register_storage_items(record.cargo_items)
 

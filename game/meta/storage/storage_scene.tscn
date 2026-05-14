@@ -304,12 +304,12 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
 text = "Repair"
 
-[node name="UnlockButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1962471177]
+[node name="AuthenticateButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1962471177]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
-text = "Unlock"
+text = "Authenticate"
 
 [node name="RestoreButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1111111111]
 custom_minimum_size = Vector2(0, 36)

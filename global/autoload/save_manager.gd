@@ -95,6 +95,7 @@ func _read_save_file() -> void:
                 continue
             var entry: ItemEntry = ItemEntry.from_dict(d)
             if entry != null:
+                entry.apply_storage_migration()
                 storage_items.append(entry)
     if parsed.has("current_day") and parsed["current_day"] is float:
         current_day = int(parsed["current_day"])
@@ -193,6 +194,20 @@ func _read_save_file() -> void:
     var valid_ids: Array = []
     for entry: ItemEntry in storage_items:
         valid_ids.append(entry.id)
+
+    # Clear orphaned UNLOCK slots for items now at final layer (Phase 5 migration).
+    for i: int in range(research_slots.size()):
+        var d: Dictionary = research_slots[i]
+        if d.get("action", "") != "unlock":
+            continue
+        var sid: int = int(d.get("item_id", -1))
+        if sid == -1:
+            continue
+        for entry: ItemEntry in storage_items:
+            if entry.id == sid and entry.is_at_final_layer():
+                research_slots[i] = { "item_id": -1, "action": "study", "completed": false }
+                break
+
     ResearchSlot.purge_orphaned(research_slots, valid_ids)
 
 

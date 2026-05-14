@@ -93,10 +93,16 @@ var id: int = -1
 # inspection so the range always converges on the true value.
 var center_offset: float = 0.0
 
-# Accumulated effort toward the current layer's unlock action. Reset on
-# advance_layer(). Persisted because UNLOCK resets it on advance, so completion
-# cannot be derived from layer_index alone.
+# [LEGACY] Accumulated effort toward the current layer's unlock action.
+# Used only by the UNLOCK SlotAction flow. The AUTHENTICATE path (Phase 6+)
+# does not use this field; progress is tracked in ResearchSlot.authenticate_days_spent.
+# Reset on advance_layer(). Persisted because UNLOCK resets it on advance,
+# so completion cannot be derived from layer_index alone.
 var unlock_progress: float = 0.0
+
+# True after Storage Authenticate completes. Reveals item_data.item_name
+# and item_data.base_price in the UI.
+var verified: bool = false
 
 # Lazy-cached appraisal skill reference.
 var _appraisal_skill: SkillData = null
@@ -129,9 +135,12 @@ var display_name: String:
     get:
         if is_veiled():
             return "Unknown Item"
+        if verified:
+            if item_data.item_name.is_empty():
+                push_warning("ItemEntry %d: verified but item_name is empty" % id)
+                return "Unknown ✓"
+            return "%s ✓" % item_data.item_name
         var name: String = active_layer().display_name
-        if is_at_final_layer() and not is_veiled():
-            name = "%s ·" % name
         if id >= 0 and ResearchSlot.action_for_item(SaveManager.research_slots, id) != "":
             name += " ⚙"
         return name
@@ -243,6 +252,10 @@ var perceived_rarity_label: String:
             _:
                 # 4+ → all show true name
                 return _true_rarity_name()
+
+var confirmed_rarity_label: String:
+    get:
+        return _true_rarity_name()
 
 # Sort-safe rarity value based on what the player can actually see.
 # Confirmed rarity → enum int (0–4). Unconfirmed floor ("X+") → enum + 0.5.
@@ -358,6 +371,24 @@ func advance_layer() -> void:
     )
 
 
+# Advances this entry directly to its final perceived identity layer.
+# Used by Hub final-layer resolution (Phase 5) and apply_storage_migration().
+func advance_to_final_layer() -> void:
+    if item_data == null or item_data.identity_layers.is_empty():
+        return
+    layer_index = item_data.identity_layers.size() - 1
+    inspected = true
+    unlock_progress = 1.0
+
+
+# Idempotent migration applied to every ItemEntry when it enters or is loaded
+# from Storage. Ensures the entry is always at its final perceived layer.
+# Add future per-entry migration steps here so SaveManager stays free of
+# entry-level logic.
+func apply_storage_migration() -> void:
+    advance_to_final_layer()
+
+
 func is_repair_complete() -> bool:
     return condition >= 0.5
 
@@ -415,6 +446,8 @@ var estimated_value_min: int:
     get:
         if is_veiled():
             return 0
+        if verified:
+            return item_data.base_price
         var layer := active_layer()
         if layer == null:
             return 0
@@ -427,6 +460,8 @@ var estimated_value_max: int:
     get:
         if is_veiled():
             return 0
+        if verified:
+            return item_data.base_price
         var layer := active_layer()
         if layer == null:
             return 0
@@ -446,6 +481,8 @@ var estimated_value_label: String:
     get:
         if is_veiled():
             return "???"
+        if verified:
+            return "$%d" % item_data.base_price
         var suffix: String = "" if is_at_final_layer() else "+"
         var lo: int = estimated_value_min
         var hi: int = estimated_value_max
@@ -458,7 +495,7 @@ var estimated_value_label: String:
 # conditionally folds in condition, knowledge, and market factors based on the
 # supplied PriceConfig, and finally scales by config.multiplier.
 func compute_price(config: PriceConfig) -> int:
-    var value: float = float(active_layer().base_value)
+    var value: float = float(item_data.base_price if verified else active_layer().base_value)
 
     if config.condition:
         if config.use_known_condition:
@@ -586,15 +623,25 @@ func price_value_for(ctx: ItemViewContext) -> int:
 
 
 func estimated_value_sort_value() -> int:
+    if verified:
+        return item_data.base_price
     return estimated_value_min
 
 
 func base_value_label_text() -> String:
-    return "???" if is_veiled() else "$%d" % active_layer().base_value
+    if is_veiled():
+        return "???"
+    if verified:
+        return "$%d" % item_data.base_price
+    return "$%d" % active_layer().base_value
 
 
 func base_value_sort_value() -> int:
-    return 0 if is_veiled() else active_layer().base_value
+    if is_veiled():
+        return 0
+    if verified:
+        return item_data.base_price
+    return active_layer().base_value
 
 
 func merchant_offer_label(merchant: MerchantData) -> String:
@@ -694,6 +741,8 @@ func research_status_text() -> String:
                 return "R"
             "unlock":
                 return "U"
+            "authenticate":
+                return "A"
             _:
                 return "?"
     return ""
@@ -706,8 +755,10 @@ func inspection_text() -> String:
 func unlock_text() -> String:
     if is_veiled():
         return LotObjectEntry.UNKNOWN_TEXT
+    if verified:
+        return "✓✓"
     if is_at_final_layer():
-        return "✓"
+        return "·"
     if current_unlock_action() == null:
         return "-"
     if unlock_progress == 0.0:
@@ -834,6 +885,10 @@ func is_at_final_layer() -> bool:
     return _safe_layer_index() == item_data.identity_layers.size() - 1
 
 
+func is_authenticated() -> bool:
+    return verified
+
+
 # Marks an uninspected item as inspected. Shared by the reveal scene and the
 # inspection action. Runtime entries already start at layer 1.
 func unveil() -> void:
@@ -897,6 +952,7 @@ func to_dict() -> Dictionary:
         "intuition_level": intuition_level,
         "center_offset": center_offset,
         "unlock_progress": unlock_progress,
+        "verified": verified,
     }
 
 
@@ -925,5 +981,7 @@ static func from_dict(d: Dictionary) -> ItemEntry:
         entry.unlock_progress = float(d["unlock_progress"])
     if d.has("id"):
         entry.id = int(d["id"])
+    if d.has("verified"):
+        entry.verified = bool(d["verified"])
     # Legacy inspection_level key is intentionally ignored — clean break.
     return entry
