@@ -45,21 +45,36 @@ identity_layers:
   - layer_id: snake_case string
     display_name: string
     base_value: int
-    unlock_action: null
+    unlock_action: null   # [Legacy] — include for now; scheduled for removal
+    clues:
+      - clue_id: snake_case string globally unique
+        known_text: string
+        unknown_hint_text: string   # optional
+        ap_cost_penalty: int        # required, must be >= 1
+        required_skill: skill_id    # include when gated by skill
+        required_level: int         # required when required_skill is present
+        required_category_rank: int # include when gated by category rank
+        required_perk: perk_id      # include when gated by perk
 ```
 
-For gated layers:
+For gated layers (unlock_action is Legacy but still required in output):
 
 ```yaml
 identity_layers:
   - layer_id: snake_case string
     display_name: string
     base_value: int
-    unlock_action:
+    unlock_action:                  # [Legacy]
       difficulty: 2.0
       required_skill: appraisal
       required_level: 1
       required_condition: 0.7
+    clues:
+      - clue_id: snake_case string
+        known_text: string
+        ap_cost_penalty: 2
+        required_skill: appraisal
+        required_level: 1
 ```
 
 ## Item Schema
@@ -84,10 +99,13 @@ items:
 - Final layers must be specific enough to support an auction decision, but must not reveal the exact verified item identity when the exact item has brand, maker, serial, provenance, year, or model detail.
 - `base_value` must strictly increase along each item's `layer_ids` chain.
 - `base_value` is perceived value, not true verified value.
-- `unlock_action` describes how the player advances past this layer.
+- `unlock_action` [Legacy] — still required in output but scheduled for removal. Follow existing rules for now.
 - Use `unlock_action: null` on every final layer.
 - Use `unlock_action: null` on layer 0 veil layers because they auto-resolve on reveal.
 - Do not use `unlock_action: null` on non-final, non-veil layers.
+- Every branch layer (non-veil, non-final) must have a `clues` list with at least one clue.
+- Veil layers and final layers must not have a `clues` field.
+- Clues gate the ADVANCE action AP cost. Final layers cannot be advanced past, so clues there serve no purpose.
 
 ## Unlock Action Rules
 
@@ -100,6 +118,40 @@ items:
 - `required_skill`: omit entirely if no skill is needed. Valid values are `appraisal`, `authentication`, `maintenance`.
 - `required_level`: include only when `required_skill` is present.
 - `required_condition`: include only when item condition gates the action. Omit when 0.
+
+## Clue Rules
+
+Every non-veil layer must have a `clues` list. Veil layers (layer 0) must not have clues.
+
+**ap_cost_penalty** is required on every clue. It must be a positive integer (≥ 1). Omitting it or setting it to 0 is not allowed. It represents extra AP added to the ADVANCE action when this clue has not yet been revealed — so a clue with no penalty is a meaningless gate.
+
+**At least one required_X field must be present on every clue.** Valid gate fields are:
+
+- `required_skill` + `required_level`: player must have the named skill at the given level.
+- `required_category_rank`: player must have the given rank in the item's super-category.
+- `required_perk`: player must hold the named perk.
+
+A clue with no required_X would reveal automatically with zero prerequisites, which defeats the clue system's purpose. Every clue must gate on something.
+
+**Clue count per layer:**
+
+- Non-veil, non-final (branch) layers: 1 to 2 clues.
+- Final (leaf) layers: no clues. Clues gate the ADVANCE action; final layers have no ADVANCE, so clues there are mechanically inert.
+
+**clue_id** must be globally unique across all clues in the project. Use descriptive snake_case that references the layer and the specific observation: `{layer_id}_{observation}`. Examples: `lamp_glass_body_clear_font`, `clock_enamel_dial_hairlines`.
+
+**known_text** is shown after the clue is revealed. Write it as a concise first-person observation: `"Clear blown-glass font with no seam lines."`, `"Gilt transfer numerals with fine hairline cracking."`. Do not use vague or generic text.
+
+**unknown_hint_text** is optional. If omitted, the UI auto-generates a hint from the required fields. Provide it only when the auto-hint would be confusing or misleading.
+
+**Valid required_skill values:** `appraisal`, `authentication`, `maintenance`.
+
+**ap_cost_penalty guidance by gate type:**
+
+- `required_category_rank: 1`: 1 AP. Low barrier.
+- `required_skill` at level 1: 1–2 AP. Accessible skill check.
+- `required_skill` at level 2+: 2–3 AP. Meaningful skill investment.
+- `required_perk`: 2–3 AP. Rare gate; use sparingly.
 
 ## Item Rules
 
@@ -197,6 +249,13 @@ If the user specifies a rarity distribution, follow it except for Legendary gene
 - Never reuse `item_id` or `layer_id` values within the same file.
 - Never create a loop in an item layer chain.
 - Never write placeholder names or IDs.
+- Never omit `clues` on a branch layer (non-veil, non-final).
+- Never add `clues` to a veil layer or a final layer.
+- Never set `ap_cost_penalty` to 0 or omit it on any clue.
+- Never create a clue with no `required_X` field (required_skill, required_category_rank, or required_perk).
+- Never add `required_level` without `required_skill` in the same clue.
+- Never reuse a `clue_id` across any layers or items in the project.
+- Never use vague or generic `known_text` (e.g. "Interesting detail found.").
 
 ## User Prompt Template
 
@@ -232,7 +291,7 @@ Output the complete YAML block starting with `categories:`.
 - `base_price` is greater than the final layer's `base_value`.
 - Final perceived layer display name is not identical to `item_name`.
 - `difficulty` is a positive float, typically 1.0 to 5.0.
-- No `required_level` appears without `required_skill`.
+- No `required_level` appears without `required_skill` (in unlock_action or clue).
 - `required_skill` values are only `appraisal`, `authentication`, `maintenance`.
 - Shared layers appear exactly once in `identity_layers`.
 - Shape ID is valid when a category is included.
@@ -242,3 +301,11 @@ Output the complete YAML block starting with `categories:`.
 - Veil layer count per category does not exceed `1 + floor(item_count / 10)`.
 - Veil layer IDs use numbered suffixes.
 - Items are distributed roughly evenly across veil variants.
+- Every branch layer (non-veil, non-final) has a `clues` list with at least one entry.
+- No veil layer has a `clues` field.
+- No final layer has a `clues` field.
+- Every clue has `ap_cost_penalty` ≥ 1.
+- Every clue has at least one of: `required_skill`, `required_category_rank`, `required_perk`.
+- Every `clue_id` is unique across all layers in the output.
+- Branch layers (non-veil, non-final) have 1–2 clues. Final and veil layers have none.
+- `known_text` is specific and observational, not vague or generic.

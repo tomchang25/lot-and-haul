@@ -5,7 +5,6 @@ class_name ResearchSlot
 extends RefCounted
 
 enum SlotAction {
-    STUDY,
     REPAIR,
     UNLOCK,
     RESTORE,
@@ -14,8 +13,6 @@ enum SlotAction {
 
 enum SlotCheck {
     OK,
-    FULLY_INSPECTED,
-    SCRUTINY_MAXED,
     REPAIR_COMPLETE,
     NO_UNLOCK_ACTION,
     ADVANCE_BLOCKED,
@@ -28,7 +25,7 @@ enum SlotCheck {
 
 # -1 means the slot is empty.
 var item_id: int = -1
-var action: SlotAction = SlotAction.STUDY
+var action: SlotAction = SlotAction.REPAIR
 
 # Set by the day-tick dispatch when the slot finishes its work. Persisted
 # because UNLOCK resets ItemEntry.unlock_progress on advance, so completion
@@ -55,8 +52,6 @@ static func create(a: SlotAction, id: int) -> ResearchSlot:
 
 static func action_to_string(a: SlotAction) -> String:
     match a:
-        SlotAction.STUDY:
-            return "study"
         SlotAction.REPAIR:
             return "repair"
         SlotAction.UNLOCK:
@@ -72,8 +67,6 @@ static func action_to_string(a: SlotAction) -> String:
 
 static func action_from_string(s: String) -> SlotAction:
     match s:
-        "study":
-            return SlotAction.STUDY
         "repair":
             return SlotAction.REPAIR
         "unlock":
@@ -84,7 +77,7 @@ static func action_from_string(s: String) -> SlotAction:
             return SlotAction.AUTHENTICATE
         _:
             push_error("ResearchSlot: unrecognised action string '%s'" % s)
-            return SlotAction.STUDY
+            return SlotAction.REPAIR
 
 
 @warning_ignore("shadowed_variable")
@@ -112,7 +105,7 @@ static func clear_for_item(slots: Array, item_id: int) -> void:
     var idx: int = find_index(slots, item_id)
     if idx < 0:
         return
-    slots[idx] = { "item_id": -1, "action": "study", "completed": false }
+    slots[idx] = ResearchSlot.new().to_dict()
 
 
 static func purge_orphaned(slots: Array, valid_ids: Array) -> void:
@@ -122,7 +115,7 @@ static func purge_orphaned(slots: Array, valid_ids: Array) -> void:
         if sid == -1:
             continue
         if not valid_ids.has(sid):
-            slots[i] = { "item_id": -1, "action": "study", "completed": false }
+            slots[i] = ResearchSlot.new().to_dict()
 
 
 func to_dict() -> Dictionary:
@@ -139,7 +132,7 @@ func to_dict() -> Dictionary:
 static func from_dict(d: Dictionary) -> ResearchSlot:
     var slot := ResearchSlot.new()
     slot.item_id = int(d.get("item_id", -1))
-    slot.action = action_from_string(d.get("action", "study"))
+    slot.action = action_from_string(d.get("action", "repair"))
     slot.completed = bool(d.get("completed", false))
     if slot.action == SlotAction.AUTHENTICATE:
         slot.authenticate_days_spent = int(d.get("authenticate_days_spent", 0))
@@ -149,12 +142,6 @@ static func from_dict(d: Dictionary) -> ResearchSlot:
 @warning_ignore("shadowed_variable")
 static func check_assignable(entry: ItemEntry, action: SlotAction) -> SlotCheck:
     match action:
-        SlotAction.STUDY:
-            if entry.is_fully_inspected():
-                return SlotCheck.FULLY_INSPECTED
-            if not entry.is_condition_inspectable():
-                return SlotCheck.SCRUTINY_MAXED
-            return SlotCheck.OK
         SlotAction.REPAIR:
             if entry.is_repair_complete():
                 return SlotCheck.REPAIR_COMPLETE
@@ -179,7 +166,7 @@ static func check_assignable(entry: ItemEntry, action: SlotAction) -> SlotCheck:
                 return SlotCheck.NOT_FINAL_LAYER
             if entry.verified:
                 return SlotCheck.ALREADY_VERIFIED
-            if entry.condition <= 0.5:
+            if entry.condition < 0.5:
                 return SlotCheck.CONDITION_TOO_LOW
             return SlotCheck.OK
         _:
@@ -191,10 +178,6 @@ static func describe_blocked(check: SlotCheck, entry: ItemEntry) -> String:
     match check:
         SlotCheck.OK:
             return ""
-        SlotCheck.FULLY_INSPECTED:
-            return "Fully inspected"
-        SlotCheck.SCRUTINY_MAXED:
-            return "Scrutiny already maxed"
         SlotCheck.REPAIR_COMPLETE:
             return "Condition already at 50% — use Restore to continue"
         SlotCheck.NO_UNLOCK_ACTION:

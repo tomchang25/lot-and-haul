@@ -67,13 +67,6 @@ func _tick_research_slots(days: int) -> Array[Dictionary]:
             if slot.completed:
                 break
             match slot.action:
-                ResearchSlot.SlotAction.STUDY:
-                    entry.advance_scrutiny()
-                    slot.completed = entry.is_study_complete()
-                    if entry.intuition_level < entry.max_intuition_level:
-                        var intuition_chance: float = 0.05 / (entry.intuition_level + 1)
-                        if randf() < intuition_chance:
-                            entry.intuition_level += 1
                 ResearchSlot.SlotAction.REPAIR:
                     entry.apply_repair()
                     slot.completed = entry.is_repair_complete()
@@ -128,8 +121,6 @@ func _find_storage_entry(item_id: int) -> ItemEntry:
 
 func _slot_effect_label(action: ResearchSlot.SlotAction) -> String:
     match action:
-        ResearchSlot.SlotAction.STUDY:
-            return "Fully inspected"
         ResearchSlot.SlotAction.REPAIR:
             return "Repair complete"
         ResearchSlot.SlotAction.UNLOCK:

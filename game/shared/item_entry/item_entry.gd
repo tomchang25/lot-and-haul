@@ -14,30 +14,6 @@ const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Lege
 # Uniform maximum range spread, in multiplier units around 1.0.
 const PRICE_MAX_SPREAD: float = 1.0
 
-# ── Scrutiny tuning knobs ────────────────────────────────────────────────────
-
-const SCRUTINY_BASE_DELTA: float = 0.1
-const MAX_SCRUTINY: float = 0.6
-const SCRUTINY_SKILL_COEFF: float = 0.35
-
-# ── Computed-base weights ────────────────────────────────────────────────────
-
-const COMPUTED_BASE_CAT_WEIGHT: float = 0.15
-const COMPUTED_BASE_SC_WEIGHT: float = 0.03
-const COMPUTED_BASE_SKILL_WEIGHT: float = 0.05
-
-# ── Rarity divisors keyed by ItemData.Rarity enum ────────────────────────────
-
-const RARITY_DIVISORS: Dictionary = {
-    ItemData.Rarity.COMMON: 1,
-    ItemData.Rarity.UNCOMMON: 2,
-    ItemData.Rarity.RARE: 3,
-    ItemData.Rarity.EPIC: 4,
-    ItemData.Rarity.LEGENDARY: 5,
-}
-
-const INTUITION_INSPECTION_BONUS: float = 0.1
-
 # ── Research tuning knobs (non-inspection) ───────────────────────────────────
 
 const REPAIR_BASE: float = 0.15
@@ -78,11 +54,6 @@ var inspected: bool = false
 
 var condition: float = 1.0
 
-# Per-item inspection effort, advanced by Inspect and Study actions.
-var scrutiny: float = 0.0
-
-var intuition_level: int = 0
-
 # Unique persistent ID assigned when this entry enters storage.
 # -1 = not yet in storage. Assigned by SaveManager
 # never assigned inside create() and never reassigned.
@@ -104,32 +75,17 @@ var unlock_progress: float = 0.0
 # and item_data.base_price in the UI.
 var verified: bool = false
 
-# Lazy-cached appraisal skill reference.
-var _appraisal_skill: SkillData = null
+var revealed_clue_ids: Array[String] = []
 
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
 # inspection_level is now fully computed, not stored.
 var inspection_level: float:
     get:
-        var category_rank: int = KnowledgeManager.get_category_rank(item_data.category_data)
-        var sc: SuperCategoryData = item_data.category_data.super_category
-        var sc_rank: int = KnowledgeManager.get_super_category_rank(sc)
-        var cat_count: int = SuperCategoryRegistry.get_categories_for_super(sc).size()
-        var sc_average: float = float(sc_rank) / maxf(cat_count, 1.0)
-        var appraisal_level: int = _get_appraisal_level()
-        var computed_base: float = (
-            category_rank * COMPUTED_BASE_CAT_WEIGHT
-            + sc_average * COMPUTED_BASE_SC_WEIGHT
-            + appraisal_level * COMPUTED_BASE_SKILL_WEIGHT
-        )
-        var rarity_divisor: float = float(RARITY_DIVISORS.get(item_data.rarity, 1))
-        var intuition_bonus: float = INTUITION_INSPECTION_BONUS if intuition_level >= 1 else 0.0
-        return clampf(computed_base / rarity_divisor + scrutiny + intuition_bonus, 0.0, 1.0)
-
-var max_intuition_level: int:
-    get:
-        return item_data.identity_layers.size() - 1 - layer_index
+        var total := _total_clue_count()
+        if total == 0:
+            return 1.0
+        return clampf(float(revealed_clue_ids.size()) / float(total), 0.0, 1.0)
 
 var display_name: String:
     get:
@@ -187,10 +143,6 @@ var condition_mult_label: String:
                 return "×?"
 
 
-func is_condition_inspectable() -> bool:
-    return scrutiny < MAX_SCRUTINY
-
-
 func get_condition_multiplier() -> float:
     if condition <= 0.25:
         return remap(condition, 0.0, 0.25, 0.25, 0.5)
@@ -222,38 +174,6 @@ func get_known_condition_multiplier() -> float:
         _:
             return 0.0
 
-# [LEGACY] Rarity hint once shown to players based on layer depth (+ intuition_level).
-# Kept for older call sites/data inspection; verified rarity is now gated by Authenticate.
-# var perceived_rarity_label: String:
-#     get:
-#         var effective_layer: int = layer_index + intuition_level
-#         var rarity_value: int = item_data.rarity
-
-#         # effective_layer 0 (veiled): no rarity shown.
-#         if effective_layer <= 0:
-#             return "Veiled"
-
-#         # Layer-based rarity reveal table
-#         match effective_layer:
-#             1:
-#                 if rarity_value == ItemData.Rarity.COMMON:
-#                     return "Common"
-#                 else:
-#                     return "Uncommon+"
-#             2:
-#                 if rarity_value <= ItemData.Rarity.UNCOMMON:
-#                     return _true_rarity_name()
-#                 else:
-#                     return "Rare+"
-#             3:
-#                 if rarity_value <= ItemData.Rarity.RARE:
-#                     return _true_rarity_name()
-#                 else:
-#                     return "Epic+"
-#             _:
-#                 # 4+ → all show true name
-#                 return _true_rarity_name()
-
 var confirmed_rarity_label: String:
     get:
         return _true_rarity_name()
@@ -264,38 +184,6 @@ var storage_rarity_label: String:
             return LotObjectEntry.UNKNOWN_TEXT
         return _true_rarity_name() if verified else LotObjectEntry.UNKNOWN_TEXT
 
-# [LEGACY] Sort-safe rarity hint based on the old perceived rarity reveal.
-# Confirmed rarity → enum int (0–4). Unconfirmed floor ("X+") → enum + 0.5.
-# Veiled → -1.
-var perceived_rarity: float:
-    get:
-        if is_veiled():
-            return -1.0
-        var effective_layer: int = layer_index + intuition_level
-        var rarity_value: int = item_data.rarity
-
-        if effective_layer <= 0:
-            return -1.0
-
-        match effective_layer:
-            1:
-                if rarity_value == ItemData.Rarity.COMMON:
-                    return float(ItemData.Rarity.COMMON)
-                else:
-                    return float(ItemData.Rarity.UNCOMMON) + 0.5
-            2:
-                if rarity_value <= ItemData.Rarity.UNCOMMON:
-                    return float(rarity_value)
-                else:
-                    return float(ItemData.Rarity.RARE) + 0.5
-            3:
-                if rarity_value <= ItemData.Rarity.RARE:
-                    return float(rarity_value)
-                else:
-                    return float(ItemData.Rarity.EPIC) + 0.5
-            _:
-                return float(rarity_value)
-
 # ── Bucket helpers ────────────────────────────────────────────────────────────
 
 
@@ -305,22 +193,6 @@ func get_condition_bucket() -> int:
 
 func is_fully_inspected() -> bool:
     return inspection_level >= 1.0
-
-
-func is_study_complete() -> bool:
-    return scrutiny >= MAX_SCRUTINY
-
-
-func advance_scrutiny() -> void:
-    var appraisal_level: int = _get_appraisal_level()
-    var skill_multiplier: float = 1.0 + appraisal_level * SCRUTINY_SKILL_COEFF
-    var delta: float = SCRUTINY_BASE_DELTA * skill_multiplier
-    scrutiny = minf(scrutiny + delta, MAX_SCRUTINY)
-    KnowledgeManager.add_category_points(
-        item_data.category_data,
-        item_data.rarity,
-        KnowledgeManager.KnowledgeAction.APPRAISE,
-    )
 
 
 func apply_repair() -> void:
@@ -369,6 +241,7 @@ func add_unlock_effort() -> void:
 
 
 func advance_layer() -> void:
+    _reveal_layer_clues(_safe_layer_index())
     layer_index += 1
     unlock_progress = 0.0
     KnowledgeManager.add_category_points(
@@ -386,6 +259,25 @@ func advance_to_final_layer() -> void:
     layer_index = item_data.identity_layers.size() - 1
     inspected = true
     unlock_progress = 1.0
+    for layer: IdentityLayer in item_data.identity_layers:
+        for clue: ClueData in layer.clues:
+            if not revealed_clue_ids.has(clue.clue_id):
+                revealed_clue_ids.append(clue.clue_id)
+
+
+# Called after item reveal in the Inspection scene.
+# Reveals clues for the current layer whose prerequisites are already met.
+func reveal_passive_clues() -> void:
+    if item_data == null:
+        return
+    var layer := active_layer()
+    if layer == null:
+        return
+    for clue: ClueData in layer.clues:
+        if revealed_clue_ids.has(clue.clue_id):
+            continue
+        if _clue_prerequisites_met(clue):
+            revealed_clue_ids.append(clue.clue_id)
 
 
 # Idempotent migration applied to every ItemEntry when it enters or is loaded
@@ -490,7 +382,7 @@ var estimated_value_label: String:
             return "???"
         if verified:
             return "$%d" % item_data.base_price
-        var suffix: String = "" if is_at_final_layer() else "+"
+        var suffix: String = "+" if not verified else ""
         var lo: int = estimated_value_min
         var hi: int = estimated_value_max
         if hi <= lo:
@@ -744,8 +636,6 @@ func research_status_text() -> String:
             return "✓"
         var action_string: String = String(d.get("action", ""))
         match action_string:
-            "study":
-                return "S"
             "repair":
                 return "R"
             "unlock":
@@ -804,11 +694,7 @@ func category_data() -> CategoryData:
 
 
 func can_inspect() -> bool:
-    return is_veiled() or is_condition_inspectable()
-
-
-func can_appraise() -> bool:
-    return not is_veiled() and intuition_level < max_intuition_level
+    return is_veiled()
 
 
 func can_advance() -> bool:
@@ -824,16 +710,7 @@ func perform_inspect() -> StringName:
             KnowledgeManager.KnowledgeAction.REVEAL,
         )
         return &"unveil"
-    advance_scrutiny()
     return &"condition"
-
-
-func perform_appraise() -> bool:
-    var success_chance: float = 0.20 / (intuition_level + 1)
-    if randf() >= success_chance:
-        return false
-    intuition_level += 1
-    return true
 
 
 func sort_value(column: int, ctx: ItemViewContext) -> Variant:
@@ -923,17 +800,39 @@ func unveil() -> void:
 
 
 func reveal() -> void:
-    advance_scrutiny()
+    pass
 
 # ── Private helpers ──────────────────────────────────────────────────────────
 
 
-func _get_appraisal_level() -> int:
-    if _appraisal_skill == null:
-        _appraisal_skill = KnowledgeManager.get_skill_by_id("appraisal")
-    if _appraisal_skill == null:
+func _total_clue_count() -> int:
+    if item_data == null:
         return 0
-    return KnowledgeManager.get_level(_appraisal_skill)
+    var total := 0
+    for layer: IdentityLayer in item_data.identity_layers:
+        total += layer.clues.size()
+    return total
+
+
+func _reveal_layer_clues(layer_idx: int) -> void:
+    if item_data == null or layer_idx < 0 or layer_idx >= item_data.identity_layers.size():
+        return
+    for clue: ClueData in item_data.identity_layers[layer_idx].clues:
+        if not revealed_clue_ids.has(clue.clue_id):
+            revealed_clue_ids.append(clue.clue_id)
+
+
+func _clue_prerequisites_met(clue: ClueData) -> bool:
+    if clue.required_skill != null:
+        if KnowledgeManager.get_level(clue.required_skill) < clue.required_level:
+            return false
+    if clue.required_category_rank > 0:
+        if KnowledgeManager.get_category_rank(item_data.category_data) < clue.required_category_rank:
+            return false
+    if clue.required_perk != null:
+        if not KnowledgeManager.has_perk(clue.required_perk):
+            return false
+    return true
 
 
 func _safe_layer_index() -> int:
@@ -957,10 +856,6 @@ static func create(data: ItemData, _veil_chance: float = 0.0) -> ItemEntry:
     entry.layer_index = 1
     entry.inspected = false
 
-    # scrutiny starts at 0; inspection_level is computed from knowledge + scrutiny.
-    entry.scrutiny = 0.0
-    entry.intuition_level = 0
-
     return entry
 
 # ══ Serialization ═════════════════════════════════════════════════════════════
@@ -973,11 +868,10 @@ func to_dict() -> Dictionary:
         "layer_index": layer_index,
         "inspected": inspected,
         "condition": condition,
-        "scrutiny": scrutiny,
-        "intuition_level": intuition_level,
         "center_offset": center_offset,
         "unlock_progress": unlock_progress,
         "verified": verified,
+        "revealed_clue_ids": revealed_clue_ids.duplicate(),
     }
 
 
@@ -993,11 +887,6 @@ static func from_dict(d: Dictionary) -> ItemEntry:
     entry.layer_index = max(1, saved_layer_index)
     entry.condition = float(d["condition"])
     # New fields — default gracefully if missing (migration-safe).
-    entry.scrutiny = float(d.get("scrutiny", 0.0))
-    if d.has("intuition_level"):
-        entry.intuition_level = int(d["intuition_level"])
-    elif bool(d.get("intuition_flag", false)):
-        entry.intuition_level = 1
     if d.has("center_offset"):
         entry.center_offset = float(d["center_offset"])
     else:
@@ -1008,5 +897,9 @@ static func from_dict(d: Dictionary) -> ItemEntry:
         entry.id = int(d["id"])
     if d.has("verified"):
         entry.verified = bool(d["verified"])
+    if d.has("revealed_clue_ids"):
+        var raw: Array = d["revealed_clue_ids"]
+        for clue_id_value in raw:
+            entry.revealed_clue_ids.append(String(clue_id_value))
     # Legacy inspection_level key is intentionally ignored — clean break.
     return entry

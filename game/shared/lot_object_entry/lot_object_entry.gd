@@ -116,20 +116,12 @@ func can_inspect() -> bool:
     return false
 
 
-func can_appraise() -> bool:
-    return false
-
-
 func can_advance() -> bool:
     return false
 
 
 func perform_inspect() -> StringName:
     return &""
-
-
-func perform_appraise() -> bool:
-    return false
 
 
 func sort_value(_column: int, _ctx: ItemViewContext) -> Variant:

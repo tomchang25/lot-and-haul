@@ -18,3 +18,5 @@ extends Resource
 # Action required to advance from this layer to the next one.
 # Null on the final layer — no further advancement possible.
 @export var unlock_action: LayerUnlockAction = null
+
+@export var clues: Array[ClueData] = []

@@ -116,10 +116,6 @@ func can_inspect() -> bool:
     return not inspected
 
 
-func can_appraise() -> bool:
-    return false
-
-
 func perform_inspect() -> StringName:
     reveal()
     return &"commodity"

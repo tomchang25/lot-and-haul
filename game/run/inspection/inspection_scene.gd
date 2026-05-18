@@ -213,9 +213,10 @@ func _on_grid_cell_pressed(coord: Vector2i) -> void:
 
     var item := entry as ItemEntry
     if item != null and item.can_advance():
-        if RunManager.run_record.actions_remaining < 1:
+        var cost := _advance_cost_for_item(item)
+        if RunManager.run_record.actions_remaining < cost:
             return
-        _start_action(entry, ActionType.ADVANCE, 1)
+        _start_action(entry, ActionType.ADVANCE, cost)
         return
 
 
@@ -247,6 +248,7 @@ func _complete_active_action() -> void:
             var item := completed_entry as ItemEntry
             if item != null and item.can_advance():
                 item.advance_layer()
+                item.reveal_passive_clues()
 
     _refresh_grid_cells()
     _refresh_hud()
@@ -279,6 +281,17 @@ func _clear_active_action() -> void:
     _active_action_type = -1
     _active_action_cost = 0
     _active_action_remaining = 0.0
+
+
+func _advance_cost_for_item(item: ItemEntry) -> int:
+    var cost := 1
+    var layer := item.active_layer()
+    if layer == null:
+        return cost
+    for clue: ClueData in layer.clues:
+        if not item.revealed_clue_ids.has(clue.clue_id):
+            cost += clue.ap_cost_penalty
+    return cost
 
 
 func _search_cost_for_entry(entry: LotObjectEntry) -> int:
@@ -316,6 +329,7 @@ func _reveal_item_at_random_layer(item: ItemEntry) -> void:
             )
 
     item.layer_index = _roll_random_layer_index(item)
+    item.reveal_passive_clues()
 
 
 func _roll_random_layer_index(item: ItemEntry) -> int:
@@ -390,7 +404,7 @@ func _origin_ap_text(entry: LotObjectEntry) -> String:
 
     var item := entry as ItemEntry
     if item != null and item.can_advance():
-        return "1 AP"
+        return "%d AP" % _advance_cost_for_item(item)
     return "✓"
 
 

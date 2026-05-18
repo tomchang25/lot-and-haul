@@ -205,7 +205,7 @@ func _read_save_file() -> void:
             continue
         for entry: ItemEntry in storage_items:
             if entry.id == sid and entry.is_at_final_layer():
-                research_slots[i] = { "item_id": -1, "action": "study", "completed": false }
+                research_slots[i] = ResearchSlot.new().to_dict()
                 break
 
     ResearchSlot.purge_orphaned(research_slots, valid_ids)

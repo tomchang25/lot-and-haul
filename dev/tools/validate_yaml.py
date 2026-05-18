@@ -25,7 +25,9 @@ from tres_lib.registry import REGISTRY
 
 
 def validate(data: dict) -> list[str]:
-    """Validate merged YAML data. Returns list of error strings.
+    """Validate merged YAML data, including embedded resource fields.
+
+    Returns list of error strings.
     Empty list means OK."""
     errors: list[str] = []
     for spec in REGISTRY:

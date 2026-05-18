@@ -52,7 +52,6 @@ var _selected_entry: ItemEntry = null
 
 # Right — action buttons
 @onready var _action_grid: GridContainer = %ActionGrid
-@onready var _study_btn: Button = %StudyButton
 @onready var _repair_btn: Button = %RepairButton
 @onready var _authenticate_btn: Button = %AuthenticateButton
 @onready var _restore_btn: Button = %RestoreButton
@@ -68,7 +67,6 @@ func _ready() -> void:
     add_child(_tooltip)
 
     _back_btn.pressed.connect(_on_back_pressed)
-    _study_btn.pressed.connect(_on_study_pressed)
     _repair_btn.pressed.connect(_on_repair_pressed)
     _authenticate_btn.pressed.connect(_on_authenticate_pressed)
     _restore_btn.pressed.connect(_on_restore_pressed)
@@ -99,10 +97,6 @@ func _on_row_tooltip_requested(
         anchor: Rect2,
 ) -> void:
     _tooltip.show_for(entry, ctx, anchor)
-
-
-func _on_study_pressed() -> void:
-    _assign_action(ResearchSlot.SlotAction.STUDY)
 
 
 func _on_repair_pressed() -> void:
@@ -251,10 +245,6 @@ func _task_progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
     if entry == null:
         return ""
     match slot.action:
-        ResearchSlot.SlotAction.STUDY:
-            if entry.is_fully_inspected():
-                return "Fully Inspected"
-            return "In progress"
         ResearchSlot.SlotAction.REPAIR:
             return "Condition: %d%%" % int(entry.condition * 100)
         ResearchSlot.SlotAction.RESTORE:
@@ -367,17 +357,14 @@ func _refresh_detail() -> void:
     or _empty_slot_index() >= 0 \
     or SaveManager.research_slots.size() < SaveManager.max_research_slots
 
-    _configure_action_btn(_study_btn, "Study", entry, ResearchSlot.SlotAction.STUDY, current_slot)
     _configure_action_btn(_repair_btn, "Repair", entry, ResearchSlot.SlotAction.REPAIR, current_slot)
     _configure_action_btn(_authenticate_btn, "Authenticate", entry, ResearchSlot.SlotAction.AUTHENTICATE, current_slot)
     _configure_action_btn(_restore_btn, "Restore", entry, ResearchSlot.SlotAction.RESTORE, current_slot)
 
     if not slots_available:
-        _study_btn.disabled = true
         _repair_btn.disabled = true
         _authenticate_btn.disabled = true
         _restore_btn.disabled = true
-        _study_btn.tooltip_text = "No research slots available"
         _repair_btn.tooltip_text = "No research slots available"
         _authenticate_btn.tooltip_text = "No research slots available"
         _restore_btn.tooltip_text = "No research slots available"
@@ -420,10 +407,6 @@ func _configure_action_btn(
 
 func _progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
     match slot.action:
-        ResearchSlot.SlotAction.STUDY:
-            if slot.completed or entry.is_fully_inspected():
-                return "Fully Inspected"
-            return "Rarity: %s   Condition: %s" % [entry.storage_rarity_label, entry.condition_label]
         ResearchSlot.SlotAction.REPAIR:
             return "Condition: %d%%" % int(entry.condition * 100)
         ResearchSlot.SlotAction.RESTORE:
