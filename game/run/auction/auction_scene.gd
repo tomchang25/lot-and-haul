@@ -1,8 +1,7 @@
 # auction_scene.gd
 # Block 04 — The player watches a live bidding sequence and decides when to drop out.
 # Reads:  RunManager.run_record.lot_entry, RunManager.run_record.lot_items
-# Writes: RunManager.run_record.paid_price, RunManager.run_record.won_items,
-#         RunManager.run_record.won_commodities
+# Writes: RunManager.run_record.paid_price, RunManager.run_record.won_items
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -205,8 +204,6 @@ func _build_lot_summary() -> void:
         var label := Label.new()
         if entry is ItemEntry:
             label.text = "%s (%s)" % [entry.display_name, entry.estimated_value_label]
-        elif entry is CommodityEntry:
-            label.text = ("%s ($%d)" % [entry.display_name, entry.compute_sale_price()]) if entry.inspected else ("%s (???)" % entry.display_name)
         label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         label.add_theme_font_size_override(&"font_size", 15)
         _lot_summary.add_child(label)
@@ -295,15 +292,12 @@ func _resolve() -> void:
     var record = RunManager.run_record
     if _last_bidder == "player":
         var current_wins: Array[ItemEntry] = record.lot_items.duplicate()
-        var current_commodity_wins: Array[CommodityEntry] = record.lot_commodities.duplicate()
         var current_object_wins: Array[LotObjectEntry] = record.lot_objects.duplicate()
 
         RunManager.run_record.last_lot_won_items = current_wins
-        RunManager.run_record.last_lot_won_commodities = current_commodity_wins
         RunManager.run_record.last_lot_won_objects = current_object_wins
         RunManager.run_record.paid_price += _current_display_price
         RunManager.run_record.won_items += current_wins
-        RunManager.run_record.won_commodities += current_commodity_wins
 
     GameManager.go_to_reveal()
 
@@ -372,8 +366,6 @@ func _init_debug_overlay() -> void:
     for entry: ItemEntry in RunManager.run_record.lot_items:
         if not entry.item_data.identity_layers.is_empty():
             true_value += entry.item_data.identity_layers.back().base_value
-    for commodity: CommodityEntry in RunManager.run_record.lot_commodities:
-        true_value += commodity.compute_sale_price()
 
     _debug_label = Label.new()
     _debug_label.add_theme_font_size_override(&"font_size", 13)

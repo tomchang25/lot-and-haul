@@ -48,8 +48,8 @@ func setup(lot_data: LotData, index: int, total: int) -> void:
 
 func _apply() -> void:
     _index_label.text = "Lot %d / %d" % [_index + 1, _total]
-    var min_count := _lot_data.item_count_min + _lot_data.commodity_count_min
-    var max_count := _lot_data.item_count_max + _lot_data.commodity_count_max
+    var min_count := _lot_data.item_count_min
+    var max_count := _lot_data.item_count_max
     if min_count == max_count:
         _item_count_label.text = "%d items" % min_count
     else:

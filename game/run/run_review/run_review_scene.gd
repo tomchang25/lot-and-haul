@@ -1,8 +1,7 @@
 # run_review_scene.gd
 # Block 06 — Run Review
 # Reads:  RunManager.run_record.cargo_items, RunManager.run_record.paid_price,
-#         RunManager.run_record.onsite_proceeds,
-#         RunManager.run_record.commodity_sales
+#         RunManager.run_record.onsite_proceeds
 # Writes: SaveManager.cash, SaveManager.storage_items
 extends Control
 
@@ -28,7 +27,6 @@ var _tooltip: ItemRowTooltip = null
 @onready var _item_list_panel: ItemListPanel = $RootVBox/ListCenter/OuterVBox/ItemListPanel
 @onready var _cost_cash_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/CostCashLabel
 @onready var _finance_onsite_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/OnsiteLabel
-@onready var _commodity_sales_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/CommoditySalesLabel
 @onready var _overall_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/OverallLabel
 @onready var _estimate_price_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/EstimatePriceLabel
 @onready var _estimate_profit_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/EstimateProfitLabel
@@ -57,7 +55,6 @@ func _ready() -> void:
     _cargo_items = RunManager.run_record.cargo_items + RunManager.run_record.trailer_items
     _review_entries = []
     _review_entries.append_array(_cargo_items)
-    _review_entries.append_array(RunManager.run_record.won_commodities)
 
     _populate_rows()
     _populate_finance()
@@ -112,13 +109,10 @@ func _populate_finance() -> void:
     var r := RunManager.run_record
     var cost_cash := r.paid_price + r.entry_fee + r.fuel_cost
     var onsite := r.onsite_proceeds
-    var commodity_sales := r.commodity_sales
-    var overall := onsite + commodity_sales - cost_cash
+    var overall := onsite - cost_cash
 
     _cost_cash_label.text = "Cost Cash:   -$%d" % cost_cash
     _finance_onsite_label.text = "Sold On-site:   +$%d" % onsite
-    _commodity_sales_label.text = "Commodity Sales:   +$%d" % commodity_sales
-    _commodity_sales_label.visible = commodity_sales > 0
 
     if overall >= 0:
         _overall_label.text = "Cash Flow:   +$%d" % overall

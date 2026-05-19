@@ -6,6 +6,8 @@ func register_storage_item(entry: ItemEntry) -> void:
     entry.id = SaveManager.next_entry_id
     SaveManager.next_entry_id += 1
     SaveManager.storage_items.append(entry)
+    if entry.item_data != null and entry.item_data.auto_verify:
+        entry.verified = true
 
 
 func register_storage_items(entries: Array[ItemEntry]) -> void:
@@ -250,7 +252,7 @@ func _find_empty_slot_index() -> int:
 
 
 func resolve_run(record: RunRecord) -> DaySummary:
-    SaveManager.cash += record.onsite_proceeds + record.commodity_sales - record.paid_price - record.entry_fee - record.fuel_cost
+    SaveManager.cash += record.onsite_proceeds - record.paid_price - record.entry_fee - record.fuel_cost
 
     # Phase 5: Auto-advance all incoming items to final perceived layer
     # before registering, so the first save already has correct state.
@@ -262,7 +264,6 @@ func resolve_run(record: RunRecord) -> DaySummary:
     var summary := advance_days(record.location_data.travel_days)
 
     summary.onsite_proceeds = record.onsite_proceeds
-    summary.commodity_sales = record.commodity_sales
     summary.paid_price = record.paid_price
     summary.entry_fee = record.entry_fee
     summary.fuel_cost = record.fuel_cost

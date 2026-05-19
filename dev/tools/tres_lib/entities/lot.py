@@ -82,14 +82,8 @@ class LotSpec:
         w.add_field_dict_auto_keys(
             "category_weights", entry.get("category_weights", {}) or {}
         )
-        w.add_field_int(
-            "commodity_count_min", int(entry.get("commodity_count_min", 0))
-        )
-        w.add_field_int(
-            "commodity_count_max", int(entry.get("commodity_count_max", 0))
-        )
         w.add_field_dict_auto_keys(
-            "commodity_weights", entry.get("commodity_weights", {}) or {}
+            "item_weights", entry.get("item_weights", {}) or {}
         )
         w.add_field_float(
             "price_floor_factor",
@@ -132,15 +126,13 @@ class LotSpec:
         _INT_FIELDS = [
             "item_count_min",
             "item_count_max",
-            "commodity_count_min",
-            "commodity_count_max",
             "action_quota",
         ]
         _DICT_FIELDS = [
             "rarity_weights",
             "super_category_weights",
             "category_weights",
-            "commodity_weights",
+            "item_weights",
         ]
 
         lot: dict = {"lot_id": lot_id}
@@ -169,10 +161,10 @@ class LotSpec:
             for sc in all_data.get("super_categories", [])
             if isinstance(sc, dict)
         }
-        known_commodity_ids: set[str] = {
-            c["commodity_id"]
-            for c in all_data.get("commodities", [])
-            if isinstance(c, dict)
+        known_item_ids: set[str] = {
+            item["item_id"]
+            for item in all_data.get("items", [])
+            if isinstance(item, dict)
         }
 
         for lot in entries:
@@ -190,10 +182,10 @@ class LotSpec:
                         f"lot '{lot_id}': super_category_weights key '{key}' not defined in super_categories"
                     )
 
-            for key in (lot.get("commodity_weights") or {}).keys():
-                if key not in known_commodity_ids:
+            for key in (lot.get("item_weights") or {}).keys():
+                if key not in known_item_ids:
                     errors.append(
-                        f"lot '{lot_id}': commodity_weights key '{key}' not defined in commodities"
+                        f"lot '{lot_id}': item_weights key '{key}' not defined in items"
                     )
 
         return errors

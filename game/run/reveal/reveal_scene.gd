@@ -3,9 +3,7 @@
 # Marks uninspected items as inspected on reveal.
 # One button press reveals ALL items at once instead of one-at-a-time.
 # Reads:  RunManager.run_record.last_lot_won_objects,
-#         RunManager.run_record.last_lot_won_commodities
-# Writes: ItemEntry.inspected, ItemEntry.scrutiny,
-#         CommodityEntry.sold, RunManager.run_record.commodity_sales
+# Writes: ItemEntry.inspected, ItemEntry.scrutiny
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -21,13 +19,13 @@ const REVEAL_COLUMNS: Array = [
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _won_items: Array[ItemEntry] = []
-var _won_commodities: Array[CommodityEntry] = []
 var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _item_list_panel: ItemListPanel = $RootVBox/ListCenter/OuterVBox/ItemListPanel
+@onready var _title_label: Label = $RootVBox/TitleLabel
 @onready var _reveal_btn: Button = $RootVBox/Footer/RevealButton
 @onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
 
@@ -46,11 +44,10 @@ func _ready() -> void:
     _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
 
     _won_items = RunManager.run_record.last_lot_won_items
-    _won_commodities = RunManager.run_record.last_lot_won_commodities
     _continue_btn.hide()
 
-    if _won_items.is_empty() and _won_commodities.is_empty():
-        GameManager.go_to_lot_browse()
+    if _won_items.is_empty():
+        _show_auction_lost_state()
         return
 
     _populate_rows()
@@ -64,8 +61,6 @@ func _on_reveal_pressed() -> void:
             entry.unveil()
 
         entry.reveal()
-
-    _sell_commodities()
 
     _on_reveal_complete()
 
@@ -92,12 +87,11 @@ func _populate_rows() -> void:
     _item_list_panel.populate(RunManager.run_record.last_lot_won_objects)
 
 
-func _sell_commodities() -> void:
-    var sales := 0
-    for commodity: CommodityEntry in _won_commodities:
-        commodity.reveal()
-        sales += commodity.mark_sold()
-    RunManager.run_record.commodity_sales += sales
+func _show_auction_lost_state() -> void:
+    _title_label.text = "Auction Lost"
+    _item_list_panel.hide()
+    _reveal_btn.hide()
+    _continue_btn.show()
 
 
 func _on_reveal_complete() -> void:

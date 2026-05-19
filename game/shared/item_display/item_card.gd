@@ -42,8 +42,6 @@ func refresh(changed: StringName = &"") -> void:
             _animate_pop(_condition_label)
         &"unveil":
             _animate_pop(_name_label)
-        &"commodity":
-            _animate_pop(_name_label)
 
 
 func _apply() -> void:

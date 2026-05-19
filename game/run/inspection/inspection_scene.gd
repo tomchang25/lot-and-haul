@@ -310,11 +310,6 @@ func _reveal_lot_object(entry: LotObjectEntry) -> void:
         _reveal_item_at_random_layer(item)
         return
 
-    var commodity := entry as CommodityEntry
-    if commodity != null:
-        commodity.perform_inspect()
-        return
-
     entry.perform_inspect()
 
 

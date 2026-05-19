@@ -31,3 +31,6 @@ enum Rarity {
 @export var identity_layers: Array[IdentityLayer] = []
 
 @export var rarity: Rarity = Rarity.COMMON
+
+# If true, entry.verified is set immediately when this item enters storage.
+@export var auto_verify: bool = false

@@ -79,6 +79,7 @@ class ItemSpec:
         w.add_field_ext_ref("category_data", cat_tag)
         w.add_field_ext_ref_array("identity_layers", layer_tags)
         w.add_field_int("rarity", int(entry.get("rarity", 0)))
+        w.add_field_bool("auto_verify", bool(entry.get("auto_verify", False)))
         return w.render()
 
     def parse_tres(self, text: str, ctx: ParseCtx) -> dict:
@@ -90,6 +91,7 @@ class ItemSpec:
             ctx.uid_to_id[uid] = item_id
 
         rarity = int(tres_field(text, "rarity") or 0)
+        auto_verify = (tres_field(text, "auto_verify") or "false").strip().lower() == "true"
 
         ext_res = ext_resources(text)
         category_id = ""
@@ -113,6 +115,7 @@ class ItemSpec:
             "base_price": base_price,
             "category_id": category_id,
             "rarity": rarity,
+            "auto_verify": auto_verify,
             "layer_ids": layer_ids,
         }
 
@@ -128,6 +131,7 @@ class ItemSpec:
             iid = item.get("item_id", "?")
             layer_ids = item.get("layer_ids", [])
             rarity = int(item.get("rarity", 0))
+            auto_verify = bool(item.get("auto_verify", False))
             item_name = item.get("item_name")
             base_price = item.get("base_price")
 
@@ -142,11 +146,14 @@ class ItemSpec:
                     f"item '{iid}': category_id '{item.get('category_id')}' not defined"
                 )
 
-            if len(layer_ids) < 2:
-                errors.append(f"item '{iid}': must have at least 2 layer_ids")
+            min_layers = 1 if auto_verify else 2
+            if len(layer_ids) < min_layers:
+                errors.append(
+                    f"item '{iid}': must have at least {min_layers} layer_ids"
+                )
 
             band = RARITY_DEPTH.get(rarity)
-            if band is not None:
+            if band is not None and not auto_verify:
                 min_depth, max_depth = band
                 depth = len(layer_ids)
                 if depth < min_depth or depth > max_depth:
@@ -175,10 +182,15 @@ class ItemSpec:
                 if (
                     type(base_price) is int
                     and isinstance(final_base_value, int)
-                    and base_price <= final_base_value
+                    and (
+                        base_price <= final_base_value
+                        if not auto_verify
+                        else base_price < final_base_value
+                    )
                 ):
+                    var_relation = "greater than" if not auto_verify else "greater than or equal to"
                     errors.append(
-                        f"item '{iid}': base_price {base_price} must be greater than"
+                        f"item '{iid}': base_price {base_price} must be {var_relation}"
                         f" final layer '{layer_ids[-1]}' base_value {final_base_value}"
                     )
 

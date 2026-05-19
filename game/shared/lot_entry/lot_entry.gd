@@ -18,14 +18,10 @@ var aggressive_factor: float = 0.5
 
 var price_variance: float = 1.0
 
-# One entry per item in this lot. Generated from lot_data.item_pool at creation.
+# One entry per item in this lot. Generated from lot_data draw tables.
 var item_entries: Array[ItemEntry] = []
 
-# One entry per commodity in this lot. Generated from lot_data.commodity_weights.
-var commodity_entries: Array[CommodityEntry] = []
-
-# Mixed ItemEntry/CommodityEntry order. Created once per lot so inspection
-# cannot leak which unknowns are commodities by grouping.
+# One entry per object in this lot, in display order.
 var lot_objects: Array[LotObjectEntry] = []
 
 # Cached NPC estimate rolled once at creation.
@@ -36,7 +32,7 @@ var npc_estimate: int = 0
 
 
 # Creates a LotEntry by rolling all factors from lot_data ranges
-# and generating one ItemEntry per item in lot_data.item_pool.
+# and generating one ItemEntry per roll in lot_data.item_count_min/max.
 # Apply external modifiers (player buffs, NPC presence) to the returned entry
 # before passing it to RunRecord.create().
 static func create(data: LotData) -> LotEntry:
@@ -54,17 +50,9 @@ static func create(data: LotData) -> LotEntry:
         if item != null:
             entry.item_entries.append(ItemEntry.create(item))
 
-    var commodity_count := randi_range(data.commodity_count_min, data.commodity_count_max)
-    for i in range(commodity_count):
-        var commodity := _draw_commodity(data)
-        if commodity != null:
-            entry.commodity_entries.append(CommodityEntry.create(commodity))
-
     entry.lot_objects = []
     for item_entry: ItemEntry in entry.item_entries:
         entry.lot_objects.append(item_entry)
-    for commodity_entry: CommodityEntry in entry.commodity_entries:
-        entry.lot_objects.append(commodity_entry)
     entry.lot_objects.shuffle()
 
     # Cache after entries are populated — get_npc_estimate() reads them.
@@ -78,6 +66,30 @@ static func create(data: LotData) -> LotEntry:
 # If super_category_weights is non-empty, rolls a super-category first, then
 # picks uniformly from its member categories. Falls through to category_weights.
 static func _draw_item(data: LotData) -> ItemData:
+    if not data.item_weights.is_empty():
+        return _draw_item_by_weight(data)
+    return _draw_item_by_rarity_and_category(data)
+
+
+static func _draw_item_by_weight(data: LotData) -> ItemData:
+    var item_keys: Array = data.item_weights.keys()
+    var item_values: Array[int] = []
+    for k in item_keys:
+        item_values.append(data.item_weights[k])
+
+    var item_idx := RandomUtils.pick_weighted_index(item_values)
+    if item_idx < 0:
+        push_warning("Item roll failed")
+        return null
+
+    var item_id: String = item_keys[item_idx]
+    var item: ItemData = ItemRegistry.get_item_by_id(item_id)
+    if item == null:
+        push_warning("_draw_item_by_weight: item_id '%s' not found" % item_id)
+    return item
+
+
+static func _draw_item_by_rarity_and_category(data: LotData) -> ItemData:
     for attempt in range(MAX_ATTEMPTS):
         # Roll rarity
         var rarity_keys: Array = data.rarity_weights.keys()
@@ -131,27 +143,6 @@ static func _draw_item(data: LotData) -> ItemData:
     return null
 
 
-static func _draw_commodity(data: LotData) -> CommodityData:
-    if data.commodity_weights.is_empty():
-        return null
-
-    var commodity_keys: Array = data.commodity_weights.keys()
-    var commodity_values: Array[int] = []
-    for k in commodity_keys:
-        commodity_values.append(data.commodity_weights[k])
-
-    var commodity_idx := RandomUtils.pick_weighted_index(commodity_values)
-    if commodity_idx < 0:
-        push_warning("Commodity roll failed")
-        return null
-
-    var commodity_id: String = commodity_keys[commodity_idx]
-    var commodity: CommodityData = CommodityRegistry.get_commodity_by_id(commodity_id)
-    if commodity == null:
-        push_warning("_draw_commodity: commodity_id '%s' not found" % commodity_id)
-    return commodity
-
-
 # Returns the cached NPC estimate. Stable across calls.
 func get_npc_estimate() -> int:
     return npc_estimate
@@ -174,9 +165,6 @@ func roll_npc_estimate() -> int:
         while npc_layer < entry.item_data.identity_layers.size() - 1 and randf() < lot_data.npc_layer_sight_chance ** (npc_layer - entry.layer_index + 1):
             npc_layer += 1
         total += entry.item_data.identity_layers[npc_layer].base_value
-
-    for commodity: CommodityEntry in commodity_entries:
-        total += commodity.compute_sale_price()
 
     return total
 
@@ -203,12 +191,6 @@ func get_player_estimate() -> Array[int]:
         if not entry.is_veiled():
             total_min += entry.estimated_value_min
             total_max += entry.estimated_value_max
-
-    for commodity: CommodityEntry in commodity_entries:
-        if commodity.inspected:
-            var price := commodity.compute_sale_price()
-            total_min += price
-            total_max += price
 
     return [total_min, total_max]
 
