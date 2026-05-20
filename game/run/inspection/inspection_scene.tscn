@@ -24,101 +24,263 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.12, 0.11, 0.14, 1)
 
-[node name="HUD" type="Control" parent="." unique_id=586966451]
+[node name="RootHBox" type="HBoxContainer" parent="." unique_id=100000001]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
+theme_override_constants/separation = 0
 
-[node name="Panel" type="Panel" parent="HUD" unique_id=2124736920]
-custom_minimum_size = Vector2(1000, 600)
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -500.0
-offset_top = -300.0
-offset_right = 500.0
-offset_bottom = 300.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
+[node name="LeftVBox" type="VBoxContainer" parent="RootHBox" unique_id=100000002]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
 
-[node name="Background" type="ColorRect" parent="HUD/Panel" unique_id=1763066689]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="HeaderHBox" type="HBoxContainer" parent="RootHBox/LeftVBox" unique_id=100000003]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderMargin" type="MarginContainer" parent="RootHBox/LeftVBox/HeaderHBox" unique_id=100000004]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 8
+
+[node name="HeaderInner" type="HBoxContainer" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin" unique_id=100000005]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=100000006]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Inspection"
+
+[node name="HeaderSpacer" type="Control" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=100000007]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StaminaHUD" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=1666666860 instance=ExtResource("2_j573n")]
+layout_mode = 2
+
+[node name="GridMargin" type="MarginContainer" parent="RootHBox/LeftVBox" unique_id=100000008]
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-mouse_filter = 2
-color = Color(0.1232, 0.14, 0.13272001, 1)
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="HUD/Panel" unique_id=513747538]
-custom_minimum_size = Vector2(1000, 600)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 20
-
-[node name="ScrollContainer" type="ScrollContainer" parent="HUD/Panel/MarginContainer" unique_id=1247062307]
+[node name="ScrollContainer" type="ScrollContainer" parent="RootHBox/LeftVBox/GridMargin" unique_id=100000009]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="ItemsGrid" type="GridContainer" parent="HUD/Panel/MarginContainer/ScrollContainer" unique_id=1410177201]
+[node name="ItemsGrid" type="GridContainer" parent="RootHBox/LeftVBox/GridMargin/ScrollContainer" unique_id=1410177201]
 layout_mode = 2
 size_flags_horizontal = 6
-theme_override_constants/h_separation = 32
-theme_override_constants/v_separation = 28
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
 columns = 4
 
-[node name="Footer" type="HBoxContainer" parent="HUD" unique_id=66347106]
-custom_minimum_size = Vector2(0, 60)
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -112.0
-offset_top = -60.0
-offset_right = 112.0
-grow_horizontal = 2
-grow_vertical = 0
-alignment = 1
+[node name="FooterHBox" type="HBoxContainer" parent="RootHBox/LeftVBox" unique_id=100000010]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_constants/separation = 8
 
-[node name="ReviewButton" type="Button" parent="HUD/Footer"]
+[node name="FooterMargin" type="MarginContainer" parent="RootHBox/LeftVBox/FooterHBox" unique_id=100000011]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_right = 18
+
+[node name="FooterInner" type="HBoxContainer" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin" unique_id=100000012]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="FooterSpacer" type="Control" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=100000013]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ReviewButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=100000014]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Review"
 
-[node name="PassButton" type="Button" parent="HUD/Footer" unique_id=1473063044]
+[node name="PassButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=1473063044]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Pass"
 
-[node name="StartAuctionButton" type="Button" parent="HUD/Footer" unique_id=1061694818]
+[node name="StartAuctionButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=1061694818]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Start Auction"
+
+[node name="SidebarSep" type="VSeparator" parent="RootHBox" unique_id=100000020]
+layout_mode = 2
+
+[node name="Sidebar" type="PanelContainer" parent="RootHBox" unique_id=100000021]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="SidebarMargin" type="MarginContainer" parent="RootHBox/Sidebar" unique_id=100000022]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="SidebarVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin" unique_id=100000023]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="ItemListSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000030]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ListHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ItemListSection" unique_id=100000031]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 11
+text = "Found · Items"
+
+[node name="FoundVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ItemListSection" unique_id=100000033]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="EmptyFoundLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ItemListSection" unique_id=100000034]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
+theme_override_font_sizes/font_size = 12
+text = "No items revealed yet."
+horizontal_alignment = 1
+
+[node name="VeiledListSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000060]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="VeiledHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/VeiledListSection" unique_id=100000061]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 11
+text = "Veiled · Items"
+
+[node name="VeiledVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/VeiledListSection" unique_id=100000063]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="EmptyVeiledLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/VeiledListSection" unique_id=100000064]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
+theme_override_font_sizes/font_size = 12
+text = "All items revealed."
+horizontal_alignment = 1
+
+[node name="SidebarHSep" type="HSeparator" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000040]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HoverSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000041]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HoverHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000042]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 11
+text = "Hover"
+
+[node name="HoverNameLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000043]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="HoverCategoryLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000044]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 10
+
+[node name="HoverStatsHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000045]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ConditionPanel" type="PanelContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox" unique_id=100000046]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CondMargin" type="MarginContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ConditionPanel" unique_id=100000047]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="CondVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ConditionPanel/CondMargin" unique_id=100000048]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="CondTitleLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ConditionPanel/CondMargin/CondVBox" unique_id=100000049]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 9
+text = "Condition"
+
+[node name="CondValueLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ConditionPanel/CondMargin/CondVBox" unique_id=100000050]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="ValuePanel" type="PanelContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox" unique_id=100000051]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ValueMargin" type="MarginContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ValuePanel" unique_id=100000052]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ValueVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ValuePanel/ValueMargin" unique_id=100000053]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ValueTitleLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ValuePanel/ValueMargin/ValueVBox" unique_id=100000054]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 9
+text = "Est. Value"
+
+[node name="ValueValueLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ValuePanel/ValueMargin/ValueVBox" unique_id=100000055]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
 
 [node name="ListReviewPopup" parent="." unique_id=796787196 instance=ExtResource("4_icrf5")]
 visible = false
 layout_mode = 1
 
-[node name="LotActionBar" parent="HUD" unique_id=615668654 instance=ExtResource("3_3483c")]
+[node name="LotActionBar" parent="." unique_id=615668654 instance=ExtResource("3_3483c")]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -131,17 +293,6 @@ offset_right = 140.0
 offset_bottom = -72.0
 grow_horizontal = 2
 grow_vertical = 0
-
-[node name="StaminaHUD" parent="." unique_id=1666666860 instance=ExtResource("2_j573n")]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -190.0
-offset_top = 12.0
-offset_right = -12.0
-offset_bottom = 44.0
-grow_horizontal = 0
 
 [node name="ConfirmPopup" type="AcceptDialog" parent="." unique_id=46946476]
 oversampling_override = 1.0

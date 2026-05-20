@@ -22,14 +22,11 @@ const SHAPE_COLORS: Array[Color] = [
     Color(0.27, 0.27, 0.40, 1.0),
 ]
 
-const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
-
 enum ActionType { SEARCH, ADVANCE }
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _ctx: ItemViewContext = null
-var _tooltip: ItemRowTooltip = null
 
 var _cell_buttons: Dictionary = { }
 var _cell_entry: Dictionary = { }
@@ -44,27 +41,45 @@ var _active_action_cost: int = 0
 var _active_action_remaining: float = 0.0
 var _inspection_finished: bool = false
 
+var _hover_entry: LotObjectEntry = null
+
 # ── Node references ───────────────────────────────────────────────────────────
 
-@onready var _items_grid: GridContainer = $HUD/Panel/MarginContainer/ScrollContainer/ItemsGrid
-@onready var _action_bar: LotActionBar = $HUD/LotActionBar
-@onready var _footer: HBoxContainer = $HUD/Footer
-@onready var _review_button: Button = $HUD/Footer/ReviewButton
+@onready var _items_grid: GridContainer = $RootHBox/LeftVBox/GridMargin/ScrollContainer/ItemsGrid
+@onready var _action_bar: LotActionBar = $LotActionBar
+@onready var _footer: HBoxContainer = $RootHBox/LeftVBox/FooterHBox
+@onready var _pass_button: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/PassButton
+@onready var _start_auction_button: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/StartAuctionButton
+@onready var _review_button: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/ReviewButton
 @onready var _list_review: ListReviewPopup = $ListReviewPopup
-@onready var _stamina_hud: StaminaHUD = $StaminaHUD
+@onready var _stamina_hud: StaminaHUD = $RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner/StaminaHUD
+
+# Sidebar — found list
+@onready var _found_vbox: VBoxContainer = %FoundVBox
+@onready var _empty_found_label: Label = %EmptyFoundLabel
+
+# Sidebar — veiled list
+@onready var _veiled_vbox: VBoxContainer = %VeiledVBox
+@onready var _empty_veiled_label: Label = %EmptyVeiledLabel
+
+# Sidebar — hover detail
+@onready var _sidebar_hsep: HSeparator = %SidebarHSep
+@onready var _hover_section: VBoxContainer = %HoverSection
+@onready var _hover_name_label: Label = %HoverNameLabel
+@onready var _hover_category_label: Label = %HoverCategoryLabel
+@onready var _hover_cond_value_label: Label = %CondValueLabel
+@onready var _hover_value_label: Label = %ValueValueLabel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
 func _ready() -> void:
     _ctx = ItemViewContext.for_inspection()
-    _tooltip = ItemRowTooltipScene.instantiate()
-    add_child(_tooltip)
 
     _action_bar.hide()
     _footer.show()
-    $HUD/Footer/PassButton.hide()
-    $HUD/Footer/StartAuctionButton.hide()
+    _pass_button.hide()
+    _start_auction_button.hide()
     _review_button.show()
     _review_button.pressed.connect(_on_review_pressed)
 
@@ -76,6 +91,9 @@ func _ready() -> void:
     _place_lot_objects()
     _refresh_grid_cells()
     _refresh_hud()
+    _refresh_found_list()
+    _refresh_veiled_list()
+    _clear_hover_section()
     set_process(true)
 
 
@@ -252,6 +270,10 @@ func _complete_active_action() -> void:
 
     _refresh_grid_cells()
     _refresh_hud()
+    _refresh_found_list()
+    _refresh_veiled_list()
+    if _hover_entry == completed_entry:
+        _update_hover_section(completed_entry)
 
     if RunManager.run_record.actions_remaining <= 0:
         _finish_inspection()
@@ -439,21 +461,117 @@ func _refresh_hud() -> void:
     var quota: int = RunManager.run_record.lot_entry.lot_data.action_quota
     _stamina_hud.update_ap(ap, quota)
 
-# ══ Tooltip ═══════════════════════════════════════════════════════════════════
+# ══ Sidebar — item list ═══════════════════════════════════════════════════════
+
+
+func _refresh_found_list() -> void:
+    for child in _found_vbox.get_children():
+        child.free()
+
+    var found_count := 0
+    for entry: LotObjectEntry in _entry_cells.keys():
+        if not entry.is_known():
+            continue
+        found_count += 1
+
+        var row := HBoxContainer.new()
+        row.add_theme_constant_override(&"separation", 8)
+
+        var name_lbl := Label.new()
+        name_lbl.text = entry.display_name_text()
+        name_lbl.add_theme_font_size_override(&"font_size", 13)
+        name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        name_lbl.clip_text = true
+        row.add_child(name_lbl)
+
+        var price_text := entry.estimated_value_text(_ctx)
+        if price_text != LotObjectEntry.UNKNOWN_TEXT:
+            var value_lbl := Label.new()
+            value_lbl.text = price_text
+            value_lbl.add_theme_font_size_override(&"font_size", 13)
+            value_lbl.add_theme_color_override(&"font_color", entry.price_display_color())
+            row.add_child(value_lbl)
+
+        _found_vbox.add_child(row)
+
+    _empty_found_label.visible = found_count == 0
+
+
+func _refresh_veiled_list() -> void:
+    for child in _veiled_vbox.get_children():
+        child.free()
+
+    var veiled_count := 0
+    for entry: LotObjectEntry in _entry_cells.keys():
+        if entry.is_known():
+            continue
+        veiled_count += 1
+
+        var row := HBoxContainer.new()
+        row.add_theme_constant_override(&"separation", 8)
+
+        var name_lbl := Label.new()
+        name_lbl.text = entry.display_name_text()
+        name_lbl.add_theme_font_size_override(&"font_size", 13)
+        name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        name_lbl.clip_text = true
+        row.add_child(name_lbl)
+
+        var ap_lbl := Label.new()
+        ap_lbl.text = "%d AP" % _search_cost_for_entry(entry)
+        ap_lbl.add_theme_font_size_override(&"font_size", 13)
+        ap_lbl.add_theme_color_override(&"font_color", Color(0.55, 0.58, 0.63, 1))
+        row.add_child(ap_lbl)
+
+        _veiled_vbox.add_child(row)
+
+    _empty_veiled_label.visible = veiled_count == 0
+
+# ══ Sidebar — hover section ═══════════════════════════════════════════════════
 
 
 func _on_grid_cell_mouse_entered(coord: Vector2i) -> void:
     var entry := _cell_entry.get(coord) as LotObjectEntry
-    var button := _cell_buttons.get(coord) as Button
-    if entry == null or button == null:
-        _tooltip.hide_tooltip()
+    if entry == null:
         return
-
-    _tooltip.show_for(entry, _ctx, Rect2(button.global_position, button.size))
+    _update_hover_section(entry)
 
 
 func _on_grid_cell_mouse_exited() -> void:
-    _tooltip.hide_tooltip()
+    pass # keep last hovered item visible
+
+
+func _update_hover_section(entry: LotObjectEntry) -> void:
+    _hover_entry = entry
+    _hover_name_label.text = entry.display_name_text()
+
+    var cat := entry.category_text() if entry.is_known() else ""
+    _hover_category_label.text = cat
+    _hover_category_label.visible = cat != ""
+
+    var cond := entry.condition_detail_text()
+    _hover_cond_value_label.text = cond if cond != "" else "—"
+    _hover_cond_value_label.add_theme_color_override(
+        &"font_color",
+        entry.condition_display_color() if cond != "" else Color(0.55, 0.58, 0.63, 1),
+    )
+
+    var price_text := entry.estimated_value_text(_ctx)
+    if price_text != LotObjectEntry.UNKNOWN_TEXT:
+        _hover_value_label.text = price_text
+        _hover_value_label.add_theme_color_override(&"font_color", entry.price_display_color())
+    else:
+        _hover_value_label.text = "—"
+        _hover_value_label.add_theme_color_override(&"font_color", Color(0.55, 0.58, 0.63, 1))
+
+    _sidebar_hsep.show()
+    _hover_section.show()
+
+
+func _clear_hover_section() -> void:
+    _hover_entry = null
+    _sidebar_hsep.hide()
+    _hover_section.hide()
 
 # ══ Summary / exit ════════════════════════════════════════════════════════════
 
@@ -466,9 +584,11 @@ func _finish_inspection() -> void:
     _clear_active_action()
     set_process(false)
 
-    _tooltip.hide_tooltip()
+    _clear_hover_section()
     _refresh_grid_cells()
     _refresh_hud()
+    _refresh_found_list()
+    _refresh_veiled_list()
     _list_review.populate()
     _list_review.show()
 
