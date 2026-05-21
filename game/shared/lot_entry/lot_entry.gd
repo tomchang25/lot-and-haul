@@ -21,9 +21,6 @@ var price_variance: float = 1.0
 # One entry per item in this lot. Generated from lot_data draw tables.
 var item_entries: Array[ItemEntry] = []
 
-# One entry per object in this lot, in display order.
-var lot_objects: Array[LotObjectEntry] = []
-
 # Cached NPC estimate rolled once at creation.
 # Both get_opening_bid() and auction rolled_price derive from this value.
 var npc_estimate: int = 0
@@ -50,10 +47,7 @@ static func create(data: LotData) -> LotEntry:
         if item != null:
             entry.item_entries.append(ItemEntry.create(item))
 
-    entry.lot_objects = []
-    for item_entry: ItemEntry in entry.item_entries:
-        entry.lot_objects.append(item_entry)
-    entry.lot_objects.shuffle()
+    entry.item_entries.shuffle()
 
     # Cache after entries are populated — get_npc_estimate() reads them.
     entry.npc_estimate = entry.roll_npc_estimate()

@@ -14,8 +14,6 @@ const STORAGE_COLUMNS: Array = [
     ItemRow.Column.CONDITION,
     ItemRow.Column.ESTIMATED_VALUE,
     ItemRow.Column.RARITY,
-    ItemRow.Column.INSPECTION,
-    ItemRow.Column.STATUS,
 ]
 
 # ── State ─────────────────────────────────────────────────────────────────────
@@ -189,8 +187,6 @@ func _build_task_card(slot: ResearchSlot, entry: ItemEntry) -> PanelContainer:
     kind_label.add_theme_font_size_override("font_size", 10)
     kind_label.text = ResearchSlot.action_to_string(slot.action).to_upper()
     match slot.action:
-        ResearchSlot.SlotAction.UNLOCK:
-            kind_label.add_theme_color_override("font_color", Color(0.95, 0.75, 0.3))
         ResearchSlot.SlotAction.AUTHENTICATE:
             kind_label.add_theme_color_override("font_color", Color(0.6, 0.9, 0.4))
         _:
@@ -249,10 +245,6 @@ func _task_progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
             return "Condition: %d%%" % int(entry.condition * 100)
         ResearchSlot.SlotAction.RESTORE:
             return "Condition: %d%%" % int(entry.condition * 100)
-        ResearchSlot.SlotAction.UNLOCK:
-            var action_def: LayerUnlockAction = entry.current_unlock_action()
-            var difficulty: float = action_def.difficulty if action_def != null else 0.0
-            return "Progress: %.1f / %.1f" % [entry.unlock_progress, difficulty]
         ResearchSlot.SlotAction.AUTHENTICATE:
             return _authenticate_progress_text(slot, entry)
         _:
@@ -308,16 +300,16 @@ func _refresh_detail() -> void:
 
     # ── Rarity ─────────────────────────────────────────────────────────────────
     if entry.verified:
-        _detail_rarity_label.text = "%s ✓" % entry.confirmed_rarity_label
+        _detail_rarity_label.text = "%s ✓" % entry.rarity_text()
     else:
-        _detail_rarity_label.text = entry.storage_rarity_label
+        _detail_rarity_label.text = entry.rarity_text()
 
     # ── Condition ─────────────────────────────────────────────────────────────
-    _detail_cond_value.text = entry.condition_label
+    _detail_cond_value.text = entry.condition_text()
     _detail_cond_value.modulate = entry.condition_color
 
     # ── Estimated value ───────────────────────────────────────────────────────
-    _detail_est_value.text = entry.estimated_value_label
+    _detail_est_value.text = entry.estimated_value_text()
     _detail_est_value.add_theme_color_override(&"font_color", entry.price_color)
 
     # ── Price convergence / verified value title ─────────────────────────────
@@ -411,12 +403,6 @@ func _progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
             return "Condition: %d%%" % int(entry.condition * 100)
         ResearchSlot.SlotAction.RESTORE:
             return "Condition: %d%%" % int(entry.condition * 100)
-        ResearchSlot.SlotAction.UNLOCK:
-            if slot.completed:
-                return "Layer Unlocked"
-            var action_def: LayerUnlockAction = entry.current_unlock_action()
-            var difficulty: float = action_def.difficulty if action_def != null else 0.0
-            return "Progress: %.1f / %.1f" % [entry.unlock_progress, difficulty]
         ResearchSlot.SlotAction.AUTHENTICATE:
             return _authenticate_progress_text(slot, entry)
         _:

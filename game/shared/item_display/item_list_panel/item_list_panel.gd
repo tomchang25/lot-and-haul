@@ -112,11 +112,10 @@ func apply_sort() -> void:
         _row_container.move_child(row, i)
 
 
-static func get_sort_value(entry, col: ItemRow.Column, ctx: ItemViewContext) -> Variant:
-    var lot_object := entry as LotObjectEntry
-    if lot_object == null:
+static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewContext) -> Variant:
+    if entry == null:
         return 0
-    return lot_object.sort_value(col, ctx)
+    return entry.sort_value(col, ctx)
 
 # ══ Header ════════════════════════════════════════════════════════════════════
 

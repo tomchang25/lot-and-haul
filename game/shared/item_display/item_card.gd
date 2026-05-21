@@ -5,7 +5,7 @@ extends PanelContainer
 
 signal clicked(card: ItemCard)
 
-var _entry: LotObjectEntry = null
+var _entry: ItemEntry = null
 var _ctx: ItemViewContext = null
 var _is_selected: bool = false
 var _has_intuition_mark: bool = false
@@ -48,9 +48,9 @@ func _apply() -> void:
     if _entry == null:
         return
 
-    _name_label.text = _entry.display_name_text()
+    _name_label.text = _entry.display_name
 
-    if not _entry.is_known():
+    if _entry.is_veiled():
         _apply_unknown()
     else:
         _apply_known()
@@ -100,18 +100,18 @@ func _apply_known() -> void:
     else:
         _condition_mult_label.hide()
 
-    _price_label.text = _entry.estimated_value_text(_ctx)
+    _price_label.text = _entry.price_text_for(_ctx)
     _price_label.add_theme_color_override(&"font_color", _entry.price_display_color())
     _price_label.show()
 
     var weight := _entry.weight_text()
     var grid := _entry.grid_text()
-    if weight != LotObjectEntry.UNKNOWN_TEXT:
+    if weight != ItemEntry.UNKNOWN_TEXT:
         _weight_label.text = weight
         _weight_label.show()
     else:
         _weight_label.hide()
-    if grid != LotObjectEntry.UNKNOWN_TEXT:
+    if grid != ItemEntry.UNKNOWN_TEXT:
         _grid_label.text = grid
         _grid_label.show()
     else:

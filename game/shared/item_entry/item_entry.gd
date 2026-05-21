@@ -1,7 +1,24 @@
 # item_entry.gd
 # Runtime context for one item within a single warehouse run.
 class_name ItemEntry
-extends LotObjectEntry
+extends RefCounted
+
+# ── Display constants ─────────────────────────────────────────────────────────
+
+const UNKNOWN_TEXT := "???"
+
+const COLUMN_NAME := 0
+const COLUMN_CONDITION := 1
+const COLUMN_ESTIMATED_VALUE := 2
+const COLUMN_BASE_VALUE := 3
+const COLUMN_MERCHANT_OFFER := 4
+const COLUMN_SPECIAL_ORDER := 5
+const COLUMN_RARITY := 6
+const COLUMN_WEIGHT := 7
+const COLUMN_GRID := 8
+const COLUMN_MARKET_FACTOR := 9
+const COLUMN_RESEARCH_STATUS := 10
+const COLUMN_INSPECTION := 11
 
 # ── Inspection constants ─────────────────────────────────────────────────────
 
@@ -10,9 +27,6 @@ const CONDITION_THRESHOLDS: Array[float] = [0.0, 0.33, 0.66]
 
 # Display names indexed by ItemData.Rarity enum value.
 const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
-
-# Uniform maximum range spread, in multiplier units around 1.0.
-const PRICE_MAX_SPREAD: float = 1.0
 
 # ── Research tuning knobs (non-inspection) ───────────────────────────────────
 
@@ -38,8 +52,6 @@ const RESTORE_RARITY_FACTOR: Dictionary = {
 const RESTORE_SKILL_COEFF: float = 0.4
 const RESTORE_CAT_SKILL_COEFF: float = 0.5
 
-const UNLOCK_BASE_EFFORT: float = 1.0
-
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var item_data: ItemData = null
@@ -64,13 +76,6 @@ var id: int = -1
 # inspection so the range always converges on the true value.
 var center_offset: float = 0.0
 
-# [LEGACY] Accumulated effort toward the current layer's unlock action.
-# Used only by the UNLOCK SlotAction flow. The AUTHENTICATE path (Phase 6+)
-# does not use this field; progress is tracked in ResearchSlot.authenticate_days_spent.
-# Reset on advance_layer(). Persisted because UNLOCK resets it on advance,
-# so completion cannot be derived from layer_index alone.
-var unlock_progress: float = 0.0
-
 # True after Storage Authenticate completes. Reveals item_data.item_name
 # and item_data.base_price in the UI.
 var verified: bool = false
@@ -79,13 +84,20 @@ var revealed_clue_ids: Array[String] = []
 
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
-# inspection_level is now fully computed, not stored.
+# inspection_level is fully computed from layer_index relative to total layers.
+# Veiled items return 0.0. Items with ≤2 layers are fully inspected once revealed.
+# For ≥3 layers: 0.0 at layer 1, 1.0 at the final layer, linear in between.
 var inspection_level: float:
     get:
-        var total := _total_clue_count()
-        if total == 0:
+        if not inspected:
+            return 0.0
+        if item_data == null or item_data.identity_layers.is_empty():
             return 1.0
-        return clampf(float(revealed_clue_ids.size()) / float(total), 0.0, 1.0)
+        var total := item_data.identity_layers.size()
+        if total <= 2:
+            return 1.0
+        var current := _safe_layer_index()
+        return clampf(float(current - 1) / float(total - 2), 0.0, 1.0)
 
 var display_name: String:
     get:
@@ -101,46 +113,9 @@ var display_name: String:
             name += " ⚙"
         return name
 
-# Condition label shown to the player, keyed off the current inspect bucket.
-var condition_label: String:
-    get:
-        if is_veiled():
-            return ""
-
-        match get_condition_bucket():
-            0:
-                return "???"
-            1:
-                if condition < 0.5:
-                    return "Poor"
-                else:
-                    return "Good"
-            2:
-                if condition < 0.25:
-                    return "Poor"
-                elif condition < 0.5:
-                    return "Fair"
-                elif condition < 0.75:
-                    return "Good"
-                else:
-                    return "Excellent"
-            _:
-                return "?????????"
-
-var condition_mult_label: String:
-    get:
-        if is_veiled():
-            return "×?"
-        match get_condition_bucket():
-            0:
-                return "×?"
-            1:
-                return "~×%.2f" % get_known_condition_multiplier()
-            2:
-                return "×%.2f" % get_condition_multiplier()
-            _:
-                push_warning("condition bucket out of range: %d" % get_condition_bucket())
-                return "×?"
+# Condition text getters live as functions below (condition_text() /
+# condition_secondary_text()). They were previously also exposed as same-named
+# computed properties — removed to eliminate name shadowing.
 
 
 func get_condition_multiplier() -> float:
@@ -172,17 +147,8 @@ func get_known_condition_multiplier() -> float:
         2:
             return get_condition_multiplier()
         _:
-            return 0.0
-
-var confirmed_rarity_label: String:
-    get:
-        return _true_rarity_name()
-
-var storage_rarity_label: String:
-    get:
-        if is_veiled() or item_data == null:
-            return LotObjectEntry.UNKNOWN_TEXT
-        return _true_rarity_name() if verified else LotObjectEntry.UNKNOWN_TEXT
+            push_warning("Unknown condition bucket: %d" % get_condition_bucket())
+            return 1.0
 
 # ── Bucket helpers ────────────────────────────────────────────────────────────
 
@@ -228,22 +194,14 @@ func apply_restore() -> void:
     KnowledgeManager.add_category_points(
         item_data.category_data,
         item_data.rarity,
-        KnowledgeManager.KnowledgeAction.REPAIR,
+        KnowledgeManager.KnowledgeAction.RESTORE,
     )
 
-
-func add_unlock_effort() -> void:
-    var action: LayerUnlockAction = current_unlock_action()
-    if action:
-        unlock_progress = minf(action.difficulty, unlock_progress + UNLOCK_BASE_EFFORT)
-    else:
-        push_warning("ItemEntry: add_unlock_effort called with no unlock action available")
 
 
 func advance_layer() -> void:
     _reveal_layer_clues(_safe_layer_index())
     layer_index += 1
-    unlock_progress = 0.0
     KnowledgeManager.add_category_points(
         item_data.category_data,
         item_data.rarity,
@@ -258,7 +216,6 @@ func advance_to_final_layer() -> void:
         return
     layer_index = item_data.identity_layers.size() - 1
     inspected = true
-    unlock_progress = 1.0
     for layer: IdentityLayer in item_data.identity_layers:
         for clue: ClueData in layer.clues:
             if not revealed_clue_ids.has(clue.clue_id):
@@ -296,14 +253,6 @@ func is_restore_complete() -> bool:
     return condition >= 1.0
 
 
-func is_unlock_ready() -> bool:
-    if is_at_final_layer():
-        return false
-    var action: LayerUnlockAction = current_unlock_action()
-    if action == null:
-        return false
-    return unlock_progress >= action.difficulty
-
 
 var price_convergence_ratio: float:
     get:
@@ -313,15 +262,6 @@ var price_convergence_ratio: float:
 func is_price_converged() -> bool:
     return price_convergence_ratio >= 1.0
 
-
-var unlock_ratio: float:
-    get:
-        if is_at_final_layer():
-            return 1.0
-        var action: LayerUnlockAction = current_unlock_action()
-        if action == null:
-            return 1.0
-        return clampf(unlock_progress / action.difficulty, 0.0, 1.0)
 
 
 func _true_rarity_name() -> String:
@@ -376,18 +316,16 @@ var estimated_value_max: int:
         var mult: float = 1.0 + spread + offset
         return maxi(1, int(base_value * mult))
 
-var estimated_value_label: String:
-    get:
-        if is_veiled():
-            return "???"
-        if verified:
-            return "$%d" % item_data.base_price
-        var suffix: String = "+" if not verified else ""
-        var lo: int = estimated_value_min
-        var hi: int = estimated_value_max
-        if hi <= lo:
-            return "$%d%s" % [lo, suffix]
-        return "$%d - $%d%s" % [lo, hi, suffix]
+func estimated_value_text() -> String:
+    if is_veiled():
+        return UNKNOWN_TEXT
+    if verified:
+        return "$%d" % item_data.base_price
+    var lo: int = estimated_value_min
+    var hi: int = estimated_value_max
+    if hi <= lo:
+        return "$%d+" % lo
+    return "$%d - $%d+" % [lo, hi]
 
 
 # Unified pricing pipeline. Reads the active layer's base value, then
@@ -416,25 +354,6 @@ func compute_price(config: PriceConfig) -> int:
     value *= config.multiplier
     return int(value)
 
-# # Returns the estimated price range as [min, max] for the given config. The
-# # midpoint is compute_price(config); the spread widens with lower
-# # inspection_level and is biased by center_offset so identical items diverge
-# # until inspected. Both ends are clamped to a minimum of 1 so the UI never
-# # shows $0 or a negative price.
-# func compute_price_range(config: PriceConfig) -> Array[int]:
-#     var base: float = float(compute_price(config))
-#     var spread: float = _max_spread() * (1.0 - inspection_level)
-#     var offset: float = center_offset * (1.0 - inspection_level)
-#     var range_min: float = 1.0 - spread + offset
-#     var range_max: float = 1.0 + spread + offset
-#     var result: Array[int] = []
-#     result.append(maxi(1, int(base * range_min)))
-#     result.append(maxi(1, int(base * range_max)))
-#     return result
-
-
-func _max_spread() -> float:
-    return PRICE_MAX_SPREAD
 
 
 var market_price: int:
@@ -481,8 +400,9 @@ var price_color: Color:
 # Condition and rarity displays live on the properties above.
 
 
-# Bridge method — kept for ItemCard / ItemRowTooltip which dispatch on stage.
-func price_label_for(ctx: ItemViewContext) -> String:
+# Stage-aware price text. ItemCard / ItemRow / ItemRowTooltip / inspection_scene
+# dispatch through this so a single Stage enum drives the visible value.
+func price_text_for(ctx: ItemViewContext) -> String:
     match ctx.stage:
         ItemViewContext.Stage.INSPECTION, \
         ItemViewContext.Stage.LIST_REVIEW, \
@@ -490,14 +410,14 @@ func price_label_for(ctx: ItemViewContext) -> String:
         ItemViewContext.Stage.CARGO, \
         ItemViewContext.Stage.RUN_REVIEW, \
         ItemViewContext.Stage.STORAGE:
-            return estimated_value_label
+            return estimated_value_text()
         ItemViewContext.Stage.MERCHANT_SHOP:
-            return merchant_offer_label(ctx.merchant)
+            return merchant_offer_text(ctx.merchant)
         ItemViewContext.Stage.FULFILLMENT_PANEL:
-            return special_order_label(ctx.order)
+            return special_order_text(ctx.order)
         _:
             push_warning("Unknown Stage for price: %d" % ctx.stage)
-            return estimated_value_label
+            return estimated_value_text()
 
 
 # Bridge method — kept for ItemCard / ItemRowTooltip which dispatch on stage.
@@ -527,14 +447,6 @@ func estimated_value_sort_value() -> int:
     return estimated_value_min
 
 
-func base_value_label_text() -> String:
-    if is_veiled():
-        return "???"
-    if verified:
-        return "$%d" % item_data.base_price
-    return "$%d" % active_layer().base_value
-
-
 func base_value_sort_value() -> int:
     if is_veiled():
         return 0
@@ -543,86 +455,157 @@ func base_value_sort_value() -> int:
     return active_layer().base_value
 
 
-func merchant_offer_label(merchant: MerchantData) -> String:
-    return "$%d" % merchant_offer_value(merchant)
-
-
 func merchant_offer_value(merchant: MerchantData) -> int:
     return merchant.offer_for(self) if merchant else market_price
-
-
-func special_order_label(order: SpecialOrder) -> String:
-    return "$%d" % special_order_value(order)
 
 
 func special_order_value(order: SpecialOrder) -> int:
     return order.compute_item_price(self) if order else 0
 
-# ── LotObjectEntry display API ───────────────────────────────────────────────
 
 
-func is_known() -> bool:
-    return not is_veiled()
-
-
-func display_name_text() -> String:
-    return display_name
 
 
 func condition_text() -> String:
-    var text := condition_label
-    return LotObjectEntry.UNKNOWN_TEXT if text == "" else text
+    if is_veiled():
+        return UNKNOWN_TEXT
+    match get_condition_bucket():
+        0:
+            return UNKNOWN_TEXT
+        1:
+            return "Poor" if condition < 0.5 else "Good"
+        2:
+            if condition < 0.25:
+                return "Poor"
+            elif condition < 0.5:
+                return "Fair"
+            elif condition < 0.75:
+                return "Good"
+            else:
+                return "Excellent"
+        _:
+            push_warning("Unknown condition bucket: %d" % get_condition_bucket())
+            return UNKNOWN_TEXT
+
+
+func condition_label() -> Label:
+    var label := Label.new()
+    label.text = condition_text()
+    label.modulate = condition_display_color()
+    return label
+
+
+func condition_secondary_text() -> String:
+    if condition_text() == UNKNOWN_TEXT:
+        return ""
+    match get_condition_bucket():
+        1:
+            return "~×%.2f" % get_known_condition_multiplier()
+        2:
+            return "×%.2f" % get_condition_multiplier()
+        _:
+            push_warning("condition bucket out of range: %d" % get_condition_bucket())
+            return "×?"
 
 
 func condition_detail_text() -> String:
     var text := condition_text()
-    if text == LotObjectEntry.UNKNOWN_TEXT:
+    if text == UNKNOWN_TEXT:
         return ""
-    return "Condition:  %s (%s)" % [text, condition_mult_label]
+    return "Condition:  %s (%s)" % [text, condition_secondary_text()]
 
 
-func condition_secondary_text() -> String:
-    return "" if condition_text() == LotObjectEntry.UNKNOWN_TEXT else condition_mult_label
-
-
-func estimated_value_text(ctx: ItemViewContext) -> String:
-    return price_label_for(ctx)
+func condition_mult_label() -> Label:
+    var label := Label.new()
+    label.text = condition_secondary_text()
+    return label
 
 
 func base_value_text() -> String:
-    return base_value_label_text()
+    if is_veiled():
+        return UNKNOWN_TEXT
+    if verified:
+        return "$%d" % item_data.base_price
+    return "$%d" % active_layer().base_value
 
 
 func merchant_offer_text(merchant: MerchantData) -> String:
-    return merchant_offer_label(merchant)
+    return "$%d" % merchant_offer_value(merchant)
 
 
 func special_order_text(order: SpecialOrder) -> String:
-    return special_order_label(order)
+    return "$%d" % special_order_value(order)
+
+
+# ── Label factories ──────────────────────────────────────────────────────────
+# One factory per colour/state-bearing field. Centralising the colour decision
+# here so all three scenes (inspection / merchant_shop / storage) share it.
+
+
+func display_name_label() -> Label:
+    var label := Label.new()
+    label.text = display_name
+    label.add_theme_color_override(&"font_color", display_name_color())
+    return label
+
+
+func estimated_value_label() -> Label:
+    var label := Label.new()
+    label.text = estimated_value_text()
+    label.add_theme_color_override(&"font_color", price_display_color())
+    return label
+
+
+func base_value_label() -> Label:
+    var label := Label.new()
+    label.text = base_value_text()
+    label.add_theme_color_override(&"font_color", price_display_color())
+    return label
+
+
+func merchant_offer_label(merchant: MerchantData) -> Label:
+    var label := Label.new()
+    label.text = merchant_offer_text(merchant)
+    label.add_theme_color_override(&"font_color", price_display_color())
+    return label
+
+
+func special_order_label(order: SpecialOrder) -> Label:
+    var label := Label.new()
+    label.text = special_order_text(order)
+    label.add_theme_color_override(&"font_color", price_display_color())
+    return label
+
+
+func price_label_for(ctx: ItemViewContext) -> Label:
+    var label := Label.new()
+    label.text = price_text_for(ctx)
+    label.add_theme_color_override(&"font_color", price_display_color())
+    return label
 
 
 func rarity_text() -> String:
     if is_veiled() or item_data == null:
-        return LotObjectEntry.UNKNOWN_TEXT
-    return _true_rarity_name() if verified else LotObjectEntry.UNKNOWN_TEXT
+        return ItemEntry.UNKNOWN_TEXT
+    return _true_rarity_name() if verified else ItemEntry.UNKNOWN_TEXT
 
 
 func weight_text() -> String:
     var category := category_data()
     if is_veiled() or category == null:
-        return LotObjectEntry.UNKNOWN_TEXT
+        return ItemEntry.UNKNOWN_TEXT
     return "%.1f kg" % category.weight
 
 
 func grid_text() -> String:
     var category := category_data()
     if is_veiled() or category == null:
-        return LotObjectEntry.UNKNOWN_TEXT
+        return ItemEntry.UNKNOWN_TEXT
     return "%d  %s" % [category.get_cells().size(), category.shape_id]
 
 
 func market_factor_text() -> String:
-    return LotObjectEntry.UNKNOWN_TEXT if is_veiled() else "%+d%%" % int(round(market_factor_delta * 100))
+    return ItemEntry.UNKNOWN_TEXT if is_veiled() else "%+d%%" % int(round(market_factor_delta * 100))
 
 
 func research_status_text() -> String:
@@ -648,21 +631,8 @@ func research_status_text() -> String:
 
 
 func inspection_text() -> String:
-    return LotObjectEntry.UNKNOWN_TEXT if is_veiled() else "%d%%" % int(price_convergence_ratio * 100)
+    return ItemEntry.UNKNOWN_TEXT if is_veiled() else "%d%%" % int(price_convergence_ratio * 100)
 
-
-func unlock_text() -> String:
-    if is_veiled():
-        return LotObjectEntry.UNKNOWN_TEXT
-    if verified:
-        return "✓✓"
-    if is_at_final_layer():
-        return "·"
-    if current_unlock_action() == null:
-        return "-"
-    if unlock_progress == 0.0:
-        return " "
-    return "%d%%" % int(unlock_ratio * 100)
 
 
 func price_display_color() -> Color:
@@ -693,6 +663,18 @@ func category_data() -> CategoryData:
     return item_data.category_data if item_data != null else null
 
 
+func super_category_text() -> String:
+    var category := category_data()
+    if category == null or category.super_category == null:
+        return ""
+    return category.super_category.display_name
+
+
+func category_text() -> String:
+    var category := category_data()
+    return category.display_name if category != null else ""
+
+
 func can_inspect() -> bool:
     return is_veiled()
 
@@ -715,45 +697,39 @@ func perform_inspect() -> StringName:
 
 func sort_value(column: int, ctx: ItemViewContext) -> Variant:
     match column:
-        LotObjectEntry.COLUMN_NAME:
+        ItemEntry.COLUMN_NAME:
             return display_name
-        LotObjectEntry.COLUMN_CONDITION:
+        ItemEntry.COLUMN_CONDITION:
             if is_veiled() or get_condition_bucket() == 0:
                 return 0.0
             return get_known_condition_multiplier()
-        LotObjectEntry.COLUMN_ESTIMATED_VALUE:
+        ItemEntry.COLUMN_ESTIMATED_VALUE:
             return estimated_value_sort_value()
-        LotObjectEntry.COLUMN_BASE_VALUE:
+        ItemEntry.COLUMN_BASE_VALUE:
             return base_value_sort_value()
-        LotObjectEntry.COLUMN_MERCHANT_OFFER:
+        ItemEntry.COLUMN_MERCHANT_OFFER:
             return merchant_offer_value(ctx.merchant)
-        LotObjectEntry.COLUMN_SPECIAL_ORDER:
+        ItemEntry.COLUMN_SPECIAL_ORDER:
             return special_order_value(ctx.order)
-        LotObjectEntry.COLUMN_RARITY:
+        ItemEntry.COLUMN_RARITY:
             return float(item_data.rarity) if verified and item_data != null else -1.0
-        LotObjectEntry.COLUMN_WEIGHT:
+        ItemEntry.COLUMN_WEIGHT:
             var weight_category := category_data()
             return weight_category.weight if weight_category != null else 0.0
-        LotObjectEntry.COLUMN_GRID:
+        ItemEntry.COLUMN_GRID:
             var grid_category := category_data()
             return grid_category.get_cells().size() if grid_category != null else 0
-        LotObjectEntry.COLUMN_MARKET_FACTOR:
+        ItemEntry.COLUMN_MARKET_FACTOR:
             return market_factor_delta
-        LotObjectEntry.COLUMN_RESEARCH_STATUS:
+        ItemEntry.COLUMN_RESEARCH_STATUS:
             for d: Dictionary in SaveManager.research_slots:
                 if int(d.get("item_id", -1)) == id:
                     if bool(d.get("completed", false)):
                         return 2
                     return 1
             return 0
-        LotObjectEntry.COLUMN_INSPECTION:
+        ItemEntry.COLUMN_INSPECTION:
             return price_convergence_ratio
-        LotObjectEntry.COLUMN_UNLOCK:
-            if is_at_final_layer():
-                return 1.0
-            if current_unlock_action() == null:
-                return 0
-            return unlock_ratio
         _:
             push_warning("Unknown Column: %d" % column)
             return 0
@@ -787,8 +763,6 @@ func is_at_final_layer() -> bool:
     return _safe_layer_index() == item_data.identity_layers.size() - 1
 
 
-func is_authenticated() -> bool:
-    return verified
 
 
 # Marks an uninspected item as inspected. Shared by the reveal scene and the
@@ -799,19 +773,8 @@ func unveil() -> void:
     inspected = true
 
 
-func reveal() -> void:
-    pass
-
 # ── Private helpers ──────────────────────────────────────────────────────────
 
-
-func _total_clue_count() -> int:
-    if item_data == null:
-        return 0
-    var total := 0
-    for layer: IdentityLayer in item_data.identity_layers:
-        total += layer.clues.size()
-    return total
 
 
 func _reveal_layer_clues(layer_idx: int) -> void:
@@ -836,23 +799,27 @@ func _clue_prerequisites_met(clue: ClueData) -> bool:
 
 
 func _safe_layer_index() -> int:
-    if item_data == null or item_data.identity_layers.is_empty():
+    if item_data == null:
         return 0
-    if item_data.identity_layers.size() == 1:
+    var n: int = item_data.identity_layers.size()
+    if n == 0:
         return 0
-    return clampi(layer_index, 1, item_data.identity_layers.size() - 1)
+    # Single-layer items pin to 0; multi-layer items clamp to [1, n-1] so the
+    # runtime never reads the legacy layer-0 veil row.
+    var lo: int = 0 if n == 1 else 1
+    var hi: int = n - 1
+    return clampi(layer_index, lo, hi)
 
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
 
-static func create(data: ItemData, _veil_chance: float = 0.0) -> ItemEntry:
+static func create(data: ItemData) -> ItemEntry:
     var entry := ItemEntry.new()
     entry.item_data = data
 
     entry.condition = randf()
     entry.center_offset = randf_range(-0.5, 0.5)
 
-    # Layer 0 remains in legacy data, but new runtime entries start at layer 1.
     entry.layer_index = 1
     entry.inspected = false
 
@@ -869,7 +836,6 @@ func to_dict() -> Dictionary:
         "inspected": inspected,
         "condition": condition,
         "center_offset": center_offset,
-        "unlock_progress": unlock_progress,
         "verified": verified,
         "revealed_clue_ids": revealed_clue_ids.duplicate(),
     }
@@ -883,16 +849,12 @@ static func from_dict(d: Dictionary) -> ItemEntry:
     var entry := ItemEntry.new()
     entry.item_data = data
     var saved_layer_index := int(d.get("layer_index", 1))
-    entry.inspected = bool(d.get("inspected", saved_layer_index > 0))
-    entry.layer_index = max(1, saved_layer_index)
+    entry.inspected = bool(d.get("inspected", false))
+    entry.layer_index = saved_layer_index
     entry.condition = float(d["condition"])
-    # New fields — default gracefully if missing (migration-safe).
     if d.has("center_offset"):
         entry.center_offset = float(d["center_offset"])
-    else:
-        entry.center_offset = randf_range(-0.5, 0.5)
-    if d.has("unlock_progress"):
-        entry.unlock_progress = float(d["unlock_progress"])
+
     if d.has("id"):
         entry.id = int(d["id"])
     if d.has("verified"):
@@ -901,5 +863,4 @@ static func from_dict(d: Dictionary) -> ItemEntry:
         var raw: Array = d["revealed_clue_ids"]
         for clue_id_value in raw:
             entry.revealed_clue_ids.append(String(clue_id_value))
-    # Legacy inspection_level key is intentionally ignored — clean break.
     return entry

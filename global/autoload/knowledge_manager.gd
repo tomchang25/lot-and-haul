@@ -22,6 +22,7 @@ enum KnowledgeAction {
     APPRAISE = 3,
     REPAIR = 4,
     SELL = 5,
+    RESTORE = 6,
 }
 
 const _BASE_MASTERY: Dictionary = {
@@ -30,6 +31,7 @@ const _BASE_MASTERY: Dictionary = {
     KnowledgeAction.APPRAISE: 4,
     KnowledgeAction.REPAIR: 4,
     KnowledgeAction.SELL: 3,
+    KnowledgeAction.RESTORE: 4,
 }
 
 const RANK_THRESHOLDS: Array[int] = [0, 100, 400, 1600, 6400, 25600]

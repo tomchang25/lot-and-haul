@@ -200,10 +200,9 @@ func _init_auction() -> void:
 func _build_lot_summary() -> void:
     var lot: LotEntry = RunManager.run_record.lot_entry
 
-    for entry: LotObjectEntry in lot.lot_objects:
+    for entry: ItemEntry in lot.item_entries:
         var label := Label.new()
-        if entry is ItemEntry:
-            label.text = "%s (%s)" % [entry.display_name, entry.estimated_value_label]
+        label.text = "%s (%s)" % [entry.display_name, entry.estimated_value_text()]
         label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         label.add_theme_font_size_override(&"font_size", 15)
         _lot_summary.add_child(label)
@@ -292,7 +291,7 @@ func _resolve() -> void:
     var record = RunManager.run_record
     if _last_bidder == "player":
         var current_wins: Array[ItemEntry] = record.lot_items.duplicate()
-        var current_object_wins: Array[LotObjectEntry] = record.lot_objects.duplicate()
+        var current_object_wins: Array[ItemEntry] = record.lot_items.duplicate()
 
         RunManager.run_record.last_lot_won_items = current_wins
         RunManager.run_record.last_lot_won_objects = current_object_wins

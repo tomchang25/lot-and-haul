@@ -60,8 +60,6 @@ func _on_reveal_pressed() -> void:
         if entry.is_veiled():
             entry.unveil()
 
-        entry.reveal()
-
     _on_reveal_complete()
 
     _reveal_btn.hide()

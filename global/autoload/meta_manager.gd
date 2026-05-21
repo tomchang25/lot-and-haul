@@ -72,11 +72,6 @@ func _tick_research_slots(days: int) -> Array[Dictionary]:
                 ResearchSlot.SlotAction.REPAIR:
                     entry.apply_repair()
                     slot.completed = entry.is_repair_complete()
-                ResearchSlot.SlotAction.UNLOCK:
-                    entry.add_unlock_effort()
-                    if entry.is_unlock_ready():
-                        entry.advance_layer()
-                        slot.completed = true
                 ResearchSlot.SlotAction.RESTORE:
                     entry.apply_restore()
                     slot.completed = entry.is_restore_complete()
@@ -125,8 +120,6 @@ func _slot_effect_label(action: ResearchSlot.SlotAction) -> String:
     match action:
         ResearchSlot.SlotAction.REPAIR:
             return "Repair complete"
-        ResearchSlot.SlotAction.UNLOCK:
-            return "Layer unlocked"
         ResearchSlot.SlotAction.RESTORE:
             return "Fully restored"
         ResearchSlot.SlotAction.AUTHENTICATE:

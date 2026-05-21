@@ -1,7 +1,7 @@
 # list_review_popup.gd
 # Block 03 — static summary overlay shown between Inspection and Auction.
 # Call populate() before showing to rebuild the item list from GameManager state.
-# Reads:  RunManager.run_record.lot_entry, RunManager.run_record.lot_objects
+# Reads:  RunManager.run_record.lot_entry, RunManager.run_record.lot_items
 class_name ListReviewPopup
 extends Control
 
@@ -54,7 +54,7 @@ func populate() -> void:
     var lot: LotEntry = RunManager.run_record.lot_entry
 
     _item_list_panel.setup(_ctx, LIST_REVIEW_COLUMNS)
-    _item_list_panel.populate(RunManager.run_record.lot_objects)
+    _item_list_panel.populate(RunManager.run_record.lot_items)
 
     _total_label.text = lot.get_player_estimate_label()
 

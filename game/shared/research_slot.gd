@@ -6,7 +6,6 @@ extends RefCounted
 
 enum SlotAction {
     REPAIR,
-    UNLOCK,
     RESTORE,
     AUTHENTICATE,
 }
@@ -14,8 +13,6 @@ enum SlotAction {
 enum SlotCheck {
     OK,
     REPAIR_COMPLETE,
-    NO_UNLOCK_ACTION,
-    ADVANCE_BLOCKED,
     RESTORE_COMPLETE,
     RESTORE_NOT_READY,
     NOT_FINAL_LAYER,
@@ -27,9 +24,7 @@ enum SlotCheck {
 var item_id: int = -1
 var action: SlotAction = SlotAction.REPAIR
 
-# Set by the day-tick dispatch when the slot finishes its work. Persisted
-# because UNLOCK resets ItemEntry.unlock_progress on advance, so completion
-# cannot be derived from ItemEntry state alone.
+# Set by the day-tick dispatch when the slot finishes its work.
 var completed: bool = false
 
 # AUTHENTICATE progress — number of days spent authenticating.
@@ -54,8 +49,6 @@ static func action_to_string(a: SlotAction) -> String:
     match a:
         SlotAction.REPAIR:
             return "repair"
-        SlotAction.UNLOCK:
-            return "unlock"
         SlotAction.RESTORE:
             return "restore"
         SlotAction.AUTHENTICATE:
@@ -69,8 +62,6 @@ static func action_from_string(s: String) -> SlotAction:
     match s:
         "repair":
             return SlotAction.REPAIR
-        "unlock":
-            return SlotAction.UNLOCK
         "restore":
             return SlotAction.RESTORE
         "authenticate":
@@ -146,15 +137,6 @@ static func check_assignable(entry: ItemEntry, action: SlotAction) -> SlotCheck:
             if entry.is_repair_complete():
                 return SlotCheck.REPAIR_COMPLETE
             return SlotCheck.OK
-        SlotAction.UNLOCK:
-            var advance: KnowledgeManager.AdvanceCheck = KnowledgeManager.can_advance(entry)
-            match advance:
-                KnowledgeManager.AdvanceCheck.NO_ACTION:
-                    return SlotCheck.NO_UNLOCK_ACTION
-                KnowledgeManager.AdvanceCheck.OK:
-                    return SlotCheck.OK
-                _:
-                    return SlotCheck.ADVANCE_BLOCKED
         SlotAction.RESTORE:
             if entry.is_restore_complete():
                 return SlotCheck.RESTORE_COMPLETE
@@ -180,14 +162,6 @@ static func describe_blocked(check: SlotCheck, entry: ItemEntry) -> String:
             return ""
         SlotCheck.REPAIR_COMPLETE:
             return "Condition already at 50% — use Restore to continue"
-        SlotCheck.NO_UNLOCK_ACTION:
-            return "No further layers to unlock"
-        SlotCheck.ADVANCE_BLOCKED:
-            return AdvanceCheckLabel.describe(
-                KnowledgeManager.can_advance(entry),
-                entry.current_unlock_action(),
-                entry,
-            )
         SlotCheck.RESTORE_COMPLETE:
             return "Condition already fully restored"
         SlotCheck.RESTORE_NOT_READY:

@@ -35,13 +35,13 @@ var _entry_origin: Dictionary = { }
 var _entry_color_by_entry: Dictionary = { }
 var _search_duration_by_entry: Dictionary = { }
 
-var _active_entry: LotObjectEntry = null
+var _active_entry: ItemEntry = null
 var _active_action_type: int = -1
 var _active_action_cost: int = 0
 var _active_action_remaining: float = 0.0
 var _inspection_finished: bool = false
 
-var _hover_entry: LotObjectEntry = null
+var _hover_entry: ItemEntry = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -146,11 +146,11 @@ func _place_lot_objects() -> void:
     _entry_color_by_entry.clear()
     _search_duration_by_entry.clear()
 
-    for entry: LotObjectEntry in RunManager.run_record.lot_objects:
+    for entry: ItemEntry in RunManager.run_record.lot_items:
         _place_entry(entry)
 
 
-func _place_entry(entry: LotObjectEntry) -> void:
+func _place_entry(entry: ItemEntry) -> void:
     var shape_cells := _get_shape_cells(entry)
     var origins := _candidate_origins()
     origins.shuffle()
@@ -160,7 +160,7 @@ func _place_entry(entry: LotObjectEntry) -> void:
             _commit_shape_placement(entry, shape_cells, origin)
             return
 
-    push_warning("Inspection grid could not place lot object: %s" % entry.display_name_text())
+    push_warning("Inspection grid could not place lot object: %s" % entry.display_name)
 
 
 func _candidate_origins() -> Array[Vector2i]:
@@ -171,7 +171,7 @@ func _candidate_origins() -> Array[Vector2i]:
     return origins
 
 
-func _get_shape_cells(entry: LotObjectEntry) -> Array[Vector2i]:
+func _get_shape_cells(entry: ItemEntry) -> Array[Vector2i]:
     var category := entry.category_data()
     var fallback: Array[Vector2i] = [Vector2i.ZERO]
     if category == null:
@@ -194,7 +194,7 @@ func _can_place_shape(shape_cells: Array[Vector2i], origin: Vector2i) -> bool:
 
 
 func _commit_shape_placement(
-        entry: LotObjectEntry,
+        entry: ItemEntry,
         shape_cells: Array[Vector2i],
         origin: Vector2i,
 ) -> void:
@@ -218,11 +218,11 @@ func _on_grid_cell_pressed(coord: Vector2i) -> void:
     if _active_entry != null:
         return
 
-    var entry := _cell_entry.get(coord) as LotObjectEntry
+    var entry := _cell_entry.get(coord) as ItemEntry
     if entry == null:
         return
 
-    if not entry.is_known():
+    if entry.is_veiled():
         var cost_seconds := _search_cost_for_entry(entry)
         if cost_seconds > RunManager.run_record.actions_remaining:
             return
@@ -238,7 +238,7 @@ func _on_grid_cell_pressed(coord: Vector2i) -> void:
         return
 
 
-func _start_action(entry: LotObjectEntry, action_type: int, cost_seconds: int) -> void:
+func _start_action(entry: ItemEntry, action_type: int, cost_seconds: int) -> void:
     _active_entry = entry
     _active_action_type = action_type
     _active_action_cost = cost_seconds
@@ -260,7 +260,7 @@ func _complete_active_action() -> void:
 
     match action_type:
         ActionType.SEARCH:
-            if not completed_entry.is_known():
+            if completed_entry.is_veiled():
                 _reveal_lot_object(completed_entry)
         ActionType.ADVANCE:
             var item := completed_entry as ItemEntry
@@ -287,7 +287,7 @@ func _on_cell_gui_input(event: InputEvent, coord: Vector2i) -> void:
         return
     if _active_entry == null:
         return
-    if (_cell_entry.get(coord) as LotObjectEntry) != _active_entry:
+    if (_cell_entry.get(coord) as ItemEntry) != _active_entry:
         return
     _cancel_active_action()
 
@@ -316,7 +316,7 @@ func _advance_cost_for_item(item: ItemEntry) -> int:
     return cost
 
 
-func _search_cost_for_entry(entry: LotObjectEntry) -> int:
+func _search_cost_for_entry(entry: ItemEntry) -> int:
     return ceili(float(_search_duration_by_entry.get(entry, SEARCH_BASE_SECONDS)))
 
 
@@ -326,7 +326,7 @@ func _compute_search_duration(cell_count: int) -> float:
     return clampf(SEARCH_BASE_SECONDS + size_factor + random_factor, SEARCH_BASE_SECONDS, SEARCH_MAX_SECONDS)
 
 
-func _reveal_lot_object(entry: LotObjectEntry) -> void:
+func _reveal_lot_object(entry: ItemEntry) -> void:
     var item := entry as ItemEntry
     if item != null:
         _reveal_item_at_random_layer(item)
@@ -378,11 +378,11 @@ func _roll_random_layer_index(item: ItemEntry) -> int:
 func _refresh_grid_cells() -> void:
     for coord in _cell_buttons:
         var button := _cell_buttons[coord] as Button
-        var entry := _cell_entry.get(coord) as LotObjectEntry
+        var entry := _cell_entry.get(coord) as ItemEntry
         _refresh_grid_cell(button, coord, entry)
 
 
-func _refresh_grid_cell(button: Button, coord: Vector2i, entry: LotObjectEntry) -> void:
+func _refresh_grid_cell(button: Button, coord: Vector2i, entry: ItemEntry) -> void:
     button.disabled = _active_entry != null and entry != _active_entry
 
     if entry == null:
@@ -401,7 +401,7 @@ func _refresh_grid_cell(button: Button, coord: Vector2i, entry: LotObjectEntry) 
         else:
             _apply_cell_style(button, base_color.lerp(Color(1.0, 0.82, 0.35, 1.0), 0.45))
         button.text = _active_origin_text() if is_origin else ""
-    elif entry.is_known():
+    elif not entry.is_veiled():
         var item := entry as ItemEntry
         var is_final_item: bool = item != null and not item.can_advance()
         _apply_cell_style(button, base_color.lightened(0.16 if is_final_item else 0.28))
@@ -411,12 +411,12 @@ func _refresh_grid_cell(button: Button, coord: Vector2i, entry: LotObjectEntry) 
         button.text = _origin_ap_text(entry) if is_origin else ""
 
 
-func _entry_grid_color(entry: LotObjectEntry) -> Color:
+func _entry_grid_color(entry: ItemEntry) -> Color:
     return _entry_color_by_entry.get(entry, Color(0.08, 0.08, 0.10, 1.0))
 
 
-func _origin_ap_text(entry: LotObjectEntry) -> String:
-    if not entry.is_known():
+func _origin_ap_text(entry: ItemEntry) -> String:
+    if entry.is_veiled():
         return "%d AP" % _search_cost_for_entry(entry)
 
     var item := entry as ItemEntry
@@ -469,8 +469,8 @@ func _refresh_found_list() -> void:
         child.free()
 
     var found_count := 0
-    for entry: LotObjectEntry in _entry_cells.keys():
-        if not entry.is_known():
+    for entry: ItemEntry in _entry_cells.keys():
+        if entry.is_veiled():
             continue
         found_count += 1
 
@@ -478,14 +478,14 @@ func _refresh_found_list() -> void:
         row.add_theme_constant_override(&"separation", 8)
 
         var name_lbl := Label.new()
-        name_lbl.text = entry.display_name_text()
+        name_lbl.text = entry.display_name
         name_lbl.add_theme_font_size_override(&"font_size", 13)
         name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         name_lbl.clip_text = true
         row.add_child(name_lbl)
 
-        var price_text := entry.estimated_value_text(_ctx)
-        if price_text != LotObjectEntry.UNKNOWN_TEXT:
+        var price_text := entry.price_text_for(_ctx)
+        if price_text != ItemEntry.UNKNOWN_TEXT:
             var value_lbl := Label.new()
             value_lbl.text = price_text
             value_lbl.add_theme_font_size_override(&"font_size", 13)
@@ -502,8 +502,8 @@ func _refresh_veiled_list() -> void:
         child.free()
 
     var veiled_count := 0
-    for entry: LotObjectEntry in _entry_cells.keys():
-        if entry.is_known():
+    for entry: ItemEntry in _entry_cells.keys():
+        if not entry.is_veiled():
             continue
         veiled_count += 1
 
@@ -511,7 +511,7 @@ func _refresh_veiled_list() -> void:
         row.add_theme_constant_override(&"separation", 8)
 
         var name_lbl := Label.new()
-        name_lbl.text = entry.display_name_text()
+        name_lbl.text = entry.display_name
         name_lbl.add_theme_font_size_override(&"font_size", 13)
         name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         name_lbl.clip_text = true
@@ -531,7 +531,7 @@ func _refresh_veiled_list() -> void:
 
 
 func _on_grid_cell_mouse_entered(coord: Vector2i) -> void:
-    var entry := _cell_entry.get(coord) as LotObjectEntry
+    var entry := _cell_entry.get(coord) as ItemEntry
     if entry == null:
         return
     _update_hover_section(entry)
@@ -541,11 +541,11 @@ func _on_grid_cell_mouse_exited() -> void:
     pass # keep last hovered item visible
 
 
-func _update_hover_section(entry: LotObjectEntry) -> void:
+func _update_hover_section(entry: ItemEntry) -> void:
     _hover_entry = entry
-    _hover_name_label.text = entry.display_name_text()
+    _hover_name_label.text = entry.display_name
 
-    var cat := entry.category_text() if entry.is_known() else ""
+    var cat := entry.category_text() if not entry.is_veiled() else ""
     _hover_category_label.text = cat
     _hover_category_label.visible = cat != ""
 
@@ -556,8 +556,8 @@ func _update_hover_section(entry: LotObjectEntry) -> void:
         entry.condition_display_color() if cond != "" else Color(0.55, 0.58, 0.63, 1),
     )
 
-    var price_text := entry.estimated_value_text(_ctx)
-    if price_text != LotObjectEntry.UNKNOWN_TEXT:
+    var price_text := entry.price_text_for(_ctx)
+    if price_text != ItemEntry.UNKNOWN_TEXT:
         _hover_value_label.text = price_text
         _hover_value_label.add_theme_color_override(&"font_color", entry.price_display_color())
     else:

@@ -44,23 +44,17 @@ func _ready() -> void:
     $VBox.move_child(_clue_container, _clue_separator.get_index() + 1)
 
 
-func show_for(entry, ctx: ItemViewContext, anchor: Rect2) -> void:
-    var lot_object := entry as LotObjectEntry
-    if lot_object == null:
+func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
+    if entry == null:
         return
-    _show_for_lot_object(lot_object, ctx, anchor)
-
-
-func _show_for_lot_object(entry: LotObjectEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
-    var item := entry as ItemEntry
 
     # ── Display name ─────────────────────────────────────────────────────────
-    _display_name_label.text = entry.display_name_text()
+    _display_name_label.text = entry.display_name
     _display_name_label.show()
 
-    # ── Layer depth (ItemEntry only, when known) ──────────────────────────────
-    if item != null and item.is_known() and item.item_data != null:
-        _layer_depth_label.text = _layer_depth_text(item)
+    # ── Layer depth (when known) ──────────────────────────────────────────────
+    if not entry.is_veiled() and entry.item_data != null:
+        _layer_depth_label.text = _layer_depth_text(entry)
         _layer_depth_label.show()
     else:
         _layer_depth_label.hide()
@@ -68,7 +62,7 @@ func _show_for_lot_object(entry: LotObjectEntry, ctx: ItemViewContext, anchor: R
     # ── Always-visible: category identity ────────────────────────────────────
     var super_category := entry.super_category_text()
     var category := entry.category_text()
-    if entry.is_known() and category != "":
+    if not entry.is_veiled() and category != "":
         _super_category_label.text = super_category
         _super_category_label.visible = super_category != ""
         _category_label.text = category
@@ -87,17 +81,17 @@ func _show_for_lot_object(entry: LotObjectEntry, ctx: ItemViewContext, anchor: R
         _condition_label.hide()
 
     # ── Conditional: price ───────────────────────────────────────────────────
-    var price_text := entry.estimated_value_text(ctx)
-    if price_text != LotObjectEntry.UNKNOWN_TEXT:
+    var price_text := entry.price_text_for(ctx)
+    if price_text != ItemEntry.UNKNOWN_TEXT:
         _price_label.text = "%s: %s" % [ItemRow.get_price_header(ctx), price_text]
         _price_label.add_theme_color_override(&"font_color", entry.price_display_color())
         _price_label.show()
     else:
         _price_label.hide()
 
-    # ── Clue section (ItemEntry only, when known) ─────────────────────────────
-    if item != null and item.is_known():
-        _populate_clue_section(item)
+    # ── Clue section ─────────────────────────────────────────────────────────
+    if not entry.is_veiled():
+        _populate_clue_section(entry)
     else:
         _clue_separator.hide()
         _clue_container.hide()
@@ -110,7 +104,7 @@ func _show_for_lot_object(entry: LotObjectEntry, ctx: ItemViewContext, anchor: R
 
     var weight := entry.weight_text()
     var grid := entry.grid_text()
-    if entry.is_known() and weight != LotObjectEntry.UNKNOWN_TEXT and grid != LotObjectEntry.UNKNOWN_TEXT:
+    if not entry.is_veiled() and weight != ItemEntry.UNKNOWN_TEXT and grid != ItemEntry.UNKNOWN_TEXT:
         _weight_label.text = "Weight:  %s" % weight
         _grid_label.text = "Grid:  %s" % grid
         _weight_label.show()
@@ -191,3 +185,4 @@ func _auto_hint(clue: ClueData) -> String:
     if clue.required_perk != null:
         return "Requires %s perk" % clue.required_perk.display_name
     return "Further examination needed"
+                                                                                                                                                          

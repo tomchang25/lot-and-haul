@@ -32,7 +32,6 @@ enum Column {
     MARKET_FACTOR,
     RESEARCH_STATUS,
     INSPECTION,
-    STATUS,
 }
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -51,7 +50,6 @@ const COLUMN_HEADERS: Dictionary = {
     Column.MARKET_FACTOR: "Market",
     Column.RESEARCH_STATUS: "Research",
     Column.INSPECTION: "Inspection",
-    Column.STATUS: "Status",
 }
 
 const COLUMN_MIN_WIDTH: Dictionary = {
@@ -67,12 +65,11 @@ const COLUMN_MIN_WIDTH: Dictionary = {
     Column.MARKET_FACTOR: 100,
     Column.RESEARCH_STATUS: 100,
     Column.INSPECTION: 100,
-    Column.STATUS: 80,
 }
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _entry: LotObjectEntry = null
+var _entry: ItemEntry = null
 var _ctx: ItemViewContext = null
 var _columns: Array = []
 var _selection_state: SelectionState = SelectionState.NONE
@@ -94,7 +91,6 @@ var _selection_state: SelectionState = SelectionState.NONE
 @onready var _research_status_label: Label = $HBoxContainer/ResearchStatusLabel
 @onready var _inspection_label: Label = $HBoxContainer/InspectionLabel
 @onready var _auth_tag_label: Label = $HBoxContainer/NameHBox/AuthTagLabel
-@onready var _status_label: Label = $HBoxContainer/StatusLabel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -194,13 +190,12 @@ func _refresh() -> void:
     _market_factor_label.visible = Column.MARKET_FACTOR in _columns
     _research_status_label.visible = Column.RESEARCH_STATUS in _columns
     _inspection_label.visible = Column.INSPECTION in _columns
-    _status_label.visible = Column.STATUS in _columns
 
     # ── Column order ──────────────────────────────────────────────────────────
     _apply_column_order()
 
     # ── NAME ──────────────────────────────────────────────────────────────────
-    _name_label.text = _entry.display_name_text()
+    _name_label.text = _entry.display_name
     _name_label.add_theme_color_override(&"font_color", _entry.display_name_color())
 
     var item_entry := _entry as ItemEntry
@@ -213,7 +208,7 @@ func _refresh() -> void:
     _condition_label.modulate = _entry.condition_display_color()
 
     # ── ESTIMATED_VALUE ────────────────────────────────────────────────────────
-    _estimated_value_label.text = _entry.estimated_value_text(_ctx)
+    _estimated_value_label.text = _entry.price_text_for(_ctx)
     _estimated_value_label.add_theme_color_override(&"font_color", _entry.price_display_color())
 
     # ── BASE_VALUE ─────────────────────────────────────────────────────────────
@@ -244,8 +239,6 @@ func _refresh() -> void:
     # ── INSPECTION ────────────────────────────────────────────────────────────
     _inspection_label.text = _entry.inspection_text()
 
-    # ── STATUS ────────────────────────────────────────────────────────────────
-    _status_label.text = _entry.unlock_text()
 
 # ══ Column ordering ═══════════════════════════════════════════════════════════
 
@@ -267,7 +260,6 @@ func _apply_column_order() -> void:
         Column.MARKET_FACTOR: _market_factor_label,
         Column.RESEARCH_STATUS: _research_status_label,
         Column.INSPECTION: _inspection_label,
-        Column.STATUS: _status_label,
     }
 
     for i in _columns.size():

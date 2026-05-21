@@ -12,15 +12,14 @@ func _ready() -> void:
     _inspect_button.pressed.connect(_on_inspect_pressed)
 
 
-func refresh_lot(selected_entry) -> void:
+func refresh_lot(selected_entry: ItemEntry) -> void:
     var stamina: int = RunManager.run_record.stamina
     var actions: int = RunManager.run_record.actions_remaining
     var actions_ok: bool = actions > 0
-    var entry := selected_entry as LotObjectEntry
 
     var can_inspect: bool = (
-        entry != null
-        and entry.can_inspect()
+        selected_entry != null
+        and selected_entry.can_inspect()
     )
     can_inspect = (
         can_inspect

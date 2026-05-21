@@ -108,18 +108,6 @@ func _read_save_file() -> void:
         for d: Variant in parsed["research_slots"]:
             if d is Dictionary:
                 research_slots.append(d)
-    elif parsed.has("active_actions") and parsed["active_actions"] is Array:
-        research_slots = []
-        for d: Variant in parsed["active_actions"]:
-            if not d is Dictionary:
-                continue
-            if d.get("action_type", "") != "unlock":
-                continue
-            var slot := ResearchSlot.create(
-                ResearchSlot.SlotAction.UNLOCK,
-                int(d.get("item_id", -1)),
-            )
-            research_slots.append(slot.to_dict())
     if parsed.has("available_location_ids") and parsed["available_location_ids"] is Array:
         available_locations = []
         for id: Variant in parsed["available_location_ids"]:
