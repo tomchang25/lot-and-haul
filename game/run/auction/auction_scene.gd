@@ -291,10 +291,8 @@ func _resolve() -> void:
     var record = RunManager.run_record
     if _last_bidder == "player":
         var current_wins: Array[ItemEntry] = record.lot_items.duplicate()
-        var current_object_wins: Array[ItemEntry] = record.lot_items.duplicate()
 
         RunManager.run_record.last_lot_won_items = current_wins
-        RunManager.run_record.last_lot_won_objects = current_object_wins
         RunManager.run_record.paid_price += _current_display_price
         RunManager.run_record.won_items += current_wins
 

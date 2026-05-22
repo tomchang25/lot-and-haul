@@ -14,7 +14,6 @@ var won_items: Array[ItemEntry] = []
 var cargo_items: Array[ItemEntry] = []
 var trailer_items: Array[ItemEntry] = []
 var last_lot_won_items: Array[ItemEntry] = []
-var last_lot_won_objects: Array[ItemEntry] = []
 
 var onsite_proceeds: int = 0
 var paid_price: int = 0
@@ -65,4 +64,3 @@ func set_lot(entry: LotEntry) -> void:
     lot_entry = entry
     actions_remaining = entry.lot_data.action_quota
     last_lot_won_items.clear()
-    last_lot_won_objects.clear()

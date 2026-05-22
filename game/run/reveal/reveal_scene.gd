@@ -2,7 +2,7 @@
 # Block 05a — Reveal won items before cargo loading.
 # Marks uninspected items as inspected on reveal.
 # One button press reveals ALL items at once instead of one-at-a-time.
-# Reads:  RunManager.run_record.last_lot_won_objects,
+# Reads:  RunManager.run_record.last_lot_won_items,
 # Writes: ItemEntry.inspected, ItemEntry.scrutiny
 extends Control
 
@@ -82,7 +82,7 @@ func _on_row_tooltip_requested(
 
 func _populate_rows() -> void:
     _item_list_panel.setup(_ctx, REVEAL_COLUMNS)
-    _item_list_panel.populate(RunManager.run_record.last_lot_won_objects)
+    _item_list_panel.populate(RunManager.run_record.last_lot_won_items)
 
 
 func _show_auction_lost_state() -> void:
@@ -94,5 +94,5 @@ func _show_auction_lost_state() -> void:
 
 func _on_reveal_complete() -> void:
     _item_list_panel.rebuild_header()
-    for entry in RunManager.run_record.last_lot_won_objects:
+    for entry in RunManager.run_record.last_lot_won_items:
         _item_list_panel.refresh_row(entry)

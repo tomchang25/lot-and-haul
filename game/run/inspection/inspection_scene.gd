@@ -88,7 +88,7 @@ func _ready() -> void:
     _list_review.auction_entered.connect(_on_auction_entered)
 
     _build_grid_controls()
-    _place_lot_objects()
+    _place_items()
     _refresh_grid_cells()
     _refresh_hud()
     _refresh_found_list()
@@ -139,7 +139,7 @@ func _build_grid_controls() -> void:
             _cell_buttons[coord] = button
 
 
-func _place_lot_objects() -> void:
+func _place_items() -> void:
     _cell_entry.clear()
     _entry_cells.clear()
     _entry_origin.clear()
@@ -160,7 +160,7 @@ func _place_entry(entry: ItemEntry) -> void:
             _commit_shape_placement(entry, shape_cells, origin)
             return
 
-    push_warning("Inspection grid could not place lot object: %s" % entry.display_name)
+    push_warning("Inspection grid could not place item: %s" % entry.display_name)
 
 
 func _candidate_origins() -> Array[Vector2i]:
@@ -261,7 +261,7 @@ func _complete_active_action() -> void:
     match action_type:
         ActionType.SEARCH:
             if completed_entry.is_veiled():
-                _reveal_lot_object(completed_entry)
+                _reveal_item(completed_entry)
         ActionType.ADVANCE:
             var item := completed_entry as ItemEntry
             if item != null and item.can_advance():
@@ -326,16 +326,7 @@ func _compute_search_duration(cell_count: int) -> float:
     return clampf(SEARCH_BASE_SECONDS + size_factor + random_factor, SEARCH_BASE_SECONDS, SEARCH_MAX_SECONDS)
 
 
-func _reveal_lot_object(entry: ItemEntry) -> void:
-    var item := entry as ItemEntry
-    if item != null:
-        _reveal_item_at_random_layer(item)
-        return
-
-    entry.perform_inspect()
-
-
-func _reveal_item_at_random_layer(item: ItemEntry) -> void:
+func _reveal_item(item: ItemEntry) -> void:
     if item.is_veiled():
         item.unveil()
         if item.item_data != null and item.item_data.category_data != null:
