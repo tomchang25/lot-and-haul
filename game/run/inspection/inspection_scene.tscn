@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://bbr8kx3k0jv3c" path="res://game/run/inspection/inspection_scene.gd" id="1_idapx"]
 [ext_resource type="PackedScene" uid="uid://bstamhudtscn1" path="res://game/run/inspection/stamina_hud/stamina_hud.tscn" id="2_j573n"]
 [ext_resource type="PackedScene" uid="uid://dqniv6urp5xob" path="res://game/run/inspection/action_popup/lot_action_bar.tscn" id="3_3483c"]
-[ext_resource type="PackedScene" uid="uid://dbc6waemph2em" path="res://game/run/inspection/list_review/list_review_popup.tscn" id="4_icrf5"]
 
 [node name="InspectionScene" type="Control" unique_id=2043279360]
 layout_mode = 3
@@ -110,11 +109,6 @@ theme_override_constants/separation = 8
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ReviewButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=100000014]
-custom_minimum_size = Vector2(120, 0)
-layout_mode = 2
-text = "Review"
-
 [node name="PassButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=1473063044]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
@@ -193,6 +187,22 @@ theme_override_font_sizes/font_size = 12
 text = "All items revealed."
 horizontal_alignment = 1
 
+[node name="TotalEstSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000070]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TotalEstHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TotalEstSection" unique_id=100000071]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 11
+text = "Est. Total"
+
+[node name="TotalEstValueLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TotalEstSection" unique_id=100000072]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "—"
+
 [node name="SidebarHSep" type="HSeparator" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000040]
 unique_name_in_owner = true
 layout_mode = 2
@@ -207,7 +217,7 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 11
-text = "Hover"
+text = "Active"
 
 [node name="HoverNameLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000043]
 unique_name_in_owner = true
@@ -276,10 +286,6 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 
-[node name="ListReviewPopup" parent="." unique_id=796787196 instance=ExtResource("4_icrf5")]
-visible = false
-layout_mode = 1
-
 [node name="LotActionBar" parent="." unique_id=615668654 instance=ExtResource("3_3483c")]
 layout_mode = 1
 anchors_preset = 7
@@ -294,7 +300,8 @@ offset_bottom = -72.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="ConfirmPopup" type="AcceptDialog" parent="." unique_id=46946476]
-oversampling_override = 1.0
-title = "Load Up?"
-ok_button_text = "Confirm"
+[node name="ConfirmPopup" type="ConfirmationDialog" parent="." unique_id=46946476]
+title = "Enter Auction?"
+dialog_text = "Proceed to auction with your current findings?"
+ok_button_text = "Enter Auction"
+cancel_button_text = "Cancel"

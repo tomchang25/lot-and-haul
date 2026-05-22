@@ -11,6 +11,9 @@ const CELL_SIZE := Vector2(64.0, 64.0)
 const SEARCH_BASE_SECONDS := 2.0
 const SEARCH_MAX_SECONDS := 5.0
 
+const ACTIVE_BORDER_COLOR := Color(1.0, 0.88, 0.25, 1.0)
+const ACTIVE_BORDER_WIDTH := 3
+
 const SHAPE_COLORS: Array[Color] = [
     Color(0.20, 0.28, 0.40, 1.0),
     Color(0.30, 0.22, 0.38, 1.0),
@@ -50,9 +53,8 @@ var _hover_entry: ItemEntry = null
 @onready var _footer: HBoxContainer = $RootHBox/LeftVBox/FooterHBox
 @onready var _pass_button: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/PassButton
 @onready var _start_auction_button: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/StartAuctionButton
-@onready var _review_button: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/ReviewButton
-@onready var _list_review: ListReviewPopup = $ListReviewPopup
 @onready var _stamina_hud: StaminaHUD = $RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner/StaminaHUD
+@onready var _confirm_popup: ConfirmationDialog = $ConfirmPopup
 
 # Sidebar — found list
 @onready var _found_vbox: VBoxContainer = %FoundVBox
@@ -62,13 +64,16 @@ var _hover_entry: ItemEntry = null
 @onready var _veiled_vbox: VBoxContainer = %VeiledVBox
 @onready var _empty_veiled_label: Label = %EmptyVeiledLabel
 
-# Sidebar — hover detail
+# Sidebar — total estimate
+@onready var _total_est_label: Label = %TotalEstValueLabel
+
+# Sidebar — active item detail
 @onready var _sidebar_hsep: HSeparator = %SidebarHSep
-@onready var _hover_section: VBoxContainer = %HoverSection
-@onready var _hover_name_label: Label = %HoverNameLabel
-@onready var _hover_category_label: Label = %HoverCategoryLabel
-@onready var _hover_cond_value_label: Label = %CondValueLabel
-@onready var _hover_value_label: Label = %ValueValueLabel
+@onready var _detail_section: VBoxContainer = %HoverSection
+@onready var _detail_name_label: Label = %HoverNameLabel
+@onready var _detail_category_label: Label = %HoverCategoryLabel
+@onready var _detail_cond_value_label: Label = %CondValueLabel
+@onready var _detail_value_label: Label = %ValueValueLabel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -78,14 +83,11 @@ func _ready() -> void:
 
     _action_bar.hide()
     _footer.show()
-    _pass_button.hide()
-    _start_auction_button.hide()
-    _review_button.show()
-    _review_button.pressed.connect(_on_review_pressed)
-
-    _list_review.back_requested.connect(_on_list_review_pass)
-    _list_review.back_to_inspection_requested.connect(_on_back_to_inspection)
-    _list_review.auction_entered.connect(_on_auction_entered)
+    _pass_button.show()
+    _start_auction_button.show()
+    _pass_button.pressed.connect(_on_pass_pressed)
+    _start_auction_button.pressed.connect(_on_auction_pressed)
+    _confirm_popup.confirmed.connect(_on_auction_confirmed)
 
     _build_grid_controls()
     _place_items()
@@ -93,7 +95,8 @@ func _ready() -> void:
     _refresh_hud()
     _refresh_found_list()
     _refresh_veiled_list()
-    _clear_hover_section()
+    _refresh_total_estimate()
+    _clear_detail_section()
     set_process(true)
 
 
@@ -134,7 +137,6 @@ func _build_grid_controls() -> void:
             button.pressed.connect(_on_grid_cell_pressed.bind(coord))
             button.gui_input.connect(_on_cell_gui_input.bind(coord))
             button.mouse_entered.connect(_on_grid_cell_mouse_entered.bind(coord))
-            button.mouse_exited.connect(_on_grid_cell_mouse_exited)
             _items_grid.add_child(button)
             _cell_buttons[coord] = button
 
@@ -272,8 +274,9 @@ func _complete_active_action() -> void:
     _refresh_hud()
     _refresh_found_list()
     _refresh_veiled_list()
+    _refresh_total_estimate()
     if _hover_entry == completed_entry:
-        _update_hover_section(completed_entry)
+        _update_detail_section(completed_entry)
 
     if RunManager.run_record.actions_remaining <= 0:
         _finish_inspection()
@@ -386,12 +389,15 @@ func _refresh_grid_cell(button: Button, coord: Vector2i, entry: ItemEntry) -> vo
     var is_origin: bool = coord == _entry_origin.get(entry, Vector2i(-1, -1))
     var base_color := _entry_grid_color(entry)
 
+    var hover_borders := _hover_edge_borders(coord) if entry == _hover_entry else {}
+
     if entry == _active_entry:
-        if _active_action_type == ActionType.ADVANCE:
-            _apply_cell_style(button, base_color.lerp(Color(1.0, 0.55, 0.26, 1.0), 0.45))
-        else:
-            _apply_cell_style(button, base_color.lerp(Color(1.0, 0.82, 0.35, 1.0), 0.45))
+        var action_color := Color(1.0, 0.55, 0.26, 1.0) if _active_action_type == ActionType.ADVANCE else Color(1.0, 0.82, 0.35, 1.0)
+        _apply_cell_style(button, base_color.lerp(action_color, 0.45), hover_borders)
         button.text = _active_origin_text() if is_origin else ""
+    elif entry == _hover_entry:
+        _apply_cell_style(button, base_color if entry.is_veiled() else base_color.lightened(0.16 if not entry.can_advance() else 0.28), hover_borders)
+        button.text = _origin_ap_text(entry) if is_origin else ""
     elif not entry.is_veiled():
         var item := entry as ItemEntry
         var is_final_item: bool = item != null and not item.can_advance()
@@ -420,31 +426,54 @@ func _active_origin_text() -> String:
     return "%d AP\n%0.1fs" % [_active_action_cost, _active_action_remaining]
 
 
-func _apply_cell_style(button: Button, color: Color) -> void:
+func _apply_cell_style(button: Button, color: Color, edge_borders: Dictionary = {}) -> void:
     button.modulate = Color.WHITE
     button.add_theme_color_override(&"font_color", Color.WHITE)
     button.add_theme_color_override(&"font_hover_color", Color.WHITE)
     button.add_theme_color_override(&"font_pressed_color", Color.WHITE)
     button.add_theme_color_override(&"font_disabled_color", Color(0.74, 0.74, 0.74, 1.0))
-    button.add_theme_stylebox_override(&"normal", _cell_style(color))
-    button.add_theme_stylebox_override(&"hover", _cell_style(color.lightened(0.08)))
-    button.add_theme_stylebox_override(&"pressed", _cell_style(color.darkened(0.08)))
-    button.add_theme_stylebox_override(&"disabled", _cell_style(color.darkened(0.25)))
+    button.add_theme_stylebox_override(&"normal", _cell_style(color, edge_borders))
+    button.add_theme_stylebox_override(&"hover", _cell_style(color.lightened(0.08), edge_borders))
+    button.add_theme_stylebox_override(&"pressed", _cell_style(color.darkened(0.08), edge_borders))
+    button.add_theme_stylebox_override(&"disabled", _cell_style(color.darkened(0.25), edge_borders))
 
 
-func _cell_style(color: Color) -> StyleBoxFlat:
+func _cell_style(color: Color, edge_borders: Dictionary = {}) -> StyleBoxFlat:
     var style := StyleBoxFlat.new()
     style.bg_color = color
     style.corner_radius_top_left = 6
     style.corner_radius_top_right = 6
     style.corner_radius_bottom_left = 6
     style.corner_radius_bottom_right = 6
-    style.border_width_top = 1
-    style.border_width_right = 1
-    style.border_width_bottom = 1
-    style.border_width_left = 1
-    style.border_color = color.lightened(0.16)
+    if edge_borders.is_empty():
+        style.border_width_top = 1
+        style.border_width_right = 1
+        style.border_width_bottom = 1
+        style.border_width_left = 1
+        style.border_color = color.lightened(0.16)
+    else:
+        style.border_width_top = edge_borders.get(&"top", 0)
+        style.border_width_right = edge_borders.get(&"right", 0)
+        style.border_width_bottom = edge_borders.get(&"bottom", 0)
+        style.border_width_left = edge_borders.get(&"left", 0)
+        style.border_color = ACTIVE_BORDER_COLOR
     return style
+
+
+func _hover_edge_borders(coord: Vector2i) -> Dictionary:
+    var borders := {}
+    var deltas := {
+        &"top": Vector2i(0, -1),
+        &"right": Vector2i(1, 0),
+        &"bottom": Vector2i(0, 1),
+        &"left": Vector2i(-1, 0),
+    }
+    for side: StringName in deltas:
+        var neighbor: Vector2i = coord + deltas[side]
+        var neighbor_entry := _cell_entry.get(neighbor) as ItemEntry
+        if neighbor_entry != _hover_entry:
+            borders[side] = ACTIVE_BORDER_WIDTH
+    return borders
 
 
 func _refresh_hud() -> void:
@@ -518,51 +547,70 @@ func _refresh_veiled_list() -> void:
 
     _empty_veiled_label.visible = veiled_count == 0
 
-# ══ Sidebar — hover section ═══════════════════════════════════════════════════
+# ══ Sidebar — total estimate ══════════════════════════════════════════════════
+
+
+func _refresh_total_estimate() -> void:
+    var lot: LotEntry = RunManager.run_record.lot_entry
+    if lot == null:
+        _total_est_label.text = "—"
+        return
+    var estimate := lot.get_player_estimate()
+    var lo: int = estimate[0]
+    var hi: int = estimate[1]
+    if lo == 0 and hi == 0:
+        _total_est_label.text = "—"
+    elif hi <= lo:
+        _total_est_label.text = "$%d" % lo
+    else:
+        _total_est_label.text = "$%d – $%d" % [lo, hi]
+
+
+# ══ Sidebar — active item detail ══════════════════════════════════════════════
 
 
 func _on_grid_cell_mouse_entered(coord: Vector2i) -> void:
     var entry := _cell_entry.get(coord) as ItemEntry
-    if entry == null:
+    if entry == null or entry == _hover_entry:
         return
-    _update_hover_section(entry)
-
-
-func _on_grid_cell_mouse_exited() -> void:
-    pass # keep last hovered item visible
-
-
-func _update_hover_section(entry: ItemEntry) -> void:
     _hover_entry = entry
-    _hover_name_label.text = entry.display_name
+    _update_detail_section(entry)
+    _refresh_grid_cells()
+
+
+func _update_detail_section(entry: ItemEntry) -> void:
+    if entry == null:
+        _clear_detail_section()
+        return
+
+    _detail_name_label.text = entry.display_name
 
     var cat := entry.category_text() if not entry.is_veiled() else ""
-    _hover_category_label.text = cat
-    _hover_category_label.visible = cat != ""
+    _detail_category_label.text = cat
+    _detail_category_label.visible = cat != ""
 
     var cond := entry.condition_detail_text()
-    _hover_cond_value_label.text = cond if cond != "" else "—"
-    _hover_cond_value_label.add_theme_color_override(
+    _detail_cond_value_label.text = cond if cond != "" else "—"
+    _detail_cond_value_label.add_theme_color_override(
         &"font_color",
         entry.condition_display_color() if cond != "" else Color(0.55, 0.58, 0.63, 1),
     )
 
     var price_text := entry.price_text_for(_ctx)
     if price_text != ItemEntry.UNKNOWN_TEXT:
-        _hover_value_label.text = price_text
-        _hover_value_label.add_theme_color_override(&"font_color", entry.price_display_color())
+        _detail_value_label.text = price_text
+        _detail_value_label.add_theme_color_override(&"font_color", entry.price_display_color())
     else:
-        _hover_value_label.text = "—"
-        _hover_value_label.add_theme_color_override(&"font_color", Color(0.55, 0.58, 0.63, 1))
+        _detail_value_label.text = "—"
+        _detail_value_label.add_theme_color_override(&"font_color", Color(0.55, 0.58, 0.63, 1))
 
     _sidebar_hsep.show()
-    _hover_section.show()
+    _detail_section.show()
 
 
-func _clear_hover_section() -> void:
-    _hover_entry = null
+func _clear_detail_section() -> void:
     _sidebar_hsep.hide()
-    _hover_section.hide()
+    _detail_section.hide()
 
 # ══ Summary / exit ════════════════════════════════════════════════════════════
 
@@ -575,36 +623,22 @@ func _finish_inspection() -> void:
     _clear_active_action()
     set_process(false)
 
-    _clear_hover_section()
+    _clear_detail_section()
     _refresh_grid_cells()
     _refresh_hud()
     _refresh_found_list()
     _refresh_veiled_list()
-    _list_review.populate()
-    _list_review.show()
+    _refresh_total_estimate()
 
 
-func _on_review_pressed() -> void:
-    if _inspection_finished:
-        return
-    _cancel_active_action()
-    set_process(false)
-    _list_review.populate()
-    _list_review.show()
-
-
-func _on_back_to_inspection() -> void:
-    _list_review.hide()
-    if _inspection_finished:
-        return
-    set_process(true)
-    _refresh_grid_cells()
-    _refresh_hud()
-
-
-func _on_list_review_pass() -> void:
+func _on_pass_pressed() -> void:
     GameManager.go_to_lot_browse()
 
 
-func _on_auction_entered() -> void:
+func _on_auction_pressed() -> void:
+    _cancel_active_action()
+    _confirm_popup.popup_centered()
+
+
+func _on_auction_confirmed() -> void:
     GameManager.go_to_auction()

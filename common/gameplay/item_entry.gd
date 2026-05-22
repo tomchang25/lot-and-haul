@@ -198,7 +198,6 @@ func apply_restore() -> void:
     )
 
 
-
 func advance_layer() -> void:
     _reveal_layer_clues(_safe_layer_index())
     layer_index += 1
@@ -253,7 +252,6 @@ func is_restore_complete() -> bool:
     return condition >= 1.0
 
 
-
 var price_convergence_ratio: float:
     get:
         return inspection_level
@@ -261,7 +259,6 @@ var price_convergence_ratio: float:
 
 func is_price_converged() -> bool:
     return price_convergence_ratio >= 1.0
-
 
 
 func _true_rarity_name() -> String:
@@ -316,16 +313,25 @@ var estimated_value_max: int:
         var mult: float = 1.0 + spread + offset
         return maxi(1, int(base_value * mult))
 
+
 func estimated_value_text() -> String:
     if is_veiled():
         return UNKNOWN_TEXT
     if verified:
         return "$%d" % item_data.base_price
+
+    var text: String
     var lo: int = estimated_value_min
     var hi: int = estimated_value_max
     if hi <= lo:
-        return "$%d+" % lo
-    return "$%d - $%d+" % [lo, hi]
+        text = "$%d" % lo
+    else:
+        text = "$%d - $%d" % [lo, hi]
+
+    if not is_at_final_layer():
+        text += "+"
+
+    return text
 
 
 # Unified pricing pipeline. Reads the active layer's base value, then
@@ -353,7 +359,6 @@ func compute_price(config: PriceConfig) -> int:
 
     value *= config.multiplier
     return int(value)
-
 
 
 var market_price: int:
@@ -463,9 +468,6 @@ func special_order_value(order: SpecialOrder) -> int:
     return order.compute_item_price(self) if order else 0
 
 
-
-
-
 func condition_text() -> String:
     if is_veiled():
         return UNKNOWN_TEXT
@@ -535,7 +537,6 @@ func merchant_offer_text(merchant: MerchantData) -> String:
 
 func special_order_text(order: SpecialOrder) -> String:
     return "$%d" % special_order_value(order)
-
 
 # ── Label factories ──────────────────────────────────────────────────────────
 # One factory per colour/state-bearing field. Centralising the colour decision
@@ -632,7 +633,6 @@ func research_status_text() -> String:
 
 func inspection_text() -> String:
     return ItemEntry.UNKNOWN_TEXT if is_veiled() else "%d%%" % int(price_convergence_ratio * 100)
-
 
 
 func price_display_color() -> Color:
@@ -763,8 +763,6 @@ func is_at_final_layer() -> bool:
     return _safe_layer_index() == item_data.identity_layers.size() - 1
 
 
-
-
 # Marks an uninspected item as inspected. Shared by the reveal scene and the
 # inspection action. Runtime entries already start at layer 1.
 func unveil() -> void:
@@ -772,9 +770,7 @@ func unveil() -> void:
         return
     inspected = true
 
-
 # ── Private helpers ──────────────────────────────────────────────────────────
-
 
 
 func _reveal_layer_clues(layer_idx: int) -> void:
