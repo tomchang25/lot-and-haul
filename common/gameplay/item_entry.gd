@@ -22,9 +22,6 @@ const COLUMN_INSPECTION := 11
 
 # ── Inspection constants ─────────────────────────────────────────────────────
 
-# Condition display thresholds against inspection_level (0–1).
-const CONDITION_THRESHOLDS: Array[float] = [0.0, 0.33, 0.66]
-
 # Display names indexed by ItemData.Rarity enum value.
 const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
 
@@ -129,32 +126,13 @@ func get_condition_multiplier() -> float:
         return remap(condition, 0.75, 1.0, 2.0, 4.0)
 
 
-# Returns the condition multiplier the player can infer from their current inspect bucket.
-# bucket 0 → neutral 1.0 (unknown)
-# bucket 1 → midpoint of the visible 2-band (Poor / Good)
-# bucket 2 → the precise true multiplier
+# Veiled → neutral 1.0 (unknown); unveiled → true multiplier.
 func get_known_condition_multiplier() -> float:
-    match get_condition_bucket():
-        0:
-            return 1.0
-        1:
-            if condition < 0.5:
-                # Poor band midpoint: condition ~0.25 → multiplier ~0.5
-                return 0.5
-            else:
-                # Good band midpoint: condition ~0.75 → multiplier ~2.0
-                return 2.0
-        2:
-            return get_condition_multiplier()
-        _:
-            push_warning("Unknown condition bucket: %d" % get_condition_bucket())
-            return 1.0
+    if is_veiled():
+        return 1.0
+    return get_condition_multiplier()
 
 # ── Bucket helpers ────────────────────────────────────────────────────────────
-
-
-func get_condition_bucket() -> int:
-    return _bucket_index(inspection_level, CONDITION_THRESHOLDS)
 
 
 func is_fully_inspected() -> bool:
@@ -268,36 +246,26 @@ func _true_rarity_name() -> String:
     return "?"
 
 
-static func _bucket_index(level: float, thresholds: Array[float]) -> int:
-    var idx: int = 0
-    for i in range(thresholds.size()):
-        if level >= thresholds[i]:
-            idx = i
-        else:
-            break
-    return idx
-
-
 var estimated_value_min: int:
     get:
         if is_veiled():
             return 0
         if verified:
-            return item_data.base_price
+            return maxi(1, int(item_data.base_price * get_condition_multiplier()))
         var layer := active_layer()
         if layer == null:
             return 0
         var spread: float = 0.5 * (1.0 - inspection_level)
         var offset: float = center_offset * (1.0 - inspection_level)
         var mult: float = 1.0 - spread + offset
-        return maxi(1, int(layer.base_value * mult))
+        return maxi(1, int(layer.base_value * mult * get_condition_multiplier()))
 
 var estimated_value_max: int:
     get:
         if is_veiled():
             return 0
         if verified:
-            return item_data.base_price
+            return maxi(1, int(item_data.base_price * get_condition_multiplier()))
         var layer := active_layer()
         if layer == null:
             return 0
@@ -311,7 +279,7 @@ var estimated_value_max: int:
         else:
             spread = 0.3 * (1.0 - inspection_level)
         var mult: float = 1.0 + spread + offset
-        return maxi(1, int(base_value * mult))
+        return maxi(1, int(base_value * mult * get_condition_multiplier()))
 
 
 func estimated_value_text() -> String:
@@ -374,10 +342,10 @@ var market_factor_delta: float:
 # ── Display colors ────────────────────────────────────────────────────────────
 
 ## The tint to apply to the condition label, based on what the player knows.
-## Unknown (veiled or bucket 0) → neutral grey. Known → banded by true condition.
+## Veiled → neutral grey. Unveiled → banded by true condition.
 var condition_color: Color:
     get:
-        if is_veiled() or get_condition_bucket() == 0:
+        if is_veiled():
             return Color(0.5, 0.5, 0.5)
         if condition >= 0.8:
             return Color.GOLD
@@ -447,8 +415,6 @@ func price_value_for(ctx: ItemViewContext) -> int:
 
 
 func estimated_value_sort_value() -> int:
-    if verified:
-        return item_data.base_price
     return estimated_value_min
 
 
@@ -471,23 +437,7 @@ func special_order_value(order: SpecialOrder) -> int:
 func condition_text() -> String:
     if is_veiled():
         return UNKNOWN_TEXT
-    match get_condition_bucket():
-        0:
-            return UNKNOWN_TEXT
-        1:
-            return "Poor" if condition < 0.5 else "Good"
-        2:
-            if condition < 0.25:
-                return "Poor"
-            elif condition < 0.5:
-                return "Fair"
-            elif condition < 0.75:
-                return "Good"
-            else:
-                return "Excellent"
-        _:
-            push_warning("Unknown condition bucket: %d" % get_condition_bucket())
-            return UNKNOWN_TEXT
+    return "%d%%" % int(condition * 100)
 
 
 func condition_label() -> Label:
@@ -498,16 +448,9 @@ func condition_label() -> Label:
 
 
 func condition_secondary_text() -> String:
-    if condition_text() == UNKNOWN_TEXT:
+    if is_veiled():
         return ""
-    match get_condition_bucket():
-        1:
-            return "~×%.2f" % get_known_condition_multiplier()
-        2:
-            return "×%.2f" % get_condition_multiplier()
-        _:
-            push_warning("condition bucket out of range: %d" % get_condition_bucket())
-            return "×?"
+    return "×%.2f" % get_condition_multiplier()
 
 
 func condition_detail_text() -> String:
@@ -700,9 +643,9 @@ func sort_value(column: int, ctx: ItemViewContext) -> Variant:
         ItemEntry.COLUMN_NAME:
             return display_name
         ItemEntry.COLUMN_CONDITION:
-            if is_veiled() or get_condition_bucket() == 0:
+            if is_veiled():
                 return 0.0
-            return get_known_condition_multiplier()
+            return get_condition_multiplier()
         ItemEntry.COLUMN_ESTIMATED_VALUE:
             return estimated_value_sort_value()
         ItemEntry.COLUMN_BASE_VALUE:
