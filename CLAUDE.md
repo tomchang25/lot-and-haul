@@ -14,7 +14,6 @@ A Godot 4.6 single-player game about buying storage lots at auction, inspecting 
 - **Identity Layers** — Abstract perceived chain (e.g. "old vase" → "antique porcelain" → "Qing dynasty vase"). NOT the real item name. Final layer value < real `base_price`.
 - **Verified** — Only after Storage Authenticate does the player see the real `item_name` and `base_price`. This is the core information asymmetry.
 - **Clues** — Knowledge gained during Inspection. Enough clues (>50% per layer) advance the perceived layer. Clues are NOT direct price reveals.
-- **Commodity** — Low-value bulk items that auto-sell at run end for immediate cash flow.
 
 ## Selling Channels
 
@@ -57,7 +56,7 @@ Items are authored in `data/yaml/items/*.yaml`, converted to `.tres` via `dev/to
 
 ## Current Phase
 
-Core loop redesign: Phases 0–2 complete (runtime veil cleanup, commodity system, AP grid inspection). Next up: Phase 3 (ItemData base price + abstract identity data) → Phase 4 (clue inspection) and Phase 5 (hub final resolution) in parallel. See `dev/docs/plan/roadmap.md` for the full phase dependency graph.
+Core loop redesign: Phases 0–2 complete (runtime veil cleanup, AP grid inspection). Next up: Phase 3 (ItemData base price + abstract identity data) → Phase 4 (clue inspection) and Phase 5 (hub final resolution) in parallel. See `dev/docs/plan/roadmap.md` for the full phase dependency graph.
 
 ## Conventions (quick reference)
 
