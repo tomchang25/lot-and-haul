@@ -66,6 +66,7 @@ Core loop redesign: Phases 0–2 complete (runtime veil cleanup, AP grid inspect
 - **Commits**: conventional commits format. See `dev/skills/conventional_commits.md`.
 - **Price pipeline**: all prices flow through `ItemEntry.compute_price(config)` / `compute_price_range(config)`. `PriceConfig` toggles select which factors apply. No per-type formulas outside the pipeline.
 - **Iterate resources, not ids**: outside serialization boundaries, pass Resource refs. String ids are for save/load only.
+- **Docstrings**: every `.gd` file starts with `# filename` + one-line purpose. All public functions and complex (>10 lines or non-obvious) private functions get a `##` GDDoc comment. Never strip or reduce existing comments when editing code.
 
 ## Don'ts
 
@@ -73,4 +74,4 @@ Core loop redesign: Phases 0–2 complete (runtime veil cleanup, AP grid inspect
 - Don't add display-name wrappers or fallback-to-id accessors on registries.
 - Don't scan ItemRegistry to answer a category/super-category question — use the dedicated registry.
 - Don't put code-level detail (function names, field lists) in `dev/docs/systems/` — that belongs in code comments.
-- Don't archive completed docs — delete them. Git history is the archive.
+- Don't leave completed docs in place — move them to `dev/docs/archived/`.
