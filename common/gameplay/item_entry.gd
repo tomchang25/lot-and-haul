@@ -129,9 +129,28 @@ func all_surface_revealed() -> bool:
     return _revealed_surface_count() >= _total_surface_count()
 
 
+## Returns the set of revealed clue ids relevant for customer fit calculation
+## (Phase 9). Surface clues are always included (auto-revealed on hub return).
+## Hidden clue ids are included only if the item has been verified.
+## Anchor clue id is excluded — it has no tag-matching role in selling.
+func get_fit_tags() -> Array[String]:
+    var tags: Array[String] = []
+    for clue: ClueData in _surface_clues():
+        if revealed_clue_ids.has(clue.clue_id):
+            tags.append(clue.clue_id)
+    if verified:
+        for clue: ClueData in _hidden_clues():
+            if revealed_clue_ids.has(clue.clue_id):
+                tags.append(clue.clue_id)
+    return tags
+
+
 # Parses a price_effect string and applies it to a base value.
 # "+3000" → base += 3000
 # "x1.4"  → base *= 1.4
+# TODO: Support conditional modifiers (e.g. "x2 if clue_x, x0.5 otherwise")
+#       as described in phase_7_clue_independence.md. No YAML data uses this
+#       format yet, so it is deferred until content requires it.
 func _apply_price_effect(base: float, price_effect: String) -> float:
     var pe := price_effect.strip_edges().to_lower()
     if pe.begins_with(EFFECT_ADD):
@@ -154,7 +173,6 @@ func _hidden_multiplier() -> float:
                 mult *= float(val)
     return mult
 
-
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
 # inspection_level based on surface clue reveal ratio.
@@ -166,7 +184,6 @@ var inspection_level: float:
         if total == 0:
             return 1.0
         return float(_revealed_surface_count()) / float(total)
-
 
 var display_name: String:
     get:
@@ -201,7 +218,6 @@ func get_known_condition_multiplier() -> float:
     if is_veiled():
         return 1.0
     return get_condition_multiplier()
-
 
 # ── Bucket helpers ────────────────────────────────────────────────────────────
 
@@ -248,7 +264,6 @@ func apply_restore() -> void:
         KnowledgeManager.KnowledgeAction.RESTORE,
     )
 
-
 # ── Clue reveal mechanics ─────────────────────────────────────────────────────
 
 
@@ -264,9 +279,9 @@ func reveal_anchor() -> void:
 func attempt_surface_clue(clue: ClueData, attribute_bonus: int) -> bool:
     if clue == null or clue.type != "surface":
         return false
-    var roll := randi() % 20 + 1
     var success_chance := clampi((21 + attribute_bonus - clue.dc) * 5, 5, 95)
-    var succeeded := (roll * 5) <= success_chance
+    var roll := randi() % 100 + 1 # 1–100 percentile roll
+    var succeeded := roll <= success_chance
     if succeeded and not revealed_clue_ids.has(clue.clue_id):
         revealed_clue_ids.append(clue.clue_id)
     return succeeded
@@ -297,7 +312,6 @@ func is_repair_complete() -> bool:
 func is_restore_complete() -> bool:
     return condition >= 1.0
 
-
 # ── Anchor value (int) ────────────────────────────────────────────────────────
 
 
@@ -311,7 +325,6 @@ func _anchor_flat_value() -> int:
         return int(float(val))
     return 0
 
-
 # ── Appraised value ────────────────────────────────────────────────────────────
 
 
@@ -323,9 +336,7 @@ func _raw_appraised_value() -> float:
             value = _apply_price_effect(value, clue.price_effect)
     return value
 
-
 # ── Estimated value (range) ────────────────────────────────────────────────────
-
 
 var estimated_value_min: int:
     get:
@@ -334,12 +345,10 @@ var estimated_value_min: int:
         if verified:
             return maxi(1, int(_raw_appraised_value() * _hidden_multiplier() * get_condition_multiplier()))
         var base := _raw_appraised_value()
-        var reveal_ratio := inspection_level
-        var spread: float = MAX_SPREAD * (1.0 - reveal_ratio)
-        var offset: float = center_offset * (1.0 - reveal_ratio)
+        var spread: float = MAX_SPREAD * (1.0 - self.reveal_ratio)
+        var offset: float = center_offset * (1.0 - self.reveal_ratio)
         var mult: float = 1.0 - spread + offset
         return maxi(1, int(base * mult * get_condition_multiplier()))
-
 
 var estimated_value_max: int:
     get:
@@ -348,12 +357,10 @@ var estimated_value_max: int:
         if verified:
             return maxi(1, int(_raw_appraised_value() * _hidden_multiplier() * get_condition_multiplier()))
         var base := _raw_appraised_value()
-        var reveal_ratio := inspection_level
-        var spread: float = MAX_SPREAD * (1.0 - reveal_ratio)
-        var offset: float = center_offset * (1.0 - reveal_ratio)
+        var spread: float = MAX_SPREAD * (1.0 - self.reveal_ratio)
+        var offset: float = center_offset * (1.0 - self.reveal_ratio)
         var mult: float = 1.0 + spread + offset
         return maxi(1, int(base * mult * get_condition_multiplier()))
-
 
 # ── Display text helpers ──────────────────────────────────────────────────────
 
@@ -405,16 +412,13 @@ var market_price: int:
     get:
         return compute_price(ItemRegistry.price_config_with_market)
 
-
 var market_factor_delta: float:
     get:
         return MarketManager.get_category_factor(
             item_data.category_data,
         ) - 1.0
 
-
 # ── Display colors ────────────────────────────────────────────────────────────
-
 
 var condition_color: Color:
     get:
@@ -429,15 +433,12 @@ var condition_color: Color:
         else:
             return Color.LIGHT_CORAL
 
-
 const PRICE_COLOR := Color(0.4, 1.0, 0.5)
 const PRICE_UNKNOWN_COLOR := Color(0.6, 0.6, 0.6)
-
 
 var price_color: Color:
     get:
         return PRICE_UNKNOWN_COLOR if is_veiled() or not anchor_revealed else PRICE_COLOR
-
 
 # ── Context-aware helpers ─────────────────────────────────────────────────────
 
@@ -451,9 +452,9 @@ func price_text_for(ctx: ItemViewContext) -> String:
         ItemViewContext.Stage.RUN_REVIEW, \
         ItemViewContext.Stage.STORAGE:
             return estimated_value_text()
-        ItemViewContext.Stage.MERCHANT_SHOP:
+        ItemViewContext.Stage.MERCHANT_SHOP: # DEPRECATED: Phase 9
             return merchant_offer_text(ctx.merchant)
-        ItemViewContext.Stage.FULFILLMENT_PANEL:
+        ItemViewContext.Stage.FULFILLMENT_PANEL: # DEPRECATED: Phase 9
             return special_order_text(ctx.order)
         _:
             push_warning("Unknown Stage for price: %d" % ctx.stage)
@@ -469,14 +470,13 @@ func price_value_for(ctx: ItemViewContext) -> int:
         ItemViewContext.Stage.RUN_REVIEW, \
         ItemViewContext.Stage.STORAGE:
             return estimated_value_sort_value()
-        ItemViewContext.Stage.MERCHANT_SHOP:
+        ItemViewContext.Stage.MERCHANT_SHOP: # DEPRECATED: Phase 9
             return merchant_offer_value(ctx.merchant)
-        ItemViewContext.Stage.FULFILLMENT_PANEL:
+        ItemViewContext.Stage.FULFILLMENT_PANEL: # DEPRECATED: Phase 9
             return special_order_value(ctx.order)
         _:
             push_warning("Unknown Stage for price: %d" % ctx.stage)
             return 0
-
 
 # ── Per-column price getters ─────────────────────────────────────────────────
 
@@ -493,10 +493,12 @@ func base_value_sort_value() -> int:
     return _anchor_flat_value()
 
 
+## DEPRECATED: Removed in Phase 9 (merchant system redesign → unified customer selling).
 func merchant_offer_value(merchant: MerchantData) -> int:
     return merchant.offer_for(self) if merchant else market_price
 
 
+## DEPRECATED: Removed in Phase 9 (merchant system redesign → unified customer selling).
 func special_order_value(order: SpecialOrder) -> int:
     return order.compute_item_price(self) if order else 0
 
@@ -541,13 +543,14 @@ func base_value_text() -> String:
     return "$%d" % _anchor_flat_value()
 
 
+## DEPRECATED: Removed in Phase 9 (merchant system redesign → unified customer selling).
 func merchant_offer_text(merchant: MerchantData) -> String:
     return "$%d" % merchant_offer_value(merchant)
 
 
+## DEPRECATED: Removed in Phase 9 (merchant system redesign → unified customer selling).
 func special_order_text(order: SpecialOrder) -> String:
     return "$%d" % special_order_value(order)
-
 
 # ── Label factories ──────────────────────────────────────────────────────────
 
@@ -573,6 +576,7 @@ func base_value_label() -> Label:
     return label
 
 
+## DEPRECATED: Removed in Phase 9 (merchant system redesign → unified customer selling).
 func merchant_offer_label(merchant: MerchantData) -> Label:
     var label := Label.new()
     label.text = merchant_offer_text(merchant)
@@ -580,6 +584,7 @@ func merchant_offer_label(merchant: MerchantData) -> Label:
     return label
 
 
+## DEPRECATED: Removed in Phase 9 (merchant system redesign → unified customer selling).
 func special_order_label(order: SpecialOrder) -> Label:
     var label := Label.new()
     label.text = special_order_text(order)
@@ -597,7 +602,12 @@ func price_label_for(ctx: ItemViewContext) -> Label:
 func rarity_text() -> String:
     if is_veiled() or item_data == null:
         return ItemEntry.UNKNOWN_TEXT
-    return _true_rarity_name() if verified else ItemEntry.UNKNOWN_TEXT
+
+    var r: int = item_data.rarity
+    if r >= 0 and r < RARITY_NAMES.size():
+        return RARITY_NAMES[r]
+
+    return ItemEntry.UNKNOWN_TEXT
 
 
 func weight_text() -> String:

@@ -117,12 +117,8 @@ def _print_rarity_table(
         items_in_rarity = by_rarity.get(r, [])
         surface_counts = [_count_surface_clues(it) for it in items_in_rarity]
         hidden_counts = [_count_hidden_clues(it) for it in items_in_rarity]
-        avg_surface = (
-            sum(surface_counts) / len(surface_counts) if surface_counts else 0
-        )
-        avg_hidden = (
-            sum(hidden_counts) / len(hidden_counts) if hidden_counts else 0
-        )
+        avg_surface = sum(surface_counts) / len(surface_counts) if surface_counts else 0
+        avg_hidden = sum(hidden_counts) / len(hidden_counts) if hidden_counts else 0
 
         line = (
             f"{indent}{name:<{max_name_len}} ({count:>3})"
@@ -193,12 +189,8 @@ def main() -> None:
 
         surface_counts = [_count_surface_clues(it) for it in items]
         hidden_counts = [_count_hidden_clues(it) for it in items]
-        avg_surface = (
-            sum(surface_counts) / len(surface_counts) if surface_counts else 0
-        )
-        avg_hidden = (
-            sum(hidden_counts) / len(hidden_counts) if hidden_counts else 0
-        )
+        avg_surface = sum(surface_counts) / len(surface_counts) if surface_counts else 0
+        avg_hidden = sum(hidden_counts) / len(hidden_counts) if hidden_counts else 0
 
         if not first:
             print(separator)
@@ -218,12 +210,8 @@ def main() -> None:
             cat_items = cats_dict[cat_id]
             cat_surface = [_count_surface_clues(it) for it in cat_items]
             cat_hidden = [_count_hidden_clues(it) for it in cat_items]
-            avg_cat_surface = (
-                sum(cat_surface) / len(cat_surface) if cat_surface else 0
-            )
-            avg_cat_hidden = (
-                sum(cat_hidden) / len(cat_hidden) if cat_hidden else 0
-            )
+            avg_cat_surface = sum(cat_surface) / len(cat_surface) if cat_surface else 0
+            avg_cat_hidden = sum(cat_hidden) / len(cat_hidden) if cat_hidden else 0
             print(
                 f"    {cat_id} ({len(cat_items)} items,"
                 f" avg surface: {avg_cat_surface:.1f},"
