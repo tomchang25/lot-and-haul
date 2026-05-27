@@ -27,7 +27,7 @@ _SKIP_IF_EMPTY = frozenset(
 )
 
 # YAML keys to include in merged data but not export as .tres files.
-_VALIDATION_ONLY_KEYS = frozenset({"tags"})
+_VALIDATION_ONLY_KEYS = frozenset()
 
 
 def _write(out_path: Path, content: str, dry_run: bool, label: str) -> None:

@@ -1,224 +1,53 @@
 items:
-  - item_id: lamp_moser_bohemian
-    item_name: Moser Bohemian Lamp
-    base_price: 1250
-    category_id: oil_lamp
-    rarity: 2
-    clues:
-      - clue_id: lamp_veil_01
-        type: anchor
-        domain: oil_lamp
-        attribute: appraisal
-        dc: 10
-        price_effect: "+10"
-        known_text: Lamp-Shaped Object
-      - clue_id: lamp_glass_body_clear_font
-        type: surface
-        domain: oil_lamp
-        attribute: appraisal
-        dc: 12
-        price_effect: "+30"
-        known_text: The clear glass font is blown rather than molded.
-      - clue_id: lamp_glass_body_wear_ring
-        type: surface
-        domain: oil_lamp
-        attribute: perception
-        dc: 14
-        price_effect: "+0"
-        known_text: The base shows old circular shelf wear.
-      - clue_id: lamp_ornate_base_cast_scrolls
-        type: surface
-        domain: oil_lamp
-        attribute: perception
-        dc: 14
-        price_effect: "+70"
-        known_text: Cast scrollwork suggests a late nineteenth century decorative base.
-      - clue_id: lamp_ornate_base_fitting_quality
-        type: surface
-        domain: oil_lamp
-        attribute: restoration
-        dc: 14
-        price_effect: "+0"
-        known_text: The burner fitting is cleaner than most mass market examples.
-      - clue_id: lamp_leaf_moser
-        type: hidden
-        domain: oil_lamp
-        attribute: investigation
-        dc: 18
-        price_effect: "x1.32"
-        known_text: Bohemian Art Glass Lamp
-
-  - item_id: lamp_baccarat_crystal
-    item_name: Baccarat Crystal Lamp
-    base_price: 2100
-    category_id: oil_lamp
-    rarity: 2
-    clues:
-      - clue_id: lamp_veil_01
-        type: anchor
-        domain: oil_lamp
-        attribute: appraisal
-        dc: 10
-        price_effect: "+10"
-        known_text: Lamp-Shaped Object
-      - clue_id: lamp_glass_body_clear_font
-        type: surface
-        domain: oil_lamp
-        attribute: appraisal
-        dc: 12
-        price_effect: "+30"
-        known_text: The clear glass font is blown rather than molded.
-      - clue_id: lamp_glass_body_wear_ring
-        type: surface
-        domain: oil_lamp
-        attribute: perception
-        dc: 14
-        price_effect: "+0"
-        known_text: The base shows old circular shelf wear.
-      - clue_id: lamp_pressed_font_mold_lines
-        type: surface
-        domain: oil_lamp
-        attribute: perception
-        dc: 14
-        price_effect: "+50"
-        known_text: Mold seams run through the glass font.
-      - clue_id: lamp_pressed_font_pattern_repeat
-        type: surface
-        domain: oil_lamp
-        attribute: investigation
-        dc: 16
-        price_effect: "+0"
-        known_text: The repeated pattern points to a French crystal maker.
-      - clue_id: lamp_leaf_baccarat
-        type: hidden
-        domain: oil_lamp
-        attribute: investigation
-        dc: 18
-        price_effect: "x1.31"
-        known_text: French Crystal Oil Lamp
-
-  - item_id: lamp_hinks_duplex
-    item_name: Hinks & Son Duplex Lamp
-    base_price: 4200
-    category_id: oil_lamp
-    rarity: 3
-    clues:
-      - clue_id: lamp_veil_01
-        type: anchor
-        domain: oil_lamp
-        attribute: appraisal
-        dc: 10
-        price_effect: "+10"
-        known_text: Lamp-Shaped Object
-      - clue_id: lamp_glass_body_clear_font
-        type: surface
-        domain: oil_lamp
-        attribute: appraisal
-        dc: 12
-        price_effect: "+30"
-        known_text: The clear glass font is blown rather than molded.
-      - clue_id: lamp_glass_body_wear_ring
-        type: surface
-        domain: oil_lamp
-        attribute: perception
-        dc: 14
-        price_effect: "+0"
-        known_text: The base shows old circular shelf wear.
-      - clue_id: lamp_hallmarked_collar_silver_marks
-        type: surface
-        domain: oil_lamp
-        attribute: perception
-        dc: 14
-        price_effect: "+260"
-        known_text: Tiny marks on the collar identify it as silver rather than plated metal.
-      - clue_id: lamp_hallmarked_collar_date_letter
-        type: surface
-        domain: oil_lamp
-        attribute: investigation
-        dc: 16
-        price_effect: "+0"
-        known_text: The date letter narrows the lamp to the late Victorian period.
-      - clue_id: lamp_authenticated_maker_clear_stamp
-        type: surface
-        domain: oil_lamp
-        attribute: investigation
-        dc: 16
-        price_effect: "+600"
-        known_text: A cleaned stamp confirms the maker mark on the burner assembly.
-      - clue_id: lamp_authenticated_maker_registry_match
-        type: surface
-        domain: oil_lamp
-        attribute: appraisal
-        dc: 18
-        price_effect: "+0"
-        known_text: The mark matches a registered Hinks pattern.
-      - clue_id: lamp_leaf_hinks
-        type: hidden
-        domain: oil_lamp
-        attribute: investigation
-        dc: 20
-        price_effect: "x1.31"
-        known_text: Hallmarked Duplex Oil Lamp
-
-  - item_id: clock_boulle_mantel
-    item_name: Boulle Mantel Clock
-    base_price: 6000
-    category_id: clock
-    rarity: 3
-    clues:
-      - clue_id: clock_veil_01
-        type: anchor
-        domain: clock
-        attribute: appraisal
-        dc: 10
-        price_effect: "+15"
-        known_text: Clock-Shaped Object
-      - clue_id: clock_wooden_case_joinery
-        type: surface
-        domain: clock
-        attribute: appraisal
-        dc: 12
-        price_effect: "+40"
-        known_text: The wooden case uses older pinned joinery.
-      - clue_id: clock_wooden_case_finish_age
-        type: surface
-        domain: clock
-        attribute: perception
-        dc: 14
-        price_effect: "+0"
-        known_text: The aged finish is consistent across the back and base.
-      - clue_id: clock_gilded_case_bronze_mounts
-        type: surface
-        domain: clock
-        attribute: perception
-        dc: 14
-        price_effect: "+265"
-        known_text: Gilded brass mounts frame the clock case.
-      - clue_id: clock_gilded_case_inlay_quality
-        type: surface
-        domain: clock
-        attribute: restoration
-        dc: 16
-        price_effect: "+0"
-        known_text: The inlay quality suggests a Boulle style case rather than ordinary gilding.
-      - clue_id: clock_signed_movement_plate_signature
-        type: surface
-        domain: clock
-        attribute: investigation
-        dc: 16
-        price_effect: "+480"
-        known_text: A signature is engraved on the movement plate.
-      - clue_id: clock_signed_movement_signature_match
-        type: surface
-        domain: clock
-        attribute: appraisal
-        dc: 18
-        price_effect: "+0"
-        known_text: The signature matches known French workshop records.
-      - clue_id: clock_leaf_boulle
-        type: hidden
-        domain: clock
-        attribute: investigation
-        dc: 20
-        price_effect: "x1.33"
-        known_text: Gilded Boulle-Style Mantel Clock
+- item_id: lamp_moser_bohemian
+  item_name: Moser Bohemian Lamp
+  base_price: 1250
+  category_id: oil_lamp
+  rarity: 2
+  clue_ids:
+  - lamp_veil_01
+  - lamp_glass_body_clear_font
+  - lamp_glass_body_wear_ring
+  - lamp_ornate_base_cast_scrolls
+  - lamp_ornate_base_fitting_quality
+  - lamp_leaf_moser
+- item_id: lamp_baccarat_crystal
+  item_name: Baccarat Crystal Lamp
+  base_price: 2100
+  category_id: oil_lamp
+  rarity: 2
+  clue_ids:
+  - lamp_veil_01
+  - lamp_glass_body_clear_font
+  - lamp_glass_body_wear_ring
+  - lamp_pressed_font_mold_lines
+  - lamp_pressed_font_pattern_repeat
+  - lamp_leaf_baccarat
+- item_id: lamp_hinks_duplex
+  item_name: Hinks & Son Duplex Lamp
+  base_price: 4200
+  category_id: oil_lamp
+  rarity: 3
+  clue_ids:
+  - lamp_veil_01
+  - lamp_glass_body_clear_font
+  - lamp_glass_body_wear_ring
+  - lamp_hallmarked_collar_silver_marks
+  - lamp_hallmarked_collar_date_letter
+  - lamp_authenticated_maker_clear_stamp
+  - lamp_authenticated_maker_registry_match
+  - lamp_leaf_hinks
+- item_id: clock_boulle_mantel
+  item_name: Boulle Mantel Clock
+  base_price: 6000
+  category_id: clock
+  rarity: 3
+  clue_ids:
+  - clock_veil_01
+  - clock_wooden_case_joinery
+  - clock_wooden_case_finish_age
+  - clock_gilded_case_bronze_mounts
+  - clock_gilded_case_inlay_quality
+  - clock_signed_movement_plate_signature
+  - clock_signed_movement_signature_match
+  - clock_leaf_boulle

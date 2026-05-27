@@ -3,17 +3,13 @@
 from __future__ import annotations
 
 import re
+import sys
 from dataclasses import dataclass, field
 
 from tres_lib.spec import BuildCtx, ParseCtx
 from tres_lib.uid import deterministic_uid
 from tres_lib.tres_writer import TresWriter
 from tres_lib.tres_format import header_uid, field as tres_field, ext_resources
-from tres_lib.entities.clue_data import SCRIPT_PATHS as CLUE_DATA_SCRIPT_PATHS
-
-
-def _gd_string(value: str) -> str:
-    return '"' + str(value).replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
 @dataclass
@@ -23,15 +19,14 @@ class ItemSpec:
     uid_prefix: str = "item"
     script_paths: dict[str, str] = field(default_factory=lambda: {
         "item_data": "res://data/definitions/item_data.gd",
-        **CLUE_DATA_SCRIPT_PATHS,
     })
 
     def entity_id(self, entry: dict) -> str:
         return entry["item_id"]
 
     def build_label(self, entry: dict) -> str:
-        clues = entry.get("clues", []) or []
-        return f"item ({len(clues)} clues)"
+        clue_ids = entry.get("clue_ids", []) or []
+        return f"item ({len(clue_ids)} clues)"
 
     def build_tres(self, entry: dict, ctx: BuildCtx) -> str:
         item_id = entry["item_id"]
@@ -59,37 +54,29 @@ class ItemSpec:
 
         cat_tag = "2_cat" if (cat_uid and cat_id) else None
 
-        # -- Clue sub-resources --
-        clues = entry.get("clues", []) or []
-        clue_sub_ids: list[str] = []
-        if clues:
+        # -- Clue ExtResource links --
+        clue_ids = entry.get("clue_ids", []) or []
+        clue_ext_tags: list[str] = []
+        for i, clue_id in enumerate(clue_ids):
+            clue_uid = ctx.uid_cache.get(clue_id)
+            if clue_uid is None:
+                print(f"ERROR: item '{item_id}': clue_id '{clue_id}' not found in uid_cache", file=sys.stderr)
+                continue
+            ext_tag = f"clue_{i}"
             w.add_ext_resource(
-                "3_clue",
-                "Script",
-                "res://data/definitions/clue_data.gd",
-                ctx.script_uids["clue_data"],
+                ext_tag,
+                "Resource",
+                f"res://data/tres/clues/{clue_id}.tres",
+                clue_uid,
             )
-            for i, clue in enumerate(clues):
-                sub_id = f"clue_{i}"
-                clue_fields = [
-                    'script = ExtResource("3_clue")',
-                    f'clue_id = {_gd_string(clue.get("clue_id", ""))}',
-                    f'known_text = {_gd_string(clue.get("known_text", ""))}',
-                    f'type = {_gd_string(clue.get("type", "surface"))}',
-                    f'domain = {_gd_string(clue.get("domain", "generic"))}',
-                    f'attribute = {_gd_string(clue.get("attribute", ""))}',
-                    f'dc = {int(clue.get("dc", 10))}',
-                    f'price_effect = {_gd_string(clue.get("price_effect", ""))}',
-                ]
-                w.add_sub_resource(sub_id, "Resource", clue_fields)
-                clue_sub_ids.append(sub_id)
+            clue_ext_tags.append(ext_tag)
 
         w.add_field('script = ExtResource("1_jyqit")')
         w.add_field_str("item_id", item_id)
         w.add_field_str("item_name", entry["item_name"])
         w.add_field_int("base_price", int(entry["base_price"]))
         w.add_field_ext_ref("category_data", cat_tag)
-        w.add_field_sub_ref_array("clues", clue_sub_ids)
+        w.add_field_ext_ref_array("clues", clue_ext_tags)
         w.add_field_int("rarity", int(entry.get("rarity", 0)))
         w.add_field_bool("auto_verify", bool(entry.get("auto_verify", False)))
         return w.render()
@@ -112,34 +99,16 @@ class ItemSpec:
             cat_uid = ext_res.get(cat_m.group(1), {}).get("uid", "")
             category_id = ctx.uid_to_id.get(cat_uid, "")
 
-        # Parse clues from sub-resources
-        subs = {}
-        for m in re.finditer(
-            r'\[sub_resource type="Resource" id="([^"]+)"\]\n(.*?)(?=\n\[|$)',
-            text,
-            re.DOTALL,
-        ):
-            sid = m.group(1)
-            body = m.group(2)
-            fields = {}
-            for fm in re.finditer(r'^(\w+)\s*=\s*(.+)$', body, re.MULTILINE):
-                fields[fm.group(1)] = fm.group(2)
-            subs[sid] = fields
-
-        clues: list[dict] = []
+        # Parse clue_ids from ExtResource references
+        clue_ids: list[str] = []
         clues_raw = tres_field(text, "clues") or "[]"
-        for cm in re.finditer(r'SubResource\("([^"]+)"\)', clues_raw):
-            fields = subs.get(cm.group(1), {})
-            clue = {
-                "clue_id": fields.get("clue_id", "").strip('"'),
-                "known_text": fields.get("known_text", "").strip('"'),
-                "type": fields.get("type", "surface").strip('"'),
-                "domain": fields.get("domain", "generic").strip('"'),
-                "attribute": fields.get("attribute", "").strip('"'),
-                "dc": int(fields.get("dc", "10")),
-                "price_effect": fields.get("price_effect", "").strip('"'),
-            }
-            clues.append(clue)
+        for cm in re.finditer(r'ExtResource\("([^"]+)"\)', clues_raw):
+            ext_tag = cm.group(1)
+            ext_info = ext_res.get(ext_tag, {})
+            ext_path = ext_info.get("path", "")
+            if "/tres/clues/" in ext_path:
+                cid = ext_path.rsplit("/", 1)[-1].replace(".tres", "")
+                clue_ids.append(cid)
 
         return {
             "item_id": item_id,
@@ -148,7 +117,7 @@ class ItemSpec:
             "category_id": category_id,
             "rarity": rarity,
             "auto_verify": auto_verify,
-            "clues": clues,
+            "clue_ids": clue_ids,
         }
 
     def validate(self, entries: list, all_data: dict) -> list[str]:
@@ -156,14 +125,13 @@ class ItemSpec:
         known_cat_ids: set[str] = {
             c["category_id"] for c in all_data.get("categories", [])
         }
-        known_tags: set[str] = {
-            t for t_list in all_data.get("tags", [])
-            for t in (t_list if isinstance(t_list, list) else [t_list])
-        } if "tags" in all_data else set()
+        known_clues_by_id: dict[str, dict] = {
+            c["clue_id"]: c for c in all_data.get("clues", [])
+        }
 
         for item in entries:
             iid = item.get("item_id", "?")
-            clues = item.get("clues", []) or []
+            clue_ids = item.get("clue_ids", []) or []
             rarity = int(item.get("rarity", 0))
             auto_verify = bool(item.get("auto_verify", False))
             item_name = item.get("item_name")
@@ -180,45 +148,30 @@ class ItemSpec:
                     f"item '{iid}': category_id '{item.get('category_id')}' not defined"
                 )
 
-            if not isinstance(clues, list):
-                errors.append(f"item '{iid}': clues must be a list")
+            if not isinstance(clue_ids, list):
+                errors.append(f"item '{iid}': clue_ids must be a list")
                 continue
 
-            if not clues:
+            if not clue_ids:
                 errors.append(f"item '{iid}': must have at least one clue")
                 continue
 
-            anchor_count = sum(1 for c in clues if c.get("type") == "anchor")
-            if anchor_count != 1:
-                errors.append(
-                    f"item '{iid}': must have exactly 1 anchor clue, found {anchor_count}"
-                )
-
-            # Validate clue ids against tag vocabulary
-            if known_tags:
-                for clue in clues:
-                    cid = clue.get("clue_id", "")
-                    if cid and cid not in known_tags:
-                        errors.append(
-                            f"item '{iid}': clue_id '{cid}' not found in tags vocabulary"
-                        )
-
-            # Validate required fields per clue
-            for clue in clues:
-                cid = clue.get("clue_id", "") if isinstance(clue, dict) else ""
-                if not cid:
-                    errors.append(f"item '{iid}': clue_id is required")
-                    continue
-
-                known_text = clue.get("known_text", "")
-                if not isinstance(known_text, str) or not known_text.strip():
-                    errors.append(f"item '{iid}', clue '{cid}': known_text is required")
-
-                ctype = clue.get("type", "")
-                if ctype not in ("anchor", "surface", "hidden"):
+            # Validate clue ids against clue table
+            for cid in clue_ids:
+                if cid not in known_clues_by_id:
                     errors.append(
-                        f"item '{iid}', clue '{cid}': type must be anchor/surface/hidden"
+                        f"item '{iid}': clue_id '{cid}' not in clue table"
                     )
+
+            # Validate anchor count by cross-referencing clue table
+            anchors = [
+                cid for cid in clue_ids
+                if known_clues_by_id.get(cid, {}).get("type") == "anchor"
+            ]
+            if len(anchors) != 1:
+                errors.append(
+                    f"item '{iid}': must have exactly 1 anchor clue, found {len(anchors)}"
+                )
 
         return errors
 

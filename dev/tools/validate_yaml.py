@@ -58,7 +58,6 @@ def main() -> None:
         sys.exit(f"No .yaml files found in: {yaml_dir}")
 
     merged: dict[str, list] = {spec.yaml_key: [] for spec in REGISTRY}
-    merged["tags"] = []
 
     for yaml_path in yaml_files:
         print(f"Loading {yaml_path.name}...")
