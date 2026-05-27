@@ -142,14 +142,24 @@ func _apply_price_effect(base: float, clue: ClueData) -> float:
     return base
 
 
-# Computes the total modifier multiplier from all hidden clues.
-func _hidden_multiplier() -> float:
+# Product of all hidden mul clues' multipliers.
+func _hidden_mul_product() -> float:
     var mult := 1.0
     for clue: ClueData in _hidden_clues():
         if revealed_clue_ids.has(clue.clue_id):
             if clue.effect_op == "mul":
                 mult *= clue.effect_amount
     return mult
+
+
+# Sum of all hidden add clues' amounts.
+func _hidden_add_sum() -> float:
+    var add_sum := 0.0
+    for clue: ClueData in _hidden_clues():
+        if revealed_clue_ids.has(clue.clue_id):
+            if clue.effect_op == "add":
+                add_sum += clue.effect_amount
+    return add_sum
 
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
@@ -302,28 +312,43 @@ func _anchor_flat_value() -> int:
 # ── Appraised value ────────────────────────────────────────────────────────────
 
 
-# appraised_value = anchor flat value + sum of revealed surface flat modifiers
+# appraised_value = (anchor_flat + sum surface_add) * product surface_mul
 func _raw_appraised_value() -> float:
-    var value := float(_anchor_flat_value())
+    var add_sum := 0.0
+    var mul_product := 1.0
     for clue: ClueData in _surface_clues():
         if revealed_clue_ids.has(clue.clue_id):
-            value = _apply_price_effect(value, clue)
-    return value
+            match clue.effect_op:
+                "add":
+                    add_sum += clue.effect_amount
+                "mul":
+                    mul_product *= clue.effect_amount
+    return (float(_anchor_flat_value()) + add_sum) * mul_product
+
+
+# appraised_with_hidden = (surface_appraised + sum hidden_add) * product hidden_mul
+func _appraised_with_hidden() -> float:
+    return (_raw_appraised_value() + _hidden_add_sum()) * _hidden_mul_product()
 
 
 ## Returns a simulated NPC price estimate for this item based on a random subset
-## of surface clues the NPC happens to notice. Starts from the anchor flat value
-## (not zero) so multiplicative surface effects apply correctly.
+## of surface clues the NPC happens to notice. Uses add-then-mul semantics:
+## (anchor_flat + sum noticed_add) * product noticed_mul.
 ## sight_chance: per-clue probability the NPC notices each surface clue.
 func roll_npc_estimate(sight_chance: float) -> int:
     var anchor := _anchor_clue()
     if anchor == null:
         return 0
-    var value := float(_anchor_flat_value())
+    var add_sum := 0.0
+    var mul_product := 1.0
     for clue: ClueData in _surface_clues():
         if randf() < sight_chance:
-            value = _apply_price_effect(value, clue)
-    return int(value)
+            match clue.effect_op:
+                "add":
+                    add_sum += clue.effect_amount
+                "mul":
+                    mul_product *= clue.effect_amount
+    return int((float(_anchor_flat_value()) + add_sum) * mul_product)
 
 # ── Estimated value (range) ────────────────────────────────────────────────────
 
@@ -332,7 +357,7 @@ var estimated_value_min: int:
         if is_veiled() or not anchor_revealed:
             return 0
         if verified:
-            return maxi(1, int(_raw_appraised_value() * _hidden_multiplier() * get_condition_multiplier()))
+            return maxi(1, int(_appraised_with_hidden() * get_condition_multiplier()))
         var base := _raw_appraised_value()
         var spread: float = MAX_SPREAD * (1.0 - self.inspection_level)
         var offset: float = center_offset * (1.0 - self.inspection_level)
@@ -344,7 +369,7 @@ var estimated_value_max: int:
         if is_veiled() or not anchor_revealed:
             return 0
         if verified:
-            return maxi(1, int(_raw_appraised_value() * _hidden_multiplier() * get_condition_multiplier()))
+            return maxi(1, int(_appraised_with_hidden() * get_condition_multiplier()))
         var base := _raw_appraised_value()
         var spread: float = MAX_SPREAD * (1.0 - self.inspection_level)
         var offset: float = center_offset * (1.0 - self.inspection_level)
@@ -358,7 +383,7 @@ func estimated_value_text() -> String:
     if is_veiled() or not anchor_revealed:
         return UNKNOWN_TEXT
     if verified:
-        return "$%d" % int(_raw_appraised_value() * _hidden_multiplier())
+        return "$%d" % int(_appraised_with_hidden())
 
     var lo: int = estimated_value_min
     var hi: int = estimated_value_max
@@ -372,7 +397,7 @@ func estimated_value_text() -> String:
 func compute_price(config: PriceConfig) -> int:
     var value: float
     if verified:
-        value = _raw_appraised_value() * _hidden_multiplier()
+        value = _appraised_with_hidden()
     else:
         value = _raw_appraised_value()
 
@@ -478,7 +503,7 @@ func base_value_sort_value() -> int:
     if is_veiled() or not anchor_revealed:
         return 0
     if verified:
-        return int(_raw_appraised_value() * _hidden_multiplier())
+        return int(_appraised_with_hidden())
     return _anchor_flat_value()
 
 
@@ -515,7 +540,7 @@ func base_value_text() -> String:
     if is_veiled() or not anchor_revealed:
         return UNKNOWN_TEXT
     if verified:
-        return "$%d" % int(_raw_appraised_value() * _hidden_multiplier())
+        return "$%d" % int(_appraised_with_hidden())
     return "$%d" % _anchor_flat_value()
 
 
