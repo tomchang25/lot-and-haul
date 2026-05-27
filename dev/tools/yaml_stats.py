@@ -1,8 +1,8 @@
 """
 yaml_stats.py
 Print per-super-category statistics for design balancing from the merged YAML
-data set (item count, rarity distribution, final-layer base_value aggregates
-including median, and average layer depth).
+data set (item count, rarity distribution, anchor value aggregates, surface
+clue counts, and hidden clue distributions).
 
 This script is read-only — it never writes or modifies YAML or TRES files.
 
@@ -12,7 +12,6 @@ Usage:
 """
 
 import argparse
-import statistics
 import sys
 from pathlib import Path
 
@@ -37,20 +36,14 @@ RARITY_NAMES = {
 
 
 def _load_merged(yaml_dir: Path) -> dict[str, list]:
-    """Glob and merge every ``*.yaml`` file in ``yaml_dir``.
-
-    Mirrors the merge pattern used by ``yaml_to_tres.py`` so both tools see
-    the exact same dataset.
-    """
+    """Glob and merge every ``*.yaml`` file in ``yaml_dir``."""
     yaml_files = sorted(yaml_dir.glob("**/*.yaml"))
     if not yaml_files:
         sys.exit(f"No .yaml files found in: {yaml_dir}")
 
     merged: dict[str, list] = {
-        "skills": [],
         "super_categories": [],
         "categories": [],
-        "identity_layers": [],
         "items": [],
     }
 
@@ -72,55 +65,47 @@ def _format_int(value: float) -> str:
     return f"{int(round(value)):,}"
 
 
-def _safe_stdev(values: list[float]) -> float:
-    """Population stdev that tolerates single-sample inputs (returns 0.0)."""
-    if len(values) < 2:
-        return 0.0
-    return statistics.pstdev(values)
+def _extract_anchor_value(item: dict) -> float | None:
+    """Extract the anchor clue's price effect as a numeric value."""
+    clues = item.get("clues", []) or []
+    for clue in clues:
+        if clue.get("type") == "anchor":
+            pe = clue.get("price_effect", "")
+            if pe.startswith("+"):
+                try:
+                    return float(pe[1:])
+                except ValueError:
+                    return None
+    return None
 
 
-def _safe_median(values: list[float]) -> float:
-    """Median that tolerates empty inputs (returns 0.0)."""
-    if not values:
-        return 0.0
-    return statistics.median(values)
+def _count_surface_clues(item: dict) -> int:
+    clues = item.get("clues", []) or []
+    return sum(1 for c in clues if c.get("type") == "surface")
 
 
-def _final_value(item: dict, layers_by_id: dict[str, dict]) -> float | None:
-    """Extract the base_value of the item's final identity layer, or None."""
-    layer_ids = item.get("layer_ids", []) or []
-    if not layer_ids:
-        return None
-    final_layer = layers_by_id.get(layer_ids[-1])
-    if final_layer is None:
-        return None
-    bv = final_layer.get("base_value")
-    return float(bv) if bv is not None else None
+def _count_hidden_clues(item: dict) -> int:
+    clues = item.get("clues", []) or []
+    return sum(1 for c in clues if c.get("type") == "hidden")
 
 
-def _print_rarity_value_table(
+def _print_rarity_table(
     items: list[dict],
-    layers_by_id: dict[str, dict],
     indent: str = "  ",
 ) -> list[float]:
-    """Print per-rarity value stats and return all final values collected.
-
-    Each rarity tier gets one line with count, avg, med, min, max.
-    """
-    # bucket values by rarity
-    by_rarity: dict[int, list[float]] = {}
+    """Print per-rarity stats and return all anchor values collected."""
+    by_rarity: dict[int, list[dict]] = {}
     rarity_counts: dict[int, int] = {}
-    all_values: list[float] = []
+    all_anchors: list[float] = []
 
     for item in items:
         r = int(item.get("rarity", 0))
         rarity_counts[r] = rarity_counts.get(r, 0) + 1
-        val = _final_value(item, layers_by_id)
+        by_rarity.setdefault(r, []).append(item)
+        val = _extract_anchor_value(item)
         if val is not None:
-            by_rarity.setdefault(r, []).append(val)
-            all_values.append(val)
+            all_anchors.append(val)
 
-    # determine column width for rarity name alignment
     max_name_len = max(
         (len(RARITY_NAMES.get(r, f"RARITY_{r}")) for r in rarity_counts),
         default=6,
@@ -129,20 +114,24 @@ def _print_rarity_value_table(
     for r in sorted(rarity_counts):
         name = RARITY_NAMES.get(r, f"RARITY_{r}")
         count = rarity_counts[r]
-        vals = by_rarity.get(r, [])
-        if vals:
-            line = (
-                f"{indent}{name:<{max_name_len}} ({count:>3})"
-                f" — avg: {_format_int(statistics.mean(vals)):>7}"
-                f"  med: {_format_int(_safe_median(vals)):>7}"
-                f"  min: {_format_int(min(vals)):>7}"
-                f"  max: {_format_int(max(vals)):>7}"
-            )
-        else:
-            line = f"{indent}{name:<{max_name_len}} ({count:>3}) — (no value data)"
+        items_in_rarity = by_rarity.get(r, [])
+        surface_counts = [_count_surface_clues(it) for it in items_in_rarity]
+        hidden_counts = [_count_hidden_clues(it) for it in items_in_rarity]
+        avg_surface = (
+            sum(surface_counts) / len(surface_counts) if surface_counts else 0
+        )
+        avg_hidden = (
+            sum(hidden_counts) / len(hidden_counts) if hidden_counts else 0
+        )
+
+        line = (
+            f"{indent}{name:<{max_name_len}} ({count:>3})"
+            f" — avg surface: {avg_surface:.1f}"
+            f"  avg hidden: {avg_hidden:.1f}"
+        )
         print(line)
 
-    return all_values
+    return all_anchors
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -168,24 +157,19 @@ def main() -> None:
 
     merged = _load_merged(yaml_dir)
 
-    layers_by_id: dict[str, dict] = {
-        l["layer_id"]: l for l in merged.get("identity_layers", [])
-    }
-
-    # ── Build category → super_category lookup ───────────────────────────────
+    # Build category -> super_category lookup
     cat_to_super: dict[str, str] = {}
     for cat in merged.get("categories", []):
         cat_to_super[cat["category_id"]] = cat.get("super_category", "unknown")
 
-    # ── Build super_category display name lookup ─────────────────────────────
+    # Build super_category display name lookup
     super_display: dict[str, str] = {}
     for sc in merged.get("super_categories", []):
         super_display[sc["super_category_id"]] = sc.get(
             "display_name", sc["super_category_id"]
         )
 
-    # ── Group items by super_category, then by category ─────────────────────
-    # Nested: super_id -> cat_id -> [items]
+    # Group items by super_category, then by category
     items_by_super_cat: dict[str, dict[str, list[dict]]] = {}
     for item in merged.get("items", []):
         cat_id = item.get("category_id", "?")
@@ -196,22 +180,26 @@ def main() -> None:
         print("\nNo items found.")
         return
 
-    separator = "═" * 60
+    separator = "=" * 60
 
-    all_final_values: list[float] = []
+    all_anchor_values: list[float] = []
     total_items = 0
     first = True
 
     for super_id in sorted(items_by_super_cat):
         cats_dict = items_by_super_cat[super_id]
-        # Flatten for super-category-level aggregates
         items = [it for cat_items in cats_dict.values() for it in cat_items]
         total_items += len(items)
 
-        depths = [len(item.get("layer_ids", []) or []) for item in items]
-        avg_depth = statistics.mean(depths) if depths else 0.0
+        surface_counts = [_count_surface_clues(it) for it in items]
+        hidden_counts = [_count_hidden_clues(it) for it in items]
+        avg_surface = (
+            sum(surface_counts) / len(surface_counts) if surface_counts else 0
+        )
+        avg_hidden = (
+            sum(hidden_counts) / len(hidden_counts) if hidden_counts else 0
+        )
 
-        # ── Super-category header ────────────────────────────────────────
         if not first:
             print(separator)
         first = False
@@ -220,36 +208,33 @@ def main() -> None:
         print(
             f"\nSuper-category: {display} [{super_id}]"
             f" ({len(items)} items, {len(cats_dict)} categories,"
-            f" avg depth: {avg_depth:.1f})"
+            f" avg surface clues: {avg_surface:.1f},"
+            f" avg hidden clues: {avg_hidden:.1f})"
         )
-        super_values = _print_rarity_value_table(items, layers_by_id, indent="  ")
-        all_final_values.extend(super_values)
+        super_anchors = _print_rarity_table(items, indent="  ")
+        all_anchor_values.extend(super_anchors)
 
-        # ── Per-category breakdown ───────────────────────────────────────
         for cat_id in sorted(cats_dict):
             cat_items = cats_dict[cat_id]
-            cat_depths = [len(it.get("layer_ids", []) or []) for it in cat_items]
-            cat_avg_depth = statistics.mean(cat_depths) if cat_depths else 0.0
+            cat_surface = [_count_surface_clues(it) for it in cat_items]
+            cat_hidden = [_count_hidden_clues(it) for it in cat_items]
+            avg_cat_surface = (
+                sum(cat_surface) / len(cat_surface) if cat_surface else 0
+            )
+            avg_cat_hidden = (
+                sum(cat_hidden) / len(cat_hidden) if cat_hidden else 0
+            )
             print(
                 f"    {cat_id} ({len(cat_items)} items,"
-                f" avg depth: {cat_avg_depth:.1f})"
+                f" avg surface: {avg_cat_surface:.1f},"
+                f" avg hidden: {avg_cat_hidden:.1f})"
             )
-            _print_rarity_value_table(cat_items, layers_by_id, indent="      ")
+            _print_rarity_table(cat_items, indent="      ")
 
         print()
 
-    # ── Grand total ──────────────────────────────────────────────────────────
+    # Grand total
     print(separator)
     print(
         f"Total: {total_items} items across {len(items_by_super_cat)} super-categories"
     )
-    if all_final_values:
-        print(
-            f"  Final value — avg: {_format_int(statistics.mean(all_final_values))}"
-            f"  med: {_format_int(_safe_median(all_final_values))}"
-            f"  std: {_format_int(_safe_stdev(all_final_values))}"
-        )
-
-
-if __name__ == "__main__":
-    main()

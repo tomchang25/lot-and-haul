@@ -4,7 +4,7 @@ from tres_lib.entities.skill import SPEC as skill_spec
 from tres_lib.entities.perk import SPEC as perk_spec
 from tres_lib.entities.super_category import SPEC as super_category_spec
 from tres_lib.entities.category import SPEC as category_spec
-from tres_lib.entities.identity_layer import SPEC as identity_layer_spec
+from tres_lib.entities.attribute_data import SPEC as attribute_data_spec
 from tres_lib.entities.item import SPEC as item_spec
 from tres_lib.entities.car import SPEC as car_spec
 from tres_lib.entities.lot import SPEC as lot_spec
@@ -19,7 +19,7 @@ REGISTRY = [
     perk_spec,
     super_category_spec,
     category_spec,
-    identity_layer_spec,
+    attribute_data_spec,
     item_spec,
     car_spec,
     lot_spec,

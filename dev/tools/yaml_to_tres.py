@@ -26,13 +26,16 @@ _SKIP_IF_EMPTY = frozenset(
     {"skills", "lots", "locations", "special_orders", "merchants"}
 )
 
+# YAML keys to include in merged data but not export as .tres files.
+_VALIDATION_ONLY_KEYS = frozenset({"tags"})
+
 
 def _write(out_path: Path, content: str, dry_run: bool, label: str) -> None:
     if dry_run:
         print(f"  [dry] would write {out_path}")
     else:
         out_path.write_text(content, encoding="utf-8")
-        print(f"  {label} → {out_path.name}")
+        print(f"  {label} -> {out_path.name}")
 
 
 def main() -> None:
@@ -65,7 +68,9 @@ def main() -> None:
     if not yaml_files:
         sys.exit(f"No .yaml files found in: {yaml_dir}")
 
-    merged: dict[str, list] = {spec.yaml_key: [] for spec in REGISTRY}
+    export_keys: set[str] = {spec.yaml_key for spec in REGISTRY}
+    all_keys: set[str] = export_keys | _VALIDATION_ONLY_KEYS
+    merged: dict[str, list] = {key: [] for key in all_keys}
     for yaml_path in yaml_files:
         print(f"Loading {yaml_path.name}...")
         data = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))

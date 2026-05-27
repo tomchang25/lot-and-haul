@@ -1,361 +1,588 @@
-identity_layers:
-  - layer_id: bag_veil_01
-    display_name: Fabric Pouch
-    base_value: 10
-    unlock_action: null
-  - layer_id: bag_veil_02
-    display_name: Bundled Cloth Bag
-    base_value: 12
-    unlock_action: null
-  - layer_id: bag_exterior_check
-    display_name: Leather Handbag
-    base_value: 55
-    unlock_action:
-      difficulty: 1.0
-    clues:
-      - clue_id: bag_exterior_check_grain
-        known_text: The exterior has a leather grain rather than woven fabric.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: appraisal
-        required_level: 1
-      - clue_id: bag_exterior_check_stitching
-        known_text: Even stitching suggests better construction than a souvenir bag.
-        ap_cost_penalty: 4
-        required_category_rank: 1
-        required_skill: authentication
-        required_level: 3
-  - layer_id: bag_hardware_check
-    display_name: Designer-Style Handbag
-    base_value: 180
-    unlock_action:
-      difficulty: 2.0
-    clues:
-      - clue_id: bag_hardware_check_plated_clasp
-        known_text: The plated clasp imitates designer hardware.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: maintenance
-        required_level: 1
-      - clue_id: bag_hardware_check_edge_paint
-        known_text: Clean edge paint and hardware fit point to a higher quality bag.
-        ap_cost_penalty: 4
-        required_skill: restoration
-        required_level: 2
-  - layer_id: bag_serial_research
-    display_name: Authenticated Luxury Bag
-    base_value: 1200
-    unlock_action:
-      difficulty: 4.0
-      required_skill: art_restoration
-      required_level: 2
-    clues:
-      - clue_id: bag_serial_research_inner_tab
-        known_text: A stamped serial tab is tucked into the lining.
-        ap_cost_penalty: 2
-        required_category_rank: 2
-        required_skill: textile_care
-        required_level: 1
-      - clue_id: bag_serial_research_database_match
-        known_text: The serial format matches authenticated luxury examples.
-        ap_cost_penalty: 4
-        required_skill: conservation
-        required_level: 2
-  - layer_id: bag_leaf_canvas_tote
-    display_name: Plain Canvas Carry-All
-    base_value: 75
-    unlock_action: null
-  - layer_id: bag_leaf_vinyl_clutch
-    display_name: Glossy Synthetic Evening Bag
-    base_value: 90
-    unlock_action: null
-  - layer_id: bag_leaf_nylon
-    display_name: Lightweight Nylon Bag
-    base_value: 60
-    unlock_action: null
-  - layer_id: bag_leaf_straw
-    display_name: Braided Natural Fiber Bag
-    base_value: 50
-    unlock_action: null
-  - layer_id: bag_leaf_faux_leather
-    display_name: Embossed Faux Leather Handbag
-    base_value: 55
-    unlock_action: null
-  - layer_id: bag_leaf_cotton
-    display_name: Cotton Canvas Carry-All
-    base_value: 80
-    unlock_action: null
-  - layer_id: bag_leaf_replica
-    display_name: Brand-Inspired Designer Bag
-    base_value: 320
-    unlock_action: null
-  - layer_id: bag_leaf_coach
-    display_name: Stamped Leather Shoulder Bag
-    base_value: 450
-    unlock_action: null
-  - layer_id: bag_leaf_lv
-    display_name: Monogram Luxury Speedy Bag
-    base_value: 1400
-    unlock_action: null
-  - layer_id: bag_leaf_hermes
-    display_name: Structured High-End Leather Bag
-    base_value: 4800
-    unlock_action: null
-  - layer_id: watch_veil_01
-    display_name: Small Metal Object
-    base_value: 8
-    unlock_action: null
-  - layer_id: watch_veil_02
-    display_name: Tarnished Metal Piece
-    base_value: 10
-    unlock_action: null
-  - layer_id: watch_case_check
-    display_name: Old Wristwatch
-    base_value: 45
-    unlock_action:
-      difficulty: 1.0
-    clues:
-      - clue_id: watch_case_check_lugs
-        known_text: The small metal object has lugs and a watch case back.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: gunsmithing
-        required_level: 1
-      - clue_id: watch_case_check_crystal_wear
-        known_text: Scratches on the crystal and case suggest age.
-        ap_cost_penalty: 4
-        required_category_rank: 1
-        required_skill: appraisal
-        required_level: 3
-  - layer_id: watch_movement_open
-    display_name: Manual-Wind Watch
-    base_value: 200
-    unlock_action:
-      difficulty: 2.0
-      required_skill: restoration
-      required_level: 2
-    clues:
-      - clue_id: watch_movement_open_crown_action
-        known_text: The crown winds the movement by hand.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: authentication
-        required_level: 1
-      - clue_id: watch_movement_open_bridge_layout
-        known_text: The bridge layout suggests a better vintage movement.
-        ap_cost_penalty: 4
-        required_skill: maintenance
-        required_level: 2
-  - layer_id: watch_leaf_quartz
-    display_name: Battery-Powered Dress Watch
-    base_value: 60
-    unlock_action: null
-  - layer_id: watch_leaf_digital
-    display_name: Digital Display Watch
-    base_value: 50
-    unlock_action: null
-  - layer_id: watch_leaf_timex
-    display_name: Mechanical Wind-Up Watch
-    base_value: 80
-    unlock_action: null
-  - layer_id: watch_leaf_russian
-    display_name: Military-Style Field Watch
-    base_value: 120
-    unlock_action: null
-  - layer_id: watch_leaf_cocktail
-    display_name: Small Formal Bracelet Watch
-    base_value: 90
-    unlock_action: null
-  - layer_id: watch_leaf_fashion
-    display_name: Logo Case Back Watch
-    base_value: 70
-    unlock_action: null
-  - layer_id: watch_leaf_seiko
-    display_name: Japanese Automatic Watch
-    base_value: 450
-    unlock_action: null
-  - layer_id: watch_leaf_bulova
-    display_name: Tuning-Fork Dress Watch
-    base_value: 650
-    unlock_action: null
-  - layer_id: watch_leaf_citizen
-    display_name: Quartz Chronograph Watch
-    base_value: 380
-    unlock_action: null
-  - layer_id: watch_leaf_longines
-    display_name: Vintage Column-Wheel Chronograph
-    base_value: 1100
-    unlock_action: null
 items:
   - item_id: handbag_canvas_tote
     item_name: Canvas Tote Bag
     base_price: 95
     category_id: handbag
     rarity: 0
-    layer_ids:
-      - bag_veil_01
-      - bag_leaf_canvas_tote
+    clues:
+      - clue_id: bag_veil_01
+        type: anchor
+        domain: handbag
+        attribute: appraisal
+        dc: 10
+        price_effect: "+10"
+        known_text: Fabric Pouch
+      - clue_id: bag_leaf_canvas_tote
+        type: hidden
+        domain: handbag
+        attribute: investigation
+        dc: 18
+        price_effect: "x9.5"
+        known_text: Plain Canvas Carry-All
+
   - item_id: handbag_vinyl_clutch
     item_name: Vinyl Clutch Purse
     base_price: 115
     category_id: handbag
     rarity: 0
-    layer_ids:
-      - bag_veil_01
-      - bag_leaf_vinyl_clutch
+    clues:
+      - clue_id: bag_veil_01
+        type: anchor
+        domain: handbag
+        attribute: appraisal
+        dc: 10
+        price_effect: "+10"
+        known_text: Fabric Pouch
+      - clue_id: bag_leaf_vinyl_clutch
+        type: hidden
+        domain: handbag
+        attribute: investigation
+        dc: 18
+        price_effect: "x11.5"
+        known_text: Glossy Synthetic Evening Bag
+
   - item_id: handbag_nylon_crossbody
     item_name: Nylon Crossbody
     base_price: 80
     category_id: handbag
     rarity: 0
-    layer_ids:
-      - bag_veil_02
-      - bag_leaf_nylon
+    clues:
+      - clue_id: bag_veil_02
+        type: anchor
+        domain: handbag
+        attribute: appraisal
+        dc: 10
+        price_effect: "+12"
+        known_text: Bundled Cloth Bag
+      - clue_id: bag_leaf_nylon
+        type: hidden
+        domain: handbag
+        attribute: investigation
+        dc: 18
+        price_effect: "x6.67"
+        known_text: Lightweight Nylon Bag
+
   - item_id: handbag_straw_bag
     item_name: Woven Straw Bag
     base_price: 70
     category_id: handbag
     rarity: 0
-    layer_ids:
-      - bag_veil_02
-      - bag_leaf_straw
+    clues:
+      - clue_id: bag_veil_02
+        type: anchor
+        domain: handbag
+        attribute: appraisal
+        dc: 10
+        price_effect: "+12"
+        known_text: Bundled Cloth Bag
+      - clue_id: bag_leaf_straw
+        type: hidden
+        domain: handbag
+        attribute: investigation
+        dc: 18
+        price_effect: "x5.83"
+        known_text: Braided Natural Fiber Bag
+
   - item_id: handbag_faux_leather
     item_name: Faux Leather Purse
     base_price: 75
     category_id: handbag
     rarity: 0
-    layer_ids:
-      - bag_veil_01
-      - bag_leaf_faux_leather
+    clues:
+      - clue_id: bag_veil_01
+        type: anchor
+        domain: handbag
+        attribute: appraisal
+        dc: 10
+        price_effect: "+10"
+        known_text: Fabric Pouch
+      - clue_id: bag_leaf_faux_leather
+        type: hidden
+        domain: handbag
+        attribute: investigation
+        dc: 18
+        price_effect: "x7.5"
+        known_text: Embossed Faux Leather Handbag
+
   - item_id: handbag_cotton_satchel
     item_name: Cotton Canvas Satchel
     base_price: 105
     category_id: handbag
     rarity: 0
-    layer_ids:
-      - bag_veil_02
-      - bag_leaf_cotton
+    clues:
+      - clue_id: bag_veil_02
+        type: anchor
+        domain: handbag
+        attribute: appraisal
+        dc: 10
+        price_effect: "+12"
+        known_text: Bundled Cloth Bag
+      - clue_id: bag_leaf_cotton
+        type: hidden
+        domain: handbag
+        attribute: investigation
+        dc: 18
+        price_effect: "x8.75"
+        known_text: Cotton Canvas Carry-All
+
   - item_id: handbag_replica_designer
     item_name: Well-Made Replica Bag
     base_price: 380
     category_id: handbag
     rarity: 1
-    layer_ids:
-      - bag_veil_01
-      - bag_exterior_check
-      - bag_leaf_replica
+    clues:
+      - clue_id: bag_veil_01
+        type: anchor
+        domain: handbag
+        attribute: appraisal
+        dc: 10
+        price_effect: "+10"
+        known_text: Fabric Pouch
+      - clue_id: bag_exterior_check_grain
+        type: surface
+        domain: handbag
+        attribute: appraisal
+        dc: 12
+        price_effect: "+45"
+        known_text: The exterior has a leather grain rather than woven fabric.
+      - clue_id: bag_exterior_check_stitching
+        type: surface
+        domain: handbag
+        attribute: perception
+        dc: 14
+        price_effect: "+0"
+        known_text: Even stitching suggests better construction than a souvenir bag.
+      - clue_id: bag_leaf_replica
+        type: hidden
+        domain: handbag
+        attribute: investigation
+        dc: 18
+        price_effect: "x6.91"
+        known_text: Brand-Inspired Designer Bag
+
   - item_id: handbag_coach_leather
     item_name: Coach Leather Bag
     base_price: 540
     category_id: handbag
     rarity: 1
-    layer_ids:
-      - bag_veil_02
-      - bag_exterior_check
-      - bag_leaf_coach
+    clues:
+      - clue_id: bag_veil_02
+        type: anchor
+        domain: handbag
+        attribute: appraisal
+        dc: 10
+        price_effect: "+12"
+        known_text: Bundled Cloth Bag
+      - clue_id: bag_exterior_check_grain
+        type: surface
+        domain: handbag
+        attribute: appraisal
+        dc: 12
+        price_effect: "+43"
+        known_text: The exterior has a leather grain rather than woven fabric.
+      - clue_id: bag_exterior_check_stitching
+        type: surface
+        domain: handbag
+        attribute: perception
+        dc: 14
+        price_effect: "+0"
+        known_text: Even stitching suggests better construction than a souvenir bag.
+      - clue_id: bag_leaf_coach
+        type: hidden
+        domain: handbag
+        attribute: investigation
+        dc: 18
+        price_effect: "x9.82"
+        known_text: Stamped Leather Shoulder Bag
+
   - item_id: handbag_louis_vuitton
     item_name: Louis Vuitton Speedy
     base_price: 1700
     category_id: handbag
     rarity: 2
-    layer_ids:
-      - bag_veil_01
-      - bag_exterior_check
-      - bag_hardware_check
-      - bag_leaf_lv
+    clues:
+      - clue_id: bag_veil_01
+        type: anchor
+        domain: handbag
+        attribute: appraisal
+        dc: 10
+        price_effect: "+10"
+        known_text: Fabric Pouch
+      - clue_id: bag_exterior_check_grain
+        type: surface
+        domain: handbag
+        attribute: appraisal
+        dc: 12
+        price_effect: "+45"
+        known_text: The exterior has a leather grain rather than woven fabric.
+      - clue_id: bag_exterior_check_stitching
+        type: surface
+        domain: handbag
+        attribute: perception
+        dc: 14
+        price_effect: "+0"
+        known_text: Even stitching suggests better construction than a souvenir bag.
+      - clue_id: bag_hardware_check_plated_clasp
+        type: surface
+        domain: handbag
+        attribute: perception
+        dc: 14
+        price_effect: "+125"
+        known_text: The plated clasp imitates designer hardware.
+      - clue_id: bag_hardware_check_edge_paint
+        type: surface
+        domain: handbag
+        attribute: restoration
+        dc: 16
+        price_effect: "+0"
+        known_text: Clean edge paint and hardware fit point to a higher quality bag.
+      - clue_id: bag_leaf_lv
+        type: hidden
+        domain: handbag
+        attribute: investigation
+        dc: 18
+        price_effect: "x9.44"
+        known_text: Monogram Luxury Speedy Bag
+
   - item_id: handbag_hermes_birkin
-    item_name: Hermès Birkin 30
+    item_name: Hermes Birkin 30
     base_price: 5800
     category_id: handbag
     rarity: 3
-    layer_ids:
-      - bag_veil_02
-      - bag_exterior_check
-      - bag_hardware_check
-      - bag_serial_research
-      - bag_leaf_hermes
+    clues:
+      - clue_id: bag_veil_02
+        type: anchor
+        domain: handbag
+        attribute: appraisal
+        dc: 10
+        price_effect: "+12"
+        known_text: Bundled Cloth Bag
+      - clue_id: bag_exterior_check_grain
+        type: surface
+        domain: handbag
+        attribute: appraisal
+        dc: 12
+        price_effect: "+43"
+        known_text: The exterior has a leather grain rather than woven fabric.
+      - clue_id: bag_exterior_check_stitching
+        type: surface
+        domain: handbag
+        attribute: perception
+        dc: 14
+        price_effect: "+0"
+        known_text: Even stitching suggests better construction than a souvenir bag.
+      - clue_id: bag_hardware_check_plated_clasp
+        type: surface
+        domain: handbag
+        attribute: perception
+        dc: 14
+        price_effect: "+125"
+        known_text: The plated clasp imitates designer hardware.
+      - clue_id: bag_hardware_check_edge_paint
+        type: surface
+        domain: handbag
+        attribute: restoration
+        dc: 16
+        price_effect: "+0"
+        known_text: Clean edge paint and hardware fit point to a higher quality bag.
+      - clue_id: bag_serial_research_inner_tab
+        type: surface
+        domain: handbag
+        attribute: investigation
+        dc: 16
+        price_effect: "+1020"
+        known_text: A stamped serial tab is tucked into the lining.
+      - clue_id: bag_serial_research_database_match
+        type: surface
+        domain: handbag
+        attribute: appraisal
+        dc: 18
+        price_effect: "+0"
+        known_text: The serial format matches authenticated luxury examples.
+      - clue_id: bag_leaf_hermes
+        type: hidden
+        domain: handbag
+        attribute: investigation
+        dc: 20
+        price_effect: "x4.83"
+        known_text: Structured High-End Leather Bag
+
   - item_id: wristwatch_quartz_dress
     item_name: Quartz Dress Watch
     base_price: 80
     category_id: wristwatch
     rarity: 0
-    layer_ids:
-      - watch_veil_01
-      - watch_leaf_quartz
+    clues:
+      - clue_id: watch_veil_01
+        type: anchor
+        domain: wristwatch
+        attribute: appraisal
+        dc: 10
+        price_effect: "+8"
+        known_text: Small Metal Object
+      - clue_id: watch_leaf_quartz
+        type: hidden
+        domain: wristwatch
+        attribute: investigation
+        dc: 18
+        price_effect: "x10.0"
+        known_text: Battery-Powered Dress Watch
+
   - item_id: wristwatch_digital_lcd
     item_name: Digital LCD Watch
     base_price: 70
     category_id: wristwatch
     rarity: 0
-    layer_ids:
-      - watch_veil_01
-      - watch_leaf_digital
+    clues:
+      - clue_id: watch_veil_01
+        type: anchor
+        domain: wristwatch
+        attribute: appraisal
+        dc: 10
+        price_effect: "+8"
+        known_text: Small Metal Object
+      - clue_id: watch_leaf_digital
+        type: hidden
+        domain: wristwatch
+        attribute: investigation
+        dc: 18
+        price_effect: "x8.75"
+        known_text: Digital Display Watch
+
   - item_id: wristwatch_timex_windup
     item_name: Timex Wind-Up
     base_price: 105
     category_id: wristwatch
     rarity: 0
-    layer_ids:
-      - watch_veil_02
-      - watch_leaf_timex
+    clues:
+      - clue_id: watch_veil_02
+        type: anchor
+        domain: wristwatch
+        attribute: appraisal
+        dc: 10
+        price_effect: "+10"
+        known_text: Tarnished Metal Piece
+      - clue_id: watch_leaf_timex
+        type: hidden
+        domain: wristwatch
+        attribute: investigation
+        dc: 18
+        price_effect: "x10.5"
+        known_text: Mechanical Wind-Up Watch
+
   - item_id: wristwatch_russian_field
     item_name: Russian Field Watch
     base_price: 150
     category_id: wristwatch
     rarity: 0
-    layer_ids:
-      - watch_veil_02
-      - watch_leaf_russian
+    clues:
+      - clue_id: watch_veil_02
+        type: anchor
+        domain: wristwatch
+        attribute: appraisal
+        dc: 10
+        price_effect: "+10"
+        known_text: Tarnished Metal Piece
+      - clue_id: watch_leaf_russian
+        type: hidden
+        domain: wristwatch
+        attribute: investigation
+        dc: 18
+        price_effect: "x15.0"
+        known_text: Military-Style Field Watch
+
   - item_id: wristwatch_ladies_cocktail
-    item_name: Ladies' Cocktail Watch
+    item_name: Ladies Cocktail Watch
     base_price: 115
     category_id: wristwatch
     rarity: 0
-    layer_ids:
-      - watch_veil_01
-      - watch_leaf_cocktail
+    clues:
+      - clue_id: watch_veil_01
+        type: anchor
+        domain: wristwatch
+        attribute: appraisal
+        dc: 10
+        price_effect: "+8"
+        known_text: Small Metal Object
+      - clue_id: watch_leaf_cocktail
+        type: hidden
+        domain: wristwatch
+        attribute: investigation
+        dc: 18
+        price_effect: "x14.38"
+        known_text: Small Formal Bracelet Watch
+
   - item_id: wristwatch_fashion_brand
     item_name: Fashion Brand Watch
     base_price: 95
     category_id: wristwatch
     rarity: 0
-    layer_ids:
-      - watch_veil_02
-      - watch_leaf_fashion
+    clues:
+      - clue_id: watch_veil_02
+        type: anchor
+        domain: wristwatch
+        attribute: appraisal
+        dc: 10
+        price_effect: "+10"
+        known_text: Tarnished Metal Piece
+      - clue_id: watch_leaf_fashion
+        type: hidden
+        domain: wristwatch
+        attribute: investigation
+        dc: 18
+        price_effect: "x9.5"
+        known_text: Logo Case Back Watch
+
   - item_id: wristwatch_seiko_auto
     item_name: Seiko 5 Auto, 1970s
     base_price: 560
     category_id: wristwatch
     rarity: 1
-    layer_ids:
-      - watch_veil_01
-      - watch_case_check
-      - watch_leaf_seiko
+    clues:
+      - clue_id: watch_veil_01
+        type: anchor
+        domain: wristwatch
+        attribute: appraisal
+        dc: 10
+        price_effect: "+8"
+        known_text: Small Metal Object
+      - clue_id: watch_case_check_lugs
+        type: surface
+        domain: wristwatch
+        attribute: appraisal
+        dc: 12
+        price_effect: "+37"
+        known_text: The small metal object has lugs and a watch case back.
+      - clue_id: watch_case_check_crystal_wear
+        type: surface
+        domain: wristwatch
+        attribute: perception
+        dc: 14
+        price_effect: "+0"
+        known_text: Scratches on the crystal and case suggest age.
+      - clue_id: watch_leaf_seiko
+        type: hidden
+        domain: wristwatch
+        attribute: investigation
+        dc: 18
+        price_effect: "x12.44"
+        known_text: Japanese Automatic Watch
+
   - item_id: wristwatch_bulova_accutron
     item_name: Bulova Accutron
     base_price: 820
     category_id: wristwatch
     rarity: 1
-    layer_ids:
-      - watch_veil_02
-      - watch_case_check
-      - watch_leaf_bulova
+    clues:
+      - clue_id: watch_veil_02
+        type: anchor
+        domain: wristwatch
+        attribute: appraisal
+        dc: 10
+        price_effect: "+10"
+        known_text: Tarnished Metal Piece
+      - clue_id: watch_case_check_lugs
+        type: surface
+        domain: wristwatch
+        attribute: appraisal
+        dc: 12
+        price_effect: "+35"
+        known_text: The small metal object has lugs and a watch case back.
+      - clue_id: watch_case_check_crystal_wear
+        type: surface
+        domain: wristwatch
+        attribute: perception
+        dc: 14
+        price_effect: "+0"
+        known_text: Scratches on the crystal and case suggest age.
+      - clue_id: watch_leaf_bulova
+        type: hidden
+        domain: wristwatch
+        attribute: investigation
+        dc: 18
+        price_effect: "x18.22"
+        known_text: Tuning-Fork Dress Watch
+
   - item_id: wristwatch_citizen_chrono
     item_name: Citizen Chrono, 1980s
     base_price: 480
     category_id: wristwatch
     rarity: 1
-    layer_ids:
-      - watch_veil_01
-      - watch_case_check
-      - watch_leaf_citizen
+    clues:
+      - clue_id: watch_veil_01
+        type: anchor
+        domain: wristwatch
+        attribute: appraisal
+        dc: 10
+        price_effect: "+8"
+        known_text: Small Metal Object
+      - clue_id: watch_case_check_lugs
+        type: surface
+        domain: wristwatch
+        attribute: appraisal
+        dc: 12
+        price_effect: "+37"
+        known_text: The small metal object has lugs and a watch case back.
+      - clue_id: watch_case_check_crystal_wear
+        type: surface
+        domain: wristwatch
+        attribute: perception
+        dc: 14
+        price_effect: "+0"
+        known_text: Scratches on the crystal and case suggest age.
+      - clue_id: watch_leaf_citizen
+        type: hidden
+        domain: wristwatch
+        attribute: investigation
+        dc: 18
+        price_effect: "x10.67"
+        known_text: Quartz Chronograph Watch
+
   - item_id: wristwatch_longines_13zn
     item_name: Longines 13ZN, c.1948
     base_price: 1450
     category_id: wristwatch
     rarity: 2
-    layer_ids:
-      - watch_veil_02
-      - watch_case_check
-      - watch_movement_open
-      - watch_leaf_longines
+    clues:
+      - clue_id: watch_veil_02
+        type: anchor
+        domain: wristwatch
+        attribute: appraisal
+        dc: 10
+        price_effect: "+10"
+        known_text: Tarnished Metal Piece
+      - clue_id: watch_case_check_lugs
+        type: surface
+        domain: wristwatch
+        attribute: appraisal
+        dc: 12
+        price_effect: "+35"
+        known_text: The small metal object has lugs and a watch case back.
+      - clue_id: watch_case_check_crystal_wear
+        type: surface
+        domain: wristwatch
+        attribute: perception
+        dc: 14
+        price_effect: "+0"
+        known_text: Scratches on the crystal and case suggest age.
+      - clue_id: watch_movement_open_crown_action
+        type: surface
+        domain: wristwatch
+        attribute: perception
+        dc: 14
+        price_effect: "+155"
+        known_text: The crown winds the movement by hand.
+      - clue_id: watch_movement_open_bridge_layout
+        type: surface
+        domain: wristwatch
+        attribute: investigation
+        dc: 16
+        price_effect: "+0"
+        known_text: The bridge layout suggests a better vintage movement.
+      - clue_id: watch_leaf_longines
+        type: hidden
+        domain: wristwatch
+        attribute: investigation
+        dc: 20
+        price_effect: "x7.25"
+        known_text: Vintage Column-Wheel Chronograph

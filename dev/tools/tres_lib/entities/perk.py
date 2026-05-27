@@ -45,6 +45,13 @@ class PerkSpec:
         w.add_field_str("perk_id", pid)
         w.add_field_str("display_name", entry["display_name"])
         w.add_field_str("description", entry["description"])
+        w.add_field_str(
+            "required_attribute", entry.get("required_attribute", "")
+        )
+        w.add_field_int(
+            "required_attribute_value",
+            int(entry.get("required_attribute_value", 0)),
+        )
         return w.render()
 
     def parse_tres(self, text: str, ctx: ParseCtx) -> dict:
@@ -55,11 +62,15 @@ class PerkSpec:
 
         display_name = tres_field(text, "display_name") or perk_id
         description = tres_field(text, "description") or ""
+        required_attribute = tres_field(text, "required_attribute") or ""
+        required_attribute_value = int(tres_field(text, "required_attribute_value") or 0)
 
         return {
             "perk_id": perk_id,
             "display_name": display_name,
             "description": description,
+            "required_attribute": required_attribute,
+            "required_attribute_value": required_attribute_value,
         }
 
     def validate(self, entries: list, all_data: dict) -> list[str]:

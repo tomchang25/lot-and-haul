@@ -15,8 +15,6 @@ class BuildCtx:
     uid_cache: dict[str, str]  # entity_id -> uid://...
     script_uids: dict[str, str]  # logical_name -> uid://... from .gd.uid sidecars
     dry_run: bool
-    # Cross-entity auxiliary data populated by earlier specs:
-    identity_layers_by_id: dict[str, dict] = field(default_factory=dict)
 
 
 @dataclass
