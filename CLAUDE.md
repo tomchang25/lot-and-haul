@@ -56,7 +56,7 @@ Items are authored in `data/yaml/items/*.yaml`, converted to `.tres` via `dev/to
 
 ## Current Phase
 
-Core loop redesign: Phases 0–2 complete (runtime veil cleanup, AP grid inspection). Next up: Phase 3 (ItemData base price + abstract identity data) → Phase 4 (clue inspection) and Phase 5 (hub final resolution) in parallel. See `dev/docs/plan/roadmap.md` for the full phase dependency graph.
+Core loop redesign: Phases 0–6 complete or superseded (runtime veil cleanup, AP grid inspection, item base price, storage authenticate). Next up: Phase 7 (clue independence + attribute system — replaces identity layers and skills with independent clue resources and dice-based attribute checks). See `ROADMAP.md` for the full phase dependency graph.
 
 ## Conventions (quick reference)
 
