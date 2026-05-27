@@ -1,53 +1,55 @@
 items:
-- item_id: lamp_moser_bohemian
-  item_name: Moser Bohemian Lamp
-  base_price: 1250
-  category_id: oil_lamp
-  rarity: 2
-  clue_ids:
-  - lamp_veil_01
-  - lamp_glass_body_clear_font
-  - lamp_glass_body_wear_ring
-  - lamp_ornate_base_cast_scrolls
-  - lamp_ornate_base_fitting_quality
-  - lamp_leaf_moser
-- item_id: lamp_baccarat_crystal
-  item_name: Baccarat Crystal Lamp
-  base_price: 2100
-  category_id: oil_lamp
-  rarity: 2
-  clue_ids:
-  - lamp_veil_01
-  - lamp_glass_body_clear_font
-  - lamp_glass_body_wear_ring
-  - lamp_pressed_font_mold_lines
-  - lamp_pressed_font_pattern_repeat
-  - lamp_leaf_baccarat
-- item_id: lamp_hinks_duplex
-  item_name: Hinks & Son Duplex Lamp
-  base_price: 4200
-  category_id: oil_lamp
-  rarity: 3
-  clue_ids:
-  - lamp_veil_01
-  - lamp_glass_body_clear_font
-  - lamp_glass_body_wear_ring
-  - lamp_hallmarked_collar_silver_marks
-  - lamp_hallmarked_collar_date_letter
-  - lamp_authenticated_maker_clear_stamp
-  - lamp_authenticated_maker_registry_match
-  - lamp_leaf_hinks
-- item_id: clock_boulle_mantel
-  item_name: Boulle Mantel Clock
-  base_price: 6000
-  category_id: clock
-  rarity: 3
-  clue_ids:
-  - clock_veil_01
-  - clock_wooden_case_joinery
-  - clock_wooden_case_finish_age
-  - clock_gilded_case_bronze_mounts
-  - clock_gilded_case_inlay_quality
-  - clock_signed_movement_plate_signature
-  - clock_signed_movement_signature_match
-  - clock_leaf_boulle
+  - item_id: lamp_moser_bohemian
+    item_name: Moser Bohemian Lamp
+    base_price: 1250
+    category_id: oil_lamp
+    rarity: 2
+    clue_ids:
+      - lamp_veil_01
+      - lamp_glass_blown
+      - lamp_glass_wear_ring
+      - lamp_cast_scrollwork
+      - lamp_burner_fitting
+      - lamp_leaf_moser
+  - item_id: lamp_baccarat_crystal
+    item_name: Baccarat Crystal Lamp
+    base_price: 2100
+    category_id: oil_lamp
+    rarity: 2
+    clue_ids:
+      - lamp_veil_01
+      - lamp_glass_blown
+      - lamp_glass_wear_ring
+      - lamp_mold_seams
+      - lamp_pattern_repeat
+      - lamp_silver_collar
+      - lamp_baccarat_etch
+      - lamp_leaf_baccarat
+  - item_id: lamp_hinks_duplex
+    item_name: Hinks & Son Duplex Lamp
+    base_price: 4200
+    category_id: oil_lamp
+    rarity: 3
+    clue_ids:
+      - lamp_veil_01
+      - lamp_glass_blown
+      - lamp_glass_wear_ring
+      - lamp_silver_collar
+      - lamp_date_letter
+      - lamp_maker_stamp
+      - lamp_registry_match
+      - lamp_leaf_hinks
+  - item_id: clock_boulle_mantel
+    item_name: Boulle Mantel Clock
+    base_price: 6000
+    category_id: clock
+    rarity: 3
+    clue_ids:
+      - clock_veil_01
+      - clock_wood_joinery
+      - clock_wood_finish
+      - clock_bronze_mounts
+      - clock_inlay_quality
+      - clock_movement_signature
+      - clock_movement_match
+      - clock_leaf_boulle

@@ -1,46 +1,22 @@
-# clues.yaml
-# Standalone clue table — every clue id is defined exactly once.
-
-# 92 total clue definitions extracted from item YAML files.
-# ── CONFLICT NOTES ───────────────────────────────────────────
-# CONFLICT: bag_exterior_check_grain.price_effect: "+45" vs "+43" in 'handbag_coach_leather'
-# CONFLICT: watch_case_check_lugs.price_effect: "+37" vs "+35" in 'wristwatch_bulova_accutron'
-
 clues:
-  # ── LAMP clues ──────────────────────────────────────────────────────────────
+  # ── OIL LAMP clues ─────────────────────────────────────────
   - clue_id: lamp_veil_01
     known_text: "Lamp-Shaped Object"
     type: anchor
     domain: oil_lamp
     attribute: appraisal
-    dc: 10
+    dc: 0
     effect_op: flat
-    effect_amount: 10
-  - clue_id: lamp_authenticated_maker_clear_stamp
-    known_text: "A cleaned stamp confirms the maker mark on the burner assembly."
-    type: surface
-    domain: oil_lamp
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 600
-  - clue_id: lamp_authenticated_maker_registry_match
-    known_text: "The mark matches a registered Hinks pattern."
-    type: surface
-    domain: oil_lamp
-    attribute: appraisal
-    dc: 18
-    effect_op: add
-    effect_amount: 0
-  - clue_id: lamp_glass_body_clear_font
+    effect_amount: 40
+  - clue_id: lamp_glass_blown
     known_text: "The clear glass font is blown rather than molded."
     type: surface
     domain: oil_lamp
     attribute: appraisal
     dc: 12
     effect_op: add
-    effect_amount: 30
-  - clue_id: lamp_glass_body_wear_ring
+    effect_amount: 150
+  - clue_id: lamp_glass_wear_ring
     known_text: "The base shows old circular shelf wear."
     type: surface
     domain: oil_lamp
@@ -48,31 +24,15 @@ clues:
     dc: 14
     effect_op: add
     effect_amount: 0
-  - clue_id: lamp_hallmarked_collar_date_letter
-    known_text: "The date letter narrows the lamp to the late Victorian period."
-    type: surface
-    domain: oil_lamp
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 0
-  - clue_id: lamp_hallmarked_collar_silver_marks
-    known_text: "Tiny marks on the collar identify it as silver rather than plated metal."
+  - clue_id: lamp_cast_scrollwork
+    known_text: "Cast scrollwork decorates the ornate base."
     type: surface
     domain: oil_lamp
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 260
-  - clue_id: lamp_ornate_base_cast_scrolls
-    known_text: "Cast scrollwork suggests a late nineteenth century decorative base."
-    type: surface
-    domain: oil_lamp
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 70
-  - clue_id: lamp_ornate_base_fitting_quality
+    effect_amount: 230
+  - clue_id: lamp_burner_fitting
     known_text: "The burner fitting is cleaner than most mass market examples."
     type: surface
     domain: oil_lamp
@@ -80,15 +40,15 @@ clues:
     dc: 14
     effect_op: add
     effect_amount: 0
-  - clue_id: lamp_pressed_font_mold_lines
-    known_text: "Mold seams run through the glass font."
+  - clue_id: lamp_mold_seams
+    known_text: "Mold seams run through the pressed glass font."
     type: surface
     domain: oil_lamp
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 50
-  - clue_id: lamp_pressed_font_pattern_repeat
+    effect_amount: 100
+  - clue_id: lamp_pattern_repeat
     known_text: "The repeated pattern points to a French crystal maker."
     type: surface
     domain: oil_lamp
@@ -96,73 +56,89 @@ clues:
     dc: 16
     effect_op: add
     effect_amount: 0
-  - clue_id: lamp_leaf_baccarat
-    known_text: "French Crystal Oil Lamp"
+  - clue_id: lamp_silver_collar
+    known_text: "The collar is solid silver rather than plated metal."
+    type: surface
+    domain: oil_lamp
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 500
+  - clue_id: lamp_date_letter
+    known_text: "The date letter narrows the lamp to the late Victorian period."
+    type: surface
+    domain: oil_lamp
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 0
+  - clue_id: lamp_maker_stamp
+    known_text: "A maker mark is stamped clearly on the burner assembly."
+    type: surface
+    domain: oil_lamp
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 800
+  - clue_id: lamp_registry_match
+    known_text: "The mark matches a registered Hinks pattern."
+    type: surface
+    domain: oil_lamp
+    attribute: appraisal
+    dc: 18
+    effect_op: add
+    effect_amount: 0
+  - clue_id: lamp_baccarat_etch
+    known_text: "A Baccarat signature mark is etched into the base."
+    type: surface
+    domain: oil_lamp
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 300
+  - clue_id: lamp_leaf_moser
+    known_text: "Bohemian engraved art glass by Moser, circa 1900."
     type: hidden
     domain: oil_lamp
     attribute: investigation
     dc: 18
     effect_op: mul
-    effect_amount: 1.31
+    effect_amount: 2.98
+  - clue_id: lamp_leaf_baccarat
+    known_text: "Pressed crystal oil lamp by Baccarat, late 19th century."
+    type: hidden
+    domain: oil_lamp
+    attribute: investigation
+    dc: 18
+    effect_op: mul
+    effect_amount: 1.93
   - clue_id: lamp_leaf_hinks
-    known_text: "Hallmarked Duplex Oil Lamp"
+    known_text: "Hallmarked duplex oil lamp by Hinks and Son."
     type: hidden
     domain: oil_lamp
     attribute: investigation
     dc: 20
     effect_op: mul
-    effect_amount: 1.31
-  - clue_id: lamp_leaf_moser
-    known_text: "Bohemian Art Glass Lamp"
-    type: hidden
-    domain: oil_lamp
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 1.32
+    effect_amount: 2.82
 
-  # ── CLOCK clues ──────────────────────────────────────────────────────────────
+  # ── CLOCK clues ────────────────────────────────────────────
   - clue_id: clock_veil_01
     known_text: "Clock-Shaped Object"
     type: anchor
     domain: clock
     attribute: appraisal
-    dc: 10
+    dc: 0
     effect_op: flat
-    effect_amount: 15
-  - clue_id: clock_gilded_case_bronze_mounts
-    known_text: "Gilded brass mounts frame the clock case."
-    type: surface
-    domain: clock
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 265
-  - clue_id: clock_gilded_case_inlay_quality
-    known_text: "The inlay quality suggests a Boulle style case rather than ordinary gilding."
-    type: surface
-    domain: clock
-    attribute: restoration
-    dc: 16
-    effect_op: add
-    effect_amount: 0
-  - clue_id: clock_signed_movement_plate_signature
-    known_text: "A signature is engraved on the movement plate."
-    type: surface
-    domain: clock
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 480
-  - clue_id: clock_signed_movement_signature_match
-    known_text: "The signature matches known French workshop records."
+    effect_amount: 60
+  - clue_id: clock_wood_joinery
+    known_text: "The wooden case uses older pinned joinery."
     type: surface
     domain: clock
     attribute: appraisal
-    dc: 18
+    dc: 12
     effect_op: add
-    effect_amount: 0
-  - clue_id: clock_wooden_case_finish_age
+    effect_amount: 120
+  - clue_id: clock_wood_finish
     known_text: "The aged finish is consistent across the back and base."
     type: surface
     domain: clock
@@ -170,50 +146,89 @@ clues:
     dc: 14
     effect_op: add
     effect_amount: 0
-  - clue_id: clock_wooden_case_joinery
-    known_text: "The wooden case uses older pinned joinery."
+  - clue_id: clock_bronze_mounts
+    known_text: "Gilded bronze mounts frame the clock case."
+    type: surface
+    domain: clock
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 800
+  - clue_id: clock_inlay_quality
+    known_text: "The inlay quality suggests a Boulle style case."
+    type: surface
+    domain: clock
+    attribute: restoration
+    dc: 16
+    effect_op: add
+    effect_amount: 0
+  - clue_id: clock_movement_signature
+    known_text: "A signature is engraved on the movement plate."
+    type: surface
+    domain: clock
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 1200
+  - clue_id: clock_movement_match
+    known_text: "The signature matches known French workshop records."
     type: surface
     domain: clock
     attribute: appraisal
-    dc: 12
+    dc: 18
     effect_op: add
-    effect_amount: 40
+    effect_amount: 0
   - clue_id: clock_leaf_boulle
-    known_text: "Gilded Boulle-Style Mantel Clock"
+    known_text: "Gilded Boulle-style mantel clock by a Parisian atelier."
     type: hidden
     domain: clock
     attribute: investigation
     dc: 20
     effect_op: mul
-    effect_amount: 1.33
+    effect_amount: 2.75
 
-  # ── BAG clues ──────────────────────────────────────────────────────────────
+  # ── HANDBAG clues ──────────────────────────────────────────
   - clue_id: bag_veil_01
     known_text: "Fabric Pouch"
     type: anchor
     domain: handbag
     attribute: appraisal
-    dc: 10
+    dc: 0
     effect_op: flat
     effect_amount: 10
   - clue_id: bag_veil_02
-    known_text: "Bundled Cloth Bag"
+    known_text: "Leather Handbag"
     type: anchor
     domain: handbag
     attribute: appraisal
-    dc: 10
+    dc: 0
     effect_op: flat
-    effect_amount: 12
-  # CONFLICT: price_effect differs between items for this clue_id
-  - clue_id: bag_exterior_check_grain
-    known_text: "The exterior has a leather grain rather than woven fabric."
+    effect_amount: 25
+  - clue_id: bag_veil_03
+    known_text: "Quality Handbag"
+    type: anchor
+    domain: handbag
+    attribute: appraisal
+    dc: 0
+    effect_op: flat
+    effect_amount: 50
+  - clue_id: bag_exterior_fabric
+    known_text: "The exterior material is woven fabric rather than leather."
+    type: surface
+    domain: handbag
+    attribute: appraisal
+    dc: 10
+    effect_op: add
+    effect_amount: 20
+  - clue_id: bag_exterior_leather
+    known_text: "The exterior has a genuine leather grain."
     type: surface
     domain: handbag
     attribute: appraisal
     dc: 12
     effect_op: add
-    effect_amount: 45
-  - clue_id: bag_exterior_check_stitching
+    effect_amount: 40
+  - clue_id: bag_exterior_stitching
     known_text: "Even stitching suggests better construction than a souvenir bag."
     type: surface
     domain: handbag
@@ -221,137 +236,217 @@ clues:
     dc: 14
     effect_op: add
     effect_amount: 0
-  - clue_id: bag_hardware_check_edge_paint
-    known_text: "Clean edge paint and hardware fit point to a higher quality bag."
+  - clue_id: bag_hardware_plated
+    known_text: "The clasp hardware is plated base metal."
+    type: surface
+    domain: handbag
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 30
+  - clue_id: bag_hardware_solid
+    known_text: "The hardware is solid brass, not plated."
+    type: surface
+    domain: handbag
+    attribute: perception
+    dc: 16
+    effect_op: add
+    effect_amount: 120
+  - clue_id: bag_edge_paint_wear
+    known_text: "The edge paint is chipping along the seams."
     type: surface
     domain: handbag
     attribute: restoration
     dc: 16
     effect_op: add
     effect_amount: 0
-  - clue_id: bag_hardware_check_plated_clasp
-    known_text: "The plated clasp imitates designer hardware."
+  - clue_id: bag_lining_synthetic
+    known_text: "The lining is synthetic, not original silk."
+    type: surface
+    domain: handbag
+    attribute: perception
+    dc: 10
+    effect_op: add
+    effect_amount: 15
+  - clue_id: bag_zipper_mark
+    known_text: "The zipper pull is stamped with a maker mark."
+    type: surface
+    domain: handbag
+    attribute: restoration
+    dc: 14
+    effect_op: add
+    effect_amount: 50
+  - clue_id: bag_strap_riveted
+    known_text: "The strap attachments are riveted rather than glued."
     type: surface
     domain: handbag
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 125
-  - clue_id: bag_serial_research_database_match
-    known_text: "The serial format matches authenticated luxury examples."
+    effect_amount: 0
+  - clue_id: bag_serial_stamp
+    known_text: "A stamped serial number is tucked into the lining."
+    type: surface
+    domain: handbag
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 200
+  - clue_id: bag_serial_match
+    known_text: "The serial format matches luxury bag records."
     type: surface
     domain: handbag
     attribute: appraisal
     dc: 18
     effect_op: add
     effect_amount: 0
-  - clue_id: bag_serial_research_inner_tab
-    known_text: "A stamped serial tab is tucked into the lining."
+  - clue_id: bag_monogram_canvas
+    known_text: "Monogram canvas pattern is visible on the exterior."
+    type: surface
+    domain: handbag
+    attribute: appraisal
+    dc: 16
+    effect_op: add
+    effect_amount: 250
+  - clue_id: bag_date_code
+    known_text: "A date code is embossed on an interior tag."
     type: surface
     domain: handbag
     attribute: investigation
     dc: 16
     effect_op: add
-    effect_amount: 1020
+    effect_amount: 180
+  - clue_id: bag_blind_stamp
+    known_text: "A blind stamp is pressed deep into the leather panel."
+    type: surface
+    domain: handbag
+    attribute: appraisal
+    dc: 18
+    effect_op: add
+    effect_amount: 500
+  - clue_id: bag_saddle_stitch
+    known_text: "Saddle stitching indicates handmade construction."
+    type: surface
+    domain: handbag
+    attribute: perception
+    dc: 18
+    effect_op: add
+    effect_amount: 650
+  - clue_id: bag_palladium_hw
+    known_text: "The hardware is palladium-finished, not standard plate."
+    type: surface
+    domain: handbag
+    attribute: perception
+    dc: 18
+    effect_op: add
+    effect_amount: 500
   - clue_id: bag_leaf_canvas_tote
-    known_text: "Plain Canvas Carry-All"
+    known_text: "Plain canvas carry-all, no designer value."
     type: hidden
     domain: handbag
     attribute: investigation
     dc: 18
     effect_op: mul
-    effect_amount: 9.5
-  - clue_id: bag_leaf_coach
-    known_text: "Stamped Leather Shoulder Bag"
+    effect_amount: 2.11
+  - clue_id: bag_leaf_vinyl_clutch
+    known_text: "Glossy synthetic evening bag, fashion only."
     type: hidden
     domain: handbag
     attribute: investigation
     dc: 18
     effect_op: mul
-    effect_amount: 9.82
-  - clue_id: bag_leaf_cotton
-    known_text: "Cotton Canvas Carry-All"
+    effect_amount: 2.88
+  - clue_id: bag_leaf_nylon
+    known_text: "Lightweight nylon crossbody, practical but not valuable."
     type: hidden
     domain: handbag
     attribute: investigation
     dc: 18
     effect_op: mul
-    effect_amount: 8.75
+    effect_amount: 2.67
+  - clue_id: bag_leaf_straw
+    known_text: "Braided natural fiber bag, a tourist piece."
+    type: hidden
+    domain: handbag
+    attribute: investigation
+    dc: 18
+    effect_op: mul
+    effect_amount: 2.80
   - clue_id: bag_leaf_faux_leather
-    known_text: "Embossed Faux Leather Handbag"
+    known_text: "Embossed faux leather handbag, not genuine hide."
     type: hidden
     domain: handbag
     attribute: investigation
     dc: 18
     effect_op: mul
-    effect_amount: 7.5
-  - clue_id: bag_leaf_hermes
-    known_text: "Structured High-End Leather Bag"
+    effect_amount: 1.50
+  - clue_id: bag_leaf_cotton
+    known_text: "Cotton canvas satchel, sturdy but common."
+    type: hidden
+    domain: handbag
+    attribute: investigation
+    dc: 18
+    effect_op: mul
+    effect_amount: 2.33
+  - clue_id: bag_leaf_replica
+    known_text: "Well-made brand-inspired replica, not authentic."
+    type: hidden
+    domain: handbag
+    attribute: investigation
+    dc: 18
+    effect_op: mul
+    effect_amount: 1.29
+  - clue_id: bag_leaf_coach
+    known_text: "Stamped leather shoulder bag by Coach."
+    type: hidden
+    domain: handbag
+    attribute: investigation
+    dc: 18
+    effect_op: mul
+    effect_amount: 1.40
+  - clue_id: bag_leaf_lv
+    known_text: "Monogram canvas Speedy bag by Louis Vuitton."
     type: hidden
     domain: handbag
     attribute: investigation
     dc: 20
     effect_op: mul
-    effect_amount: 4.83
-  - clue_id: bag_leaf_lv
-    known_text: "Monogram Luxury Speedy Bag"
+    effect_amount: 2.02
+  - clue_id: bag_leaf_hermes
+    known_text: "Hand-stitched leather Birkin by Hermes, Paris."
     type: hidden
     domain: handbag
     attribute: investigation
-    dc: 18
+    dc: 20
     effect_op: mul
-    effect_amount: 9.44
-  - clue_id: bag_leaf_nylon
-    known_text: "Lightweight Nylon Bag"
-    type: hidden
-    domain: handbag
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 6.67
-  - clue_id: bag_leaf_replica
-    known_text: "Brand-Inspired Designer Bag"
-    type: hidden
-    domain: handbag
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 6.91
-  - clue_id: bag_leaf_straw
-    known_text: "Braided Natural Fiber Bag"
-    type: hidden
-    domain: handbag
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 5.83
-  - clue_id: bag_leaf_vinyl_clutch
-    known_text: "Glossy Synthetic Evening Bag"
-    type: hidden
-    domain: handbag
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 11.5
+    effect_amount: 2.82
 
-  # ── WATCH clues ──────────────────────────────────────────────────────────────
+  # ── WRISTWATCH clues ───────────────────────────────────────
   - clue_id: watch_veil_01
     known_text: "Small Metal Object"
     type: anchor
     domain: wristwatch
     attribute: appraisal
-    dc: 10
+    dc: 0
     effect_op: flat
-    effect_amount: 8
+    effect_amount: 10
   - clue_id: watch_veil_02
-    known_text: "Tarnished Metal Piece"
+    known_text: "Tarnished Metal Watch"
     type: anchor
     domain: wristwatch
     attribute: appraisal
-    dc: 10
+    dc: 0
     effect_op: flat
-    effect_amount: 10
-  - clue_id: watch_case_check_crystal_wear
+    effect_amount: 20
+  - clue_id: watch_case_lugs
+    known_text: "The small metal object has lugs and a watch case back."
+    type: surface
+    domain: wristwatch
+    attribute: appraisal
+    dc: 12
+    effect_op: add
+    effect_amount: 40
+  - clue_id: watch_crystal_scratches
     known_text: "Scratches on the crystal and case suggest age."
     type: surface
     domain: wristwatch
@@ -359,130 +454,169 @@ clues:
     dc: 14
     effect_op: add
     effect_amount: 0
-  # CONFLICT: price_effect differs between items for this clue_id
-  - clue_id: watch_case_check_lugs
-    known_text: "The small metal object has lugs and a watch case back."
-    type: surface
-    domain: wristwatch
-    attribute: appraisal
-    dc: 12
-    effect_op: add
-    effect_amount: 37
-  - clue_id: watch_movement_open_bridge_layout
-    known_text: "The bridge layout suggests a better vintage movement."
-    type: surface
-    domain: wristwatch
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 0
-  - clue_id: watch_movement_open_crown_action
+  - clue_id: watch_crown_wind
     known_text: "The crown winds the movement by hand."
     type: surface
     domain: wristwatch
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 155
-  - clue_id: watch_leaf_bulova
-    known_text: "Tuning-Fork Dress Watch"
+    effect_amount: 80
+  - clue_id: watch_movement_bridge
+    known_text: "The bridge layout suggests a quality vintage movement."
+    type: surface
+    domain: wristwatch
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 0
+  - clue_id: watch_dial_patina
+    known_text: "The dial shows an even cream patina with age."
+    type: surface
+    domain: wristwatch
+    attribute: perception
+    dc: 12
+    effect_op: add
+    effect_amount: 30
+  - clue_id: watch_band_replace
+    known_text: "The band is a period replacement, not original."
+    type: surface
+    domain: wristwatch
+    attribute: restoration
+    dc: 14
+    effect_op: add
+    effect_amount: 0
+  - clue_id: watch_case_engraving
+    known_text: "An inscription is engraved on the case back."
+    type: surface
+    domain: wristwatch
+    attribute: investigation
+    dc: 14
+    effect_op: add
+    effect_amount: 60
+  - clue_id: watch_jewels_count
+    known_text: "The movement uses fifteen or more ruby jewels."
+    type: surface
+    domain: wristwatch
+    attribute: appraisal
+    dc: 16
+    effect_op: add
+    effect_amount: 120
+  - clue_id: watch_serial_number
+    known_text: "A serial number is engraved between the lugs."
+    type: surface
+    domain: wristwatch
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 80
+  - clue_id: watch_complication
+    known_text: "The movement includes a column-wheel chronograph complication."
+    type: surface
+    domain: wristwatch
+    attribute: appraisal
+    dc: 18
+    effect_op: add
+    effect_amount: 200
+  - clue_id: watch_leaf_quartz
+    known_text: "Battery-powered quartz dress watch, mass produced."
     type: hidden
     domain: wristwatch
     attribute: investigation
     dc: 18
     effect_op: mul
-    effect_amount: 18.22
-  - clue_id: watch_leaf_citizen
-    known_text: "Quartz Chronograph Watch"
-    type: hidden
-    domain: wristwatch
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 10.67
-  - clue_id: watch_leaf_cocktail
-    known_text: "Small Formal Bracelet Watch"
-    type: hidden
-    domain: wristwatch
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 14.38
+    effect_amount: 1.60
   - clue_id: watch_leaf_digital
-    known_text: "Digital Display Watch"
+    known_text: "Digital LCD watch with integrated circuit movement."
     type: hidden
     domain: wristwatch
     attribute: investigation
     dc: 18
     effect_op: mul
-    effect_amount: 8.75
+    effect_amount: 1.40
+  - clue_id: watch_leaf_timex
+    known_text: "Mechanical wind-up watch by Timex, mid century."
+    type: hidden
+    domain: wristwatch
+    attribute: investigation
+    dc: 18
+    effect_op: mul
+    effect_amount: 2.10
+  - clue_id: watch_leaf_russian
+    known_text: "Military-style field watch from a Soviet factory."
+    type: hidden
+    domain: wristwatch
+    attribute: investigation
+    dc: 18
+    effect_op: mul
+    effect_amount: 1.25
+  - clue_id: watch_leaf_cocktail
+    known_text: "Small formal bracelet watch set with paste stones."
+    type: hidden
+    domain: wristwatch
+    attribute: investigation
+    dc: 18
+    effect_op: mul
+    effect_amount: 1.44
   - clue_id: watch_leaf_fashion
-    known_text: "Logo Case Back Watch"
+    known_text: "Fashion brand logo watch, basic quartz movement."
     type: hidden
     domain: wristwatch
     attribute: investigation
     dc: 18
     effect_op: mul
-    effect_amount: 9.5
-  - clue_id: watch_leaf_longines
-    known_text: "Vintage Column-Wheel Chronograph"
+    effect_amount: 1.90
+  - clue_id: watch_leaf_seiko
+    known_text: "Japanese automatic watch by Seiko, nineteen seventies."
+    type: hidden
+    domain: wristwatch
+    attribute: investigation
+    dc: 18
+    effect_op: mul
+    effect_amount: 2.15
+  - clue_id: watch_leaf_bulova
+    known_text: "Tuning-fork Accutron watch by Bulova, nineteen sixties."
     type: hidden
     domain: wristwatch
     attribute: investigation
     dc: 20
     effect_op: mul
-    effect_amount: 7.25
-  - clue_id: watch_leaf_quartz
-    known_text: "Battery-Powered Dress Watch"
+    effect_amount: 2.41
+  - clue_id: watch_leaf_citizen
+    known_text: "Quartz chronograph watch by Citizen, nineteen eighties."
     type: hidden
     domain: wristwatch
     attribute: investigation
     dc: 18
     effect_op: mul
-    effect_amount: 10.0
-  - clue_id: watch_leaf_russian
-    known_text: "Military-Style Field Watch"
+    effect_amount: 1.71
+  - clue_id: watch_leaf_longines
+    known_text: "Vintage column-wheel chronograph by Longines, circa nineteen forty-eight."
     type: hidden
     domain: wristwatch
     attribute: investigation
-    dc: 18
+    dc: 20
     effect_op: mul
-    effect_amount: 15.0
-  - clue_id: watch_leaf_seiko
-    known_text: "Japanese Automatic Watch"
-    type: hidden
-    domain: wristwatch
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 12.44
-  - clue_id: watch_leaf_timex
-    known_text: "Mechanical Wind-Up Watch"
-    type: hidden
-    domain: wristwatch
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 10.5
+    effect_amount: 2.42
 
-  # ── PISTOL clues ──────────────────────────────────────────────────────────────
+  # ── PISTOL clues ───────────────────────────────────────────
   - clue_id: pistol_veil_01
     known_text: "Heavy Metal Object"
     type: anchor
     domain: pistol
     attribute: appraisal
-    dc: 10
+    dc: 0
     effect_op: flat
     effect_amount: 40
-  - clue_id: pistol_body_old_patina
-    known_text: "The metal patina appears consistent with age."
-    type: surface
+  - clue_id: pistol_veil_02
+    known_text: "Ornate Metal Object"
+    type: anchor
     domain: pistol
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 0
-  - clue_id: pistol_body_short_barrel
+    attribute: appraisal
+    dc: 0
+    effect_op: flat
+    effect_amount: 80
+  - clue_id: pistol_short_barrel
     known_text: "The short barrel and lock plate identify a pistol body."
     type: surface
     domain: pistol
@@ -490,47 +624,23 @@ clues:
     dc: 12
     effect_op: add
     effect_amount: 50
-  - clue_id: pistol_carved_grip_presentation_quality
-    known_text: "The carving quality suggests a presentation piece."
-    type: surface
-    domain: pistol
-    attribute: appraisal
-    dc: 16
-    effect_op: add
-    effect_amount: 0
-  - clue_id: pistol_carved_grip_scrollwork
-    known_text: "The grip is carved with decorative scrollwork."
+  - clue_id: pistol_metal_patina
+    known_text: "The metal patina appears consistent with age."
     type: surface
     domain: pistol
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 510
-  - clue_id: pistol_maker_mark_lock_signature
-    known_text: "A maker signature is visible on the lock plate."
-    type: surface
-    domain: pistol
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 1400
-  - clue_id: pistol_maker_mark_reference_match
-    known_text: "The signature matches a known presentation pistol maker."
-    type: surface
-    domain: pistol
-    attribute: appraisal
-    dc: 18
-    effect_op: add
     effect_amount: 0
-  - clue_id: pistol_proofmark_barrel_stamp
+  - clue_id: pistol_proof_stamp
     known_text: "Proof marks are stamped near the barrel breech."
     type: surface
     domain: pistol
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 260
-  - clue_id: pistol_proofmark_origin_style
+    effect_amount: 180
+  - clue_id: pistol_proof_style
     known_text: "The proof mark style suggests British or Continental inspection."
     type: surface
     domain: pistol
@@ -538,57 +648,121 @@ clues:
     dc: 16
     effect_op: add
     effect_amount: 0
+  - clue_id: pistol_lock_signature
+    known_text: "A maker signature is visible on the lock plate."
+    type: surface
+    domain: pistol
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 600
+  - clue_id: pistol_signature_match
+    known_text: "The signature matches known gunsmith records."
+    type: surface
+    domain: pistol
+    attribute: appraisal
+    dc: 18
+    effect_op: add
+    effect_amount: 0
+  - clue_id: pistol_scroll_grip
+    known_text: "The grip is carved with decorative scrollwork."
+    type: surface
+    domain: pistol
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 350
+  - clue_id: pistol_carving_quality
+    known_text: "The carving quality suggests a presentation piece."
+    type: surface
+    domain: pistol
+    attribute: appraisal
+    dc: 16
+    effect_op: add
+    effect_amount: 0
+  - clue_id: pistol_maker_signature
+    known_text: "A master maker signature is engraved on the barrel."
+    type: surface
+    domain: pistol
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 900
+  - clue_id: pistol_maker_reference
+    known_text: "The signature matches a known presentation maker."
+    type: surface
+    domain: pistol
+    attribute: appraisal
+    dc: 18
+    effect_op: add
+    effect_amount: 0
+  - clue_id: pistol_gold_inlay
+    known_text: "Gold wire inlay decorates the barrel and breech."
+    type: surface
+    domain: pistol
+    attribute: perception
+    dc: 18
+    effect_op: add
+    effect_amount: 1500
+  - clue_id: pistol_versailles_mark
+    known_text: "A Versailles arsenal inspection mark is stamped on the stock."
+    type: surface
+    domain: pistol
+    attribute: investigation
+    dc: 18
+    effect_op: add
+    effect_amount: 2000
+  - clue_id: pistol_walnut_stock
+    known_text: "The stock is carved from select European walnut."
+    type: surface
+    domain: pistol
+    attribute: restoration
+    dc: 16
+    effect_op: add
+    effect_amount: 400
+  - clue_id: pistol_leaf_dutch
+    known_text: "Continental holster pistol by a Dutch gunsmith."
+    type: hidden
+    domain: pistol
+    attribute: investigation
+    dc: 18
+    effect_op: mul
+    effect_amount: 2.07
+  - clue_id: pistol_leaf_naval
+    known_text: "British naval service pistol with Board of Ordnance marks."
+    type: hidden
+    domain: pistol
+    attribute: investigation
+    dc: 18
+    effect_op: mul
+    effect_amount: 1.72
+  - clue_id: pistol_leaf_cavalry
+    known_text: "French cavalry officer's pistol of Napoleonic pattern."
+    type: hidden
+    domain: pistol
+    attribute: investigation
+    dc: 18
+    effect_op: mul
+    effect_amount: 2.64
   - clue_id: pistol_leaf_boutet
-    known_text: "Presentation Flintlock Pistol"
+    known_text: "Presentation flintlock pistol by Boutet, Versailles manufactory."
     type: hidden
     domain: pistol
     attribute: investigation
     dc: 20
     effect_op: mul
-    effect_amount: 1.21
-  - clue_id: pistol_leaf_cavalry
-    known_text: "Cavalry Officer's Pistol"
-    type: hidden
-    domain: pistol
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 12.44
-  - clue_id: pistol_leaf_dutch
-    known_text: "Continental Holster Pistol"
-    type: hidden
-    domain: pistol
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 6.22
-  - clue_id: pistol_leaf_naval
-    known_text: "Naval Service Pistol"
-    type: hidden
-    domain: pistol
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 4.29
+    effect_amount: 2.47
 
-  # ── RIFLE clues ──────────────────────────────────────────────────────────────
+  # ── RIFLE clues ────────────────────────────────────────────
   - clue_id: rifle_veil_01
     known_text: "Heavy Long Object"
     type: anchor
     domain: rifle
     attribute: appraisal
-    dc: 10
+    dc: 0
     effect_op: flat
     effect_amount: 50
-  - clue_id: rifle_body_bore_wear
-    known_text: "Wear in the bore suggests real use rather than decoration."
-    type: surface
-    domain: rifle
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 0
-  - clue_id: rifle_body_long_barrel
+  - clue_id: rifle_long_barrel
     known_text: "The long barrel and full stock identify a rifle or musket."
     type: surface
     domain: rifle
@@ -596,47 +770,23 @@ clues:
     dc: 12
     effect_op: add
     effect_amount: 70
-  - clue_id: rifle_engraved_action_precision_sights
-    known_text: "The sights and action work suggest a precision rifle."
-    type: surface
-    domain: rifle
-    attribute: restoration
-    dc: 16
-    effect_op: add
-    effect_amount: 0
-  - clue_id: rifle_engraved_action_scroll
-    known_text: "Fine scroll engraving covers the action."
+  - clue_id: rifle_bore_wear
+    known_text: "Wear in the bore suggests real use rather than decoration."
     type: surface
     domain: rifle
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 1080
-  - clue_id: rifle_maker_signed_reference_match
-    known_text: "The signature matches documented target rifle makers."
-    type: surface
-    domain: rifle
-    attribute: appraisal
-    dc: 18
-    effect_op: add
     effect_amount: 0
-  - clue_id: rifle_maker_signed_top_flat
-    known_text: "A maker signature appears on the barrel top flat."
-    type: surface
-    domain: rifle
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 2300
-  - clue_id: rifle_military_proof_barrel_marks
+  - clue_id: rifle_proof_marks
     known_text: "Military proof marks are stamped into the barrel."
     type: surface
     domain: rifle
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 380
-  - clue_id: rifle_military_proof_lock_pattern
+    effect_amount: 500
+  - clue_id: rifle_lock_pattern
     known_text: "The lock pattern fits mid nineteenth century military arms."
     type: surface
     domain: rifle
@@ -644,57 +794,137 @@ clues:
     dc: 16
     effect_op: add
     effect_amount: 0
+  - clue_id: rifle_scroll_engraving
+    known_text: "Fine scroll engraving covers the action."
+    type: surface
+    domain: rifle
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 600
+  - clue_id: rifle_precision_sights
+    known_text: "The adjustable sights suggest a precision rifle."
+    type: surface
+    domain: rifle
+    attribute: restoration
+    dc: 16
+    effect_op: add
+    effect_amount: 0
+  - clue_id: rifle_maker_signature
+    known_text: "A maker signature appears on the barrel top flat."
+    type: surface
+    domain: rifle
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 1500
+  - clue_id: rifle_maker_documented
+    known_text: "The signature matches documented target rifle makers."
+    type: surface
+    domain: rifle
+    attribute: appraisal
+    dc: 18
+    effect_op: add
+    effect_amount: 0
+  - clue_id: rifle_brass_buttplate
+    known_text: "A brass buttplate and triggerguard survive intact."
+    type: surface
+    domain: rifle
+    attribute: perception
+    dc: 12
+    effect_op: add
+    effect_amount: 100
+  - clue_id: rifle_sling_swivels
+    known_text: "Sling swivels indicate military service use."
+    type: surface
+    domain: rifle
+    attribute: restoration
+    dc: 14
+    effect_op: add
+    effect_amount: 0
+  - clue_id: rifle_bayonet_lug
+    known_text: "A bayonet lug is fitted under the barrel."
+    type: surface
+    domain: rifle
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 150
+  - clue_id: rifle_target_sights
+    known_text: "Long-range target sights are fitted to the action."
+    type: surface
+    domain: rifle
+    attribute: appraisal
+    dc: 16
+    effect_op: add
+    effect_amount: 500
+  - clue_id: rifle_whitworth_hex
+    known_text: "The bore uses Whitworth hexagonal rifling, a rare feature."
+    type: surface
+    domain: rifle
+    attribute: appraisal
+    dc: 16
+    effect_op: add
+    effect_amount: 2000
+  - clue_id: rifle_optical_sight
+    known_text: "A period optical sight is mounted to the barrel."
+    type: surface
+    domain: rifle
+    attribute: perception
+    dc: 18
+    effect_op: add
+    effect_amount: 3000
+  - clue_id: rifle_matched_action
+    known_text: "The action is hand-fitted, indicating a benchrest build."
+    type: surface
+    domain: rifle
+    attribute: restoration
+    dc: 16
+    effect_op: add
+    effect_amount: 1500
   - clue_id: rifle_leaf_charleville
-    known_text: "Continental Infantry Musket"
+    known_text: "Continental infantry musket, Charleville pattern."
     type: hidden
     domain: rifle
     attribute: investigation
     dc: 18
     effect_op: mul
-    effect_amount: 7.5
-  - clue_id: rifle_leaf_regiment
-    known_text: "Regiment-Marked Service Rifle"
-    type: hidden
-    domain: rifle
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 12.8
+    effect_amount: 1.45
   - clue_id: rifle_leaf_springfield
-    known_text: "American Civil War Rifle-Musket"
+    known_text: "American Civil War rifle-musket, Springfield Armory."
     type: hidden
     domain: rifle
     attribute: investigation
     dc: 18
     effect_op: mul
-    effect_amount: 4.6
+    effect_amount: 2.64
+  - clue_id: rifle_leaf_regiment
+    known_text: "Regiment-marked Enfield rifle, Crimean War issue."
+    type: hidden
+    domain: rifle
+    attribute: investigation
+    dc: 18
+    effect_op: mul
+    effect_amount: 2.70
   - clue_id: rifle_leaf_whitworth
-    known_text: "Precision Target Rifle"
+    known_text: "Precision target rifle by Whitworth, hexagonal bore."
     type: hidden
     domain: rifle
     attribute: investigation
     dc: 20
     effect_op: mul
-    effect_amount: 1.2
+    effect_amount: 1.95
 
-  # ── CROSSBOW clues ──────────────────────────────────────────────────────────────
+  # ── CROSSBOW clues ─────────────────────────────────────────
   - clue_id: crossbow_veil_01
     known_text: "Heavy Wooden Object"
     type: anchor
     domain: crossbow
     attribute: appraisal
-    dc: 10
+    dc: 0
     effect_op: flat
     effect_amount: 30
-  - clue_id: crossbow_body_tool_marks
-    known_text: "Hand tool marks are visible inside the stock channel."
-    type: surface
-    domain: crossbow
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 0
-  - clue_id: crossbow_body_wooden_tiller
+  - clue_id: crossbow_wood_tiller
     known_text: "The wooden tiller and bow channel identify a crossbow frame."
     type: surface
     domain: crossbow
@@ -702,7 +932,23 @@ clues:
     dc: 12
     effect_op: add
     effect_amount: 50
-  - clue_id: crossbow_mechanism_iron_work
+  - clue_id: crossbow_tool_marks
+    known_text: "Hand tool marks are visible inside the stock channel."
+    type: surface
+    domain: crossbow
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 0
+  - clue_id: crossbow_trigger_mech
+    known_text: "A trigger and release nut are fitted into the tiller."
+    type: surface
+    domain: crossbow
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 150
+  - clue_id: crossbow_iron_work
     known_text: "The iron work suggests a European mechanical bow."
     type: surface
     domain: crossbow
@@ -710,15 +956,15 @@ clues:
     dc: 16
     effect_op: add
     effect_amount: 0
-  - clue_id: crossbow_mechanism_trigger
-    known_text: "A trigger and release nut are fitted into the tiller."
+  - clue_id: crossbow_provenance_tag
+    known_text: "An old collection tag is tied through the stock."
     type: surface
     domain: crossbow
-    attribute: perception
-    dc: 14
+    attribute: investigation
+    dc: 16
     effect_op: add
-    effect_amount: 220
-  - clue_id: crossbow_provenance_catalog_match
+    effect_amount: 300
+  - clue_id: crossbow_catalog_entry
     known_text: "The tag matches an older collection catalog entry."
     type: surface
     domain: crossbow
@@ -726,35 +972,67 @@ clues:
     dc: 18
     effect_op: add
     effect_amount: 0
-  - clue_id: crossbow_provenance_old_tag
-    known_text: "An old collection tag is tied through the stock."
+  - clue_id: crossbow_prod_steel
+    known_text: "The prod is steel, suggesting a later military crossbow."
     type: surface
     domain: crossbow
-    attribute: investigation
+    attribute: appraisal
+    dc: 14
+    effect_op: add
+    effect_amount: 200
+  - clue_id: crossbow_inlay_work
+    known_text: "Bone and brass inlay decorate the tiller."
+    type: surface
+    domain: crossbow
+    attribute: perception
+    dc: 16
+    effect_op: add
+    effect_amount: 400
+  - clue_id: crossbow_stock_carving
+    known_text: "The stock is carved with foliate decoration."
+    type: surface
+    domain: crossbow
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 250
+  - clue_id: crossbow_gold_wire
+    known_text: "Gold wire inlay traces the tiller relief."
+    type: surface
+    domain: crossbow
+    attribute: perception
+    dc: 18
+    effect_op: add
+    effect_amount: 800
+  - clue_id: crossbow_ivory_tip
+    known_text: "The prod tips are capped in carved ivory."
+    type: surface
+    domain: crossbow
+    attribute: appraisal
     dc: 16
     effect_op: add
     effect_amount: 600
   - clue_id: crossbow_leaf_hunting
-    known_text: "European Hunting Crossbow"
+    known_text: "European hunting crossbow, likely seventeenth century."
     type: hidden
     domain: crossbow
     attribute: investigation
     dc: 18
     effect_op: mul
-    effect_amount: 8.13
+    effect_amount: 2.83
   - clue_id: crossbow_leaf_military
-    known_text: "Military Pattern Crossbow"
+    known_text: "Military pattern crossbow with steel prod."
     type: hidden
     domain: crossbow
     attribute: investigation
     dc: 18
     effect_op: mul
-    effect_amount: 7.0
+    effect_amount: 2.88
   - clue_id: crossbow_leaf_noble
-    known_text: "Noble Presentation Crossbow"
+    known_text: "Noble presentation crossbow with decorative inlay."
     type: hidden
     domain: crossbow
     attribute: investigation
     dc: 20
     effect_op: mul
-    effect_amount: 6.11
+    effect_amount: 2.52

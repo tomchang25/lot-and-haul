@@ -1,133 +1,172 @@
 items:
-- item_id: pistol_dutch_holster
-  item_name: Dutch Holster Pistol
-  base_price: 560
-  category_id: pistol
-  rarity: 1
-  clue_ids:
-  - pistol_veil_01
-  - pistol_body_short_barrel
-  - pistol_body_old_patina
-  - pistol_leaf_dutch
-- item_id: pistol_british_naval
-  item_name: British Naval Pistol
-  base_price: 1500
-  category_id: pistol
-  rarity: 2
-  clue_ids:
-  - pistol_veil_01
-  - pistol_body_short_barrel
-  - pistol_body_old_patina
-  - pistol_proofmark_barrel_stamp
-  - pistol_proofmark_origin_style
-  - pistol_leaf_naval
-- item_id: pistol_french_cavalry
-  item_name: French Cavalry Pistol
-  base_price: 5600
-  category_id: pistol
-  rarity: 2
-  clue_ids:
-  - pistol_veil_01
-  - pistol_body_short_barrel
-  - pistol_body_old_patina
-  - pistol_proofmark_barrel_stamp
-  - pistol_proofmark_origin_style
-  - pistol_leaf_cavalry
-- item_id: pistol_boutet_versailles
-  item_name: Boutet Pistol, c.1800
-  base_price: 14500
-  category_id: pistol
-  rarity: 3
-  clue_ids:
-  - pistol_veil_01
-  - pistol_body_short_barrel
-  - pistol_body_old_patina
-  - pistol_carved_grip_scrollwork
-  - pistol_carved_grip_presentation_quality
-  - pistol_maker_mark_lock_signature
-  - pistol_maker_mark_reference_match
-  - pistol_leaf_boutet
-- item_id: rifle_charleville_repro
-  item_name: Charleville Musket
-  base_price: 900
-  category_id: rifle
-  rarity: 1
-  clue_ids:
-  - rifle_veil_01
-  - rifle_body_long_barrel
-  - rifle_body_bore_wear
-  - rifle_leaf_charleville
-- item_id: rifle_springfield_1861
-  item_name: Springfield M1861
-  base_price: 2300
-  category_id: rifle
-  rarity: 2
-  clue_ids:
-  - rifle_veil_01
-  - rifle_body_long_barrel
-  - rifle_body_bore_wear
-  - rifle_military_proof_barrel_marks
-  - rifle_military_proof_lock_pattern
-  - rifle_leaf_springfield
-- item_id: rifle_crimea_enfield
-  item_name: Crimea Enfield Rifle
-  base_price: 6400
-  category_id: rifle
-  rarity: 2
-  clue_ids:
-  - rifle_veil_01
-  - rifle_body_long_barrel
-  - rifle_body_bore_wear
-  - rifle_military_proof_barrel_marks
-  - rifle_military_proof_lock_pattern
-  - rifle_leaf_regiment
-- item_id: rifle_whitworth_sniper
-  item_name: Whitworth Rifle, c.1860
-  base_price: 18000
-  category_id: rifle
-  rarity: 3
-  clue_ids:
-  - rifle_veil_01
-  - rifle_body_long_barrel
-  - rifle_body_bore_wear
-  - rifle_engraved_action_scroll
-  - rifle_engraved_action_precision_sights
-  - rifle_maker_signed_top_flat
-  - rifle_maker_signed_reference_match
-  - rifle_leaf_whitworth
-- item_id: crossbow_german_hunting
-  item_name: German Hunting Bow
-  base_price: 650
-  category_id: crossbow
-  rarity: 1
-  clue_ids:
-  - crossbow_veil_01
-  - crossbow_body_wooden_tiller
-  - crossbow_body_tool_marks
-  - crossbow_leaf_hunting
-- item_id: crossbow_swiss_military
-  item_name: Swiss Military Bow
-  base_price: 2100
-  category_id: crossbow
-  rarity: 2
-  clue_ids:
-  - crossbow_veil_01
-  - crossbow_body_wooden_tiller
-  - crossbow_body_tool_marks
-  - crossbow_mechanism_trigger
-  - crossbow_mechanism_iron_work
-  - crossbow_leaf_military
-- item_id: crossbow_noble_presentation
-  item_name: Noble Presentation Bow
-  base_price: 7000
-  category_id: crossbow
-  rarity: 3
-  clue_ids:
-  - crossbow_veil_01
-  - crossbow_body_wooden_tiller
-  - crossbow_body_tool_marks
-  - crossbow_mechanism_trigger
-  - crossbow_mechanism_iron_work
-  - crossbow_provenance_old_tag
-  - crossbow_provenance_catalog_match
-  - crossbow_leaf_noble
+  - item_id: pistol_dutch_holster
+    item_name: Dutch Holster Pistol
+    base_price: 560
+    category_id: pistol
+    rarity: 1
+    clue_ids:
+      - pistol_veil_01
+      - pistol_short_barrel
+      - pistol_metal_patina
+      - pistol_proof_stamp
+      - pistol_proof_style
+      - pistol_leaf_dutch
+  - item_id: pistol_british_naval
+    item_name: British Naval Pistol
+    base_price: 1500
+    category_id: pistol
+    rarity: 2
+    clue_ids:
+      - pistol_veil_01
+      - pistol_short_barrel
+      - pistol_metal_patina
+      - pistol_proof_stamp
+      - pistol_proof_style
+      - pistol_lock_signature
+      - pistol_signature_match
+      - pistol_leaf_naval
+  - item_id: pistol_french_cavalry
+    item_name: French Cavalry Pistol
+    base_price: 5600
+    category_id: pistol
+    rarity: 2
+    clue_ids:
+      - pistol_veil_01
+      - pistol_short_barrel
+      - pistol_metal_patina
+      - pistol_proof_stamp
+      - pistol_proof_style
+      - pistol_lock_signature
+      - pistol_signature_match
+      - pistol_scroll_grip
+      - pistol_carving_quality
+      - pistol_maker_signature
+      - pistol_maker_reference
+      - pistol_leaf_cavalry
+  - item_id: pistol_boutet_versailles
+    item_name: Boutet Pistol, c.1800
+    base_price: 14500
+    category_id: pistol
+    rarity: 3
+    clue_ids:
+      - pistol_veil_02
+      - pistol_short_barrel
+      - pistol_metal_patina
+      - pistol_scroll_grip
+      - pistol_carving_quality
+      - pistol_lock_signature
+      - pistol_signature_match
+      - pistol_maker_signature
+      - pistol_maker_reference
+      - pistol_gold_inlay
+      - pistol_versailles_mark
+      - pistol_walnut_stock
+      - pistol_leaf_boutet
+  - item_id: rifle_charleville_repro
+    item_name: Charleville Musket
+    base_price: 900
+    category_id: rifle
+    rarity: 1
+    clue_ids:
+      - rifle_veil_01
+      - rifle_long_barrel
+      - rifle_bore_wear
+      - rifle_proof_marks
+      - rifle_lock_pattern
+      - rifle_leaf_charleville
+  - item_id: rifle_springfield_1861
+    item_name: Springfield M1861
+    base_price: 2300
+    category_id: rifle
+    rarity: 2
+    clue_ids:
+      - rifle_veil_01
+      - rifle_long_barrel
+      - rifle_bore_wear
+      - rifle_proof_marks
+      - rifle_lock_pattern
+      - rifle_brass_buttplate
+      - rifle_sling_swivels
+      - rifle_bayonet_lug
+      - rifle_leaf_springfield
+  - item_id: rifle_crimea_enfield
+    item_name: Crimea Enfield Rifle
+    base_price: 6400
+    category_id: rifle
+    rarity: 2
+    clue_ids:
+      - rifle_veil_01
+      - rifle_long_barrel
+      - rifle_bore_wear
+      - rifle_proof_marks
+      - rifle_lock_pattern
+      - rifle_brass_buttplate
+      - rifle_sling_swivels
+      - rifle_bayonet_lug
+      - rifle_maker_signature
+      - rifle_maker_documented
+      - rifle_leaf_regiment
+  - item_id: rifle_whitworth_sniper
+    item_name: Whitworth Rifle, c.1860
+    base_price: 18000
+    category_id: rifle
+    rarity: 3
+    clue_ids:
+      - rifle_veil_01
+      - rifle_long_barrel
+      - rifle_bore_wear
+      - rifle_scroll_engraving
+      - rifle_precision_sights
+      - rifle_maker_signature
+      - rifle_maker_documented
+      - rifle_target_sights
+      - rifle_whitworth_hex
+      - rifle_optical_sight
+      - rifle_matched_action
+      - rifle_leaf_whitworth
+  - item_id: crossbow_german_hunting
+    item_name: German Hunting Bow
+    base_price: 650
+    category_id: crossbow
+    rarity: 1
+    clue_ids:
+      - crossbow_veil_01
+      - crossbow_wood_tiller
+      - crossbow_tool_marks
+      - crossbow_trigger_mech
+      - crossbow_iron_work
+      - crossbow_leaf_hunting
+  - item_id: crossbow_swiss_military
+    item_name: Swiss Military Bow
+    base_price: 2100
+    category_id: crossbow
+    rarity: 2
+    clue_ids:
+      - crossbow_veil_01
+      - crossbow_wood_tiller
+      - crossbow_tool_marks
+      - crossbow_trigger_mech
+      - crossbow_iron_work
+      - crossbow_provenance_tag
+      - crossbow_catalog_entry
+      - crossbow_prod_steel
+      - crossbow_leaf_military
+  - item_id: crossbow_noble_presentation
+    item_name: Noble Presentation Bow
+    base_price: 7000
+    category_id: crossbow
+    rarity: 3
+    clue_ids:
+      - crossbow_veil_01
+      - crossbow_wood_tiller
+      - crossbow_tool_marks
+      - crossbow_trigger_mech
+      - crossbow_iron_work
+      - crossbow_provenance_tag
+      - crossbow_catalog_entry
+      - crossbow_inlay_work
+      - crossbow_stock_carving
+      - crossbow_prod_steel
+      - crossbow_gold_wire
+      - crossbow_ivory_tip
+      - crossbow_leaf_noble

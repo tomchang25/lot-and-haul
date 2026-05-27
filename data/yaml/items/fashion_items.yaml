@@ -1,185 +1,246 @@
 items:
-- item_id: handbag_canvas_tote
-  item_name: Canvas Tote Bag
-  base_price: 95
-  category_id: handbag
-  rarity: 0
-  clue_ids:
-  - bag_veil_01
-  - bag_leaf_canvas_tote
-- item_id: handbag_vinyl_clutch
-  item_name: Vinyl Clutch Purse
-  base_price: 115
-  category_id: handbag
-  rarity: 0
-  clue_ids:
-  - bag_veil_01
-  - bag_leaf_vinyl_clutch
-- item_id: handbag_nylon_crossbody
-  item_name: Nylon Crossbody
-  base_price: 80
-  category_id: handbag
-  rarity: 0
-  clue_ids:
-  - bag_veil_02
-  - bag_leaf_nylon
-- item_id: handbag_straw_bag
-  item_name: Woven Straw Bag
-  base_price: 70
-  category_id: handbag
-  rarity: 0
-  clue_ids:
-  - bag_veil_02
-  - bag_leaf_straw
-- item_id: handbag_faux_leather
-  item_name: Faux Leather Purse
-  base_price: 75
-  category_id: handbag
-  rarity: 0
-  clue_ids:
-  - bag_veil_01
-  - bag_leaf_faux_leather
-- item_id: handbag_cotton_satchel
-  item_name: Cotton Canvas Satchel
-  base_price: 105
-  category_id: handbag
-  rarity: 0
-  clue_ids:
-  - bag_veil_02
-  - bag_leaf_cotton
-- item_id: handbag_replica_designer
-  item_name: Well-Made Replica Bag
-  base_price: 380
-  category_id: handbag
-  rarity: 1
-  clue_ids:
-  - bag_veil_01
-  - bag_exterior_check_grain
-  - bag_exterior_check_stitching
-  - bag_leaf_replica
-- item_id: handbag_coach_leather
-  item_name: Coach Leather Bag
-  base_price: 540
-  category_id: handbag
-  rarity: 1
-  clue_ids:
-  - bag_veil_02
-  - bag_exterior_check_grain
-  - bag_exterior_check_stitching
-  - bag_leaf_coach
-- item_id: handbag_louis_vuitton
-  item_name: Louis Vuitton Speedy
-  base_price: 1700
-  category_id: handbag
-  rarity: 2
-  clue_ids:
-  - bag_veil_01
-  - bag_exterior_check_grain
-  - bag_exterior_check_stitching
-  - bag_hardware_check_plated_clasp
-  - bag_hardware_check_edge_paint
-  - bag_leaf_lv
-- item_id: handbag_hermes_birkin
-  item_name: Hermes Birkin 30
-  base_price: 5800
-  category_id: handbag
-  rarity: 3
-  clue_ids:
-  - bag_veil_02
-  - bag_exterior_check_grain
-  - bag_exterior_check_stitching
-  - bag_hardware_check_plated_clasp
-  - bag_hardware_check_edge_paint
-  - bag_serial_research_inner_tab
-  - bag_serial_research_database_match
-  - bag_leaf_hermes
-- item_id: wristwatch_quartz_dress
-  item_name: Quartz Dress Watch
-  base_price: 80
-  category_id: wristwatch
-  rarity: 0
-  clue_ids:
-  - watch_veil_01
-  - watch_leaf_quartz
-- item_id: wristwatch_digital_lcd
-  item_name: Digital LCD Watch
-  base_price: 70
-  category_id: wristwatch
-  rarity: 0
-  clue_ids:
-  - watch_veil_01
-  - watch_leaf_digital
-- item_id: wristwatch_timex_windup
-  item_name: Timex Wind-Up
-  base_price: 105
-  category_id: wristwatch
-  rarity: 0
-  clue_ids:
-  - watch_veil_02
-  - watch_leaf_timex
-- item_id: wristwatch_russian_field
-  item_name: Russian Field Watch
-  base_price: 150
-  category_id: wristwatch
-  rarity: 0
-  clue_ids:
-  - watch_veil_02
-  - watch_leaf_russian
-- item_id: wristwatch_ladies_cocktail
-  item_name: Ladies Cocktail Watch
-  base_price: 115
-  category_id: wristwatch
-  rarity: 0
-  clue_ids:
-  - watch_veil_01
-  - watch_leaf_cocktail
-- item_id: wristwatch_fashion_brand
-  item_name: Fashion Brand Watch
-  base_price: 95
-  category_id: wristwatch
-  rarity: 0
-  clue_ids:
-  - watch_veil_02
-  - watch_leaf_fashion
-- item_id: wristwatch_seiko_auto
-  item_name: Seiko 5 Auto, 1970s
-  base_price: 560
-  category_id: wristwatch
-  rarity: 1
-  clue_ids:
-  - watch_veil_01
-  - watch_case_check_lugs
-  - watch_case_check_crystal_wear
-  - watch_leaf_seiko
-- item_id: wristwatch_bulova_accutron
-  item_name: Bulova Accutron
-  base_price: 820
-  category_id: wristwatch
-  rarity: 1
-  clue_ids:
-  - watch_veil_02
-  - watch_case_check_lugs
-  - watch_case_check_crystal_wear
-  - watch_leaf_bulova
-- item_id: wristwatch_citizen_chrono
-  item_name: Citizen Chrono, 1980s
-  base_price: 480
-  category_id: wristwatch
-  rarity: 1
-  clue_ids:
-  - watch_veil_01
-  - watch_case_check_lugs
-  - watch_case_check_crystal_wear
-  - watch_leaf_citizen
-- item_id: wristwatch_longines_13zn
-  item_name: Longines 13ZN, c.1948
-  base_price: 1450
-  category_id: wristwatch
-  rarity: 2
-  clue_ids:
-  - watch_veil_02
-  - watch_case_check_lugs
-  - watch_case_check_crystal_wear
-  - watch_movement_open_crown_action
-  - watch_movement_open_bridge_layout
-  - watch_leaf_longines
+  - item_id: handbag_canvas_tote
+    item_name: Canvas Tote Bag
+    base_price: 95
+    category_id: handbag
+    rarity: 0
+    clue_ids:
+      - bag_veil_01
+      - bag_exterior_fabric
+      - bag_exterior_stitching
+      - bag_lining_synthetic
+      - bag_leaf_canvas_tote
+  - item_id: handbag_vinyl_clutch
+    item_name: Vinyl Clutch Purse
+    base_price: 115
+    category_id: handbag
+    rarity: 0
+    clue_ids:
+      - bag_veil_01
+      - bag_hardware_plated
+      - bag_edge_paint_wear
+      - bag_leaf_vinyl_clutch
+  - item_id: handbag_nylon_crossbody
+    item_name: Nylon Crossbody
+    base_price: 80
+    category_id: handbag
+    rarity: 0
+    clue_ids:
+      - bag_veil_01
+      - bag_exterior_fabric
+      - bag_exterior_stitching
+      - bag_strap_riveted
+      - bag_leaf_nylon
+  - item_id: handbag_straw_bag
+    item_name: Woven Straw Bag
+    base_price: 70
+    category_id: handbag
+    rarity: 0
+    clue_ids:
+      - bag_veil_01
+      - bag_lining_synthetic
+      - bag_strap_riveted
+      - bag_leaf_straw
+  - item_id: handbag_faux_leather
+    item_name: Faux Leather Purse
+    base_price: 75
+    category_id: handbag
+    rarity: 0
+    clue_ids:
+      - bag_veil_01
+      - bag_exterior_leather
+      - bag_exterior_stitching
+      - bag_edge_paint_wear
+      - bag_leaf_faux_leather
+  - item_id: handbag_cotton_satchel
+    item_name: Cotton Canvas Satchel
+    base_price: 105
+    category_id: handbag
+    rarity: 0
+    clue_ids:
+      - bag_veil_01
+      - bag_exterior_fabric
+      - bag_exterior_stitching
+      - bag_lining_synthetic
+      - bag_strap_riveted
+      - bag_leaf_cotton
+  - item_id: handbag_replica_designer
+    item_name: Well-Made Replica Bag
+    base_price: 380
+    category_id: handbag
+    rarity: 1
+    clue_ids:
+      - bag_veil_02
+      - bag_exterior_leather
+      - bag_exterior_stitching
+      - bag_hardware_plated
+      - bag_edge_paint_wear
+      - bag_serial_stamp
+      - bag_leaf_replica
+  - item_id: handbag_coach_leather
+    item_name: Coach Leather Bag
+    base_price: 540
+    category_id: handbag
+    rarity: 1
+    clue_ids:
+      - bag_veil_02
+      - bag_exterior_leather
+      - bag_exterior_stitching
+      - bag_hardware_solid
+      - bag_edge_paint_wear
+      - bag_serial_stamp
+      - bag_leaf_coach
+  - item_id: handbag_louis_vuitton
+    item_name: Louis Vuitton Speedy
+    base_price: 1700
+    category_id: handbag
+    rarity: 2
+    clue_ids:
+      - bag_veil_03
+      - bag_exterior_leather
+      - bag_exterior_stitching
+      - bag_hardware_solid
+      - bag_edge_paint_wear
+      - bag_serial_stamp
+      - bag_serial_match
+      - bag_monogram_canvas
+      - bag_date_code
+      - bag_leaf_lv
+  - item_id: handbag_hermes_birkin
+    item_name: Hermes Birkin 30
+    base_price: 5800
+    category_id: handbag
+    rarity: 3
+    clue_ids:
+      - bag_veil_03
+      - bag_exterior_leather
+      - bag_exterior_stitching
+      - bag_hardware_solid
+      - bag_edge_paint_wear
+      - bag_serial_stamp
+      - bag_serial_match
+      - bag_blind_stamp
+      - bag_saddle_stitch
+      - bag_palladium_hw
+      - bag_leaf_hermes
+  - item_id: wristwatch_quartz_dress
+    item_name: Quartz Dress Watch
+    base_price: 80
+    category_id: wristwatch
+    rarity: 0
+    clue_ids:
+      - watch_veil_01
+      - watch_case_lugs
+      - watch_crystal_scratches
+      - watch_leaf_quartz
+  - item_id: wristwatch_digital_lcd
+    item_name: Digital LCD Watch
+    base_price: 70
+    category_id: wristwatch
+    rarity: 0
+    clue_ids:
+      - watch_veil_01
+      - watch_case_lugs
+      - watch_crystal_scratches
+      - watch_band_replace
+      - watch_leaf_digital
+  - item_id: wristwatch_timex_windup
+    item_name: Timex Wind-Up
+    base_price: 105
+    category_id: wristwatch
+    rarity: 0
+    clue_ids:
+      - watch_veil_02
+      - watch_dial_patina
+      - watch_band_replace
+      - watch_leaf_timex
+  - item_id: wristwatch_russian_field
+    item_name: Russian Field Watch
+    base_price: 150
+    category_id: wristwatch
+    rarity: 0
+    clue_ids:
+      - watch_veil_02
+      - watch_case_lugs
+      - watch_crystal_scratches
+      - watch_case_engraving
+      - watch_leaf_russian
+  - item_id: wristwatch_ladies_cocktail
+    item_name: Ladies Cocktail Watch
+    base_price: 115
+    category_id: wristwatch
+    rarity: 0
+    clue_ids:
+      - watch_veil_01
+      - watch_case_lugs
+      - watch_crystal_scratches
+      - watch_dial_patina
+      - watch_leaf_cocktail
+  - item_id: wristwatch_fashion_brand
+    item_name: Fashion Brand Watch
+    base_price: 95
+    category_id: wristwatch
+    rarity: 0
+    clue_ids:
+      - watch_veil_01
+      - watch_case_lugs
+      - watch_crystal_scratches
+      - watch_band_replace
+      - watch_leaf_fashion
+  - item_id: wristwatch_seiko_auto
+    item_name: Seiko 5 Auto, 1970s
+    base_price: 560
+    category_id: wristwatch
+    rarity: 1
+    clue_ids:
+      - watch_veil_02
+      - watch_case_lugs
+      - watch_crystal_scratches
+      - watch_crown_wind
+      - watch_movement_bridge
+      - watch_jewels_count
+      - watch_leaf_seiko
+  - item_id: wristwatch_bulova_accutron
+    item_name: Bulova Accutron
+    base_price: 820
+    category_id: wristwatch
+    rarity: 1
+    clue_ids:
+      - watch_veil_02
+      - watch_case_lugs
+      - watch_crystal_scratches
+      - watch_crown_wind
+      - watch_movement_bridge
+      - watch_jewels_count
+      - watch_serial_number
+      - watch_leaf_bulova
+  - item_id: wristwatch_citizen_chrono
+    item_name: Citizen Chrono, 1980s
+    base_price: 480
+    category_id: wristwatch
+    rarity: 1
+    clue_ids:
+      - watch_veil_01
+      - watch_case_lugs
+      - watch_crystal_scratches
+      - watch_crown_wind
+      - watch_movement_bridge
+      - watch_dial_patina
+      - watch_jewels_count
+      - watch_leaf_citizen
+  - item_id: wristwatch_longines_13zn
+    item_name: Longines 13ZN, c.1948
+    base_price: 1450
+    category_id: wristwatch
+    rarity: 2
+    clue_ids:
+      - watch_veil_02
+      - watch_case_lugs
+      - watch_crystal_scratches
+      - watch_crown_wind
+      - watch_movement_bridge
+      - watch_jewels_count
+      - watch_serial_number
+      - watch_case_engraving
+      - watch_complication
+      - watch_leaf_longines
