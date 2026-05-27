@@ -144,7 +144,7 @@ static func check_assignable(entry: ItemEntry, action: SlotAction) -> SlotCheck:
                 return SlotCheck.RESTORE_NOT_READY
             return SlotCheck.OK
         SlotAction.AUTHENTICATE:
-            if not entry.is_at_final_layer():
+            if entry.anchor_revealed and not entry.all_surface_revealed():
                 return SlotCheck.NOT_FINAL_LAYER
             if entry.verified:
                 return SlotCheck.ALREADY_VERIFIED

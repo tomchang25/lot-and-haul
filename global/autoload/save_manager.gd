@@ -183,18 +183,12 @@ func _read_save_file() -> void:
     for entry: ItemEntry in storage_items:
         valid_ids.append(entry.id)
 
-    # Clear orphaned UNLOCK slots for items now at final layer (Phase 5 migration).
+    # Clear orphaned UNLOCK slots (Phase 5 migration, no longer relevant).
     for i: int in range(research_slots.size()):
         var d: Dictionary = research_slots[i]
         if d.get("action", "") != "unlock":
             continue
-        var sid: int = int(d.get("item_id", -1))
-        if sid == -1:
-            continue
-        for entry: ItemEntry in storage_items:
-            if entry.id == sid and entry.is_at_final_layer():
-                research_slots[i] = ResearchSlot.new().to_dict()
-                break
+        research_slots[i] = ResearchSlot.new().to_dict()
 
     ResearchSlot.purge_orphaned(research_slots, valid_ids)
 

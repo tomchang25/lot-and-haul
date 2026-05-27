@@ -1,24 +1,8 @@
 # advance_check_label.gd
-# Static utility that maps AdvanceCheck enum values to player-facing tooltip strings.
+# REMOVED in Phase 7 -- replaced by clue-based inspection checks.
+# This file kept as empty stub to prevent parse errors; will be deleted in PR 7.
 class_name AdvanceCheckLabel
 extends RefCounted
 
-static func describe(check: int, action: LayerUnlockAction, entry: ItemEntry) -> String:
-    if action == null or entry == null:
-        return ""
-
-    match check:
-        KnowledgeManager.AdvanceCheck.OK:
-            return ""
-        KnowledgeManager.AdvanceCheck.NO_ACTION:
-            return "Cannot advance further"
-        KnowledgeManager.AdvanceCheck.INSUFFICIENT_CATEGORY_RANK:
-            var cat_name: String = entry.item_data.category_data.display_name
-            return "Need %s rank %d" % [cat_name, action.required_category_rank]
-        KnowledgeManager.AdvanceCheck.INSUFFICIENT_SKILL:
-            var skill_name: String = action.required_skill.display_name if action.required_skill != null else "Unknown"
-            return "Need %s level %d" % [skill_name, action.required_level]
-        KnowledgeManager.AdvanceCheck.MISSING_PERK:
-            var perk_name: String = action.required_perk.display_name if action.required_perk != null else "Unknown"
-            return "Requires perk: %s" % perk_name
+static func describe(check: int, action = null, entry = null) -> String:
     return ""

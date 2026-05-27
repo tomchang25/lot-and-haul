@@ -25,7 +25,7 @@ const SHAPE_COLORS: Array[Color] = [
     Color(0.27, 0.27, 0.40, 1.0),
 ]
 
-enum ActionType { SEARCH, ADVANCE }
+enum ActionType { SEARCH, INSPECT_CLUE }
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
@@ -231,12 +231,11 @@ func _on_grid_cell_pressed(coord: Vector2i) -> void:
         _start_action(entry, ActionType.SEARCH, cost_seconds)
         return
 
-    var item := entry as ItemEntry
-    if item != null and item.can_advance():
-        var cost := _advance_cost_for_item(item)
+    if entry.can_advance():
+        var cost := _clue_cost_for_item(entry)
         if RunManager.run_record.actions_remaining < cost:
             return
-        _start_action(entry, ActionType.ADVANCE, cost)
+        _start_action(entry, ActionType.INSPECT_CLUE, cost)
         return
 
 
@@ -264,11 +263,8 @@ func _complete_active_action() -> void:
         ActionType.SEARCH:
             if completed_entry.is_veiled():
                 _reveal_item(completed_entry)
-        ActionType.ADVANCE:
-            var item := completed_entry as ItemEntry
-            if item != null and item.can_advance():
-                item.advance_layer()
-                item.reveal_passive_clues()
+        ActionType.INSPECT_CLUE:
+            _attempt_clue_reveal(completed_entry)
 
     _refresh_grid_cells()
     _refresh_hud()
@@ -308,15 +304,8 @@ func _clear_active_action() -> void:
     _active_action_remaining = 0.0
 
 
-func _advance_cost_for_item(item: ItemEntry) -> int:
-    var cost := 1
-    var layer := item.active_layer()
-    if layer == null:
-        return cost
-    for clue: ClueData in layer.clues:
-        if not item.revealed_clue_ids.has(clue.clue_id):
-            cost += clue.ap_cost_penalty
-    return cost
+func _clue_cost_for_item(item: ItemEntry) -> int:
+    return 1
 
 
 func _search_cost_for_entry(entry: ItemEntry) -> int:
@@ -332,39 +321,46 @@ func _compute_search_duration(cell_count: int) -> float:
 func _reveal_item(item: ItemEntry) -> void:
     if item.is_veiled():
         item.unveil()
-        if item.item_data != null and item.item_data.category_data != null:
+        if item.item_data != null and item.item_data.category_data != None:
             KnowledgeManager.add_category_points(
                 item.item_data.category_data,
                 item.item_data.rarity,
                 KnowledgeManager.KnowledgeAction.REVEAL,
             )
 
-    item.layer_index = _roll_random_layer_index(item)
-    item.reveal_passive_clues()
+    # Auto-reveal anchor clue on first inspect.
+    item.reveal_anchor()
 
 
-func _roll_random_layer_index(item: ItemEntry) -> int:
-    if item.item_data == null or item.item_data.identity_layers.is_empty():
-        return item.layer_index
+func _attempt_clue_reveal(item: ItemEntry) -> void:
+    if item == null or not item.anchor_revealed:
+        return
 
-    var max_index := item.item_data.identity_layers.size() - 1
-    if max_index <= 0:
-        return 0
-    if max_index == 1:
-        return 1
+    # Find the first unrevealed surface clue with lowest DC.
+    var target: ClueData = null
+    for clue: ClueData in item.item_data.clues:
+        if clue.type != "surface":
+            continue
+        if item.revealed_clue_ids.has(clue.clue_id):
+            continue
+        if target == null or clue.dc < target.dc:
+            target = clue
 
-    var total_weight := 0.0
-    for layer_index in range(1, max_index + 1):
-        total_weight += 1.0 / float(layer_index * layer_index)
+    if target == null:
+        return
 
-    var roll := randf_range(0.0, total_weight)
-    var running := 0.0
-    for layer_index in range(1, max_index + 1):
-        running += 1.0 / float(layer_index * layer_index)
-        if roll <= running:
-            return layer_index
+    var attr_value := KnowledgeManager.get_attribute_value(target.attribute)
+    var attribute_bonus: int = attr_value - 1  # zero-index: 1 -> +0, 2 -> +1, etc.
+    if attribute_bonus < 0:
+        attribute_bonus = 0
 
-    return max_index
+    var succeeded := item.attempt_surface_clue(target, attribute_bonus)
+    if succeeded:
+        KnowledgeManager.add_category_points(
+            item.item_data.category_data,
+            item.item_data.rarity,
+            KnowledgeManager.KnowledgeAction.REVEAL,
+        )
 
 # ══ Display refresh ═══════════════════════════════════════════════════════════
 
@@ -392,15 +388,14 @@ func _refresh_grid_cell(button: Button, coord: Vector2i, entry: ItemEntry) -> vo
     var hover_borders := _hover_edge_borders(coord) if entry == _hover_entry else {}
 
     if entry == _active_entry:
-        var action_color := Color(1.0, 0.55, 0.26, 1.0) if _active_action_type == ActionType.ADVANCE else Color(1.0, 0.82, 0.35, 1.0)
+        var action_color := Color(1.0, 0.55, 0.26, 1.0) if _active_action_type == ActionType.INSPECT_CLUE else Color(1.0, 0.82, 0.35, 1.0)
         _apply_cell_style(button, base_color.lerp(action_color, 0.45), hover_borders)
         button.text = _active_origin_text() if is_origin else ""
     elif entry == _hover_entry:
         _apply_cell_style(button, base_color if entry.is_veiled() else base_color.lightened(0.16 if not entry.can_advance() else 0.28), hover_borders)
         button.text = _origin_ap_text(entry) if is_origin else ""
     elif not entry.is_veiled():
-        var item := entry as ItemEntry
-        var is_final_item: bool = item != null and not item.can_advance()
+        var is_final_item: bool = not entry.can_advance()
         _apply_cell_style(button, base_color.lightened(0.16 if is_final_item else 0.28))
         button.text = _origin_ap_text(entry) if is_origin else ""
     else:
@@ -416,9 +411,8 @@ func _origin_ap_text(entry: ItemEntry) -> String:
     if entry.is_veiled():
         return "%d AP" % _search_cost_for_entry(entry)
 
-    var item := entry as ItemEntry
-    if item != null and item.can_advance():
-        return "%d AP" % _advance_cost_for_item(item)
+    if entry.can_advance():
+        return "%d AP" % _clue_cost_for_item(entry)
     return "✓"
 
 

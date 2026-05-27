@@ -148,19 +148,46 @@ func get_opening_bid() -> int:
     return roundi(get_npc_estimate() * lot_data.opening_bid_factor)
 
 
-# Called once during create(). Rolls randf() per item — never call again after caching.
+# Called once during create(). Rolls randf() per item -- never call again after caching.
 func roll_npc_estimate() -> int:
     var total := 0
     for entry: ItemEntry in item_entries:
-        if entry.item_data.identity_layers.is_empty():
+        if entry.item_data.clues.is_empty():
             continue
 
-        var npc_layer := entry.layer_index
-        while npc_layer < entry.item_data.identity_layers.size() - 1 and randf() < lot_data.npc_layer_sight_chance ** (npc_layer - entry.layer_index + 1):
-            npc_layer += 1
-        total += entry.item_data.identity_layers[npc_layer].base_value
+        var anchor_flat: int = 0
+        var anchor := _find_anchor(entry)
+        if anchor != null:
+            var pe := anchor.price_effect.strip_edges().to_lower()
+            if pe.begins_with("+"):
+                anchor_flat = int(float(pe.trim_prefix("+").trim_prefix(" ")))
+
+        var surface_sum: int = 0
+        for clue: ClueData in _get_npc_surface_clues(entry):
+            var pe := clue.price_effect.strip_edges().to_lower()
+            if pe.begins_with("+"):
+                surface_sum += int(float(pe.trim_prefix("+").trim_prefix(" ")))
+            elif pe.begins_with("x"):
+                surface_sum = int(float(surface_sum) * float(pe.trim_prefix("x").trim_prefix(" ")))
+
+        total += anchor_flat + surface_sum
 
     return total
+
+
+static func _find_anchor(entry: ItemEntry) -> ClueData:
+    for clue: ClueData in entry.item_data.clues:
+        if clue.type == "anchor":
+            return clue
+    return null
+
+
+static func _get_npc_surface_clues(entry: ItemEntry) -> Array[ClueData]:
+    var result: Array[ClueData] = []
+    for clue: ClueData in entry.item_data.clues:
+        if clue.type == "surface" and randf() < 0.6:
+            result.append(clue)
+    return result
 
 
 func get_rolled_price() -> int:
