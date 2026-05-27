@@ -1,8 +1,7 @@
 # perk_data.gd
 # Designer-authored resource representing one unlockable perk.
-# Perks have no fixed unlock path — they are granted by calling
-# KnowledgeManager.unlock_perk(perk_id) from any system (cash purchase,
-# quest reward, etc.).
+# Perks are sourced from attribute thresholds — when an attribute reaches a
+# specific value, it unlocks one or more perks.
 # Place .tres files under data/tres/perks/
 class_name PerkData
 extends Resource
@@ -14,3 +13,9 @@ extends Resource
 @export var display_name: String = ""
 
 @export var description: String = ""
+
+# Attribute that gates this perk.
+@export var required_attribute: String = ""
+
+# Minimum attribute value required to unlock this perk.
+@export var required_attribute_value: int = 0

@@ -1,0 +1,137 @@
+# tags.yaml
+# Unified tag vocabulary listing every legal clue id.
+# Enforced by validate_yaml.py — all clue ids and customer demand tags
+# must draw from this list.
+tags:
+  # ── Lamp clues ──────────────────────────────────────────────────────────────
+  - lamp_veil_01
+  - lamp_glass_body_clear_font
+  - lamp_glass_body_wear_ring
+  - lamp_ornate_base_cast_scrolls
+  - lamp_ornate_base_fitting_quality
+  - lamp_leaf_moser
+  - lamp_pressed_font_mold_lines
+  - lamp_pressed_font_pattern_repeat
+  - lamp_leaf_baccarat
+  - lamp_hallmarked_collar_silver_marks
+  - lamp_hallmarked_collar_date_letter
+  - lamp_authenticated_maker_clear_stamp
+  - lamp_authenticated_maker_registry_match
+  - lamp_leaf_hinks
+
+  # ── Clock clues ─────────────────────────────────────────────────────────────
+  - clock_veil_01
+  - clock_wooden_case_joinery
+  - clock_wooden_case_finish_age
+  - clock_brass_movement_plate
+  - clock_brass_movement_wheel_train
+  - clock_enamel_dial_hairlines
+  - clock_enamel_dial_numerals
+  - clock_platform_escapement_visible
+  - clock_platform_escapement_service_marks
+  - clock_gilded_case_bronze_mounts
+  - clock_gilded_case_inlay_quality
+  - clock_signed_movement_plate_signature
+  - clock_signed_movement_signature_match
+  - clock_leaf_boulle
+
+  # ── Vase clues ──────────────────────────────────────────────────────────────
+  - vase_veil_01
+  - vase_ceramic_body_glaze
+  - vase_ceramic_body_foot_wear
+  - vase_painted_surface_brushwork
+  - vase_painted_surface_palette
+  - vase_transfer_pattern_repeat
+  - vase_transfer_pattern_registration
+  - vase_porcelain_body_translucent
+  - vase_porcelain_body_paste_quality
+  - vase_cobalt_gilding_bands
+  - vase_cobalt_gilding_wear
+  - vase_factory_mark_visible
+  - vase_factory_mark_reference
+  - vase_archive_provenance_old_label
+  - vase_archive_provenance_archive_match
+
+  # ── Bag clues ───────────────────────────────────────────────────────────────
+  - bag_veil_01
+  - bag_veil_02
+  - bag_exterior_check_grain
+  - bag_exterior_check_stitching
+  - bag_hardware_check_plated_clasp
+  - bag_hardware_check_edge_paint
+  - bag_serial_research_inner_tab
+  - bag_serial_research_database_match
+  - bag_leaf_canvas_tote
+  - bag_leaf_vinyl_clutch
+  - bag_leaf_nylon
+  - bag_leaf_straw
+  - bag_leaf_faux_leather
+  - bag_leaf_cotton
+  - bag_leaf_replica
+  - bag_leaf_coach
+  - bag_leaf_lv
+  - bag_leaf_hermes
+
+  # ── Watch clues ─────────────────────────────────────────────────────────────
+  - watch_veil_01
+  - watch_veil_02
+  - watch_case_check_lugs
+  - watch_case_check_crystal_wear
+  - watch_movement_open_crown_action
+  - watch_movement_open_bridge_layout
+  - watch_leaf_quartz
+  - watch_leaf_digital
+  - watch_leaf_timex
+  - watch_leaf_russian
+  - watch_leaf_cocktail
+  - watch_leaf_fashion
+  - watch_leaf_seiko
+  - watch_leaf_bulova
+  - watch_leaf_citizen
+  - watch_leaf_longines
+
+  # ── Pistol clues ────────────────────────────────────────────────────────────
+  - pistol_veil_01
+  - pistol_body_short_barrel
+  - pistol_body_old_patina
+  - pistol_proofmark_barrel_stamp
+  - pistol_proofmark_origin_style
+  - pistol_arsenal_stamp_stock_mark
+  - pistol_arsenal_stamp_service_pattern
+  - pistol_carved_grip_scrollwork
+  - pistol_carved_grip_presentation_quality
+  - pistol_maker_mark_lock_signature
+  - pistol_maker_mark_reference_match
+  - pistol_leaf_dutch
+  - pistol_leaf_naval
+  - pistol_leaf_cavalry
+  - pistol_leaf_boutet
+
+  # ── Rifle clues ─────────────────────────────────────────────────────────────
+  - rifle_veil_01
+  - rifle_body_long_barrel
+  - rifle_body_bore_wear
+  - rifle_military_proof_barrel_marks
+  - rifle_military_proof_lock_pattern
+  - rifle_regiment_mark_butt_stamp
+  - rifle_regiment_mark_campaign_wear
+  - rifle_engraved_action_scroll
+  - rifle_engraved_action_precision_sights
+  - rifle_maker_signed_top_flat
+  - rifle_maker_signed_reference_match
+  - rifle_leaf_charleville
+  - rifle_leaf_springfield
+  - rifle_leaf_regiment
+  - rifle_leaf_whitworth
+
+  # ── Crossbow clues ──────────────────────────────────────────────────────────
+  - crossbow_veil_01
+  - crossbow_body_wooden_tiller
+  - crossbow_body_tool_marks
+  - crossbow_mechanism_trigger
+  - crossbow_mechanism_iron_work
+  - crossbow_provenance_old_tag
+  - crossbow_provenance_catalog_match
+  - crossbow_leaf_hunting
+  - crossbow_leaf_military
+  - crossbow_leaf_noble
