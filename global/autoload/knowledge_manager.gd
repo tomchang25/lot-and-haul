@@ -1,21 +1,5 @@
 extends Node
 
-enum AdvanceCheck {
-    OK,
-    NO_ACTION,
-    INSUFFICIENT_CATEGORY_RANK,
-    INSUFFICIENT_SKILL,
-    MISSING_PERK,
-}
-
-enum UpgradeResult {
-    OK,
-    MAX_LEVEL,
-    INSUFFICIENT_SUPER_CATEGORY_RANK,
-    INSUFFICIENT_MASTERY_RANK,
-    INSUFFICIENT_CASH,
-}
-
 enum KnowledgeAction {
     INSPECT = 1,
     REVEAL = 2,
@@ -36,13 +20,15 @@ const _BASE_MASTERY: Dictionary = {
 
 const RANK_THRESHOLDS: Array[int] = [0, 100, 400, 1600, 6400, 25600]
 
-var _perk_registry: Dictionary = { } # perk_id → PerkData
-var _skill_registry: Dictionary = { } # skill_id → SkillData
+const _ATTRIBUTE_UPGRADE_COST: int = 1000
+
+var _perk_registry: Dictionary = { } # perk_id -> PerkData
+var _attribute_registry: Dictionary = { } # attribute_id -> AttributeData
 
 
 func _ready() -> void:
     _load_perk_registry()
-    _load_skill_registry()
+    _load_attribute_registry()
     RegistryCoordinator.register(self)
 
 
@@ -51,8 +37,8 @@ func validate() -> bool:
     if perk_count() == 0:
         push_error("KnowledgeManager: perk registry is empty")
         ok = false
-    if skill_count() == 0:
-        push_error("KnowledgeManager: skill registry is empty")
+    if attribute_count() == 0:
+        push_error("KnowledgeManager: attribute registry is empty")
         ok = false
     for perk_id: String in SaveManager.unlocked_perks:
         if get_perk_by_id(perk_id) == null:
@@ -61,19 +47,12 @@ func validate() -> bool:
                 % perk_id,
             )
             ok = false
-    for skill_id: String in SaveManager.skill_levels.keys():
-        if get_skill_by_id(skill_id) == null:
-            push_error(
-                "KnowledgeManager: SaveManager.skill_levels key '%s' not found"
-                % skill_id,
-            )
-            ok = false
     return ok
 
 
 func add_category_points(category: CategoryData, rarity: ItemData.Rarity, action: KnowledgeAction) -> void:
     var base: int = _BASE_MASTERY[action]
-    var rarity_mult: int = rarity + 1 # COMMON=0→1, UNCOMMON=1→2, …, LEGENDARY=4→5
+    var rarity_mult: int = rarity + 1
     var gain: int = base * rarity_mult
     var category_id: String = category.category_id
     if not SaveManager.category_points.has(category_id):
@@ -111,76 +90,42 @@ func get_mastery_rank() -> int:
     return total
 
 
-func get_level(skill: SkillData) -> int:
-    return SaveManager.skill_levels.get(skill.skill_id, 0)
+# -- Attribute registry ---------------------------------------------------------
 
 
-func get_skill_by_id(skill_id: String) -> SkillData:
-    return _skill_registry.get(skill_id, null)
+func get_attribute_value(attribute_id: String) -> int:
+    return SaveManager.attribute_levels.get(attribute_id, 1)
 
 
-func get_all_skills() -> Array[SkillData]:
-    var result: Array[SkillData] = []
-    for skill: SkillData in _skill_registry.values():
-        result.append(skill)
+func get_attribute_by_id(attribute_id: String) -> AttributeData:
+    return _attribute_registry.get(attribute_id, null)
+
+
+func get_all_attributes() -> Array[AttributeData]:
+    var result: Array[AttributeData] = []
+    for attr: AttributeData in _attribute_registry.values():
+        result.append(attr)
     return result
 
 
-func _check_upgrade(skill: SkillData) -> UpgradeResult:
-    if skill == null:
-        return UpgradeResult.MAX_LEVEL
-    var current: int = get_level(skill)
-    if current >= skill.levels.size():
-        return UpgradeResult.MAX_LEVEL
-    var next: SkillLevelData = skill.levels[current]
-    for super_id: String in next.required_super_category_ranks:
-        var min_rank: int = int(next.required_super_category_ranks[super_id])
-        var sc: SuperCategoryData = SuperCategoryRegistry.get_super_category_by_id(super_id)
-        if sc == null or get_super_category_rank(sc) < min_rank:
-            return UpgradeResult.INSUFFICIENT_SUPER_CATEGORY_RANK
-    if get_mastery_rank() < next.required_mastery_rank:
-        return UpgradeResult.INSUFFICIENT_MASTERY_RANK
-    if SaveManager.cash < next.cash_cost:
-        return UpgradeResult.INSUFFICIENT_CASH
-    return UpgradeResult.OK
+func attribute_count() -> int:
+    return _attribute_registry.size()
 
 
-func peek_upgrade(skill: SkillData) -> UpgradeResult:
-    return _check_upgrade(skill)
-
-
-func try_upgrade_skill(skill: SkillData) -> UpgradeResult:
-    var result: UpgradeResult = _check_upgrade(skill)
-    if result != UpgradeResult.OK:
-        return result
-    var current: int = get_level(skill)
-    var next: SkillLevelData = skill.levels[current]
-    SaveManager.cash -= next.cash_cost
-    SaveManager.skill_levels[skill.skill_id] = current + 1
+func upgrade_attribute(attribute_id: String) -> bool:
+    var attr: AttributeData = get_attribute_by_id(attribute_id)
+    if attr == null:
+        return false
+    if SaveManager.cash < _ATTRIBUTE_UPGRADE_COST:
+        return false
+    SaveManager.cash -= _ATTRIBUTE_UPGRADE_COST
+    var current := SaveManager.attribute_levels.get(attribute_id, attr.starting_value)
+    SaveManager.attribute_levels[attribute_id] = current + 1
     SaveManager.save()
-    return UpgradeResult.OK
+    return true
 
 
-func can_advance(entry: ItemEntry) -> AdvanceCheck:
-    var action: LayerUnlockAction = entry.current_unlock_action()
-    if action == null or entry.is_at_final_layer():
-        return AdvanceCheck.NO_ACTION
-
-    if action.required_category_rank > 0:
-        if get_category_rank(entry.item_data.category_data) < action.required_category_rank:
-            return AdvanceCheck.INSUFFICIENT_CATEGORY_RANK
-
-    if action.required_skill != null:
-        if get_level(action.required_skill) < action.required_level:
-            return AdvanceCheck.INSUFFICIENT_SKILL
-
-    if action.required_perk != null:
-        if not has_perk(action.required_perk):
-            return AdvanceCheck.MISSING_PERK
-
-    return AdvanceCheck.OK
-
-# ══ Perk registry ════════════════════════════════════════════════════════════
+# -- Perk registry --------------------------------------------------------------
 
 
 func unlock_perk(perk: PerkData) -> void:
@@ -192,6 +137,10 @@ func unlock_perk(perk: PerkData) -> void:
 
 func has_perk(perk: PerkData) -> bool:
     return perk.perk_id in SaveManager.unlocked_perks
+
+
+func has_perk_by_id(perk_id: String) -> bool:
+    return perk_id in SaveManager.unlocked_perks
 
 
 func get_perk_by_id(perk_id: String) -> PerkData:
@@ -209,10 +158,6 @@ func perk_count() -> int:
     return _perk_registry.size()
 
 
-func skill_count() -> int:
-    return _skill_registry.size()
-
-
 func _load_perk_registry() -> void:
     _perk_registry = ResourceDirLoader.load_by_id(
         DataPaths.PERKS_DIR,
@@ -221,9 +166,9 @@ func _load_perk_registry() -> void:
     )
 
 
-func _load_skill_registry() -> void:
-    _skill_registry = ResourceDirLoader.load_by_id(
-        DataPaths.SKILLS_DIR,
+func _load_attribute_registry() -> void:
+    _attribute_registry = ResourceDirLoader.load_by_id(
+        DataPaths.ATTRIBUTES_DIR,
         func(r: Resource) -> String:
-            return (r as SkillData).skill_id if r is SkillData else ""
+            return (r as AttributeData).attribute_id if r is AttributeData else ""
     )
