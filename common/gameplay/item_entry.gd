@@ -326,8 +326,9 @@ func _raw_appraised_value() -> float:
     return (float(_anchor_flat_value()) + add_sum) * mul_product
 
 
-# appraised_with_hidden = (surface_appraised + sum hidden_add) * product hidden_mul
-func _appraised_with_hidden() -> float:
+## Full clue value: anchor + all surface + all hidden modifiers (add-then-mul).
+## This is the item's true resolved value before condition/market factors.
+func appraised_with_hidden() -> float:
     return (_raw_appraised_value() + _hidden_add_sum()) * _hidden_mul_product()
 
 
@@ -357,7 +358,7 @@ var estimated_value_min: int:
         if is_veiled() or not anchor_revealed:
             return 0
         if verified:
-            return maxi(1, int(_appraised_with_hidden() * get_condition_multiplier()))
+            return maxi(1, int(appraised_with_hidden() * get_condition_multiplier()))
         var base := _raw_appraised_value()
         var spread: float = MAX_SPREAD * (1.0 - self.inspection_level)
         var offset: float = center_offset * (1.0 - self.inspection_level)
@@ -369,7 +370,7 @@ var estimated_value_max: int:
         if is_veiled() or not anchor_revealed:
             return 0
         if verified:
-            return maxi(1, int(_appraised_with_hidden() * get_condition_multiplier()))
+            return maxi(1, int(appraised_with_hidden() * get_condition_multiplier()))
         var base := _raw_appraised_value()
         var spread: float = MAX_SPREAD * (1.0 - self.inspection_level)
         var offset: float = center_offset * (1.0 - self.inspection_level)
@@ -383,7 +384,7 @@ func estimated_value_text() -> String:
     if is_veiled() or not anchor_revealed:
         return UNKNOWN_TEXT
     if verified:
-        return "$%d" % int(_appraised_with_hidden())
+        return "$%d" % int(appraised_with_hidden())
 
     var lo: int = estimated_value_min
     var hi: int = estimated_value_max
@@ -397,7 +398,7 @@ func estimated_value_text() -> String:
 func compute_price(config: PriceConfig) -> int:
     var value: float
     if verified:
-        value = _appraised_with_hidden()
+        value = appraised_with_hidden()
     else:
         value = _raw_appraised_value()
 
@@ -503,7 +504,7 @@ func base_value_sort_value() -> int:
     if is_veiled() or not anchor_revealed:
         return 0
     if verified:
-        return int(_appraised_with_hidden())
+        return int(appraised_with_hidden())
     return _anchor_flat_value()
 
 
@@ -540,7 +541,7 @@ func base_value_text() -> String:
     if is_veiled() or not anchor_revealed:
         return UNKNOWN_TEXT
     if verified:
-        return "$%d" % int(_appraised_with_hidden())
+        return "$%d" % int(appraised_with_hidden())
     return "$%d" % _anchor_flat_value()
 
 

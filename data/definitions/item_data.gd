@@ -18,7 +18,10 @@ enum Rarity {
 # True item name. Shown only after verification/authentication.
 @export var item_name: String = ""
 
-# True item base price. Must stay above the final perceived layer value.
+## DEPRECATED — Phase 7 moved true value into clue modifiers
+## (anchor + surface + hidden). Retained only for YAML pipeline validation
+## and debug sanity checks. Will be removed once pool-based item generation
+## (item_system.md draft) replaces hand-curated ItemData.
 @export var base_price: int = 0
 
 # Physical classification. Holds super_category, category, weight, grid_size.
