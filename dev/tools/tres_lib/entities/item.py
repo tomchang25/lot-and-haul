@@ -89,7 +89,6 @@ class ItemSpec:
         w.add_field_str("item_name", entry["item_name"])
         w.add_field_int("base_price", int(entry["base_price"]))
         w.add_field_ext_ref("category_data", cat_tag)
-        w.add_field_ext_ref_array("identity_layers", [])  # empty, kept for compat
         w.add_field_sub_ref_array("clues", clue_sub_ids)
         w.add_field_int("rarity", int(entry.get("rarity", 0)))
         w.add_field_bool("auto_verify", bool(entry.get("auto_verify", False)))

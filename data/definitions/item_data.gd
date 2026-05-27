@@ -24,16 +24,8 @@ enum Rarity {
 # Physical classification. Holds super_category, category, weight, grid_size.
 @export var category_data: CategoryData = null
 
-# Ordered chain from least to most specific identity.
-# Layer 0 is always the starting state — no action needed to see it.
-# Each layer's unlock_action describes how to advance from that layer to the next.
-# The final layer has a null unlock_action.
-# NOTE: Will be removed in Phase 7 when identity layers are fully replaced by clues.
-@export var identity_layers: Array[IdentityLayer] = []
-
 # Clue-based identity data. Each item has one anchor clue, zero or more
 # surface clues, and zero or more hidden clues.
-# NOTE: Coexists with identity_layers during migration.
 @export var clues: Array[ClueData] = []
 
 @export var rarity: Rarity = Rarity.COMMON

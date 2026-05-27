@@ -14,7 +14,7 @@ extends Resource
 @export var merchant_hub: PackedScene
 @export var merchant_shop: PackedScene
 @export var day_summary: PackedScene
-@export var skill_panel: PackedScene
+@export var attribute_panel: PackedScene
 @export var knowledge_hub: PackedScene
 @export var mastery_panel: PackedScene
 @export var perk_panel: PackedScene

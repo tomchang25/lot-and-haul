@@ -794,12 +794,7 @@ static func from_dict(d: Dictionary) -> ItemEntry:
     entry.item_data = data
     entry.inspected = bool(d.get("inspected", false))
 
-    # Migration: old saves use layer_index; new saves use anchor_revealed.
-    if d.has("layer_index"):
-        entry.anchor_revealed = true
-        entry.revealed_clue_ids = []
-    else:
-        entry.anchor_revealed = bool(d.get("anchor_revealed", false))
+    entry.anchor_revealed = bool(d.get("anchor_revealed", false))
 
     entry.condition = float(d["condition"])
     if d.has("center_offset"):

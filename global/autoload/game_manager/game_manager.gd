@@ -87,8 +87,8 @@ func go_to_storage() -> void:
     get_tree().change_scene_to_packed(scenes.storage)
 
 
-func go_to_skill_panel() -> void:
-    get_tree().change_scene_to_packed(scenes.skill_panel)
+func go_to_attribute_panel() -> void:
+    get_tree().change_scene_to_packed(scenes.attribute_panel)
 
 
 func go_to_knowledge_hub() -> void:
