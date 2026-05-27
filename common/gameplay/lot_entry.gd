@@ -154,40 +154,8 @@ func roll_npc_estimate() -> int:
     for entry: ItemEntry in item_entries:
         if entry.item_data.clues.is_empty():
             continue
-
-        var anchor_flat: int = 0
-        var anchor := _find_anchor(entry)
-        if anchor != null:
-            var pe := anchor.price_effect.strip_edges().to_lower()
-            if pe.begins_with("+"):
-                anchor_flat = int(float(pe.trim_prefix("+").trim_prefix(" ")))
-
-        var surface_sum: int = 0
-        for clue: ClueData in _get_npc_surface_clues(entry):
-            var pe := clue.price_effect.strip_edges().to_lower()
-            if pe.begins_with("+"):
-                surface_sum += int(float(pe.trim_prefix("+").trim_prefix(" ")))
-            elif pe.begins_with("x"):
-                surface_sum = int(float(surface_sum) * float(pe.trim_prefix("x").trim_prefix(" ")))
-
-        total += anchor_flat + surface_sum
-
+        total += entry.roll_npc_estimate(lot_data.npc_clue_sight_chance)
     return total
-
-
-static func _find_anchor(entry: ItemEntry) -> ClueData:
-    for clue: ClueData in entry.item_data.clues:
-        if clue.type == "anchor":
-            return clue
-    return null
-
-
-static func _get_npc_surface_clues(entry: ItemEntry) -> Array[ClueData]:
-    var result: Array[ClueData] = []
-    for clue: ClueData in entry.item_data.clues:
-        if clue.type == "surface" and randf() < 0.6:
-            result.append(clue)
-    return result
 
 
 func get_rolled_price() -> int:

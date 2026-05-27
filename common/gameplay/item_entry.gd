@@ -129,22 +129,6 @@ func all_surface_revealed() -> bool:
     return _revealed_surface_count() >= _total_surface_count()
 
 
-## Returns the set of revealed clue ids relevant for customer fit calculation
-## (Phase 9). Surface clues are always included (auto-revealed on hub return).
-## Hidden clue ids are included only if the item has been verified.
-## Anchor clue id is excluded — it has no tag-matching role in selling.
-func get_fit_tags() -> Array[String]:
-    var tags: Array[String] = []
-    for clue: ClueData in _surface_clues():
-        if revealed_clue_ids.has(clue.clue_id):
-            tags.append(clue.clue_id)
-    if verified:
-        for clue: ClueData in _hidden_clues():
-            if revealed_clue_ids.has(clue.clue_id):
-                tags.append(clue.clue_id)
-    return tags
-
-
 # Parses a price_effect string and applies it to a base value.
 # "+3000" → base += 3000
 # "x1.4"  → base *= 1.4
@@ -336,6 +320,21 @@ func _raw_appraised_value() -> float:
             value = _apply_price_effect(value, clue.price_effect)
     return value
 
+
+## Returns a simulated NPC price estimate for this item based on a random subset
+## of surface clues the NPC happens to notice. Starts from the anchor flat value
+## (not zero) so multiplicative surface effects apply correctly.
+## sight_chance: per-clue probability the NPC notices each surface clue.
+func roll_npc_estimate(sight_chance: float) -> int:
+    var anchor := _anchor_clue()
+    if anchor == null:
+        return 0
+    var value := float(_anchor_flat_value())
+    for clue: ClueData in _surface_clues():
+        if randf() < sight_chance:
+            value = _apply_price_effect(value, clue.price_effect)
+    return int(value)
+
 # ── Estimated value (range) ────────────────────────────────────────────────────
 
 var estimated_value_min: int:
@@ -509,13 +508,6 @@ func condition_text() -> String:
     return "%d%%" % int(condition * 100)
 
 
-func condition_label() -> Label:
-    var label := Label.new()
-    label.text = condition_text()
-    label.modulate = condition_display_color()
-    return label
-
-
 func condition_secondary_text() -> String:
     if is_veiled():
         return ""
@@ -527,12 +519,6 @@ func condition_detail_text() -> String:
     if text == UNKNOWN_TEXT:
         return ""
     return "Condition:  %s (%s)" % [text, condition_secondary_text()]
-
-
-func condition_mult_label() -> Label:
-    var label := Label.new()
-    label.text = condition_secondary_text()
-    return label
 
 
 func base_value_text() -> String:
@@ -551,52 +537,6 @@ func merchant_offer_text(merchant: MerchantData) -> String:
 ## DEPRECATED: Removed in Phase 9 (merchant system redesign → unified customer selling).
 func special_order_text(order: SpecialOrder) -> String:
     return "$%d" % special_order_value(order)
-
-# ── Label factories ──────────────────────────────────────────────────────────
-
-
-func display_name_label() -> Label:
-    var label := Label.new()
-    label.text = display_name
-    label.add_theme_color_override(&"font_color", display_name_color())
-    return label
-
-
-func estimated_value_label() -> Label:
-    var label := Label.new()
-    label.text = estimated_value_text()
-    label.add_theme_color_override(&"font_color", price_display_color())
-    return label
-
-
-func base_value_label() -> Label:
-    var label := Label.new()
-    label.text = base_value_text()
-    label.add_theme_color_override(&"font_color", price_display_color())
-    return label
-
-
-## DEPRECATED: Removed in Phase 9 (merchant system redesign → unified customer selling).
-func merchant_offer_label(merchant: MerchantData) -> Label:
-    var label := Label.new()
-    label.text = merchant_offer_text(merchant)
-    label.add_theme_color_override(&"font_color", price_display_color())
-    return label
-
-
-## DEPRECATED: Removed in Phase 9 (merchant system redesign → unified customer selling).
-func special_order_label(order: SpecialOrder) -> Label:
-    var label := Label.new()
-    label.text = special_order_text(order)
-    label.add_theme_color_override(&"font_color", price_display_color())
-    return label
-
-
-func price_label_for(ctx: ItemViewContext) -> Label:
-    var label := Label.new()
-    label.text = price_text_for(ctx)
-    label.add_theme_color_override(&"font_color", price_display_color())
-    return label
 
 
 func rarity_text() -> String:

@@ -271,7 +271,9 @@ func _complete_active_action() -> void:
     _refresh_found_list()
     _refresh_veiled_list()
     _refresh_total_estimate()
-    if _hover_entry == completed_entry:
+    # For clue attempts, _attempt_clue_reveal() sets sidebar feedback directly
+    # skip _update_detail_section() so the feedback persists until the next hover.
+    if action_type != ActionType.INSPECT_CLUE and _hover_entry == completed_entry:
         _update_detail_section(completed_entry)
 
     if RunManager.run_record.actions_remaining <= 0:
@@ -350,7 +352,7 @@ func _attempt_clue_reveal(item: ItemEntry) -> void:
         return
 
     var attr_value := KnowledgeManager.get_attribute_value(target.attribute)
-    var attribute_bonus: int = attr_value - 1  # zero-index: 1 -> +0, 2 -> +1, etc.
+    var attribute_bonus: int = attr_value - 1 # zero-index: 1 -> +0, 2 -> +1, etc.
     if attribute_bonus < 0:
         attribute_bonus = 0
 
@@ -361,6 +363,13 @@ func _attempt_clue_reveal(item: ItemEntry) -> void:
             item.item_data.rarity,
             KnowledgeManager.KnowledgeAction.REVEAL,
         )
+        _detail_value_label.text = target.known_text
+        _detail_value_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
+    else:
+        _detail_value_label.text = "Nothing found."
+        _detail_value_label.add_theme_color_override(&"font_color", Color(0.55, 0.58, 0.63, 1))
+    _sidebar_hsep.show()
+    _detail_section.show()
 
 # ══ Display refresh ═══════════════════════════════════════════════════════════
 
@@ -385,7 +394,7 @@ func _refresh_grid_cell(button: Button, coord: Vector2i, entry: ItemEntry) -> vo
     var is_origin: bool = coord == _entry_origin.get(entry, Vector2i(-1, -1))
     var base_color := _entry_grid_color(entry)
 
-    var hover_borders := _hover_edge_borders(coord) if entry == _hover_entry else {}
+    var hover_borders := _hover_edge_borders(coord) if entry == _hover_entry else { }
 
     if entry == _active_entry:
         var action_color := Color(1.0, 0.55, 0.26, 1.0) if _active_action_type == ActionType.INSPECT_CLUE else Color(1.0, 0.82, 0.35, 1.0)
@@ -407,12 +416,29 @@ func _entry_grid_color(entry: ItemEntry) -> Color:
     return _entry_color_by_entry.get(entry, Color(0.08, 0.08, 0.10, 1.0))
 
 
+## Returns the clamped success percentage for the next unrevealed surface clue
+## on entry (the one with the lowest DC). Returns 0 if no unrevealed clues remain.
+## Mirrors the roll logic in attempt_surface_clue() without consuming AP.
+func _success_chance_for_next_clue(entry: ItemEntry) -> int:
+    var target: ClueData = null
+    for clue: ClueData in entry.item_data.clues:
+        if clue.type != "surface" or entry.revealed_clue_ids.has(clue.clue_id):
+            continue
+        if target == null or clue.dc < target.dc:
+            target = clue
+    if target == null:
+        return 0
+    var bonus := maxi(KnowledgeManager.get_attribute_value(target.attribute) - 1, 0)
+    return clampi((21 + bonus - target.dc) * 5, 5, 95)
+
+
 func _origin_ap_text(entry: ItemEntry) -> String:
     if entry.is_veiled():
         return "%d AP" % _search_cost_for_entry(entry)
 
     if entry.can_advance():
-        return "%d AP" % _clue_cost_for_item(entry)
+        var pct := _success_chance_for_next_clue(entry)
+        return "%d AP\n%d%%" % [_clue_cost_for_item(entry), pct]
     return "✓"
 
 
@@ -420,7 +446,7 @@ func _active_origin_text() -> String:
     return "%d AP\n%0.1fs" % [_active_action_cost, _active_action_remaining]
 
 
-func _apply_cell_style(button: Button, color: Color, edge_borders: Dictionary = {}) -> void:
+func _apply_cell_style(button: Button, color: Color, edge_borders: Dictionary = { }) -> void:
     button.modulate = Color.WHITE
     button.add_theme_color_override(&"font_color", Color.WHITE)
     button.add_theme_color_override(&"font_hover_color", Color.WHITE)
@@ -432,7 +458,7 @@ func _apply_cell_style(button: Button, color: Color, edge_borders: Dictionary = 
     button.add_theme_stylebox_override(&"disabled", _cell_style(color.darkened(0.25), edge_borders))
 
 
-func _cell_style(color: Color, edge_borders: Dictionary = {}) -> StyleBoxFlat:
+func _cell_style(color: Color, edge_borders: Dictionary = { }) -> StyleBoxFlat:
     var style := StyleBoxFlat.new()
     style.bg_color = color
     style.corner_radius_top_left = 6
@@ -455,7 +481,7 @@ func _cell_style(color: Color, edge_borders: Dictionary = {}) -> StyleBoxFlat:
 
 
 func _hover_edge_borders(coord: Vector2i) -> Dictionary:
-    var borders := {}
+    var borders := { }
     var deltas := {
         &"top": Vector2i(0, -1),
         &"right": Vector2i(1, 0),
@@ -558,7 +584,6 @@ func _refresh_total_estimate() -> void:
         _total_est_label.text = "$%d" % lo
     else:
         _total_est_label.text = "$%d – $%d" % [lo, hi]
-
 
 # ══ Sidebar — active item detail ══════════════════════════════════════════════
 
