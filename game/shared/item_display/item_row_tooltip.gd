@@ -5,7 +5,7 @@
 #
 # Always-shown rows: Display Name, Super-category, Category, Weight, Grid.
 # Conditional rows:  Condition detail, Price (hidden until inspected).
-# Inspection rows:   Layer depth, Clues (ItemEntry only, when known).
+# Inspection rows:   Clues (ItemEntry only, when known).
 class_name ItemRowTooltip
 extends PanelContainer
 
@@ -19,19 +19,11 @@ extends PanelContainer
 @onready var _grid_label: Label = $VBox/GridLabel
 
 # Dynamically created nodes — inserted into VBox in _ready().
-var _layer_depth_label: Label = null
 var _clue_separator: HSeparator = null
 var _clue_container: VBoxContainer = null
 
 
 func _ready() -> void:
-    # Layer depth subtitle — inserted right after the display name label.
-    _layer_depth_label = Label.new()
-    _layer_depth_label.add_theme_font_size_override(&"font_size", 11)
-    _layer_depth_label.add_theme_color_override(&"font_color", Color(0.55, 0.55, 0.55))
-    $VBox.add_child(_layer_depth_label)
-    $VBox.move_child(_layer_depth_label, _display_name_label.get_index() + 1)
-
     # Clue separator — inserted just before the cargo separator.
     _clue_separator = HSeparator.new()
     $VBox.add_child(_clue_separator)
@@ -51,13 +43,6 @@ func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
     # ── Display name ─────────────────────────────────────────────────────────
     _display_name_label.text = entry.display_name
     _display_name_label.show()
-
-    # ── Layer depth (when known) ──────────────────────────────────────────────
-    if not entry.is_veiled() and entry.item_data != null:
-        _layer_depth_label.text = _layer_depth_text(entry)
-        _layer_depth_label.show()
-    else:
-        _layer_depth_label.hide()
 
     # ── Always-visible: category identity ────────────────────────────────────
     var super_category := entry.super_category_text()
@@ -128,20 +113,11 @@ func hide_tooltip() -> void:
 # ── Private helpers ──────────────────────────────────────────────────────────
 
 
-func _layer_depth_text(item: ItemEntry) -> String:
-    var current: int = clampi(item.layer_index, 1, item.item_data.identity_layers.size() - 1)
-    if item.is_at_final_layer():
-        var total: int = item.item_data.identity_layers.size() - 1
-        return "Layer %d / %d" % [current, total]
-    return "Layer %d / ?" % current
-
-
 func _populate_clue_section(item: ItemEntry) -> void:
     for child in _clue_container.get_children():
         child.free()
 
-    var layer := item.active_layer()
-    if layer == null or layer.clues.is_empty():
+    if item.item_data == null or item.item_data.clues.is_empty():
         _clue_separator.hide()
         _clue_container.hide()
         return
@@ -155,7 +131,7 @@ func _populate_clue_section(item: ItemEntry) -> void:
     header.add_theme_color_override(&"font_color", Color(0.65, 0.65, 0.65))
     _clue_container.add_child(header)
 
-    for clue: ClueData in layer.clues:
+    for clue: ClueData in item.item_data.clues:
         var row := Label.new()
         row.add_theme_font_size_override(&"font_size", 11)
         row.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -165,24 +141,7 @@ func _populate_clue_section(item: ItemEntry) -> void:
             row.text = "● %s" % clue.known_text
             row.add_theme_color_override(&"font_color", Color.WHITE)
         else:
-            var hint: String = (
-                clue.unknown_hint_text if clue.unknown_hint_text != "" else _auto_hint(clue)
-            )
-            var penalty: String = (
-                " (+%d AP)" % clue.ap_cost_penalty if clue.ap_cost_penalty > 0 else ""
-            )
-            row.text = "○ %s%s" % [hint, penalty]
+            row.text = "○ %s (DC %d, %s)" % [clue.known_text, clue.dc, clue.attribute.capitalize()]
             row.add_theme_color_override(&"font_color", Color(0.55, 0.55, 0.55))
 
         _clue_container.add_child(row)
-
-
-func _auto_hint(clue: ClueData) -> String:
-    if clue.required_skill != null and clue.required_level > 0:
-        return "Requires %s (Lv.%d)" % [clue.required_skill.display_name, clue.required_level]
-    if clue.required_category_rank > 0:
-        return "Requires category rank %d" % clue.required_category_rank
-    if clue.required_perk != null:
-        return "Requires %s perk" % clue.required_perk.display_name
-    return "Further examination needed"
-                                                                                                                                                          

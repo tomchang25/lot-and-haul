@@ -361,8 +361,8 @@ func _init_debug_overlay() -> void:
 
     var true_value := 0
     for entry: ItemEntry in RunManager.run_record.lot_items:
-        if not entry.item_data.identity_layers.is_empty():
-            true_value += entry.item_data.identity_layers.back().base_value
+        if entry.item_data != null:
+            true_value += int(entry.appraised_with_hidden())
 
     _debug_label = Label.new()
     _debug_label.add_theme_font_size_override(&"font_size", 13)

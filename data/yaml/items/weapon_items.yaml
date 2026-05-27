@@ -1,404 +1,172 @@
-identity_layers:
-  - layer_id: pistol_veil_01
-    display_name: Heavy Metal Object
-    base_value: 40
-    unlock_action: null
-  - layer_id: pistol_body
-    display_name: Short Firearm Body
-    base_value: 90
-    unlock_action:
-      difficulty: 1.0
-    clues:
-      - clue_id: pistol_body_short_barrel
-        known_text: The short barrel and lock plate identify a pistol body.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: appraisal
-        required_level: 1
-      - clue_id: pistol_body_old_patina
-        known_text: The metal patina appears consistent with age.
-        ap_cost_penalty: 4
-        required_category_rank: 1
-        required_skill: authentication
-        required_level: 3
-  - layer_id: pistol_proofmark
-    display_name: Proofmarked Pistol
-    base_value: 350
-    unlock_action:
-      difficulty: 2.0
-    clues:
-      - clue_id: pistol_proofmark_barrel_stamp
-        known_text: Proof marks are stamped near the barrel breech.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: maintenance
-        required_level: 1
-      - clue_id: pistol_proofmark_origin_style
-        known_text: The proof mark style suggests British or Continental inspection.
-        ap_cost_penalty: 4
-        required_skill: restoration
-        required_level: 2
-  - layer_id: pistol_arsenal_stamp
-    display_name: Arsenal-Stamped Pistol
-    base_value: 900
-    unlock_action:
-      difficulty: 3.0
-      required_skill: art_restoration
-      required_level: 2
-    clues:
-      - clue_id: pistol_arsenal_stamp_stock_mark
-        known_text: An arsenal stamp is pressed into the stock.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: textile_care
-        required_level: 1
-      - clue_id: pistol_arsenal_stamp_service_pattern
-        known_text: The stamp and hardware suggest cavalry service.
-        ap_cost_penalty: 4
-        required_skill: conservation
-        required_level: 2
-  - layer_id: pistol_carved_grip
-    display_name: Ornate Grip Pistol
-    base_value: 600
-    unlock_action:
-      difficulty: 2.0
-    clues:
-      - clue_id: pistol_carved_grip_scrollwork
-        known_text: The grip is carved with decorative scrollwork.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: gunsmithing
-        required_level: 1
-      - clue_id: pistol_carved_grip_presentation_quality
-        known_text: The carving quality suggests a presentation piece.
-        ap_cost_penalty: 4
-        required_category_rank: 1
-        required_skill: appraisal
-        required_level: 3
-  - layer_id: pistol_maker_mark
-    display_name: Signed Maker Pistol
-    base_value: 2000
-    unlock_action:
-      difficulty: 4.0
-      required_skill: restoration
-      required_level: 2
-    clues:
-      - clue_id: pistol_maker_mark_lock_signature
-        known_text: A maker signature is visible on the lock plate.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: authentication
-        required_level: 1
-      - clue_id: pistol_maker_mark_reference_match
-        known_text: The signature matches a known presentation pistol maker.
-        ap_cost_penalty: 4
-        required_skill: maintenance
-        required_level: 2
-  - layer_id: pistol_leaf_dutch
-    display_name: Continental Holster Pistol
-    base_value: 450
-    unlock_action: null
-  - layer_id: pistol_leaf_naval
-    display_name: Naval Service Pistol
-    base_value: 1200
-    unlock_action: null
-  - layer_id: pistol_leaf_cavalry
-    display_name: Cavalry Officer's Pistol
-    base_value: 4500
-    unlock_action: null
-  - layer_id: pistol_leaf_boutet
-    display_name: Presentation Flintlock Pistol
-    base_value: 12000
-    unlock_action: null
-  - layer_id: rifle_veil_01
-    display_name: Heavy Long Object
-    base_value: 50
-    unlock_action: null
-  - layer_id: rifle_body
-    display_name: Long-Barreled Firearm
-    base_value: 120
-    unlock_action:
-      difficulty: 1.0
-    clues:
-      - clue_id: rifle_body_long_barrel
-        known_text: The long barrel and full stock identify a rifle or musket.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: textile_care
-        required_level: 1
-      - clue_id: rifle_body_bore_wear
-        known_text: Wear in the bore suggests real use rather than decoration.
-        ap_cost_penalty: 4
-        required_category_rank: 1
-        required_skill: conservation
-        required_level: 2
-  - layer_id: rifle_military_proof
-    display_name: Military-Proved Rifle
-    base_value: 500
-    unlock_action:
-      difficulty: 2.0
-    clues:
-      - clue_id: rifle_military_proof_barrel_marks
-        known_text: Military proof marks are stamped into the barrel.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: art_restoration
-        required_level: 1
-      - clue_id: rifle_military_proof_lock_pattern
-        known_text: The lock pattern fits mid nineteenth century military arms.
-        ap_cost_penalty: 4
-        required_skill: gunsmithing
-        required_level: 2
-  - layer_id: rifle_regiment_mark
-    display_name: Regiment-Marked Rifle
-    base_value: 1500
-    unlock_action:
-      difficulty: 3.0
-      required_skill: maintenance
-      required_level: 2
-    clues:
-      - clue_id: rifle_regiment_mark_butt_stamp
-        known_text: A regiment mark is stamped into the butt stock.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: appraisal
-        required_level: 1
-      - clue_id: rifle_regiment_mark_campaign_wear
-        known_text: The mark and wear suggest field service.
-        ap_cost_penalty: 4
-        required_skill: authentication
-        required_level: 3
-  - layer_id: rifle_engraved_action
-    display_name: Engraved Action Rifle
-    base_value: 1200
-    unlock_action:
-      difficulty: 2.0
-    clues:
-      - clue_id: rifle_engraved_action_scroll
-        known_text: Fine scroll engraving covers the action.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: restoration
-        required_level: 1
-      - clue_id: rifle_engraved_action_precision_sights
-        known_text: The sights and action work suggest a precision rifle.
-        ap_cost_penalty: 4
-        required_category_rank: 1
-        required_skill: textile_care
-        required_level: 2
-  - layer_id: rifle_maker_signed
-    display_name: Signed by Maker
-    base_value: 3500
-    unlock_action:
-      difficulty: 4.0
-      required_skill: gunsmithing
-      required_level: 2
-    clues:
-      - clue_id: rifle_maker_signed_top_flat
-        known_text: A maker signature appears on the barrel top flat.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: conservation
-        required_level: 1
-      - clue_id: rifle_maker_signed_reference_match
-        known_text: The signature matches documented target rifle makers.
-        ap_cost_penalty: 4
-        required_skill: art_restoration
-        required_level: 2
-  - layer_id: rifle_leaf_charleville
-    display_name: Continental Infantry Musket
-    base_value: 700
-    unlock_action: null
-  - layer_id: rifle_leaf_springfield
-    display_name: American Civil War Rifle-Musket
-    base_value: 1800
-    unlock_action: null
-  - layer_id: rifle_leaf_regiment
-    display_name: Regiment-Marked Service Rifle
-    base_value: 5000
-    unlock_action: null
-  - layer_id: rifle_leaf_whitworth
-    display_name: Precision Target Rifle
-    base_value: 15000
-    unlock_action: null
-  - layer_id: crossbow_veil_01
-    display_name: Heavy Wooden Object
-    base_value: 30
-    unlock_action: null
-  - layer_id: crossbow_body
-    display_name: Old Crossbow Frame
-    base_value: 80
-    unlock_action:
-      difficulty: 1.0
-    clues:
-      - clue_id: crossbow_body_wooden_tiller
-        known_text: The wooden tiller and bow channel identify a crossbow frame.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: appraisal
-        required_level: 1
-      - clue_id: crossbow_body_tool_marks
-        known_text: Hand tool marks are visible inside the stock channel.
-        ap_cost_penalty: 4
-        required_category_rank: 1
-        required_skill: authentication
-        required_level: 3
-  - layer_id: crossbow_mechanism
-    display_name: Crossbow with Trigger
-    base_value: 300
-    unlock_action:
-      difficulty: 2.0
-    clues:
-      - clue_id: crossbow_mechanism_trigger
-        known_text: A trigger and release nut are fitted into the tiller.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: maintenance
-        required_level: 1
-      - clue_id: crossbow_mechanism_iron_work
-        known_text: The iron work suggests a European mechanical bow.
-        ap_cost_penalty: 4
-        required_skill: restoration
-        required_level: 2
-  - layer_id: crossbow_provenance
-    display_name: Documented Crossbow
-    base_value: 900
-    unlock_action:
-      difficulty: 3.0
-      required_skill: art_restoration
-      required_level: 2
-    clues:
-      - clue_id: crossbow_provenance_old_tag
-        known_text: An old collection tag is tied through the stock.
-        ap_cost_penalty: 2
-        required_category_rank: 1
-        required_skill: textile_care
-        required_level: 1
-      - clue_id: crossbow_provenance_catalog_match
-        known_text: The tag matches an older collection catalog entry.
-        ap_cost_penalty: 4
-        required_skill: conservation
-        required_level: 2
-  - layer_id: crossbow_leaf_hunting
-    display_name: European Hunting Crossbow
-    base_value: 500
-    unlock_action: null
-  - layer_id: crossbow_leaf_military
-    display_name: Military Pattern Crossbow
-    base_value: 1600
-    unlock_action: null
-  - layer_id: crossbow_leaf_noble
-    display_name: Noble Presentation Crossbow
-    base_value: 5500
-    unlock_action: null
 items:
   - item_id: pistol_dutch_holster
     item_name: Dutch Holster Pistol
     base_price: 560
     category_id: pistol
     rarity: 1
-    layer_ids:
+    clue_ids:
       - pistol_veil_01
-      - pistol_body
+      - pistol_short_barrel
+      - pistol_metal_patina
+      - pistol_proof_stamp
+      - pistol_proof_style
       - pistol_leaf_dutch
   - item_id: pistol_british_naval
     item_name: British Naval Pistol
     base_price: 1500
     category_id: pistol
     rarity: 2
-    layer_ids:
+    clue_ids:
       - pistol_veil_01
-      - pistol_body
-      - pistol_proofmark
+      - pistol_short_barrel
+      - pistol_metal_patina
+      - pistol_proof_stamp
+      - pistol_proof_style
+      - pistol_lock_signature
+      - pistol_signature_match
       - pistol_leaf_naval
   - item_id: pistol_french_cavalry
     item_name: French Cavalry Pistol
     base_price: 5600
     category_id: pistol
     rarity: 2
-    layer_ids:
+    clue_ids:
       - pistol_veil_01
-      - pistol_body
-      - pistol_proofmark
+      - pistol_short_barrel
+      - pistol_metal_patina
+      - pistol_proof_stamp
+      - pistol_proof_style
+      - pistol_lock_signature
+      - pistol_signature_match
+      - pistol_scroll_grip
+      - pistol_carving_quality
+      - pistol_maker_signature
+      - pistol_maker_reference
       - pistol_leaf_cavalry
   - item_id: pistol_boutet_versailles
     item_name: Boutet Pistol, c.1800
     base_price: 14500
     category_id: pistol
     rarity: 3
-    layer_ids:
-      - pistol_veil_01
-      - pistol_body
-      - pistol_carved_grip
-      - pistol_maker_mark
+    clue_ids:
+      - pistol_veil_02
+      - pistol_short_barrel
+      - pistol_metal_patina
+      - pistol_scroll_grip
+      - pistol_carving_quality
+      - pistol_lock_signature
+      - pistol_signature_match
+      - pistol_maker_signature
+      - pistol_maker_reference
+      - pistol_gold_inlay
+      - pistol_versailles_mark
+      - pistol_walnut_stock
       - pistol_leaf_boutet
   - item_id: rifle_charleville_repro
     item_name: Charleville Musket
     base_price: 900
     category_id: rifle
     rarity: 1
-    layer_ids:
+    clue_ids:
       - rifle_veil_01
-      - rifle_body
+      - rifle_long_barrel
+      - rifle_bore_wear
+      - rifle_proof_marks
+      - rifle_lock_pattern
       - rifle_leaf_charleville
   - item_id: rifle_springfield_1861
     item_name: Springfield M1861
     base_price: 2300
     category_id: rifle
     rarity: 2
-    layer_ids:
+    clue_ids:
       - rifle_veil_01
-      - rifle_body
-      - rifle_military_proof
+      - rifle_long_barrel
+      - rifle_bore_wear
+      - rifle_proof_marks
+      - rifle_lock_pattern
+      - rifle_brass_buttplate
+      - rifle_sling_swivels
+      - rifle_bayonet_lug
       - rifle_leaf_springfield
   - item_id: rifle_crimea_enfield
     item_name: Crimea Enfield Rifle
     base_price: 6400
     category_id: rifle
     rarity: 2
-    layer_ids:
+    clue_ids:
       - rifle_veil_01
-      - rifle_body
-      - rifle_military_proof
+      - rifle_long_barrel
+      - rifle_bore_wear
+      - rifle_proof_marks
+      - rifle_lock_pattern
+      - rifle_brass_buttplate
+      - rifle_sling_swivels
+      - rifle_bayonet_lug
+      - rifle_maker_signature
+      - rifle_maker_documented
       - rifle_leaf_regiment
   - item_id: rifle_whitworth_sniper
     item_name: Whitworth Rifle, c.1860
     base_price: 18000
     category_id: rifle
     rarity: 3
-    layer_ids:
+    clue_ids:
       - rifle_veil_01
-      - rifle_body
-      - rifle_engraved_action
-      - rifle_maker_signed
+      - rifle_long_barrel
+      - rifle_bore_wear
+      - rifle_scroll_engraving
+      - rifle_precision_sights
+      - rifle_maker_signature
+      - rifle_maker_documented
+      - rifle_target_sights
+      - rifle_whitworth_hex
+      - rifle_optical_sight
+      - rifle_matched_action
       - rifle_leaf_whitworth
   - item_id: crossbow_german_hunting
     item_name: German Hunting Bow
     base_price: 650
     category_id: crossbow
     rarity: 1
-    layer_ids:
+    clue_ids:
       - crossbow_veil_01
-      - crossbow_body
+      - crossbow_wood_tiller
+      - crossbow_tool_marks
+      - crossbow_trigger_mech
+      - crossbow_iron_work
       - crossbow_leaf_hunting
   - item_id: crossbow_swiss_military
     item_name: Swiss Military Bow
     base_price: 2100
     category_id: crossbow
     rarity: 2
-    layer_ids:
+    clue_ids:
       - crossbow_veil_01
-      - crossbow_body
-      - crossbow_mechanism
+      - crossbow_wood_tiller
+      - crossbow_tool_marks
+      - crossbow_trigger_mech
+      - crossbow_iron_work
+      - crossbow_provenance_tag
+      - crossbow_catalog_entry
+      - crossbow_prod_steel
       - crossbow_leaf_military
   - item_id: crossbow_noble_presentation
     item_name: Noble Presentation Bow
     base_price: 7000
     category_id: crossbow
     rarity: 3
-    layer_ids:
+    clue_ids:
       - crossbow_veil_01
-      - crossbow_body
-      - crossbow_mechanism
-      - crossbow_provenance
+      - crossbow_wood_tiller
+      - crossbow_tool_marks
+      - crossbow_trigger_mech
+      - crossbow_iron_work
+      - crossbow_provenance_tag
+      - crossbow_catalog_entry
+      - crossbow_inlay_work
+      - crossbow_stock_carving
+      - crossbow_prod_steel
+      - crossbow_gold_wire
+      - crossbow_ivory_tip
       - crossbow_leaf_noble

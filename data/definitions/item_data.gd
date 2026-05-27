@@ -18,17 +18,18 @@ enum Rarity {
 # True item name. Shown only after verification/authentication.
 @export var item_name: String = ""
 
-# True item base price. Must stay above the final perceived layer value.
+## DEPRECATED — Phase 7 moved true value into clue modifiers
+## (anchor + surface + hidden). Retained only for YAML pipeline validation
+## and debug sanity checks. Will be removed once pool-based item generation
+## (item_system.md draft) replaces hand-curated ItemData.
 @export var base_price: int = 0
 
 # Physical classification. Holds super_category, category, weight, grid_size.
 @export var category_data: CategoryData = null
 
-# Ordered chain from least to most specific identity.
-# Layer 0 is always the starting state — no action needed to see it.
-# Each layer's unlock_action describes how to advance from that layer to the next.
-# The final layer has a null unlock_action.
-@export var identity_layers: Array[IdentityLayer] = []
+# Clue-based identity data. Each item has one anchor clue, zero or more
+# surface clues, and zero or more hidden clues.
+@export var clues: Array[ClueData] = []
 
 @export var rarity: Rarity = Rarity.COMMON
 

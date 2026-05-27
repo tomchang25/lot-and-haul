@@ -1,0 +1,20 @@
+attributes:
+  - attribute_id: appraisal
+    display_name: Appraisal
+    starting_value: 1
+
+  - attribute_id: perception
+    display_name: Perception
+    starting_value: 1
+
+  - attribute_id: restoration
+    display_name: Restoration
+    starting_value: 1
+
+  - attribute_id: negotiation
+    display_name: Negotiation
+    starting_value: 1
+
+  - attribute_id: investigation
+    display_name: Investigation
+    starting_value: 1

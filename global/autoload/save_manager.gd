@@ -17,7 +17,7 @@ var next_entry_id: int = 0 # monotonically increasing; never reset
 var research_slots: Array = [] # Array of plain Dictionaries (ResearchSlot)
 var available_locations: Array[LocationData] = []
 var unlocked_perks: Array[String] = []
-var skill_levels: Dictionary = { } # skill_id (String) → int
+var attribute_levels: Dictionary = { } # attribute_id (String) → int
 
 
 func save() -> void:
@@ -44,7 +44,7 @@ func save() -> void:
         "research_slots": research_slots,
         "available_location_ids": serialized_available_location_ids,
         "unlocked_perks": unlocked_perks,
-        "skill_levels": skill_levels,
+        "attribute_levels": attribute_levels,
         "super_cat_means": MarketManager.super_cat_means,
         "category_factors_today": MarketManager.category_factors_today,
         "merchant_negotiations_used_today": _build_negotiation_dict(),
@@ -121,16 +121,16 @@ func _read_save_file() -> void:
         for s: Variant in parsed["unlocked_perks"]:
             if s is String:
                 unlocked_perks.append(s)
-    if parsed.has("skill_levels") and parsed["skill_levels"] is Dictionary:
-        skill_levels = { }
-        for key: Variant in parsed["skill_levels"]:
-            if key is String and parsed["skill_levels"][key] is float:
-                skill_levels[key] = int(parsed["skill_levels"][key])
+    if parsed.has("attribute_levels") and parsed["attribute_levels"] is Dictionary:
+        attribute_levels = { }
+        for key: Variant in parsed["attribute_levels"]:
+            if key is String and parsed["attribute_levels"][key] is float:
+                attribute_levels[key] = int(parsed["attribute_levels"][key])
+    elif parsed.has("skill_levels"):
+        # Migration: discard old skill_levels, start fresh with defaults.
+        attribute_levels = { }
     else:
-        skill_levels = { }
-    if skill_levels.has("mechanical"):
-        skill_levels["maintenance"] = skill_levels["mechanical"]
-        skill_levels.erase("mechanical")
+        attribute_levels = { }
 
     if parsed.has("super_cat_means") and parsed["super_cat_means"] is Dictionary:
         MarketManager.super_cat_means = { }
@@ -183,18 +183,12 @@ func _read_save_file() -> void:
     for entry: ItemEntry in storage_items:
         valid_ids.append(entry.id)
 
-    # Clear orphaned UNLOCK slots for items now at final layer (Phase 5 migration).
+    # Clear orphaned UNLOCK slots (Phase 5 migration, no longer relevant).
     for i: int in range(research_slots.size()):
         var d: Dictionary = research_slots[i]
         if d.get("action", "") != "unlock":
             continue
-        var sid: int = int(d.get("item_id", -1))
-        if sid == -1:
-            continue
-        for entry: ItemEntry in storage_items:
-            if entry.id == sid and entry.is_at_final_layer():
-                research_slots[i] = ResearchSlot.new().to_dict()
-                break
+        research_slots[i] = ResearchSlot.new().to_dict()
 
     ResearchSlot.purge_orphaned(research_slots, valid_ids)
 

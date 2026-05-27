@@ -64,7 +64,7 @@ def main() -> None:
         data = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
         if not data:
             continue
-        for key in merged:
+        for key in list(merged.keys()):
             merged[key].extend(data.get(key, []) or [])
 
     print("Validating...")

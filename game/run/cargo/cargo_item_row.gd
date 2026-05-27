@@ -47,7 +47,6 @@ func _ready() -> void:
         _apply()
         _apply_state_style()
 
-
 # ══ Common API ════════════════════════════════════════════════════════════════
 
 

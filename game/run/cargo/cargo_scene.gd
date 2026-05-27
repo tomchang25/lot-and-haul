@@ -645,7 +645,7 @@ func _refresh_extra_slot_visuals() -> void:
 
         var icon_label: Label = cell.get_node("IconLabel")
         if entry != null:
-            var words = entry.active_layer().display_name.split(" ", false)
+            var words = entry.display_name.split(" ", false)
             icon_label.text = (words[0].left(1) if words.size() > 0 else "") + (words[1].left(1) if words.size() > 1 else "")
             icon_label.text = icon_label.text.to_upper()
         else:

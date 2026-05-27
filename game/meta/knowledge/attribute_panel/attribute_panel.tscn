@@ -1,8 +1,8 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" uid="uid://d13776nnixjin" path="res://game/meta/knowledge/skill_panel/skill_panel.gd" id="1_script"]
+[ext_resource type="Script" path="res://game/meta/knowledge/attribute_panel/attribute_panel.gd" id="1_script"]
 
-[node name="SkillPanel" type="Control"]
+[node name="AttributePanel" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -33,25 +33,18 @@ theme_override_constants/separation = 16
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Skills"
+text = "Attributes"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="EmptyLabel" type="Label" parent="RootVBox"]
-visible = false
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "No skills available"
-horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="RootVBox"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="RowContainer" type="VBoxContainer" parent="RootVBox/ScrollContainer"]
+[node name="Content" type="VBoxContainer" parent="RootVBox/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
 [node name="Footer" type="HBoxContainer" parent="RootVBox"]
 layout_mode = 2

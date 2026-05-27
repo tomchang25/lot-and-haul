@@ -31,6 +31,11 @@ extends Resource
 # Placeholder for full NPC knowledge system. 0.0 = sees only starting layer.
 @export var npc_layer_sight_chance: float = 0.5
 
+# Per-clue probability that the NPC notices each surface clue when forming its
+# price estimate. Passed to ItemEntry.roll_npc_estimate(). Default 0.6 matches
+# the hardcoded value from before this field was introduced.
+@export var npc_clue_sight_chance: float = 0.6
+
 # ── Auction ───────────────────────────────────────────────────────────────────
 
 # Fraction of npc_estimate used as the opening bid.
@@ -39,7 +44,7 @@ extends Resource
 
 # ── Item pool ─────────────────────────────────────────────────────────────────
 
-# Deprecated in Phase 0 runtime-first cleanup. Kept for YAML/TRES compatibility;
+# Deprecated in Phase 0 runtime-first cleanup. Kept for YAML/TRES compatibility
 # ItemEntry now starts uninspected regardless of this value.
 @export var veiled_chance: float = 0.4
 

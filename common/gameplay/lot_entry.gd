@@ -148,18 +148,13 @@ func get_opening_bid() -> int:
     return roundi(get_npc_estimate() * lot_data.opening_bid_factor)
 
 
-# Called once during create(). Rolls randf() per item — never call again after caching.
+# Called once during create(). Rolls randf() per item -- never call again after caching.
 func roll_npc_estimate() -> int:
     var total := 0
     for entry: ItemEntry in item_entries:
-        if entry.item_data.identity_layers.is_empty():
+        if entry.item_data.clues.is_empty():
             continue
-
-        var npc_layer := entry.layer_index
-        while npc_layer < entry.item_data.identity_layers.size() - 1 and randf() < lot_data.npc_layer_sight_chance ** (npc_layer - entry.layer_index + 1):
-            npc_layer += 1
-        total += entry.item_data.identity_layers[npc_layer].base_value
-
+        total += entry.roll_npc_estimate(lot_data.npc_clue_sight_chance)
     return total
 
 
