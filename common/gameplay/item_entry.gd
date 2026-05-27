@@ -345,8 +345,8 @@ var estimated_value_min: int:
         if verified:
             return maxi(1, int(_raw_appraised_value() * _hidden_multiplier() * get_condition_multiplier()))
         var base := _raw_appraised_value()
-        var spread: float = MAX_SPREAD * (1.0 - self.reveal_ratio)
-        var offset: float = center_offset * (1.0 - self.reveal_ratio)
+        var spread: float = MAX_SPREAD * (1.0 - self.inspection_level)
+        var offset: float = center_offset * (1.0 - self.inspection_level)
         var mult: float = 1.0 - spread + offset
         return maxi(1, int(base * mult * get_condition_multiplier()))
 
@@ -357,8 +357,8 @@ var estimated_value_max: int:
         if verified:
             return maxi(1, int(_raw_appraised_value() * _hidden_multiplier() * get_condition_multiplier()))
         var base := _raw_appraised_value()
-        var spread: float = MAX_SPREAD * (1.0 - self.reveal_ratio)
-        var offset: float = center_offset * (1.0 - self.reveal_ratio)
+        var spread: float = MAX_SPREAD * (1.0 - self.inspection_level)
+        var offset: float = center_offset * (1.0 - self.inspection_level)
         var mult: float = 1.0 + spread + offset
         return maxi(1, int(base * mult * get_condition_multiplier()))
 

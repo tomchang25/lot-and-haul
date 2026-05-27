@@ -321,7 +321,7 @@ func _compute_search_duration(cell_count: int) -> float:
 func _reveal_item(item: ItemEntry) -> void:
     if item.is_veiled():
         item.unveil()
-        if item.item_data != null and item.item_data.category_data != None:
+        if item.item_data != null and item.item_data.category_data != null:
             KnowledgeManager.add_category_points(
                 item.item_data.category_data,
                 item.item_data.rarity,
