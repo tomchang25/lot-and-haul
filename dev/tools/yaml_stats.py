@@ -70,12 +70,10 @@ def _extract_anchor_value(item: dict) -> float | None:
     clues = item.get("clues", []) or []
     for clue in clues:
         if clue.get("type") == "anchor":
-            pe = clue.get("price_effect", "")
-            if pe.startswith("+"):
-                try:
-                    return float(pe[1:])
-                except ValueError:
-                    return None
+            try:
+                return float(clue["effect_amount"])
+            except (KeyError, ValueError, TypeError):
+                return None
     return None
 
 

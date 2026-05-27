@@ -79,10 +79,6 @@ var revealed_clue_ids: Array[String] = []
 
 # ══ Clue helpers ══════════════════════════════════════════════════════════════
 
-# Price effect constants — parsed from price_effect string.
-const EFFECT_ADD := "+"
-const EFFECT_MUL := "x"
-
 
 func _anchor_clue() -> ClueData:
     if item_data == null:
@@ -129,20 +125,20 @@ func all_surface_revealed() -> bool:
     return _revealed_surface_count() >= _total_surface_count()
 
 
-# Parses a price_effect string and applies it to a base value.
-# "+3000" → base += 3000
-# "x1.4"  → base *= 1.4
-# TODO: Support conditional modifiers (e.g. "x2 if clue_x, x0.5 otherwise")
-#       as described in phase_7_clue_independence.md. No YAML data uses this
-#       format yet, so it is deferred until content requires it.
-func _apply_price_effect(base: float, price_effect: String) -> float:
-    var pe := price_effect.strip_edges().to_lower()
-    if pe.begins_with(EFFECT_ADD):
-        var val := pe.trim_prefix(EFFECT_ADD).trim_prefix(" ")
-        return base + float(val)
-    elif pe.begins_with(EFFECT_MUL):
-        var val := pe.trim_prefix(EFFECT_MUL).trim_prefix(" ")
-        return base * float(val)
+## Applies a single clue's price effect to [param base] and returns the result.
+## Dispatches on [member ClueData.effect_op]:
+##   "flat" — sets the baseline price (anchor-only; currently same as "add"),
+##   "add"  — adds [member ClueData.effect_amount] to [param base],
+##   "mul"  — multiplies [param base] by [member ClueData.effect_amount].
+## Unknown ops leave [param base] unchanged.
+func _apply_price_effect(base: float, clue: ClueData) -> float:
+    match clue.effect_op:
+        "flat":
+            return clue.effect_amount
+        "add":
+            return base + clue.effect_amount
+        "mul":
+            return base * clue.effect_amount
     return base
 
 
@@ -151,10 +147,8 @@ func _hidden_multiplier() -> float:
     var mult := 1.0
     for clue: ClueData in _hidden_clues():
         if revealed_clue_ids.has(clue.clue_id):
-            var pe := clue.price_effect.strip_edges().to_lower()
-            if pe.begins_with(EFFECT_MUL):
-                var val := pe.trim_prefix(EFFECT_MUL).trim_prefix(" ")
-                mult *= float(val)
+            if clue.effect_op == "mul":
+                mult *= clue.effect_amount
     return mult
 
 # ══ Computed properties ═══════════════════════════════════════════════════════
@@ -303,11 +297,7 @@ func _anchor_flat_value() -> int:
     var anchor := _anchor_clue()
     if anchor == null:
         return 0
-    var pe := anchor.price_effect.strip_edges().to_lower()
-    if pe.begins_with(EFFECT_ADD):
-        var val := pe.trim_prefix(EFFECT_ADD).trim_prefix(" ")
-        return int(float(val))
-    return 0
+    return int(anchor.effect_amount)
 
 # ── Appraised value ────────────────────────────────────────────────────────────
 
@@ -317,7 +307,7 @@ func _raw_appraised_value() -> float:
     var value := float(_anchor_flat_value())
     for clue: ClueData in _surface_clues():
         if revealed_clue_ids.has(clue.clue_id):
-            value = _apply_price_effect(value, clue.price_effect)
+            value = _apply_price_effect(value, clue)
     return value
 
 
@@ -332,7 +322,7 @@ func roll_npc_estimate(sight_chance: float) -> int:
     var value := float(_anchor_flat_value())
     for clue: ClueData in _surface_clues():
         if randf() < sight_chance:
-            value = _apply_price_effect(value, clue.price_effect)
+            value = _apply_price_effect(value, clue)
     return int(value)
 
 # ── Estimated value (range) ────────────────────────────────────────────────────

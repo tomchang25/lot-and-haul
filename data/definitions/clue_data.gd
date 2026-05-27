@@ -23,5 +23,7 @@ extends Resource
 # Difficulty class for the discovery check. 10 = moderate.
 @export var dc: int = 10
 
-# Price modifier string, e.g. "+3000", "x1.4", "x2 if clue_x".
-@export var price_effect: String = ""
+## Price effect operation type: "flat" (baseline setter, anchor-only), "add" (flat addition), or "mul" (multiplier).
+@export var effect_op: String = "add"
+## Numeric magnitude of the price effect. Added to or multiplied with the running price.
+@export var effect_amount: float = 0.0

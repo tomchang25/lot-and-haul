@@ -16,9 +16,11 @@ class ClueSpec:
     yaml_key: str = "clues"
     tres_subdir: str = "clues"
     uid_prefix: str = "clue"
-    script_paths: dict[str, str] = field(default_factory=lambda: {
-        **CLUE_DATA_SCRIPT_PATHS,
-    })
+    script_paths: dict[str, str] = field(
+        default_factory=lambda: {
+            **CLUE_DATA_SCRIPT_PATHS,
+        }
+    )
 
     def entity_id(self, entry: dict) -> str:
         return entry["clue_id"]
@@ -45,7 +47,8 @@ class ClueSpec:
         w.add_field_str("domain", entry.get("domain", "generic"))
         w.add_field_str("attribute", entry.get("attribute", ""))
         w.add_field_int("dc", int(entry.get("dc", 10)))
-        w.add_field_str("price_effect", entry.get("price_effect", ""))
+        w.add_field_str("effect_op", entry.get("effect_op", "add"))
+        w.add_field_float("effect_amount", float(entry.get("effect_amount", 0.0)))
         return w.render()
 
     def parse_tres(self, text: str, ctx: ParseCtx) -> dict:
@@ -60,12 +63,17 @@ class ClueSpec:
             "domain": tres_field(text, "domain") or "generic",
             "attribute": tres_field(text, "attribute") or "",
             "dc": int(tres_field(text, "dc") or 10),
-            "price_effect": tres_field(text, "price_effect") or "",
+            "effect_op": tres_field(text, "effect_op") or "add",
+            "effect_amount": float(tres_field(text, "effect_amount") or 0.0),
         }
 
     def validate(self, entries: list, all_data: dict) -> list[str]:
         errors: list[str] = []
         seen_ids: dict[str, int] = {}
+        VALID_OPS = {"flat", "add", "mul"}
+        EFFECT_AMOUNT_MIN = -100_000.0
+        EFFECT_AMOUNT_MAX = 100_000.0
+
         for i, clue in enumerate(entries):
             cid = clue.get("clue_id", "")
             if not cid:
@@ -85,6 +93,21 @@ class ClueSpec:
             ctype = clue.get("type", "")
             if ctype not in ("anchor", "surface", "hidden"):
                 errors.append(f"clue '{cid}': type must be anchor/surface/hidden")
+
+            op = clue.get("effect_op")
+            if op not in VALID_OPS:
+                errors.append(
+                    f"clue '{cid}': unknown effect_op '{op}' (must be 'flat', 'add', or 'mul')"
+                )
+
+            try:
+                amount = float(clue.get("effect_amount", "MISSING"))
+                if not (EFFECT_AMOUNT_MIN <= amount <= EFFECT_AMOUNT_MAX):
+                    errors.append(
+                        f"clue '{cid}': effect_amount {amount} out of range [{EFFECT_AMOUNT_MIN}, {EFFECT_AMOUNT_MAX}]"
+                    )
+            except (ValueError, TypeError):
+                errors.append(f"clue '{cid}': effect_amount is not a valid number")
 
         return errors
 
