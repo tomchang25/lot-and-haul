@@ -7,9 +7,6 @@ extends RefCounted
 
 const UNKNOWN_TEXT := "???"
 
-enum DisplayState { VEILED, UNVEILED, VERIFIED }
-const VEILED_PREFIX := "Unknown "
-
 const COLUMN_NAME := 0
 const COLUMN_CONDITION := 1
 const COLUMN_ESTIMATED_VALUE := 2
@@ -134,6 +131,18 @@ func all_surface_revealed() -> bool:
     return _revealed_surface_count() >= _total_surface_count()
 
 
+func _naming_clue_pool() -> Array[ClueData]:
+    if item_data == null:
+        return []
+    var result: Array[ClueData] = []
+    for clue: ClueData in item_data.clues:
+        if clue.clue_id in revealed_clue_ids:
+            result.append(clue)
+        elif clue.type == ClueData.ClueType.ANCHOR and anchor_revealed:
+            result.append(clue)
+    return result
+
+
 ## Applies a single clue's price effect to [param base] and returns the result.
 ## Dispatches on [member ClueData.effect_op]:
 ##   "flat" — sets the baseline price (anchor-only; currently same as "add"),
@@ -184,23 +193,43 @@ var inspection_level: float:
 
 var display_name: String:
     get:
-        if is_veiled():
-            var cat := category_data()
-            if cat != null and not cat.display_name.is_empty():
-                return VEILED_PREFIX + cat.display_name
-            return VEILED_PREFIX + "Item"
         if verified:
             if item_data.item_name.is_empty():
                 push_warning("ItemEntry %d: verified but item_name is empty" % id)
                 return "Unknown Item"
             return item_data.item_name
-        var anchor := _anchor_clue()
-        if anchor != null:
-            var name: String = anchor.known_text
-            if id >= 0 and ResearchSlot.action_for_item(SaveManager.research_slots, id) != "":
-                name += " E2 9A 99"
-            return name
-        return VEILED_PREFIX + "Item"
+
+        var pool := _naming_clue_pool()
+        var best_prefix: ClueData = null
+        var best_body: ClueData = null
+        var best_suffix: ClueData = null
+
+        for clue: ClueData in pool:
+            var slot := clue.naming_slot
+            if slot.is_empty():
+                continue
+            match slot:
+                "prefix":
+                    if best_prefix == null or clue.naming_priority > best_prefix.naming_priority:
+                        best_prefix = clue
+                "body":
+                    if best_body == null or clue.naming_priority > best_body.naming_priority:
+                        best_body = clue
+                "suffix":
+                    if best_suffix == null or clue.naming_priority > best_suffix.naming_priority:
+                        best_suffix = clue
+
+        var parts: Array[String] = []
+        if best_prefix != null:
+            parts.append(best_prefix.known_text)
+        if best_body != null:
+            parts.append(best_body.known_text)
+        if best_suffix != null:
+            parts.append(best_suffix.known_text)
+
+        if parts.is_empty():
+            return "Unknown Item"
+        return " ".join(parts)
 
 
 func get_condition_multiplier() -> float:
@@ -768,6 +797,21 @@ static func from_dict(d: Dictionary) -> ItemEntry:
         var raw: Array = d["revealed_clue_ids"]
         for clue_id_value in raw:
             entry.revealed_clue_ids.append(String(clue_id_value))
+    # Strip revealed_clue_ids that no longer exist in item_data.clues.
+    # Handles renamed clue IDs across data pipeline regenerations (e.g. _veil_NN →
+    # _anchor_NN in Phase 8b). Stale IDs are dropped; then reveal_anchor() re-adds
+    # the current anchor ID when anchor_revealed is true, keeping price and naming
+    # consistent without needing a manual migration table.
+    if not entry.revealed_clue_ids.is_empty():
+        var known_ids: Dictionary = { }
+        for clue: ClueData in entry.item_data.clues:
+            known_ids[clue.clue_id] = true
+        var clean: Array[String] = []
+        for cid: String in entry.revealed_clue_ids:
+            if known_ids.has(cid):
+                clean.append(cid)
+        entry.revealed_clue_ids = clean
+
     # Legacy migration: old saves stored verified as a bool flag without
     # populating revealed_clue_ids. reveal_all_hidden() is idempotent —
     # clue IDs already loaded above are guarded by has(), so no duplicates.

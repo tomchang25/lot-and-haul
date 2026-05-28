@@ -188,6 +188,47 @@ class ItemSpec:
                     f"item '{iid}': hidden clue '{clue_ids[first_hidden_idx]}' appears before or interleaved with surface clues. All hidden clues must come after all surface clues."
                 )
 
+            # ── Composition match rule ───────────────────────────────────────
+            # Simulate full-reveal naming composition and compare to item_name.
+            clue_refs = [known_clues_by_id.get(cid) for cid in clue_ids]
+            clue_refs = [c for c in clue_refs if c is not None]
+            has_naming = any(
+                c.get("naming") is not None for c in clue_refs
+            )
+            if has_naming:
+                # All clues are revealed in full-reveal simulation.
+                best_prefix: dict | None = None
+                best_body: dict | None = None
+                best_suffix: dict | None = None
+
+                for c in clue_refs:
+                    naming = c.get("naming")
+                    if naming is None:
+                        continue
+                    slot = naming.get("slot", "")
+                    priority = int(naming.get("priority", 0))
+                    if slot == "prefix":
+                        if best_prefix is None or priority > best_prefix["prio"]:
+                            best_prefix = {"clue": c, "prio": priority}
+                    elif slot == "body":
+                        if best_body is None or priority > best_body["prio"]:
+                            best_body = {"clue": c, "prio": priority}
+                    elif slot == "suffix":
+                        if best_suffix is None or priority > best_suffix["prio"]:
+                            best_suffix = {"clue": c, "prio": priority}
+
+                parts: list[str] = []
+                for best in (best_prefix, best_body, best_suffix):
+                    if best is not None:
+                        parts.append(best["clue"].get("known_text", ""))
+                composed = " ".join(parts)
+
+                authored_name = item.get("item_name", "")
+                if composed != authored_name:
+                    errors.append(
+                        f"item '{iid}': full-reveal composition '{composed}' does not match item_name '{authored_name}'"
+                    )
+
         return errors
 
 

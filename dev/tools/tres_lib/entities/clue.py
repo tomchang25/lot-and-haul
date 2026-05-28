@@ -53,6 +53,12 @@ class ClueSpec:
         w.add_field_int("dc", int(entry.get("dc", 10)))
         w.add_field_str("effect_op", entry.get("effect_op", "add"))
         w.add_field_float("effect_amount", float(entry.get("effect_amount", 0.0)))
+
+        naming = entry.get("naming") or {}
+        slot = naming.get("slot", "")
+        priority = int(naming.get("priority", 0))
+        w.add_field_str("naming_slot", slot)
+        w.add_field_int("naming_priority", priority)
         return w.render()
 
     def parse_tres(self, text: str, ctx: ParseCtx) -> dict:
@@ -69,6 +75,8 @@ class ClueSpec:
             "dc": int(tres_field(text, "dc") or 10),
             "effect_op": tres_field(text, "effect_op") or "add",
             "effect_amount": float(tres_field(text, "effect_amount") or 0.0),
+            "naming_slot": tres_field(text, "naming_slot") or "",
+            "naming_priority": int(tres_field(text, "naming_priority") or 0),
         }
 
     def validate(self, entries: list, all_data: dict) -> list[str]:
@@ -114,6 +122,29 @@ class ClueSpec:
                     )
             except (ValueError, TypeError):
                 errors.append(f"clue '{cid}': effect_amount is not a valid number")
+
+            # Three-word ceiling on known_text.
+            known_text = clue.get("known_text", "")
+            if isinstance(known_text, str) and known_text.strip():
+                word_count = len(known_text.split())
+                if word_count > 3:
+                    errors.append(
+                        f"clue '{cid}': known_text \"{known_text}\" has {word_count} words (max 3)"
+                    )
+
+            # Validate naming block.
+            naming = clue.get("naming")
+            if naming is not None:
+                nslot = naming.get("slot", "")
+                if nslot not in ("prefix", "body", "suffix"):
+                    errors.append(
+                        f"clue '{cid}': naming.slot must be 'prefix', 'body', or 'suffix', got '{nslot}'"
+                    )
+                nprio = naming.get("priority")
+                if nprio is not None and (not isinstance(nprio, int) or nprio < 0):
+                    errors.append(
+                        f"clue '{cid}': naming.priority must be a non-negative integer"
+                    )
 
         return errors
 
