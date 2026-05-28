@@ -34,6 +34,7 @@ Players buy mystery lots at auction and identify items over time. Item knowledge
 
 - Player-facing display names should be concise and readable in UI.
 - Avoid names longer than 30 characters unless the data-type-specific prompt explicitly allows it.
+- Clue `known_text` must be three words or fewer. This applies to ALL clues, regardless of whether they carry a naming entry.
 - Prefer natural commercial or collector language over database-like phrasing.
 - Use ASCII unless the requested real-world name clearly requires a non-ASCII character.
 
