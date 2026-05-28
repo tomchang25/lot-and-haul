@@ -61,7 +61,7 @@ When authoring new items or clues, use the generation prompts at `dev/tools/prom
 
 ## Current Phase
 
-Core loop redesign: Phases 0–7 complete (runtime veil cleanup, AP grid inspection, item base price, storage authenticate, clue independence + attribute system). Identity layers and skills have been fully replaced by clue-based pricing and SPECIAL-style attributes. Next up: Phase 8 (dynamic naming rules) and Phase 10 (value policy cleanup) in parallel; Phase 9 (merchant system redesign) after Phase 10. See `ROADMAP.md` for the full phase dependency graph.
+Core loop redesign: Phases 0–8b complete (runtime veil cleanup, AP grid inspection, item base price, storage authenticate, clue independence + attribute system, inspection refinement, dynamic naming rules, YAML content regeneration). Identity layers and skills have been fully replaced by clue-based pricing and SPECIAL-style attributes; all clues carry 1-word known_text and naming entries. Next up: Phase 10 (value policy cleanup); Phase 9 (merchant system redesign) after Phase 10. See `ROADMAP.md` for the full phase dependency graph.
 
 ## Conventions (quick reference)
 

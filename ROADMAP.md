@@ -60,12 +60,15 @@ Phases 0–6 cover the foundational work. Detailed specs omitted — see git his
 | 5     | Hub final layer resolution               | ⚠️ Superseded — auto-advance logic exists but will be removed when identity layers are deleted in Phase 7 |
 | 6     | Storage Authenticate                     | ✅ Complete — verified flag, rarity-based duration, slot action all operational                           |
 | 7     | Clue Independence + Attribute System     | ✅ Complete — identity layers/skills removed, clue-based pricing, SPECIAL attributes, dice inspection     |
+| 7.5   | Inspection Refinement                    | ✅ Complete — veiled/unveiled/verified vocabulary, chain reveal, lot unveil probability                   |
+| 8     | Dynamic Naming Rules                     | ✅ Complete — ClueData naming_slot/priority, display_name composition, validator rules                    |
+| 8b    | YAML Content Regeneration                | ✅ Complete — all 128 clues rewritten to 1-word known_text, naming entries assigned, names reconciled     |
 
 ---
 
 ## Core Loop Redesign — Phase Plan
 
-**Phase 7 is complete.** Phases 8, 9, and 10 can now proceed — 8 and 10 in parallel, 9 after 10.
+**Phases 7, 7.5, 8, and 8b are complete.** Phase 10 (Value Policy Cleanup) is next. Phase 9 (Merchant System Redesign) follows after Phase 10.
 
 ### Phase 7 — Clue Independence + Attribute System ✅
 
@@ -93,18 +96,48 @@ _Full spec: `dev/docs/archived/phase_7_clue_independence.md` `dev/docs/systems/i
 
 ---
 
-### Phase 8 — Dynamic Naming Rules
+### Phase 7.5 — Inspection Refinement ✅
 
-**Goal:** Replace static `display_name` on identity layers with a category-level naming template that composes the item's display name from revealed clue tags.
+**Status: Complete** (commit `e59d58e`)
 
-**Design decisions:**
+**Goal:** Refine inspection semantics, item display naming vocabulary, and clue reveal mechanics left unresolved after Phase 7.
 
-- Each category defines a naming template with tag slots (e.g. `{era} {brand} {genre} Arcade Cabinet`). Each clue carries one or more tags that fill template slots.
-- Unrevealed slots show a generic placeholder or are omitted. As clues are revealed, the name becomes more specific.
-- When all clues are revealed, the dynamically generated name should match `ItemData.item_name`. A mismatch indicates a naming rule or clue configuration error — the YAML validator enforces this.
-- Verified items always show `ItemData.item_name` directly, bypassing the template.
+**What shipped:**
 
-**Scope:** Naming rule resource, category-level template authoring, dynamic display name generation, YAML validator extension. Excludes pool-based generation.
+- `DisplayState` enum (VEILED / UNVEILED / VERIFIED) and unified naming vocabulary across all code, UI, and docs. Veiled = anchor unrevealed ("Unknown [Category]"); unveiled = anchor revealed (anchor known_text); verified = all hidden clues revealed (true item name).
+- Unveil action costs a fixed 1 AP. Chain reveal costs 2 AP per attempt; on success, immediately attempts the next unrevealed clue in sequence until a check fails or clues are exhausted.
+- Lot unveil probability field — each item in a lot rolls independently to determine starting veil state.
+- Clue results display in a dedicated section, separate from the value column.
+- `verified` is now a computed property (true when all hidden clues are in `revealed_clue_ids`); items with no hidden clues are verified by default.
+- Storage Authenticate renamed to Research.
+
+_Full spec: `dev/docs/archived/phase_7_5_inspection_refinement.md`_
+
+---
+
+### Phase 8 — Dynamic Naming Rules ✅
+
+**Status: Complete** (commits `3c4c423`, `e59d58e`)
+
+**Goal:** Replace the binary display name with a priority-based affix composition system that assembles the item's visible name progressively as clues are revealed.
+
+**What shipped:**
+
+- `naming_slot` (prefix / body / suffix) and `naming_priority` fields on `ClueData`.
+- `display_name` computed property on `ItemEntry`: assembles from highest-priority revealed clue per slot; falls back to "Unknown Item" when no naming clues are revealed; verified items bypass composition and show `item_data.item_name` directly.
+- Three-word `known_text` ceiling enforced by `validate_yaml.py`.
+- Full-reveal composition validation: composed name must equal `item_name` — mismatch is a pipeline error.
+- YAML pipeline (`tres_lib/entities/clue.py`, `yaml_to_tres.py`) updated for naming fields.
+- Generation prompts (`base.md`, `item.md`) document naming entry schema, slot/priority conventions, and 1-word preferred / 3-word max rule.
+
+**Phase 8b — YAML Content Regeneration** (commit `19c6caf`): bulk content pass on all existing clues and items.
+
+- All 128 clue `known_text` values rewritten to 1-word labels.
+- Naming entries (`slot`, `priority`) assigned to every clue (anchors → body prio 1, surfaces → prefix prio 2, hidden → prefix prio 5).
+- Item names reconciled to 2-word prefix+body format matching full-reveal composition.
+- Validator reports zero naming-match and known_text-length errors.
+
+_Full spec: `dev/docs/archived/phase_8_dynamic_naming_rules_impl_spec.md`_
 
 **Dependencies:** Phase 7
 
@@ -179,14 +212,16 @@ The following phases from the previous roadmap are fully superseded by the merch
 ### Phase Dependency Graph
 
 ```
-Phase 7 — Clue Independence + Attributes  ✅
-  ├─ Phase 8  — Dynamic Naming Rules         ← next (parallel)
-  ├─ Phase 10 — Value Policy Cleanup         ← next (parallel)
+Phase 7  — Clue Independence + Attributes  ✅
+  └─ Phase 7.5 — Inspection Refinement      ✅
+Phase 8  — Dynamic Naming Rules             ✅
+  └─ Phase 8b — YAML Content Regeneration   ✅
+Phase 10 — Value Policy Cleanup             ← next
   └─ Phase 9  — Merchant System Redesign (depends on 7, 10)
        └─ Phase 11 — Day Summary Rework
 ```
 
-Phase 7 is complete. Phases 8 and 10 can now run in parallel. Phase 9 depends on both 7 and 10.
+Phases 7, 7.5, 8, and 8b are complete. Phase 10 is unblocked and is next. Phase 9 depends on both 7 and 10.
 
 ---
 
