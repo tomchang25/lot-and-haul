@@ -15,6 +15,7 @@ enum Rarity {
 # Internal identifier. Never displayed to the player.
 @export var item_id: String = ""
 
+## DEPRECATED — Phase 8
 # True item name. Shown only after verification/authentication.
 @export var item_name: String = ""
 

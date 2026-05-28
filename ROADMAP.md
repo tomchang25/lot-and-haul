@@ -10,13 +10,13 @@ Every price resolves through the shared pricing pipeline. A config object toggle
 
 Items carry three clue tiers: one **anchor clue** (flat base value, auto-revealed on first inspect), zero or more **surface clues** (price modifiers, discoverable during inspection, auto-revealed on hub return), and zero or more **hidden clues** (only revealed by Authenticate or passive conditions, can be positive or negative).
 
-| Name                 | Basis                                           | Range | Role                                     |
-| -------------------- | ----------------------------------------------- | ----- | ---------------------------------------- |
-| `appraised_value`    | anchor × revealed surface modifiers             | yes   | base for all display and selling         |
-| `verified_value`     | anchor × all surface × all hidden modifiers     | no    | replaces appraised for authenticated items |
-| `market_price`       | appraised/verified × condition × market factor  | no    | car total input                          |
-| `car_total`          | sum of item market_prices (verified items ×1.2) | no    | customer transaction base                |
-| `sell_price`         | car_total × sell multiplier                     | no    | final transaction price                  |
+| Name              | Basis                                           | Range | Role                                       |
+| ----------------- | ----------------------------------------------- | ----- | ------------------------------------------ |
+| `appraised_value` | anchor × revealed surface modifiers             | yes   | base for all display and selling           |
+| `verified_value`  | anchor × all surface × all hidden modifiers     | no    | replaces appraised for authenticated items |
+| `market_price`    | appraised/verified × condition × market factor  | no    | car total input                            |
+| `car_total`       | sum of item market_prices (verified items ×1.2) | no    | customer transaction base                  |
+| `sell_price`      | car_total × sell multiplier                     | no    | final transaction price                    |
 
 Naming convention: `_value` = appraisal-side, `_price` / `_total` = transaction-side.
 
@@ -59,34 +59,37 @@ Phases 0–6 cover the foundational work. Detailed specs omitted — see git his
 | 4     | Clues + AP inspection (layer-based)      | ⚠️ Superseded — clue data structures exist but the layer-based advancement model is replaced by Phase 7   |
 | 5     | Hub final layer resolution               | ⚠️ Superseded — auto-advance logic exists but will be removed when identity layers are deleted in Phase 7 |
 | 6     | Storage Authenticate                     | ✅ Complete — verified flag, rarity-based duration, slot action all operational                           |
+| 7     | Clue Independence + Attribute System     | ✅ Complete — identity layers/skills removed, clue-based pricing, SPECIAL attributes, dice inspection     |
 
 ---
 
 ## Core Loop Redesign — Phase Plan
 
-**Phase 7 is next.** Phases 8 and 9 can run in parallel once Phase 7 lands.
+**Phase 7 is complete.** Phases 8, 9, and 10 can now proceed — 8 and 10 in parallel, 9 after 10.
 
-### Phase 7 — Clue Independence + Attribute System
+### Phase 7 — Clue Independence + Attribute System ✅
+
+**Status: Complete** (PR #107 merged)
 
 **Goal:** Replace identity layers and the skill system with independent clue resources and attribute-based discovery.
 
-**Design decisions:**
+**What shipped:**
 
-- Items become category + anchor clue + surface clues + hidden clues. Identity layers and their unlock actions are removed.
-- Each clue has two classification fields: `type` (anchor | surface | hidden) and `domain` (generic | category_id). Tag = clue — a clue's id is its tag.
-- Each clue carries a price modifier (flat, multiplier, or conditional). Perceived value = anchor × revealed modifiers. Spread = `max_spread × (1.0 - reveal_ratio)`.
-- Inspection: 1 AP = attempt 1 surface clue. Display shows a single success percentage. Anchor auto-reveals on first inspect; surface clues auto-reveal on hub return.
-- Authenticate reveals hidden clues (positive or negative), replacing the old "reveal true base_price" model.
-- Skills replaced by SPECIAL-style Attributes — a fixed set of named numeric stats. Perks sourced from attribute thresholds.
-- Mastery retained as a level-equivalent progression signal. Does not affect DC or success rate. Hooks into clue system as informational meta (draft).
-- Unified tag vocabulary enforced by YAML pipeline.
-- All identity layer, layer advancement, and skill code paths removed.
+- Items = category + anchor clue + surface clues + hidden clues. Identity layers, layer advancement, SkillData, SkillLevelData all removed.
+- ClueData with `type` (anchor | surface | hidden), `domain`, `attribute`, `dc`, `effect_op`, `effect_amount`.
+- 5 SPECIAL-style attributes (Appraisal, Perception, Restoration, Negotiation, Investigation) replace skill system. Perks gate on attribute thresholds.
+- Inspection: 1 AP = dice roll vs DC. Success rate = `clamp((21 + bonus - DC) × 5, 5, 95)`. Anchor auto-reveals; surface clues auto-reveal on hub return.
+- Authenticate reveals hidden clues (can be positive or negative).
+- Add-then-mul pricing: `(anchor_flat + sum surface_add) × product surface_mul`.
+- Unified tag vocabulary — clue table is the single source of truth, validated by pipeline.
+- `ItemData.base_price` deprecated — true value now derived entirely from clues.
 
-**Scope:** Data definitions (ClueData with type/domain, AttributeData, PerkData), KnowledgeManager restructure, ItemEntry restructure, pricing pipeline, YAML schema migration, inspection scene adaptation, tag vocabulary file. Excludes naming rules (Phase 8), selling channels (Phase 9), pool-based generation (deferred).
+**Deferred to later:**
 
-**Dependencies:** None (builds on completed Phases 0–6)
+- Mastery ↔ clue integration effects (see Draft Features)
+- Attribute upgrade cost scaling (see item_system.md draft)
 
-_Full spec: `dev/docs/plan/phase_7_clue_independence.md`_
+_Full spec: `dev/docs/archived/phase_7_clue_independence.md` `dev/docs/systems/item_system.md`_
 
 ---
 
@@ -165,25 +168,25 @@ _Full spec: `dev/docs/plan/merchant_system_redesign.md`_
 
 The following phases from the previous roadmap are fully superseded by the merchant system redesign (Phase 9):
 
-| Old Phase | Old Title | Reason |
-|-----------|-----------|--------|
-| 9 (old) | Special Order Verified Integration | Special orders deprecated; verified bonus integrated into customer sell flow |
-| 11 (old) | Player Shop | All selling unified through customer system |
-| 12 (old) | Garage Auction + Merchant Deprecation | Merchant deprecation handled in Phase 9; garage auction concept replaced |
+| Old Phase | Old Title                             | Reason                                                                       |
+| --------- | ------------------------------------- | ---------------------------------------------------------------------------- |
+| 9 (old)   | Special Order Verified Integration    | Special orders deprecated; verified bonus integrated into customer sell flow |
+| 11 (old)  | Player Shop                           | All selling unified through customer system                                  |
+| 12 (old)  | Garage Auction + Merchant Deprecation | Merchant deprecation handled in Phase 9; garage auction concept replaced     |
 
 ---
 
 ### Phase Dependency Graph
 
 ```
-Phase 7 — Clue Independence + Attributes  ← next
-  ├─ Phase 8  — Dynamic Naming Rules
-  ├─ Phase 10 — Value Policy Cleanup
+Phase 7 — Clue Independence + Attributes  ✅
+  ├─ Phase 8  — Dynamic Naming Rules         ← next (parallel)
+  ├─ Phase 10 — Value Policy Cleanup         ← next (parallel)
   └─ Phase 9  — Merchant System Redesign (depends on 7, 10)
        └─ Phase 11 — Day Summary Rework
 ```
 
-Phases 8 and 10 can run in parallel after Phase 7. Phase 9 depends on both 7 and 10.
+Phase 7 is complete. Phases 8 and 10 can now run in parallel. Phase 9 depends on both 7 and 10.
 
 ---
 

@@ -5,24 +5,27 @@ A Godot 4.6 single-player game about buying storage lots at auction, inspecting 
 ## Core Loop
 
 1. **Run phase** — Player travels to a Location, browses Lots, inspects items (spending AP to reveal clues), bids in Auctions, and loads won items into Cargo.
-2. **Hub phase** — Back home, items auto-resolve to their final perceived identity layer. Player manages Storage (assign research: Study, Repair, Authenticate), sells via Merchants / Special Orders, and prepares for the next run.
+
+- Inspection Scene
+- Auction Scene
+- Reveal Scene
+- Repeat 1-3
+- Cargo Scene
+- Summary Scene
+
+2. **Hub phase** — Back home, all unrevealed surface clues auto-reveal. Player manages Storage (assign research: Repair, Restore, Authenticate), sells via nightly customers, and prepares for the next run.
 
 ## Key Concepts
 
-- **ItemData** (designer resource) — The real item definition: `item_name`, `base_price`, identity layers, rarity, category.
-- **ItemEntry** (runtime) — A specific instance the player owns: tracks `inspection_level`, `perceived_layer`, `verified` status, `condition`, research state.
-- **Identity Layers** — Abstract perceived chain (e.g. "old vase" → "antique porcelain" → "Qing dynasty vase"). NOT the real item name. Final layer value < real `base_price`.
-- **Verified** — Only after Storage Authenticate does the player see the real `item_name` and `base_price`. This is the core information asymmetry.
-- **Clues** — Knowledge gained during Inspection. Enough clues (>50% per layer) advance the perceived layer. Clues are NOT direct price reveals.
+- **ItemData** (designer resource) — The real item definition: `item_name`, clues (anchor + surface + hidden), rarity, category. `base_price` is deprecated — true value derives from clue modifiers.
+- **ItemEntry** (runtime) — A specific instance the player owns: tracks `anchor_revealed`, `revealed_clue_ids`, `verified` status, `condition`, research state. `inspection_level` = ratio of revealed surface clues.
+- **Clues** — Three types: **anchor** (flat base value, auto-revealed on first inspect), **surface** (price modifiers, dice-discovered during inspection or auto-revealed on hub return), **hidden** (revealed only by Authenticate, can be positive or negative). Each clue has a `type`, `domain`, `attribute`, `dc`, `effect_op`, and `effect_amount`.
+- **Attributes** — Five SPECIAL-style stats (Appraisal, Perception, Restoration, Negotiation, Investigation) that provide bonuses to clue discovery dice rolls. Replace the old skill system.
+- **Verified** — Only after Storage Authenticate does the player see the real `item_name` and hidden clue effects. Verified value may be higher or lower than appraised. This is the core information asymmetry.
 
-## Selling Channels
+## Selling (Phase 9 — planned)
 
-| Channel | Gate | Price basis |
-|---------|------|-------------|
-| Quick Sell | None | Perceived value × discount |
-| Merchant Negotiation | Perk | `market_price × merchant_multiplier`, then negotiated |
-| Special Order | Merchant-specific | PriceConfig flags + buff; premium orders require verified |
-| Player Shop (planned) | Phase 9 | Player-set price, interest based on verified status |
+All selling channels (Quick Sell, Merchant Negotiation, Special Orders) are deprecated. Phase 9 replaces them with a unified nightly customer system: customers arrive with demand tags and car grids, the player fills cars, and chooses conservative (×1.2) or aggressive (dice pool) sell. See `ROADMAP.md`.
 
 ## Project Structure
 
@@ -56,7 +59,7 @@ Items are authored in `data/yaml/items/*.yaml`, converted to `.tres` via `dev/to
 
 ## Current Phase
 
-Core loop redesign: Phases 0–6 complete or superseded (runtime veil cleanup, AP grid inspection, item base price, storage authenticate). Next up: Phase 7 (clue independence + attribute system — replaces identity layers and skills with independent clue resources and dice-based attribute checks). See `ROADMAP.md` for the full phase dependency graph.
+Core loop redesign: Phases 0–7 complete (runtime veil cleanup, AP grid inspection, item base price, storage authenticate, clue independence + attribute system). Identity layers and skills have been fully replaced by clue-based pricing and SPECIAL-style attributes. Next up: Phase 8 (dynamic naming rules) and Phase 10 (value policy cleanup) in parallel; Phase 9 (merchant system redesign) after Phase 10. See `ROADMAP.md` for the full phase dependency graph.
 
 ## Conventions (quick reference)
 
@@ -64,7 +67,7 @@ Core loop redesign: Phases 0–6 complete or superseded (runtime veil cleanup, A
 - **Registries**: one autoload per designer resource type, required API: `get_<singular>_by_id`, `get_all_<plural>`, `size`. No display-name wrappers. See `dev/standards/registries.md`.
 - **Scene architecture**: block scenes follow the standard in `dev/standards/block_scene_architecture_standard.md`.
 - **Commits**: conventional commits format. See `dev/skills/conventional_commits.md`.
-- **Price pipeline**: all prices flow through `ItemEntry.compute_price(config)` / `compute_price_range(config)`. `PriceConfig` toggles select which factors apply. No per-type formulas outside the pipeline.
+- **Price pipeline**: all prices flow through `ItemEntry.compute_price(config)`. `PriceConfig` toggles select which factors apply (condition, knowledge, market, scalar). Appraised value = anchor + surface modifiers (add-then-mul). Verified value includes hidden modifiers. No per-type formulas outside the pipeline.
 - **Iterate resources, not ids**: outside serialization boundaries, pass Resource refs. String ids are for save/load only.
 - **Docstrings**: every `.gd` file starts with `# filename` + one-line purpose. All public functions and complex (>10 lines or non-obvious) private functions get a `##` GDDoc comment. Never strip or reduce existing comments when editing code.
 
