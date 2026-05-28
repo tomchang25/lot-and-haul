@@ -7,7 +7,7 @@ extends RefCounted
 enum SlotAction {
     REPAIR,
     RESTORE,
-    AUTHENTICATE,
+    RESEARCH,
 }
 
 enum SlotCheck {
@@ -27,10 +27,10 @@ var action: SlotAction = SlotAction.REPAIR
 # Set by the day-tick dispatch when the slot finishes its work.
 var completed: bool = false
 
-# AUTHENTICATE progress — number of days spent authenticating.
+# RESEARCH progress — number of days spent researching.
 # Persisted as part of the slot dict because it is slot-scoped state
 # that must survive day ticks and save/load cycles.
-var authenticate_days_spent: int = 0
+var research_days_spent: int = 0
 
 
 func is_empty() -> bool:
@@ -51,8 +51,8 @@ static func action_to_string(a: SlotAction) -> String:
             return "repair"
         SlotAction.RESTORE:
             return "restore"
-        SlotAction.AUTHENTICATE:
-            return "authenticate"
+        SlotAction.RESEARCH:
+            return "research"
         _:
             push_error("ResearchSlot: unknown SlotAction %d" % a)
             return "unknown"
@@ -64,8 +64,8 @@ static func action_from_string(s: String) -> SlotAction:
             return SlotAction.REPAIR
         "restore":
             return SlotAction.RESTORE
-        "authenticate":
-            return SlotAction.AUTHENTICATE
+        "authenticate", "research":
+            return SlotAction.RESEARCH
         _:
             push_error("ResearchSlot: unrecognised action string '%s'" % s)
             return SlotAction.REPAIR
@@ -115,8 +115,8 @@ func to_dict() -> Dictionary:
         "action": action_to_string(action),
         "completed": completed,
     }
-    if action == SlotAction.AUTHENTICATE:
-        d["authenticate_days_spent"] = authenticate_days_spent
+    if action == SlotAction.RESEARCH:
+        d["research_days_spent"] = research_days_spent
     return d
 
 
@@ -125,8 +125,8 @@ static func from_dict(d: Dictionary) -> ResearchSlot:
     slot.item_id = int(d.get("item_id", -1))
     slot.action = action_from_string(d.get("action", "repair"))
     slot.completed = bool(d.get("completed", false))
-    if slot.action == SlotAction.AUTHENTICATE:
-        slot.authenticate_days_spent = int(d.get("authenticate_days_spent", 0))
+    if slot.action == SlotAction.RESEARCH:
+        slot.research_days_spent = int(d.get("research_days_spent", d.get("authenticate_days_spent", 0)))
     return slot
 
 
@@ -143,7 +143,7 @@ static func check_assignable(entry: ItemEntry, action: SlotAction) -> SlotCheck:
             if entry.condition < 0.5:
                 return SlotCheck.RESTORE_NOT_READY
             return SlotCheck.OK
-        SlotAction.AUTHENTICATE:
+        SlotAction.RESEARCH:
             if entry.anchor_revealed and not entry.all_surface_revealed():
                 return SlotCheck.NOT_FINAL_LAYER
             if entry.verified:
@@ -167,9 +167,9 @@ static func describe_blocked(check: SlotCheck, entry: ItemEntry) -> String:
         SlotCheck.RESTORE_NOT_READY:
             return "Repair to 50% before restoring"
         SlotCheck.NOT_FINAL_LAYER:
-            return "Must be at final perceived layer"
+            return "Inspect all surface clues before researching"
         SlotCheck.ALREADY_VERIFIED:
             return "Already verified"
         SlotCheck.CONDITION_TOO_LOW:
-            return "Repair before authenticating"
+            return "Repair before researching"
     return ""

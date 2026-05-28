@@ -44,8 +44,8 @@ extends Resource
 
 # ── Item pool ─────────────────────────────────────────────────────────────────
 
-# Deprecated in Phase 0 runtime-first cleanup. Kept for YAML/TRES compatibility
-# ItemEntry now starts uninspected regardless of this value.
+# Probability that an item in this lot starts veiled (not pre-unveiled).
+# Rolled once per item at lot generation: randf() > veiled_chance -> pre-unveiled.
 @export var veiled_chance: float = 0.4
 
 # Number of items drawn for this lot. Actual count is randi_range(min, max).

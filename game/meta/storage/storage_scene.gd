@@ -51,7 +51,7 @@ var _selected_entry: ItemEntry = null
 # Right — action buttons
 @onready var _action_grid: GridContainer = %ActionGrid
 @onready var _repair_btn: Button = %RepairButton
-@onready var _authenticate_btn: Button = %AuthenticateButton
+@onready var _research_btn: Button = %ResearchButton
 @onready var _restore_btn: Button = %RestoreButton
 @onready var _remove_btn: Button = %RemoveButton
 @onready var _value_title_label: Label = %ValueTitleLabel
@@ -66,7 +66,7 @@ func _ready() -> void:
 
     _back_btn.pressed.connect(_on_back_pressed)
     _repair_btn.pressed.connect(_on_repair_pressed)
-    _authenticate_btn.pressed.connect(_on_authenticate_pressed)
+    _research_btn.pressed.connect(_on_research_pressed)
     _restore_btn.pressed.connect(_on_restore_pressed)
     _remove_btn.pressed.connect(_on_remove_pressed)
 
@@ -101,8 +101,8 @@ func _on_repair_pressed() -> void:
     _assign_action(ResearchSlot.SlotAction.REPAIR)
 
 
-func _on_authenticate_pressed() -> void:
-    _assign_action(ResearchSlot.SlotAction.AUTHENTICATE)
+func _on_research_pressed() -> void:
+    _assign_action(ResearchSlot.SlotAction.RESEARCH)
 
 
 func _on_restore_pressed() -> void:
@@ -187,7 +187,7 @@ func _build_task_card(slot: ResearchSlot, entry: ItemEntry) -> PanelContainer:
     kind_label.add_theme_font_size_override("font_size", 10)
     kind_label.text = ResearchSlot.action_to_string(slot.action).to_upper()
     match slot.action:
-        ResearchSlot.SlotAction.AUTHENTICATE:
+        ResearchSlot.SlotAction.RESEARCH:
             kind_label.add_theme_color_override("font_color", Color(0.6, 0.9, 0.4))
         _:
             kind_label.add_theme_color_override("font_color", Color(0.42, 0.75, 0.85))
@@ -228,12 +228,12 @@ func _build_task_card(slot: ResearchSlot, entry: ItemEntry) -> PanelContainer:
     return card
 
 
-func _authenticate_progress_text(slot: ResearchSlot, entry: ItemEntry) -> String:
+func _research_progress_text(slot: ResearchSlot, entry: ItemEntry) -> String:
     if slot.completed:
         return "Verified"
-    return "Authenticating… Day %d/%d" % [
-        slot.authenticate_days_spent,
-        Economy.AUTHENTICATE_DAYS.get(entry.item_data.rarity, 3),
+    return "Researching… Day %d/%d" % [
+        slot.research_days_spent,
+        Economy.RESEARCH_DAYS.get(entry.item_data.rarity, 3),
     ]
 
 
@@ -245,8 +245,8 @@ func _task_progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
             return "Condition: %d%%" % int(entry.condition * 100)
         ResearchSlot.SlotAction.RESTORE:
             return "Condition: %d%%" % int(entry.condition * 100)
-        ResearchSlot.SlotAction.AUTHENTICATE:
-            return _authenticate_progress_text(slot, entry)
+        ResearchSlot.SlotAction.RESEARCH:
+            return _research_progress_text(slot, entry)
         _:
             return ""
 
@@ -350,15 +350,15 @@ func _refresh_detail() -> void:
     or SaveManager.research_slots.size() < SaveManager.max_research_slots
 
     _configure_action_btn(_repair_btn, "Repair", entry, ResearchSlot.SlotAction.REPAIR, current_slot)
-    _configure_action_btn(_authenticate_btn, "Authenticate", entry, ResearchSlot.SlotAction.AUTHENTICATE, current_slot)
+    _configure_action_btn(_research_btn, "Research", entry, ResearchSlot.SlotAction.RESEARCH, current_slot)
     _configure_action_btn(_restore_btn, "Restore", entry, ResearchSlot.SlotAction.RESTORE, current_slot)
 
     if not slots_available:
         _repair_btn.disabled = true
-        _authenticate_btn.disabled = true
+        _research_btn.disabled = true
         _restore_btn.disabled = true
         _repair_btn.tooltip_text = "No research slots available"
-        _authenticate_btn.tooltip_text = "No research slots available"
+        _research_btn.tooltip_text = "No research slots available"
         _restore_btn.tooltip_text = "No research slots available"
 
     # Repair / Restore: only show one at a time; never both visible.
@@ -403,8 +403,8 @@ func _progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
             return "Condition: %d%%" % int(entry.condition * 100)
         ResearchSlot.SlotAction.RESTORE:
             return "Condition: %d%%" % int(entry.condition * 100)
-        ResearchSlot.SlotAction.AUTHENTICATE:
-            return _authenticate_progress_text(slot, entry)
+        ResearchSlot.SlotAction.RESEARCH:
+            return _research_progress_text(slot, entry)
         _:
             push_warning("StorageScene: unknown SlotAction %d" % slot.action)
             return ""

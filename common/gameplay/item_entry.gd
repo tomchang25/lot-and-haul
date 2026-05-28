@@ -7,6 +7,9 @@ extends RefCounted
 
 const UNKNOWN_TEXT := "???"
 
+enum DisplayState { VEILED, UNVEILED, VERIFIED }
+const VEILED_PREFIX := "Unknown "
+
 const COLUMN_NAME := 0
 const COLUMN_CONDITION := 1
 const COLUMN_ESTIMATED_VALUE := 2
@@ -17,8 +20,7 @@ const COLUMN_RARITY := 6
 const COLUMN_WEIGHT := 7
 const COLUMN_GRID := 8
 const COLUMN_MARKET_FACTOR := 9
-const COLUMN_RESEARCH_STATUS := 10
-const COLUMN_INSPECTION := 11
+const COLUMN_INSPECTION := 10
 
 # ── Inspection constants ─────────────────────────────────────────────────────
 
@@ -55,10 +57,8 @@ const MAX_SPREAD: float = 0.5
 
 var item_data: ItemData = null
 
-# False until the player has inspected/revealed this entry.
-var inspected: bool = false
-
 # True after the anchor clue has been revealed (auto-revealed on first inspect).
+# This is the sole authority for veil state — use is_veiled() to read it.
 var anchor_revealed: bool = false
 
 var condition: float = 1.0
@@ -72,8 +72,17 @@ var id: int = -1
 # inspection so the range always converges on the true value.
 var center_offset: float = 0.0
 
-# True after Storage Authenticate completes. Reveals hidden clues.
-var verified: bool = false
+# Computed: true when every hidden clue is in revealed_clue_ids.
+# If item has no hidden clues, verified is true by default.
+var verified: bool:
+    get:
+        var hidden := _hidden_clues()
+        if hidden.is_empty():
+            return true
+        for clue: ClueData in hidden:
+            if not revealed_clue_ids.has(clue.clue_id):
+                return false
+        return true
 
 var revealed_clue_ids: Array[String] = []
 
@@ -84,7 +93,7 @@ func _anchor_clue() -> ClueData:
     if item_data == null:
         return null
     for clue: ClueData in item_data.clues:
-        if clue.type == "anchor":
+        if clue.type == ClueData.ClueType.ANCHOR:
             return clue
     return null
 
@@ -94,7 +103,7 @@ func _surface_clues() -> Array[ClueData]:
         return []
     var result: Array[ClueData] = []
     for clue: ClueData in item_data.clues:
-        if clue.type == "surface":
+        if clue.type == ClueData.ClueType.SURFACE:
             result.append(clue)
     return result
 
@@ -104,7 +113,7 @@ func _hidden_clues() -> Array[ClueData]:
         return []
     var result: Array[ClueData] = []
     for clue: ClueData in item_data.clues:
-        if clue.type == "hidden":
+        if clue.type == ClueData.ClueType.HIDDEN:
             result.append(clue)
     return result
 
@@ -166,7 +175,7 @@ func _hidden_add_sum() -> float:
 # inspection_level based on surface clue reveal ratio.
 var inspection_level: float:
     get:
-        if not inspected or not anchor_revealed:
+        if not anchor_revealed:
             return 0.0
         var total := _total_surface_count()
         if total == 0:
@@ -176,19 +185,22 @@ var inspection_level: float:
 var display_name: String:
     get:
         if is_veiled():
-            return "Unknown Item"
+            var cat := category_data()
+            if cat != null and not cat.display_name.is_empty():
+                return VEILED_PREFIX + cat.display_name
+            return VEILED_PREFIX + "Item"
         if verified:
             if item_data.item_name.is_empty():
                 push_warning("ItemEntry %d: verified but item_name is empty" % id)
-                return "Unknown E2 9C 93"
-            return "%s E2 9C 93" % item_data.item_name
+                return "Unknown Item"
+            return item_data.item_name
         var anchor := _anchor_clue()
         if anchor != null:
             var name: String = anchor.known_text
             if id >= 0 and ResearchSlot.action_for_item(SaveManager.research_slots, id) != "":
                 name += " E2 9A 99"
             return name
-        return "Unknown Item"
+        return VEILED_PREFIX + "Item"
 
 
 func get_condition_multiplier() -> float:
@@ -264,15 +276,30 @@ func reveal_anchor() -> void:
     anchor_revealed = true
 
 
-func attempt_surface_clue(clue: ClueData, attribute_bonus: int) -> bool:
-    if clue == null or clue.type != "surface":
+func attempt_clue(clue: ClueData, attribute_bonus: int) -> bool:
+    if clue == null or clue.type == ClueData.ClueType.ANCHOR:
         return false
     var success_chance := clampi((21 + attribute_bonus - clue.dc) * 5, 5, 95)
-    var roll := randi() % 100 + 1 # 1–100 percentile roll
+    var roll := randi() % 100 + 1
     var succeeded := roll <= success_chance
     if succeeded and not revealed_clue_ids.has(clue.clue_id):
         revealed_clue_ids.append(clue.clue_id)
+        KnowledgeManager.add_category_points(
+            item_data.category_data,
+            item_data.rarity,
+            KnowledgeManager.KnowledgeAction.REVEAL,
+        )
     return succeeded
+
+
+func get_inspection_clues() -> Array[ClueData]:
+    if item_data == null:
+        return []
+    var result: Array[ClueData] = []
+    for clue: ClueData in item_data.clues:
+        if clue.type != ClueData.ClueType.ANCHOR and not revealed_clue_ids.has(clue.clue_id):
+            result.append(clue)
+    return result
 
 
 func auto_reveal_all_surface() -> void:
@@ -584,28 +611,6 @@ func market_factor_text() -> String:
     return ItemEntry.UNKNOWN_TEXT if is_veiled() else "%+d%%" % int(round(market_factor_delta * 100))
 
 
-func research_status_text() -> String:
-    if id == -1:
-        return ""
-    for d: Dictionary in SaveManager.research_slots:
-        var slot_item_id: int = int(d.get("item_id", -1))
-        if slot_item_id == -1 or slot_item_id != id:
-            continue
-        if bool(d.get("completed", false)):
-            return "E2 9C 93"
-        var action_string: String = String(d.get("action", ""))
-        match action_string:
-            "repair":
-                return "R"
-            "unlock":
-                return "U"
-            "authenticate":
-                return "A"
-            _:
-                return "?"
-    return ""
-
-
 func inspection_text() -> String:
     return ItemEntry.UNKNOWN_TEXT if is_veiled() or not anchor_revealed else "%d%%" % int(price_convergence_ratio * 100)
 
@@ -650,24 +655,18 @@ func category_text() -> String:
     return category.display_name if category != null else ""
 
 
-func can_inspect() -> bool:
-    return is_veiled()
-
-
-func can_advance() -> bool:
-    return anchor_revealed and not all_surface_revealed()
-
-
-func perform_inspect() -> StringName:
-    if is_veiled():
-        unveil()
-        KnowledgeManager.add_category_points(
-            item_data.category_data,
-            item_data.rarity,
-            KnowledgeManager.KnowledgeAction.REVEAL,
-        )
-        return &"unveil"
-    return &"condition"
+## Returns true if the item has any unrevealed surface or hidden clues available
+## for inspection. False once all discoverable clues are revealed, or before
+## the anchor has been revealed.
+func has_inspection_clues() -> bool:
+    if not anchor_revealed:
+        return false
+    if not all_surface_revealed():
+        return true
+    for clue: ClueData in _hidden_clues():
+        if not revealed_clue_ids.has(clue.clue_id):
+            return true
+    return false
 
 
 func sort_value(column: int, ctx: ItemViewContext) -> Variant:
@@ -696,13 +695,6 @@ func sort_value(column: int, ctx: ItemViewContext) -> Variant:
             return grid_category.get_cells().size() if grid_category != null else 0
         ItemEntry.COLUMN_MARKET_FACTOR:
             return market_factor_delta
-        ItemEntry.COLUMN_RESEARCH_STATUS:
-            for d: Dictionary in SaveManager.research_slots:
-                if int(d.get("item_id", -1)) == id:
-                    if bool(d.get("completed", false)):
-                        return 2
-                    return 1
-            return 0
         ItemEntry.COLUMN_INSPECTION:
             return price_convergence_ratio
         _:
@@ -711,14 +703,21 @@ func sort_value(column: int, ctx: ItemViewContext) -> Variant:
 
 
 func is_veiled() -> bool:
-    return not inspected
+    return not anchor_revealed
 
 
-# Marks an uninspected item as inspected.
+## Player-triggered unveil. Reveals the anchor clue and grants REVEAL knowledge XP.
+## For system-level pre-unveils (lot generation, migration), call reveal_anchor() directly.
 func unveil() -> void:
     if not is_veiled():
         return
-    inspected = true
+    reveal_anchor()
+    if item_data != null and item_data.category_data != null:
+        KnowledgeManager.add_category_points(
+            item_data.category_data,
+            item_data.rarity,
+            KnowledgeManager.KnowledgeAction.REVEAL,
+        )
 
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
@@ -729,8 +728,6 @@ static func create(data: ItemData) -> ItemEntry:
 
     entry.condition = randf()
     entry.center_offset = randf_range(-0.5, 0.5)
-
-    entry.inspected = false
     entry.anchor_revealed = false
 
     return entry
@@ -743,7 +740,6 @@ func to_dict() -> Dictionary:
         "item_id": item_data.item_id,
         "id": id,
         "anchor_revealed": anchor_revealed,
-        "inspected": inspected,
         "condition": condition,
         "center_offset": center_offset,
         "verified": verified,
@@ -758,9 +754,9 @@ static func from_dict(d: Dictionary) -> ItemEntry:
         return null
     var entry := ItemEntry.new()
     entry.item_data = data
-    entry.inspected = bool(d.get("inspected", false))
-
-    entry.anchor_revealed = bool(d.get("anchor_revealed", false))
+    # Legacy saves may have "inspected" without "anchor_revealed"; treat as unveiled.
+    var legacy_inspected := bool(d.get("inspected", false))
+    entry.anchor_revealed = bool(d.get("anchor_revealed", legacy_inspected))
 
     entry.condition = float(d["condition"])
     if d.has("center_offset"):
@@ -768,10 +764,13 @@ static func from_dict(d: Dictionary) -> ItemEntry:
 
     if d.has("id"):
         entry.id = int(d["id"])
-    if d.has("verified"):
-        entry.verified = bool(d["verified"])
     if d.has("revealed_clue_ids"):
         var raw: Array = d["revealed_clue_ids"]
         for clue_id_value in raw:
             entry.revealed_clue_ids.append(String(clue_id_value))
+    # Legacy migration: old saves stored verified as a bool flag without
+    # populating revealed_clue_ids. reveal_all_hidden() is idempotent —
+    # clue IDs already loaded above are guarded by has(), so no duplicates.
+    if d.has("verified") and bool(d["verified"]):
+        entry.reveal_all_hidden()
     return entry

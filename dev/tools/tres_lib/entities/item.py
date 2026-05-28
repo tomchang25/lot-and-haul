@@ -173,6 +173,21 @@ class ItemSpec:
                     f"item '{iid}': must have exactly 1 anchor clue, found {len(anchors)}"
                 )
 
+            # Validate clue ordering: all hidden clues must appear after all surface clues.
+            last_surface_idx = -1
+            first_hidden_idx = len(clue_ids)
+            for idx, cid in enumerate(clue_ids):
+                ctype = known_clues_by_id.get(cid, {}).get("type", "")
+                if ctype == "surface":
+                    last_surface_idx = idx
+                elif ctype == "hidden":
+                    if idx < first_hidden_idx:
+                        first_hidden_idx = idx
+            if first_hidden_idx < len(clue_ids) and first_hidden_idx <= last_surface_idx:
+                errors.append(
+                    f"item '{iid}': hidden clue '{clue_ids[first_hidden_idx]}' appears before or interleaved with surface clues. All hidden clues must come after all surface clues."
+                )
+
         return errors
 
 

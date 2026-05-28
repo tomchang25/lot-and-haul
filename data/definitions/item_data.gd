@@ -16,7 +16,7 @@ enum Rarity {
 @export var item_id: String = ""
 
 ## DEPRECATED — Phase 8
-# True item name. Shown only after verification/authentication.
+# True item name. Shown only after verification (all hidden clues revealed).
 @export var item_name: String = ""
 
 ## DEPRECATED — Phase 7 moved true value into clue modifiers

@@ -30,7 +30,6 @@ enum Column {
     WEIGHT,
     GRID,
     MARKET_FACTOR,
-    RESEARCH_STATUS,
     INSPECTION,
 }
 
@@ -48,7 +47,6 @@ const COLUMN_HEADERS: Dictionary = {
     Column.WEIGHT: "Weight",
     Column.GRID: "Grid",
     Column.MARKET_FACTOR: "Market",
-    Column.RESEARCH_STATUS: "Research",
     Column.INSPECTION: "Inspection",
 }
 
@@ -63,7 +61,6 @@ const COLUMN_MIN_WIDTH: Dictionary = {
     Column.WEIGHT: 100,
     Column.GRID: 80,
     Column.MARKET_FACTOR: 100,
-    Column.RESEARCH_STATUS: 100,
     Column.INSPECTION: 100,
 }
 
@@ -88,7 +85,6 @@ var _selection_state: SelectionState = SelectionState.NONE
 @onready var _weight_label: Label = $HBoxContainer/WeightLabel
 @onready var _grid_label: Label = $HBoxContainer/GridLabel
 @onready var _market_factor_label: Label = $HBoxContainer/MarketFactorLabel
-@onready var _research_status_label: Label = $HBoxContainer/ResearchStatusLabel
 @onready var _inspection_label: Label = $HBoxContainer/InspectionLabel
 @onready var _auth_tag_label: Label = $HBoxContainer/NameHBox/AuthTagLabel
 
@@ -188,7 +184,6 @@ func _refresh() -> void:
     _weight_label.visible = Column.WEIGHT in _columns
     _grid_label.visible = Column.GRID in _columns
     _market_factor_label.visible = Column.MARKET_FACTOR in _columns
-    _research_status_label.visible = Column.RESEARCH_STATUS in _columns
     _inspection_label.visible = Column.INSPECTION in _columns
 
     # ── Column order ──────────────────────────────────────────────────────────
@@ -233,12 +228,8 @@ func _refresh() -> void:
     # ── MARKET FACTOR ─────────────────────────────────────────────────────────
     _market_factor_label.text = _entry.market_factor_text()
 
-    # ── RESEARCH STATUS ───────────────────────────────────────────────────────
-    _research_status_label.text = _entry.research_status_text()
-
     # ── INSPECTION ────────────────────────────────────────────────────────────
     _inspection_label.text = _entry.inspection_text()
-
 
 # ══ Column ordering ═══════════════════════════════════════════════════════════
 
@@ -258,7 +249,6 @@ func _apply_column_order() -> void:
         Column.WEIGHT: _weight_label,
         Column.GRID: _grid_label,
         Column.MARKET_FACTOR: _market_factor_label,
-        Column.RESEARCH_STATUS: _research_status_label,
         Column.INSPECTION: _inspection_label,
     }
 

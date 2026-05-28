@@ -45,7 +45,13 @@ static func create(data: LotData) -> LotEntry:
         var item := _draw_item(data)
 
         if item != null:
-            entry.item_entries.append(ItemEntry.create(item))
+            var item_entry := ItemEntry.create(item)
+            # Roll veiled_chance: each item independently starts pre-unveiled
+            # when randf() > veiled_chance. Calls reveal_anchor() directly —
+            # no XP granted for system-level pre-unveils.
+            if data.veiled_chance < 1.0 and randf() > data.veiled_chance:
+                item_entry.reveal_anchor()
+            entry.item_entries.append(item_entry)
 
     entry.item_entries.shuffle()
 

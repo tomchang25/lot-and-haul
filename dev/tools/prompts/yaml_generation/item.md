@@ -17,7 +17,7 @@ verified_value  = (appraised_value + Σ revealed_hidden_add) × Π revealed_hidd
 
 **Add before multiply.** All `add` effects are summed first, then all `mul` effects are applied as a product. Order within the YAML does not affect the result.
 
-The player sees `appraised_value` during the run and in storage until Authenticate completes. `verified_value` replaces it after authentication.
+The player sees `appraised_value` during the run and in storage until Research completes. `verified_value` replaces it after authentication.
 
 ---
 
@@ -61,14 +61,15 @@ clues:
 
 ### Hidden (0 or more per item, typically 0–2)
 
-- Revealed by Storage Authenticate, not inspection.
+- Accessible during inspection via the chain reveal mechanic, but DC should be set high enough that in-run discovery is unlikely. Fully revealed by Storage Research on completion.
 - `effect_op`: any of `add`, `mul`. `mul` is most common for hidden clues.
   - Use `mul` > 1.0 for a positive discovery (e.g., confirmed authentic: `x1.5`).
   - Use `mul` < 1.0 for a negative discovery (e.g., confirmed forgery: `x0.3`).
   - Use `add` for a flat bonus (e.g., hidden component adds independent value).
 - `known_text`: a significant reveal. Write as a sentence that would change the player's assessment. Example: `"Hallmarked Duplex Oil Lamp by Hinks & Son."`.
-- `dc` and `attribute` are set but not currently used for Authenticate. Set sensible values for future compatibility.
-- Hidden clues make Authenticate a risk/reward decision — the verified value may be higher or lower than the appraised value.
+- `dc`: 20–25. High enough to make inspection discovery rare but not impossible.
+- `attribute`: choose the attribute that fits the nature of the hidden information.
+- Hidden clues make Research a risk/reward decision — the verified value may be higher or lower than the appraised value.
 
 ---
 
@@ -91,8 +92,8 @@ Surface add amounts should sum to a total that, combined with the anchor, produc
 ```yaml
 items:
   - item_id: snake_case_unique_id
-    item_name: "Display Name Shown After Authenticate"
-    base_price: <positive int> # true verified price, shown only after Authenticate
+    item_name: "Display Name Shown After Research"
+    base_price: <positive int> # true verified price, shown only after Research
     category_id: <category_id> # must exist in category_data.yaml
     rarity: 0 | 1 | 2 | 3 | 4 # 0=Common, 1=Uncommon, 2=Rare, 3=Epic, 4=Legendary
     clue_ids:
@@ -104,7 +105,8 @@ items:
 
 - `base_price` must be greater than the maximum possible appraised value (anchor + all surface adds). This preserves the authentication value gap.
 - `clue_ids` must include exactly one anchor clue. All referenced ids must exist in `clues.yaml`.
-- `item_name` is shown to the player only after Authenticate. Before that, the anchor clue's `known_text` is the player-visible name.
+- `clue_ids` ordering: anchor first, then all surface clues, then all hidden clues. Hidden clues must never appear before a surface clue — this is enforced by the YAML validator.
+- `item_name` is shown to the player only after all hidden clues are revealed (verified state). Before that, the anchor clue's `known_text` is the player-visible name.
 
 ---
 

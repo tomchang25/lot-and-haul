@@ -8,8 +8,8 @@ const GRID_COLS := 8
 const GRID_ROWS := 8
 const CELL_SIZE := Vector2(64.0, 64.0)
 
-const SEARCH_BASE_SECONDS := 2.0
-const SEARCH_MAX_SECONDS := 5.0
+const UNVEIL_COST := 1
+const CLUE_CHAIN_COST := 2
 
 const ACTIVE_BORDER_COLOR := Color(1.0, 0.88, 0.25, 1.0)
 const ACTIVE_BORDER_WIDTH := 3
@@ -25,7 +25,7 @@ const SHAPE_COLORS: Array[Color] = [
     Color(0.27, 0.27, 0.40, 1.0),
 ]
 
-enum ActionType { SEARCH, INSPECT_CLUE }
+enum ActionType { UNVEIL, INSPECT_CLUE }
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
@@ -36,12 +36,10 @@ var _cell_entry: Dictionary = { }
 var _entry_cells: Dictionary = { }
 var _entry_origin: Dictionary = { }
 var _entry_color_by_entry: Dictionary = { }
-var _search_duration_by_entry: Dictionary = { }
 
 var _active_entry: ItemEntry = null
 var _active_action_type: int = -1
 var _active_action_cost: int = 0
-var _active_action_remaining: float = 0.0
 var _inspection_finished: bool = false
 
 var _hover_entry: ItemEntry = null
@@ -75,6 +73,10 @@ var _hover_entry: ItemEntry = null
 @onready var _detail_cond_value_label: Label = %CondValueLabel
 @onready var _detail_value_label: Label = %ValueValueLabel
 
+# Sidebar — clue results (dedicated, separate from value)
+@onready var _clue_result_section: VBoxContainer = %ClueResultSection
+@onready var _clue_result_label: RichTextLabel = %ClueResultLabel
+
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
@@ -97,20 +99,11 @@ func _ready() -> void:
     _refresh_veiled_list()
     _refresh_total_estimate()
     _clear_detail_section()
-    set_process(true)
+    _clear_clue_result()
 
 
-func _process(delta: float) -> void:
-    if _inspection_finished or _active_entry == null:
-        return
-
-    _active_action_remaining -= delta
-    if _active_action_remaining <= 0.0:
-        _complete_active_action()
-        return
-
-    _refresh_grid_cells()
-    _refresh_hud()
+func _process(_delta: float) -> void:
+    pass
 
 # ══ Grid setup ════════════════════════════════════════════════════════════════
 
@@ -146,7 +139,6 @@ func _place_items() -> void:
     _entry_cells.clear()
     _entry_origin.clear()
     _entry_color_by_entry.clear()
-    _search_duration_by_entry.clear()
 
     for entry: ItemEntry in RunManager.run_record.lot_items:
         _place_entry(entry)
@@ -209,7 +201,6 @@ func _commit_shape_placement(
     _entry_cells[entry] = occupied_cells
     _entry_origin[entry] = origin
     _entry_color_by_entry[entry] = SHAPE_COLORS[_entry_color_by_entry.size() % SHAPE_COLORS.size()]
-    _search_duration_by_entry[entry] = _compute_search_duration(occupied_cells.size())
 
 # ══ Search interaction ════════════════════════════════════════════════════════
 
@@ -225,55 +216,72 @@ func _on_grid_cell_pressed(coord: Vector2i) -> void:
         return
 
     if entry.is_veiled():
-        var cost_seconds := _search_cost_for_entry(entry)
-        if cost_seconds > RunManager.run_record.actions_remaining:
+        if UNVEIL_COST > RunManager.run_record.actions_remaining:
             return
-        _start_action(entry, ActionType.SEARCH, cost_seconds)
+        _do_unveil(entry)
         return
 
-    if entry.can_advance():
-        var cost := _clue_cost_for_item(entry)
-        if RunManager.run_record.actions_remaining < cost:
+    if entry.has_inspection_clues():
+        if CLUE_CHAIN_COST > RunManager.run_record.actions_remaining:
             return
-        _start_action(entry, ActionType.INSPECT_CLUE, cost)
+        _do_clue_chain(entry)
         return
 
 
-func _start_action(entry: ItemEntry, action_type: int, cost_seconds: int) -> void:
+func _do_unveil(entry: ItemEntry) -> void:
     _active_entry = entry
-    _active_action_type = action_type
-    _active_action_cost = cost_seconds
-    _active_action_remaining = max(0.5, float(cost_seconds) * 0.25)
-    _refresh_grid_cells()
-    _refresh_hud()
+    _active_action_type = ActionType.UNVEIL
+    _active_action_cost = UNVEIL_COST
+
+    RunManager.run_record.actions_remaining -= UNVEIL_COST
+    _reveal_item(entry)
+
+    _complete_action(entry, ActionType.UNVEIL)
 
 
-func _complete_active_action() -> void:
-    var completed_entry := _active_entry
-    var action_type := _active_action_type
-    var action_cost := _active_action_cost
+func _do_clue_chain(entry: ItemEntry) -> void:
+    _active_entry = entry
+    _active_action_type = ActionType.INSPECT_CLUE
+    _active_action_cost = CLUE_CHAIN_COST
+
+    RunManager.run_record.actions_remaining -= CLUE_CHAIN_COST
+
+    _clear_clue_result()
+    var clue_texts: Array[String] = []
+    for clue: ClueData in entry.get_inspection_clues():
+        if entry.revealed_clue_ids.has(clue.clue_id):
+            continue
+        var attr_value := KnowledgeManager.get_attribute_value(clue.attribute)
+        var attribute_bonus: int = maxi(attr_value - 1, 0)
+        var succeeded := entry.attempt_clue(clue, attribute_bonus)
+        # XP is granted inside attempt_clue() on success.
+        if succeeded:
+            clue_texts.append("[color=#66ff80]%s[/color]" % clue.known_text)
+        else:
+            clue_texts.append("[color=#8c949f]Failed: %s[/color]" % clue.known_text)
+            break
+
+    if clue_texts.is_empty():
+        _clue_result_label.text = "No more clues to investigate."
+    else:
+        _clue_result_label.text = "\n".join(clue_texts)
+    _clue_result_section.show()
+
+    _complete_action(entry, ActionType.INSPECT_CLUE)
+
+
+func _complete_action(completed_entry: ItemEntry, action_type: int) -> void:
     _clear_active_action()
-
-    if completed_entry == null:
-        return
-
-    RunManager.run_record.actions_remaining -= action_cost
-
-    match action_type:
-        ActionType.SEARCH:
-            if completed_entry.is_veiled():
-                _reveal_item(completed_entry)
-        ActionType.INSPECT_CLUE:
-            _attempt_clue_reveal(completed_entry)
 
     _refresh_grid_cells()
     _refresh_hud()
     _refresh_found_list()
     _refresh_veiled_list()
     _refresh_total_estimate()
-    # For clue attempts, _attempt_clue_reveal() sets sidebar feedback directly
-    # skip _update_detail_section() so the feedback persists until the next hover.
-    if action_type != ActionType.INSPECT_CLUE and _hover_entry == completed_entry:
+
+    # Always refresh detail when the active item is hovered — _update_detail_section
+    # only touches name/condition/value labels and does not clear the clue result area.
+    if _hover_entry == completed_entry:
         _update_detail_section(completed_entry)
 
     if RunManager.run_record.actions_remaining <= 0:
@@ -303,73 +311,16 @@ func _clear_active_action() -> void:
     _active_entry = null
     _active_action_type = -1
     _active_action_cost = 0
-    _active_action_remaining = 0.0
 
 
-func _clue_cost_for_item(item: ItemEntry) -> int:
-    return 1
-
-
-func _search_cost_for_entry(entry: ItemEntry) -> int:
-    return ceili(float(_search_duration_by_entry.get(entry, SEARCH_BASE_SECONDS)))
-
-
-func _compute_search_duration(cell_count: int) -> float:
-    var size_factor: float = minf(maxi(cell_count - 1, 0) * 0.35, 1.4)
-    var random_factor: float = randf_range(0.0, 1.2)
-    return clampf(SEARCH_BASE_SECONDS + size_factor + random_factor, SEARCH_BASE_SECONDS, SEARCH_MAX_SECONDS)
+func _clear_clue_result() -> void:
+    _clue_result_label.text = ""
+    _clue_result_section.hide()
 
 
 func _reveal_item(item: ItemEntry) -> void:
-    if item.is_veiled():
-        item.unveil()
-        if item.item_data != null and item.item_data.category_data != null:
-            KnowledgeManager.add_category_points(
-                item.item_data.category_data,
-                item.item_data.rarity,
-                KnowledgeManager.KnowledgeAction.REVEAL,
-            )
-
-    # Auto-reveal anchor clue on first inspect.
-    item.reveal_anchor()
-
-
-func _attempt_clue_reveal(item: ItemEntry) -> void:
-    if item == null or not item.anchor_revealed:
-        return
-
-    # Find the first unrevealed surface clue with lowest DC.
-    var target: ClueData = null
-    for clue: ClueData in item.item_data.clues:
-        if clue.type != "surface":
-            continue
-        if item.revealed_clue_ids.has(clue.clue_id):
-            continue
-        if target == null or clue.dc < target.dc:
-            target = clue
-
-    if target == null:
-        return
-
-    var attr_value := KnowledgeManager.get_attribute_value(target.attribute)
-    var attribute_bonus: int = attr_value - 1 # zero-index: 1 -> +0, 2 -> +1, etc.
-    if attribute_bonus < 0:
-        attribute_bonus = 0
-
-    var succeeded := item.attempt_surface_clue(target, attribute_bonus)
-    if succeeded:
-        KnowledgeManager.add_category_points(
-            item.item_data.category_data,
-            item.item_data.rarity,
-            KnowledgeManager.KnowledgeAction.REVEAL,
-        )
-        _detail_value_label.text = target.known_text
-        _detail_value_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
-    else:
-        _detail_value_label.text = "Nothing found."
-        _detail_value_label.add_theme_color_override(&"font_color", Color(0.55, 0.58, 0.63, 1))
-    _sidebar_hsep.show()
-    _detail_section.show()
+    # unveil() reveals the anchor and grants REVEAL XP internally.
+    item.unveil()
 
 # ══ Display refresh ═══════════════════════════════════════════════════════════
 
@@ -401,10 +352,10 @@ func _refresh_grid_cell(button: Button, coord: Vector2i, entry: ItemEntry) -> vo
         _apply_cell_style(button, base_color.lerp(action_color, 0.45), hover_borders)
         button.text = _active_origin_text() if is_origin else ""
     elif entry == _hover_entry:
-        _apply_cell_style(button, base_color if entry.is_veiled() else base_color.lightened(0.16 if not entry.can_advance() else 0.28), hover_borders)
+        _apply_cell_style(button, base_color if entry.is_veiled() else base_color.lightened(0.16 if not entry.has_inspection_clues() else 0.28), hover_borders)
         button.text = _origin_ap_text(entry) if is_origin else ""
     elif not entry.is_veiled():
-        var is_final_item: bool = not entry.can_advance()
+        var is_final_item: bool = not entry.has_inspection_clues()
         _apply_cell_style(button, base_color.lightened(0.16 if is_final_item else 0.28))
         button.text = _origin_ap_text(entry) if is_origin else ""
     else:
@@ -416,34 +367,27 @@ func _entry_grid_color(entry: ItemEntry) -> Color:
     return _entry_color_by_entry.get(entry, Color(0.08, 0.08, 0.10, 1.0))
 
 
-## Returns the clamped success percentage for the next unrevealed surface clue
-## on entry (the one with the lowest DC). Returns 0 if no unrevealed clues remain.
-## Mirrors the roll logic in attempt_surface_clue() without consuming AP.
 func _success_chance_for_next_clue(entry: ItemEntry) -> int:
-    var target: ClueData = null
-    for clue: ClueData in entry.item_data.clues:
-        if clue.type != "surface" or entry.revealed_clue_ids.has(clue.clue_id):
-            continue
-        if target == null or clue.dc < target.dc:
-            target = clue
-    if target == null:
+    var clues := entry.get_inspection_clues()
+    if clues.is_empty():
         return 0
+    var target := clues[0]
     var bonus := maxi(KnowledgeManager.get_attribute_value(target.attribute) - 1, 0)
     return clampi((21 + bonus - target.dc) * 5, 5, 95)
 
 
 func _origin_ap_text(entry: ItemEntry) -> String:
     if entry.is_veiled():
-        return "%d AP" % _search_cost_for_entry(entry)
+        return "%d AP" % UNVEIL_COST
 
-    if entry.can_advance():
+    if entry.has_inspection_clues():
         var pct := _success_chance_for_next_clue(entry)
-        return "%d AP\n%d%%" % [_clue_cost_for_item(entry), pct]
+        return "%d AP\n%d%%" % [CLUE_CHAIN_COST, pct]
     return "✓"
 
 
 func _active_origin_text() -> String:
-    return "%d AP\n%0.1fs" % [_active_action_cost, _active_action_remaining]
+    return "%d AP" % _active_action_cost
 
 
 func _apply_cell_style(button: Button, color: Color, edge_borders: Dictionary = { }) -> void:
@@ -558,7 +502,7 @@ func _refresh_veiled_list() -> void:
         row.add_child(name_lbl)
 
         var ap_lbl := Label.new()
-        ap_lbl.text = "%d AP" % _search_cost_for_entry(entry)
+        ap_lbl.text = "%d AP" % UNVEIL_COST
         ap_lbl.add_theme_font_size_override(&"font_size", 13)
         ap_lbl.add_theme_color_override(&"font_color", Color(0.55, 0.58, 0.63, 1))
         row.add_child(ap_lbl)
@@ -640,9 +584,9 @@ func _finish_inspection() -> void:
 
     _inspection_finished = true
     _clear_active_action()
-    set_process(false)
 
     _clear_detail_section()
+    _clear_clue_result()
     _refresh_grid_cells()
     _refresh_hud()
     _refresh_found_list()

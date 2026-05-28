@@ -19,7 +19,7 @@ func refresh_lot(selected_entry: ItemEntry) -> void:
 
     var can_inspect: bool = (
         selected_entry != null
-        and selected_entry.can_inspect()
+        and selected_entry.is_veiled()
     )
     can_inspect = (
         can_inspect

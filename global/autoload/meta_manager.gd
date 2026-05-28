@@ -7,7 +7,7 @@ func register_storage_item(entry: ItemEntry) -> void:
     SaveManager.next_entry_id += 1
     SaveManager.storage_items.append(entry)
     if entry.item_data != null and entry.item_data.auto_verify:
-        entry.verified = true
+        entry.reveal_all_hidden()
 
 
 func register_storage_items(entries: Array[ItemEntry]) -> void:
@@ -75,13 +75,12 @@ func _tick_research_slots(days: int) -> Array[Dictionary]:
                 ResearchSlot.SlotAction.RESTORE:
                     entry.apply_restore()
                     slot.completed = entry.is_restore_complete()
-                ResearchSlot.SlotAction.AUTHENTICATE:
-                    slot.authenticate_days_spent += 1
-                    var duration: int = Economy.AUTHENTICATE_DAYS.get(
+                ResearchSlot.SlotAction.RESEARCH:
+                    slot.research_days_spent += 1
+                    var duration: int = Economy.RESEARCH_DAYS.get(
                         entry.item_data.rarity, 3,
                     )
-                    if slot.authenticate_days_spent >= duration:
-                        entry.verified = true
+                    if slot.research_days_spent >= duration:
                         entry.reveal_all_hidden()
                         slot.completed = true
                 _:
@@ -90,10 +89,10 @@ func _tick_research_slots(days: int) -> Array[Dictionary]:
             if slot.completed and not completed_during_tick:
                 completed_during_tick = true
 
-        # AUTHENTICATE auto-clears on completion — entry.verified is the
-        # source of truth; the slot has no further use once verified is set.
+        # RESEARCH auto-clears on completion — verified is computed from
+        # hidden clue coverage; the slot has no further use once verified.
         # All other actions keep the completed slot until the player removes it.
-        if slot.action == ResearchSlot.SlotAction.AUTHENTICATE and slot.completed:
+        if slot.action == ResearchSlot.SlotAction.RESEARCH and slot.completed:
             SaveManager.research_slots[i] = ResearchSlot.new().to_dict()
         else:
             SaveManager.research_slots[i] = slot.to_dict()
@@ -123,7 +122,7 @@ func _slot_effect_label(action: ResearchSlot.SlotAction) -> String:
             return "Repair complete"
         ResearchSlot.SlotAction.RESTORE:
             return "Fully restored"
-        ResearchSlot.SlotAction.AUTHENTICATE:
+        ResearchSlot.SlotAction.RESEARCH:
             return "Verified"
         _:
             push_warning("MetaManager: unknown SlotAction %d" % action)

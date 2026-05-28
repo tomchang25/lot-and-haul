@@ -203,6 +203,25 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "—"
 
+[node name="ClueResultSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000080]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ClueResultHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ClueResultSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 11
+text = "Clue Results"
+
+[node name="ClueResultLabel" type="RichTextLabel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ClueResultSection"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+bbcode_enabled = true
+fit_content = true
+
 [node name="SidebarHSep" type="HSeparator" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000040]
 unique_name_in_owner = true
 layout_mode = 2

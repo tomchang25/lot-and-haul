@@ -5,14 +5,19 @@
 class_name ClueData
 extends Resource
 
+## Clue reveal category. ANCHOR is auto-revealed on first inspect; SURFACE clues
+## are discovered via dice during inspection or auto-revealed on hub return;
+## HIDDEN clues require Storage Research (or a high-DC inspection roll).
+enum ClueType { ANCHOR, SURFACE, HIDDEN }
+
 # Unique identifier across all clues in the project.
 @export var clue_id: String = ""
 
 # Text shown when this clue has been revealed.
 @export var known_text: String = ""
 
-# anchor | surface | hidden — controls reveal mechanic.
-@export var type: String = "surface"
+# Controls which reveal mechanic applies to this clue.
+@export var type: ClueType = ClueType.SURFACE
 
 # generic | <category_id> — controls content scope.
 @export var domain: String = "generic"

@@ -6,8 +6,8 @@ extends RefCounted
 const DAILY_BASE_COST: int = 100
 const LOCATION_SAMPLE_SIZE: int = 3
 
-# Authenticate duration in days, keyed by ItemData.Rarity enum.
-const AUTHENTICATE_DAYS: Dictionary = {
+# Research duration in days, keyed by ItemData.Rarity enum.
+const RESEARCH_DAYS: Dictionary = {
     ItemData.Rarity.COMMON: 1,
     ItemData.Rarity.UNCOMMON: 2,
     ItemData.Rarity.RARE: 3,

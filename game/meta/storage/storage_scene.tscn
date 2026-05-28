@@ -196,13 +196,13 @@ theme_override_font_sizes/font_size = 16
 [node name="AuthTagLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailNameHBox" unique_id=1558467984]
 unique_name_in_owner = true
 visible = false
+modulate = Color(0.6, 0.9, 0.4, 1)
 custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "● AUTH"
 horizontal_alignment = 1
 vertical_alignment = 1
-modulate = Color(0.6, 0.9, 0.4, 1)
 
 [node name="DetailCategoryLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=24253426]
 unique_name_in_owner = true
@@ -338,13 +338,12 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
 text = "Restore"
 
-[node name="AuthenticateButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1962471177]
+[node name="ResearchButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1962471177]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
-text = "Authenticate"
+text = "Research"
 
 [node name="RemoveButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1949861252]
 unique_name_in_owner = true

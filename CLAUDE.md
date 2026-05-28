@@ -57,6 +57,8 @@ EventBus → AudioManager → RegistryCoordinator → ItemRegistry → RunManage
 
 Items are authored in `data/yaml/items/*.yaml`, converted to `.tres` via `dev/tools/yaml_to_tres.py`. Validate with `dev/tools/validate_yaml.py`. Stats via `dev/tools/yaml_stats.py`. Reverse with `dev/tools/tres_to_yaml.py`. Never hand-edit `.tres` files under `data/tres/`.
 
+When authoring new items or clues, use the generation prompts at `dev/tools/prompts/yaml_generation/` (`base.md` + `category.md` + `item.md`). These define the schema, naming conventions, clue ordering rules, and effect amount guidelines.
+
 ## Current Phase
 
 Core loop redesign: Phases 0–7 complete (runtime veil cleanup, AP grid inspection, item base price, storage authenticate, clue independence + attribute system). Identity layers and skills have been fully replaced by clue-based pricing and SPECIAL-style attributes. Next up: Phase 8 (dynamic naming rules) and Phase 10 (value policy cleanup) in parallel; Phase 9 (merchant system redesign) after Phase 10. See `ROADMAP.md` for the full phase dependency graph.

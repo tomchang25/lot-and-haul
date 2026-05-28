@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+# Maps YAML string values <-> ClueData.ClueType enum integers (ANCHOR=0, SURFACE=1, HIDDEN=2).
+_CLUE_TYPE_TO_INT: dict[str, int] = {"anchor": 0, "surface": 1, "hidden": 2}
+_INT_TO_CLUE_TYPE: dict[int, str] = {v: k for k, v in _CLUE_TYPE_TO_INT.items()}
+
 from tres_lib.spec import BuildCtx, ParseCtx
 from tres_lib.uid import deterministic_uid
 from tres_lib.tres_writer import TresWriter
@@ -43,7 +47,7 @@ class ClueSpec:
         w.add_field('script = ExtResource("1_cluedef")')
         w.add_field_str("clue_id", clue_id)
         w.add_field_str("known_text", entry.get("known_text", ""))
-        w.add_field_str("type", entry.get("type", "surface"))
+        w.add_field_int("type", _CLUE_TYPE_TO_INT.get(entry.get("type", "surface"), 1))
         w.add_field_str("domain", entry.get("domain", "generic"))
         w.add_field_str("attribute", entry.get("attribute", ""))
         w.add_field_int("dc", int(entry.get("dc", 10)))
@@ -59,7 +63,7 @@ class ClueSpec:
         return {
             "clue_id": clue_id,
             "known_text": tres_field(text, "known_text") or "",
-            "type": tres_field(text, "type") or "surface",
+            "type": _INT_TO_CLUE_TYPE.get(int(tres_field(text, "type") or 1), "surface"),
             "domain": tres_field(text, "domain") or "generic",
             "attribute": tres_field(text, "attribute") or "",
             "dc": int(tres_field(text, "dc") or 10),
@@ -104,7 +108,9 @@ class ClueSpec:
                 amount = float(clue.get("effect_amount", "MISSING"))
                 if not (EFFECT_AMOUNT_MIN <= amount <= EFFECT_AMOUNT_MAX):
                     errors.append(
-                        f"clue '{cid}': effect_amount {amount} out of range [{EFFECT_AMOUNT_MIN}, {EFFECT_AMOUNT_MAX}]"
+                        "clue '{}': effect_amount {} out of range [{}, {}]".format(
+                            cid, amount, EFFECT_AMOUNT_MIN, EFFECT_AMOUNT_MAX
+                        )
                     )
             except (ValueError, TypeError):
                 errors.append(f"clue '{cid}': effect_amount is not a valid number")
