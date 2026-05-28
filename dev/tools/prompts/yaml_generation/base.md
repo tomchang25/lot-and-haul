@@ -37,6 +37,9 @@ Players buy mystery lots at auction and identify items over time. Item knowledge
 - Clue `known_text` must be three words or fewer. This applies to ALL clues, regardless of whether they carry a naming entry.
 - Prefer natural commercial or collector language over database-like phrasing.
 - Use ASCII unless the requested real-world name clearly requires a non-ASCII character.
+- **Forbidden `known_text` words.** The following game-mechanic and generic terms MUST NOT appear as any clue's `known_text`:
+  `Verified`, `Authentication`, `Authenticated`, `Authentic`, `Identified`, `Generic`, `Unknown`, `Checked`, `Confirmed`, `Validated`, `Appraised`, `Evaluated`
+  Clue text must describe a physical observation or historical detail, not a game state or process.
 
 ## Validation Principles
 

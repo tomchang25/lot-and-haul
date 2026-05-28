@@ -217,6 +217,21 @@ class ItemSpec:
                         if best_suffix is None or priority > best_suffix["prio"]:
                             best_suffix = {"clue": c, "prio": priority}
 
+                # Structural slot requirements: every named item must resolve a
+                # body and at least one qualifier (prefix or suffix) at full reveal.
+                # Without a body the name has no noun; without a qualifier the
+                # display_name can only show "Unknown {body}" even when verified.
+                if best_body is None:
+                    errors.append(
+                        f"item '{iid}': naming entries have no body slot — "
+                        f"at least one clue must declare naming.slot = body"
+                    )
+                if best_prefix is None and best_suffix is None:
+                    errors.append(
+                        f"item '{iid}': naming entries have no prefix or suffix slot — "
+                        f"at least one clue must declare naming.slot = prefix or suffix"
+                    )
+
                 parts: list[str] = []
                 for best in (best_prefix, best_body, best_suffix):
                     if best is not None:

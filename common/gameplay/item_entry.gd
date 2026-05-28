@@ -193,12 +193,6 @@ var inspection_level: float:
 
 var display_name: String:
     get:
-        if verified:
-            if item_data.item_name.is_empty():
-                push_warning("ItemEntry %d: verified but item_name is empty" % id)
-                return "Unknown Item"
-            return item_data.item_name
-
         var pool := _naming_clue_pool()
         var best_prefix: ClueData = null
         var best_body: ClueData = null
@@ -229,6 +223,14 @@ var display_name: String:
 
         if parts.is_empty():
             return "Unknown Item"
+
+        # No prefix or suffix revealed yet: the player knows the category (body)
+        # but not the qualifying characteristic. Prepend "Unknown" to signal
+        # partial identification — e.g. "Unknown Bow" while "Elven" is still hidden.
+        var has_qualifier := (best_prefix != null or best_suffix != null)
+        if not has_qualifier and best_body != null:
+            return "Unknown " + best_body.known_text
+
         return " ".join(parts)
 
 

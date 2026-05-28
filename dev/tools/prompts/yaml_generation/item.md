@@ -44,7 +44,11 @@ The `known_text` field serves double duty: it appears as the reveal description 
 
 **Naming composition**: as clues are revealed, the highest-priority naming clue for each slot (`prefix`, `body`, `suffix`) contributes its `known_text`. Ties resolve by array order — the first clue in the slot wins. The three parts are concatenated with spaces. Before verification, this forms the player-visible name. After verification, the authored `item_name` is shown directly.
 
-Under full reveal, the composed name must match `item_name` exactly (enforced by the YAML validator). Items where no clue carries a `naming` block are exempt from this check but will show "Unknown Item" until verified.
+Under full reveal, the composed name must match `item_name` exactly (enforced by the YAML validator).
+
+**Naming is the norm, not the exception.** Every standard item must have naming blocks on its clues. At full reveal the naming entries must resolve **at least one body slot and at least one prefix or suffix slot** — the validator enforces both. An item with only a body but no prefix or suffix will display as "Unknown {body}" (e.g. "Unknown Bow") until verification, because the runtime prepends "Unknown" when no qualifier has been revealed yet.
+
+Items with no naming entries at all are a deliberate exception (e.g. a generic commodity or placeholder) and must be treated as such — they show "Unknown Item" until verified. This must be the minority case and should be noted in the item's comment in the YAML file.
 
 ---
 
