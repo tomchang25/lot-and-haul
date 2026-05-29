@@ -75,6 +75,9 @@ var _hover_entry: ItemEntry = null
 @onready var _clue_result_section: VBoxContainer = %ClueResultSection
 @onready var _clue_result_label: RichTextLabel = %ClueResultLabel
 
+# Sidebar — revealed clue breakdown (created in _ready, appended to _detail_section)
+var _clues_vbox: VBoxContainer = null
+
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
@@ -94,6 +97,7 @@ func _ready() -> void:
     _refresh_found_list()
     _refresh_veiled_list()
     _refresh_total_estimate()
+    _build_clues_vbox()
     _clear_detail_section()
     _clear_clue_result()
 
@@ -563,8 +567,91 @@ func _update_detail_section(entry: ItemEntry) -> void:
         _detail_value_label.text = "—"
         _detail_value_label.add_theme_color_override(&"font_color", Color(0.55, 0.58, 0.63, 1))
 
+    _refresh_clues_section(entry)
+
     _sidebar_hsep.show()
     _detail_section.show()
+
+
+func _build_clues_vbox() -> void:
+    _clues_vbox = VBoxContainer.new()
+    _clues_vbox.add_theme_constant_override(&"separation", 2)
+    _detail_section.add_child(_clues_vbox)
+
+
+## Rebuilds the revealed-clue breakdown rows for the given entry.
+## Shows anchor (if revealed) then each revealed surface clue with op + amount.
+func _refresh_clues_section(entry: ItemEntry) -> void:
+    for child in _clues_vbox.get_children():
+        child.queue_free()
+
+    var rows: Array[Dictionary] = []
+
+    # Anchor row
+    if entry.anchor_revealed:
+        var anchor := entry.item_data.clues.filter(
+            func(c: ClueData) -> bool: return c.type == ClueData.ClueType.ANCHOR
+        )
+        if not anchor.is_empty():
+            var c: ClueData = anchor[0]
+            rows.append({ "text": c.known_text, "op": c.effect_op, "amount": c.effect_amount, "anchor": true })
+
+    # Surface clue rows — only revealed
+    for clue: ClueData in entry.item_data.clues:
+        if clue.type != ClueData.ClueType.SURFACE:
+            continue
+        if not entry.revealed_clue_ids.has(clue.clue_id):
+            continue
+        rows.append({ "text": clue.known_text, "op": clue.effect_op, "amount": clue.effect_amount, "anchor": false })
+
+    if rows.is_empty():
+        _clues_vbox.hide()
+        return
+
+    var sep := HSeparator.new()
+    sep.add_theme_constant_override(&"separation", 6)
+    _clues_vbox.add_child(sep)
+
+    var header := Label.new()
+    header.text = "CLUES"
+    header.add_theme_font_size_override(&"font_size", 10)
+    header.add_theme_color_override(&"font_color", Color(0.55, 0.58, 0.63, 1))
+    _clues_vbox.add_child(header)
+
+    for row: Dictionary in rows:
+        var hbox := HBoxContainer.new()
+        hbox.add_theme_constant_override(&"separation", 4)
+
+        var name_lbl := Label.new()
+        name_lbl.text = row["text"]
+        name_lbl.add_theme_font_size_override(&"font_size", 12)
+        name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        name_lbl.clip_text = true
+        hbox.add_child(name_lbl)
+
+        var op: String = row["op"]
+        var amount: float = row["amount"]
+        var val_text: String
+        var val_color: Color
+        if op == "mul":
+            val_text = "×%.2f" % amount
+            val_color = Color(0.92, 0.72, 0.18, 1.0) if amount >= 1.0 else Color(0.85, 0.40, 0.35, 1.0)
+        elif amount == 0.0:
+            val_text = "—"
+            val_color = Color(0.55, 0.58, 0.63, 1)
+        else:
+            val_text = "+$%d" % int(amount)
+            val_color = Color(0.55, 0.85, 0.60, 1.0)
+
+        var val_lbl := Label.new()
+        val_lbl.text = val_text
+        val_lbl.add_theme_font_size_override(&"font_size", 12)
+        val_lbl.add_theme_color_override(&"font_color", val_color)
+        hbox.add_child(val_lbl)
+
+        _clues_vbox.add_child(hbox)
+
+    _clues_vbox.show()
 
 
 func _clear_detail_section() -> void:
