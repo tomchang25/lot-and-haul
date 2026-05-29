@@ -46,6 +46,11 @@ func advance_days(days: int) -> DaySummary:
 
     SaveManager.available_locations.clear()
 
+    # Capture customer sales before nightly generation clears the ledger.
+    for sale in SaveManager.customer_sales_today:
+        summary.customer_sales_total += sale.sale_price
+        summary.customer_sales_detail.append(sale.duplicate())
+
     _generate_nightly_customers()
 
     SaveManager.save()

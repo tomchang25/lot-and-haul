@@ -91,8 +91,8 @@ func _apply_trailer_damage() -> int:
 
 
 func _resolve_run_and_navigate() -> void:
-    MetaManager.resolve_run(RunManager.run_record)
-    GameManager.go_to_hub()
+    var summary := MetaManager.resolve_run(RunManager.run_record)
+    GameManager.go_to_day_summary(summary)
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 

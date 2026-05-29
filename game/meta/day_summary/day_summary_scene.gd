@@ -14,6 +14,11 @@ extends Control
 @onready var _fuel_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup/FuelLabel
 @onready var _paid_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup/PaidLabel
 
+@onready var _customer_group: VBoxContainer = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup
+@onready var _conservative_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup/ConservativeLabel
+@onready var _aggressive_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup/AggressiveLabel
+@onready var _customer_total_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup/CustomerTotalLabel
+
 @onready var _living_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/LivingLabel
 @onready var _actions_group: VBoxContainer = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/ActionsGroup
 @onready var _actions_list: VBoxContainer = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/ActionsGroup/ActionsList
@@ -60,6 +65,24 @@ func _render(summary: DaySummary) -> void:
         _fuel_label.text = "Fuel Cost:   -$%d" % summary.fuel_cost
         _paid_label.visible = summary.paid_price != 0
         _paid_label.text = "Amount Paid:   -$%d" % summary.paid_price
+
+    # Customer sales section
+    _customer_group.visible = summary.has_customer_sales()
+    if summary.has_customer_sales():
+        var cons_count := 0
+        var cons_total := 0
+        var agg_count := 0
+        var agg_total := 0
+        for sale in summary.customer_sales_detail:
+            if sale.strategy == "conservative":
+                cons_count += sale.item_count
+                cons_total += sale.sale_price
+            elif sale.strategy == "aggressive":
+                agg_count += sale.item_count
+                agg_total += sale.sale_price
+        _conservative_label.text = "Conservative: %d items, $%d" % [cons_count, cons_total]
+        _aggressive_label.text = "Aggressive: %d items, $%d" % [agg_count, agg_total]
+        _customer_total_label.text = "Total Customer Sales: $%d" % summary.customer_sales_total
 
     # Daily group — always visible
     _living_label.text = "Living (%d/day × %d):   -$%d" % [

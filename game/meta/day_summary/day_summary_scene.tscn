@@ -93,6 +93,28 @@ theme_override_font_sizes/font_size = 18
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
+[node name="CustomerSalesGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="CustomerHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 16
+text = "Customer Sales"
+
+[node name="ConservativeLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="AggressiveLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="CustomerTotalLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+
 [node name="DailyGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox" unique_id=524467120]
 layout_mode = 2
 theme_override_constants/separation = 4

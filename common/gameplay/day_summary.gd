@@ -18,9 +18,13 @@ var cargo_count: int = 0
 var living_cost: int = 0
 var completed_actions: Array[Dictionary] = []
 
+# Customer sales (captured before _generate_nightly_customers clears it)
+var customer_sales_total: int = 0
+var customer_sales_detail: Array[Dictionary] = []
+
 var net_change: int:
     get:
-        return onsite_proceeds - paid_price - entry_fee - fuel_cost - living_cost
+        return onsite_proceeds + customer_sales_total - paid_price - entry_fee - fuel_cost - living_cost
 
 
 func has_run_data() -> bool:
@@ -30,3 +34,7 @@ func has_run_data() -> bool:
         or entry_fee != 0
         or fuel_cost != 0
     )
+
+
+func has_customer_sales() -> bool:
+    return not customer_sales_detail.is_empty()

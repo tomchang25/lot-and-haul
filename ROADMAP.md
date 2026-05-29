@@ -65,12 +65,13 @@ Phases 0–6 cover the foundational work. Detailed specs omitted — see git his
 | 8b    | YAML Content Regeneration                | ✅ Complete — all 128 clues rewritten to 1-word known_text, naming entries assigned, names reconciled     |
 | 9     | Merchant System Redesign                 | ✅ Complete — Customer data model, car grid packing UI, fit/sell flow, dice UI, legacy selling removed    |
 | 10    | Value Policy Cleanup                     | ✅ Complete — MarketManager, PriceConfig, compute_price removed; item_price simplified to (appraised      | verified) × condition_multiplier |
+| 11    | Day Summary Rework                       | ✅ Complete — customer_sales_today captured into DaySummary before clear, net change includes sales revenue, customer sales section in summary scene, post-run routes through summary |
 
 ---
 
 ## Core Loop Redesign — Phase Plan
 
-**Phases 7–10 are complete.** Phase 11 (Day Summary Rework) is next; Phase 12 (Time-Slot + Storage AP) follows, ideally landing before Phase 11.
+**Phases 7–11 are complete.** Phase 12 (Time-Slot + Storage AP) is next.
 
 ### Phase 7 — Clue Independence + Attribute System ✅
 
@@ -118,21 +119,13 @@ Priority-based `display_name` composition from naming clues, 3-word `known_text`
 
 ---
 
-### Phase 11 — Day Summary Rework ← next
+### Phase 11 — Day Summary Rework ✅
 
-**Goal:** Resolve the psychological harm caused by the Net figure showing the player as perpetually losing money, now that customer selling is the income source.
+**Status: Complete**
 
-**What's already in place:** `SaveManager.customer_sales_today` records each nightly sale (`day`, `customer_id/name`, `strategy`, `item_count`, `item_ids`, `sale_price`) and resets when the next night's customers generate. This ledger is the data feed for the reworked summary.
+`DaySummary` value object now carries `customer_sales_total`, `customer_sales_detail`, and `has_customer_sales()`. `MetaManager.advance_days()` captures `SaveManager.customer_sales_today` into the summary before `_generate_nightly_customers()` clears the ledger. Net change includes customer sales revenue. Summary scene renders a customer sales section (count, total, strategy breakdown). Post-run flow routes through the day summary scene.
 
-**Design decisions:**
-
-- Net can be kept or removed depending on cash-flow feel once customer selling is the main revenue.
-- Surface nightly customer sales (count, total, strategy mix) in the summary using `customer_sales_today`.
-- Non-auction days may skip the summary entirely and return directly to hub.
-
-**Scope:** Day Summary UI + `DaySummary` value object. Excludes weekly system, Weekly Report, fixed-deduction game over.
-
-**Dependencies:** Phase 9 ✅. Interacts with the time-slot economy below — sequence them so the summary reads whichever day model is live.
+**Dependencies:** Phase 9 ✅
 
 ---
 ### Phase 12 — Time-Slot Day Structure + Storage AP Economy
@@ -170,12 +163,11 @@ Phase 8  — Dynamic Naming Rules             ✅
   └─ Phase 8b — YAML Content Regeneration   ✅
 Phase 10 — Value Policy Cleanup             ✅
 Phase 9  — Merchant System Redesign (depends on 7, 10)  ✅
-  └─ Phase 11 — Day Summary Rework (depends on 9)       ← next
-  └─ Phase 12 — Time-Slot + Storage AP (depends on 9)
-       └─ Phase 11 reads whichever day model is live — sequence Phase 12 first
-```
+  └─ Phase 11 — Day Summary Rework (depends on 9)       ✅
+  └─ Phase 12 — Time-Slot + Storage AP (depends on 9)   ← next
 
-Phases 7–10 are complete. Phase 11 is next (small, independent). Phase 12 (Time-Slot + Storage AP) is the larger redesign and should land before Phase 11 so the summary reads the slot model.
+
+Phases 7–11 are complete. Phase 12 (Time-Slot + Storage AP) is next.
 
 ---
 
