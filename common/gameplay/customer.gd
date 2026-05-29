@@ -100,13 +100,65 @@ static func generate_batch(
 		result[i] = generate(rng, inventory_category_ids, all_category_ids)
 	return result
 
+# ══ Nightly generation ═══════════════════════════════════════════════════════
+
+
+## Generates 3–5 customers for a night.
+##
+## Builds the owned-pool from storage items' category IDs (50/50 match bias).
+## Each customer gets 2–4 demand tags.
+static func generate_for_night(
+	rng: RandomNumberGenerator,
+	storage_items: Array = [],
+	all_category_ids: Array[String] = [],
+) -> Array[Customer]:
+	var count := rng.randi_range(3, 5)
+
+	if all_category_ids.is_empty():
+		all_category_ids = CategoryRegistry.get_all_category_ids()
+
+	var owned_pool: Array[String] = []
+	for entry in storage_items:
+		var cat_id := _entry_category_id(entry)
+		if cat_id != "" and not owned_pool.has(cat_id):
+			owned_pool.append(cat_id)
+
+	var result: Array[Customer] = []
+	result.resize(count)
+	for i in range(count):
+		result[i] = generate(rng, owned_pool, all_category_ids)
+		if owned_pool.is_empty():
+			result[i].demand_tags = _pick_demand(rng, all_category_ids, 2, 4)
+		else:
+			var use_match := rng.randf() < 0.5
+			var pool: Array[String] = owned_pool if use_match else all_category_ids
+			result[i].demand_tags = _pick_demand(rng, pool, 2, 4)
+	return result
+
+
+## Returns the category_id for an ItemEntry or similar duck-typed object.
+static func _entry_category_id(entry) -> String:
+	if entry is ItemEntry and entry.item_data != null:
+		var item: ItemEntry = entry
+		if item.item_data.category_data != null:
+			return item.item_data.category_data.category_id
+	return ""
+
+
 # ══ Internal ═══════════════════════════════════════════════════════════════════
 
 
-## Picks 1-3 unique category IDs from the given pool.
+## Picks unique category IDs from the given pool.
+## Clamps counts so the range never exceeds pool size.
 static func _pick_demand(
 	rng: RandomNumberGenerator,
 	pool: Array[String],
+	min_count: int = 1,
+	max_count: int = 3,
 ) -> Array[String]:
-	var count := rng.randi_range(1, mini(3, pool.size()))
+	if pool.is_empty():
+		return []
+	var hi := mini(max_count, pool.size())
+	var lo := mini(min_count, hi)
+	var count := rng.randi_range(lo, hi)
 	return RandomUtils.pick_unique(rng, pool, count) as Array[String]

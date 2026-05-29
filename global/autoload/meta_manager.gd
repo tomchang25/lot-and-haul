@@ -47,8 +47,40 @@ func advance_days(days: int) -> DaySummary:
     MerchantRegistry.advance_day()
     SaveManager.available_locations.clear()
 
+    _generate_nightly_customers()
+
     SaveManager.save()
     return summary
+
+# ══ Nightly customers ═════════════════════════════════════════════════════════
+
+
+## Generates the nightly customer set for the current day.
+## Delegates to Customer.generate_for_night, stores in SaveManager.
+func _generate_nightly_customers() -> void:
+    var rng := RandomNumberGenerator.new()
+    rng.randomize()
+    SaveManager.nightly_customers = Customer.generate_for_night(
+        rng,
+        SaveManager.storage_items,
+    )
+
+
+## Commits a customer sale: removes items from storage, adds cash, saves.
+##
+## [param items] — ItemEntry instances being sold.
+## [param sale_price] — total price computed by SellMath.
+func resolve_customer_sale(items: Array, sale_price: int) -> void:
+    for entry: ItemEntry in items:
+        SaveManager.storage_items.erase(entry)
+        ResearchSlot.clear_for_item(SaveManager.research_slots, entry.id)
+        KnowledgeManager.add_category_points(
+            entry.item_data.category_data,
+            entry.item_data.rarity,
+            KnowledgeManager.KnowledgeAction.SELL,
+        )
+    SaveManager.cash += sale_price
+    SaveManager.save()
 
 
 func _tick_research_slots(days: int) -> Array[Dictionary]:
@@ -77,7 +109,8 @@ func _tick_research_slots(days: int) -> Array[Dictionary]:
                 ResearchSlot.SlotAction.RESEARCH:
                     slot.research_days_spent += 1
                     var duration: int = Economy.RESEARCH_DAYS.get(
-                        entry.item_data.rarity, 3,
+                        entry.item_data.rarity,
+                        3,
                     )
                     if slot.research_days_spent >= duration:
                         entry.reveal_all_hidden()

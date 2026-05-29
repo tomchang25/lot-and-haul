@@ -19,6 +19,9 @@ var available_locations: Array[LocationData] = []
 var unlocked_perks: Array[String] = []
 var attribute_levels: Dictionary = { } # attribute_id (String) → int
 
+## Customers generated for the current night. Array of Customer dicts on disk.
+var nightly_customers: Array = []
+
 
 func save() -> void:
     var serialized_items: Array = []
@@ -31,6 +34,10 @@ func save() -> void:
     var serialized_available_location_ids: Array[String] = []
     for loc: LocationData in available_locations:
         serialized_available_location_ids.append(loc.location_id)
+
+    var serialized_customers: Array = []
+    for c: Customer in nightly_customers:
+        serialized_customers.append(c.to_dict())
 
     var data := {
         "category_points": category_points,
@@ -45,6 +52,7 @@ func save() -> void:
         "available_location_ids": serialized_available_location_ids,
         "unlocked_perks": unlocked_perks,
         "attribute_levels": attribute_levels,
+        "nightly_customers": serialized_customers,
         "merchant_negotiations_used_today": _build_negotiation_dict(),
         "merchant_orders": _build_order_dict(),
         "next_order_id": MerchantRegistry.next_order_id,
@@ -129,6 +137,12 @@ func _read_save_file() -> void:
         attribute_levels = { }
     else:
         attribute_levels = { }
+
+    if parsed.has("nightly_customers") and parsed["nightly_customers"] is Array:
+        nightly_customers = []
+        for d: Variant in parsed["nightly_customers"]:
+            if d is Dictionary:
+                nightly_customers.append(Customer.from_dict(d))
 
     # Old saves may contain "super_cat_means" and "category_factors_today" keys
     # from the removed MarketManager system — silently ignore them.
