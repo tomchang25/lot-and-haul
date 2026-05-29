@@ -32,9 +32,8 @@ extends Resource
 @export var npc_layer_sight_chance: float = 0.5
 
 # Per-clue probability that the NPC notices each surface clue when forming its
-# price estimate. Passed to ItemEntry.roll_npc_estimate(). Default 0.6 matches
-# the hardcoded value from before this field was introduced.
-@export var npc_clue_sight_chance: float = 0.6
+# price estimate. Passed to ItemEntry.roll_npc_estimate().
+@export var npc_clue_sight_chance: float = 0.15
 
 # ── Auction ───────────────────────────────────────────────────────────────────
 

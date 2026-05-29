@@ -387,6 +387,29 @@ func appraised_with_hidden() -> float:
     return (_raw_appraised_value() + _hidden_add_sum()) * _hidden_mul_product()
 
 
+## Full potential value with ALL clues applied regardless of reveal state.
+## Ignores revealed_clue_ids — use for debug overlays only, never in release UI.
+func full_true_value() -> float:
+    var s_add := 0.0
+    var s_mul := 1.0
+    for clue: ClueData in _surface_clues():
+        match clue.effect_op:
+            "add":
+                s_add += clue.effect_amount
+            "mul":
+                s_mul *= clue.effect_amount
+    var surface_val := (float(_anchor_flat_value()) + s_add) * s_mul
+    var h_add := 0.0
+    var h_mul := 1.0
+    for clue: ClueData in _hidden_clues():
+        match clue.effect_op:
+            "add":
+                h_add += clue.effect_amount
+            "mul":
+                h_mul *= clue.effect_amount
+    return (surface_val + h_add) * h_mul
+
+
 ## Returns a simulated NPC price estimate for this item based on a random subset
 ## of surface clues the NPC happens to notice. Uses add-then-mul semantics:
 ## (anchor_flat + sum noticed_add) * product noticed_mul.

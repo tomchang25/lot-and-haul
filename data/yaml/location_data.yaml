@@ -21,6 +21,7 @@ lots:
     aggressive_lerp_min: 0.7
     aggressive_lerp_max: 1.05
     npc_layer_sight_chance: 0.3
+    npc_clue_sight_chance: 0.1
     opening_bid_factor: 0.2
     veiled_chance: 0.3
     item_count_min: 3
@@ -43,6 +44,7 @@ lots:
     aggressive_lerp_min: 0.7
     aggressive_lerp_max: 1.1
     npc_layer_sight_chance: 0.35
+    npc_clue_sight_chance: 0.1
     opening_bid_factor: 0.2
     veiled_chance: 0.35
     item_count_min: 3
@@ -65,6 +67,7 @@ lots:
     aggressive_lerp_min: 0.75
     aggressive_lerp_max: 1.05
     npc_layer_sight_chance: 0.3
+    npc_clue_sight_chance: 0.1
     opening_bid_factor: 0.2
     veiled_chance: 0.3
     item_count_min: 3
@@ -88,6 +91,7 @@ lots:
     aggressive_lerp_min: 0.8
     aggressive_lerp_max: 1.25
     npc_layer_sight_chance: 0.5
+    npc_clue_sight_chance: 0.15
     opening_bid_factor: 0.25
     veiled_chance: 0.45
     item_count_min: 4
@@ -110,6 +114,7 @@ lots:
     aggressive_lerp_min: 0.8
     aggressive_lerp_max: 1.2
     npc_layer_sight_chance: 0.45
+    npc_clue_sight_chance: 0.15
     opening_bid_factor: 0.25
     veiled_chance: 0.4
     item_count_min: 4
@@ -132,6 +137,7 @@ lots:
     aggressive_lerp_min: 0.8
     aggressive_lerp_max: 1.2
     npc_layer_sight_chance: 0.5
+    npc_clue_sight_chance: 0.2
     opening_bid_factor: 0.25
     veiled_chance: 0.45
     item_count_min: 4
