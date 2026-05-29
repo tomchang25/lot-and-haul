@@ -95,19 +95,6 @@ static func generate(
     return c
 
 
-## Generates multiple customers in one call.
-static func generate_batch(
-        rng: RandomNumberGenerator,
-        count: int,
-        owned_clue_ids: Array[String] = [],
-        all_clue_ids: Array[String] = [],
-) -> Array[Customer]:
-    var result: Array[Customer] = []
-    result.resize(count)
-    for i in range(count):
-        result[i] = generate(rng, owned_clue_ids, all_clue_ids)
-    return result
-
 # ══ Nightly generation ═══════════════════════════════════════════════════════
 
 

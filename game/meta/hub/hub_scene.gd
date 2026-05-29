@@ -12,7 +12,7 @@ const DayPassDialogGd = preload("res://game/meta/hub/day_pass_dialog/day_pass_di
 @onready var _storage_count_label: Label = $RootVBox/InfoContainer/StorageCountLabel
 @onready var _next_run_btn: Button = $RootVBox/ButtonsVBox/NextRunButton
 @onready var _storage_btn: Button = $RootVBox/ButtonsVBox/StorageButton
-@onready var _merchant_btn: Button = $RootVBox/ButtonsVBox/MerchantButton
+@onready var _sell_btn: Button = $RootVBox/ButtonsVBox/MerchantButton
 @onready var _vehicle_btn: Button = $RootVBox/ButtonsVBox/VehicleButton
 @onready var _knowledge_btn: Button = $RootVBox/ButtonsVBox/KnowledgeButton
 @onready var _day_pass_btn: Button = $RootVBox/ButtonsVBox/DayPassButton
@@ -24,7 +24,7 @@ const DayPassDialogGd = preload("res://game/meta/hub/day_pass_dialog/day_pass_di
 func _ready() -> void:
     _next_run_btn.pressed.connect(_on_next_run_pressed)
     _storage_btn.pressed.connect(_on_storage_pressed)
-    _merchant_btn.pressed.connect(_on_merchant_pressed)
+    _sell_btn.pressed.connect(_on_sell_pressed)
     _vehicle_btn.pressed.connect(_on_vehicle_pressed)
     _knowledge_btn.pressed.connect(_on_knowledge_pressed)
     _day_pass_btn.pressed.connect(_on_day_pass_pressed)
@@ -44,7 +44,7 @@ func _on_storage_pressed() -> void:
     GameManager.go_to_storage()
 
 
-func _on_merchant_pressed() -> void:
+func _on_sell_pressed() -> void:
     GameManager.go_to_customer_sell()
 
 

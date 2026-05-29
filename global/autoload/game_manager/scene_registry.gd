@@ -11,8 +11,6 @@ extends Resource
 @export var run_review: PackedScene
 @export var hub: PackedScene
 @export var storage: PackedScene
-@export var merchant_hub: PackedScene
-@export var merchant_shop: PackedScene
 @export var day_summary: PackedScene
 @export var attribute_panel: PackedScene
 @export var knowledge_hub: PackedScene
@@ -21,5 +19,4 @@ extends Resource
 @export var vehicle_hub: PackedScene
 @export var car_select: PackedScene
 @export var car_shop: PackedScene
-@export var fulfillment_panel: PackedScene
 @export var customer_sell: PackedScene
