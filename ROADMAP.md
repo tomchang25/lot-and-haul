@@ -10,19 +10,19 @@ Items carry three clue tiers: one **anchor clue** (flat base value, auto-reveale
 
 Clue math: add/subtract first, then multiply. `(anchor_flat + Σ surface_add) × Π surface_mul`. Verified items additionally apply hidden modifiers in the same add-then-mul order.
 
-| Name              | Basis                                           | Range | Role                             |
-| ----------------- | ----------------------------------------------- | ----- | -------------------------------- |
-| `appraised_value` | anchor + revealed clue modifiers (add-then-mul) | yes   | base for all display and selling |
-| `verified_value`  | appraised + hidden clue modifiers (add-then-mul)| no    | replaces appraised when verified |
-| `item_price`      | (appraised or verified) × condition_multiplier  | no    | resolved per-item price          |
+| Name              | Basis                                            | Range | Role                             |
+| ----------------- | ------------------------------------------------ | ----- | -------------------------------- |
+| `appraised_value` | anchor + revealed clue modifiers (add-then-mul)  | yes   | base for all display and selling |
+| `verified_value`  | appraised + hidden clue modifiers (add-then-mul) | no    | replaces appraised when verified |
+| `item_price`      | (appraised or verified) × condition_multiplier   | no    | resolved per-item price          |
 
 Condition is an independent system (0.0–1.0, non-linear bucketing into ×0.25–×4.0) tied to Repair/Restore research. It multiplies into item_price but is not a clue.
 
-Market factor and knowledge bonus are removed — Phase 9's customer fit + sell strategy replaces their design role.
+Market factor and knowledge bonus are removed — customer fit + sell strategy replaces their design role.
 
 Verified items use `verified_value` in place of `appraised_value` as item_price input, and receive ×1.2 on their individual car contribution. Verified value may be higher or lower than appraised — hidden clues can be negative.
 
-Transaction-level pricing (car total, sell multiplier, verified bonus) is owned by the customer/shop system — see Phase 9.
+Transaction-level pricing (car total, sell multiplier, verified bonus) is owned by the customer/shop system — see Phase 9 (complete).
 
 Range convergence: appraised value shows as a range when not all surface clues are revealed. Spread = `max_spread × (1.0 - reveal_ratio)`. At ratio 1.0 the range collapses to the exact appraised value.
 
@@ -53,7 +53,7 @@ Range convergence: appraised value shows as a range when not all surface clues a
 Phases 0–6 cover the foundational work. Detailed specs omitted — see git history and code.
 
 | Phase | Title                                    | Status                                                                                                    |
-| ----- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| ----- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------- | -------------------------------- |
 | 0–2   | Runtime veil cleanup, AP grid inspection | ✅ Complete                                                                                               |
 | 3     | Item base price + abstract identity data | ✅ Complete                                                                                               |
 | 4     | Clues + AP inspection (layer-based)      | ⚠️ Superseded — clue data structures exist but the layer-based advancement model is replaced by Phase 7   |
@@ -63,37 +63,20 @@ Phases 0–6 cover the foundational work. Detailed specs omitted — see git his
 | 7.5   | Inspection Refinement                    | ✅ Complete — veiled/unveiled/verified vocabulary, chain reveal, lot unveil probability                   |
 | 8     | Dynamic Naming Rules                     | ✅ Complete — ClueData naming_slot/priority, display_name composition, validator rules                    |
 | 8b    | YAML Content Regeneration                | ✅ Complete — all 128 clues rewritten to 1-word known_text, naming entries assigned, names reconciled     |
-| 10    | Value Policy Cleanup                     | ✅ Complete — MarketManager, PriceConfig, compute_price removed; item_price simplified to (appraised|verified) × condition_multiplier |
+| 9     | Merchant System Redesign                 | ✅ Complete — Customer data model, car grid packing UI, fit/sell flow, dice UI, legacy selling removed    |
+| 10    | Value Policy Cleanup                     | ✅ Complete — MarketManager, PriceConfig, compute_price removed; item_price simplified to (appraised      | verified) × condition_multiplier |
 
 ---
 
 ## Core Loop Redesign — Phase Plan
 
-**Phases 7, 7.5, 8, 8b, and 10 are complete.** Phase 9 (Merchant System Redesign) is next.
+**Phases 7–10 are complete.** Phase 11 (Day Summary Rework) is next; Phase 12 (Time-Slot + Storage AP) follows, ideally landing before Phase 11.
 
 ### Phase 7 — Clue Independence + Attribute System ✅
 
 **Status: Complete** (PR #107 merged)
 
-**Goal:** Replace identity layers and the skill system with independent clue resources and attribute-based discovery.
-
-**What shipped:**
-
-- Items = category + anchor clue + surface clues + hidden clues. Identity layers, layer advancement, SkillData, SkillLevelData all removed.
-- ClueData with `type` (anchor | surface | hidden), `domain`, `attribute`, `dc`, `effect_op`, `effect_amount`.
-- 5 SPECIAL-style attributes (Appraisal, Perception, Restoration, Negotiation, Investigation) replace skill system. Perks gate on attribute thresholds.
-- Inspection: 1 AP = dice roll vs DC. Success rate = `clamp((21 + bonus - DC) × 5, 5, 95)`. Anchor auto-reveals; surface clues auto-reveal on hub return.
-- Authenticate reveals hidden clues (can be positive or negative).
-- Add-then-mul pricing: `(anchor_flat + sum surface_add) × product surface_mul`.
-- Unified tag vocabulary — clue table is the single source of truth, validated by pipeline.
-- `ItemData.base_price` deprecated — true value now derived entirely from clues.
-
-**Deferred to later:**
-
-- Mastery ↔ clue integration effects (see Draft Features)
-- Attribute upgrade cost scaling (see item_system.md draft)
-
-_Full spec: `dev/docs/archived/phase_7_clue_independence.md` `dev/docs/systems/item_system.md`_
+Clue-based pricing (add-then-mul), 5 SPECIAL attributes, dice-roll inspection, deprecated `ItemData.base_price`. Full spec: `dev/docs/archived/phase_7_clue_independence.md`
 
 ---
 
@@ -101,18 +84,7 @@ _Full spec: `dev/docs/archived/phase_7_clue_independence.md` `dev/docs/systems/i
 
 **Status: Complete** (commit `e59d58e`)
 
-**Goal:** Refine inspection semantics, item display naming vocabulary, and clue reveal mechanics left unresolved after Phase 7.
-
-**What shipped:**
-
-- `DisplayState` enum (VEILED / UNVEILED / VERIFIED) and unified naming vocabulary across all code, UI, and docs. Veiled = anchor unrevealed ("Unknown [Category]"); unveiled = anchor revealed (anchor known_text); verified = all hidden clues revealed (true item name).
-- Unveil action costs a fixed 1 AP. Chain reveal costs 2 AP per attempt; on success, immediately attempts the next unrevealed clue in sequence until a check fails or clues are exhausted.
-- Lot unveil probability field — each item in a lot rolls independently to determine starting veil state.
-- Clue results display in a dedicated section, separate from the value column.
-- `verified` is now a computed property (true when all hidden clues are in `revealed_clue_ids`); items with no hidden clues are verified by default.
-- Storage Authenticate renamed to Research.
-
-_Full spec: `dev/docs/archived/phase_7_5_inspection_refinement.md`_
+`DisplayState` (VEILED/UNVEILED/VERIFIED), chain reveal, lot unveil probability, `verified` as computed property. Full spec: `dev/docs/archived/phase_7_5_inspection_refinement.md`
 
 ---
 
@@ -120,49 +92,19 @@ _Full spec: `dev/docs/archived/phase_7_5_inspection_refinement.md`_
 
 **Status: Complete** (commits `3c4c423`, `e59d58e`)
 
-**Goal:** Replace the binary display name with a priority-based affix composition system that assembles the item's visible name progressively as clues are revealed.
-
-**What shipped:**
-
-- `naming_slot` (prefix / body / suffix) and `naming_priority` fields on `ClueData`.
-- `display_name` computed property on `ItemEntry`: assembles from highest-priority revealed clue per slot; falls back to "Unknown Item" when no naming clues are revealed; verified items bypass composition and show `item_data.item_name` directly.
-- Three-word `known_text` ceiling enforced by `validate_yaml.py`.
-- Full-reveal composition validation: composed name must equal `item_name` — mismatch is a pipeline error.
-- YAML pipeline (`tres_lib/entities/clue.py`, `yaml_to_tres.py`) updated for naming fields.
-- Generation prompts (`base.md`, `item.md`) document naming entry schema, slot/priority conventions, and 1-word preferred / 3-word max rule.
-
-**Phase 8b — YAML Content Regeneration** (commit `19c6caf`): bulk content pass on all existing clues and items.
-
-- All 128 clue `known_text` values rewritten to 1-word labels.
-- Naming entries (`slot`, `priority`) assigned to every clue (anchors → body prio 1, surfaces → prefix prio 2, hidden → prefix prio 5).
-- Item names reconciled to 2-word prefix+body format matching full-reveal composition.
-- Validator reports zero naming-match and known_text-length errors.
-
-_Full spec: `dev/docs/archived/phase_8_dynamic_naming_rules_impl_spec.md`_
+Priority-based `display_name` composition from naming clues, 3-word `known_text` ceiling, full-reveal validation. Phase 8b (commit `19c6caf`): regenerated all 128 clues to 1-word labels with naming entries. Full spec: `dev/docs/archived/phase_8_dynamic_naming_rules_impl_spec.md`
 
 **Dependencies:** Phase 7
 
 ---
 
-### Phase 9 — Merchant System Redesign
+### Phase 9 — Merchant System Redesign ✅
 
-**Goal:** Replace all existing selling channels with a unified customer-based system. Nightly customers arrive with demand tags and car grids; the player fills cars and chooses a sell strategy.
+**Status: Complete** (commit `236f636`, PR #108 cleanup `9b4dfe9`)
 
-**Design decisions:**
-
-- 3–5 customers per night. Each has demand tags (clue ids, uniform random) and a car grid (random from hardcoded size list).
-- Item list per customer filters to fit ≥ 1 only. Fit = set intersection of customer demand tags and item's revealed clue ids. Tag = clue.
-- **Conservative sell:** flat ×1.2 on entire car total. No dice.
-- **Aggressive sell:** dice pool from best single-item fit in the car (fit 1→2d, fit 2→4d, fit 3→6d). Each verified item adds +1 die. Player rolls all, selects 2. Sum: 2–5 = ×1.0, 6–10 = ×1.5, 11–12 = ×0.8.
-- Verified items: ×1.2 price bonus on individual car contribution, +1 die, hidden clue tags count toward fit.
-- Player sees result before confirming sale. Declined items return to storage.
-- **Deprecations:** pawn_shop, antique_dealer, special order system, Quick Sell, merchant negotiation dialog — all removed.
-
-**Scope:** Customer data model, demand tag generation, car grid packing UI, fit calculation, sell flow (conservative + aggressive), dice UI, verified bonuses, deprecation of all old selling systems. Excludes customer personality, progression-weighted generation, selling-related perks.
+`Customer` runtime type with `generate_for_night()`, `SellMath` pure helpers (conservative ×1.25 / aggressive dice bands), customer sell scene with car grid packing and dice UI, `SaveManager.customer_sales_today` ledger, legacy selling code removed. Full spec: `dev/docs/archived/phase_9_merchant_system_impl_spec.md`
 
 **Dependencies:** Phase 7, Phase 10
-
-_Full spec: `dev/docs/plans/merchant_system_redesign.md`_
 
 ---
 
@@ -170,46 +112,52 @@ _Full spec: `dev/docs/plans/merchant_system_redesign.md`_
 
 **Status: Complete** (commit `41a5945`)
 
-**Goal:** Simplify the pricing pipeline to appraised value × condition as the sole selling base; remove market factor and knowledge bonus systems.
-
-**What shipped:**
-
-- Selling base = `appraised_value × condition_multiplier` (unverified) or `verified_value × condition_multiplier` (verified). No other factors.
-- `MarketManager` autoload removed — migration comment only remains in SaveManager.
-- `PriceConfig` and `compute_price()` removed — `item_price` is a simple getter: `(appraised value | verified value) × condition_multiplier`.
-- Knowledge bonus (`1.0 + 0.01 × rank`) removed from pricing.
-- `ItemViewContext` and its display helpers (`price_text_for`, `price_value_for`, etc.) removed.
-- Condition stays as an independent ×0.25–×4.0 system tied to Repair/Restore research.
-- Old selling-channel price helpers (`MerchantData.offer_for`, `SpecialOrder.compute_item_price`) deprecated and removed.
+`item_price` simplified to `(appraised|verified) × condition_multiplier`. `MarketManager`, `PriceConfig`, `ItemViewContext` removed. Condition stays as independent ×0.25–×4.0 system.
 
 **Dependencies:** Phase 7
 
 ---
 
-### Phase 11 — Day Summary Rework
+### Phase 11 — Day Summary Rework ← next
 
-**Goal:** Resolve the psychological harm caused by the Net figure showing the player as perpetually losing money.
+**Goal:** Resolve the psychological harm caused by the Net figure showing the player as perpetually losing money, now that customer selling is the income source.
+
+**What's already in place:** `SaveManager.customer_sales_today` records each nightly sale (`day`, `customer_id/name`, `strategy`, `item_count`, `item_ids`, `sale_price`) and resets when the next night's customers generate. This ledger is the data feed for the reworked summary.
 
 **Design decisions:**
 
-- Net can be kept or removed depending on cash-flow feel once customer selling is live.
-- Non-auction days may skip summary entirely and return directly to hub.
+- Net can be kept or removed depending on cash-flow feel once customer selling is the main revenue.
+- Surface nightly customer sales (count, total, strategy mix) in the summary using `customer_sales_today`.
+- Non-auction days may skip the summary entirely and return directly to hub.
 
-**Scope:** Day Summary UI adjustments. Excludes weekly system, Weekly Report, fixed-deduction game over.
+**Scope:** Day Summary UI + `DaySummary` value object. Excludes weekly system, Weekly Report, fixed-deduction game over.
 
-**Dependencies:** Phase 9
+**Dependencies:** Phase 9 ✅. Interacts with the time-slot economy below — sequence them so the summary reads whichever day model is live.
 
 ---
+### Phase 12 — Time-Slot Day Structure + Storage AP Economy
 
-### Superseded Phases
+**Goal:** Replace the passive day-counter hub with a three-slot day model (morning / afternoon / evening) so each day is an explicit resource-allocation decision, and convert storage actions from day-timers to an AP economy.
 
-The following phases from the previous roadmap are fully superseded by the merchant system redesign (Phase 9):
+**Activities (one per slot):**
 
-| Old Phase | Old Title                             | Reason                                                                       |
-| --------- | ------------------------------------- | ---------------------------------------------------------------------------- |
-| 9 (old)   | Special Order Verified Integration    | Special orders deprecated; verified bonus integrated into customer sell flow |
-| 11 (old)  | Player Shop                           | All selling unified through customer system                                  |
-| 12 (old)  | Garage Auction + Merchant Deprecation | Merchant deprecation handled in Phase 9; garage auction concept replaced     |
+- **Auction** — available only from morning, consumes morning + afternoon (two slots); player returns in the evening with one slot left. One auction per day.
+- **Storage maintenance** — spend AP for Repair (condition → 0.5), Restore (condition → 1.0), and Research (reveal one hidden clue per attempt). Each action costs AP from a daily pool instead of ticking calendar days. This replaces the current `ResearchSlot` day-tick model (`REPAIR`/`RESTORE`/`RESEARCH` in `MetaManager._tick_research_slots`).
+- **Open shop** — ends the day immediately; customer count scales with consecutive slots dedicated (more slots → more customers, with a full-day bonus).
+
+**Wiring already present:** `Customer.generate_for_night(rng, storage_items, count, …)` takes an explicit `count` (negative = roll the default 3–5). The time-slot economy passes a slot-derived count here instead of the default roll.
+
+**Core tension:** auction eats two slots, leaving one for light storage or a small evening shop; skipping auction frees all three for heavy maintenance, a full shop day, or a mix.
+
+**Open questions (carried from the draft):**
+
+- Shared vs. separate AP pool for inspection and storage maintenance.
+- Daily AP pool sizing — flat, attribute-derived, or upgradeable (starting assumption: flat).
+- Customer-count curves per slot config (starting assumptions: 1 slot → 2–3, 2 slots → 5–7, 3 slots → 8–12; needs playtest).
+
+**Dependencies:** Phase 9 ✅. Should land before/with Phase 11 so the summary reflects the slot model. Storage AP changes touch the same `ResearchSlot` plumbing.
+
+_Reference: `dev/docs/draft/time_slot_economy.md`._
 
 ---
 
@@ -221,11 +169,13 @@ Phase 7  — Clue Independence + Attributes  ✅
 Phase 8  — Dynamic Naming Rules             ✅
   └─ Phase 8b — YAML Content Regeneration   ✅
 Phase 10 — Value Policy Cleanup             ✅
-  └─ Phase 9  — Merchant System Redesign (depends on 7, 10)  ← next
-       └─ Phase 11 — Day Summary Rework
+Phase 9  — Merchant System Redesign (depends on 7, 10)  ✅
+  └─ Phase 11 — Day Summary Rework (depends on 9)       ← next
+  └─ Phase 12 — Time-Slot + Storage AP (depends on 9)
+       └─ Phase 11 reads whichever day model is live — sequence Phase 12 first
 ```
 
-Phases 7, 7.5, 8, 8b, and 10 are complete. Phase 9 depends on both 7 and 10 and is next.
+Phases 7–10 are complete. Phase 11 is next (small, independent). Phase 12 (Time-Slot + Storage AP) is the larger redesign and should land before Phase 11 so the summary reads the slot model.
 
 ---
 
@@ -233,7 +183,7 @@ Phases 7, 7.5, 8, 8b, and 10 are complete. Phase 9 depends on both 7 and 10 and 
 
 These are independent of the core loop redesign phases and can proceed in parallel.
 
-- **Customer content** — demand tag pools, car grid size list, and customer generation tuning. `pawn_shop` and `antique_dealer` merchant content is deprecated; `arms_dealer` and `fashion_buyer` are evaluated separately for potential conversion to customer archetypes or removal.
+- **Customer content** — demand tag pools, car grid size list, and customer generation tuning. Legacy merchants (`pawn_shop`, `antique_dealer`, `arms_dealer`, `fashion_buyer`) are removed — customer archetypes or tag-biased generation replace their content role.
 - **Director system** — skeleton to get all three demo runs flowing end-to-end with placeholder content. See `dev/docs/plans/demo_summary.md`.
 - **Dialog system** — linear first, Uncle branching second.
 - **Bank / Bankruptcy** — daily interest, game-over condition, optional loans.
