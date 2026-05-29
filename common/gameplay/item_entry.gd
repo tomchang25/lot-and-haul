@@ -7,7 +7,6 @@ extends RefCounted
 
 const UNKNOWN_TEXT := "???"
 
-
 # ── Inspection constants ─────────────────────────────────────────────────────
 
 const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
@@ -16,13 +15,14 @@ const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Lege
 
 const MAX_SPREAD: float = 0.5
 
+
 # A resolved value snapshot. All numbers already include condition multiplier.
 class PriceView extends RefCounted:
-    var known: bool = false      # false when veiled or anchor not revealed
-    var exact: bool = false      # true when verified — single number, no range
+    var known: bool = false # false when veiled or anchor not revealed
+    var exact: bool = false # true when verified — single number, no range
     var min_value: int = 0
     var max_value: int = 0
-    var point_value: int = 0     # the resolved item_price
+    var point_value: int = 0 # the resolved item_price
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
@@ -153,6 +153,7 @@ func _hidden_add_sum() -> float:
                 add_sum += clue.effect_amount
     return add_sum
 
+
 ## Single source of truth for estimated range + item_price.
 func resolve_price() -> PriceView:
     var view := PriceView.new()
@@ -256,7 +257,6 @@ func is_fully_inspected() -> bool:
 func is_price_converged() -> bool:
     return inspection_level >= 1.0
 
-
 # ── Clue reveal mechanics ─────────────────────────────────────────────────────
 
 
@@ -311,7 +311,6 @@ func reveal_all_hidden() -> void:
 # from Storage. Replaced old advance_to_final_layer with auto-reveal surfaces.
 func apply_storage_migration() -> void:
     auto_reveal_all_surface()
-
 
 # ── Anchor value (int) ────────────────────────────────────────────────────────
 
@@ -396,24 +395,29 @@ func roll_npc_estimate(sight_chance: float) -> int:
 # ── Estimated value (range) ────────────────────────────────────────────────────
 
 var estimated_value_min: int:
-    get: return resolve_price().min_value
+    get:
+        return resolve_price().min_value
 
 var estimated_value_max: int:
-    get: return resolve_price().max_value
+    get:
+        return resolve_price().max_value
 
 # ── Display text helpers ──────────────────────────────────────────────────────
 
 
 func estimated_value_text() -> String:
     var v := resolve_price()
-    if not v.known: return UNKNOWN_TEXT
-    if v.exact or v.max_value <= v.min_value: return "$%d" % v.min_value
+    if not v.known:
+        return UNKNOWN_TEXT
+    if v.exact or v.max_value <= v.min_value:
+        return "$%d" % v.min_value
     return "$%d - $%d" % [v.min_value, v.max_value]
 
 ## Resolved item price: appraised or verified value × condition multiplier.
 ## Veiled items should not use this — check anchor_revealed at call sites.
 var item_price: int:
-    get: return resolve_price().point_value
+    get:
+        return resolve_price().point_value
 
 # ── Display colors ────────────────────────────────────────────────────────────
 
@@ -434,10 +438,10 @@ const PRICE_COLOR := Color(0.4, 1.0, 0.5)
 const PRICE_UNKNOWN_COLOR := Color(0.6, 0.6, 0.6)
 
 var price_color: Color:
-    get: return PRICE_COLOR if resolve_price().known else PRICE_UNKNOWN_COLOR
+    get:
+        return PRICE_COLOR if resolve_price().known else PRICE_UNKNOWN_COLOR
 
 # ── Context-aware helpers ─────────────────────────────────────────────────────
-
 
 # ── Per-column price getters ─────────────────────────────────────────────────
 
@@ -572,7 +576,10 @@ func sort_value(column: int) -> Variant:
         ItemRow.Column.BASE_VALUE:
             return base_value_sort_value()
         ItemRow.Column.RARITY:
-            return float(item_data.rarity) if verified and item_data != null else -1.0
+            if item_data == null:
+                return -1.0
+            var verified_bonus := 10.0 if verified else 0.0
+            return verified_bonus + float(item_data.rarity)
         ItemRow.Column.WEIGHT:
             var weight_category := category_data()
             return weight_category.weight if weight_category != null else 0.0
