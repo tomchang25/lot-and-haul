@@ -1,0 +1,128 @@
+[gd_scene format=3 uid="uid://bxrs864dl2cmg"]
+
+[ext_resource type="Script" uid="uid://b61ssm5ecobc4" path="res://game/meta/customer_sell/customer_sell_scene.gd" id="1_css"]
+
+[node name="CustomerSellScene" type="Control" unique_id=331840253]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_css")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1644354066]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.1, 0.1, 0.12, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="." unique_id=300340752]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="HeaderRow" type="HBoxContainer" parent="RootVBox" unique_id=452268255]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="RootVBox/HeaderRow" unique_id=1218286169]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "Night Market"
+vertical_alignment = 1
+
+[node name="DayLabel" type="Label" parent="RootVBox/HeaderRow" unique_id=1563382684]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Day 1"
+vertical_alignment = 1
+
+[node name="BackButton" type="Button" parent="RootVBox/HeaderRow" unique_id=1597092715]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Back to Hub"
+
+[node name="CustomerTabsRow" type="HBoxContainer" parent="RootVBox" unique_id=1458900080]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="MainArea" type="HBoxContainer" parent="RootVBox" unique_id=785758664]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="ItemScroll" type="ScrollContainer" parent="RootVBox/MainArea" unique_id=1975978480]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="ItemListVBox" type="VBoxContainer" parent="RootVBox/MainArea/ItemScroll" unique_id=826718706]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="GridContainer" type="Control" parent="RootVBox/MainArea" unique_id=295981979]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SellPanel" type="VBoxContainer" parent="RootVBox/MainArea" unique_id=709091156]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CustomerNameLabel" type="Label" parent="RootVBox/MainArea/SellPanel" unique_id=706047828]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+vertical_alignment = 1
+
+[node name="GridSizeLabel" type="Label" parent="RootVBox/MainArea/SellPanel" unique_id=779385138]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+
+[node name="DemandTagsLabel" type="Label" parent="RootVBox/MainArea/SellPanel" unique_id=1193600170]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 2
+max_lines_visible = 3
+
+[node name="LabelDivider1" type="HSeparator" parent="RootVBox/MainArea/SellPanel" unique_id=918250383]
+layout_mode = 2
+
+[node name="CarTotalLabel" type="Label" parent="RootVBox/MainArea/SellPanel" unique_id=8029017]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="VerifiedCountLabel" type="Label" parent="RootVBox/MainArea/SellPanel" unique_id=1841041322]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+
+[node name="LabelDivider2" type="HSeparator" parent="RootVBox/MainArea/SellPanel" unique_id=535341362]
+layout_mode = 2
+
+[node name="EmptyLabel" type="Label" parent="." unique_id=125428447]
+visible = false
+layout_mode = 0
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
+text = "No customers tonight."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SellResultPopup" type="ConfirmationDialog" parent="." unique_id=475284183]
+title = "Sale Result"
+ok_button_text = "Confirm Sale"
+dialog_autowrap = true

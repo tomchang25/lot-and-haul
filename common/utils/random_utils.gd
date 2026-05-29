@@ -1,6 +1,54 @@
 class_name RandomUtils
 extends RefCounted
 
+# ── Name pools ─────────────────────────────────────────────────────────────────
+
+const FIRST_NAMES: Array[String] = [
+    "Alice",
+    "Bob",
+    "Carol",
+    "Dave",
+    "Eve",
+    "Frank",
+    "Grace",
+    "Hank",
+    "Iris",
+    "Jake",
+    "Kate",
+    "Leo",
+    "Mia",
+    "Noah",
+    "Olive",
+    "Pete",
+    "Quinn",
+    "Rosa",
+    "Sam",
+    "Tina",
+    "Uma",
+    "Vince",
+    "Wendy",
+    "Xander",
+]
+
+const LAST_NAMES: Array[String] = [
+    "Weaver",
+    "Chen",
+    "Diaz",
+    "Park",
+    "Torres",
+    "Lin",
+    "Kim",
+    "Moss",
+    "Bell",
+    "Sato",
+    "Rossi",
+    "Patel",
+    "Khan",
+    "Mueller",
+    "Costa",
+    "Yamada",
+]
+
 
 static func pick_weighted_index(weights: Array[int], rng: RandomNumberGenerator = null) -> int:
     if weights.is_empty():
@@ -46,6 +94,40 @@ static func pick_weighted_entry(entries: Array, rng: RandomNumberGenerator = nul
         return null
 
     return entries[picked_index]
+
+
+## Returns a random alphanumeric string of [param length] characters.
+static func random_id(rng: RandomNumberGenerator, length: int = 8) -> String:
+    var chars := "abcdefghijklmnopqrstuvwxyz0123456789"
+    var id := ""
+    for i in range(length):
+        id += chars[rng.randi_range(0, chars.length() - 1)]
+    return id
+
+
+## Returns a random "First Last" name drawn from the NAME pools.
+static func random_name(rng: RandomNumberGenerator) -> String:
+    var first: String = FIRST_NAMES[rng.randi_range(0, FIRST_NAMES.size() - 1)]
+    var last: String = LAST_NAMES[rng.randi_range(0, LAST_NAMES.size() - 1)]
+    return "%s %s" % [first, last]
+
+
+## Picks [param count] unique items from [param pool] using [param rng].
+## Returns fewer items if the pool is smaller than count.
+static func pick_unique(rng: RandomNumberGenerator, pool: Array, count: int) -> Array:
+    if pool.is_empty() or count <= 0:
+        return []
+
+    var actual := mini(count, pool.size())
+    var chosen: Array = []
+    var used: Array[int] = []
+    for i in range(actual):
+        var idx := rng.randi_range(0, pool.size() - 1)
+        while idx in used:
+            idx = rng.randi_range(0, pool.size() - 1)
+        used.append(idx)
+        chosen.append(pool[idx])
+    return chosen
 
 
 static func _create_fallback_rng() -> RandomNumberGenerator:

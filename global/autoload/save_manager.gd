@@ -19,6 +19,15 @@ var available_locations: Array[LocationData] = []
 var unlocked_perks: Array[String] = []
 var attribute_levels: Dictionary = { } # attribute_id (String) → int
 
+## Customers generated for the current night. Array of Customer dicts on disk.
+var nightly_customers: Array[Customer] = []
+
+## Customer sales resolved during the current night, in order. Each entry is a
+## plain Dictionary (day, customer_id/name, strategy, item_count, item_ids,
+## sale_price). Reset when the next night's customers are generated. Read by the
+## Day Summary rework (Phase 11) to report nightly selling.
+var customer_sales_today: Array[Dictionary] = []
+
 
 func save() -> void:
     var serialized_items: Array = []
@@ -31,6 +40,10 @@ func save() -> void:
     var serialized_available_location_ids: Array[String] = []
     for loc: LocationData in available_locations:
         serialized_available_location_ids.append(loc.location_id)
+
+    var serialized_customers: Array = []
+    for c: Customer in nightly_customers:
+        serialized_customers.append(c.to_dict())
 
     var data := {
         "category_points": category_points,
@@ -45,9 +58,8 @@ func save() -> void:
         "available_location_ids": serialized_available_location_ids,
         "unlocked_perks": unlocked_perks,
         "attribute_levels": attribute_levels,
-        "merchant_negotiations_used_today": _build_negotiation_dict(),
-        "merchant_orders": _build_order_dict(),
-        "next_order_id": MerchantRegistry.next_order_id,
+        "nightly_customers": serialized_customers,
+        "customer_sales_today": customer_sales_today,
     }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
     if file == null:
@@ -130,43 +142,25 @@ func _read_save_file() -> void:
     else:
         attribute_levels = { }
 
-    # Old saves may contain "super_cat_means" and "category_factors_today" keys
-    # from the removed MarketManager system — silently ignore them.
+    nightly_customers = []
+    if parsed.has("nightly_customers") and parsed["nightly_customers"] is Array:
+        for d: Variant in parsed["nightly_customers"]:
+            if d is Dictionary:
+                nightly_customers.append(Customer.from_dict(d))
 
-    if parsed.has("merchant_negotiations_used_today") and parsed["merchant_negotiations_used_today"] is Dictionary:
-        var neg_dict: Dictionary = parsed["merchant_negotiations_used_today"]
-        for key: Variant in neg_dict:
-            if key is String and neg_dict[key] is float:
-                var m: MerchantData = MerchantRegistry.get_merchant_by_id(key)
-                if m != null:
-                    m.negotiations_used_today = int(neg_dict[key])
+    customer_sales_today = []
+    if parsed.has("customer_sales_today") and parsed["customer_sales_today"] is Array:
+        for rec: Variant in parsed["customer_sales_today"]:
+            if rec is Dictionary:
+                rec = rec.duplicate()
+                if rec.has("item_ids") and rec["item_ids"] is Array:
+                    rec["item_ids"] = _intify_array(rec["item_ids"])
+                customer_sales_today.append(rec)
 
-    if parsed.has("next_order_id") and parsed["next_order_id"] is float:
-        MerchantRegistry.next_order_id = int(parsed["next_order_id"])
-
-    if parsed.has("merchant_orders") and parsed["merchant_orders"] is Dictionary:
-        var orders_dict: Dictionary = parsed["merchant_orders"]
-        for key: Variant in orders_dict:
-            if not key is String:
-                continue
-            var m: MerchantData = MerchantRegistry.get_merchant_by_id(key)
-            if m == null:
-                continue
-            var entry: Variant = orders_dict[key]
-            if not entry is Dictionary:
-                continue
-            if entry.has("last_roll_day") and entry["last_roll_day"] is float:
-                m.last_order_roll_day = int(entry["last_roll_day"])
-            if entry.has("active_orders") and entry["active_orders"] is Array:
-                m.active_orders = []
-                for od: Variant in entry["active_orders"]:
-                    if od is Dictionary:
-                        m.active_orders.append(SpecialOrder.from_dict(od))
-            if entry.has("completed_order_ids") and entry["completed_order_ids"] is Array:
-                m.completed_order_ids = []
-                for cid: Variant in entry["completed_order_ids"]:
-                    if cid is String:
-                        m.completed_order_ids.append(cid)
+    # Old saves may contain "super_cat_means", "category_factors_today",
+    # "merchant_negotiations_used_today", "merchant_orders", and "next_order_id"
+    # keys from the removed MarketManager/MerchantRegistry systems — silently
+    # ignore them.
 
     var valid_ids: Array = []
     for entry: ItemEntry in storage_items:
@@ -182,25 +176,11 @@ func _read_save_file() -> void:
     ResearchSlot.purge_orphaned(research_slots, valid_ids)
 
 
-func _build_negotiation_dict() -> Dictionary:
-    var result: Dictionary = { }
-    for m: MerchantData in MerchantRegistry.get_all_merchants():
-        if m.negotiations_used_today > 0:
-            result[m.merchant_id] = m.negotiations_used_today
-    return result
-
-
-func _build_order_dict() -> Dictionary:
-    var result: Dictionary = { }
-    for m: MerchantData in MerchantRegistry.get_all_merchants():
-        if m.active_orders.is_empty() and m.completed_order_ids.is_empty() and m.last_order_roll_day < 0:
-            continue
-        var order_dicts: Array = []
-        for order: SpecialOrder in m.active_orders:
-            order_dicts.append(order.to_dict())
-        result[m.merchant_id] = {
-            "last_roll_day": m.last_order_roll_day,
-            "active_orders": order_dicts,
-            "completed_order_ids": m.completed_order_ids,
-        }
+static func _intify_array(arr: Array) -> Array:
+    var result: Array = []
+    for v: Variant in arr:
+        if v is float:
+            result.append(int(v))
+        else:
+            result.append(v)
     return result

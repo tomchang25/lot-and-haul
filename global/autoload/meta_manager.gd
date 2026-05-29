@@ -44,11 +44,72 @@ func advance_days(days: int) -> DaySummary:
     summary.completed_actions = _tick_research_slots(days)
     summary.end_day = SaveManager.current_day
 
-    MerchantRegistry.advance_day()
     SaveManager.available_locations.clear()
+
+    _generate_nightly_customers()
 
     SaveManager.save()
     return summary
+
+# ══ Nightly customers ═════════════════════════════════════════════════════════
+
+
+## Generates the nightly customer set for the current day.
+## Delegates to Customer.generate_for_night, stores in SaveManager, and resets
+## the per-night sales ledger that the Day Summary rework (Phase 11) reads.
+func _generate_nightly_customers() -> void:
+    var rng := RandomNumberGenerator.new()
+    rng.randomize()
+    SaveManager.nightly_customers = Customer.generate_for_night(
+        rng,
+        SaveManager.storage_items,
+    )
+    SaveManager.customer_sales_today.clear()
+
+
+## Commits a customer sale: removes items from storage, adds cash, records the
+## sale for the daily summary, drops the served customer, and saves.
+##
+## MetaManager is the transactional authority — the sell scene only computes the
+## price and calls this; it does not mutate cash, storage, or the customer list.
+##
+## [param items] — ItemEntry instances being sold.
+## [param sale_price] — total price computed by SellMath.
+## [param customer] — the served customer; removed from the nightly set. May be
+##   null (caller manages removal) for backward compatibility.
+## [param strategy] — "conservative" / "aggressive", recorded for the summary.
+func resolve_customer_sale(
+        items: Array,
+        sale_price: int,
+        customer: Customer = null,
+        strategy: String = "",
+) -> void:
+    var sold_ids: Array[int] = []
+    for entry: ItemEntry in items:
+        sold_ids.append(entry.id)
+        SaveManager.storage_items.erase(entry)
+        ResearchSlot.clear_for_item(SaveManager.research_slots, entry.id)
+        KnowledgeManager.add_category_points(
+            entry.item_data.category_data,
+            entry.item_data.rarity,
+            KnowledgeManager.KnowledgeAction.SELL,
+        )
+    SaveManager.cash += sale_price
+
+    SaveManager.customer_sales_today.append({
+        "day": SaveManager.current_day,
+        "customer_id": customer.customer_id if customer != null else "",
+        "customer_name": customer.display_name if customer != null else "",
+        "strategy": strategy,
+        "item_count": items.size(),
+        "item_ids": sold_ids,
+        "sale_price": sale_price,
+    })
+
+    if customer != null:
+        SaveManager.nightly_customers.erase(customer)
+
+    SaveManager.save()
 
 
 func _tick_research_slots(days: int) -> Array[Dictionary]:
@@ -77,7 +138,8 @@ func _tick_research_slots(days: int) -> Array[Dictionary]:
                 ResearchSlot.SlotAction.RESEARCH:
                     slot.research_days_spent += 1
                     var duration: int = Economy.RESEARCH_DAYS.get(
-                        entry.item_data.rarity, 3,
+                        entry.item_data.rarity,
+                        3,
                     )
                     if slot.research_days_spent >= duration:
                         entry.reveal_all_hidden()
@@ -126,55 +188,6 @@ func _slot_effect_label(action: ResearchSlot.SlotAction) -> String:
         _:
             push_warning("MetaManager: unknown SlotAction %d" % action)
             return "Done"
-
-# ══ Trade operations ══════════════════════════════════════════════════════════
-
-
-func sell_items(items: Array[ItemEntry], price: int, merchant: MerchantData) -> void:
-    for entry: ItemEntry in items:
-        SaveManager.storage_items.erase(entry)
-        ResearchSlot.clear_for_item(SaveManager.research_slots, entry.id)
-        KnowledgeManager.add_category_points(
-            entry.item_data.category_data,
-            entry.item_data.rarity,
-            KnowledgeManager.KnowledgeAction.SELL,
-        )
-    SaveManager.cash += price
-    MerchantRegistry.increment_negotiation(merchant)
-    SaveManager.save()
-
-
-func fulfill_order(order: SpecialOrder, assignments: Dictionary) -> int:
-    var merchant: MerchantData = order.merchant
-    var total_payout: int = 0
-    var consumed: Array[ItemEntry] = []
-
-    for slot_idx: Variant in assignments:
-        var assigned: Array = assignments[slot_idx]
-        var slot: OrderSlot = order.slots[int(slot_idx)]
-        for entry: ItemEntry in assigned:
-            total_payout += order.compute_item_price(entry)
-            consumed.append(entry)
-            slot.filled_count += 1
-
-    for entry: ItemEntry in consumed:
-        SaveManager.storage_items.erase(entry)
-        ResearchSlot.clear_for_item(SaveManager.research_slots, entry.id)
-        KnowledgeManager.add_category_points(
-            entry.item_data.category_data,
-            entry.item_data.rarity,
-            KnowledgeManager.KnowledgeAction.SELL,
-        )
-
-    if order.is_complete():
-        total_payout += order.completion_bonus
-        merchant.completed_order_ids.append(order.id)
-        merchant.active_orders.erase(order)
-
-    SaveManager.cash += total_payout
-    SaveManager.save()
-    return total_payout
-
 
 func buy_car(car: CarData) -> bool:
     if car == null:

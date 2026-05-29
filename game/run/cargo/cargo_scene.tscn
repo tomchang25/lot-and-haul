@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bed421fg56sjp"]
 
 [ext_resource type="Script" uid="uid://bmkpu1bykwvjt" path="res://game/run/cargo/cargo_scene.gd" id="1_cargov2"]
+[ext_resource type="Script" path="res://game/shared/packing/packing_grid.gd" id="2_packing_grid"]
 
 [node name="CargoSceneV2" type="Control" unique_id=1664710573]
 layout_mode = 3
@@ -82,6 +83,7 @@ text = "Car cargo"
 horizontal_alignment = 1
 
 [node name="CargoGrid" type="GridContainer" parent="MainHBox/VehiclePanel/CargoSection" unique_id=178417464]
+script = ExtResource("2_packing_grid")
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/h_separation = 3

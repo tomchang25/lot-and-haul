@@ -23,9 +23,9 @@ A Godot 4.6 single-player game about buying storage lots at auction, inspecting 
 - **Attributes** — Five SPECIAL-style stats (Appraisal, Perception, Restoration, Negotiation, Investigation) that provide bonuses to clue discovery dice rolls. Replace the old skill system.
 - **Verified** — Only after Storage Authenticate does the player see the real `item_name` and hidden clue effects. Verified value may be higher or lower than appraised. This is the core information asymmetry.
 
-## Selling (Phase 9 — planned)
+## Selling
 
-All selling channels (Quick Sell, Merchant Negotiation, Special Orders) are deprecated. Phase 9 replaces them with a unified nightly customer system: customers arrive with demand tags and car grids, the player fills cars, and chooses conservative (×1.2) or aggressive (dice pool) sell. See `ROADMAP.md`.
+All selling goes through the unified nightly customer system: customers arrive with demand tags and car grids, the player fills cars, and chooses conservative (×1.2) or aggressive (dice pool) sell. The legacy merchant negotiation, special orders, and quick-sell paths have been removed.
 
 ## Project Structure
 
@@ -65,7 +65,7 @@ stage/        Testbeds, demo runs, and tile sets (mostly empty)
 
 ## Autoloads (load order matters)
 
-EventBus → AudioManager → RegistryCoordinator → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → MerchantRegistry → KnowledgeManager → SaveManager → MetaManager → GameManager
+EventBus → AudioManager → RegistryCoordinator → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → KnowledgeManager → SaveManager → MetaManager → GameManager
 
 `RegistryCoordinator` orchestrates boot: each registry calls `RegistryCoordinator.register(self)` in `_ready()`, then `GameManager._ready()` runs `run_migrations()` and `run_validation()`.
 
@@ -77,7 +77,7 @@ When authoring new items or clues, use the generation prompts at `dev/tools/prom
 
 ## Current Phase
 
-Core loop redesign: Phases 0–10 complete (runtime veil cleanup, AP grid inspection, item base price, storage authenticate, clue independence + attribute system, inspection refinement, dynamic naming rules, YAML content regeneration, value policy cleanup). Identity layers and skills have been fully replaced by clue-based pricing and SPECIAL-style attributes; all clues carry 1-word known_text and naming entries. `item_price` is now the sole per-item price resolver (`appraised or verified value × condition_multiplier`); MarketManager, PriceConfig, and deprecated selling helpers have been removed. Next up: Phase 9 (merchant system redesign). See `ROADMAP.md` for the full phase dependency graph.
+Core loop redesign: Phases 0–10 complete (runtime veil cleanup, AP grid inspection, item base price, storage authenticate, clue independence + attribute system, inspection refinement, dynamic naming rules, YAML content regeneration, value policy cleanup). Identity layers and skills have been fully replaced by clue-based pricing and SPECIAL-style attributes; all clues carry 1-word known_text and naming entries. `item_price` is now the sole per-item price resolver (`appraised or verified value × condition_multiplier`); MarketManager, PriceConfig, merchant registry, special orders, and deprecated selling helpers have been removed. Next up: Phase 11 (day summary consumption / timing of `customer_sales_today`). See `ROADMAP.md` for the full phase dependency graph.
 
 ## Conventions (quick reference)
 
