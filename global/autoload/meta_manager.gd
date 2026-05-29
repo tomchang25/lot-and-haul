@@ -69,11 +69,11 @@ func _tick_research_slots(days: int) -> Array[Dictionary]:
                 break
             match slot.action:
                 ResearchSlot.SlotAction.REPAIR:
-                    entry.apply_repair()
-                    slot.completed = entry.is_repair_complete()
+                    ResearchSlot.apply_repair(entry)
+                    slot.completed = ResearchSlot.is_repair_complete(entry)
                 ResearchSlot.SlotAction.RESTORE:
-                    entry.apply_restore()
-                    slot.completed = entry.is_restore_complete()
+                    ResearchSlot.apply_restore(entry)
+                    slot.completed = ResearchSlot.is_restore_complete(entry)
                 ResearchSlot.SlotAction.RESEARCH:
                     slot.research_days_spent += 1
                     var duration: int = Economy.RESEARCH_DAYS.get(

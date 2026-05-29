@@ -12,29 +12,6 @@ const UNKNOWN_TEXT := "???"
 
 const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
 
-# ── Research tuning knobs (non-inspection) ───────────────────────────────────
-
-const REPAIR_BASE: float = 0.15
-const REPAIR_ZONE_FACTORS: Dictionary = { 0.25: 1.0, 0.50: 0.35 }
-const REPAIR_RARITY_FACTOR: Dictionary = {
-    ItemData.Rarity.COMMON: 1.0,
-    ItemData.Rarity.UNCOMMON: 0.9,
-    ItemData.Rarity.RARE: 0.8,
-    ItemData.Rarity.EPIC: 0.7,
-    ItemData.Rarity.LEGENDARY: 0.6,
-}
-
-const RESTORE_BASE: float = 0.10
-const RESTORE_ZONE_FACTORS: Dictionary = { 0.75: 0.12, 1.0: 0.02 }
-const RESTORE_RARITY_FACTOR: Dictionary = {
-    ItemData.Rarity.COMMON: 1.0,
-    ItemData.Rarity.UNCOMMON: 0.8,
-    ItemData.Rarity.RARE: 0.6,
-    ItemData.Rarity.EPIC: 0.4,
-    ItemData.Rarity.LEGENDARY: 0.2,
-}
-const RESTORE_ATTR_COEFF: float = 0.4
-
 # ── Pricing ──────────────────────────────────────────────────────────────────
 
 const MAX_SPREAD: float = 0.5
@@ -250,35 +227,6 @@ func is_price_converged() -> bool:
     return inspection_level >= 1.0
 
 
-func apply_repair() -> void:
-    var zone_factor: float = REPAIR_ZONE_FACTORS[0.50]
-    if condition < 0.25:
-        zone_factor = REPAIR_ZONE_FACTORS[0.25]
-    var rarity_factor: float = REPAIR_RARITY_FACTOR[item_data.rarity]
-    var delta: float = REPAIR_BASE * zone_factor * rarity_factor
-    condition = minf(condition + delta, 0.5)
-    KnowledgeManager.add_category_points(
-        item_data.category_data,
-        item_data.rarity,
-        KnowledgeManager.KnowledgeAction.REPAIR,
-    )
-
-
-func apply_restore() -> void:
-    var zone_factor: float = RESTORE_ZONE_FACTORS[1.0]
-    if condition < 0.75:
-        zone_factor = RESTORE_ZONE_FACTORS[0.75]
-    var rarity_factor: float = RESTORE_RARITY_FACTOR[item_data.rarity]
-    var restoration_attr := KnowledgeManager.get_attribute_value("restoration")
-    var attr_mult: float = 1.0 + restoration_attr * RESTORE_ATTR_COEFF
-    var delta: float = RESTORE_BASE * zone_factor * rarity_factor * attr_mult
-    condition = minf(condition + delta, 1.0)
-    KnowledgeManager.add_category_points(
-        item_data.category_data,
-        item_data.rarity,
-        KnowledgeManager.KnowledgeAction.RESTORE,
-    )
-
 # ── Clue reveal mechanics ─────────────────────────────────────────────────────
 
 
@@ -334,13 +282,6 @@ func reveal_all_hidden() -> void:
 func apply_storage_migration() -> void:
     auto_reveal_all_surface()
 
-
-func is_repair_complete() -> bool:
-    return condition >= 0.5
-
-
-func is_restore_complete() -> bool:
-    return condition >= 1.0
 
 # ── Anchor value (int) ────────────────────────────────────────────────────────
 
