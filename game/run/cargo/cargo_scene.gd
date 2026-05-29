@@ -5,70 +5,49 @@
 #         RunManager.run_record.onsite_proceeds
 extends Control
 
-# ── Constants ─────────────────────────────────────────────────────────────────
+# ── Constants ──────────────────────────────────────────────────────────────────
 
 const ONSITE_SELL_PRICE := 50
 const CELL_SIZE := 56
-const CELL_GAP := 3
 
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 const CargoItemRowScene: PackedScene = preload("res://game/run/cargo/cargo_item_row.tscn")
 
-# ── Enums ─────────────────────────────────────────────────────────────────────
-
-enum Phase {
-    IDLE,
-    ITEM_HELD,
-}
-
-# ── State ─────────────────────────────────────────────────────────────────────
+# ── State ──────────────────────────────────────────────────────────────────────
 
 var _won_items: Array[ItemEntry] = []
 
-var _active_item: ItemEntry = null
 var _active_origin: String = ""
-var _active_origin_pos: Vector2i = Vector2i(-1, -1)
-
-var _extra_slot_items: Array[ItemEntry] = []
 var _active_origin_extra_index: int = -1
 
-var _hover_cell: Vector2i = Vector2i(-1, -1)
+var _extra_slot_items: Array[ItemEntry] = []
 var _hover_extra_index: int = -1
 
-var _phase: Phase = Phase.IDLE
-var _active_rotation: int = 0
-var _item_rotations: Dictionary = { }
-
-# ── Cargo Grid State ──────────────────────────────────────────────────────────
-
-var _cargo_placement: Dictionary = { }
-var _cargo_cells: Dictionary = { }
-
-# ── Extra Slot Grid State ─────────────────────────────────────────────────────
+# ── Extra Slot Grid State ──────────────────────────────────────────────────────
 
 var _extra_slot_cells: Dictionary = { }
 
-# ── Item List State ───────────────────────────────────────────────────────────
+# ── Item List State ────────────────────────────────────────────────────────────
 
 var _item_rows: Dictionary = { }
 var _loaded_items: Array[ItemEntry] = []
 
-# ── Stats ─────────────────────────────────────────────────────────────────────
+# ── Stats ──────────────────────────────────────────────────────────────────────
 
 var _slots_used: int = 0
 var _weight_used: float = 0.0
 var _item_colors: Dictionary = { }
 
-# ── Tooltip Support ───────────────────────────────────────────────────────────
+# ── Tooltip Support ────────────────────────────────────────────────────────────
 
 var _tooltip: ItemRowTooltip = null
 var _hovered_item: ItemEntry = null
 
-# ── Node references ───────────────────────────────────────────────────────────
+# ── Node references ────────────────────────────────────────────────────────────
 
 @onready var _item_list_vbox: VBoxContainer = $MainHBox/ItemListPanel/ItemListScroll/ItemListVBox
 @onready var _error_label: Label = $MainHBox/VehiclePanel/ErrorLabel
-@onready var _cargo_grid: GridContainer = $MainHBox/VehiclePanel/CargoSection/CargoGrid
+@onready var _cargo_grid: PackingGrid = $MainHBox/VehiclePanel/CargoSection/CargoGrid
 @onready var _trailer_section: HBoxContainer = $MainHBox/VehiclePanel/TrailerSection
 @onready var _extra_slot_container: HBoxContainer = $MainHBox/VehiclePanel/TrailerSection/TrailerSlotContainer
 @onready var _reset_btn: Button = $ResetButton
@@ -84,7 +63,7 @@ var _hovered_item: ItemEntry = null
 @onready var _summary_trailer_value: Label = $MainHBox/VehiclePanel/RunSummary/SummaryVBox/TrailerLine/TrailerRiskValue
 @onready var _run_summary: PanelContainer = $MainHBox/VehiclePanel/RunSummary
 
-# ══ Lifecycle ═════════════════════════════════════════════════════════════════
+# ══ Lifecycle ══════════════════════════════════════════════════════════════════
 
 
 func _ready() -> void:
@@ -110,7 +89,23 @@ func _ready() -> void:
 
     _assign_item_colors()
 
-    _build_cargo_grid()
+    # ── Configure PackingGrid ─────────────────────────────────────────────
+    var cols := RunManager.run_record.car_data.grid_columns
+    var rows := RunManager.run_record.car_data.grid_rows
+
+    _cargo_grid.get_shape_cells = _packing_shape_provider
+    _cargo_grid.get_item_color = _packing_color_provider
+    _cargo_grid.get_item_border_color = _packing_border_provider
+    _cargo_grid.additional_validator = _packing_weight_validator
+
+    _cargo_grid.item_clicked.connect(_on_packing_grid_item_clicked)
+    _cargo_grid.cell_clicked.connect(_on_packing_grid_cell_clicked)
+    _cargo_grid.placement_cancelled.connect(_on_packing_grid_placement_cancelled)
+    _cargo_grid.hover_started.connect(_on_packing_grid_hover_started)
+    _cargo_grid.hover_ended.connect(_on_packing_grid_hover_ended)
+
+    _cargo_grid.setup(cols, rows)
+
     _build_item_list()
     _build_extra_slots()
     _recalc_totals()
@@ -118,40 +113,81 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
-    if event is InputEventMouseButton:
-        if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-            if _phase == Phase.ITEM_HELD:
-                _cancel_placement()
-                accept_event()
+    if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+        if _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
+            _cargo_grid.cancel_placement()
+            accept_event()
+
+# ══ PackingGrid callbacks ═══════════════════════════════════════════════════════
 
 
-func _unhandled_input(event: InputEvent) -> void:
-    if _phase != Phase.ITEM_HELD or _active_item == null:
-        return
-    if event is InputEventKey and event.pressed and not event.echo:
-        match event.keycode:
-            KEY_Q:
-                _active_rotation = (_active_rotation + 3) % 4
-                _refresh_cargo_cell_visuals()
-                get_viewport().set_input_as_handled()
-            KEY_E:
-                _active_rotation = (_active_rotation + 1) % 4
-                _refresh_cargo_cell_visuals()
-                get_viewport().set_input_as_handled()
+func _packing_shape_provider(item) -> Array[Vector2i]:
+    var entry: ItemEntry = item as ItemEntry
+    return entry.item_data.category_data.get_cells()
+
+
+func _packing_color_provider(item) -> Color:
+    return _get_item_color(item)
+
+
+func _packing_border_provider(item) -> Color:
+    return _get_item_border_color(item)
+
+
+func _packing_weight_validator(item, origin: Vector2i) -> bool:
+    return not _would_exceed_weight(item)
+
+# ══ PackingGrid signal handlers ════════════════════════════════════════════════
+
+
+func _on_packing_grid_item_clicked(item) -> void:
+    _hide_tooltip()
+    var entry: ItemEntry = item as ItemEntry
+    if _item_rows.has(entry):
+        _item_rows[entry].set_external_highlight(false)
+    _lift_from_cargo(entry)
+
+
+func _on_packing_grid_cell_clicked(pos: Vector2i) -> void:
+    var item = _cargo_grid.active_item
+    if item != null and _cargo_grid.can_place(item, pos):
+        _cargo_grid.place(item, pos)
+        _active_origin = ""
+        _recalc_totals()
+        _refresh_ui()
+
+
+func _on_packing_grid_placement_cancelled(item) -> void:
+    if _active_origin == "extra" and _active_origin_extra_index >= 0:
+        _extra_slot_items[_active_origin_extra_index] = item
+        _active_origin_extra_index = -1
+    _active_origin = ""
+    _recalc_totals()
+    _refresh_ui()
+
+
+func _on_packing_grid_hover_started(pos: Vector2i) -> void:
+    if _cargo_grid.phase != PackingGrid.Phase.ITEM_HELD and _cargo_grid.placement.has(pos):
+        var entry: ItemEntry = _cargo_grid.placement[pos] as ItemEntry
+        if _item_rows.has(entry):
+            _item_rows[entry].set_external_highlight(true)
+            _show_tooltip_for_item(entry, _item_rows[entry].get_global_rect())
+
+
+func _on_packing_grid_hover_ended() -> void:
+    _hide_tooltip()
+    for entry: ItemEntry in _item_rows:
+        _item_rows[entry].set_external_highlight(false)
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
 func _on_reset_pressed() -> void:
-    _cargo_placement.clear()
+    _cargo_grid.reset()
     _extra_slot_items.fill(null)
 
-    _active_item = null
     _active_origin = ""
-    _active_origin_pos = Vector2i(-1, -1)
     _active_origin_extra_index = -1
-    _phase = Phase.IDLE
-    _item_rotations.clear()
 
     _recalc_totals()
     _refresh_ui()
@@ -164,8 +200,8 @@ func _on_continue_pressed() -> void:
 
 func _on_confirm_popup_confirmed() -> void:
     var cargo: Array[ItemEntry] = []
-    for pos: Vector2i in _cargo_placement:
-        var entry: ItemEntry = _cargo_placement[pos]
+    for pos: Vector2i in _cargo_grid.placement:
+        var entry: ItemEntry = _cargo_grid.placement[pos]
         if entry not in cargo:
             cargo.append(entry)
     RunManager.run_record.cargo_items = cargo
@@ -184,28 +220,15 @@ func _on_confirm_popup_confirmed() -> void:
     GameManager.go_to_run_review()
 
 
-func _on_cargo_cell_pressed(cell_pos: Vector2i) -> void:
-    _hide_tooltip()
-    if _phase == Phase.IDLE:
-        if _cargo_placement.has(cell_pos):
-            var entry: ItemEntry = _cargo_placement[cell_pos]
-            if _item_rows.has(entry):
-                _item_rows[entry].set_external_highlight(false)
-            _lift_from_cargo(entry)
-    elif _phase == Phase.ITEM_HELD:
-        if _can_place_at_cargo(_active_item, cell_pos):
-            _place_item_in_cargo(_active_item, cell_pos)
-
-
 func _on_extra_slot_pressed(slot_index: int) -> void:
     _hide_tooltip()
-    if _phase == Phase.IDLE:
+    if _cargo_grid.phase == PackingGrid.Phase.IDLE:
         if _extra_slot_items[slot_index] != null:
             var entry: ItemEntry = _extra_slot_items[slot_index]
             if _item_rows.has(entry):
                 _item_rows[entry].set_external_highlight(false)
             _lift_from_extra(slot_index)
-    elif _phase == Phase.ITEM_HELD:
+    elif _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
         _place_item_in_extra(slot_index)
 
 
@@ -213,8 +236,8 @@ func _on_item_row_pressed(entry: ItemEntry) -> void:
     _hide_tooltip()
     if _item_rows.has(entry):
         _item_rows[entry].set_external_highlight(false)
-    if _phase == Phase.ITEM_HELD:
-        _cancel_placement()
+    if _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
+        _cargo_grid.cancel_placement()
     _lift_item_entry(entry)
 
 
@@ -225,11 +248,11 @@ func _on_row_tooltip_requested(entry: ItemEntry, anchor: Rect2) -> void:
 func _on_row_tooltip_dismissed() -> void:
     _hide_tooltip()
 
-# ══ Item lift helpers ═════════════════════════════════════════════════════════
+# ══ Item lift helpers ══════════════════════════════════════════════════════════
 
 
 func _lift_item_entry(entry: ItemEntry) -> void:
-    if _is_item_in_cargo(entry):
+    if _cargo_grid.is_item_placed(entry):
         _lift_from_cargo(entry)
     elif _is_item_in_extra(entry):
         var idx: int = _extra_slot_items.find(entry)
@@ -238,24 +261,47 @@ func _lift_item_entry(entry: ItemEntry) -> void:
         _lift_from_list(entry)
 
 
-func _is_item_in_cargo(entry: ItemEntry) -> bool:
-    for pos: Vector2i in _cargo_placement:
-        if _cargo_placement[pos] == entry:
-            return true
-    return false
-
-
 func _is_item_in_extra(entry: ItemEntry) -> bool:
     return entry in _extra_slot_items
 
 
 func _lift_from_list(entry: ItemEntry) -> void:
-    _active_item = entry
-    _active_rotation = _item_rotations.get(entry, 0)
     _active_origin = "list"
-    _active_origin_pos = Vector2i(-1, -1)
-    _phase = Phase.ITEM_HELD
+    _cargo_grid.set_held_item(entry, _cargo_grid.item_rotations.get(entry, 0))
     _refresh_ui()
+
+
+func _lift_from_cargo(entry: ItemEntry) -> void:
+    _active_origin = "cargo"
+    _cargo_grid.lift(entry)
+    _refresh_ui()
+
+
+func _lift_from_extra(slot_index: int) -> void:
+    var entry: ItemEntry = _extra_slot_items[slot_index]
+    _active_origin = "extra"
+    _active_origin_extra_index = slot_index
+    _extra_slot_items[slot_index] = null
+    _cargo_grid.set_held_item(entry, _cargo_grid.item_rotations.get(entry, 0))
+    _recalc_totals()
+    _refresh_ui()
+
+
+func _place_item_in_extra(slot_index: int) -> void:
+    if _extra_slot_items[slot_index] != null:
+        return
+
+    var item = _cargo_grid.active_item
+    if item == null:
+        return
+
+    if _cargo_grid.is_item_placed(item):
+        _cargo_grid.erase(item)
+
+    _extra_slot_items[slot_index] = item
+    _active_origin = ""
+    _active_origin_extra_index = -1
+    _cargo_grid.cancel_placement()
 
 # ══ Color assignment ═══════════════════════════════════════════════════════════
 
@@ -282,21 +328,7 @@ func _get_item_border_color(entry: ItemEntry) -> Color:
         return base.lightened(0.35)
     return Color(0.40, 0.55, 0.75, 1.0)
 
-# ══ Grid construction ══════════════════════════════════════════════════════════
-
-
-func _build_cargo_grid() -> void:
-    var cols := RunManager.run_record.car_data.grid_columns
-    var rows := RunManager.run_record.car_data.grid_rows
-
-    _cargo_grid.columns = cols
-
-    for row in rows:
-        for col in cols:
-            var pos := Vector2i(col, row)
-            var cell := _make_cargo_cell(pos)
-            _cargo_grid.add_child(cell)
-            _cargo_cells[pos] = cell
+# ══ Grid construction (PackingGrid delegates) ══════════════════════════════════
 
 
 func _build_extra_slots() -> void:
@@ -318,155 +350,30 @@ func _build_item_list() -> void:
         _item_list_vbox.add_child(row)
         _item_rows[entry] = row
 
-# ══ Placement logic ════════════════════════════════════════════════════════════
-
-
-func _get_active_cells(entry: ItemEntry) -> Array[Vector2i]:
-    var base: Array[Vector2i] = entry.item_data.category_data.get_cells()
-    return CargoShapes.rotate_cells(base, _active_rotation)
-
-
-func _can_place_at_cargo(entry: ItemEntry, origin: Vector2i) -> bool:
-    var cols := RunManager.run_record.car_data.grid_columns
-    var rows := RunManager.run_record.car_data.grid_rows
-    var cells: Array[Vector2i] = _get_active_cells(entry)
-
-    for c: Vector2i in cells:
-        var world := origin + c
-        if world.x < 0 or world.x >= cols or world.y < 0 or world.y >= rows:
-            return false
-        if _cargo_placement.has(world) and _cargo_placement[world] != entry:
-            return false
-
-    if _would_exceed_weight(entry):
-        return false
-
-    return true
+# ══ Placement helpers ══════════════════════════════════════════════════════════
 
 
 func _would_exceed_weight(entry: ItemEntry) -> bool:
     var max_weight: float = RunManager.run_record.car_data.max_weight
     var entry_weight: float = entry.item_data.category_data.weight
 
-    var already_in_cargo := false
-    for pos: Vector2i in _cargo_placement:
-        if _cargo_placement[pos] == entry:
-            already_in_cargo = true
-            break
-
-    if already_in_cargo:
+    if _cargo_grid.is_item_placed(entry):
         return false
-    else:
-        return (_weight_used + entry_weight) > max_weight
+    return (_weight_used + entry_weight) > max_weight
 
 
 func _get_pending_weight(entry: ItemEntry) -> float:
-    for pos: Vector2i in _cargo_placement:
-        if _cargo_placement[pos] == entry:
-            return 0.0
+    if _cargo_grid.is_item_placed(entry):
+        return 0.0
     return entry.item_data.category_data.weight
 
 
 func _get_pending_slots(entry: ItemEntry) -> int:
-    for pos: Vector2i in _cargo_placement:
-        if _cargo_placement[pos] == entry:
-            return 0
-    return _get_active_cells(entry).size()
+    if _cargo_grid.is_item_placed(entry):
+        return 0
+    return _cargo_grid.get_active_cells(entry).size()
 
-
-func _place_item_in_cargo(entry: ItemEntry, origin: Vector2i) -> void:
-    _erase_from_cargo(entry)
-    _erase_from_extra(entry)
-
-    var cells: Array[Vector2i] = _get_active_cells(entry)
-    for c: Vector2i in cells:
-        _cargo_placement[origin + c] = entry
-
-    _item_rotations[_active_item] = _active_rotation
-    _active_item = null
-    _active_origin = ""
-    _active_origin_pos = Vector2i(-1, -1)
-    _phase = Phase.IDLE
-    _recalc_totals()
-    _refresh_ui()
-
-
-func _erase_from_cargo(entry: ItemEntry) -> void:
-    var keys_to_erase: Array[Vector2i] = []
-    for pos: Vector2i in _cargo_placement:
-        if _cargo_placement[pos] == entry:
-            keys_to_erase.append(pos)
-    for pos: Vector2i in keys_to_erase:
-        _cargo_placement.erase(pos)
-
-
-func _erase_from_extra(entry: ItemEntry) -> void:
-    for i in _extra_slot_items.size():
-        if _extra_slot_items[i] == entry:
-            _extra_slot_items[i] = null
-
-
-func _lift_from_cargo(entry: ItemEntry) -> void:
-    var origin_pos := Vector2i(999, 999)
-    for pos: Vector2i in _cargo_placement:
-        if _cargo_placement[pos] == entry:
-            if pos.y < origin_pos.y or (pos.y == origin_pos.y and pos.x < origin_pos.x):
-                origin_pos = pos
-
-    _active_item = entry
-    _active_rotation = _item_rotations.get(entry, 0)
-    _active_origin = "cargo"
-    _active_origin_pos = origin_pos
-    _phase = Phase.ITEM_HELD
-    _refresh_ui()
-
-
-func _lift_from_extra(slot_index: int) -> void:
-    _active_item = _extra_slot_items[slot_index]
-    _active_rotation = _item_rotations.get(_active_item, 0)
-    _active_origin = "extra"
-    _active_origin_extra_index = slot_index
-    _extra_slot_items[slot_index] = null
-    _phase = Phase.ITEM_HELD
-    _recalc_totals()
-    _refresh_ui()
-
-
-func _cancel_placement() -> void:
-    if _phase != Phase.ITEM_HELD or _active_item == null:
-        return
-
-    if _active_origin == "extra":
-        _extra_slot_items[_active_origin_extra_index] = _active_item
-        _active_origin_extra_index = -1
-
-    _active_item = null
-    _active_rotation = 0
-    _active_origin = ""
-    _active_origin_pos = Vector2i(-1, -1)
-    _phase = Phase.IDLE
-
-    _recalc_totals()
-    _refresh_ui()
-
-
-func _place_item_in_extra(slot_index: int) -> void:
-    if _extra_slot_items[slot_index] != null:
-        return
-
-    if _active_origin == "cargo":
-        _erase_from_cargo(_active_item)
-
-    _extra_slot_items[slot_index] = _active_item
-    _active_item = null
-    _active_origin = ""
-    _active_origin_pos = Vector2i(-1, -1)
-    _active_origin_extra_index = -1
-    _phase = Phase.IDLE
-    _recalc_totals()
-    _refresh_ui()
-
-# ══ UI helpers ════════════════════════════════════════════════════════════════
+# ══ UI helpers ═════════════════════════════════════════════════════════════════
 
 
 func _recalc_totals() -> void:
@@ -475,8 +382,8 @@ func _recalc_totals() -> void:
     _loaded_items.clear()
 
     var seen: Array[ItemEntry] = []
-    for pos: Vector2i in _cargo_placement:
-        var entry: ItemEntry = _cargo_placement[pos]
+    for pos: Vector2i in _cargo_grid.placement:
+        var entry: ItemEntry = _cargo_grid.placement[pos]
         if entry not in seen:
             seen.append(entry)
             _loaded_items.append(entry)
@@ -498,9 +405,10 @@ func _refresh_ui() -> void:
     var pending_weight := 0.0
     var weight_exceeded := false
 
-    if _phase == Phase.ITEM_HELD and _active_item != null:
-        pending_slots = _get_pending_slots(_active_item)
-        pending_weight = _get_pending_weight(_active_item)
+    var held_item = _cargo_grid.active_item
+    if _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD and held_item != null:
+        pending_slots = _get_pending_slots(held_item)
+        pending_weight = _get_pending_weight(held_item)
         weight_exceeded = (_weight_used + pending_weight) > max_weight
 
     _update_summary(pending_slots, pending_weight, weight_exceeded, max_slots, max_weight)
@@ -510,7 +418,7 @@ func _refresh_ui() -> void:
     else:
         _error_label.text = ""
 
-    _refresh_cargo_cell_visuals()
+    _cargo_grid.refresh_visuals()
     _refresh_extra_slot_visuals()
     _refresh_item_list_visuals()
 
@@ -570,56 +478,13 @@ func _update_summary(pending_slots: int, pending_weight: float, weight_exceeded:
         _summary_trailer_line.visible = false
 
 
-func _refresh_cargo_cell_visuals() -> void:
-    var preview_cells: Array[Vector2i] = []
-    var preview_valid := false
-    if _phase == Phase.ITEM_HELD and _hover_cell != Vector2i(-1, -1) and _active_item != null:
-        preview_valid = _can_place_at_cargo(_active_item, _hover_cell)
-        for c: Vector2i in _get_active_cells(_active_item):
-            preview_cells.append(_hover_cell + c)
-
-    for pos: Vector2i in _cargo_cells:
-        var cell: Panel = _cargo_cells[pos]
-        var style: StyleBoxFlat
-        if pos in preview_cells:
-            if preview_valid:
-                style = _make_stylebox(
-                    Color(0.20, 0.45, 0.22, 1.0),
-                    Color(0.35, 0.75, 0.40, 1.0),
-                )
-            else:
-                style = _make_stylebox(
-                    Color(0.45, 0.18, 0.18, 1.0),
-                    Color(0.75, 0.30, 0.30, 1.0),
-                )
-        elif _cargo_placement.has(pos):
-            var entry: ItemEntry = _cargo_placement[pos]
-            if _phase == Phase.ITEM_HELD and _active_item == entry:
-                var base_color := _get_item_color(entry)
-                style = _make_stylebox(
-                    base_color.lightened(0.2),
-                    _get_item_border_color(entry).lightened(0.15),
-                )
-            else:
-                style = _make_stylebox(
-                    _get_item_color(entry),
-                    _get_item_border_color(entry),
-                )
-        else:
-            style = _make_stylebox(
-                Color(0.18, 0.18, 0.20, 1.0),
-                Color(0.35, 0.35, 0.38, 1.0),
-            )
-        cell.add_theme_stylebox_override("panel", style)
-
-
 func _refresh_extra_slot_visuals() -> void:
     for i: int in _extra_slot_cells:
         var cell: Panel = _extra_slot_cells[i]
         var style: StyleBoxFlat
         var entry: ItemEntry = _extra_slot_items[i] if i < _extra_slot_items.size() else null
         if entry != null:
-            if i == _hover_extra_index and _phase != Phase.ITEM_HELD:
+            if i == _hover_extra_index and _cargo_grid.phase != PackingGrid.Phase.ITEM_HELD:
                 style = _make_stylebox(
                     _get_item_color(entry).lightened(0.2),
                     _get_item_border_color(entry).lightened(0.15),
@@ -629,7 +494,7 @@ func _refresh_extra_slot_visuals() -> void:
                     _get_item_color(entry),
                     _get_item_border_color(entry),
                 )
-        elif i == _hover_extra_index and _phase == Phase.ITEM_HELD:
+        elif i == _hover_extra_index and _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
             style = _make_stylebox(
                 Color(0.20, 0.45, 0.22, 1.0),
                 Color(0.35, 0.75, 0.40, 1.0),
@@ -654,14 +519,12 @@ func _refresh_item_list_visuals() -> void:
     for entry: ItemEntry in _item_rows:
         var row: CargoItemRow = _item_rows[entry]
         row.set_loaded(_is_item_loaded(entry))
-        row.set_holding(entry == _active_item and _phase == Phase.ITEM_HELD)
+        var held = _cargo_grid.active_item == entry and _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD
+        row.set_holding(held)
 
 
 func _is_item_loaded(entry: ItemEntry) -> bool:
-    for pos: Vector2i in _cargo_placement:
-        if _cargo_placement[pos] == entry:
-            return true
-    return entry in _extra_slot_items
+    return _cargo_grid.is_item_placed(entry) or entry in _extra_slot_items
 
 
 func _build_summary_text() -> String:
@@ -686,54 +549,6 @@ func _make_stylebox(bg: Color, border: Color) -> StyleBoxFlat:
     s.border_width_bottom = 1
     s.border_color = border
     return s
-
-
-func _make_cargo_cell(pos: Vector2i) -> Panel:
-    var cell := Panel.new()
-    cell.custom_minimum_size = Vector2(CELL_SIZE, CELL_SIZE)
-    cell.set_meta("cell_pos", pos)
-
-    var style := StyleBoxFlat.new()
-    style.bg_color = Color(0.18, 0.18, 0.20, 1.0)
-    style.border_width_left = 1
-    style.border_width_right = 1
-    style.border_width_top = 1
-    style.border_width_bottom = 1
-    style.border_color = Color(0.35, 0.35, 0.38, 1.0)
-    cell.add_theme_stylebox_override("panel", style)
-
-    cell.mouse_entered.connect(
-        func() -> void:
-            _hover_cell = pos
-            _refresh_cargo_cell_visuals()
-            if _phase != Phase.ITEM_HELD and _cargo_placement.has(pos):
-                var entry: ItemEntry = _cargo_placement[pos]
-                if _item_rows.has(entry):
-                    _item_rows[entry].set_external_highlight(true)
-                    _show_tooltip_for_item(entry, _item_rows[entry].get_global_rect())
-                else:
-                    _show_tooltip_for_item(entry, cell.get_global_rect())
-    )
-    cell.mouse_exited.connect(
-        func() -> void:
-            if _hover_cell == pos:
-                _hover_cell = Vector2i(-1, -1)
-            if _cargo_placement.has(pos) and _item_rows.has(_cargo_placement[pos]):
-                _item_rows[_cargo_placement[pos]].set_external_highlight(false)
-            _refresh_cargo_cell_visuals()
-            _hide_tooltip()
-    )
-
-    cell.gui_input.connect(
-        func(event: InputEvent) -> void:
-            if event is InputEventMouseButton and event.pressed:
-                if event.button_index == MOUSE_BUTTON_LEFT:
-                    _on_cargo_cell_pressed(pos)
-                elif event.button_index == MOUSE_BUTTON_RIGHT:
-                    if _phase == Phase.ITEM_HELD:
-                        _cancel_placement()
-    )
-    return cell
 
 
 func _make_extra_slot_cell(slot_index: int) -> Panel:
@@ -763,7 +578,7 @@ func _make_extra_slot_cell(slot_index: int) -> Panel:
             _hover_extra_index = slot_index
             _refresh_extra_slot_visuals()
 
-            if _phase != Phase.ITEM_HELD and _extra_slot_items[slot_index] != null:
+            if _cargo_grid.phase != PackingGrid.Phase.ITEM_HELD and _extra_slot_items[slot_index] != null:
                 var entry: ItemEntry = _extra_slot_items[slot_index]
                 if _item_rows.has(entry):
                     _item_rows[entry].set_external_highlight(true)
@@ -788,8 +603,8 @@ func _make_extra_slot_cell(slot_index: int) -> Panel:
                 if event.button_index == MOUSE_BUTTON_LEFT:
                     _on_extra_slot_pressed(slot_index)
                 elif event.button_index == MOUSE_BUTTON_RIGHT:
-                    if _phase == Phase.ITEM_HELD:
-                        _cancel_placement()
+                    if _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
+                        _cargo_grid.cancel_placement()
     )
     return cell
 
@@ -797,7 +612,7 @@ func _make_extra_slot_cell(slot_index: int) -> Panel:
 
 
 func _show_tooltip_for_item(entry: ItemEntry, anchor: Rect2) -> void:
-    if _phase == Phase.ITEM_HELD:
+    if _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
         return
     _hovered_item = entry
     _tooltip.show_for(entry, anchor)
