@@ -52,19 +52,19 @@ Range convergence: appraised value shows as a range when not all surface clues a
 
 Phases 0–6 cover the foundational work. Detailed specs omitted — see git history and code.
 
-| Phase | Title                                    | Status                                                                                                    |
-| ----- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------- | -------------------------------- |
-| 0–2   | Runtime veil cleanup, AP grid inspection | ✅ Complete                                                                                               |
-| 3     | Item base price + abstract identity data | ✅ Complete                                                                                               |
-| 4     | Clues + AP inspection (layer-based)      | ⚠️ Superseded — clue data structures exist but the layer-based advancement model is replaced by Phase 7   |
-| 5     | Hub final layer resolution               | ⚠️ Superseded — auto-advance logic exists but will be removed when identity layers are deleted in Phase 7 |
-| 6     | Storage Authenticate                     | ✅ Complete — verified flag, rarity-based duration, slot action all operational                           |
-| 7     | Clue Independence + Attribute System     | ✅ Complete — identity layers/skills removed, clue-based pricing, SPECIAL attributes, dice inspection     |
-| 7.5   | Inspection Refinement                    | ✅ Complete — veiled/unveiled/verified vocabulary, chain reveal, lot unveil probability                   |
-| 8     | Dynamic Naming Rules                     | ✅ Complete — ClueData naming_slot/priority, display_name composition, validator rules                    |
-| 8b    | YAML Content Regeneration                | ✅ Complete — all 128 clues rewritten to 1-word known_text, naming entries assigned, names reconciled     |
-| 9     | Merchant System Redesign                 | ✅ Complete — Customer data model, car grid packing UI, fit/sell flow, dice UI, legacy selling removed    |
-| 10    | Value Policy Cleanup                     | ✅ Complete — MarketManager, PriceConfig, compute_price removed; item_price simplified to (appraised      | verified) × condition_multiplier |
+| Phase | Title                                    | Status                                                                                                                                                                                |
+| ----- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| 0–2   | Runtime veil cleanup, AP grid inspection | ✅ Complete                                                                                                                                                                           |
+| 3     | Item base price + abstract identity data | ✅ Complete                                                                                                                                                                           |
+| 4     | Clues + AP inspection (layer-based)      | ⚠️ Superseded — clue data structures exist but the layer-based advancement model is replaced by Phase 7                                                                               |
+| 5     | Hub final layer resolution               | ⚠️ Superseded — auto-advance logic exists but will be removed when identity layers are deleted in Phase 7                                                                             |
+| 6     | Storage Authenticate                     | ✅ Complete — verified flag, rarity-based duration, slot action all operational                                                                                                       |
+| 7     | Clue Independence + Attribute System     | ✅ Complete — identity layers/skills removed, clue-based pricing, SPECIAL attributes, dice inspection                                                                                 |
+| 7.5   | Inspection Refinement                    | ✅ Complete — veiled/unveiled/verified vocabulary, chain reveal, lot unveil probability                                                                                               |
+| 8     | Dynamic Naming Rules                     | ✅ Complete — ClueData naming_slot/priority, display_name composition, validator rules                                                                                                |
+| 8b    | YAML Content Regeneration                | ✅ Complete — all 128 clues rewritten to 1-word known_text, naming entries assigned, names reconciled                                                                                 |
+| 9     | Merchant System Redesign                 | ✅ Complete — Customer data model, car grid packing UI, fit/sell flow, dice UI, legacy selling removed                                                                                |
+| 10    | Value Policy Cleanup                     | ✅ Complete — MarketManager, PriceConfig, compute_price removed; item_price simplified to (appraised                                                                                  | verified) × condition_multiplier |
 | 11    | Day Summary Rework                       | ✅ Complete — customer_sales_today captured into DaySummary before clear, net change includes sales revenue, customer sales section in summary scene, post-run routes through summary |
 
 ---
@@ -128,6 +128,38 @@ Priority-based `display_name` composition from naming clues, 3-word `known_text`
 **Dependencies:** Phase 9 ✅
 
 ---
+
+### Phase Dependency Graph
+
+```
+Phase 7  — Clue Independence + Attributes  ✅
+  └─ Phase 7.5 — Inspection Refinement      ✅
+Phase 8  — Dynamic Naming Rules             ✅
+  └─ Phase 8b — YAML Content Regeneration   ✅
+Phase 10 — Value Policy Cleanup             ✅
+Phase 9  — Merchant System Redesign (depends on 7, 10)  ✅
+  └─ Phase 11 — Day Summary Rework (depends on 9)       ✅
+
+
+Phases 7–11 are complete.
+
+---
+
+## Other Current Work
+
+These are independent of the core loop redesign phases and can proceed in parallel.
+
+- **Ghost data cleanup** — delete `data/tres/identity_layers/` (94 files), `data/tres/skills/` (8 files), and `data/tres/commodities/` (5 files referencing removed `CommodityData`). Archive stale system docs: `dev/docs/systems/meta/merchant.md`, `merchant_shop.md`, `special_orders.md`.
+- **Customer content** — demand tag pools, car grid size list, and customer generation tuning. Legacy merchants (`pawn_shop`, `antique_dealer`, `arms_dealer`, `fashion_buyer`) are removed — customer archetypes or tag-biased generation replace their content role.
+- **Director system** — skeleton to get all three demo runs flowing end-to-end with placeholder content. See `dev/docs/plans/demo_summary.md`.
+- **Dialog system** — linear first, Uncle branching second.
+- **Bank / Bankruptcy** — daily interest, game-over condition, optional loans.
+---
+
+## Pending Features
+
+---
+
 ### Phase 12 — Time-Slot Day Structure + Storage AP Economy
 
 **Goal:** Replace the passive day-counter hub with a three-slot day model (morning / afternoon / evening) so each day is an explicit resource-allocation decision, and convert storage actions from day-timers to an AP economy.
@@ -148,41 +180,11 @@ Priority-based `display_name` composition from naming clues, 3-word `known_text`
 - Daily AP pool sizing — flat, attribute-derived, or upgradeable (starting assumption: flat).
 - Customer-count curves per slot config (starting assumptions: 1 slot → 2–3, 2 slots → 5–7, 3 slots → 8–12; needs playtest).
 
-**Dependencies:** Phase 9 ✅. Should land before/with Phase 11 so the summary reflects the slot model. Storage AP changes touch the same `ResearchSlot` plumbing.
+**Dependencies:** Phase 9 ✅. Phase 11 already complete; Phase 12 lands after Phase 11. Summary scene may need a minor update to reflect the slot model. Storage AP changes touch the same `ResearchSlot` plumbing.
 
 _Reference: `dev/docs/draft/time_slot_economy.md`._
 
 ---
-
-### Phase Dependency Graph
-
-```
-Phase 7  — Clue Independence + Attributes  ✅
-  └─ Phase 7.5 — Inspection Refinement      ✅
-Phase 8  — Dynamic Naming Rules             ✅
-  └─ Phase 8b — YAML Content Regeneration   ✅
-Phase 10 — Value Policy Cleanup             ✅
-Phase 9  — Merchant System Redesign (depends on 7, 10)  ✅
-  └─ Phase 11 — Day Summary Rework (depends on 9)       ✅
-  └─ Phase 12 — Time-Slot + Storage AP (depends on 9)   ← next
-
-
-Phases 7–11 are complete. Phase 12 (Time-Slot + Storage AP) is next.
-
----
-
-## Other Current Work
-
-These are independent of the core loop redesign phases and can proceed in parallel.
-
-- **Customer content** — demand tag pools, car grid size list, and customer generation tuning. Legacy merchants (`pawn_shop`, `antique_dealer`, `arms_dealer`, `fashion_buyer`) are removed — customer archetypes or tag-biased generation replace their content role.
-- **Director system** — skeleton to get all three demo runs flowing end-to-end with placeholder content. See `dev/docs/plans/demo_summary.md`.
-- **Dialog system** — linear first, Uncle branching second.
-- **Bank / Bankruptcy** — daily interest, game-over condition, optional loans.
-
----
-
-## Pending Features
 
 **Content & calibration (post-Phase 7+):** Attribute costs, customer generation weighting, and perk balance don't stabilise until earlier systems impose real constraints on a run.
 
@@ -207,3 +209,4 @@ These are independent of the core loop redesign phases and can proceed in parall
 - **Auction Modifier: All-Base-Layer Run** — requires auction modifier system design.
 - **Training Courses** — training resource, hub Training button. Deferred.
 - **Category Mastery ↔ Clue Integration** — Mastery as "experience-based intuition": at certain category mastery ranks, inspection shows unrevealed clue count, or auto-reveals the easiest surface clue for that category. Mastery does not affect DC or success rate (that's attributes). Exact thresholds and effects TBD. See Phase 7 spec for draft details.
+```

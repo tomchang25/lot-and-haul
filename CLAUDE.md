@@ -40,17 +40,16 @@ data/         Designer resources: definitions, yaml sources, generated .tres
   definitions/  Resource class scripts (.gd) for each type
   yaml/         Human-authored YAML source data (items, clues, categories, etc.)
   tres/         Generated from yaml — do not hand-edit
-    attributes/ cars/ categories/ clues/ commodities/
-    identity_layers/ items/ locations/ lots/ merchants/
-    perks/ skills/ special_orders/ super_categories/
+    attributes/ cars/ categories/ clues/ items/ locations/
+    lots/ perks/ super_categories/
 dev/          Development tooling and documentation
   docs/       Git submodule — architecture docs (archived/, draft/, plans/, systems/)
   skills/     AI coding references (commit format, GDScript patterns)
   standards/  Coding conventions, naming, registries, scene architecture
   tools/      YAML↔TRES pipeline (Python scripts + prompts)
 game/         Game feature scenes and logic
-  meta/       Hub-phase: day_summary, hub, knowledge, location_select,
-  |           merchant, storage, vehicle
+  meta/       Hub-phase: customer_sell, day_summary, hub, knowledge,
+  |           location_select, storage, vehicle
   run/        Run-phase: auction, cargo, inspection, location_entry,
   |           lot_browse, reveal, run_review
   shared/     Cross-phase UI: item_display, plus placeholder dirs
@@ -65,7 +64,7 @@ stage/        Testbeds, demo runs, and tile sets (mostly empty)
 
 ## Autoloads (load order matters)
 
-EventBus → AudioManager → RegistryCoordinator → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → KnowledgeManager → SaveManager → MetaManager → GameManager
+EventBus → AudioManager → RegistryCoordinator → ClueRegistry → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → KnowledgeManager → SaveManager → MetaManager → GameManager
 
 `RegistryCoordinator` orchestrates boot: each registry calls `RegistryCoordinator.register(self)` in `_ready()`, then `GameManager._ready()` runs `run_migrations()` and `run_validation()`.
 
@@ -77,7 +76,7 @@ When authoring new items or clues, use the generation prompts at `dev/tools/prom
 
 ## Current Phase
 
-Core loop redesign: Phases 0–11 complete (runtime veil cleanup, AP grid inspection, item base price, storage authenticate, clue independence + attribute system, inspection refinement, dynamic naming rules, YAML content regeneration, value policy cleanup, day summary rework). Identity layers and skills have been fully replaced by clue-based pricing and SPECIAL-style attributes; all clues carry 1-word known_text and naming entries. `item_price` is now the sole per-item price resolver (`appraised or verified value × condition_multiplier`); MarketManager, PriceConfig, merchant registry, special orders, and deprecated selling helpers have been removed. DaySummary captures `customer_sales_today` before nightly generation clears it, net change reflects customer sales revenue, and post-run routes through the day summary scene. Next up: Phase 12 (time-slot day structure + storage AP economy). See `ROADMAP.md` for the full phase dependency graph.
+Core loop redesign: Phases 0–11 complete (runtime veil cleanup, AP grid inspection, item base price, storage authenticate, clue independence + attribute system, inspection refinement, dynamic naming rules, YAML content regeneration, value policy cleanup, day summary rework). Identity layers and skills have been fully replaced by clue-based pricing and SPECIAL-style attributes; all clues carry 1-word known_text and naming entries. `item_price` is now the sole per-item price resolver (`appraised or verified value × condition_multiplier`); MarketManager, PriceConfig, merchant registry, special orders, commodity data, and deprecated selling helpers have been removed. DaySummary captures `customer_sales_today` before nightly generation clears it, net change reflects customer sales revenue, and post-run routes through the day summary scene.
 
 ## Conventions (quick reference)
 

@@ -1,3 +1,5 @@
+# save_manager.gd
+# Persistence layer: serializes/deserializes all runtime game state to a JSON file.
 extends Node
 
 const SAVE_PATH := "user://save.json"
@@ -157,10 +159,8 @@ func _read_save_file() -> void:
                     rec["item_ids"] = _intify_array(rec["item_ids"])
                 customer_sales_today.append(rec)
 
-    # Old saves may contain "super_cat_means", "category_factors_today",
-    # "merchant_negotiations_used_today", "merchant_orders", and "next_order_id"
-    # keys from the removed MarketManager/MerchantRegistry systems — silently
-    # ignore them.
+    # Old saves may contain keys from now-removed systems (MarketManager,
+    # MerchantRegistry, etc.) — silently ignore them.
 
     var valid_ids: Array = []
     for entry: ItemEntry in storage_items:
