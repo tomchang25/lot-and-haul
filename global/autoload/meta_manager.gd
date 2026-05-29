@@ -56,7 +56,8 @@ func advance_days(days: int) -> DaySummary:
 
 
 ## Generates the nightly customer set for the current day.
-## Delegates to Customer.generate_for_night, stores in SaveManager.
+## Delegates to Customer.generate_for_night, stores in SaveManager, and resets
+## the per-night sales ledger that the Day Summary rework (Phase 11) reads.
 func _generate_nightly_customers() -> void:
     var rng := RandomNumberGenerator.new()
     rng.randomize()
@@ -64,14 +65,29 @@ func _generate_nightly_customers() -> void:
         rng,
         SaveManager.storage_items,
     )
+    SaveManager.customer_sales_today.clear()
 
 
-## Commits a customer sale: removes items from storage, adds cash, saves.
+## Commits a customer sale: removes items from storage, adds cash, records the
+## sale for the daily summary, drops the served customer, and saves.
+##
+## MetaManager is the transactional authority — the sell scene only computes the
+## price and calls this; it does not mutate cash, storage, or the customer list.
 ##
 ## [param items] — ItemEntry instances being sold.
 ## [param sale_price] — total price computed by SellMath.
-func resolve_customer_sale(items: Array, sale_price: int) -> void:
+## [param customer] — the served customer; removed from the nightly set. May be
+##   null (caller manages removal) for backward compatibility.
+## [param strategy] — "conservative" / "aggressive", recorded for the summary.
+func resolve_customer_sale(
+        items: Array,
+        sale_price: int,
+        customer: Customer = null,
+        strategy: String = "",
+) -> void:
+    var sold_ids: Array[int] = []
     for entry: ItemEntry in items:
+        sold_ids.append(entry.id)
         SaveManager.storage_items.erase(entry)
         ResearchSlot.clear_for_item(SaveManager.research_slots, entry.id)
         KnowledgeManager.add_category_points(
@@ -80,6 +96,20 @@ func resolve_customer_sale(items: Array, sale_price: int) -> void:
             KnowledgeManager.KnowledgeAction.SELL,
         )
     SaveManager.cash += sale_price
+
+    SaveManager.customer_sales_today.append({
+        "day": SaveManager.current_day,
+        "customer_id": customer.customer_id if customer != null else "",
+        "customer_name": customer.display_name if customer != null else "",
+        "strategy": strategy,
+        "item_count": items.size(),
+        "item_ids": sold_ids,
+        "sale_price": sale_price,
+    })
+
+    if customer != null:
+        SaveManager.nightly_customers.erase(customer)
+
     SaveManager.save()
 
 

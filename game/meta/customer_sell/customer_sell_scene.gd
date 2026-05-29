@@ -13,6 +13,7 @@ var _item_colors: Dictionary = { }
 var _dice_rolls: Array[int] = []
 var _selected_dice_indices: Array[int] = []
 var _pending_sale_price: int = 0
+var _pending_strategy: String = ""
 
 var _grid: PackingGrid = null
 
@@ -330,6 +331,7 @@ func _on_conservative_pressed() -> void:
         return
     var price := SellMath.conservative_total(placed)
     _pending_sale_price = price
+    _pending_strategy = "conservative"
     _sell_result_popup.dialog_text = _build_result_text(placed, price, "conservative")
     _sell_result_popup.popup_centered()
 
@@ -358,9 +360,11 @@ func _on_aggressive_pressed() -> void:
         dice_row.remove_child(child)
         child.queue_free()
 
-    var _rng := RandomNumberGenerator.new()
+    var rng := RandomNumberGenerator.new()
+    rng.randomize()  # RandomNumberGenerator.new() has a fixed seed in Godot 4.
+    var rolls := SellMath.roll_dice(pool, rng)
     for i in range(pool):
-        var val := _rng.randi_range(1, 6)
+        var val := rolls[i]
         _dice_rolls.append(val)
         var btn := Button.new()
         btn.custom_minimum_size = Vector2(44, 44)
@@ -409,6 +413,7 @@ func _on_dice_toggled(idx: int, toggled: bool) -> void:
 
 func _on_confirm_dice_pressed() -> void:
     _dice_section.visible = false
+    _pending_strategy = "aggressive"
     var placed: Array = _get_placed_items()
     _sell_result_popup.dialog_text = _build_result_text(placed, _pending_sale_price, "aggressive")
     _sell_result_popup.popup_centered()
@@ -439,12 +444,14 @@ func _on_sell_confirmed() -> void:
     if placed.is_empty():
         return
 
-    MetaManager.resolve_customer_sale(placed, _pending_sale_price)
+    var sold_customer: Customer = _customers[_selected_idx]
+    # MetaManager owns the transaction: it commits cash/storage, records the
+    # sale for the daily summary, and removes the served customer from the
+    # persisted nightly set. The scene only drops it from its local view.
+    MetaManager.resolve_customer_sale(placed, _pending_sale_price, sold_customer, _pending_strategy)
     _customers.remove_at(_selected_idx)
-    SaveManager.nightly_customers.remove_at(_selected_idx)
 
     if _customers.is_empty():
-        SaveManager.save()
         _empty_label.visible = true
         _main_area.visible = false
         _customer_tabs_row.hide()
@@ -457,6 +464,7 @@ func _on_sell_confirmed() -> void:
 
 func _on_sell_cancelled() -> void:
     _pending_sale_price = 0
+    _pending_strategy = ""
 
 
 func _on_back_pressed() -> void:

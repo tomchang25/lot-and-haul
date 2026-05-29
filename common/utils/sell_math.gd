@@ -46,23 +46,6 @@ static func matched_items(customer: Customer, storage: Array) -> Array:
     return result
 
 
-## Returns how many distinct demand_tags the player can satisfy with items.
-## This is the fit depth (clamped to 1-3) used for dice-pool sizing.
-static func fit_depth(customer: Customer, storage: Array) -> int:
-    if customer.demand_tags.is_empty() or storage.is_empty():
-        return 0
-
-    var matched: Array[String] = []
-    for entry in storage:
-        for tag: String in customer.demand_tags:
-            if tag in matched:
-                continue
-            if _item_matches_tag(entry, tag):
-                matched.append(tag)
-                break
-    return clampi(matched.size(), 1, 3)
-
-
 ## Returns the highest number of demand tags matched by any single item.
 ## Used for aggressive dice-pool sizing (best-fit item in the car).
 static func best_item_fit_depth(customer: Customer, items: Array) -> int:
@@ -86,6 +69,16 @@ static func best_item_fit_depth(customer: Customer, items: Array) -> int:
 static func dice_pool_size(depth: int, verified_count: int) -> int:
     var base: int = DICE_POOL_BY_DEPTH.get(clampi(depth, 1, 3), 2)
     return base + verified_count * VERIFIED_BONUS_DICE
+
+
+## Rolls [param pool_size] d6 using the injected RNG.
+## Pure + RNG-injectable so aggressive-sell rolls are unit-testable and
+## deterministic under a seeded RNG (the scene passes a randomized RNG).
+static func roll_dice(pool_size: int, rng: RandomNumberGenerator) -> Array[int]:
+    var rolls: Array[int] = []
+    for _i in range(maxi(0, pool_size)):
+        rolls.append(rng.randi_range(1, 6))
+    return rolls
 
 
 ## Maps a dice sum to a sell multiplier using the committed SUM_BANDS.

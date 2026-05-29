@@ -50,18 +50,32 @@ const GRID_PRESETS: Array[Vector2i] = [
 ]
 
 
+## Default demand-tag count range per customer.
+const DEFAULT_TAG_MIN: int = 2
+const DEFAULT_TAG_MAX: int = 4
+
+## Default nightly customer count range. Used when generate_for_night is
+## called without an explicit count (the time-slot economy will later pass a
+## slot-derived count here instead — see dev/docs/draft/time_slot_economy.md).
+const DEFAULT_NIGHT_MIN: int = 3
+const DEFAULT_NIGHT_MAX: int = 5
+
+
 ## Generates a single customer.
 ##
 ## [param rng] — seedable RNG for deterministic generation.
 ## [param inventory_category_ids] — categories the player currently has in
-##   storage. When non-empty, there's a 50% chance demand_tags are biased
-##   toward matching these.
+##   storage. Each demand tag has a 50% chance of being drawn from this pool
+##   (guaranteed-matchable) and 50% from the full vocabulary — a per-tag bias,
+##   so roughly half of a customer's tags match current storage.
 ## [param all_category_ids] — full pool of available category IDs to draw from
 ##   for random demand. Defaults to CategoryRegistry when empty.
 static func generate(
         rng: RandomNumberGenerator,
         inventory_category_ids: Array[String] = [],
         all_category_ids: Array[String] = [],
+        tag_min: int = DEFAULT_TAG_MIN,
+        tag_max: int = DEFAULT_TAG_MAX,
 ) -> Customer:
     var c := Customer.new()
     c.customer_id = "cust_%s" % RandomUtils.random_id(rng)
@@ -74,17 +88,9 @@ static func generate(
     if all_category_ids.is_empty():
         all_category_ids = CategoryRegistry.get_all_category_ids()
 
-    var use_match := (
-        not inventory_category_ids.is_empty()
-        and all_category_ids.size() > 0
-        and rng.randf() < 0.5
+    c.demand_tags = _pick_biased_demand(
+        rng, inventory_category_ids, all_category_ids, tag_min, tag_max,
     )
-
-    if use_match:
-        c.demand_tags = _pick_demand(rng, inventory_category_ids)
-    else:
-        c.demand_tags = _pick_demand(rng, all_category_ids)
-
     return c
 
 
@@ -104,16 +110,22 @@ static func generate_batch(
 # ══ Nightly generation ═══════════════════════════════════════════════════════
 
 
-## Generates 3–5 customers for a night.
+## Generates a night's worth of customers.
 ##
-## Builds the owned-pool from storage items' category IDs (50/50 match bias).
-## Each customer gets 2–4 demand tags.
+## Builds the owned-pool from storage items' category IDs (per-tag 50/50 match
+## bias inside [method generate]). Each customer gets 2–4 demand tags.
+##
+## [param count] — number of customers. When negative, a random
+##   DEFAULT_NIGHT_MIN..DEFAULT_NIGHT_MAX count is rolled. The time-slot economy
+##   feature passes a slot-derived count here.
 static func generate_for_night(
         rng: RandomNumberGenerator,
         storage_items: Array = [],
+        count: int = -1,
         all_category_ids: Array[String] = [],
 ) -> Array[Customer]:
-    var count := rng.randi_range(3, 5)
+    if count < 0:
+        count = rng.randi_range(DEFAULT_NIGHT_MIN, DEFAULT_NIGHT_MAX)
 
     if all_category_ids.is_empty():
         all_category_ids = CategoryRegistry.get_all_category_ids()
@@ -128,12 +140,6 @@ static func generate_for_night(
     result.resize(count)
     for i in range(count):
         result[i] = generate(rng, owned_pool, all_category_ids)
-        if owned_pool.is_empty():
-            result[i].demand_tags = _pick_demand(rng, all_category_ids, 2, 4)
-        else:
-            var use_match := rng.randf() < 0.5
-            var pool: Array[String] = owned_pool if use_match else all_category_ids
-            result[i].demand_tags = _pick_demand(rng, pool, 2, 4)
     return result
 
 
@@ -148,22 +154,33 @@ static func _entry_category_id(entry) -> String:
 # ══ Internal ═══════════════════════════════════════════════════════════════════
 
 
-## Picks unique category IDs from the given pool.
-## Clamps counts so the range never exceeds pool size.
-static func _pick_demand(
+## Picks unique demand tags with a per-tag 50/50 match bias.
+## For each slot, draws from [param owned_pool] (guaranteed-matchable) with
+## 50% probability, otherwise from [param all_pool]. Dedupes across slots.
+## Falls back entirely to all_pool when owned_pool is empty.
+static func _pick_biased_demand(
         rng: RandomNumberGenerator,
-        pool: Array[String],
-        min_count: int = 1,
-        max_count: int = 3,
+        owned_pool: Array[String],
+        all_pool: Array[String],
+        min_count: int,
+        max_count: int,
 ) -> Array[String]:
-    if pool.is_empty():
+    if all_pool.is_empty():
         return []
 
-    var hi := mini(max_count, pool.size())
-    var lo := mini(min_count, hi)
+    var hi := mini(max_count, all_pool.size())
+    var lo := clampi(min_count, 0, hi)
     var count := rng.randi_range(lo, hi)
 
     var result: Array[String] = []
-    result.assign(RandomUtils.pick_unique(rng, pool, count))
-
+    # Bounded attempts: dedupe can reject draws, so cap iterations defensively.
+    var attempts := 0
+    var max_attempts := count * 20 + 10
+    while result.size() < count and attempts < max_attempts:
+        attempts += 1
+        var use_owned := not owned_pool.is_empty() and rng.randf() < 0.5
+        var src: Array[String] = owned_pool if use_owned else all_pool
+        var pick: String = src[rng.randi_range(0, src.size() - 1)]
+        if pick not in result:
+            result.append(pick)
     return result

@@ -22,6 +22,12 @@ var attribute_levels: Dictionary = { } # attribute_id (String) → int
 ## Customers generated for the current night. Array of Customer dicts on disk.
 var nightly_customers: Array[Customer] = []
 
+## Customer sales resolved during the current night, in order. Each entry is a
+## plain Dictionary (day, customer_id/name, strategy, item_count, item_ids,
+## sale_price). Reset when the next night's customers are generated. Read by the
+## Day Summary rework (Phase 11) to report nightly selling.
+var customer_sales_today: Array[Dictionary] = []
+
 
 func save() -> void:
     var serialized_items: Array = []
@@ -53,6 +59,7 @@ func save() -> void:
         "unlocked_perks": unlocked_perks,
         "attribute_levels": attribute_levels,
         "nightly_customers": serialized_customers,
+        "customer_sales_today": customer_sales_today,
         "merchant_negotiations_used_today": _build_negotiation_dict(),
         "merchant_orders": _build_order_dict(),
         "next_order_id": MerchantRegistry.next_order_id,
@@ -143,6 +150,12 @@ func _read_save_file() -> void:
         for d: Variant in parsed["nightly_customers"]:
             if d is Dictionary:
                 nightly_customers.append(Customer.from_dict(d))
+
+    customer_sales_today = []
+    if parsed.has("customer_sales_today") and parsed["customer_sales_today"] is Array:
+        for rec: Variant in parsed["customer_sales_today"]:
+            if rec is Dictionary:
+                customer_sales_today.append(rec)
 
     # Old saves may contain "super_cat_means" and "category_factors_today" keys
     # from the removed MarketManager system — silently ignore them.
