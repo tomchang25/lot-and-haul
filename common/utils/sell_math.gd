@@ -7,7 +7,7 @@ extends RefCounted
 # ── Committed constants ────────────────────────────────────────────────────────
 
 ## Conservative sell: flat price multiplier, no dice.
-const CONSERVATIVE_MULTIPLIER: float = 1.2
+const CONSERVATIVE_MULTIPLIER: float = 1.25
 
 ## Verified items get a ×1.2 price bonus on car contribution.
 const VERIFIED_PRICE_BONUS: float = 1.2
@@ -24,41 +24,53 @@ const VERIFIED_BONUS_DICE: int = 1
 
 ## Dice sum → sale multiplier bands for aggressive sell.
 ## Stored as Array of [min_sum, max_sum, multiplier].
+## Monotonic high=good mapping (impl spec): larger dice pools are strictly more
+## controllable, so Conservative wins at low fit and Aggressive at fit 2+.
 const SUM_BANDS: Array = [
-    [2, 5, 1.0],
-    [6, 10, 1.5],
-    [11, 12, 0.8],
+    [2, 4, 0.7],
+    [5, 9, 1.1],
+    [10, 12, 1.5],
 ]
 
 # ══ Public API ═════════════════════════════════════════════════════════════════
 
 
-## Returns storage items whose category (or super-category) appears in the
-## customer's demand_tags.
+## Returns storage items with fit ≥ 1 for the customer, i.e. at least one of
+## the item's revealed clue tags appears in the customer's demand_tags.
 static func matched_items(customer: Customer, storage: Array) -> Array:
     if customer.demand_tags.is_empty() or storage.is_empty():
         return []
 
     var result: Array = []
     for entry in storage:
-        if _item_matches_any_tag(entry, customer.demand_tags):
+        if item_fit(customer, entry) >= 1:
             result.append(entry)
     return result
 
 
-## Returns the highest number of demand tags matched by any single item.
+## Fit of a single item for a customer: the number of the item's revealed clue
+## tags (surface always; hidden only if verified) that match the demand_tags.
+static func item_fit(customer: Customer, entry) -> int:
+    if customer.demand_tags.is_empty():
+        return 0
+    var item_tags: Array = _entry_tags(entry)
+    if item_tags.is_empty():
+        return 0
+    var count := 0
+    for tag: String in customer.demand_tags:
+        if tag in item_tags:
+            count += 1
+    return count
+
+
+## Returns the highest fit of any single item in the car, clamped to 1-3.
 ## Used for aggressive dice-pool sizing (best-fit item in the car).
 static func best_item_fit_depth(customer: Customer, items: Array) -> int:
     if customer.demand_tags.is_empty() or items.is_empty():
         return 0
     var best := 0
     for entry in items:
-        var count := 0
-        for tag: String in customer.demand_tags:
-            if _item_matches_tag(entry, tag):
-                count += 1
-        if count > best:
-            best = count
+        best = maxi(best, item_fit(customer, entry))
     return clampi(best, 1, 3)
 
 
@@ -135,31 +147,8 @@ static func is_item_verified(entry) -> bool:
     return false
 
 
-static func _item_matches_any_tag(entry, tags: Array) -> bool:
-    for tag: String in tags:
-        if _item_matches_tag(entry, tag):
-            return true
-    return false
-
-
-static func _item_matches_tag(entry, tag: String) -> bool:
-    var entry_cat: CategoryData = _entry_category(entry)
-    if entry_cat == null:
-        return false
-
-    if entry_cat.category_id == tag:
-        return true
-
-    var entry_super: SuperCategoryData = entry_cat.super_category
-    if entry_super != null and entry_super.super_category_id == tag:
-        return true
-
-    return false
-
-
-static func _entry_category(entry):
-    if entry.has_method("category_data"):
-        return entry.category_data()
-    if "item_data" in entry and entry.item_data != null:
-        return entry.item_data.category_data
-    return null
+## Revealed clue tags for an item (duck-typed via ItemEntry.fit_tags()).
+static func _entry_tags(entry) -> Array:
+    if entry != null and entry.has_method("fit_tags"):
+        return entry.fit_tags()
+    return []

@@ -1,7 +1,7 @@
 # customer.gd
 # Runtime value object representing a single nightly customer visit.
-# Each customer arrives with demand tags (what categories they want to buy)
-# and a car grid (how much cargo space they have).
+# Each customer arrives with demand tags (clue ids they want to buy) and a car
+# grid (how much cargo space they have).
 class_name Customer
 extends RefCounted
 
@@ -12,7 +12,8 @@ var display_name: String = ""
 var grid_columns: int = 2
 var grid_rows: int = 2
 
-## Category IDs (or super-category IDs) the customer is looking to buy.
+## Clue ids (tags) the customer is looking to buy. A clue's id IS its tag;
+## an item fits when its revealed clue ids intersect these.
 var demand_tags: Array[String] = []
 
 # ══ Serialisation ══════════════════════════════════════════════════════════════
@@ -64,16 +65,16 @@ const DEFAULT_NIGHT_MAX: int = 5
 ## Generates a single customer.
 ##
 ## [param rng] — seedable RNG for deterministic generation.
-## [param inventory_category_ids] — categories the player currently has in
-##   storage. Each demand tag has a 50% chance of being drawn from this pool
+## [param owned_clue_ids] — clue tags revealed on the player's current storage.
+##   Each demand tag has a 50% chance of being drawn from this pool
 ##   (guaranteed-matchable) and 50% from the full vocabulary — a per-tag bias,
 ##   so roughly half of a customer's tags match current storage.
-## [param all_category_ids] — full pool of available category IDs to draw from
-##   for random demand. Defaults to CategoryRegistry when empty.
+## [param all_clue_ids] — full tag vocabulary to draw random demand from.
+##   Defaults to the surface+hidden clue ids in ClueRegistry when empty.
 static func generate(
         rng: RandomNumberGenerator,
-        inventory_category_ids: Array[String] = [],
-        all_category_ids: Array[String] = [],
+        owned_clue_ids: Array[String] = [],
+        all_clue_ids: Array[String] = [],
         tag_min: int = DEFAULT_TAG_MIN,
         tag_max: int = DEFAULT_TAG_MAX,
 ) -> Customer:
@@ -85,11 +86,11 @@ static func generate(
     c.grid_columns = preset.x
     c.grid_rows = preset.y
 
-    if all_category_ids.is_empty():
-        all_category_ids = CategoryRegistry.get_all_category_ids()
+    if all_clue_ids.is_empty():
+        all_clue_ids = _tag_vocabulary()
 
     c.demand_tags = _pick_biased_demand(
-        rng, inventory_category_ids, all_category_ids, tag_min, tag_max,
+        rng, owned_clue_ids, all_clue_ids, tag_min, tag_max,
     )
     return c
 
@@ -98,13 +99,13 @@ static func generate(
 static func generate_batch(
         rng: RandomNumberGenerator,
         count: int,
-        inventory_category_ids: Array[String] = [],
-        all_category_ids: Array[String] = [],
+        owned_clue_ids: Array[String] = [],
+        all_clue_ids: Array[String] = [],
 ) -> Array[Customer]:
     var result: Array[Customer] = []
     result.resize(count)
     for i in range(count):
-        result[i] = generate(rng, inventory_category_ids, all_category_ids)
+        result[i] = generate(rng, owned_clue_ids, all_clue_ids)
     return result
 
 # ══ Nightly generation ═══════════════════════════════════════════════════════
@@ -112,8 +113,8 @@ static func generate_batch(
 
 ## Generates a night's worth of customers.
 ##
-## Builds the owned-pool from storage items' category IDs (per-tag 50/50 match
-## bias inside [method generate]). Each customer gets 2–4 demand tags.
+## Builds the owned-pool from the clue tags revealed on storage items (per-tag
+## 50/50 match bias inside [method generate]). Each customer gets 2–4 demand tags.
 ##
 ## [param count] — number of customers. When negative, a random
 ##   DEFAULT_NIGHT_MIN..DEFAULT_NIGHT_MAX count is rolled. The time-slot economy
@@ -122,34 +123,43 @@ static func generate_for_night(
         rng: RandomNumberGenerator,
         storage_items: Array = [],
         count: int = -1,
-        all_category_ids: Array[String] = [],
+        all_clue_ids: Array[String] = [],
 ) -> Array[Customer]:
     if count < 0:
         count = rng.randi_range(DEFAULT_NIGHT_MIN, DEFAULT_NIGHT_MAX)
 
-    if all_category_ids.is_empty():
-        all_category_ids = CategoryRegistry.get_all_category_ids()
+    if all_clue_ids.is_empty():
+        all_clue_ids = _tag_vocabulary()
 
     var owned_pool: Array[String] = []
     for entry in storage_items:
-        var cat_id := _entry_category_id(entry)
-        if cat_id != "" and not owned_pool.has(cat_id):
-            owned_pool.append(cat_id)
+        for tag: String in _entry_tags(entry):
+            if not owned_pool.has(tag):
+                owned_pool.append(tag)
 
     var result: Array[Customer] = []
     result.resize(count)
     for i in range(count):
-        result[i] = generate(rng, owned_pool, all_category_ids)
+        result[i] = generate(rng, owned_pool, all_clue_ids)
     return result
 
 
-## Returns the category_id for an ItemEntry or similar duck-typed object.
-static func _entry_category_id(entry) -> String:
-    if entry is ItemEntry and entry.item_data != null:
-        var item: ItemEntry = entry
-        if item.item_data.category_data != null:
-            return item.item_data.category_data.category_id
-    return ""
+## Full demand-tag vocabulary: every surface and hidden clue id (anchors excluded,
+## matching ItemEntry.fit_tags). Drawn from ClueRegistry so it tracks content.
+static func _tag_vocabulary() -> Array[String]:
+    var ids: Array[String] = []
+    for clue: ClueData in ClueRegistry.get_all_clues():
+        if clue.type == ClueData.ClueType.ANCHOR:
+            continue
+        ids.append(clue.clue_id)
+    return ids
+
+
+## Revealed clue tags for an ItemEntry-or-duck-typed storage entry.
+static func _entry_tags(entry) -> Array[String]:
+    if entry != null and entry.has_method("fit_tags"):
+        return entry.fit_tags()
+    return []
 
 # ══ Internal ═══════════════════════════════════════════════════════════════════
 

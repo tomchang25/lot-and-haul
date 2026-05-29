@@ -89,8 +89,8 @@ func _select_customer(idx: int) -> void:
 
     var tag_names: Array[String] = []
     for tag: String in c.demand_tags:
-        var cat := CategoryRegistry.get_category_by_id(tag)
-        tag_names.append(cat.display_name if cat != null else tag)
+        var clue := ClueRegistry.get_clue_by_id(tag)
+        tag_names.append(clue.known_text if clue != null and clue.known_text != "" else tag)
     _demand_tags_label.text = "Wants: %s" % ", ".join(tag_names)
 
     _rebuild_grid(c)

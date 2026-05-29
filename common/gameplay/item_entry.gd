@@ -105,6 +105,22 @@ func all_surface_revealed() -> bool:
     return _revealed_surface_count() >= _total_surface_count()
 
 
+## Revealed clue ids that act as demand tags for the customer sell system.
+## A clue's id IS its tag (Phase 9). Surface clues are revealed once the item is
+## in storage; hidden clues only after authentication (verified). Anchor clues
+## are excluded — the anchor is the base-value identity, not a demand tag.
+func fit_tags() -> Array[String]:
+    var tags: Array[String] = []
+    if item_data == null:
+        return tags
+    for clue: ClueData in item_data.clues:
+        if clue.type == ClueData.ClueType.ANCHOR:
+            continue
+        if revealed_clue_ids.has(clue.clue_id):
+            tags.append(clue.clue_id)
+    return tags
+
+
 func _naming_clue_pool() -> Array[ClueData]:
     if item_data == null:
         return []
