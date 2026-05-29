@@ -45,7 +45,7 @@ func _on_storage_pressed() -> void:
 
 
 func _on_merchant_pressed() -> void:
-    GameManager.go_to_merchant_hub()
+    GameManager.go_to_customer_sell()
 
 
 func _on_vehicle_pressed() -> void:

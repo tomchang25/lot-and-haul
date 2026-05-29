@@ -8,21 +8,22 @@
 [ext_resource type="Script" uid="uid://bvxr6q4cplcj8" path="res://global/autoload/game_manager/scene_registry.gd" id="5_ea43q"]
 [ext_resource type="PackedScene" uid="uid://cysp2gm1hjmca" path="res://game/run/run_review/run_review_scene.tscn" id="6_f47ts"]
 [ext_resource type="PackedScene" uid="uid://bwrhentry001" path="res://game/run/location_entry/location_entry.tscn" id="6_locentry"]
-[ext_resource type="PackedScene" uid="uid://blocsel000001" path="res://game/meta/location_select/location_select.tscn" id="16_locselect"]
 [ext_resource type="PackedScene" uid="uid://blocbrowse001" path="res://game/run/lot_browse/lot_browse_scene.tscn" id="7_locbrw"]
 [ext_resource type="PackedScene" uid="uid://bhubscene0001" path="res://game/meta/hub/hub_scene.tscn" id="8_hub01"]
 [ext_resource type="PackedScene" uid="uid://bhomescene001" path="res://game/meta/storage/storage_scene.tscn" id="9_home01"]
 [ext_resource type="PackedScene" path="res://game/meta/merchant/merchant_hub.tscn" id="10_mhub"]
-[ext_resource type="PackedScene" path="res://game/meta/merchant/merchant_shop/merchant_shop_scene.tscn" id="10_mshop"]
-[ext_resource type="PackedScene" path="res://game/meta/day_summary/day_summary_scene.tscn" id="11_daysum"]
+[ext_resource type="PackedScene" uid="uid://up5kyjwu6ne4" path="res://game/meta/merchant/merchant_shop/merchant_shop_scene.tscn" id="10_mshop"]
+[ext_resource type="PackedScene" uid="uid://kkse0j0m2aq7" path="res://game/meta/day_summary/day_summary_scene.tscn" id="11_daysum"]
 [ext_resource type="PackedScene" path="res://game/meta/knowledge/attribute_panel/attribute_panel.tscn" id="12_attr"]
 [ext_resource type="PackedScene" path="res://game/meta/knowledge/knowledge_hub.tscn" id="13_khub"]
 [ext_resource type="PackedScene" path="res://game/meta/knowledge/mastery_panel/mastery_panel.tscn" id="14_mastery"]
 [ext_resource type="PackedScene" path="res://game/meta/knowledge/perk_panel/perk_panel.tscn" id="15_perk"]
+[ext_resource type="PackedScene" uid="uid://blocsel000001" path="res://game/meta/location_select/location_select.tscn" id="16_locselect"]
 [ext_resource type="PackedScene" path="res://game/meta/vehicle/vehicle_hub.tscn" id="16_vehhub"]
 [ext_resource type="PackedScene" path="res://game/meta/vehicle/car_select/car_select_scene.tscn" id="17_csel"]
 [ext_resource type="PackedScene" path="res://game/meta/vehicle/car_shop/car_shop_scene.tscn" id="18_cshop"]
 [ext_resource type="PackedScene" path="res://game/meta/merchant/fulfillment_panel/fulfillment_panel.tscn" id="19_fpanel"]
+[ext_resource type="PackedScene" path="res://game/meta/customer_sell/customer_sell_scene.tscn" id="20_csell"]
 
 [sub_resource type="Resource" id="Resource_yimu3"]
 script = ExtResource("5_ea43q")
@@ -47,6 +48,7 @@ vehicle_hub = ExtResource("16_vehhub")
 car_select = ExtResource("17_csel")
 car_shop = ExtResource("18_cshop")
 fulfillment_panel = ExtResource("19_fpanel")
+customer_sell = ExtResource("20_csell")
 metadata/_custom_type_script = "uid://bvxr6q4cplcj8"
 
 [node name="GameManager" type="Node2D" unique_id=1537594909]

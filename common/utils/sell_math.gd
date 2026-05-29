@@ -63,9 +63,25 @@ static func fit_depth(customer: Customer, storage: Array) -> int:
     return clampi(matched.size(), 1, 3)
 
 
+## Returns the highest number of demand tags matched by any single item.
+## Used for aggressive dice-pool sizing (best-fit item in the car).
+static func best_item_fit_depth(customer: Customer, items: Array) -> int:
+    if customer.demand_tags.is_empty() or items.is_empty():
+        return 0
+    var best := 0
+    for entry in items:
+        var count := 0
+        for tag: String in customer.demand_tags:
+            if _item_matches_tag(entry, tag):
+                count += 1
+        if count > best:
+            best = count
+    return clampi(best, 1, 3)
+
+
 ## Computes the aggressive-sell dice pool size.
 ##
-## [param depth] — fit depth from [method fit_depth] (1-3).
+## [param depth] — fit depth from [method best_item_fit_depth] (1-3).
 ## [param verified_count] — number of verified items in the car (adds bonus dice).
 static func dice_pool_size(depth: int, verified_count: int) -> int:
     var base: int = DICE_POOL_BY_DEPTH.get(clampi(depth, 1, 3), 2)
@@ -101,6 +117,11 @@ static func item_contribution(entry) -> int:
     return maxi(1, int(_item_base_contribution(entry)))
 
 
+## Returns true if the entry is verified (anchor revealed + all hidden revealed).
+static func is_item_verified(entry) -> bool:
+    return _is_item_verified(entry)
+
+
 ## Conservative sell: flat multiplier on car total.
 static func conservative_total(items: Array) -> int:
     return car_total(items, CONSERVATIVE_MULTIPLIER)
@@ -114,14 +135,14 @@ static func aggressive_total(items: Array, rolled_sum: int) -> int:
 
 
 static func _item_base_contribution(entry) -> float:
-    var price: float = float(entry.item_price) if entry.has_method("item_price") else 0.0
+    var price: float = float(entry.item_price) if "item_price" in entry else 0.0
     if _is_item_verified(entry):
         price *= VERIFIED_PRICE_BONUS
     return price
 
 
 static func _is_item_verified(entry) -> bool:
-    if entry.has_method("is_veiled") and entry.has_method("verified"):
+    if entry.has_method("is_veiled") and "verified" in entry:
         return not entry.is_veiled() and entry.verified
     return false
 
