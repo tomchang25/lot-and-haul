@@ -98,7 +98,7 @@ func _apply_known() -> void:
     else:
         _condition_mult_label.hide()
 
-    _price_label.text = _entry.price_text_for()
+    _price_label.text = _entry.estimated_value_text()
     _price_label.add_theme_color_override(&"font_color", _entry.price_display_color())
     _price_label.show()
 

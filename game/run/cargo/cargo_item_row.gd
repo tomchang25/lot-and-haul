@@ -1,7 +1,7 @@
 # cargo_item_row.gd
 # Row component for the cargo item list — shows display name, estimated value,
 # weight, condition, and a shape mini-grid. Not the shared ItemRow.
-# Reads:  ItemEntry fields (display_name, price_text_for, weight_text, etc.)
+# Reads:  ItemEntry fields (display_name, estimated_value_text, weight_text, etc.)
 # Writes: nothing
 class_name CargoItemRow
 extends PanelContainer
@@ -90,7 +90,7 @@ func _apply() -> void:
     _name_label.text = _entry.display_name
     _name_label.add_theme_color_override(&"font_color", _entry.display_name_color())
 
-    _value_label.text = _entry.price_text_for()
+    _value_label.text = _entry.estimated_value_text()
     _value_label.add_theme_color_override(&"font_color", _entry.price_display_color())
 
     _weight_label.text = _entry.weight_text()

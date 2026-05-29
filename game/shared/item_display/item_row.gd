@@ -170,7 +170,7 @@ func _refresh() -> void:
     _condition_label.modulate = _entry.condition_display_color()
 
     # ── ESTIMATED_VALUE ────────────────────────────────────────────────────────
-    _estimated_value_label.text = _entry.price_text_for()
+    _estimated_value_label.text = _entry.estimated_value_text()
     _estimated_value_label.add_theme_color_override(&"font_color", _entry.price_display_color())
 
     # ── BASE_VALUE ─────────────────────────────────────────────────────────────

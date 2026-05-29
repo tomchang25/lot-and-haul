@@ -66,7 +66,7 @@ func show_for(entry: ItemEntry, anchor: Rect2) -> void:
         _condition_label.hide()
 
     # ── Conditional: price ───────────────────────────────────────────────────
-    var price_text := entry.price_text_for()
+    var price_text := entry.estimated_value_text()
     if price_text != ItemEntry.UNKNOWN_TEXT:
         _price_label.text = "%s: %s" % [ItemRow.get_price_header(), price_text]
         _price_label.add_theme_color_override(&"font_color", entry.price_display_color())

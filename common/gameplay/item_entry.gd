@@ -7,14 +7,6 @@ extends RefCounted
 
 const UNKNOWN_TEXT := "???"
 
-const COLUMN_NAME := 0
-const COLUMN_CONDITION := 1
-const COLUMN_ESTIMATED_VALUE := 2
-const COLUMN_BASE_VALUE := 3
-const COLUMN_RARITY := 4
-const COLUMN_WEIGHT := 5
-const COLUMN_GRID := 6
-const COLUMN_INSPECTION := 7
 
 # ── Inspection constants ─────────────────────────────────────────────────────
 
@@ -255,12 +247,7 @@ func is_fully_inspected() -> bool:
 
 
 func is_price_converged() -> bool:
-    return price_convergence_ratio >= 1.0
-
-
-var price_convergence_ratio: float:
-    get:
-        return inspection_level
+    return inspection_level >= 1.0
 
 
 func apply_repair() -> void:
@@ -502,13 +489,6 @@ var price_color: Color:
 # ── Context-aware helpers ─────────────────────────────────────────────────────
 
 
-func price_text_for() -> String:
-    return estimated_value_text()
-
-
-func price_value_for() -> int:
-    return estimated_value_sort_value()
-
 # ── Per-column price getters ─────────────────────────────────────────────────
 
 
@@ -577,7 +557,7 @@ func grid_text() -> String:
 
 
 func inspection_text() -> String:
-    return ItemEntry.UNKNOWN_TEXT if is_veiled() or not anchor_revealed else "%d%%" % int(price_convergence_ratio * 100)
+    return ItemEntry.UNKNOWN_TEXT if is_veiled() or not anchor_revealed else "%d%%" % int(inspection_level * 100)
 
 
 func price_display_color() -> Color:
@@ -636,26 +616,26 @@ func has_inspection_clues() -> bool:
 
 func sort_value(column: int) -> Variant:
     match column:
-        ItemEntry.COLUMN_NAME:
+        ItemRow.Column.NAME:
             return display_name
-        ItemEntry.COLUMN_CONDITION:
+        ItemRow.Column.CONDITION:
             if is_veiled():
                 return 0.0
             return get_condition_multiplier()
-        ItemEntry.COLUMN_ESTIMATED_VALUE:
+        ItemRow.Column.ESTIMATED_VALUE:
             return estimated_value_sort_value()
-        ItemEntry.COLUMN_BASE_VALUE:
+        ItemRow.Column.BASE_VALUE:
             return base_value_sort_value()
-        ItemEntry.COLUMN_RARITY:
+        ItemRow.Column.RARITY:
             return float(item_data.rarity) if verified and item_data != null else -1.0
-        ItemEntry.COLUMN_WEIGHT:
+        ItemRow.Column.WEIGHT:
             var weight_category := category_data()
             return weight_category.weight if weight_category != null else 0.0
-        ItemEntry.COLUMN_GRID:
+        ItemRow.Column.GRID:
             var grid_category := category_data()
             return grid_category.get_cells().size() if grid_category != null else 0
-        ItemEntry.COLUMN_INSPECTION:
-            return price_convergence_ratio
+        ItemRow.Column.INSPECTION:
+            return inspection_level
         _:
             push_warning("Unknown Column: %d" % column)
             return 0
