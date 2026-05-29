@@ -16,6 +16,14 @@ const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Lege
 
 const MAX_SPREAD: float = 0.5
 
+# A resolved value snapshot. All numbers already include condition multiplier.
+class PriceView extends RefCounted:
+    var known: bool = false      # false when veiled or anchor not revealed
+    var exact: bool = false      # true when verified — single number, no range
+    var min_value: int = 0
+    var max_value: int = 0
+    var point_value: int = 0     # the resolved item_price
+
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var item_data: ItemData = null
@@ -144,6 +152,28 @@ func _hidden_add_sum() -> float:
             if clue.effect_op == "add":
                 add_sum += clue.effect_amount
     return add_sum
+
+## Single source of truth for estimated range + item_price.
+func resolve_price() -> PriceView:
+    var view := PriceView.new()
+    if is_veiled() or not anchor_revealed:
+        return view
+    view.known = true
+    var cond := get_condition_multiplier()
+    if verified:
+        var v := maxi(1, int(appraised_with_hidden() * cond))
+        view.exact = true
+        view.min_value = v
+        view.max_value = v
+        view.point_value = v
+        return view
+    var base := _raw_appraised_value()
+    var spread := MAX_SPREAD * (1.0 - inspection_level)
+    var offset := center_offset * (1.0 - inspection_level)
+    view.min_value = maxi(1, int(base * (1.0 - spread + offset) * cond))
+    view.max_value = maxi(1, int(base * (1.0 + spread + offset) * cond))
+    view.point_value = maxi(1, int(base * cond))
+    return view
 
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
@@ -292,6 +322,12 @@ func _anchor_flat_value() -> int:
         return 0
     return int(anchor.effect_amount)
 
+
+func _base_value() -> int:
+    if is_veiled() or not anchor_revealed:
+        return 0
+    return int(appraised_with_hidden()) if verified else _anchor_flat_value()
+
 # ── Appraised value ────────────────────────────────────────────────────────────
 
 
@@ -360,50 +396,24 @@ func roll_npc_estimate(sight_chance: float) -> int:
 # ── Estimated value (range) ────────────────────────────────────────────────────
 
 var estimated_value_min: int:
-    get:
-        if is_veiled() or not anchor_revealed:
-            return 0
-        if verified:
-            return maxi(1, int(appraised_with_hidden() * get_condition_multiplier()))
-        var base := _raw_appraised_value()
-        var spread: float = MAX_SPREAD * (1.0 - self.inspection_level)
-        var offset: float = center_offset * (1.0 - self.inspection_level)
-        var mult: float = 1.0 - spread + offset
-        return maxi(1, int(base * mult * get_condition_multiplier()))
+    get: return resolve_price().min_value
 
 var estimated_value_max: int:
-    get:
-        if is_veiled() or not anchor_revealed:
-            return 0
-        if verified:
-            return maxi(1, int(appraised_with_hidden() * get_condition_multiplier()))
-        var base := _raw_appraised_value()
-        var spread: float = MAX_SPREAD * (1.0 - self.inspection_level)
-        var offset: float = center_offset * (1.0 - self.inspection_level)
-        var mult: float = 1.0 + spread + offset
-        return maxi(1, int(base * mult * get_condition_multiplier()))
+    get: return resolve_price().max_value
 
 # ── Display text helpers ──────────────────────────────────────────────────────
 
 
 func estimated_value_text() -> String:
-    if is_veiled() or not anchor_revealed:
-        return UNKNOWN_TEXT
-    if verified:
-        return "$%d" % maxi(1, int(appraised_with_hidden() * get_condition_multiplier()))
-
-    var lo: int = estimated_value_min
-    var hi: int = estimated_value_max
-    if hi <= lo:
-        return "$%d" % lo
-    return "$%d - $%d" % [lo, hi]
+    var v := resolve_price()
+    if not v.known: return UNKNOWN_TEXT
+    if v.exact or v.max_value <= v.min_value: return "$%d" % v.min_value
+    return "$%d - $%d" % [v.min_value, v.max_value]
 
 ## Resolved item price: appraised or verified value × condition multiplier.
 ## Veiled items should not use this — check anchor_revealed at call sites.
 var item_price: int:
-    get:
-        var value: float = appraised_with_hidden() if verified else _raw_appraised_value()
-        return maxi(1, int(value * get_condition_multiplier()))
+    get: return resolve_price().point_value
 
 # ── Display colors ────────────────────────────────────────────────────────────
 
@@ -424,8 +434,7 @@ const PRICE_COLOR := Color(0.4, 1.0, 0.5)
 const PRICE_UNKNOWN_COLOR := Color(0.6, 0.6, 0.6)
 
 var price_color: Color:
-    get:
-        return PRICE_UNKNOWN_COLOR if is_veiled() or not anchor_revealed else PRICE_COLOR
+    get: return PRICE_COLOR if resolve_price().known else PRICE_UNKNOWN_COLOR
 
 # ── Context-aware helpers ─────────────────────────────────────────────────────
 
@@ -434,15 +443,11 @@ var price_color: Color:
 
 
 func estimated_value_sort_value() -> int:
-    return estimated_value_min
+    return resolve_price().min_value
 
 
 func base_value_sort_value() -> int:
-    if is_veiled() or not anchor_revealed:
-        return 0
-    if verified:
-        return int(appraised_with_hidden())
-    return _anchor_flat_value()
+    return _base_value()
 
 
 func condition_text() -> String:
@@ -465,11 +470,10 @@ func condition_detail_text() -> String:
 
 
 func base_value_text() -> String:
-    if is_veiled() or not anchor_revealed:
+    var v := _base_value()
+    if v == 0:
         return UNKNOWN_TEXT
-    if verified:
-        return "$%d" % int(appraised_with_hidden())
-    return "$%d" % _anchor_flat_value()
+    return "$%d" % v
 
 
 func rarity_text() -> String:
