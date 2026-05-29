@@ -69,7 +69,7 @@ Core loop redesign: Phases 0–10 complete (runtime veil cleanup, AP grid inspec
 - **Registries**: one autoload per designer resource type, required API: `get_<singular>_by_id`, `get_all_<plural>`, `size`. No display-name wrappers. See `dev/standards/registries.md`.
 - **Scene architecture**: block scenes follow the standard in `dev/standards/block_scene_architecture_standard.md`.
 - **Commits**: conventional commits format. See `dev/skills/conventional_commits.md`.
-- **Price pipeline**: all prices flow through `ItemEntry.compute_price(config)`. `PriceConfig` toggles select which factors apply (condition, knowledge, market, scalar). Appraised value = anchor + surface modifiers (add-then-mul). Verified value includes hidden modifiers. No per-type formulas outside the pipeline.
+- **Price pipeline**: all prices resolve through `ItemEntry.item_price` (`(appraised|verified value) × condition_multiplier`). Appraised value = anchor + revealed surface modifiers (add-then-mul). Verified value includes hidden modifiers. No per-type formulas outside the pipeline.
 - **Iterate resources, not ids**: outside serialization boundaries, pass Resource refs. String ids are for save/load only.
 - **Docstrings**: every `.gd` file starts with `# filename` + one-line purpose. All public functions and complex (>10 lines or non-obvious) private functions get a `##` GDDoc comment. Never strip or reduce existing comments when editing code.
 

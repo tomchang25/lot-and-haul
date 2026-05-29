@@ -63,12 +63,13 @@ Phases 0–6 cover the foundational work. Detailed specs omitted — see git his
 | 7.5   | Inspection Refinement                    | ✅ Complete — veiled/unveiled/verified vocabulary, chain reveal, lot unveil probability                   |
 | 8     | Dynamic Naming Rules                     | ✅ Complete — ClueData naming_slot/priority, display_name composition, validator rules                    |
 | 8b    | YAML Content Regeneration                | ✅ Complete — all 128 clues rewritten to 1-word known_text, naming entries assigned, names reconciled     |
+| 10    | Value Policy Cleanup                     | ✅ Complete — MarketManager, PriceConfig, compute_price removed; item_price simplified to (appraised|verified) × condition_multiplier |
 
 ---
 
 ## Core Loop Redesign — Phase Plan
 
-**Phases 7, 7.5, 8, and 8b are complete.** Phase 10 (Value Policy Cleanup) is next. Phase 9 (Merchant System Redesign) follows after Phase 10.
+**Phases 7, 7.5, 8, 8b, and 10 are complete.** Phase 9 (Merchant System Redesign) is next.
 
 ### Phase 7 — Clue Independence + Attribute System ✅
 
@@ -165,20 +166,21 @@ _Full spec: `dev/docs/plans/merchant_system_redesign.md`_
 
 ---
 
-### Phase 10 — Value Policy Cleanup
+### Phase 10 — Value Policy Cleanup ✅
+
+**Status: Complete** (commit `41a5945`)
 
 **Goal:** Simplify the pricing pipeline to appraised value × condition as the sole selling base; remove market factor and knowledge bonus systems.
 
-**Design decisions:**
+**What shipped:**
 
 - Selling base = `appraised_value × condition_multiplier` (unverified) or `verified_value × condition_multiplier` (verified). No other factors.
-- Remove `MarketManager` autoload and all market factor references.
-- Remove knowledge bonus (`1.0 + 0.01 × rank`).
-- Remove or simplify `PriceConfig` / `compute_price` — with market and knowledge gone, the config toggle system is over-engineered.
-- Condition stays as an independent system (not a clue) — it's tightly coupled to Repair/Restore research and has meaningful gameplay impact (×0.25–×4.0 range).
-- Deprecate `MerchantData.offer_for()`, `SpecialOrder.compute_item_price()`, and other old selling-channel price callers.
-
-**Scope:** Pipeline simplification, caller migration, MarketManager removal, old selling price helper deprecation. Excludes UI redesign.
+- `MarketManager` autoload removed — migration comment only remains in SaveManager.
+- `PriceConfig` and `compute_price()` removed — `item_price` is a simple getter: `(appraised value | verified value) × condition_multiplier`.
+- Knowledge bonus (`1.0 + 0.01 × rank`) removed from pricing.
+- `ItemViewContext` and its display helpers (`price_text_for`, `price_value_for`, etc.) removed.
+- Condition stays as an independent ×0.25–×4.0 system tied to Repair/Restore research.
+- Old selling-channel price helpers (`MerchantData.offer_for`, `SpecialOrder.compute_item_price`) deprecated and removed.
 
 **Dependencies:** Phase 7
 
@@ -218,12 +220,12 @@ Phase 7  — Clue Independence + Attributes  ✅
   └─ Phase 7.5 — Inspection Refinement      ✅
 Phase 8  — Dynamic Naming Rules             ✅
   └─ Phase 8b — YAML Content Regeneration   ✅
-Phase 10 — Value Policy Cleanup             ← next
-  └─ Phase 9  — Merchant System Redesign (depends on 7, 10)
+Phase 10 — Value Policy Cleanup             ✅
+  └─ Phase 9  — Merchant System Redesign (depends on 7, 10)  ← next
        └─ Phase 11 — Day Summary Rework
 ```
 
-Phases 7, 7.5, 8, and 8b are complete. Phase 10 is unblocked and is next. Phase 9 depends on both 7 and 10.
+Phases 7, 7.5, 8, 8b, and 10 are complete. Phase 9 depends on both 7 and 10 and is next.
 
 ---
 
