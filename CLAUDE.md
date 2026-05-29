@@ -30,21 +30,37 @@ All selling channels (Quick Sell, Merchant Negotiation, Special Orders) are depr
 ## Project Structure
 
 ```
-common/       Reusable systems, not tied to any game feature
-data/         Designer resources: definitions (.gd), yaml sources, generated .tres
-  yaml/       Human-authored item/merchant/location data
-  tres/       Generated from yaml — do not hand-edit
-game/
-  meta/       Hub-phase: merchant, storage, knowledge, vehicle
-  run/        Run-phase: lot browse, auction, cargo, inspection
-  shared/     Cross-phase UI components and display logic
+assets/       Static assets: car sprites, warehouse images
+common/       Reusable systems (not game-feature-specific)
+  audio/      Event-driven audio system (events, presets, audio bus)
+  framework/  State machine pattern
+  gameplay/   Runtime types: ItemEntry, LotEntry, RunRecord, etc.
+  utils/      Random utils, perk effects
+data/         Designer resources: definitions, yaml sources, generated .tres
+  definitions/  Resource class scripts (.gd) for each type
+  yaml/         Human-authored YAML source data (items, clues, categories, etc.)
+  tres/         Generated from yaml — do not hand-edit
+    attributes/ cars/ categories/ clues/ commodities/
+    identity_layers/ items/ locations/ lots/ merchants/
+    perks/ skills/ special_orders/ super_categories/
+dev/          Development tooling and documentation
+  docs/       Git submodule — architecture docs (archived/, draft/, plans/, systems/)
+  skills/     AI coding references (commit format, GDScript patterns)
+  standards/  Coding conventions, naming, registries, scene architecture
+  tools/      YAML↔TRES pipeline (Python scripts + prompts)
+game/         Game feature scenes and logic
+  meta/       Hub-phase: day_summary, hub, knowledge, location_select,
+  |           merchant, storage, vehicle
+  run/        Run-phase: auction, cargo, inspection, location_entry,
+  |           lot_browse, reveal, run_review
+  shared/     Cross-phase UI: item_display, plus placeholder dirs
 global/       Autoloads and project-wide resources
-stage/        Testbeds and run entry points
-dev/
-  docs/       Architecture and planning (see dev/docs/README.md)
-  standards/  Coding conventions and structural rules
-  skills/     AI coding references (GDScript patterns, commit format)
-  tools/      YAML↔TRES pipeline scripts
+  autoload/   All autoload scripts (registries, managers, event bus)
+  constants/  Data paths, economy constants
+  theme/      Main theme resource
+  utils/      Registry audit utility
+localization/ Localization files (empty, planned)
+stage/        Testbeds, demo runs, and tile sets (mostly empty)
 ```
 
 ## Autoloads (load order matters)
