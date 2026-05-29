@@ -468,7 +468,7 @@ func _refresh_found_list() -> void:
         name_lbl.clip_text = true
         row.add_child(name_lbl)
 
-        var price_text := entry.price_text_for()
+        var price_text := entry.estimated_value_text()
         if price_text != ItemEntry.UNKNOWN_TEXT:
             var value_lbl := Label.new()
             value_lbl.text = price_text
@@ -559,7 +559,7 @@ func _update_detail_section(entry: ItemEntry) -> void:
         entry.condition_display_color() if cond != "" else Color(0.55, 0.58, 0.63, 1),
     )
 
-    var price_text := entry.price_text_for()
+    var price_text := entry.estimated_value_text()
     if price_text != ItemEntry.UNKNOWN_TEXT:
         _detail_value_label.text = price_text
         _detail_value_label.add_theme_color_override(&"font_color", entry.price_display_color())

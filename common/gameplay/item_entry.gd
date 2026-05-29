@@ -7,45 +7,22 @@ extends RefCounted
 
 const UNKNOWN_TEXT := "???"
 
-const COLUMN_NAME := 0
-const COLUMN_CONDITION := 1
-const COLUMN_ESTIMATED_VALUE := 2
-const COLUMN_BASE_VALUE := 3
-const COLUMN_RARITY := 4
-const COLUMN_WEIGHT := 5
-const COLUMN_GRID := 6
-const COLUMN_INSPECTION := 7
 
 # ── Inspection constants ─────────────────────────────────────────────────────
 
 const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
 
-# ── Research tuning knobs (non-inspection) ───────────────────────────────────
-
-const REPAIR_BASE: float = 0.15
-const REPAIR_ZONE_FACTORS: Dictionary = { 0.25: 1.0, 0.50: 0.35 }
-const REPAIR_RARITY_FACTOR: Dictionary = {
-    ItemData.Rarity.COMMON: 1.0,
-    ItemData.Rarity.UNCOMMON: 0.9,
-    ItemData.Rarity.RARE: 0.8,
-    ItemData.Rarity.EPIC: 0.7,
-    ItemData.Rarity.LEGENDARY: 0.6,
-}
-
-const RESTORE_BASE: float = 0.10
-const RESTORE_ZONE_FACTORS: Dictionary = { 0.75: 0.12, 1.0: 0.02 }
-const RESTORE_RARITY_FACTOR: Dictionary = {
-    ItemData.Rarity.COMMON: 1.0,
-    ItemData.Rarity.UNCOMMON: 0.8,
-    ItemData.Rarity.RARE: 0.6,
-    ItemData.Rarity.EPIC: 0.4,
-    ItemData.Rarity.LEGENDARY: 0.2,
-}
-const RESTORE_ATTR_COEFF: float = 0.4
-
 # ── Pricing ──────────────────────────────────────────────────────────────────
 
 const MAX_SPREAD: float = 0.5
+
+# A resolved value snapshot. All numbers already include condition multiplier.
+class PriceView extends RefCounted:
+    var known: bool = false      # false when veiled or anchor not revealed
+    var exact: bool = false      # true when verified — single number, no range
+    var min_value: int = 0
+    var max_value: int = 0
+    var point_value: int = 0     # the resolved item_price
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
@@ -176,6 +153,28 @@ func _hidden_add_sum() -> float:
                 add_sum += clue.effect_amount
     return add_sum
 
+## Single source of truth for estimated range + item_price.
+func resolve_price() -> PriceView:
+    var view := PriceView.new()
+    if is_veiled() or not anchor_revealed:
+        return view
+    view.known = true
+    var cond := get_condition_multiplier()
+    if verified:
+        var v := maxi(1, int(appraised_with_hidden() * cond))
+        view.exact = true
+        view.min_value = v
+        view.max_value = v
+        view.point_value = v
+        return view
+    var base := _raw_appraised_value()
+    var spread := MAX_SPREAD * (1.0 - inspection_level)
+    var offset := center_offset * (1.0 - inspection_level)
+    view.min_value = maxi(1, int(base * (1.0 - spread + offset) * cond))
+    view.max_value = maxi(1, int(base * (1.0 + spread + offset) * cond))
+    view.point_value = maxi(1, int(base * cond))
+    return view
+
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
 # inspection_level based on surface clue reveal ratio.
@@ -255,42 +254,8 @@ func is_fully_inspected() -> bool:
 
 
 func is_price_converged() -> bool:
-    return price_convergence_ratio >= 1.0
+    return inspection_level >= 1.0
 
-
-var price_convergence_ratio: float:
-    get:
-        return inspection_level
-
-
-func apply_repair() -> void:
-    var zone_factor: float = REPAIR_ZONE_FACTORS[0.50]
-    if condition < 0.25:
-        zone_factor = REPAIR_ZONE_FACTORS[0.25]
-    var rarity_factor: float = REPAIR_RARITY_FACTOR[item_data.rarity]
-    var delta: float = REPAIR_BASE * zone_factor * rarity_factor
-    condition = minf(condition + delta, 0.5)
-    KnowledgeManager.add_category_points(
-        item_data.category_data,
-        item_data.rarity,
-        KnowledgeManager.KnowledgeAction.REPAIR,
-    )
-
-
-func apply_restore() -> void:
-    var zone_factor: float = RESTORE_ZONE_FACTORS[1.0]
-    if condition < 0.75:
-        zone_factor = RESTORE_ZONE_FACTORS[0.75]
-    var rarity_factor: float = RESTORE_RARITY_FACTOR[item_data.rarity]
-    var restoration_attr := KnowledgeManager.get_attribute_value("restoration")
-    var attr_mult: float = 1.0 + restoration_attr * RESTORE_ATTR_COEFF
-    var delta: float = RESTORE_BASE * zone_factor * rarity_factor * attr_mult
-    condition = minf(condition + delta, 1.0)
-    KnowledgeManager.add_category_points(
-        item_data.category_data,
-        item_data.rarity,
-        KnowledgeManager.KnowledgeAction.RESTORE,
-    )
 
 # ── Clue reveal mechanics ─────────────────────────────────────────────────────
 
@@ -348,13 +313,6 @@ func apply_storage_migration() -> void:
     auto_reveal_all_surface()
 
 
-func is_repair_complete() -> bool:
-    return condition >= 0.5
-
-
-func is_restore_complete() -> bool:
-    return condition >= 1.0
-
 # ── Anchor value (int) ────────────────────────────────────────────────────────
 
 
@@ -363,6 +321,12 @@ func _anchor_flat_value() -> int:
     if anchor == null:
         return 0
     return int(anchor.effect_amount)
+
+
+func _base_value() -> int:
+    if is_veiled() or not anchor_revealed:
+        return 0
+    return int(appraised_with_hidden()) if verified else _anchor_flat_value()
 
 # ── Appraised value ────────────────────────────────────────────────────────────
 
@@ -432,50 +396,24 @@ func roll_npc_estimate(sight_chance: float) -> int:
 # ── Estimated value (range) ────────────────────────────────────────────────────
 
 var estimated_value_min: int:
-    get:
-        if is_veiled() or not anchor_revealed:
-            return 0
-        if verified:
-            return maxi(1, int(appraised_with_hidden() * get_condition_multiplier()))
-        var base := _raw_appraised_value()
-        var spread: float = MAX_SPREAD * (1.0 - self.inspection_level)
-        var offset: float = center_offset * (1.0 - self.inspection_level)
-        var mult: float = 1.0 - spread + offset
-        return maxi(1, int(base * mult * get_condition_multiplier()))
+    get: return resolve_price().min_value
 
 var estimated_value_max: int:
-    get:
-        if is_veiled() or not anchor_revealed:
-            return 0
-        if verified:
-            return maxi(1, int(appraised_with_hidden() * get_condition_multiplier()))
-        var base := _raw_appraised_value()
-        var spread: float = MAX_SPREAD * (1.0 - self.inspection_level)
-        var offset: float = center_offset * (1.0 - self.inspection_level)
-        var mult: float = 1.0 + spread + offset
-        return maxi(1, int(base * mult * get_condition_multiplier()))
+    get: return resolve_price().max_value
 
 # ── Display text helpers ──────────────────────────────────────────────────────
 
 
 func estimated_value_text() -> String:
-    if is_veiled() or not anchor_revealed:
-        return UNKNOWN_TEXT
-    if verified:
-        return "$%d" % maxi(1, int(appraised_with_hidden() * get_condition_multiplier()))
-
-    var lo: int = estimated_value_min
-    var hi: int = estimated_value_max
-    if hi <= lo:
-        return "$%d" % lo
-    return "$%d - $%d" % [lo, hi]
+    var v := resolve_price()
+    if not v.known: return UNKNOWN_TEXT
+    if v.exact or v.max_value <= v.min_value: return "$%d" % v.min_value
+    return "$%d - $%d" % [v.min_value, v.max_value]
 
 ## Resolved item price: appraised or verified value × condition multiplier.
 ## Veiled items should not use this — check anchor_revealed at call sites.
 var item_price: int:
-    get:
-        var value: float = appraised_with_hidden() if verified else _raw_appraised_value()
-        return maxi(1, int(value * get_condition_multiplier()))
+    get: return resolve_price().point_value
 
 # ── Display colors ────────────────────────────────────────────────────────────
 
@@ -496,32 +434,20 @@ const PRICE_COLOR := Color(0.4, 1.0, 0.5)
 const PRICE_UNKNOWN_COLOR := Color(0.6, 0.6, 0.6)
 
 var price_color: Color:
-    get:
-        return PRICE_UNKNOWN_COLOR if is_veiled() or not anchor_revealed else PRICE_COLOR
+    get: return PRICE_COLOR if resolve_price().known else PRICE_UNKNOWN_COLOR
 
 # ── Context-aware helpers ─────────────────────────────────────────────────────
 
-
-func price_text_for() -> String:
-    return estimated_value_text()
-
-
-func price_value_for() -> int:
-    return estimated_value_sort_value()
 
 # ── Per-column price getters ─────────────────────────────────────────────────
 
 
 func estimated_value_sort_value() -> int:
-    return estimated_value_min
+    return resolve_price().min_value
 
 
 func base_value_sort_value() -> int:
-    if is_veiled() or not anchor_revealed:
-        return 0
-    if verified:
-        return int(appraised_with_hidden())
-    return _anchor_flat_value()
+    return _base_value()
 
 
 func condition_text() -> String:
@@ -544,11 +470,10 @@ func condition_detail_text() -> String:
 
 
 func base_value_text() -> String:
-    if is_veiled() or not anchor_revealed:
+    var v := _base_value()
+    if v == 0:
         return UNKNOWN_TEXT
-    if verified:
-        return "$%d" % int(appraised_with_hidden())
-    return "$%d" % _anchor_flat_value()
+    return "$%d" % v
 
 
 func rarity_text() -> String:
@@ -577,7 +502,7 @@ func grid_text() -> String:
 
 
 func inspection_text() -> String:
-    return ItemEntry.UNKNOWN_TEXT if is_veiled() or not anchor_revealed else "%d%%" % int(price_convergence_ratio * 100)
+    return ItemEntry.UNKNOWN_TEXT if is_veiled() or not anchor_revealed else "%d%%" % int(inspection_level * 100)
 
 
 func price_display_color() -> Color:
@@ -636,26 +561,26 @@ func has_inspection_clues() -> bool:
 
 func sort_value(column: int) -> Variant:
     match column:
-        ItemEntry.COLUMN_NAME:
+        ItemRow.Column.NAME:
             return display_name
-        ItemEntry.COLUMN_CONDITION:
+        ItemRow.Column.CONDITION:
             if is_veiled():
                 return 0.0
             return get_condition_multiplier()
-        ItemEntry.COLUMN_ESTIMATED_VALUE:
+        ItemRow.Column.ESTIMATED_VALUE:
             return estimated_value_sort_value()
-        ItemEntry.COLUMN_BASE_VALUE:
+        ItemRow.Column.BASE_VALUE:
             return base_value_sort_value()
-        ItemEntry.COLUMN_RARITY:
+        ItemRow.Column.RARITY:
             return float(item_data.rarity) if verified and item_data != null else -1.0
-        ItemEntry.COLUMN_WEIGHT:
+        ItemRow.Column.WEIGHT:
             var weight_category := category_data()
             return weight_category.weight if weight_category != null else 0.0
-        ItemEntry.COLUMN_GRID:
+        ItemRow.Column.GRID:
             var grid_category := category_data()
             return grid_category.get_cells().size() if grid_category != null else 0
-        ItemEntry.COLUMN_INSPECTION:
-            return price_convergence_ratio
+        ItemRow.Column.INSPECTION:
+            return inspection_level
         _:
             push_warning("Unknown Column: %d" % column)
             return 0
