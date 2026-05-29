@@ -9,12 +9,19 @@
 class_name CarData
 extends Resource
 
+## Internal identifier. snake_case. Matches the .tres filename stem.
 @export var car_id: String
+## Human-readable label shown in the Car Select / Car Shop UI.
 @export var display_name: String
+## Cargo grid width in cells. total_slots() = grid_columns * grid_rows.
 @export var grid_columns: int
+## Cargo grid height in cells.
 @export var grid_rows: int
+## Maximum total cargo weight (kg) the car can carry.
 @export var max_weight: float
+## Action-point pool the player spends inspecting lots; resets per run.
 @export var stamina_cap: int
+## Cash deducted per travel day for this car (fuel). 0 = free to run.
 @export var fuel_cost_per_day: int = 0
 
 ## Number of independent trailer slots this car has.

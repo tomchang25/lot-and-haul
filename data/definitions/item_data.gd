@@ -32,6 +32,7 @@ enum Rarity {
 # surface clues, and zero or more hidden clues.
 @export var clues: Array[ClueData] = []
 
+# Lot-draw weighting tier and player-facing display tier.
 @export var rarity: Rarity = Rarity.COMMON
 
 # If true, entry.verified is set immediately when this item enters storage.

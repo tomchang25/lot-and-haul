@@ -87,6 +87,7 @@ Core loop redesign: Phases 0–11 complete (runtime veil cleanup, AP grid inspec
 - **Price pipeline**: all prices resolve through `ItemEntry.item_price` (`(appraised|verified value) × condition_multiplier`). Appraised value = anchor + revealed surface modifiers (add-then-mul). Verified value includes hidden modifiers. No per-type formulas outside the pipeline.
 - **Iterate resources, not ids**: outside serialization boundaries, pass Resource refs. String ids are for save/load only.
 - **Docstrings**: every `.gd` file starts with `# filename` + one-line purpose. All public functions and complex (>10 lines or non-obvious) private functions get a `##` GDDoc comment. Never strip or reduce existing comments when editing code.
+- **Docs layering**: 3 levels, each fact lives in exactly one. L1 vision (`dev/docs/vision/`, ≤5, rarely changes), L2 systems/plans/draft/TODO (`dev/docs/`, design intent + flow, concept only), L3 detail (code docstrings). Single source of truth — no duplication across levels. Full rules in `dev/docs/README.md`.
 
 ## Don'ts
 
@@ -94,4 +95,5 @@ Core loop redesign: Phases 0–11 complete (runtime veil cleanup, AP grid inspec
 - Don't add display-name wrappers or fallback-to-id accessors on registries.
 - Don't scan ItemRegistry to answer a category/super-category question — use the dedicated registry.
 - Don't put code-level detail (function names, field lists) in `dev/docs/systems/` — that belongs in code comments.
-- Don't leave completed docs in place — move them to `dev/docs/archived/`.
+- Don't leave completed docs in place — move them to `dev/docs/archived/`. When a draft's design locks, graduate the conclusion into `systems/` (same commit as the code), then archive the draft.
+- Don't put anything needing more than one line of reasoning in `TODO.md` — if it grows a paragraph, a table, or a trade-off, it's a `draft/` file, not a checkbox.
