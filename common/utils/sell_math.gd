@@ -117,11 +117,6 @@ static func item_contribution(entry) -> int:
     return maxi(1, int(_item_base_contribution(entry)))
 
 
-## Returns true if the entry is verified (anchor revealed + all hidden revealed).
-static func is_item_verified(entry) -> bool:
-    return _is_item_verified(entry)
-
-
 ## Conservative sell: flat multiplier on car total.
 static func conservative_total(items: Array) -> int:
     return car_total(items, CONSERVATIVE_MULTIPLIER)
@@ -136,12 +131,12 @@ static func aggressive_total(items: Array, rolled_sum: int) -> int:
 
 static func _item_base_contribution(entry) -> float:
     var price: float = float(entry.item_price) if "item_price" in entry else 0.0
-    if _is_item_verified(entry):
+    if is_item_verified(entry):
         price *= VERIFIED_PRICE_BONUS
     return price
 
 
-static func _is_item_verified(entry) -> bool:
+static func is_item_verified(entry) -> bool:
     if entry.has_method("is_veiled") and "verified" in entry:
         return not entry.is_veiled() and entry.verified
     return false
@@ -172,8 +167,6 @@ static func _item_matches_tag(entry, tag: String) -> bool:
 static func _entry_category(entry):
     if entry.has_method("category_data"):
         return entry.category_data()
-    if entry is ItemEntry:
-        return entry.item_data.category_data if entry.item_data else null
     if "item_data" in entry and entry.item_data != null:
         return entry.item_data.category_data
     return null

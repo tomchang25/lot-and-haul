@@ -20,7 +20,7 @@ var unlocked_perks: Array[String] = []
 var attribute_levels: Dictionary = { } # attribute_id (String) → int
 
 ## Customers generated for the current night. Array of Customer dicts on disk.
-var nightly_customers: Array = []
+var nightly_customers: Array[Customer] = []
 
 
 func save() -> void:

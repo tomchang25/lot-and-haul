@@ -6,7 +6,7 @@ extends Control
 
 const CargoItemRowScene: PackedScene = preload("res://game/run/cargo/cargo_item_row.tscn")
 
-var _customers: Array = []
+var _customers: Array[Customer] = []
 var _selected_idx: int = -1
 var _item_rows: Dictionary = { }
 var _item_colors: Dictionary = { }
@@ -16,7 +16,6 @@ var _pending_sale_price: int = 0
 
 var _grid: PackingGrid = null
 
-@onready var _title_label: Label = $RootVBox/HeaderRow/TitleLabel
 @onready var _day_label: Label = $RootVBox/HeaderRow/DayLabel
 @onready var _back_btn: Button = $RootVBox/HeaderRow/BackButton
 @onready var _customer_tabs_row: HBoxContainer = $RootVBox/CustomerTabsRow
@@ -275,14 +274,14 @@ func _refresh_display() -> void:
     _update_item_row_states()
 
 
-func _get_placed_items() -> Array:
+func _get_placed_items() -> Array[ItemEntry]:
     if _grid == null:
         return []
-    var seen: Array = []
-    var result: Array = []
+    var seen: Array[ItemEntry] = []
+    var result: Array[ItemEntry] = []
     for pos: Vector2i in _grid.placement:
-        var entry = _grid.placement[pos]
-        if entry not in seen:
+        var entry: ItemEntry = _grid.placement[pos] as ItemEntry
+        if entry != null and entry not in seen:
             seen.append(entry)
             result.append(entry)
     return result
@@ -302,6 +301,7 @@ func _on_item_row_pressed(entry: ItemEntry) -> void:
         return
     if _grid.phase == PackingGrid.Phase.ITEM_HELD:
         _grid.cancel_placement()
+        _update_item_row_states()
         return
     if _grid.is_item_placed(entry):
         _grid.lift(entry)
@@ -353,12 +353,14 @@ func _on_aggressive_pressed() -> void:
     _selected_dice_indices.clear()
     _dice_buttons.clear()
 
-    for child: Node in _dice_section.get_node("DiceRow").get_children():
-        _dice_section.get_node("DiceRow").remove_child(child)
+    var dice_row: HBoxContainer = _dice_section.get_node("DiceRow")
+    for child: Node in dice_row.get_children():
+        dice_row.remove_child(child)
         child.queue_free()
 
+    var _rng := RandomNumberGenerator.new()
     for i in range(pool):
-        var val := randi() % 6 + 1
+        var val := _rng.randi_range(1, 6)
         _dice_rolls.append(val)
         var btn := Button.new()
         btn.custom_minimum_size = Vector2(44, 44)
@@ -367,7 +369,7 @@ func _on_aggressive_pressed() -> void:
         btn.add_theme_font_size_override("font_size", 16)
         var idx := i
         btn.toggled.connect(func(toggled: bool) -> void: _on_dice_toggled(idx, toggled))
-        _dice_section.get_node("DiceRow").add_child(btn)
+        dice_row.add_child(btn)
         _dice_buttons.append(btn)
 
     _dice_section.get_node("DiceHint").text = "Select 2 dice to keep"
@@ -451,28 +453,10 @@ func _on_sell_confirmed() -> void:
 
     _build_customer_tabs()
     _select_customer(mini(_selected_idx, _customers.size() - 1))
-    _update_tab_states()
 
 
 func _on_sell_cancelled() -> void:
     _pending_sale_price = 0
-
-
-func _count_remaining_customers() -> int:
-    var count := 0
-    for c: Customer in _customers:
-        if c != null:
-            count += 1
-    return count
-
-
-func _find_next_customer(from: int) -> int:
-    var sz := _customers.size()
-    for offset in range(1, sz + 1):
-        var idx := (from + offset) % sz
-        if _customers[idx] != null:
-            return idx
-    return -1
 
 
 func _on_back_pressed() -> void:
