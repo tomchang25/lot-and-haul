@@ -36,7 +36,7 @@ func _ready() -> void:
     $VBox.move_child(_clue_container, _clue_separator.get_index() + 1)
 
 
-func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
+func show_for(entry: ItemEntry, anchor: Rect2) -> void:
     if entry == null:
         return
 
@@ -66,9 +66,9 @@ func show_for(entry: ItemEntry, ctx: ItemViewContext, anchor: Rect2) -> void:
         _condition_label.hide()
 
     # ── Conditional: price ───────────────────────────────────────────────────
-    var price_text := entry.price_text_for(ctx)
+    var price_text := entry.price_text_for()
     if price_text != ItemEntry.UNKNOWN_TEXT:
-        _price_label.text = "%s: %s" % [ItemRow.get_price_header(ctx), price_text]
+        _price_label.text = "%s: %s" % [ItemRow.get_price_header(), price_text]
         _price_label.add_theme_color_override(&"font_color", entry.price_display_color())
         _price_label.show()
     else:

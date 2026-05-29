@@ -15,8 +15,6 @@ const SHOP_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
     ItemRow.Column.ESTIMATED_VALUE,
-    ItemRow.Column.MERCHANT_OFFER,
-    ItemRow.Column.MARKET_FACTOR,
     ItemRow.Column.RARITY,
     ItemRow.Column.INSPECTION,
 ]
@@ -24,7 +22,6 @@ const SHOP_COLUMNS: Array = [
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _merchant: MerchantData = null
-var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
 var _selected: Dictionary = { } # ItemEntry → bool
 var _negotiation_dialog: Control = null
@@ -46,7 +43,6 @@ var _pending_basket: Array[ItemEntry] = []
 
 func _ready() -> void:
     _merchant = GameManager.consume_pending_merchant()
-    _ctx = ItemViewContext.for_merchant_shop(_merchant)
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 
@@ -88,10 +84,9 @@ func _on_row_pressed(entry: ItemEntry) -> void:
 
 func _on_row_tooltip_requested(
         entry: ItemEntry,
-        ctx: ItemViewContext,
         anchor: Rect2,
 ) -> void:
-    _tooltip.show_for(entry, ctx, anchor)
+    _tooltip.show_for(entry, anchor)
 
 
 func _on_sell_pressed() -> void:
@@ -193,7 +188,11 @@ func _populate_pricing_info() -> void:
 func _populate_rows() -> void:
     var buyable: Array[ItemEntry] = []
     for entry: ItemEntry in SaveManager.storage_items:
-        if _merchant.offer_for(entry) > 0:
+        var in_specialty: bool = entry.item_data != null \
+            and _merchant.accepted_super_categories.has(
+                entry.item_data.category_data.super_category,
+            )
+        if in_specialty or _merchant.accepts_off_category:
             buyable.append(entry)
 
     if buyable.is_empty():
@@ -205,7 +204,7 @@ func _populate_rows() -> void:
     _empty_label.visible = false
     _item_list_panel.visible = true
 
-    _item_list_panel.setup(_ctx, SHOP_COLUMNS)
+    _item_list_panel.setup(SHOP_COLUMNS)
     _item_list_panel.populate(buyable)
 
     for entry: ItemEntry in buyable:

@@ -7,7 +7,7 @@ class_name ItemListPanel
 extends PanelContainer
 
 signal row_pressed(entry)
-signal tooltip_requested(entry, ctx: ItemViewContext, anchor: Rect2)
+signal tooltip_requested(entry, anchor: Rect2)
 signal tooltip_dismissed
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -16,7 +16,6 @@ const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _ctx: ItemViewContext = null
 var _columns: Array = [] # Array of ItemRow.Column
 var _sort_column: ItemRow.Column = ItemRow.Column.NAME
 var _sort_ascending: bool = true
@@ -31,12 +30,10 @@ var _rows: Dictionary = { } # lot object -> ItemRow
 
 
 func setup(
-        ctx: ItemViewContext,
         columns: Array,
         default_sort_column: ItemRow.Column = ItemRow.Column.NAME,
         default_ascending: bool = true,
 ) -> void:
-    _ctx = ctx
     _columns = columns
     if _columns.size() > 0 and not (_sort_column in _columns):
         _sort_column = default_sort_column if default_sort_column in _columns else _columns[0]
@@ -50,7 +47,7 @@ func populate(entries: Array) -> void:
 
     for entry in entries:
         var row: ItemRow = ItemRowScene.instantiate()
-        row.setup(entry, _ctx, _columns)
+        row.setup(entry, _columns)
         row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
         row.row_pressed.connect(_on_row_pressed)
@@ -95,13 +92,12 @@ func apply_sort() -> void:
 
     var entries: Array = _rows.keys()
     var col: ItemRow.Column = _sort_column
-    var ctx: ItemViewContext = _ctx
     var ascending: bool = _sort_ascending
 
     entries.sort_custom(
         func(a, b) -> bool:
-            var va: Variant = get_sort_value(a, col, ctx)
-            var vb: Variant = get_sort_value(b, col, ctx)
+            var va: Variant = get_sort_value(a, col)
+            var vb: Variant = get_sort_value(b, col)
             if ascending:
                 return va < vb
             return va > vb
@@ -112,10 +108,10 @@ func apply_sort() -> void:
         _row_container.move_child(row, i)
 
 
-static func get_sort_value(entry: ItemEntry, col: ItemRow.Column, ctx: ItemViewContext) -> Variant:
+static func get_sort_value(entry: ItemEntry, col: ItemRow.Column) -> Variant:
     if entry == null:
         return 0
-    return entry.sort_value(col, ctx)
+    return entry.sort_value(col)
 
 # ══ Header ════════════════════════════════════════════════════════════════════
 
@@ -131,11 +127,7 @@ func _build_header() -> void:
         btn.add_theme_font_size_override(&"font_size", 14)
         btn.add_theme_color_override(&"font_color", Color(0.7, 0.7, 0.7, 1))
 
-        var label_text: String
-        if col == ItemRow.Column.MERCHANT_OFFER:
-            label_text = "%s Offer" % _ctx.merchant.display_name if _ctx.merchant else "Offer"
-        else:
-            label_text = ItemRow.COLUMN_HEADERS[col]
+        var label_text: String = ItemRow.COLUMN_HEADERS[col]
 
         if col == _sort_column:
             label_text += " ▲" if _sort_ascending else " ▼"
@@ -174,10 +166,9 @@ func _on_row_pressed(entry) -> void:
 
 func _on_row_tooltip_requested(
         entry,
-        ctx: ItemViewContext,
         anchor: Rect2,
 ) -> void:
-    tooltip_requested.emit(entry, ctx, anchor)
+    tooltip_requested.emit(entry, anchor)
 
 
 func _on_row_tooltip_dismissed() -> void:

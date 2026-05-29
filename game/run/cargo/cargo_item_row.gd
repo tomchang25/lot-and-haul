@@ -19,7 +19,6 @@ const SHAPE_PADDING := 2
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _entry: ItemEntry = null
-var _ctx: ItemViewContext = null
 var _loaded: bool = false
 var _hovered: bool = false
 var _holding: bool = false
@@ -50,9 +49,8 @@ func _ready() -> void:
 # ══ Common API ════════════════════════════════════════════════════════════════
 
 
-func setup(entry: ItemEntry, ctx: ItemViewContext) -> void:
+func setup(entry: ItemEntry) -> void:
     _entry = entry
-    _ctx = ctx
 
     if is_node_ready():
         _apply()
@@ -86,13 +84,13 @@ func set_external_highlight(val: bool) -> void:
 
 
 func _apply() -> void:
-    if _entry == null or _ctx == null:
+    if _entry == null:
         return
 
     _name_label.text = _entry.display_name
     _name_label.add_theme_color_override(&"font_color", _entry.display_name_color())
 
-    _value_label.text = _entry.price_text_for(_ctx)
+    _value_label.text = _entry.price_text_for()
     _value_label.add_theme_color_override(&"font_color", _entry.price_display_color())
 
     _weight_label.text = _entry.weight_text()

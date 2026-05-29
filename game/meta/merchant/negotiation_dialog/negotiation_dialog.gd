@@ -79,7 +79,7 @@ func begin(merchant: MerchantData, basket: Array[ItemEntry]) -> void:
 
     _base_offer = 0
     for entry: ItemEntry in _basket:
-        _base_offer += _merchant.offer_for(entry)
+        _base_offer += entry.item_price
 
     _current_offer = _base_offer
 

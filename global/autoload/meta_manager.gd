@@ -44,7 +44,6 @@ func advance_days(days: int) -> DaySummary:
     summary.completed_actions = _tick_research_slots(days)
     summary.end_day = SaveManager.current_day
 
-    MarketManager.advance_market(days)
     MerchantRegistry.advance_day()
     SaveManager.available_locations.clear()
 

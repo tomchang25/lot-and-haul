@@ -6,15 +6,6 @@ extends Node
 
 var _items_by_id: Dictionary = { } # item_id → ItemData
 
-# ── PriceConfig preset cache ─────────────────────────────────────────────────
-# Preset PriceConfig instances built once at startup so high-frequency callers
-# (e.g. item row rendering) can read pricing policies without allocating.
-
-var price_config_plain: PriceConfig = null
-var price_config_with_condition: PriceConfig = null
-var price_config_with_estimated: PriceConfig = null
-var price_config_with_market: PriceConfig = null
-
 
 func _ready() -> void:
     _items_by_id = ResourceDirLoader.load_by_id(
@@ -22,7 +13,6 @@ func _ready() -> void:
         func(r: Resource) -> String:
             return (r as ItemData).item_id if r is ItemData else ""
     )
-    _build_price_config_presets()
     RegistryCoordinator.register(self)
 
 
@@ -31,13 +21,6 @@ func validate() -> bool:
         push_error("ItemRegistry: registry is empty")
         return false
     return true
-
-
-func _build_price_config_presets() -> void:
-    price_config_plain = PriceConfig.plain()
-    price_config_with_condition = PriceConfig.with_condition()
-    price_config_with_estimated = PriceConfig.with_estimated()
-    price_config_with_market = PriceConfig.with_market()
 
 
 # Returns all items matching the given rarity and category_id.

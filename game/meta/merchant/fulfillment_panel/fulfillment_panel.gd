@@ -12,7 +12,6 @@ const PANEL_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
     ItemRow.Column.ESTIMATED_VALUE,
-    ItemRow.Column.SPECIAL_ORDER,
     ItemRow.Column.INSPECTION,
 ]
 
@@ -25,7 +24,6 @@ var _selected_order: SpecialOrder = null
 var _selected_slot_index: int = -1
 var _session_assignments: Dictionary = { } # slot_index (int) → Array[ItemEntry]
 var _tooltip: ItemRowTooltip = null
-var _ctx: ItemViewContext = null
 var _research_warning_dialog: ConfirmationDialog = null
 
 # ── Node references ───────────────────────────────────────────────────────────
@@ -107,10 +105,9 @@ func _on_item_row_pressed(entry: ItemEntry) -> void:
 
 func _on_row_tooltip_requested(
         entry: ItemEntry,
-        ctx: ItemViewContext,
         anchor: Rect2,
 ) -> void:
-    _tooltip.show_for(entry, ctx, anchor)
+    _tooltip.show_for(entry, anchor)
 
 
 func _on_confirm_pressed() -> void:
@@ -210,7 +207,6 @@ func _select_order(order: SpecialOrder) -> void:
     _selected_order = order
     _selected_slot_index = -1
     _session_assignments.clear()
-    _ctx = ItemViewContext.for_fulfillment(order)
 
     _refresh_order_info()
     _refresh_slot_display()
@@ -311,7 +307,7 @@ func _populate_inventory_for_slot() -> void:
         return
 
     var slot: OrderSlot = _selected_order.slots[_selected_slot_index]
-    _item_list_panel.setup(_ctx, PANEL_COLUMNS)
+    _item_list_panel.setup(PANEL_COLUMNS)
 
     # Filter storage items by slot.accepts()
     var eligible: Array[ItemEntry] = []

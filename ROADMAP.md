@@ -6,23 +6,23 @@ High-level milestones and deferred systems. Not an implementation spec — this 
 
 ## Value Hierarchy
 
-Every price resolves through the shared pricing pipeline. A config object toggles which factors participate; there is no per-type formula living outside the pipeline.
-
 Items carry three clue tiers: one **anchor clue** (flat base value, auto-revealed on first inspect), zero or more **surface clues** (price modifiers, discoverable during inspection, auto-revealed on hub return), and zero or more **hidden clues** (only revealed by Authenticate or passive conditions, can be positive or negative).
 
-| Name              | Basis                                           | Range | Role                                       |
-| ----------------- | ----------------------------------------------- | ----- | ------------------------------------------ |
-| `appraised_value` | anchor × revealed surface modifiers             | yes   | base for all display and selling           |
-| `verified_value`  | anchor × all surface × all hidden modifiers     | no    | replaces appraised for authenticated items |
-| `market_price`    | appraised/verified × condition × market factor  | no    | car total input                            |
-| `car_total`       | sum of item market_prices (verified items ×1.2) | no    | customer transaction base                  |
-| `sell_price`      | car_total × sell multiplier                     | no    | final transaction price                    |
+Clue math: add/subtract first, then multiply. `(anchor_flat + Σ surface_add) × Π surface_mul`. Verified items additionally apply hidden modifiers in the same add-then-mul order.
 
-Naming convention: `_value` = appraisal-side, `_price` / `_total` = transaction-side.
+| Name              | Basis                                           | Range | Role                             |
+| ----------------- | ----------------------------------------------- | ----- | -------------------------------- |
+| `appraised_value` | anchor + revealed clue modifiers (add-then-mul) | yes   | base for all display and selling |
+| `verified_value`  | appraised + hidden clue modifiers (add-then-mul)| no    | replaces appraised when verified |
+| `item_price`      | (appraised or verified) × condition_multiplier  | no    | resolved per-item price          |
 
-Verified items use `verified_value` in place of `appraised_value` as pipeline input, and receive ×1.2 on their individual contribution to car total. Verified value may be higher or lower than appraised — hidden clues can be negative.
+Condition is an independent system (0.0–1.0, non-linear bucketing into ×0.25–×4.0) tied to Repair/Restore research. It multiplies into item_price but is not a clue.
 
-Sell multiplier: conservative = flat ×1.2; aggressive = dice result (×1.0 / ×1.5 / ×0.8 depending on roll). See Phase 9 spec.
+Market factor and knowledge bonus are removed — Phase 9's customer fit + sell strategy replaces their design role.
+
+Verified items use `verified_value` in place of `appraised_value` as item_price input, and receive ×1.2 on their individual car contribution. Verified value may be higher or lower than appraised — hidden clues can be negative.
+
+Transaction-level pricing (car total, sell multiplier, verified bonus) is owned by the customer/shop system — see Phase 9.
 
 Range convergence: appraised value shows as a range when not all surface clues are revealed. Spread = `max_spread × (1.0 - reveal_ratio)`. At ratio 1.0 the range collapses to the exact appraised value.
 
@@ -161,22 +161,24 @@ _Full spec: `dev/docs/archived/phase_8_dynamic_naming_rules_impl_spec.md`_
 
 **Dependencies:** Phase 7, Phase 10
 
-_Full spec: `dev/docs/plan/merchant_system_redesign.md`_
+_Full spec: `dev/docs/plans/merchant_system_redesign.md`_
 
 ---
 
 ### Phase 10 — Value Policy Cleanup
 
-**Goal:** Centralise verified / unverified item value resolution; eliminate price rules scattered across scenes.
+**Goal:** Simplify the pricing pipeline to appraised value × condition as the sole selling base; remove market factor and knowledge bonus systems.
 
 **Design decisions:**
 
-- Unverified display value: anchor + revealed clue modifiers.
-- Verified display value: anchor × all surface × all hidden modifiers.
-- All selling flows use `market_price` (appraised/verified × condition × market factor) as the item's contribution to car total.
-- Verified items receive ×1.2 on their car contribution.
+- Selling base = `appraised_value × condition_multiplier` (unverified) or `verified_value × condition_multiplier` (verified). No other factors.
+- Remove `MarketManager` autoload and all market factor references.
+- Remove knowledge bonus (`1.0 + 0.01 × rank`).
+- Remove or simplify `PriceConfig` / `compute_price` — with market and knowledge gone, the config toggle system is over-engineered.
+- Condition stays as an independent system (not a clue) — it's tightly coupled to Repair/Restore research and has meaningful gameplay impact (×0.25–×4.0 range).
+- Deprecate `MerchantData.offer_for()`, `SpecialOrder.compute_item_price()`, and other old selling-channel price callers.
 
-**Scope:** Centralised value helper, migration of existing callers. Excludes full UI redesign.
+**Scope:** Pipeline simplification, caller migration, MarketManager removal, old selling price helper deprecation. Excludes UI redesign.
 
 **Dependencies:** Phase 7
 
@@ -230,7 +232,7 @@ Phases 7, 7.5, 8, and 8b are complete. Phase 10 is unblocked and is next. Phase 
 These are independent of the core loop redesign phases and can proceed in parallel.
 
 - **Customer content** — demand tag pools, car grid size list, and customer generation tuning. `pawn_shop` and `antique_dealer` merchant content is deprecated; `arms_dealer` and `fashion_buyer` are evaluated separately for potential conversion to customer archetypes or removal.
-- **Director system** — skeleton to get all three demo runs flowing end-to-end with placeholder content. See `dev/docs/plan/demo_summary.md`.
+- **Director system** — skeleton to get all three demo runs flowing end-to-end with placeholder content. See `dev/docs/plans/demo_summary.md`.
 - **Dialog system** — linear first, Uncle branching second.
 - **Bank / Bankruptcy** — daily interest, game-over condition, optional loans.
 
@@ -241,10 +243,6 @@ These are independent of the core loop redesign phases and can proceed in parall
 **Content & calibration (post-Phase 7+):** Attribute costs, customer generation weighting, and perk balance don't stabilise until earlier systems impose real constraints on a run.
 
 **Attribute growth design:** How do attributes increase? Starting model: spend cash to increase by 1. More complex models (per-run rewards, daily training slots, mastery-gated upgrades) are explored after the base system is stable.
-
-**Market system evolution:**
-
-- **Mean-reversion drift** — replace pure random walk with drift that pulls super-category means back toward 1.0; the current walk can leave a category depressed or inflated forever.
 
 **Customer system evolution (post-Phase 9):**
 

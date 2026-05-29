@@ -45,8 +45,6 @@ func save() -> void:
         "available_location_ids": serialized_available_location_ids,
         "unlocked_perks": unlocked_perks,
         "attribute_levels": attribute_levels,
-        "super_cat_means": MarketManager.super_cat_means,
-        "category_factors_today": MarketManager.category_factors_today,
         "merchant_negotiations_used_today": _build_negotiation_dict(),
         "merchant_orders": _build_order_dict(),
         "next_order_id": MerchantRegistry.next_order_id,
@@ -132,17 +130,8 @@ func _read_save_file() -> void:
     else:
         attribute_levels = { }
 
-    if parsed.has("super_cat_means") and parsed["super_cat_means"] is Dictionary:
-        MarketManager.super_cat_means = { }
-        for key: Variant in parsed["super_cat_means"]:
-            if key is String and parsed["super_cat_means"][key] is float:
-                MarketManager.super_cat_means[key] = float(parsed["super_cat_means"][key])
-
-    if parsed.has("category_factors_today") and parsed["category_factors_today"] is Dictionary:
-        MarketManager.category_factors_today = { }
-        for key: Variant in parsed["category_factors_today"]:
-            if key is String and parsed["category_factors_today"][key] is float:
-                MarketManager.category_factors_today[key] = float(parsed["category_factors_today"][key])
+    # Old saves may contain "super_cat_means" and "category_factors_today" keys
+    # from the removed MarketManager system — silently ignore them.
 
     if parsed.has("merchant_negotiations_used_today") and parsed["merchant_negotiations_used_today"] is Dictionary:
         var neg_dict: Dictionary = parsed["merchant_negotiations_used_today"]

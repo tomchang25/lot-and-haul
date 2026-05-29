@@ -29,8 +29,6 @@ enum ActionType { UNVEIL, INSPECT_CLUE }
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _ctx: ItemViewContext = null
-
 var _cell_buttons: Dictionary = { }
 var _cell_entry: Dictionary = { }
 var _entry_cells: Dictionary = { }
@@ -81,8 +79,6 @@ var _hover_entry: ItemEntry = null
 
 
 func _ready() -> void:
-    _ctx = ItemViewContext.for_inspection()
-
     _action_bar.hide()
     _footer.show()
     _pass_button.show()
@@ -468,7 +464,7 @@ func _refresh_found_list() -> void:
         name_lbl.clip_text = true
         row.add_child(name_lbl)
 
-        var price_text := entry.price_text_for(_ctx)
+        var price_text := entry.price_text_for()
         if price_text != ItemEntry.UNKNOWN_TEXT:
             var value_lbl := Label.new()
             value_lbl.text = price_text
@@ -559,7 +555,7 @@ func _update_detail_section(entry: ItemEntry) -> void:
         entry.condition_display_color() if cond != "" else Color(0.55, 0.58, 0.63, 1),
     )
 
-    var price_text := entry.price_text_for(_ctx)
+    var price_text := entry.price_text_for()
     if price_text != ItemEntry.UNKNOWN_TEXT:
         _detail_value_label.text = price_text
         _detail_value_label.add_theme_color_override(&"font_color", entry.price_display_color())

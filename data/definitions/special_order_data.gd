@@ -24,11 +24,6 @@ extends Resource
 @export var buff_min: float = 1.0
 @export var buff_max: float = 1.0
 
-# Per-factor pricing flags. These map one-to-one to the same-named fields on
-# SpecialOrder and feed the order's PriceConfig.
-@export var uses_condition: bool = false
-@export var uses_knowledge: bool = false
-@export var uses_market: bool = false
 
 # If true, confirm works with any non-empty assignment and slot progress
 # persists across sessions. If false, confirm is disabled until every slot

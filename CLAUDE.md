@@ -49,7 +49,7 @@ dev/
 
 ## Autoloads (load order matters)
 
-EventBus → AudioManager → RegistryCoordinator → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → MarketManager → MerchantRegistry → KnowledgeManager → SaveManager → MetaManager → GameManager
+EventBus → AudioManager → RegistryCoordinator → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → MerchantRegistry → KnowledgeManager → SaveManager → MetaManager → GameManager
 
 `RegistryCoordinator` orchestrates boot: each registry calls `RegistryCoordinator.register(self)` in `_ready()`, then `GameManager._ready()` runs `run_migrations()` and `run_validation()`.
 
@@ -61,7 +61,7 @@ When authoring new items or clues, use the generation prompts at `dev/tools/prom
 
 ## Current Phase
 
-Core loop redesign: Phases 0–8b complete (runtime veil cleanup, AP grid inspection, item base price, storage authenticate, clue independence + attribute system, inspection refinement, dynamic naming rules, YAML content regeneration). Identity layers and skills have been fully replaced by clue-based pricing and SPECIAL-style attributes; all clues carry 1-word known_text and naming entries. Next up: Phase 10 (value policy cleanup); Phase 9 (merchant system redesign) after Phase 10. See `ROADMAP.md` for the full phase dependency graph.
+Core loop redesign: Phases 0–10 complete (runtime veil cleanup, AP grid inspection, item base price, storage authenticate, clue independence + attribute system, inspection refinement, dynamic naming rules, YAML content regeneration, value policy cleanup). Identity layers and skills have been fully replaced by clue-based pricing and SPECIAL-style attributes; all clues carry 1-word known_text and naming entries. `item_price` is now the sole per-item price resolver (`appraised or verified value × condition_multiplier`); MarketManager, PriceConfig, and deprecated selling helpers have been removed. Next up: Phase 9 (merchant system redesign). See `ROADMAP.md` for the full phase dependency graph.
 
 ## Conventions (quick reference)
 

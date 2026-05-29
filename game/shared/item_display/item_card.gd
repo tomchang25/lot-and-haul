@@ -6,7 +6,6 @@ extends PanelContainer
 signal clicked(card: ItemCard)
 
 var _entry: ItemEntry = null
-var _ctx: ItemViewContext = null
 var _is_selected: bool = false
 var _has_intuition_mark: bool = false
 
@@ -25,9 +24,8 @@ func _ready() -> void:
     _apply()
 
 
-func setup(entry, ctx: ItemViewContext) -> void:
+func setup(entry) -> void:
     _entry = entry
-    _ctx = ctx
 
     if is_node_ready():
         _apply()
@@ -100,7 +98,7 @@ func _apply_known() -> void:
     else:
         _condition_mult_label.hide()
 
-    _price_label.text = _entry.price_text_for(_ctx)
+    _price_label.text = _entry.price_text_for()
     _price_label.add_theme_color_override(&"font_color", _entry.price_display_color())
     _price_label.show()
 

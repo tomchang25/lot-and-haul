@@ -18,7 +18,6 @@ const STORAGE_COLUMNS: Array = [
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
 var _selected_entry: ItemEntry = null
 
@@ -60,7 +59,6 @@ var _selected_entry: ItemEntry = null
 
 
 func _ready() -> void:
-    _ctx = ItemViewContext.for_storage()
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 
@@ -91,10 +89,9 @@ func _on_row_pressed(entry: ItemEntry) -> void:
 
 func _on_row_tooltip_requested(
         entry: ItemEntry,
-        ctx: ItemViewContext,
         anchor: Rect2,
 ) -> void:
-    _tooltip.show_for(entry, ctx, anchor)
+    _tooltip.show_for(entry, anchor)
 
 
 func _on_repair_pressed() -> void:
@@ -130,7 +127,7 @@ func _populate_rows() -> void:
     _empty_label.visible = false
     _item_list_panel.visible = true
 
-    _item_list_panel.setup(_ctx, STORAGE_COLUMNS)
+    _item_list_panel.setup(STORAGE_COLUMNS)
     _item_list_panel.populate(SaveManager.storage_items)
 
     for entry: ItemEntry in SaveManager.storage_items:

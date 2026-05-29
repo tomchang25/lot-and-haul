@@ -61,7 +61,6 @@ var _item_colors: Dictionary = { }
 
 # ── Tooltip Support ───────────────────────────────────────────────────────────
 
-var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
 var _hovered_item: ItemEntry = null
 
@@ -89,7 +88,6 @@ var _hovered_item: ItemEntry = null
 
 
 func _ready() -> void:
-    _ctx = ItemViewContext.for_cargo()
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 
@@ -313,7 +311,7 @@ func _build_extra_slots() -> void:
 func _build_item_list() -> void:
     for entry: ItemEntry in _won_items:
         var row: CargoItemRow = CargoItemRowScene.instantiate()
-        row.setup(entry, _ctx)
+        row.setup(entry)
         row.row_pressed.connect(_on_item_row_pressed)
         row.tooltip_requested.connect(_on_row_tooltip_requested)
         row.tooltip_dismissed.connect(_on_row_tooltip_dismissed)
@@ -802,7 +800,7 @@ func _show_tooltip_for_item(entry: ItemEntry, anchor: Rect2) -> void:
     if _phase == Phase.ITEM_HELD:
         return
     _hovered_item = entry
-    _tooltip.show_for(entry, _ctx, anchor)
+    _tooltip.show_for(entry, anchor)
 
 
 func _hide_tooltip() -> void:

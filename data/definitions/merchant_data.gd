@@ -22,7 +22,7 @@ extends Resource
 
 # ── Pricing ──────────────────────────────────────────────────────────────────
 
-# Multiplier applied to market_price for items in accepted super-categories.
+# Multiplier applied to item_price for items in accepted super-categories.
 @export var price_multiplier: float = 1.0
 
 # ── Off-category handling ────────────────────────────────────────────────────
@@ -81,18 +81,6 @@ extends Resource
 # Perk required to access this merchant.
 # null = no gate (accessible to all players).
 @export var required_perk: PerkData = null
-
-# ── Offer logic ──────────────────────────────────────────────────────────────
-
-
-func offer_for(entry: ItemEntry) -> int:
-    var base: int = entry.market_price
-    if accepted_super_categories.has(entry.item_data.category_data.super_category):
-        return int(base * price_multiplier)
-    elif accepts_off_category:
-        return int(base * price_multiplier * off_category_multiplier)
-    else:
-        return 0
 
 # ── Runtime state (not exported, persisted via SaveManager) ──────────────────
 

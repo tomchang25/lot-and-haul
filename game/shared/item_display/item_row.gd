@@ -6,7 +6,7 @@
 class_name ItemRow
 extends PanelContainer
 
-signal tooltip_requested(entry, ctx: ItemViewContext, anchor: Rect2)
+signal tooltip_requested(entry, anchor: Rect2)
 signal tooltip_dismissed
 signal row_pressed(entry)
 
@@ -24,29 +24,22 @@ enum Column {
     CONDITION,
     ESTIMATED_VALUE,
     BASE_VALUE,
-    MERCHANT_OFFER,
-    SPECIAL_ORDER,
     RARITY,
     WEIGHT,
     GRID,
-    MARKET_FACTOR,
     INSPECTION,
 }
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-# Header text shown for each column. MERCHANT_OFFER is dynamic — see _build_header().
 const COLUMN_HEADERS: Dictionary = {
     Column.NAME: "Item",
     Column.CONDITION: "Condition",
     Column.ESTIMATED_VALUE: "Est. Value",
     Column.BASE_VALUE: "Base Value",
-    Column.MERCHANT_OFFER: "",
-    Column.SPECIAL_ORDER: "Order Price",
     Column.RARITY: "Rarity",
     Column.WEIGHT: "Weight",
     Column.GRID: "Grid",
-    Column.MARKET_FACTOR: "Market",
     Column.INSPECTION: "Inspection",
 }
 
@@ -55,19 +48,15 @@ const COLUMN_MIN_WIDTH: Dictionary = {
     Column.CONDITION: 120,
     Column.ESTIMATED_VALUE: 160,
     Column.BASE_VALUE: 160,
-    Column.MERCHANT_OFFER: 160,
-    Column.SPECIAL_ORDER: 160,
     Column.RARITY: 120,
     Column.WEIGHT: 100,
     Column.GRID: 80,
-    Column.MARKET_FACTOR: 100,
     Column.INSPECTION: 100,
 }
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _entry: ItemEntry = null
-var _ctx: ItemViewContext = null
 var _columns: Array = []
 var _selection_state: SelectionState = SelectionState.NONE
 
@@ -79,12 +68,9 @@ var _selection_state: SelectionState = SelectionState.NONE
 @onready var _condition_label: Label = $HBoxContainer/ConditionLabel
 @onready var _estimated_value_label: Label = $HBoxContainer/EstimatedValueLabel
 @onready var _base_value_label: Label = $HBoxContainer/BaseValueLabel
-@onready var _merchant_offer_label: Label = $HBoxContainer/MerchantOfferLabel
-@onready var _special_order_label: Label = $HBoxContainer/SpecialOrderLabel
 @onready var _rarity_label: Label = $HBoxContainer/RarityLabel
 @onready var _weight_label: Label = $HBoxContainer/WeightLabel
 @onready var _grid_label: Label = $HBoxContainer/GridLabel
-@onready var _market_factor_label: Label = $HBoxContainer/MarketFactorLabel
 @onready var _inspection_label: Label = $HBoxContainer/InspectionLabel
 @onready var _auth_tag_label: Label = $HBoxContainer/NameHBox/AuthTagLabel
 
@@ -100,9 +86,8 @@ func _ready() -> void:
 # ══ Common API ════════════════════════════════════════════════════════════════
 
 
-func setup(entry, ctx: ItemViewContext, columns: Array = []) -> void:
+func setup(entry, columns: Array = []) -> void:
     _entry = entry
-    _ctx = ctx
     _columns = columns
 
     if is_node_ready():
@@ -136,23 +121,8 @@ func set_selection_state(state: SelectionState) -> void:
             push_warning("Unknown SelectionState: %d" % state)
 
 
-# Bridge method — kept for ItemRowTooltip which dispatches on stage.
-static func get_price_header(ctx: ItemViewContext) -> String:
-    match ctx.stage:
-        ItemViewContext.Stage.INSPECTION, \
-        ItemViewContext.Stage.LIST_REVIEW, \
-        ItemViewContext.Stage.REVEAL, \
-        ItemViewContext.Stage.CARGO, \
-        ItemViewContext.Stage.RUN_REVIEW, \
-        ItemViewContext.Stage.STORAGE:
-            return "Est. Value"
-        ItemViewContext.Stage.MERCHANT_SHOP:
-            return "%s Offer" % ctx.merchant.display_name if ctx.merchant else "Offer"
-        ItemViewContext.Stage.FULFILLMENT_PANEL:
-            return "Order Price"
-        _:
-            push_warning("Unknown Stage for price header: %d" % ctx.stage)
-            return "Price"
+static func get_price_header() -> String:
+    return "Est. Value"
 
 # ══ Input ═════════════════════════════════════════════════════════════════════
 
@@ -178,12 +148,9 @@ func _refresh() -> void:
     _condition_label.visible = Column.CONDITION in _columns
     _estimated_value_label.visible = Column.ESTIMATED_VALUE in _columns
     _base_value_label.visible = Column.BASE_VALUE in _columns
-    _merchant_offer_label.visible = Column.MERCHANT_OFFER in _columns
-    _special_order_label.visible = Column.SPECIAL_ORDER in _columns
     _rarity_label.visible = Column.RARITY in _columns
     _weight_label.visible = Column.WEIGHT in _columns
     _grid_label.visible = Column.GRID in _columns
-    _market_factor_label.visible = Column.MARKET_FACTOR in _columns
     _inspection_label.visible = Column.INSPECTION in _columns
 
     # ── Column order ──────────────────────────────────────────────────────────
@@ -203,20 +170,12 @@ func _refresh() -> void:
     _condition_label.modulate = _entry.condition_display_color()
 
     # ── ESTIMATED_VALUE ────────────────────────────────────────────────────────
-    _estimated_value_label.text = _entry.price_text_for(_ctx)
+    _estimated_value_label.text = _entry.price_text_for()
     _estimated_value_label.add_theme_color_override(&"font_color", _entry.price_display_color())
 
     # ── BASE_VALUE ─────────────────────────────────────────────────────────────
     _base_value_label.text = _entry.base_value_text()
     _base_value_label.add_theme_color_override(&"font_color", _entry.price_display_color())
-
-    # ── MERCHANT_OFFER ─────────────────────────────────────────────────────────
-    _merchant_offer_label.text = _entry.merchant_offer_text(_ctx.merchant)
-    _merchant_offer_label.add_theme_color_override(&"font_color", _entry.price_display_color())
-
-    # ── SPECIAL_ORDER ──────────────────────────────────────────────────────────
-    _special_order_label.text = _entry.special_order_text(_ctx.order)
-    _special_order_label.add_theme_color_override(&"font_color", _entry.price_display_color())
 
     # ── RARITY ────────────────────────────────────────────────────────────────
     _rarity_label.text = _entry.rarity_text()
@@ -224,9 +183,6 @@ func _refresh() -> void:
     # ── WEIGHT / GRID ─────────────────────────────────────────────────────────
     _weight_label.text = _entry.weight_text()
     _grid_label.text = _entry.grid_text()
-
-    # ── MARKET FACTOR ─────────────────────────────────────────────────────────
-    _market_factor_label.text = _entry.market_factor_text()
 
     # ── INSPECTION ────────────────────────────────────────────────────────────
     _inspection_label.text = _entry.inspection_text()
@@ -243,12 +199,9 @@ func _apply_column_order() -> void:
         Column.CONDITION: _condition_label,
         Column.ESTIMATED_VALUE: _estimated_value_label,
         Column.BASE_VALUE: _base_value_label,
-        Column.MERCHANT_OFFER: _merchant_offer_label,
-        Column.SPECIAL_ORDER: _special_order_label,
         Column.RARITY: _rarity_label,
         Column.WEIGHT: _weight_label,
         Column.GRID: _grid_label,
-        Column.MARKET_FACTOR: _market_factor_label,
         Column.INSPECTION: _inspection_label,
     }
 
@@ -282,7 +235,7 @@ static func _ensure_styles() -> void:
 
 
 func _on_mouse_entered() -> void:
-    tooltip_requested.emit(_entry, _ctx, get_global_rect())
+    tooltip_requested.emit(_entry, get_global_rect())
 
 
 func _on_mouse_exited() -> void:

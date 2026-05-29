@@ -19,7 +19,6 @@ const REVIEW_COLUMNS: Array = [
 
 var _cargo_items: Array[ItemEntry] = []
 var _review_entries: Array = []
-var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
 
 # ── Node references ───────────────────────────────────────────────────────────
@@ -37,7 +36,6 @@ var _tooltip: ItemRowTooltip = null
 
 
 func _ready() -> void:
-    _ctx = ItemViewContext.for_run_review()
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 
@@ -68,10 +66,9 @@ func _on_continue_pressed() -> void:
 
 func _on_row_tooltip_requested(
         entry,
-        ctx: ItemViewContext,
         anchor: Rect2,
 ) -> void:
-    _tooltip.show_for(entry, ctx, anchor)
+    _tooltip.show_for(entry, anchor)
 
 # ══ Trailer damage ════════════════════════════════════════════════════════════
 
@@ -101,7 +98,7 @@ func _resolve_run_and_navigate() -> void:
 
 
 func _populate_rows() -> void:
-    _item_list_panel.setup(_ctx, REVIEW_COLUMNS)
+    _item_list_panel.setup(REVIEW_COLUMNS)
     _item_list_panel.populate(_review_entries)
 
 

@@ -19,7 +19,6 @@ const REVEAL_COLUMNS: Array = [
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _won_items: Array[ItemEntry] = []
-var _ctx: ItemViewContext = null
 var _tooltip: ItemRowTooltip = null
 
 # ── Node references ───────────────────────────────────────────────────────────
@@ -33,7 +32,6 @@ var _tooltip: ItemRowTooltip = null
 
 
 func _ready() -> void:
-    _ctx = ItemViewContext.for_reveal()
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 
@@ -60,6 +58,8 @@ func _on_reveal_pressed() -> void:
         if entry.is_veiled():
             entry.unveil()
 
+        entry.auto_reveal_all_surface()
+
     _on_reveal_complete()
 
     _reveal_btn.hide()
@@ -72,16 +72,15 @@ func _on_continue_pressed() -> void:
 
 func _on_row_tooltip_requested(
         entry,
-        ctx: ItemViewContext,
         anchor: Rect2,
 ) -> void:
-    _tooltip.show_for(entry, ctx, anchor)
+    _tooltip.show_for(entry, anchor)
 
 # ══ Reveal sequence ════════════════════════════════════════════════════════════
 
 
 func _populate_rows() -> void:
-    _item_list_panel.setup(_ctx, REVEAL_COLUMNS)
+    _item_list_panel.setup(REVEAL_COLUMNS)
     _item_list_panel.populate(RunManager.run_record.last_lot_won_items)
 
 

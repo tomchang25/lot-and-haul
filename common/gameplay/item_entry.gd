@@ -11,13 +11,10 @@ const COLUMN_NAME := 0
 const COLUMN_CONDITION := 1
 const COLUMN_ESTIMATED_VALUE := 2
 const COLUMN_BASE_VALUE := 3
-const COLUMN_MERCHANT_OFFER := 4
-const COLUMN_SPECIAL_ORDER := 5
-const COLUMN_RARITY := 6
-const COLUMN_WEIGHT := 7
-const COLUMN_GRID := 8
-const COLUMN_MARKET_FACTOR := 9
-const COLUMN_INSPECTION := 10
+const COLUMN_RARITY := 4
+const COLUMN_WEIGHT := 5
+const COLUMN_GRID := 6
+const COLUMN_INSPECTION := 7
 
 # ── Inspection constants ─────────────────────────────────────────────────────
 
@@ -442,7 +439,7 @@ func estimated_value_text() -> String:
     if is_veiled() or not anchor_revealed:
         return UNKNOWN_TEXT
     if verified:
-        return "$%d" % int(appraised_with_hidden())
+        return "$%d" % maxi(1, int(appraised_with_hidden() * get_condition_multiplier()))
 
     var lo: int = estimated_value_min
     var hi: int = estimated_value_max
@@ -450,46 +447,12 @@ func estimated_value_text() -> String:
         return "$%d" % lo
     return "$%d - $%d" % [lo, hi]
 
-
-# Unified pricing pipeline. Uses anchor + surface modifiers (non-verified)
-# or anchor + surface + hidden (verified), then folds in condition and market.
-func compute_price(config: PriceConfig) -> int:
-    var value: float
-    if verified:
-        value = appraised_with_hidden()
-    else:
-        value = _raw_appraised_value()
-
-    if config.condition:
-        if config.use_known_condition:
-            value *= get_known_condition_multiplier()
-        else:
-            value *= get_condition_multiplier()
-
-    if config.knowledge:
-        var rank: int = KnowledgeManager.get_super_category_rank(
-            item_data.category_data.super_category,
-        )
-        value *= 1.0 + 0.01 * rank
-
-    if config.market:
-        value *= MarketManager.get_category_factor(
-            item_data.category_data,
-        )
-
-    value *= config.multiplier
-    return int(value)
-
-
-var market_price: int:
+## Resolved item price: appraised or verified value × condition multiplier.
+## Veiled items should not use this — check anchor_revealed at call sites.
+var item_price: int:
     get:
-        return compute_price(ItemRegistry.price_config_with_market)
-
-var market_factor_delta: float:
-    get:
-        return MarketManager.get_category_factor(
-            item_data.category_data,
-        ) - 1.0
+        var value: float = appraised_with_hidden() if verified else _raw_appraised_value()
+        return maxi(1, int(value * get_condition_multiplier()))
 
 # ── Display colors ────────────────────────────────────────────────────────────
 
@@ -516,40 +479,12 @@ var price_color: Color:
 # ── Context-aware helpers ─────────────────────────────────────────────────────
 
 
-func price_text_for(ctx: ItemViewContext) -> String:
-    match ctx.stage:
-        ItemViewContext.Stage.INSPECTION, \
-        ItemViewContext.Stage.LIST_REVIEW, \
-        ItemViewContext.Stage.REVEAL, \
-        ItemViewContext.Stage.CARGO, \
-        ItemViewContext.Stage.RUN_REVIEW, \
-        ItemViewContext.Stage.STORAGE:
-            return estimated_value_text()
-        ItemViewContext.Stage.MERCHANT_SHOP: # DEPRECATED: Phase 9
-            return merchant_offer_text(ctx.merchant)
-        ItemViewContext.Stage.FULFILLMENT_PANEL: # DEPRECATED: Phase 9
-            return special_order_text(ctx.order)
-        _:
-            push_warning("Unknown Stage for price: %d" % ctx.stage)
-            return estimated_value_text()
+func price_text_for() -> String:
+    return estimated_value_text()
 
 
-func price_value_for(ctx: ItemViewContext) -> int:
-    match ctx.stage:
-        ItemViewContext.Stage.INSPECTION, \
-        ItemViewContext.Stage.LIST_REVIEW, \
-        ItemViewContext.Stage.REVEAL, \
-        ItemViewContext.Stage.CARGO, \
-        ItemViewContext.Stage.RUN_REVIEW, \
-        ItemViewContext.Stage.STORAGE:
-            return estimated_value_sort_value()
-        ItemViewContext.Stage.MERCHANT_SHOP: # DEPRECATED: Phase 9
-            return merchant_offer_value(ctx.merchant)
-        ItemViewContext.Stage.FULFILLMENT_PANEL: # DEPRECATED: Phase 9
-            return special_order_value(ctx.order)
-        _:
-            push_warning("Unknown Stage for price: %d" % ctx.stage)
-            return 0
+func price_value_for() -> int:
+    return estimated_value_sort_value()
 
 # ── Per-column price getters ─────────────────────────────────────────────────
 
@@ -564,16 +499,6 @@ func base_value_sort_value() -> int:
     if verified:
         return int(appraised_with_hidden())
     return _anchor_flat_value()
-
-
-## DEPRECATED: Removed in Phase 9 (merchant system redesign → unified customer selling).
-func merchant_offer_value(merchant: MerchantData) -> int:
-    return merchant.offer_for(self) if merchant else market_price
-
-
-## DEPRECATED: Removed in Phase 9 (merchant system redesign → unified customer selling).
-func special_order_value(order: SpecialOrder) -> int:
-    return order.compute_item_price(self) if order else 0
 
 
 func condition_text() -> String:
@@ -603,16 +528,6 @@ func base_value_text() -> String:
     return "$%d" % _anchor_flat_value()
 
 
-## DEPRECATED: Removed in Phase 9 (merchant system redesign → unified customer selling).
-func merchant_offer_text(merchant: MerchantData) -> String:
-    return "$%d" % merchant_offer_value(merchant)
-
-
-## DEPRECATED: Removed in Phase 9 (merchant system redesign → unified customer selling).
-func special_order_text(order: SpecialOrder) -> String:
-    return "$%d" % special_order_value(order)
-
-
 func rarity_text() -> String:
     if is_veiled() or item_data == null:
         return ItemEntry.UNKNOWN_TEXT
@@ -636,10 +551,6 @@ func grid_text() -> String:
     if is_veiled() or category == null:
         return ItemEntry.UNKNOWN_TEXT
     return "%d  %s" % [category.get_cells().size(), category.shape_id]
-
-
-func market_factor_text() -> String:
-    return ItemEntry.UNKNOWN_TEXT if is_veiled() else "%+d%%" % int(round(market_factor_delta * 100))
 
 
 func inspection_text() -> String:
@@ -700,7 +611,7 @@ func has_inspection_clues() -> bool:
     return false
 
 
-func sort_value(column: int, ctx: ItemViewContext) -> Variant:
+func sort_value(column: int) -> Variant:
     match column:
         ItemEntry.COLUMN_NAME:
             return display_name
@@ -712,10 +623,6 @@ func sort_value(column: int, ctx: ItemViewContext) -> Variant:
             return estimated_value_sort_value()
         ItemEntry.COLUMN_BASE_VALUE:
             return base_value_sort_value()
-        ItemEntry.COLUMN_MERCHANT_OFFER:
-            return merchant_offer_value(ctx.merchant)
-        ItemEntry.COLUMN_SPECIAL_ORDER:
-            return special_order_value(ctx.order)
         ItemEntry.COLUMN_RARITY:
             return float(item_data.rarity) if verified and item_data != null else -1.0
         ItemEntry.COLUMN_WEIGHT:
@@ -724,8 +631,6 @@ func sort_value(column: int, ctx: ItemViewContext) -> Variant:
         ItemEntry.COLUMN_GRID:
             var grid_category := category_data()
             return grid_category.get_cells().size() if grid_category != null else 0
-        ItemEntry.COLUMN_MARKET_FACTOR:
-            return market_factor_delta
         ItemEntry.COLUMN_INSPECTION:
             return price_convergence_ratio
         _:
