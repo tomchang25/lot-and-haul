@@ -203,7 +203,7 @@ Not now: hand-curated `ItemData` gives full designer control and isolates variab
 
 Flows currently being built. One-line pointer each — same format as `## Plan`, just promoted here when work starts. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress → this section is empty.
 
-- [day-structure] Time-slot day + storage AP economy: 3-slot day (morning/afternoon/evening), 10 AP/day pool for storage actions, customer scaling by slot commitment. See `dev/docs/plans/time_slot_economy.md`.
+- [day-structure] Time-slot day + storage AP economy (IN PROGRESS - see dev/docs/plans/time_slot_economy_impl_spec.md)
 
 ---
 

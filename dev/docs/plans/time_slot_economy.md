@@ -1,14 +1,21 @@
 # Time-Slot Day Structure & Storage AP Economy
 
-## Problem
+## Goal
 
-The hub phase has two problems. Storage actions run on passive day-counters with no player agency — the player assigns an item, then clicks "day pass" repeatedly until timers tick down. Meanwhile, the run/hub boundary is binary: the player either goes to auction (consumes one or more full days) or stays home with nothing interesting to do besides advance timers.
+Replace the hub phase's passive day-counter model with a **3-slot day** (morning, afternoon, evening) in which the player allocates each slot to one activity, and move storage work onto an action-point (AP) economy. Today the hub has no moment-to-moment agency — the player assigns an item, then clicks "day pass" repeatedly until timers tick down — and the run/hub boundary is all-or-nothing: go to auction (a whole-day commitment) or stay home advancing timers. The slot model lets a single day mix auction, storage, and selling, and the AP economy turns storage from a waiting game into a budgeted set of choices.
 
-## Solution Overview
+## Requirements
 
-Replace atomic days with a **3-slot day** (morning, afternoon, evening). Each slot the player allocates to one activity. Storage actions cost **AP** from a daily pool instead of running on day-timers. Customer count scales with slots committed to selling.
+1. Replace atomic calendar days with a 3-slot day; the player allocates each slot to an activity (Auction, Storage, or Open Shop) from the hub.
+2. Run storage actions on a per-slot AP pool instead of passive day-timers — a fresh pool each storage slot, so committing more slots to storage does proportionally more work (mirroring how committing more slots to selling raises customer traffic).
+3. Make hidden-clue research deterministic — no success roll. Variance belongs at the time-pressured auction; in slow storage work, repeated bad luck only punishes a player who has already paid slots, AP, and living cost.
+4. Replace the auction's per-lot fixed action quota with a two-tier inspection AP pool: a per-lot cap plus a reserve that tops the cap back up only at lot boundaries.
+5. Scale nightly customer count with the number of slots the player commits to selling.
+6. Preserve existing saves and in-progress item state (condition, revealed clues, partial research) across the change without losing player work.
 
-## Slot Model
+## Design
+
+### Slot Model
 
 Each calendar day has three slots:
 
@@ -18,75 +25,87 @@ Each calendar day has three slots:
 | 2    | Afternoon |
 | 3    | Evening   |
 
-The player allocates each slot from the hub. The three activities:
+The three activities a slot can hold:
 
-- **Auction** — Morning only. Consumes slots 1+2 (morning + afternoon). Player travels to the location, inspects/bids/loads cargo, and returns for the evening slot. Only one auction per day.
-- **Storage** — Player enters the storage scene, spends AP from the daily pool on Repair/Restore/Research. Available in any unallocated slot. Multiple storage slots in one day let the player check progress and do more work.
-- **Open Shop** — Triggers the customer sell scene immediately and ends the day. Customer count is determined by how many of the 3 slots are being committed to selling (see Customer Scaling below).
+- **Auction** — Morning only. Consumes slots 1+2 (morning + afternoon): the player travels to the location, inspects/bids/loads cargo, and returns for the evening slot. One auction per day.
+- **Storage** — The player works items with a fresh per-slot AP pool on Repair/Restore/Research. Available in any unallocated slot. Each storage slot grants its own full pool, so multiple storage slots in a day stack into proportionally more work.
+- **Open Shop** — Triggers the nightly customer sell immediately and ends the day. Customer count depends on how many of the day's slots are committed to selling (see Customer Scaling).
 
-### Slot Flow by Example
+Slot-flow examples:
 
-**Auction day:** Slot 1 = Auction, Slot 2 = (auto-locked as travel/auction), Slot 3 = free (Storage or Open Shop).
+- **Auction day:** Slot 1 = Auction, Slot 2 = locked to travel/auction, Slot 3 = free (Storage or Open Shop).
+- **Storage-heavy day:** Slot 1 = Storage, Slot 2 = Storage, Slot 3 = Open Shop.
+- **Full shop day:** Slot 1 = Open Shop — a 3-slot commitment: shop opens at once, maximum customers, day ends.
+- **Mixed day:** Slot 1 = Storage, Slot 2 = Open Shop — a 2-slot commitment, moderate customers.
 
-**Storage-heavy day:** Slot 1 = Storage, Slot 2 = Storage, Slot 3 = Open Shop.
+### Storage AP Economy
 
-**Full shop day:** Slot 1 = Open Shop (3-slot commitment: player opens immediately, gets max customers, day ends).
+Storage actions consume AP from a **per-slot** pool, replacing the day-counter/tick model.
 
-**Mixed day:** Slot 1 = Storage, Slot 2 = Open Shop (2-slot commitment, moderate customers).
+- **Pool size:** 10 AP per storage slot (flat; revisited after playtesting).
+- **Refresh:** Full pool at the start of every Storage slot — not once per calendar day. A 2-storage-slot day grants 10 + 10 = 20 AP of total work.
+- **Leftover:** Unspent AP is discarded when the slot ends; it never carries into the next slot.
 
-## Storage AP Economy
+Action costs and effects:
 
-Storage actions consume AP from a daily pool. This replaces the current day-counter/tick model.
+| Action       | AP Cost | Effect                                                                                                                                                                                                       |
+| ------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Repair**   | 3 AP    | Condition rises by a base increment scaled by storage zone and item rarity, capped at 0.5.                                                                                                                   |
+| **Restore**  | 4 AP    | Condition rises by a larger base increment scaled by storage zone, rarity, and the Restoration attribute, capped at 1.0.                                                                                     |
+| **Research** | 5 AP    | Deterministic — no roll. Each spend adds `5 + Investigation attribute` progress toward one target hidden clue; the clue reveals when accumulated progress ≥ its DC. Unavailable when no hidden clues remain. |
 
-### AP Pool
+Each action applies immediately on selection — no day-tick delay. One press applies one action's worth of effect.
 
-- **Size:** 10 AP per day (flat; revisited after playtesting)
-- **Refresh:** Full pool at the start of each calendar day (after day summary)
-- **Tracking:** `SaveManager` field + display in storage scene header
+**Per-slot budget math** — 10 AP is the budget for _one_ storage slot:
 
-### Action Costs & Effects
+| Single-Slot Plan         | AP Used | Notes                             |
+| ------------------------ | ------- | --------------------------------- |
+| 2× Repair + 1× Research  | 11      | Over budget — must drop one       |
+| 1× Restore + 1× Research | 9       | Feasible, 1 AP waste              |
+| 3× Repair                | 9       | Full-condition push, 1 AP waste   |
+| 2× Research              | 10      | Research-focused slot             |
+| 1× Restore + 1× Repair   | 7       | Mixed, 3 AP leftover              |
+| 1× Repair                | 3       | Light maintenance, rest AP unused |
 
-| Action       | AP Cost | Effect                                                                                                                                                        |
-| ------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Repair**   | 3 AP    | Condition += `REPAIR_BASE * zone_factor * rarity_factor`, capped at 0.5. Uses existing `ResearchSlot.apply_repair()` math.                                    |
-| **Restore**  | 4 AP    | Condition += `RESTORE_BASE * zone_factor * rarity_factor * (1 + restoration_attr * 0.4)`, capped at 1.0. Uses existing `ResearchSlot.apply_restore()` math.   |
-| **Research** | 5 AP    | One attempt to reveal a hidden clue. Rolls `attempt_clue(clue, attribute_bonus)` against the clue's DC. If no hidden clues remain, the action is unavailable. |
+A player who wants to do more spends _another slot_ on Storage for a fresh 10 AP — the cost is the auction or selling given up, not a shared daily ceiling.
 
-### Per-Day Budget Math
+> **Tuning note:** these numbers were first calibrated against a shared daily pool. With 10 AP now per slot (a 2–3 storage-slot day yields 20–30 AP), the per-slot amount and/or action costs need a retuning pass before release — 10/slot may make full authentication too cheap once slots are stacked.
 
-With 10 AP and the costs above:
+**Why research is deterministic, not a roll:** variance belongs where there is tension and a clock — the on-site auction, where the inspection mechanic stays a gamble. Storage research is a slow, deliberate investment of slots, AP, and living cost; a fail-roll there only punishes commitment and produces "spent three slots, revealed nothing" feel-bad outcomes. Deterministic research gives a clean split — **gamble at the auction, grind in storage.** The clue's DC stays meaningful (it sets how much total research a clue costs) and the Investigation attribute still matters (it raises progress per AP), just without luck. Research progress accumulates per in-progress clue and persists across slots and days, so a single clue can be worked toward over several sessions.
 
-| Daily Plan                               | AP Used | Notes                          |
-| ---------------------------------------- | ------- | ------------------------------ |
-| 2× Repair + 1× Research                  | 11      | Over budget — must drop one    |
-| 1× Restore + 1× Research                 | 9       | Feasible, 1 AP waste           |
-| 3× Repair                                | 9       | Full condition day, 1 AP waste |
-| 2× Research (attempts)                   | 10      | Full research day              |
-| 1× Restore + 1× Repair                   | 7       | Mixed, 3 AP leftover           |
-| 1× Repair (+ evening slot after auction) | 3       | Light evening maintenance      |
+### Auction AP Economy
 
-The intent is that 10 AP forces meaningful choices but doesn't feel stingy. Leftover AP is fine — it's lost at day end.
+Auction inspection AP is a **two-tier** pool, separate from the storage pool. It is consumptive within a lot and refills only at lot boundaries.
 
-### UI Impact on Storage Scene
+- **AP (cap 10):** the spendable budget for inspecting the _current_ lot. Hard-capped at 10 with no buffs — the cap is the burst lever. Within a single lot, AP is pure consume; once spent it does not regenerate mid-lot.
+- **Refill Metric (reserve):** a finite reserve for the whole auction visit — the endurance lever.
 
-Current storage scene (`game/meta/storage/storage_scene.gd`): three action buttons (Repair, Research, Restore) that call `MetaManager.assign_research_slot()`. Under the new model:
+Refill cadence — at lot boundary only:
 
-1. Each button deducts AP on press instead of assigning a slot
-2. A persistent AP bar at the top shows `AP: 8 / 10`
-3. Buttons are grayed out when AP < cost or the action is inapplicable (e.g., condition already ≥ 0.5 for Repair, no hidden clues left for Research)
-4. The action executes immediately — no day-tick delay
-5. Completed actions emit the same knowledge XP events as the current tick model
-6. Remove the old `ResearchSlot` day-ticker — `_tick_research_slots()` is deleted from `MetaManager`
+1. The player inspects the current lot, spending AP down (possibly to 0).
+2. When the lot's auction ends, AP refills back toward the cap from the Refill Metric, paying only the **deficit** (`cap − current AP`).
+3. The next lot begins with the refilled AP.
+4. When the Refill Metric is empty, no refill happens — later lots run on whatever AP is left, eventually reaching 0.
+5. **Partial refill:** if the reserve can't cover the full deficit, it tops up as much as it can and goes to 0 (it never refuses to refill).
 
-### Per-Action Cadence vs. Day Ticks
+The two tiers are independent levers: raising the **cap** deepens inspection of any single lot (never exceeding the cap within one lot, no matter how full the reserve); raising the **Refill Metric** lets the player inspect more lots deeply across one visit. Because refill only pays the deficit, **under-spending on a weak lot preserves the reserve for later good lots** — a built-in "don't over-inspect junk" incentive with no extra rules.
 
-Currently, Repair/Restore apply incremental gains per day-tick. In the AP model, each button press applies one tick's worth of gain. Research previously took 1-5 calendar days and auto-revealed ALL hidden clues on completion. Now each 5-AP attempt tries to reveal one hidden clue, with the success roll determined by attributes vs. clue DC — consistent with the inspection scene's `attempt_clue()` mechanic.
+Worked example (cap 10, Metric 30):
 
-**Items already in-progress:** On migration, convert days-remaining for Research into a fraction (research_days_spent / RESEARCH_DAYS[rarity]) × hidden_clue_count, rounded down as already-revealed clues. For Repair/Restore, no conversion needed — condition is already tracked as a float.
+```
+Enter      AP 10 / Metric 30
+Lot1 -8    AP 2  → end: refill deficit 8  → AP 10 / Metric 22
+Lot2 -10   AP 0  → end: refill deficit 10 → AP 10 / Metric 12
+Lot3 -10   AP 0  → end: refill deficit 10 → AP 10 / Metric 2
+Lot4 -10   AP 0  → end: refill deficit 2 (reserve short) → AP 2 / Metric 0
+Lot5       only 2 AP available, no further refill
+```
 
-## Customer Scaling by Slot Commitment
+This replaces the current per-lot fixed action quota: inspection is no longer gated by a number stored on each lot, but by the shared two-tier pool, capped per lot. A specific lot may still cap below the pool maximum if a designer wants it tighter.
 
-When the player chooses "Open Shop," the number of daily customers scales with slots consumed:
+### Customer Scaling by Slot Commitment
+
+When the player opens shop, nightly customer count scales with the slots committed to selling:
 
 | Slots Committed            | Customer Count | Description                      |
 | -------------------------- | -------------- | -------------------------------- |
@@ -94,26 +113,17 @@ When the player chooses "Open Shop," the number of daily customers scales with s
 | 2 (afternoon + evening)    | 4–6            | Moderate window, bonus 1–2       |
 | 3 (full day)               | 7–10           | Full-day commitment, max traffic |
 
-**Mechanic:** When the player clicks "Open Shop," the slot count is passed through to `MetaManager._generate_nightly_customers(count_hint)`. The existing `Customer.generate_for_night()` already accepts a count override — wire it.
+The committed slot count drives how many customers arrive that night. Opening shop in slot 1 ends the day immediately with full 3-slot traffic (the player is committing the whole day); opening after an auction (evening only) gives 1-slot traffic.
 
-**Open Shop from any slot:** If the player opens shop in slot 1, the day ends immediately with 3-slot-equivalent customers (the player is committing the entire day). If after auction (slot 3 only), they get 1-slot customers.
+### Living Cost
 
-## Living Cost
+Living cost stays per calendar day, not per slot — a day is a calendar day regardless of how its slots are spent.
 
-Stays at `DAILY_BASE_COST × 1 day` — not per-slot. A day is a calendar day.
+### Hub Presentation
 
-## Hub UI Changes
+The hub drops the Day Pass control and presents a **slot tray**: three slots with filled/empty indicators. Each unfilled slot offers an activity chooser — Auction, Storage, Open Shop. Auction is selectable only in slot 1 and is otherwise greyed with a tooltip. After a slot is allocated the hub re-renders for the next slot; after the final slot is spent, or whenever Open Shop is chosen, the day transitions to the day summary.
 
-Current hub: buttons for Storage, Sell, Vehicle, Knowledge, Next Run, Day Pass. Slot model changes:
-
-1. Remove **Day Pass** button and `day_pass_dialog.tscn`
-2. Add **Slot Tray** — shows 3 slots (filled/empty indicators). Each unfilled slot shows available actions.
-3. Add **Activity Chooser** per unfilled slot: [Auction] [Storage] [Open Shop]
-4. Auction button (slot 1 only) — greys out with tooltip if not slot 1
-5. Next Run is replaced by Auction (slot 1 choice)
-6. Storage and Sell buttons are replaced by slot-based choices
-
-**Hub layout sketch:**
+Layout sketch:
 
 ```
 [Day 7]          [● Slot 1: Morning]  [○ Slot 2: Afternoon]  [○ Slot 3: Evening]
@@ -122,53 +132,31 @@ Current hub: buttons for Storage, Sell, Vehicle, Knowledge, Next Run, Day Pass. 
 [Mastery: R3]  [$ 12,450]  [Storage: 8/20]
 ```
 
-After allocating slot 1, the hub re-renders for slot 2, etc. After slot 3 (or Open Shop from any slot), transitions to day summary.
+### State Persistence
 
-## Day Summary Changes
+- Storage AP is ephemeral: it refreshes to full at the start of each storage slot and any leftover is discarded when the slot ends — it never persists or carries between slots.
+- Research progress per hidden clue persists across slots and days, so a clue can be revealed over multiple work sessions.
+- Auction AP (both tiers) is scoped to one auction visit and resets when a new visit starts; it is not preserved mid-visit across sessions, consistent with a run being a single sitting.
+- The day summary reflects how many slots were used and how many storage actions were taken.
+- Existing saves and in-progress items carry over without losing work: condition and already-revealed clues are preserved, and any partial research in flight is converted into starting progress under the new model rather than discarded.
 
-`DaySummary` gains:
+## Non-Goals
 
-- `slots_used: int` (1-3)
-- `storage_actions_taken: int` (sum of Repair + Restore + Research actions performed)
-- Existing `completed_actions` array still records each action for display
+1. Do not redesign the nightly customer sell mechanics beyond making customer count scale with slot commitment.
+2. Do not change the on-site auction inspection mechanic — it stays a roll. Only storage research becomes deterministic.
+3. Do not add AP or endurance progression levers yet (perks, vehicle upgrades, attribute thresholds that raise the storage pool, the auction cap, or the Refill Metric) — all pool sizes are flat for this pass.
+4. Do not move living cost to per-slot; it stays per calendar day.
+5. Do not change how anchor/surface clues or appraisal pricing work.
 
-No structural changes to the summary scene itself — just new data fields.
+## Acceptance Criteria
 
-## Save Format Changes
-
-`SaveManager` gains:
-
-- `current_slot: int` (0 = day hasn't started, 1-3 = current slot index)
-- `storage_ap: int` (current AP available for storage)
-- Remove: `research_slots` array (the old day-ticker slots) — replaced by ephemeral per-action execution
-- Migration: detect legacy `research_slots` on load and discard. Items' condition and `revealed_clue_ids` are already persisted — no data loss.
-
-## Open Questions (Resolved)
-
-1. **Shared vs. separate AP?** — Separate. Inspection uses per-lot `actions_remaining` from `lot_data.action_quota`. Storage uses a daily pool. Different contexts, no shared pool needed.
-2. **Daily AP pool scaling?** — Flat 10 AP/day. Revisit after base flow is playable. Candidate progression levers: perks that add +2 AP, vehicle-upgrade unlocks, attribute threshold bonuses.
-3. **Customer count curves?** — 1 slot: 2–3, 2 slots: 4–6, 3 slots: 7–10. Verified after playtesting.
-
-## Implementation Order
-
-| Step | Description                                                                                                                                                                        | Files Impacted                                                    |
-| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| 1    | Add `storage_ap` to SaveManager, MetaManager, and DaySummary. Expose as `MetaManager.storage_ap` / `MetaManager.max_storage_ap`                                                    | `save_manager.gd`, `meta_manager.gd`, `day_summary.gd`            |
-| 2    | Add AP bar to storage scene UI. Modify `_assign_action()` to deduct AP and execute immediately (no slot assignment). Gray out buttons when AP insufficient or action inapplicable. | `storage_scene.gd`, `storage_scene.tscn`                          |
-| 3    | Delete `ResearchSlot` day-ticker logic. Remove `_tick_research_slots()` from MetaManager. Remove `assign_research_slot()` / `remove_research_slot()`.                              | `meta_manager.gd`, `research_slot.gd` (or inline)                 |
-| 4    | Build slot tray + activity chooser into hub. Remove Day Pass button + dialog. Wire Auction → location select, Storage → storage scene, Open Shop → customer sell with slot count.  | `hub_scene.gd`, `hub_scene.tscn`, `day_pass_dialog.tscn` (delete) |
-| 5    | Modify `_generate_nightly_customers()` to accept slot count.                                                                                                                       | `meta_manager.gd`, `customer.gd`                                  |
-| 6    | Update DaySummary to capture per-slot data. Verify summary scene displays new fields gracefully when missing.                                                                      | `day_summary.gd`, `day_summary_scene.gd`                          |
-| 7    | Add save migration: detect legacy `research_slots`, discard them, set fresh defaults.                                                                                              | `save_manager.gd`                                                 |
-| 8    | Tuning pass: AP pool size, action costs, customer curves. Remove debug logging.                                                                                                    | —                                                                 |
-
-## Post-Implementation Validation
-
-- Storage actions execute immediately on button press and consume AP
-- AP bar updates correctly and grays out buttons appropriately
-- Auction consumes 2 slots, returns for evening
-- Customer count matches slot commitment
-- Open Shop from any slot ends the day
-- Living cost deducted once per day (not per slot)
-- Legacy saves load without error, old research_slots silently discarded
-- Day summary correctly reflects the day's activity
+1. A day is three slots; the player allocates each to Auction, Storage, or Open Shop, and an auction consumes the morning and afternoon slots and returns the player for the evening.
+2. Storage actions execute immediately on selection and consume AP from a pool that is full at the start of each storage slot; a two-storage-slot day provides two full pools.
+3. Storage actions are unavailable when AP is insufficient or the action does not apply (condition already at its repair cap, or no hidden clues remain).
+4. Research always converts AP into progress and never fails a reveal; a hidden clue reveals once its accumulated progress reaches its DC, and progress carries across slots and days.
+5. Auction inspection AP is capped per lot, never regenerates within a lot, and refills toward the cap — paying only the deficit, partial when the reserve is short — only at lot boundaries, stopping once the reserve is empty.
+6. Nightly customer count matches the number of slots committed to selling.
+7. Choosing Open Shop ends the day from whatever slot it is chosen in.
+8. Living cost is deducted once per calendar day, not per slot.
+9. Existing saves load without error and in-progress items retain their condition, revealed clues, and partial research.
+10. The day summary reflects the day's slot usage and storage activity.
