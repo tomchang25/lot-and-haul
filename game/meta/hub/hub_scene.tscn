@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://bhubscene0001"]
 
 [ext_resource type="Script" uid="uid://cpdf8haohlsir" path="res://game/meta/hub/hub_scene.gd" id="1_hubgd"]
-[ext_resource type="PackedScene" path="res://game/meta/hub/day_pass_dialog/day_pass_dialog.tscn" id="2_dpdlg"]
 
 [node name="HubScene" type="Control" unique_id=1000000001]
 layout_mode = 3
@@ -63,6 +62,14 @@ theme_override_font_sizes/font_size = 18
 text = "Storage:   0 items"
 horizontal_alignment = 1
 
+[node name="SlotLabel" type="Label" parent="RootVBox" unique_id=1000000014]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.75, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "Day 0   |   ► Morning  ○ Afternoon  ○ Evening"
+horizontal_alignment = 1
+
 [node name="ButtonsVBox" type="VBoxContainer" parent="RootVBox" unique_id=1000000008]
 layout_mode = 2
 size_flags_horizontal = 4
@@ -74,21 +81,21 @@ custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
-text = "Next Run"
+text = "Auction  (Morning)"
 
 [node name="StorageButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000010]
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
-text = "Storage"
+text = "Storage  (work items)"
 
 [node name="MerchantButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000011]
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
-text = "Night Market"
+text = "Open Shop"
 
 [node name="VehicleButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000012]
 custom_minimum_size = Vector2(240, 52)
@@ -103,12 +110,3 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
 text = "Knowledge"
-
-[node name="DayPassButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1984289116]
-custom_minimum_size = Vector2(240, 52)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 18
-text = "Day Pass"
-
-[node name="DayPassDialog" parent="." instance=ExtResource("2_dpdlg")]

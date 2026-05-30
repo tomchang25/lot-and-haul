@@ -37,6 +37,8 @@ func _populate_cards() -> void:
 
 func _on_card_pressed(card: LocationCard) -> void:
     var location := card.get_location_data()
+
+    MetaManager.begin_auction()
     RunManager.run_record = RunRecord.create(
         location,
         SaveManager.active_car,

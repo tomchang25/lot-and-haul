@@ -1,8 +1,9 @@
 # storage_scene.gd
-# Storage — Displays stored items and assigns them to research slots.
-# V1 layout: dense table (left) + detail rail (right) with task cards.
-# Reads:  SaveManager.storage_items, SaveManager.research_slots
-# Writes: MetaManager.assign_research_slot, MetaManager.remove_research_slot
+# Storage — Displays stored items and lets the player spend AP on Repair,
+# Restore, and Research actions immediately. No slot-assignment UI.
+# V2 layout: dense table (left) + detail rail (right) with AP bar + action buttons.
+# Reads:  SaveManager.storage_items, SaveManager.storage_ap
+# Writes: MetaManager.repair_item, MetaManager.restore_item, MetaManager.research_item
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -31,16 +32,16 @@ var _selected_entry: ItemEntry = null
 @onready var _footer_status_label: Label = %FooterStatusLabel
 @onready var _back_btn: Button = %BackButton
 
-# Right — tasks
-@onready var _task_ready_label: Label = %TaskReadyLabel
-@onready var _task_container: VBoxContainer = %TaskContainer
-
-# Right — detail
+# Right — AP bar and detail
+@onready var _ap_label: Label = %APLabel
 @onready var _detail_section: VBoxContainer = %DetailSection
 @onready var _detail_name_label: Label = %DetailNameLabel
 @onready var _auth_tag_label: Label = %AuthTagLabel
 @onready var _detail_category_label: Label = %DetailCategoryLabel
 @onready var _detail_rarity_label: Label = %DetailRarityLabel
+@onready var _detail_rarity_hbox: HBoxContainer = %DetailRarityHBox
+@onready var _detail_stats_hbox: HBoxContainer = %DetailStatsHBox
+@onready var _convergence_panel: PanelContainer = %ConvergencePanel
 @onready var _detail_cond_value: Label = %CondValueLabel
 @onready var _detail_est_value: Label = %ValueValueLabel
 @onready var _detail_conv_ratio: Label = %ConvRatioLabel
@@ -52,7 +53,6 @@ var _selected_entry: ItemEntry = null
 @onready var _repair_btn: Button = %RepairButton
 @onready var _research_btn: Button = %ResearchButton
 @onready var _restore_btn: Button = %RestoreButton
-@onready var _remove_btn: Button = %RemoveButton
 @onready var _value_title_label: Label = %ValueTitleLabel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
@@ -66,20 +66,20 @@ func _ready() -> void:
     _repair_btn.pressed.connect(_on_repair_pressed)
     _research_btn.pressed.connect(_on_research_pressed)
     _restore_btn.pressed.connect(_on_restore_pressed)
-    _remove_btn.pressed.connect(_on_remove_pressed)
 
     _item_list_panel.row_pressed.connect(_on_row_pressed)
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
     _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
 
+    _refresh_ap_label()
     _populate_rows()
-    _populate_tasks()
     _refresh_detail()
 
 # ══ Signal handlers ═══════════════════════════════════════════════════════════
 
 
 func _on_back_pressed() -> void:
+    # Slot already committed on entry — leaving returns to hub for the next slot.
     GameManager.go_to_hub()
 
 
@@ -95,24 +95,44 @@ func _on_row_tooltip_requested(
 
 
 func _on_repair_pressed() -> void:
-    _assign_action(ResearchSlot.SlotAction.REPAIR)
+    if _selected_entry == null:
+        return
+    if MetaManager.repair_item(_selected_entry):
+        _refresh_row(_selected_entry)
+        _refresh_ap_label()
+        _refresh_detail()
 
 
 func _on_research_pressed() -> void:
-    _assign_action(ResearchSlot.SlotAction.RESEARCH)
+    if _selected_entry == null:
+        return
+    if MetaManager.research_item(_selected_entry):
+        _refresh_row(_selected_entry)
+        _refresh_ap_label()
+        _refresh_detail()
 
 
 func _on_restore_pressed() -> void:
-    _assign_action(ResearchSlot.SlotAction.RESTORE)
-
-
-func _on_remove_pressed() -> void:
     if _selected_entry == null:
         return
-    MetaManager.remove_research_slot(_selected_entry)
-    _refresh_row(_selected_entry)
-    _populate_tasks()
-    _refresh_detail()
+    if MetaManager.restore_item(_selected_entry):
+        _refresh_row(_selected_entry)
+        _refresh_ap_label()
+        _refresh_detail()
+
+# ══ AP label ══════════════════════════════════════════════════════════════════
+
+
+func _refresh_ap_label() -> void:
+    var ap: int = SaveManager.storage_ap
+    var max_ap: int = Economy.STORAGE_AP_MAX
+    _ap_label.text = "AP:  %d / %d" % [ap, max_ap]
+    if ap == 0:
+        _ap_label.add_theme_color_override("font_color", Color(0.6, 0.4, 0.4))
+    elif ap <= 4:
+        _ap_label.add_theme_color_override("font_color", Color(0.95, 0.75, 0.3))
+    else:
+        _ap_label.add_theme_color_override("font_color", Color(0.4, 0.85, 1.0))
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 
@@ -142,111 +162,6 @@ func _populate_rows() -> void:
 func _refresh_row(entry: ItemEntry) -> void:
     _item_list_panel.refresh_row(entry)
 
-# ══ Tasks ═════════════════════════════════════════════════════════════════════
-
-
-func _populate_tasks() -> void:
-    for child: Node in _task_container.get_children():
-        child.queue_free()
-
-    var active_count: int = 0
-
-    for d: Dictionary in SaveManager.research_slots:
-        var slot := ResearchSlot.from_dict(d)
-        if slot.is_empty():
-            continue
-
-        active_count += 1
-
-        var entry: ItemEntry = _find_entry_by_id(slot.item_id)
-        var card := _build_task_card(slot, entry)
-        _task_container.add_child(card)
-
-    _task_ready_label.text = "%d/%d" % [active_count, SaveManager.max_research_slots]
-
-
-func _build_task_card(slot: ResearchSlot, entry: ItemEntry) -> PanelContainer:
-    var card := PanelContainer.new()
-
-    var margin := MarginContainer.new()
-    margin.add_theme_constant_override("margin_left", 8)
-    margin.add_theme_constant_override("margin_top", 6)
-    margin.add_theme_constant_override("margin_right", 8)
-    margin.add_theme_constant_override("margin_bottom", 6)
-    card.add_child(margin)
-
-    var hbox := HBoxContainer.new()
-    hbox.add_theme_constant_override("separation", 8)
-    margin.add_child(hbox)
-
-    # ── Action type label ─────────────────────────────────────────────────────
-    var kind_label := Label.new()
-    kind_label.add_theme_font_size_override("font_size", 10)
-    kind_label.text = ResearchSlot.action_to_string(slot.action).to_upper()
-    match slot.action:
-        ResearchSlot.SlotAction.RESEARCH:
-            kind_label.add_theme_color_override("font_color", Color(0.6, 0.9, 0.4))
-        _:
-            kind_label.add_theme_color_override("font_color", Color(0.42, 0.75, 0.85))
-    kind_label.custom_minimum_size.x = 52
-    hbox.add_child(kind_label)
-
-    # ── Target + status ───────────────────────────────────────────────────────
-    var info_vbox := VBoxContainer.new()
-    info_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    info_vbox.add_theme_constant_override("separation", 2)
-    hbox.add_child(info_vbox)
-
-    var name_label := Label.new()
-    name_label.add_theme_font_size_override("font_size", 12)
-    name_label.text = entry.display_name if entry != null else "Unknown"
-    name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-    info_vbox.add_child(name_label)
-
-    var status_label := Label.new()
-    status_label.add_theme_font_size_override("font_size", 10)
-    if slot.completed:
-        status_label.text = "Completed"
-        status_label.add_theme_color_override("font_color", Color(0.4, 1.0, 0.5))
-    else:
-        status_label.text = _task_progress_text(entry, slot)
-        status_label.add_theme_color_override("font_color", Color(0.55, 0.58, 0.63))
-    info_vbox.add_child(status_label)
-
-    # ── Click to select ───────────────────────────────────────────────────────
-    if entry != null:
-        card.gui_input.connect(
-            func(event: InputEvent) -> void:
-                if event is InputEventMouseButton and event.pressed:
-                    _select_entry(entry)
-        )
-        card.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-
-    return card
-
-
-func _research_progress_text(slot: ResearchSlot, entry: ItemEntry) -> String:
-    if slot.completed:
-        return "Verified"
-    return "Researching… Day %d/%d" % [
-        slot.research_days_spent,
-        Economy.RESEARCH_DAYS.get(entry.item_data.rarity, 3),
-    ]
-
-
-func _task_progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
-    if entry == null:
-        return ""
-    match slot.action:
-        ResearchSlot.SlotAction.REPAIR:
-            return "Condition: %d%%" % int(entry.condition * 100)
-        ResearchSlot.SlotAction.RESTORE:
-            return "Condition: %d%%" % int(entry.condition * 100)
-        ResearchSlot.SlotAction.RESEARCH:
-            return _research_progress_text(slot, entry)
-        _:
-            return ""
-
 # ══ Detail panel ══════════════════════════════════════════════════════════════
 
 
@@ -269,13 +184,12 @@ func _refresh_detail() -> void:
     var has_selection: bool = _selected_entry != null
     _no_selection_label.visible = not has_selection
 
-    # Hide detail content when nothing selected
     _detail_name_label.visible = has_selection
     _auth_tag_label.visible = false
     _detail_category_label.visible = has_selection
-    _detail_section.get_node("DetailRarityHBox").visible = has_selection
-    _detail_section.get_node("DetailStatsHBox").visible = has_selection
-    _detail_section.get_node("ConvergencePanel").visible = has_selection
+    _detail_rarity_hbox.visible = has_selection
+    _detail_stats_hbox.visible = has_selection
+    _convergence_panel.visible = has_selection
     _action_grid.visible = has_selection
     _progress_label.visible = false
 
@@ -295,7 +209,7 @@ func _refresh_detail() -> void:
     else:
         _detail_category_label.text = "#%d" % entry.id
 
-    # ── Rarity ─────────────────────────────────────────────────────────────────
+    # ── Rarity ────────────────────────────────────────────────────────────────
     if entry.verified:
         _detail_rarity_label.text = "%s ✓" % entry.rarity_text()
     else:
@@ -309,7 +223,7 @@ func _refresh_detail() -> void:
     _detail_est_value.text = entry.estimated_value_text()
     _detail_est_value.add_theme_color_override(&"font_color", entry.price_color)
 
-    # ── Price convergence / verified value title ─────────────────────────────
+    # ── Price convergence / verified value title ──────────────────────────────
     if entry.verified:
         _detail_conv_ratio.text = "Verified"
         _detail_conv_ratio.modulate = Color(0.4, 1.0, 0.5)
@@ -330,118 +244,80 @@ func _refresh_detail() -> void:
         _detail_conv_ratio.modulate = Color(0.95, 0.75, 0.3) if ratio < 60.0 else Color.WHITE
         _value_title_label.text = "Est. Value"
 
-    # ── Slot status ───────────────────────────────────────────────────────────
-    var slot_index: int = _find_slot_index(entry)
-    var in_slot: bool = slot_index >= 0
-    var current_slot: ResearchSlot = null
-    if in_slot:
-        current_slot = ResearchSlot.from_dict(SaveManager.research_slots[slot_index])
-
-    if in_slot:
-        _progress_label.text = _progress_text(entry, current_slot)
-        _progress_label.visible = true
+    # ── Research progress ─────────────────────────────────────────────────────
+    if entry.has_unrevealed_hidden() and not entry.research_progress.is_empty():
+        for clue: ClueData in entry.item_data.clues:
+            if clue.type != ClueData.ClueType.HIDDEN:
+                continue
+            if entry.revealed_clue_ids.has(clue.clue_id):
+                continue
+            var progress: int = int(entry.research_progress.get(clue.clue_id, 0))
+            if progress > 0:
+                _progress_label.text = "Research: %d / %d" % [progress, clue.dc]
+                _progress_label.visible = true
+            break
 
     # ── Action buttons ────────────────────────────────────────────────────────
-    var slots_available: bool = in_slot \
-    or _empty_slot_index() >= 0 \
-    or SaveManager.research_slots.size() < SaveManager.max_research_slots
+    _configure_action_buttons(entry)
 
-    _configure_action_btn(_repair_btn, "Repair", entry, ResearchSlot.SlotAction.REPAIR, current_slot)
-    _configure_action_btn(_research_btn, "Research", entry, ResearchSlot.SlotAction.RESEARCH, current_slot)
-    _configure_action_btn(_restore_btn, "Restore", entry, ResearchSlot.SlotAction.RESTORE, current_slot)
 
-    if not slots_available:
-        _repair_btn.disabled = true
-        _research_btn.disabled = true
-        _restore_btn.disabled = true
-        _repair_btn.tooltip_text = "No research slots available"
-        _research_btn.tooltip_text = "No research slots available"
-        _restore_btn.tooltip_text = "No research slots available"
+func _configure_action_buttons(entry: ItemEntry) -> void:
+    var ap: int = SaveManager.storage_ap
 
-    # Repair / Restore: only show one at a time; never both visible.
-    var repair_available: bool = not _repair_btn.disabled
-    var restore_available: bool = not _restore_btn.disabled
-    if repair_available:
+    # ── Repair ──────────────────────────────────────────────────────────────
+    var repair_done: bool = ResearchSlot.is_repair_complete(entry)
+    var can_repair: bool = ap >= Economy.REPAIR_AP_COST and not repair_done
+    _repair_btn.disabled = not can_repair
+    _repair_btn.text = "Repair  [%d AP]" % Economy.REPAIR_AP_COST
+    if repair_done:
+        _repair_btn.tooltip_text = "Condition already at 50% — use Restore to continue"
+    elif ap < Economy.REPAIR_AP_COST:
+        _repair_btn.tooltip_text = "Not enough AP (need %d)" % Economy.REPAIR_AP_COST
+    else:
+        _repair_btn.tooltip_text = ""
+
+    # ── Restore ──────────────────────────────────────────────────────────────
+    var restore_done: bool = ResearchSlot.is_restore_complete(entry)
+    var not_ready: bool = entry.condition < 0.5
+    var can_restore: bool = ap >= Economy.RESTORE_AP_COST and not not_ready and not restore_done
+    _restore_btn.disabled = not can_restore
+    _restore_btn.text = "Restore  [%d AP]" % Economy.RESTORE_AP_COST
+    if not_ready:
+        _restore_btn.tooltip_text = "Repair to 50%% before restoring"
+    elif restore_done:
+        _restore_btn.tooltip_text = "Condition already fully restored"
+    elif ap < Economy.RESTORE_AP_COST:
+        _restore_btn.tooltip_text = "Not enough AP (need %d)" % Economy.RESTORE_AP_COST
+    else:
+        _restore_btn.tooltip_text = ""
+
+    # Show only Repair or Restore (whichever applies), never both.
+    if not repair_done:
         _repair_btn.visible = true
         _restore_btn.visible = false
-    elif restore_available:
+    elif not restore_done:
         _repair_btn.visible = false
         _restore_btn.visible = true
     else:
-        # Neither available — show Restore (disabled) as fallback
+        # Condition maxed — show Restore disabled as status indicator.
         _repair_btn.visible = false
         _restore_btn.visible = true
 
-    _remove_btn.visible = in_slot
-    _remove_btn.text = "Remove"
-
-
-func _configure_action_btn(
-        btn: Button,
-        label: String,
-        entry: ItemEntry,
-        action: ResearchSlot.SlotAction,
-        current_slot: ResearchSlot,
-) -> void:
-    var check: ResearchSlot.SlotCheck = ResearchSlot.check_assignable(entry, action)
-    btn.disabled = check != ResearchSlot.SlotCheck.OK
-    btn.tooltip_text = ResearchSlot.describe_blocked(check, entry)
-
-    var is_current: bool = current_slot != null and current_slot.action == action
-    if is_current:
-        btn.text = "✓ %s" % label
+    # ── Research ─────────────────────────────────────────────────────────────
+    var has_hidden: bool = entry.has_unrevealed_hidden()
+    var research_needs_repair: bool = entry.condition < 0.5
+    var can_research: bool = (
+        ap >= Economy.RESEARCH_AP_COST
+        and has_hidden
+        and not research_needs_repair
+    )
+    _research_btn.disabled = not can_research
+    _research_btn.text = "Research  [%d AP]" % Economy.RESEARCH_AP_COST
+    if not has_hidden:
+        _research_btn.tooltip_text = "No hidden clues remaining"
+    elif research_needs_repair:
+        _research_btn.tooltip_text = "Repair to 50%% condition before researching"
+    elif ap < Economy.RESEARCH_AP_COST:
+        _research_btn.tooltip_text = "Not enough AP (need %d)" % Economy.RESEARCH_AP_COST
     else:
-        btn.text = label
-
-
-func _progress_text(entry: ItemEntry, slot: ResearchSlot) -> String:
-    match slot.action:
-        ResearchSlot.SlotAction.REPAIR:
-            return "Condition: %d%%" % int(entry.condition * 100)
-        ResearchSlot.SlotAction.RESTORE:
-            return "Condition: %d%%" % int(entry.condition * 100)
-        ResearchSlot.SlotAction.RESEARCH:
-            return _research_progress_text(slot, entry)
-        _:
-            push_warning("StorageScene: unknown SlotAction %d" % slot.action)
-            return ""
-
-# ══ Assignment ════════════════════════════════════════════════════════════════
-
-
-func _assign_action(action: ResearchSlot.SlotAction) -> void:
-    if _selected_entry == null:
-        return
-    if not MetaManager.assign_research_slot(_selected_entry, action):
-        return
-    _refresh_row(_selected_entry)
-    _populate_tasks()
-    _refresh_detail()
-
-# ══ Slot lookups ══════════════════════════════════════════════════════════════
-
-
-func _find_slot_index(entry: ItemEntry) -> int:
-    if entry == null or entry.id == -1:
-        return -1
-    for i: int in range(SaveManager.research_slots.size()):
-        var d: Dictionary = SaveManager.research_slots[i]
-        var slot_item_id: int = int(d.get("item_id", -1))
-        if slot_item_id != -1 and slot_item_id == entry.id:
-            return i
-    return -1
-
-
-func _empty_slot_index() -> int:
-    for i: int in range(SaveManager.research_slots.size()):
-        var d: Dictionary = SaveManager.research_slots[i]
-        if int(d.get("item_id", -1)) == -1:
-            return i
-    return -1
-
-
-func _find_entry_by_id(item_id: int) -> ItemEntry:
-    for entry: ItemEntry in SaveManager.storage_items:
-        if entry.id == item_id:
-            return entry
-    return null
+        _research_btn.tooltip_text = ""

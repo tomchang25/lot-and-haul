@@ -14,20 +14,40 @@ var owned_cars: Array[CarData] = []
 var storage_items: Array = []
 
 var current_day: int = 0
-var max_research_slots: int = 4
 var next_entry_id: int = 0 # monotonically increasing; never reset
-var research_slots: Array = [] # Array of plain Dictionaries (ResearchSlot)
 var available_locations: Array[LocationData] = []
 var unlocked_perks: Array[String] = []
 var attribute_levels: Dictionary = { } # attribute_id (String) → int
+
+# ── Slot economy state ────────────────────────────────────────────────────────
+
+## Current slot index within the active day (1 = Morning, 2 = Afternoon,
+## 3 = Evening). > 3 means the day is ending — hub auto-calls end_day on entry.
+var current_slot: int = 1
+
+## AP remaining in the current storage slot. Refreshed to Economy.STORAGE_AP_MAX
+## at the start of each Storage slot; leftover is discarded when the slot ends.
+var storage_ap: int = 0
+
+## Selling slots committed to Open Shop this day. Set by begin_open_shop(),
+## consumed by end_day() to populate the DaySummary customer count.
+var selling_slots_today: int = 0
+
+## Run economics awaiting fold-in by end_day(). Populated by resolve_run() after
+## an auction; consumed and cleared by end_day(). Persisted so quitting during
+## the evening slot doesn't drop the run breakdown from the day summary. Empty
+## when no run is pending. Keys (all int): onsite_proceeds, paid_price,
+## entry_fee, fuel_cost, cargo_count.
+var pending_run: Dictionary = {}
+
+# ── Nightly customers ─────────────────────────────────────────────────────────
 
 ## Customers generated for the current night. Array of Customer dicts on disk.
 var nightly_customers: Array[Customer] = []
 
 ## Customer sales resolved during the current night, in order. Each entry is a
 ## plain Dictionary (day, customer_id/name, strategy, item_count, item_ids,
-## sale_price). Reset when the next night's customers are generated. Read by the
-## Day Summary rework (Phase 11) to report nightly selling.
+## sale_price). Reset when Open Shop begins (before customer generation).
 var customer_sales_today: Array[Dictionary] = []
 
 
@@ -54,14 +74,16 @@ func save() -> void:
         "owned_car_ids": serialized_owned_car_ids,
         "storage_items": serialized_items,
         "current_day": current_day,
-        "max_research_slots": max_research_slots,
         "next_entry_id": next_entry_id,
-        "research_slots": research_slots,
         "available_location_ids": serialized_available_location_ids,
         "unlocked_perks": unlocked_perks,
         "attribute_levels": attribute_levels,
         "nightly_customers": serialized_customers,
         "customer_sales_today": customer_sales_today,
+        "current_slot": current_slot,
+        "storage_ap": storage_ap,
+        "selling_slots_today": selling_slots_today,
+        "pending_run": pending_run,
     }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
     if file == null:
@@ -111,15 +133,8 @@ func _read_save_file() -> void:
                 storage_items.append(entry)
     if parsed.has("current_day") and parsed["current_day"] is float:
         current_day = int(parsed["current_day"])
-    if parsed.has("max_research_slots") and parsed["max_research_slots"] is float:
-        max_research_slots = int(parsed["max_research_slots"])
     if parsed.has("next_entry_id") and parsed["next_entry_id"] is float:
         next_entry_id = int(parsed["next_entry_id"])
-    if parsed.has("research_slots") and parsed["research_slots"] is Array:
-        research_slots = []
-        for d: Variant in parsed["research_slots"]:
-            if d is Dictionary:
-                research_slots.append(d)
     if parsed.has("available_location_ids") and parsed["available_location_ids"] is Array:
         available_locations = []
         for id: Variant in parsed["available_location_ids"]:
@@ -159,21 +174,78 @@ func _read_save_file() -> void:
                     rec["item_ids"] = _intify_array(rec["item_ids"])
                 customer_sales_today.append(rec)
 
+    # Slot economy fields (new in time-slot economy; default gracefully for old saves).
+    if parsed.has("current_slot") and parsed["current_slot"] is float:
+        current_slot = int(parsed["current_slot"])
+    if parsed.has("storage_ap") and parsed["storage_ap"] is float:
+        storage_ap = int(parsed["storage_ap"])
+    if parsed.has("selling_slots_today") and parsed["selling_slots_today"] is float:
+        selling_slots_today = int(parsed["selling_slots_today"])
+
+    # Pending run economics: intify on load (JSON numbers parse as float) so
+    # end_day() reads plain ints. Absent/empty for saves with no run pending.
+    pending_run = {}
+    if parsed.has("pending_run") and parsed["pending_run"] is Dictionary:
+        for key: Variant in parsed["pending_run"]:
+            if key is String and parsed["pending_run"][key] is float:
+                pending_run[key] = int(parsed["pending_run"][key])
+
+    # ── Migration: discard legacy research_slots ──────────────────────────────
+    # Old saves carried a research_slots array (day-ticker lifecycle). Under the
+    # time-slot economy that array is retired. Partial research state is seeded
+    # into ItemEntry.research_progress so no player work is lost.
+    if parsed.has("research_slots") and parsed["research_slots"] is Array:
+        _migrate_research_slots(parsed["research_slots"])
+
     # Old saves may contain keys from now-removed systems (MarketManager,
-    # MerchantRegistry, etc.) — silently ignore them.
+    # MerchantRegistry, max_research_slots, etc.) — silently ignore them.
 
-    var valid_ids: Array = []
-    for entry: ItemEntry in storage_items:
-        valid_ids.append(entry.id)
 
-    # Clear orphaned UNLOCK slots (Phase 5 migration, no longer relevant).
-    for i: int in range(research_slots.size()):
-        var d: Dictionary = research_slots[i]
-        if d.get("action", "") != "unlock":
+## Converts legacy research_slots entries to ItemEntry.research_progress so
+## in-flight research survives the save format change.
+##
+## REPAIR/RESTORE slots are discarded — condition is already on ItemEntry and
+## persists unchanged. For RESEARCH slots with days_spent > 0, each day's
+## equivalent progress (5 base, ignoring attribute) is added to the first
+## unrevealed hidden clue in order.
+func _migrate_research_slots(slots: Array) -> void:
+    for d: Variant in slots:
+        if not d is Dictionary:
             continue
-        research_slots[i] = ResearchSlot.new().to_dict()
-
-    ResearchSlot.purge_orphaned(research_slots, valid_ids)
+        var action: String = d.get("action", "")
+        if action != "research" and action != "authenticate":
+            continue
+        var item_id: int = int(d.get("item_id", -1))
+        if item_id == -1:
+            continue
+        var days_spent: int = int(d.get("research_days_spent",
+            d.get("authenticate_days_spent", 0)))
+        if days_spent <= 0:
+            continue
+        var entry: ItemEntry = null
+        for e: ItemEntry in storage_items:
+            if e.id == item_id:
+                entry = e
+                break
+        if entry == null or entry.verified:
+            continue
+        # Each legacy research day converts to 5 progress points (base rate,
+        # no attribute — the pre-slot system had no attribute bonus for research).
+        var remaining: int = days_spent * 5
+        for clue: ClueData in entry.item_data.clues:
+            if clue.type != ClueData.ClueType.HIDDEN:
+                continue
+            if entry.revealed_clue_ids.has(clue.clue_id):
+                continue
+            var existing: int = int(entry.research_progress.get(clue.clue_id, 0))
+            if existing >= clue.dc:
+                continue
+            var needed: int = clue.dc - existing
+            var apply: int = mini(remaining, needed)
+            entry.research_progress[clue.clue_id] = existing + apply
+            remaining -= apply
+            if remaining <= 0:
+                break
 
 
 static func _intify_array(arr: Array) -> Array:

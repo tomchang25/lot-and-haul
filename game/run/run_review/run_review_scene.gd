@@ -91,8 +91,11 @@ func _apply_trailer_damage() -> int:
 
 
 func _resolve_run_and_navigate() -> void:
-    var summary := MetaManager.resolve_run(RunManager.run_record)
-    GameManager.go_to_day_summary(summary)
+    # resolve_run stashes run economics as pending and sets current_slot = 3
+    # (player returns for the evening slot). The day summary fires later when
+    # the player chooses Open Shop or exhausts all slots from the hub.
+    MetaManager.resolve_run(RunManager.run_record)
+    GameManager.go_to_hub()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 

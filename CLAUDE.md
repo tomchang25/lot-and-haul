@@ -2,6 +2,14 @@
 
 A Godot 4.6 single-player game about buying storage lots at auction, inspecting items, and reselling them through various channels. Think "Storage Wars" as a strategy/management game.
 
+## Agent environment note (sandboxed shell vs. real files)
+
+The sandboxed Linux shell can return **phantom file corruption** for files in this repo — blocks of NUL bytes, mid-token truncation, "binary file matches", or wrong byte counts — especially right after a write. This is a mount artifact, NOT real disk damage. The files are intact in VS Code and git in the real environment.
+
+- The Read/Edit file tools are authoritative. After modifying a file, verify it with **Read**, never by `cat`/`hexdump`/`wc`/`grep` through the shell. If Read shows clean content, the file is fine — stop.
+- Never diagnose "corrupted files" from a shell read alone, and never `git restore`/overwrite working-tree files to "recover" from shell-reported corruption — that risks discarding genuine uncommitted work over a false reading.
+- `git` against the object DB (`git show HEAD:<file>`, `git log`, `git diff`) is reliable; working-tree file-content reads through the shell mount are not.
+
 ## Core Loop
 
 1. **Run phase** — Player travels to a Location, browses Lots, inspects items (spending AP to reveal clues), bids in Auctions, and loads won items into Cargo.
@@ -82,7 +90,7 @@ Core loop redesign: Phases 0–11 complete (runtime veil cleanup, AP grid inspec
 
 - **Naming**: snake_case files, PascalCase classes, UPPER_SNAKE constants. See `dev/standards/naming_conventions.md`.
 - **Registries**: one autoload per designer resource type, required API: `get_<singular>_by_id`, `get_all_<plural>`, `size`. No display-name wrappers. See `dev/standards/registries.md`.
-- **Scene architecture**: block scenes follow the standard in `dev/standards/block_scene_architecture_standard.md`.
+- **Scene architecture**: block scenes follow the standard in `dev/standards/block_scene_architecture_standard.md`. **All persistent nodes must be defined in the `.tscn` file** — if a node exists for the full lifetime of the scene, it belongs in the scene, not created with `add_child()` in code. Only ephemeral nodes (instantiated packed scenes of unknown count, tooltips, dynamic list items) may be created in code.
 - **Commits**: conventional commits format. See `dev/skills/conventional_commits.md`.
 - **Price pipeline**: all prices resolve through `ItemEntry.item_price` (`(appraised|verified value) × condition_multiplier`). Appraised value = anchor + revealed surface modifiers (add-then-mul). Verified value includes hidden modifiers. No per-type formulas outside the pipeline.
 - **Iterate resources, not ids**: outside serialization boundaries, pass Resource refs. String ids are for save/load only.

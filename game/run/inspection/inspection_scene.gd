@@ -442,8 +442,10 @@ func _hover_edge_borders(coord: Vector2i) -> Dictionary:
 
 func _refresh_hud() -> void:
     var ap: int = RunManager.run_record.actions_remaining
-    var quota: int = RunManager.run_record.lot_entry.lot_data.action_quota
-    _stamina_hud.update_ap(ap, quota)
+    # Use the two-tier cap as the HUD maximum — reflects the per-lot ceiling,
+    # not the legacy per-lot action_quota.
+    var cap: int = RunManager.run_record.inspection_ap_cap
+    _stamina_hud.update_ap(ap, cap)
 
 # ══ Sidebar — item list ═══════════════════════════════════════════════════════
 

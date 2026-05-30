@@ -203,8 +203,6 @@ Not now: hand-curated `ItemData` gives full designer control and isolates variab
 
 Flows currently being built. One-line pointer each — same format as `## Plan`, just promoted here when work starts. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress → this section is empty.
 
-- [day-structure] Time-slot day + storage AP economy: 3-slot day (morning/afternoon/evening), 10 AP/day pool for storage actions, customer scaling by slot commitment. See `dev/docs/plans/time_slot_economy.md`.
-
 ---
 
 ## Plan
@@ -235,4 +233,5 @@ One-line, no reasoning, no backing doc.
 
 One-line defect to fix.
 
-_None yet._
+- [Night Market (Customer selling)] can't cancel the item in grid back to temp list. Nor any method to reset whole grid either.
+- [Night Market (Customer selling)] Back to Hub Button location is too confusing and hard to find.
