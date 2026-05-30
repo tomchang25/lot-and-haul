@@ -43,7 +43,7 @@ data/         Designer resources: definitions, yaml sources, generated .tres
     attributes/ cars/ categories/ clues/ items/ locations/
     lots/ perks/ super_categories/
 dev/          Development tooling and documentation
-  docs/       Git submodule — architecture docs (vision/, systems/, plans/, archived/)
+  docs/       Architecture docs, tracked in this repo (vision/, systems/, plans/, archived/)
   skills/     AI coding references (commit format, GDScript patterns)
   standards/  Coding conventions, naming, registries, scene architecture
   tools/      YAML↔TRES pipeline (Python scripts + prompts)
