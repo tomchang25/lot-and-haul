@@ -82,7 +82,7 @@ Condition is a float (0.0–1.0) rolled at item creation. The multiplier curve i
 | 50–75%  | 1.0×–2.0×  | Restore territory — value doubles, but restoration is slow     |
 | 75–100% | 2.0×–4.0×  | Premium tier — rare to reach, especially for high-rarity items |
 
-**Repair** (0→0.5 cap) and **Restore** (0.5→1.0) are distinct research actions on `ResearchSlot`, applied by `MetaManager._tick_research_slots()` via `ResearchSlot.apply_repair()` / `apply_restore()`. Veiled items show condition as `"???"`.
+**Repair** (0→0.5 cap) and **Restore** (0.5→1.0) are distinct storage actions; the condition math lives in the static `ResearchSlot.apply_repair()` / `apply_restore()` helpers, invoked immediately by `MetaManager`'s storage AP actions (see `day_slot_economy.md`). Veiled items show condition as `"???"`.
 
 ---
 
@@ -94,7 +94,7 @@ Condition is a float (0.0–1.0) rolled at item creation. The multiplier curve i
 
 3. **Auction & cargo** — Won items enter cargo, constrained by the vehicle's grid and weight (see `shared/data_model.md` packing).
 
-4. **Hub — storage & research** — On hub return / save load, `apply_storage_migration()` auto-reveals all surface clues. Items assigned to a research slot run one of: **Repair** (→0.5), **Restore** (→1.0), or **Research** (after `Economy.RESEARCH_DAYS[rarity]` day-ticks, reveals all hidden clues → verified, then auto-clears the slot). `ItemData.auto_verify` items reveal hidden clues immediately on storage entry.
+4. **Hub — storage & research** — On hub return / save load, `apply_storage_migration()` auto-reveals all surface clues. In a Storage slot the player spends AP on one of: **Repair** (→0.5), **Restore** (→1.0), or **Research** — deterministic per-clue progress (`5 + Investigation` per spend) that reveals one hidden clue at a time once its accumulated progress reaches the clue's DC, marking the item verified when all hidden clues are revealed. `ItemData.auto_verify` items reveal hidden clues immediately on storage entry. See `day_slot_economy.md`.
 
 5. **Selling** — All selling goes through the nightly customer system (`customer_sell.md`). Quick Sell, merchant negotiation, and special orders are removed/being removed (Phase 9). Verified items contribute a ×1.2 bonus, add a die to the aggressive pool, and count hidden tags toward customer fit.
 

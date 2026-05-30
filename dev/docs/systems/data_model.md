@@ -63,18 +63,19 @@ All `RefCounted` value objects — save-serialized where persisted, free of auto
   `../item_system.md` for the full pricing/naming/condition model. Serialization self-heals:
   on load it migrates legacy keys and drops clue ids no longer present in the item's
   current clue set, so pipeline regenerations don't corrupt saves.
-- **ResearchSlot** — one storage research slot (Repair / Restore / Research). The daily
-  tick dispatches per action: Repair and Restore mutate condition within capped zones;
-  Research accrues days until the rarity-based threshold, then reveals all hidden clues
-  and auto-clears the slot. Replaced the identity-layer-era Study/Unlock actions.
-- **Customer** — one nightly buyer (Phase 9): a car grid plus demand tags (clue ids it
+- **ResearchSlot** — now a stateless holder for the static storage condition math
+  (`apply_repair`, `apply_restore`, caps, zone/rarity factors, the Restoration coefficient)
+  invoked by `MetaManager`'s immediate storage AP actions. Its old day-ticker lifecycle
+  was retired with the slot economy; the math was kept. Hidden-clue reveal is no longer
+  here — it is deterministic per-clue progress on `ItemEntry` (see `day_slot_economy.md`).
+- **Customer** — one nightly buyer: a car grid plus demand tags (clue ids it
   wants). Generation is RNG-injectable and biases each tag roughly half the time toward
   tags actually present in current storage (so nights are matchable) and otherwise toward
-  the full vocabulary. The time-slot economy will later drive the per-night count.
-- **DaySummary** — value object returned by `MetaManager.advance_days()` and read by
-  `DaySummaryScene`. Captures run costs, living cost, completed research actions, and the
-  night's customer sales (snapshotted before nightly generation clears them); `net_change`
-  is computed from these.
+  the full vocabulary. The per-night count is driven by the selling-slot commitment.
+- **DaySummary** — value object returned by `MetaManager`'s day-end sequence and read by
+  `DaySummaryScene`. Captures run costs (folded from pending-run economics), living cost,
+  and the night's customer sales (snapshotted before nightly generation clears them);
+  `net_change` is computed from these.
 
 ### Sell math (`common/utils/sell_math.gd`)
 

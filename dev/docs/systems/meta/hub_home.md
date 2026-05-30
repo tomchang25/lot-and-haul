@@ -1,48 +1,48 @@
 # Hub & Home
 
-Meta block group in `game/meta/` — hub navigation, day-pass system, storage, and entry points to the sell / vehicle / knowledge sub-systems. The selling surface is the unified nightly customer system (`../customer_sell.md`); the legacy merchant channel is removed from the hub and its old design docs are archived (`../../archived/merchant.md`, `merchant_shop.md`, `special_orders.md`). This doc covers the hub surface around them.
+Meta block group in `game/meta/` — hub navigation, the slot tray that allocates a day, storage, and entry points to the sell / vehicle / knowledge sub-systems. The day's slot/AP structure is owned by `../day_slot_economy.md` (the calendar day, storage AP, auction AP, customer scaling, living cost); the selling surface is the unified nightly customer system (`../customer_sell.md`); the legacy merchant channel is removed from the hub and its old design docs are archived (`../../archived/merchant.md`, `merchant_shop.md`, `special_orders.md`). This doc covers the hub surface around them.
 
 ## Goal
 
-Be the calm between runs: the place where the player converts won cargo into cash, spends cash on progression, and ticks the day forward. Success is a hub that frames every major meta system (knowledge, storage, selling, vehicles) without itself becoming a minigame.
+Be the calm between runs: the place where the player converts won cargo into cash, spends cash on progression, and allocates the day's three slots. Success is a hub that frames every major meta system (knowledge, storage, selling, vehicles) without itself becoming a minigame.
 
 ## Reads
 
 - `SaveManager.cash` — displayed in hub header (Balance)
 - `SaveManager.storage_items` — hub header (item count) and storage scene source of truth
 - `KnowledgeManager.get_mastery_rank()` — hub header (Mastery Rank)
+- `SaveManager.current_slot` — which of the day's three slots the tray presents next; `> 3` triggers day-end
 - `GameManager.consume_pending_day_summary()` — `DaySummaryScene` input
-- `SaveManager.research_slots` — Storage research-slot state (per-action availability gating)
 
 ## Writes
 
-- `SaveManager.current_day` / `cash` / `research_slots` — via `MetaManager.advance_days()` on Day Pass
-- `SaveManager.storage_items` — mutated by Storage actions (assign/remove research slot)
+- Slot transitions go through `MetaManager` (one entry point per activity); the hub never writes `current_day`, living cost, or customers itself — see `../day_slot_economy.md`.
+- `SaveManager.storage_items` — mutated by Storage AP actions (Repair / Restore / Research)
 
-On Day Pass: `GameManager.go_to_day_summary(summary)`. On Knowledge: `GameManager.go_to_knowledge_hub()`. On Next Run: `GameManager.go_to_location_select()`. On Sell: routes into the customer-sell scene (see `../customer_sell.md`). On Storage: `GameManager.go_to_storage()`.
+Routing: Auction (slot 1 only) → `GameManager.go_to_location_select()`. Storage → `GameManager.go_to_storage()`. Open Shop → customer-sell scene. Knowledge → `GameManager.go_to_knowledge_hub()`. Vehicle → `GameManager.go_to_vehicle_hub()`. When the day ends (Open Shop chosen, or all slots spent) the hub takes the `DaySummary` from `MetaManager` to `GameManager.go_to_day_summary(summary)`.
 
 ## Feature Intro
 
 ### Data Definitions
 
-No resources owned by this block directly — Hub is a navigation surface over other systems' data. The only runtime hook is the Day Pass: it advances one day through `MetaManager` and routes the returned summary to the Day Summary scene.
+No resources owned by this block directly — Hub is a navigation surface over other systems' data. Its runtime hook is the slot tray: it allocates each of the day's three slots to an activity through `MetaManager` and, when the day ends, routes the returned summary to the Day Summary scene. The slot/AP rules behind the tray live in `../day_slot_economy.md`.
 
 ### Hub Scene
 
-`game/meta/hub/hub_scene.gd` + `.tscn` — central navigation after each run and between day passes.
+`game/meta/hub/hub_scene.gd` + `.tscn` — central navigation after each run and across the day's slots.
 
 Header displays Mastery Rank, Balance, and Storage item count (refreshed by `_refresh_display()` on `_ready()`).
 
-Buttons:
+The **slot tray** presents the three slots (Morning / Afternoon / Evening) with filled/empty indicators and offers an activity chooser for the next open slot:
 
-- **Next Run** → `GameManager.go_to_location_select()`
-- **Storage** → `GameManager.go_to_storage()`
-- **Sell** → customer-sell scene (the unified nightly customer system; replaces the old Merchant button — see `../customer_sell.md`)
+- **Auction** (slot 1 only; greyed otherwise) → consumes slots 1+2 → `GameManager.go_to_location_select()`
+- **Storage** → begins a fresh storage AP slot → `GameManager.go_to_storage()`
+- **Open Shop** → generates slot-scaled nightly customers and ends the day → customer-sell scene
+- **Next Run / Sell** route as Auction / Open Shop above (the unified nightly customer system replaces the old Merchant button — see `../customer_sell.md`)
 - **Vehicle** → `GameManager.go_to_vehicle_hub()` (see `vehicle.md`)
 - **Knowledge** → `GameManager.go_to_knowledge_hub()` (Mastery / Attributes / Perks — see `knowledge.md`)
-- **Day Pass** → `ConfirmationDialog` (`DayPassConfirm`) → on confirm, `_do_day_pass()` → `DaySummaryScene`
 
-Returning from `DaySummaryScene` via `GameManager.go_to_hub()` re-runs hub `_ready()`, which calls `_refresh_display()` to update the header.
+When the day ends — Open Shop chosen, or all three slots spent (`current_slot > 3`) — the hub asks `MetaManager` to close the day and routes the `DaySummary` to `DaySummaryScene`. Returning via `GameManager.go_to_hub()` re-runs `_ready()` → `_refresh_display()`.
 
 ### Vehicle Hub Entry
 
@@ -54,19 +54,17 @@ Returning from `DaySummaryScene` via `GameManager.go_to_hub()` re-runs hub `_rea
 
 ### Day Summary Scene
 
-`game/meta/day_summary/day_summary_scene.gd` + `.tscn` — standalone scene displaying day-advancement results. Used by both the hub Day Pass and the run-review continue flow. Reads a pending `DaySummary` from `GameManager.consume_pending_day_summary()`; if none is pending, returns to hub with a warning.
+`game/meta/day_summary/day_summary_scene.gd` + `.tscn` — standalone scene displaying day-end results. Reached when the hub closes the day. Reads a pending `DaySummary` from `GameManager.consume_pending_day_summary()`; if none is pending, returns to hub with a warning.
 
-`DaySummary` (the value object, in `common/gameplay/day_summary.gd` — see `../shared/data_model.md`) carries the day range, run-specific costs, living cost, completed research actions, and the night's customer sales, with a computed net change. `has_run_data()` gates the income group in the scene.
+`DaySummary` (the value object, in `common/gameplay/day_summary.gd` — see `../shared/data_model.md`) carries the day range, run-specific costs (folded from the pending-run economics stashed after an auction), living cost, and the night's customer sales, with a computed net change. `has_run_data()` gates the income group in the scene. It does not currently carry slot-count or storage-action fields.
 
 ### Storage
 
-`game/meta/storage/storage_scene.gd` + `.tscn` — player manages stored items and assigns them to research slots. Storage is both the viewer and the verb surface — there is no separate Research scene. The slot actions are the `ResearchSlot.SlotAction` set: **Repair** (condition → 0.5), **Restore** (0.5 → 1.0), and **Research** (reveals all hidden clues after `Economy.RESEARCH_DAYS[rarity]` day-ticks, marking the item verified). The old Study / Unlock actions are gone.
+`game/meta/storage/storage_scene.gd` + `.tscn` — player works stored items by spending the slot's storage AP. Storage is both the viewer and the verb surface — there is no separate Research scene, and there is no slot to assign: each button applies its effect immediately and charges AP. The three actions are **Repair** (condition → 0.5 cap), **Restore** (0.5 → 1.0), and **Research** (deterministic per-clue hidden reveal). AP pool size, costs, the deterministic-research rule, and condition guards are owned by `../day_slot_economy.md`; this scene is the surface that renders the AP bar and drives those `MetaManager` actions.
 
-- Item list uses `ItemListPanel` with storage columns including `RESEARCH_STATUS`, which reflects the current slot action or completion state; empty when the item is not assigned.
-- Clicking a row opens an `ActionPopup` with the available slot actions plus Remove / Cancel. If `max_research_slots` is exhausted the popup shows `"No research slots available"` and hides the action buttons.
-- Actions disable with a tooltip when not applicable (e.g. Repair when condition is already ≥ 0.5, Restore when already at full condition, Research when the item is already verified).
-- Choosing a new action writes a fresh `ResearchSlot` to `SaveManager.research_slots`; switching action on an in-slot item replaces the slot and resets `completed` but leaves the item's `condition` and reveal state untouched.
-- Hub Storage button text is appended with `"(N done)"` when completed research slots exist (counted via `_completed_research_count()` in `hub_scene.gd`).
+- Item list uses `ItemListPanel`; clicking a row opens the action surface for the selected item.
+- Each action button executes immediately on press (no day-tick) and disables when its guard fails — insufficient AP, condition already past a cap, or no unrevealed hidden clue remaining.
+- After any action the scene re-renders the AP bar, the detail panel, and each button's enabled state.
 
 ### Sell Surface
 
@@ -78,11 +76,11 @@ Another auction-type scene modelled on the existing `game/run/auction/` structur
 
 ### Own Shop _(deferred — system unclear)_
 
-Player lists items at a set price. Sale resolution ticks inside `MetaManager.advance_days()` alongside action ticking. Lives in hub for now because the player-listing surface may not belong to any single merchant. (Largely subsumed by the customer-sell system; retained as an open design idea only.)
+Player lists items at a set price, resolved during the day-end sequence. Lives in hub for now because the player-listing surface may not belong to any single merchant. (Largely subsumed by the customer-sell system; retained as an open design idea only.)
 
 ### Bank / Bankruptcy _(deferred)_
 
-Daily interest applied inside `MetaManager.advance_days()` after sale-side mutation and before living cost. Defines bankruptcy state and game-over condition. Optional loan UI in hub.
+Daily interest applied during the day-end sequence before living cost. Defines bankruptcy state and game-over condition. Optional loan UI in hub.
 
 ### Museum / Prestige _(deferred)_
 
@@ -105,5 +103,3 @@ Hub is where vehicle selection and the car shop _surface_ (via the Vehicle butto
 ### Selling lives in `../customer_sell.md`
 
 Hub only routes into the customer-sell scene via the **Sell** button. The unified nightly customer system owns all selling logic. The legacy merchant design docs are archived under `../../archived/`.
-
-

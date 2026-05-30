@@ -28,7 +28,7 @@ hub
                                      └── hub
 ```
 
-Run review routes through the Day Summary scene (`GameManager.go_to_day_summary`) before returning to Hub. The hub day-pass surfaces the same summary scene.
+A finished run returns the player to the Hub for the Evening slot, stashing its economics as pending; the Day Summary scene (`GameManager.go_to_day_summary`) fires when the day ends from the hub (Open Shop or all slots spent). See `day_slot_economy.md`.
 
 ## Key Flows
 
@@ -46,7 +46,7 @@ All sampled lot cards are visible, but only the current card exposes Enter and P
 
 ### Inspection And List Review
 
-Current inspection is a per-lot AP grid, not the older stamina action model. The active lot's item shapes are placed on an 8x8 hidden grid using category shapes. The AP budget resets from the lot's action quota each time a lot is entered. Car stamina still exists on the run record, but the current inspection UI does not spend it.
+Current inspection is an AP grid, not the older stamina action model. The active lot's item shapes are placed on an 8x8 hidden grid using category shapes. The AP budget is a two-tier pool — a per-lot cap plus a visit-wide reserve that refills the cap (deficit only) at each lot boundary — owned by the run record; the old per-lot `action_quota` no longer drives it. See `day_slot_economy.md` for the full pool model. Car stamina still exists on the run record, but the current inspection UI does not spend it.
 
 Identity is clue-based, not layer-based. Clicking a veiled object spends the unveil AP cost and calls `ItemEntry.unveil()`, which reveals the item's **anchor** clue (its base-value identity) and grants reveal knowledge. There is no layer ladder.
 
@@ -82,7 +82,7 @@ Run review applies trailer damage before showing the item list. Trailer damage u
 
 The finance panel shows cash cost, sold-on-site proceeds, immediate cash flow, estimated cargo value, and estimated profit. Cash cost is auction paid total plus entry fee plus fuel cost. Immediate cash flow is on-site proceeds minus that cost.
 
-Continuing resolves the run through `MetaManager.resolve_run()`: cash is mutated by on-site proceeds minus paid price, entry fee, and fuel cost; normal cargo items have all surface clues auto-revealed (`ItemEntry.auto_reveal_all_surface()` — no layer ladder) and enter storage; then `advance_days(travel_days)` runs daily living cost, research-slot ticks, and location-sample clearing. Items flagged `auto_verify` also reveal their hidden clues on storage entry. There is no market advancement (`MarketManager` was removed). Run state is cleared and the player is routed to the Day Summary scene, then Hub.
+Continuing resolves the run through `MetaManager.resolve_run()`: cash is mutated by on-site proceeds minus paid price, entry fee, and fuel cost; normal cargo items have all surface clues auto-revealed (`ItemEntry.auto_reveal_all_surface()` — no layer ladder) and enter storage; the run's economics are stashed as pending (folded into the day summary at day-end) and the player returns to the Hub for the Evening slot (the auction consumed the morning + afternoon). Items flagged `auto_verify` also reveal their hidden clues on storage entry. There is no market advancement (`MarketManager` was removed). Living cost and the day summary are applied later by the day-end sequence, not here — see `day_slot_economy.md`. Run state is cleared after settlement.
 
 Current caveat: run review displays cargo plus trailer items and applies trailer damage, but settlement registration currently only stores normal cargo items (see Open Questions).
 
@@ -90,7 +90,7 @@ Current caveat: run review displays cargo plus trailer items and applies trailer
 
 - **Paid total and won items accumulate across lots.** Lost or passed auctions deliberately do not mutate those totals, so earlier wins survive later losses.
 - **The lot browse index advances before inspection.** Returning from reveal should always show the next sampled lot, not the same lot again.
-- **AP is per-lot today.** Vehicle stamina is present in run state but is not consumed by current inspection actions. Reconnect or remove it before tuning cars around inspection endurance.
+- **AP is a two-tier pool, capped per lot.** Within a lot AP is pure consume and never exceeds the cap; the visit-wide reserve refills the cap (deficit only) at lot boundaries. Vehicle stamina is present in run state but is not consumed by current inspection actions. Reconnect or remove it before tuning cars around inspection endurance. Full model in `day_slot_economy.md`.
 - **Aggressive lerp is the primary location risk dial.** Entry fee and travel days are secondary. Price variance is useful for texture, but too much variance creates noise more than readable risk.
 - **Extra slots bypass weight today.** Treat them as a deliberate trailer escape valve only after settlement behavior is fixed.
 - **On-site proceeds currently mean left-behind won items.** Commodity fields exist in authored location YAML, but there is no active commodity runtime path in the lot/auction/cargo code reviewed here.
