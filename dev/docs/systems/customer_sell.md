@@ -23,9 +23,9 @@ A clue's id **is** its demand tag. `ItemEntry.fit_tags()` returns the item's rev
 
 ## Nightly Generation
 
-`MetaManager.advance_days()` calls `_generate_nightly_customers()`, which delegates to `Customer.generate_for_night(rng, storage_items, count, all_clue_ids)`:
+Opening shop (`MetaManager.begin_open_shop`) generates the night's customers via `_generate_nightly_customers()`, which delegates to `Customer.generate_for_night(rng, storage_items, count, all_clue_ids)`:
 
-- **Count** — `count < 0` rolls `DEFAULT_NIGHT_MIN..MAX` (3–5). The time-slot economy (planned) passes a slot-derived count here instead.
+- **Count** — derived from the selling-slot commitment: 1 slot → 2–3, 2 → 4–6, 3 → 7–10 (see `day_slot_economy.md`). The generator still supports `count < 0` rolling a `DEFAULT_NIGHT_MIN..MAX` (3–5) default, but the live path always passes an explicit slot-derived count.
 - **Owned pool** — union of `fit_tags()` across current storage.
 - **Per-tag 50/50 bias** — each of a customer's 2–4 demand tags is drawn from the owned pool (guaranteed-matchable) with 50% probability, else from the full vocabulary. Deduped per customer. Empty storage → all tags fall back to the full vocabulary.
 - **Grid dims** — uniform pick from `Customer.GRID_PRESETS` (`2×2 … 5×4`).
@@ -67,7 +67,7 @@ The player sees the resulting price before confirming. Declined items return to 
 
 `MetaManager.resolve_customer_sale(items, sale_price, customer, strategy)`:
 
-1. Erase each sold item from `storage_items`, clear any research slot on it, and credit `SELL` category mastery.
+1. Erase each sold item from `storage_items` and credit `SELL` category mastery.
 2. `cash += sale_price`.
 3. Append a record to `customer_sales_today` (`day`, `customer_id/name`, `strategy`, `item_count`, `item_ids`, `sale_price`).
 4. Remove the served customer from `nightly_customers` and `save()`.

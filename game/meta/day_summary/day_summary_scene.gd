@@ -20,8 +20,6 @@ extends Control
 @onready var _customer_total_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup/CustomerTotalLabel
 
 @onready var _living_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/LivingLabel
-@onready var _actions_group: VBoxContainer = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/ActionsGroup
-@onready var _actions_list: VBoxContainer = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/ActionsGroup/ActionsList
 
 @onready var _cargo_group: VBoxContainer = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CargoGroup
 @onready var _cargo_count_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CargoGroup/CargoCountLabel
@@ -85,21 +83,7 @@ func _render(summary: DaySummary) -> void:
         _customer_total_label.text = "Total Customer Sales: $%d" % summary.customer_sales_total
 
     # Daily group — always visible
-    _living_label.text = "Living (%d/day × %d):   -$%d" % [
-        Economy.DAILY_BASE_COST,
-        summary.days_elapsed,
-        summary.living_cost,
-    ]
-
-    # Completed actions
-    for child in _actions_list.get_children():
-        child.queue_free()
-    _actions_group.visible = not summary.completed_actions.is_empty()
-    for c: Dictionary in summary.completed_actions:
-        var lbl := Label.new()
-        lbl.text = "  · %s — %s" % [c.get("name", "?"), c.get("effect", "?")]
-        lbl.add_theme_font_size_override("font_size", 16)
-        _actions_list.add_child(lbl)
+    _living_label.text = "Living:   -$%d" % summary.living_cost
 
     # Cargo count
     _cargo_group.visible = summary.cargo_count > 0

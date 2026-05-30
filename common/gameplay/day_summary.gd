@@ -1,5 +1,6 @@
 # day_summary.gd
-# Value object returned by SaveManager.advance_days().
+# Value object returned by MetaManager.end_day(). Financial recap only —
+# storage feedback is immediate and does not need a deferred summary entry.
 class_name DaySummary
 extends RefCounted
 
@@ -7,7 +8,7 @@ var start_day: int
 var end_day: int
 var days_elapsed: int
 
-# Run-specific (zero/empty for hub day-pass)
+# Run-specific (zero/empty for pure hub days)
 var onsite_proceeds: int = 0
 var paid_price: int = 0
 var entry_fee: int = 0
@@ -16,9 +17,8 @@ var fuel_cost: int = 0
 # Universal
 var cargo_count: int = 0
 var living_cost: int = 0
-var completed_actions: Array[Dictionary] = []
 
-# Customer sales (captured before _generate_nightly_customers clears it)
+# Customer sales (captured before nightly generation clears it)
 var customer_sales_total: int = 0
 var customer_sales_detail: Array[Dictionary] = []
 

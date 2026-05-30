@@ -29,7 +29,7 @@ Listed in `project.godot` load order. `RegistryCoordinator` orchestrates boot: e
 
 | Class       | File                             | Role                                                                                                                        |
 | ----------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `Economy`   | `global/constants/economy.gd`    | `DAILY_BASE_COST`, `LOCATION_SAMPLE_SIZE`, `RESEARCH_DAYS` (rarity → days to verify), and other economy constants.          |
+| `Economy`   | `global/constants/economy.gd`    | `DAILY_BASE_COST`, `LOCATION_SAMPLE_SIZE`, storage AP costs, auction AP cap + reserve, and `RESEARCH_DAYS` (legacy rarity→days table, kept only for save migration). |
 | `DataPaths` | `global/constants/data_paths.gd` | `res://data/tres/` directory strings: items, clues, categories, super_categories, perks, attributes, locations, lots, cars. |
 
 ---
@@ -48,48 +48,39 @@ Static helper that loads every `.tres` in a directory into an `{ id → Resource
 
 ## SaveManager
 
-Persists to `user://save.json`. **Serialization only** — it holds no day-advance or transaction logic (that's `MetaManager`). It persists the cross-run state: progression (category points, attribute levels, unlocked perks), economy (cash, owned/active car), storage items, research slots, available locations, the current day and monotonic entry id, and the current night's customers + sale ledger. Field list in `save_manager.gd`.
+Persists to `user://save.json`. **Serialization only** — it holds no day-advance or transaction logic (that's `MetaManager`). It persists the cross-run state: progression (category points, attribute levels, unlocked perks), economy (cash, owned/active car), storage items (each with its per-clue `research_progress`), available locations, the current day, the day's slot/AP state (`current_slot`, `storage_ap`, `selling_slots_today`) and pending-run economics, the monotonic entry id, and the current night's customers + sale ledger. Field list in `save_manager.gd`. The slot/AP model is described in `day_slot_economy.md`.
 
 ### Migrations on load
 
 - `skill_levels` (old) → discarded; `attribute_levels` starts fresh.
 - `super_cat_means` / `category_factors_today` (removed MarketManager) → silently ignored.
-- Orphaned `unlock` research slots (identity-layer era) → cleared.
-- `ResearchSlot.purge_orphaned` drops slots whose item is gone.
+- `research_slots` (the old day-ticker lifecycle) → discarded; any in-flight `research_days_spent` is converted into per-clue `ItemEntry.research_progress` so partial work isn't lost.
 - Legacy merchant save keys (`merchant_negotiations_used_today`, `merchant_orders`, `next_order_id`) → silently ignored on load.
 
-Storage registration, location rolling, day advance, research-slot assignment, and all trade operations live on `MetaManager` (below); `SaveManager` itself only exposes save and load.
+Storage registration, location rolling, slot transitions, storage AP actions, and all trade operations live on `MetaManager` (below); `SaveManager` itself only exposes save and load.
 
 ---
 
 ## MetaManager
 
-Hub-phase transactional authority. Mutates `SaveManager` state and saves; delegates computation to value objects / pure helpers. It owns: storage registration (assigning ids; auto-verify items reveal hidden clues on entry), rolling available locations, the day advance (deduct living cost → tick research slots → clear locations → generate nightly customers → save, returning a `DaySummary`), committing customer sales, research-slot assign/remove, car purchase + active swap, and run settlement (cash, surface auto-reveal, cargo storage, travel days). Signatures in `meta_manager.gd`.
+Hub-phase transactional authority. Mutates `SaveManager` state and saves; delegates computation to value objects / pure helpers. It is the single authority for slot progression: storage registration (assigning ids; auto-verify items reveal hidden clues on entry), rolling available locations, the slot transitions (begin a Storage slot, begin an Auction, begin Open Shop), the immediate storage AP actions (Repair / Restore / Research), the day-end sequence (advance the calendar day → deduct living cost once → fold pending-run economics and customer sales → reset slot state → save, returning a `DaySummary`), committing customer sales, car purchase + active swap, and run settlement (cash, surface auto-reveal, cargo storage; stashes run economics as pending). Signatures in `meta_manager.gd`; the slot/AP rules live in `day_slot_economy.md`.
 
-### Research slot ticking
+### Storage AP actions
 
-The day-tick dispatches per slot on the research action:
-
-| Action   | Per day-tick                        | Completes when                                                          |
-| -------- | ----------------------------------- | ----------------------------------------------------------------------- |
-| Repair   | raises condition toward the 0.5 cap | condition reaches 0.5                                                   |
-| Restore  | raises condition toward 1.0         | condition reaches 1.0                                                   |
-| Research | accrues one research day            | rarity-based day threshold → reveals all hidden clues, slot auto-clears |
-
-Completions are reported back in the day summary. Tuning constants and the exact formulas live in `research_slot.gd`.
+Each storage action applies immediately on press and follows guard → apply → charge, charging AP only after the effect lands. The condition math (caps, factors, the Restoration coefficient) lives in the static `ResearchSlot` helpers; Research advances deterministic per-clue progress on `ItemEntry`. Costs, the AP pool, and guards are in `day_slot_economy.md`.
 
 ---
 
 ## Hub Navigation
 
 ```
-Hub
- ├── Location Select → run loop (location_entry → lot_browse → … → run_review)
- ├── Storage (manage items, assign research slots: Repair / Restore / Research)
- ├── Sell (nightly customer-sell scene)
+Hub (slot tray: Morning / Afternoon / Evening)
+ ├── Auction (slot 1; consumes slots 1+2) → run loop (location_entry → lot_browse → … → run_review)
+ ├── Storage (spend storage AP: Repair / Restore / Research)
+ ├── Open Shop (slot-scaled nightly customer-sell scene) → ends day
  ├── Vehicle Hub (Garage car select + Car Shop)
  ├── Knowledge Hub (Mastery, Attributes, Perks)
- └── Day Pass → DaySummaryScene
+ └── Day end (Open Shop or all slots spent) → DaySummaryScene
 ```
 
 ---

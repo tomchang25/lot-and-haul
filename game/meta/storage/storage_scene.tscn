@@ -118,7 +118,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "← Back"
+text = "Leave Workshop"
 
 [node name="SidebarSep" type="VSeparator" parent="RootHBox" unique_id=568005494]
 layout_mode = 2
@@ -140,6 +140,7 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="TaskSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=854617958]
+visible = false
 layout_mode = 2
 theme_override_constants/separation = 8
 
@@ -211,6 +212,7 @@ theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 10
 
 [node name="DetailRarityHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=806539401]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 12
 
@@ -220,6 +222,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 12
 
 [node name="DetailStatsHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=1330949172]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
 
@@ -277,6 +280,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 16
 
 [node name="ConvergencePanel" type="PanelContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=574237905]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="ConvMargin" type="MarginContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ConvergencePanel" unique_id=164997626]
@@ -315,6 +319,14 @@ theme_override_font_sizes/font_size = 11
 layout_mode = 2
 size_flags_vertical = 3
 
+[node name="APLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=1000000020]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "AP:  0 / 10"
+horizontal_alignment = 1
+
 [node name="ActionGrid" type="GridContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=420510029]
 unique_name_in_owner = true
 layout_mode = 2
@@ -344,15 +356,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
 text = "Research"
-
-[node name="RemoveButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1949861252]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 36)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 13
-text = "Remove"
 
 [node name="NoSelectionLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=567673002]
 unique_name_in_owner = true
