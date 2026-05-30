@@ -50,22 +50,22 @@ Action costs and effects:
 
 | Action       | AP Cost | Effect                                                                                                                                                                                                       |
 | ------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Repair**   | 3 AP    | Condition rises by a base increment scaled by storage zone and item rarity, capped at 0.5.                                                                                                                   |
+| **Repair**   | 2 AP    | Condition rises by a base increment scaled by storage zone and item rarity, capped at 0.5.                                                                                                                   |
 | **Restore**  | 4 AP    | Condition rises by a larger base increment scaled by storage zone, rarity, and the Restoration attribute, capped at 1.0.                                                                                     |
-| **Research** | 5 AP    | Deterministic — no roll. Each spend adds `5 + Investigation attribute` progress toward one target hidden clue; the clue reveals when accumulated progress ≥ its DC. Unavailable when no hidden clues remain. |
+| **Research** | 4 AP    | Deterministic — no roll. Each spend adds `5 + Investigation attribute` progress toward one target hidden clue; the clue reveals when accumulated progress ≥ its DC. Unavailable when no hidden clues remain. |
 
 Each action applies immediately on selection — no day-tick delay. One press applies one action's worth of effect.
 
 **Per-slot budget math** — 10 AP is the budget for _one_ storage slot:
 
-| Single-Slot Plan         | AP Used | Notes                             |
-| ------------------------ | ------- | --------------------------------- |
-| 2× Repair + 1× Research  | 11      | Over budget — must drop one       |
-| 1× Restore + 1× Research | 9       | Feasible, 1 AP waste              |
-| 3× Repair                | 9       | Full-condition push, 1 AP waste   |
-| 2× Research              | 10      | Research-focused slot             |
-| 1× Restore + 1× Repair   | 7       | Mixed, 3 AP leftover              |
-| 1× Repair                | 3       | Light maintenance, rest AP unused |
+| Single-Slot Plan                     | AP Used | Notes                                  |
+| ------------------------------------ | ------- | -------------------------------------- |
+| 2× Restore + 1× Research             | 12      | Over budget — must drop one            |
+| 2× Research + 1× Repair              | 10      | Research-focused slot, exact fit       |
+| 1× Restore + 1× Research + 1× Repair | 10      | Mixed slot, exact fit                  |
+| 5× Repair                            | 10      | Full-condition push                    |
+| 1× Restore + 1× Research             | 8       | Feasible, 2 AP leftover (room for Repair) |
+| 1× Repair                            | 2       | Light maintenance, rest AP unused      |
 
 A player who wants to do more spends _another slot_ on Storage for a fresh 10 AP — the cost is the auction or selling given up, not a shared daily ceiling.
 

@@ -47,6 +47,7 @@ Replace atomic calendar days with a 3-slot day, move storage work onto a per-slo
 | `game/meta/storage/storage_scene.gd` + `.tscn` | Large | AP bar; buttons spend AP and apply immediately; gray-out on insufficient AP / inapplicable; drop slot-assignment UI. |
 | `common/gameplay/item_entry.gd` | Medium | Add per-clue `research_progress`; deterministic add-progress + single-clue reveal; serialize it; leave `attempt_clue` untouched. |
 | `common/gameplay/research_slot.gd` | Medium | Keep `apply_repair`/`apply_restore` (and constants); remove slot lifecycle (`research_days_spent`, `completed`, assignment `check_assignable`). |
+| `global/constants/economy.gd` | Small | Add `STORAGE_AP_MAX`, `REPAIR_AP_COST`, `RESTORE_AP_COST`, `RESEARCH_AP_COST`; retire `RESEARCH_DAYS` (migration keeps a frozen local copy of the legacy table). |
 | `global/autoload/save_manager.gd` | Medium | Add `current_slot`, `storage_ap`; remove `research_slots` from schema; migration to discard legacy slots and seed `research_progress`. |
 | `common/gameplay/run_record.gd` | Medium | Add `inspection_ap_cap` + `refill_metric`; change `set_lot()` from hard reset to deficit refill toward cap. |
 | `global/autoload/run_manager.gd` | Small | Initialize cap + reserve at auction-visit start; reset on `clear_run_state()`. |
@@ -58,9 +59,37 @@ Replace atomic calendar days with a 3-slot day, move storage work onto a per-slo
 
 ## Implementation Notes
 
-**Storage AP (MetaManager + storage_scene).** AP is per Storage *slot*, not per day: refresh `storage_ap` to max (10) when a Storage slot begins, discard leftover when it ends — never carry across slots. Storage buttons call a new immediate-execution method that (1) checks cost ≤ `storage_ap`, (2) applies the effect, (3) decrements `storage_ap`, (4) emits the same `KnowledgeManager.add_category_points(...)` XP events the old tick path emitted (REPAIR/RESTORE/REVEAL). Costs: Repair 3, Restore 4, Research 5. Reuse `ResearchSlot.apply_repair`/`apply_restore` directly — they already enforce the 0.5 / 1.0 caps and read the Restoration attribute.
+**Storage AP (MetaManager + storage_scene).** AP is per Storage *slot*, not per day: `MetaManager` refreshes `storage_ap` to `Economy.STORAGE_AP_MAX` (10) when a Storage slot begins and discards any leftover when the slot ends — AP never carries across slots. Cost constants live in `economy.gd` next to `STORAGE_AP_MAX`:
 
-**Deterministic research (item_entry).** Add `research_progress: Dictionary` (clue_id → int). Research targets one hidden clue; each spend adds `5 + KnowledgeManager.get_attribute_value("investigation")` to that clue's progress; reveal it (append to `revealed_clue_ids`, grant a REVEAL XP event) once progress ≥ `clue.dc`. No roll, never `attempt_clue`. The action is unavailable when all `_hidden_clues()` are revealed. Serialize `research_progress` in `to_dict`/`from_dict`.
+| Action | Constant | AP Cost |
+| --- | --- | --- |
+| Repair | `REPAIR_AP_COST` | 2 |
+| Restore | `RESTORE_AP_COST` | 4 |
+| Research | `RESEARCH_AP_COST` | 4 |
+
+Each Storage button maps to one immediate-execution MetaManager method — there is no slot to assign. The old `storage_scene.gd` path (`_assign_action` → `MetaManager.assign_research_slot` / `remove_research_slot`, plus `_populate_tasks` task cards and the Remove button) is deleted; buttons call the new methods and the scene re-renders. Every method follows the same **guard → apply → charge** shape, and AP is charged *after* the effect lands, so a disabled or no-op action never costs AP:
+
+*Repair* — press Repair → `MetaManager.repair_item(entry)`:
+
+1. Guard: `storage_ap >= REPAIR_AP_COST` and `not ResearchSlot.is_repair_complete(entry)` (condition < 0.5). Button disabled otherwise.
+2. Apply: `ResearchSlot.apply_repair(entry)` — raises condition toward the 0.5 cap and emits the REPAIR XP event.
+3. Charge: `storage_ap -= REPAIR_AP_COST` (2).
+
+*Restore* — press Restore → `MetaManager.restore_item(entry)`:
+
+1. Guard: `storage_ap >= RESTORE_AP_COST`, condition ≥ 0.5, and `not ResearchSlot.is_restore_complete(entry)` (condition < 1.0).
+2. Apply: `ResearchSlot.apply_restore(entry)` — raises condition toward 1.0 using the Restoration attribute and emits the RESTORE XP event.
+3. Charge: `storage_ap -= RESTORE_AP_COST` (4).
+
+*Research* — press Research → `MetaManager.research_item(entry)`:
+
+1. Guard: `storage_ap >= RESEARCH_AP_COST` and at least one hidden clue is still unrevealed.
+2. Apply: advance progress on the target hidden clue by `5 + KnowledgeManager.get_attribute_value("investigation")` (deterministic — never `attempt_clue`); when progress ≥ `clue.dc`, reveal it (append to `revealed_clue_ids`, emit the REVEAL XP event). See the deterministic-research note below for the per-clue progress store.
+3. Charge: `storage_ap -= RESEARCH_AP_COST` (4).
+
+Reuse `ResearchSlot.apply_repair`/`apply_restore` directly — they already enforce the 0.5 / 1.0 caps and read the Restoration attribute. After any action MetaManager saves and `storage_scene.gd` re-renders the AP bar, the detail panel, and each button's enabled/visible state (Repair/Restore mutual exclusion is unchanged).
+
+**Deterministic research (item_entry).** This is the day-count → progress refactor: the old model (`ResearchSlot.research_days_spent` ticked against `Economy.RESEARCH_DAYS[rarity]`, then an atomic `reveal_all_hidden()`) is replaced by per-clue accumulated progress revealed one clue at a time. Add `research_progress: Dictionary` (clue_id → int) on `ItemEntry`. Research targets one hidden clue; each spend (cost `RESEARCH_AP_COST`) adds `5 + KnowledgeManager.get_attribute_value("investigation")` to that clue's progress; reveal it (append to `revealed_clue_ids`, grant a REVEAL XP event) once progress ≥ `clue.dc`. No roll, never `attempt_clue`. The action is unavailable when all `_hidden_clues()` are revealed. Serialize `research_progress` in `to_dict`/`from_dict`.
 
 **Auction two-tier AP (run_record + run_manager).** Add `inspection_ap_cap` (10) and `refill_metric` to RunRecord. In `set_lot()`, replace `actions_remaining = action_quota` with a deficit refill: `deficit = cap - actions_remaining; take = min(deficit, refill_metric); actions_remaining += take; refill_metric -= take`. On the first lot of a visit `actions_remaining` starts at the cap. Within-lot spending is unchanged. When `refill_metric` is 0 no top-up occurs. RunManager seeds cap + reserve when a visit begins and clears them in `clear_run_state()`. The inspection HUD max becomes the cap.
 
@@ -68,7 +97,7 @@ Replace atomic calendar days with a 3-slot day, move storage work onto a per-slo
 
 **Customer count.** Map committed selling slots → count before generation: 1 → randi(2,3), 2 → randi(4,6), 3 → randi(7,10). Pass as the `count` arg of `Customer.generate_for_night`.
 
-**Migration (save_manager).** On load: if `research_slots` is present, discard it. For an item mid-research under the old model, seed `research_progress` so spent effort isn't lost — convert `research_days_spent / Economy.RESEARCH_DAYS[rarity]` into already-revealed hidden clues, remainder into progress on the next clue. `condition` and `revealed_clue_ids` already persist — no loss. Auction AP is run-scoped and never persisted.
+**Migration (save_manager).** On load: if `research_slots` is present, discard it. For an item mid-research under the old model, seed `research_progress` so spent effort isn't lost — convert `research_days_spent` against the legacy duration into already-revealed hidden clues, remainder into progress on the next clue. Because `Economy.RESEARCH_DAYS` is retired, the migration keeps a frozen local copy of that rarity→days table rather than reading the live constant. `condition` and `revealed_clue_ids` already persist — no loss. Auction AP is run-scoped and never persisted.
 
 ## Edge Cases
 
