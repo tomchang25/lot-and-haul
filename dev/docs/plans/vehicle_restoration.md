@@ -1,9 +1,5 @@
 # Vehicle Restoration System
 
-**Status:** Exploring
-
-> Not scheduled. Open questions flagged inline.
-
 Collectible subsystem: vehicle parts appear in auction lots, players collect
 full sets across runs, assemble them in a dedicated garage, and sell finished
 vehicles (or occasionally drive them) through the Car Shop. Separate from the
@@ -118,7 +114,7 @@ restoration fantasy.
 - **Part shape/weight in cargo.** If a car frame is a 3×5 monster, it
   dominates the grid. Is that the point (trade-off pressure) or a frustration
   (locks out the run)? Probably the point, but needs playtest.
-- **Auction frequency.** How often does *any* vehicle part appear? How much
+- **Auction frequency.** How often does _any_ vehicle part appear? How much
   rarer is a whole assembled vehicle? Needs tuning so a full restoration
   feels achievable but not routine.
 - **Interaction with `Vehicle` super_category removal.** Existing

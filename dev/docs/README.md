@@ -9,11 +9,11 @@ levels is what causes docs to rot — when the same thing is written twice, one 
 goes stale and you can't tell which. The level is chosen by **audience + how often
 the fact changes**, not by how "important" it feels.
 
-| Level | What | Audience | Lives in | Changes |
-|-------|------|----------|----------|---------|
-| **L1 Vision** | The whole-project concept: core loop, the fantasy, why it's fun. ≤5 artifacts total. | Humans | `vision/` (interactive HTML or md) | Almost never |
-| **L2 Systems & design** | One system's design intent + flow, or a standalone design/work doc. Agent-readable, human-readable. | Agents (humans too) | `systems/` `plans/` | When design changes |
-| **L3 Detail** | Function names, fields, signatures, step-by-step logic. | Agents reading code | Code docstrings (`#` header, `##` GDDoc) | Every commit |
+| Level                   | What                                                                                                | Audience            | Lives in                                 | Changes             |
+| ----------------------- | --------------------------------------------------------------------------------------------------- | ------------------- | ---------------------------------------- | ------------------- |
+| **L1 Vision**           | The whole-project concept: core loop, the fantasy, why it's fun. ≤5 artifacts total.                | Humans              | `vision/` (interactive HTML or md)       | Almost never        |
+| **L2 Systems & design** | One system's design intent + flow, or a standalone design/work doc. Agent-readable, human-readable. | Agents (humans too) | `systems/` `plans/`                      | When design changes |
+| **L3 Detail**           | Function names, fields, signatures, step-by-step logic.                                             | Agents reading code | Code docstrings (`#` header, `##` GDDoc) | Every commit        |
 
 Why this resists rot:
 
@@ -24,32 +24,32 @@ Why this resists rot:
 
 ## Tracking lives at the repo root, not here
 
-Documentation (this folder) describes **how the project works**. *Tracking* —
+Documentation (this folder) describes **how the project works**. _Tracking_ —
 what's done, what's planned, what's next — is a separate concern and lives in three
 root-level files. Keeping them apart is what stops architecture docs from filling
 with status noise.
 
-| File | Direction | What it holds | Rots? |
-|------|-----------|---------------|-------|
-| `CHANGELOG.md` | backward | Append-only record of shipped work. The permanent "done" history. | Never — append-only, never reconciled against code |
-| `ROADMAP.md` | forward | The **active** flow + dependency map + decided-but-deferred features. Coarse, small, current. | No — because completed flows are *cut out*, not marked done |
-| `TODO.md` | forward | The single forward surface: open work (Plan/Chore/Bug one-liners) **plus** a `## Draft` section of brewing concepts. | No — done = delete the line |
+| File           | Direction | What it holds                                                                                                                                                                                         | Rots?                                              |
+| -------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `CHANGELOG.md` | backward  | Append-only record of shipped work. The permanent "done" history.                                                                                                                                     | Never — append-only, never reconciled against code |
+| `TODO.md`      | forward   | The single forward surface: `## Active` in-flight flows, open work (Plan/Chore/Bug one-liners), and a `## Draft` section of brewing concepts. Multi-step flows detail out to `dev/docs/plans/` files. | No — done = delete the line                        |
 
-> **The one principle behind all three: there is no living "Done" list anywhere.**
+> **The one principle behind all of them: there is no living "Done" list anywhere.**
 > "Done" is recorded once in `CHANGELOG.md` (immutable history) and erased everywhere
-> else. A `systems/` doc never enumerates what was built; `ROADMAP.md` never keeps a
-> "complete" table; `TODO.md` has no Done section. A standing list of finished work is
-> the single most reliable way to rot — so we don't keep one.
+> else. A `systems/` doc never enumerates what was built; a `dev/docs/plans/` file cuts
+> shipped phases out rather than checking them off; `TODO.md` has no Done section. A
+> standing list of finished work is the single most reliable way to rot — so we don't keep one.
 
-### ROADMAP vs TODO vs CHANGELOG
+### TODO vs plans/ vs CHANGELOG
 
-- **ROADMAP** = the WHY and the *order*. The currently-active branch of work (the flow
-  being planned/implemented) plus its dependency map and decided-but-deferred features.
-  Coarse, milestone-level. **Forward-only**: when a whole flow ships, you cut it out
-  entirely. Test: *does this item need sequencing or a dependency reason?* → ROADMAP.
-- **TODO** = the WHAT-NOW, and the only place an idea lives before it earns a file.
-  One forward surface so nothing gets forgotten in a second list. Test: *is it just a
-  thing to do (or a concept I'm chewing on) that isn't sequenced?* → TODO.
+- **TODO** = the WHAT-NOW and the single forward surface — every open item and brewing
+  idea, so nothing gets forgotten in a second list. `## Active` holds in-flight flows,
+  `## Plan` holds queued flows backed by a file, `## Draft` holds concepts. Entries are
+  one line; the moment something needs sequencing, a dependency reason, or phases, it
+  earns a `dev/docs/plans/` file and `TODO.md` keeps only a one-line pointer.
+- **plans/** = the WHY and the _order_. A multi-step flow's phases, dependencies, and
+  acceptance criteria live in its own file. **Forward-only**: ship a phase → cut it out;
+  ship the flow → archive the file.
 - **CHANGELOG** = the permanent record. The only place finished work persists.
 
 ## The maturity scale (one item, one home)
@@ -57,17 +57,17 @@ with status noise.
 A forward item has exactly one home, chosen by how much substance it carries. It moves
 home as it grows — it is never written in two places at once.
 
-| Maturity | Home | Form |
-|----------|------|------|
-| One line, no reasoning | `TODO.md` → `Plan` / `Chore` / `Bug` | a single line |
-| Bigger than a line, but one section says enough | `TODO.md` → `## Draft` | one `###` sub-section under `## Draft` |
-| Earned its own file (grew sub-structure / actionable / needs a stable link) | `dev/docs/plans/<x>.md` | a file with a `Status:` header |
-| Design locked | graduate the conclusion into `systems/`, archive the file | present-tense paragraph in `systems/` |
-| Shipped | `CHANGELOG.md` entry; cut from ROADMAP; delete TODO line | append-only history |
+| Maturity                                                                    | Home                                                                                                   | Form                                   |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------- |
+| One line, no reasoning                                                      | `TODO.md` → `Plan` / `Chore` / `Bug`                                                                   | a single line                          |
+| Bigger than a line, but one section says enough                             | `TODO.md` → `## Draft`                                                                                 | one `###` sub-section under `## Draft` |
+| Earned its own file (grew sub-structure / actionable / needs a stable link) | `dev/docs/plans/<x>.md` + a one-line pointer in `TODO.md` `## Plan`                                    | a standalone design/work file          |
+| Design locked                                                               | graduate the conclusion into `systems/`, archive the file                                              | present-tense paragraph in `systems/`  |
+| Shipped                                                                     | `CHANGELOG.md` entry; cut the phase from its plan file; delete the TODO line when the whole flow lands | append-only history                    |
 
 > **The one rule — now about sections, not files:** the actionable TODO tiers
 > (`Plan`/`Chore`/`Bug`) are **one line each**. The instant an item needs a paragraph of
-> *why*, a table, or a trade-off, it belongs in `## Draft` as its own section — never
+> _why_, a table, or a trade-off, it belongs in `## Draft` as its own section — never
 > inline in a one-liner tier. When that section grows sub-structure, becomes actionable,
 > or needs to be linked, it graduates to a `plans/` file.
 
@@ -79,14 +79,13 @@ actionable one-liners clean by corralling reasoning into a single labelled secti
 
 ```
 repo root/
-├── ROADMAP.md   Forward-only: active flow + dependency map + deferred features. Cut shipped flows.
-├── TODO.md      Single forward surface: Plan/Chore/Bug one-liners + a ## Draft section.
+├── TODO.md      Single forward surface: ## Active + Plan/Chore/Bug one-liners + a ## Draft section.
 └── CHANGELOG.md Append-only shipped history. The permanent "done" record.
 
 dev/docs/
 ├── vision/      L1: whole-project concept. ≤5 artifacts. Changes almost never.
 ├── systems/     L2: per-system design intent + flow, present tense. Evergreen. (concept only)
-├── plans/       L2: one standalone design/work doc per file, each with a Status: header.
+├── plans/       L2: one standalone design/work doc per file (multi-step flow detail).
 ├── archived/    Completed or superseded docs (read-only reference)
 └── README.md    This file
 ```
@@ -97,12 +96,14 @@ You will not "tidy docs" on a schedule — so the system must update itself whil
 work:
 
 - **Finish a chore/bug** → delete its line in `TODO.md`. Nothing left behind.
-- **A `## Draft` idea earns a file** → move it to `dev/docs/plans/<x>.md` with a
-  `Status: Exploring` header and delete the Draft section. A `## Draft` idea that went
-  stale and never grew → just delete it.
-- **Ship a flow** → append one entry to `CHANGELOG.md`, cut the flow out of
-  `ROADMAP.md`, and delete its `TODO.md` lines — all in the same commit.
-- **A plan's design gets locked** → write the *conclusion* (1 paragraph) into the
+- **A `## Draft` idea earns a file** → move it to `dev/docs/plans/<x>.md`, leave a
+  one-line pointer in `TODO.md` `## Plan`, and delete the Draft section. A `## Draft`
+  idea (or a stale `## Plan` pointer) that never grew → just delete it / retire it back
+  to Draft.
+- **Ship a phase** → append one entry to `CHANGELOG.md` and cut that phase from its plan
+  file. **Ship the whole flow** → archive the plan file and delete its `TODO.md` line —
+  all in the same commit.
+- **A plan's design gets locked** → write the _conclusion_ (1 paragraph) into the
   matching `systems/` doc, then move the plan to `archived/`. It never lingers as a
   competing source of truth.
 - **Code detail changes** → it was in L3, so it's already updated in the same commit.
@@ -128,7 +129,7 @@ Tie doc maintenance to "marking something done," never to a separate cleanup pas
 ### vision/ (L1)
 
 The project's reason to exist: core loop, player fantasy, what makes it fun. Aimed at
-a human seeing the whole picture, so interactive HTML is fine — but keep the *source*
+a human seeing the whole picture, so interactive HTML is fine — but keep the _source_
 maintainable (write the substance in md and render, or accept it changes almost never).
 Hard cap: **≤5 artifacts.** If you're adding a 6th, it's probably an L2 system doc.
 
@@ -152,7 +153,7 @@ is a snapshot of current design, not a history of how it got here.
   points), anything that changes with a refactor.
 - A **`## Status` / `Done` enumeration of what's been built.** That's a changelog —
   it rots, and git already has it. Delete it; the system doc's present-tense
-  description *is* the status.
+  description _is_ the status.
 - **Any `## Planned` / `## Future` / todo-style section** — even a links-only one.
   A system doc carries zero forward-looking sections. Every forward item is routed to
   one of two homes instead:
@@ -161,7 +162,7 @@ is a snapshot of current design, not a history of how it got here.
     question, present tense (e.g. "Should trailer items enter storage, be discarded, or
     be a separate risk channel? — undecided").
   - if it's **forward work or a feature idea** (something to build) → it leaves the doc
-    entirely and goes into the `TODO.md` / `ROADMAP.md` pre-implement sequence.
+    entirely and goes into `TODO.md` (and, if it's a multi-step flow, a `dev/docs/plans/` file).
 
 Guiding test: **if renaming a function would make the doc wrong, that detail doesn't
 belong here. If the doc would still be true after the next ship, it's evergreen.** A
@@ -171,19 +172,16 @@ system doc only ever describes the present and names what's genuinely undecided 
 ### plans/ (L2, temporary)
 
 One file per standalone design/work item — the place an idea lands once it has outgrown
-a `TODO.md` `## Draft` section. This single folder holds **both** still-exploratory
-designs and committed pre-plans; the difference is expressed by a header line, not by
-which folder it sits in:
-
-```md
-**Status:** Exploring   ← still figuring out whether/how; may be abandoned
-**Status:** Committed   ← decided; has (or will have) a TODO "Plan" line / ROADMAP slot
-```
+a `TODO.md` `## Draft` section. It holds both still-exploratory designs and committed
+pre-plans; there is no `Status:` header — whether it's actively being built is expressed
+by where its pointer sits in `TODO.md` (`## Plan` = queued, `## Active` = building), and
+a stale plan is retired by moving its content back to `## Draft`.
 
 Name: `<scope>_<short_description>.md`. Contains goal (1–2 sentences), context/why now,
-high-level steps, acceptance criteria, and the `Status:` header. When the work ships,
-the flow is recorded in `CHANGELOG.md`; when its design locks, graduate the conclusion
-to `systems/`. Archive the plan once it's shipped or superseded.
+high-level steps (or phases), and acceptance criteria. Keep it **forward-only**: as each
+phase ships, cut it out and record it in `CHANGELOG.md` — don't keep a checked-off phase
+ledger. When its design locks, graduate the conclusion to `systems/`. Archive the plan
+once it's shipped or superseded.
 
 ## Relationship to other dev/ folders
 

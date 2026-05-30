@@ -1,7 +1,5 @@
 # Garage-Sale Auction
 
-**Status:** Exploring
-
 > Not scheduled. Also serves as the canonical backup of
 > the **merchant negotiation mechanic**, which is being decommissioned with the rest
 > of the merchant system (`game/meta/merchant/`, `MerchantData`, `MerchantRegistry`,
@@ -16,9 +14,9 @@ fitting items into a cargo grid, and then haggles the seller's asking price down
 trying to pay as little as possible without making the seller dig in and refuse.
 
 It is the **mirror image** of the old merchant shop. There, the player was the
-*seller* pushing a basket of owned items *up* toward a hidden ceiling while the
-merchant's anger rose. Here the player is the *buyer* pushing the seller's asking
-price *down* toward a hidden floor while the seller's anger rises. The negotiation
+_seller_ pushing a basket of owned items _up_ toward a hidden ceiling while the
+merchant's anger rose. Here the player is the _buyer_ pushing the seller's asking
+price _down_ toward a hidden floor while the seller's anger rises. The negotiation
 engine is the same; only the direction and the labels flip.
 
 ## Why this exists
@@ -30,7 +28,7 @@ mode with a different texture:
 - **Open inventory, not sealed.** Every item is unveiled by default — the player
   sees what is on offer up front and can inspect to reveal clues, but there is no
   "buy the whole mystery box" gamble.
-- **Selective, not all-or-nothing.** The player chooses *which* items to take by
+- **Selective, not all-or-nothing.** The player chooses _which_ items to take by
   fitting them into a cargo grid, the same spatial puzzle used in cargo packing and
   customer sell. Grid capacity is the constraint, not a single winning bid.
 - **Priced by haggling, not by auction.** Instead of out-bidding rivals, the player
@@ -73,7 +71,7 @@ modified by the player's attributes.
 
 For the garage sale, the key difference stated in the feature brief is **all items
 are unveiled by default** — there is no fog over the grid. The player still spends
-AP (or some inspection budget) to reveal *clues* and raise `inspection_level`, which
+AP (or some inspection budget) to reveal _clues_ and raise `inspection_level`, which
 sharpens the appraised value, but the "what shape is this even" reveal step is
 skipped. In practice this means reusing the clue-inspection half of the existing
 scene with the unveil step pre-completed for every shape.
@@ -153,7 +151,7 @@ anger         = 0
 state         = NEGOTIATING
 ```
 
-The exact rolled `ceiling` is **never shown**. The UI only shows the *range*
+The exact rolled `ceiling` is **never shown**. The UI only shows the _range_
 (`base_offer × ceiling_multiplier_min` … `base_offer × ceiling_multiplier_max`), so
 the player knows the band but must probe for the real number. This mystery is the
 core of the mechanic — overshoot the ceiling and you instantly max out anger.
@@ -162,13 +160,13 @@ core of the mechanic — overshoot the ceiling and you instantly max out anger.
 
 Evaluated top-to-bottom; first matching branch wins:
 
-| Condition | Outcome |
-| --- | --- |
-| `proposal <= current_offer` | Lowball-confirm dialog. On confirm → `accepted(proposal)` (you can always accept the standing offer or worse). On cancel → no anger, the round is **not** consumed. |
-| `proposal > ceiling` | Anger pinned to `anger_max` → `FINAL_OFFER` state at `current_offer`. |
-| anger would reach `anger_max` | `anger = anger_max` → `FINAL_OFFER` state at `current_offer`. |
-| proposal inside the auto-accept band | Probabilistic immediate `accepted(proposal)` — skips the counter round. |
-| otherwise | Apply anger, emit a counter-offer, stay in `NEGOTIATING`. |
+| Condition                            | Outcome                                                                                                                                                             |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `proposal <= current_offer`          | Lowball-confirm dialog. On confirm → `accepted(proposal)` (you can always accept the standing offer or worse). On cancel → no anger, the round is **not** consumed. |
+| `proposal > ceiling`                 | Anger pinned to `anger_max` → `FINAL_OFFER` state at `current_offer`.                                                                                               |
+| anger would reach `anger_max`        | `anger = anger_max` → `FINAL_OFFER` state at `current_offer`.                                                                                                       |
+| proposal inside the auto-accept band | Probabilistic immediate `accepted(proposal)` — skips the counter round.                                                                                             |
+| otherwise                            | Apply anger, emit a counter-offer, stay in `NEGOTIATING`.                                                                                                           |
 
 ### Anger formula
 
@@ -182,7 +180,7 @@ anger += anger_k × greed + anger_per_round
 
 `anger_per_round` is a flat tax every submission, so even patient haggling has a
 hard round ceiling of `anger_max / anger_per_round` rounds. `anger_k` scales the
-*greed* penalty: a proposal that jumps most of the way to the ceiling costs far more
+_greed_ penalty: a proposal that jumps most of the way to the ceiling costs far more
 patience than a small nudge. A `proposal > ceiling` skips this entirely and pins
 anger to max.
 
@@ -249,24 +247,24 @@ CenterContainer/Panel/MarginContainer/VBox
 ```
 
 The ±% buttons set `ProposalInput = int(current_offer × (1 + pct))` — they are
-shortcuts relative to the *standing offer*, not the base.
+shortcuts relative to the _standing offer_, not the base.
 
 ### Tuning surface (`MerchantData` negotiation fields)
 
 These are the designer-facing knobs to preserve. Reproduced from
 `data/definitions/merchant_data.gd`:
 
-| Field | Default | Meaning |
-| --- | --- | --- |
-| `ceiling_multiplier_min` | `1.1` | Lower bound of the per-session ceiling roll (× base offer). |
-| `ceiling_multiplier_max` | `1.3` | Upper bound of the ceiling roll. The shown range. |
-| `anger_max` | `100.0` | Patience cap; reaching it forces the final offer. |
-| `anger_k` | `20.0` | Gain on the greed term of the anger formula. |
-| `anger_per_round` | `20.0` | Flat anger per submission. Sets the hard round cap (`anger_max / anger_per_round`). |
-| `counter_aggressiveness` | `0.3` | Fraction of the gap closed per counter, in `(0, 1]`. |
-| `auto_accept_threshold` | `0.2` | Gap-ratio below which auto-accept may fire. |
-| `auto_accept_p_min` | `0.05` | Acceptance probability at the threshold edge (interpolates from `1.0`). |
-| `negotiation_per_day` | `1` | Sessions allowed per day (runtime `negotiations_used_today`). |
+| Field                    | Default | Meaning                                                                             |
+| ------------------------ | ------- | ----------------------------------------------------------------------------------- |
+| `ceiling_multiplier_min` | `1.1`   | Lower bound of the per-session ceiling roll (× base offer).                         |
+| `ceiling_multiplier_max` | `1.3`   | Upper bound of the ceiling roll. The shown range.                                   |
+| `anger_max`              | `100.0` | Patience cap; reaching it forces the final offer.                                   |
+| `anger_k`                | `20.0`  | Gain on the greed term of the anger formula.                                        |
+| `anger_per_round`        | `20.0`  | Flat anger per submission. Sets the hard round cap (`anger_max / anger_per_round`). |
+| `counter_aggressiveness` | `0.3`   | Fraction of the gap closed per counter, in `(0, 1]`.                                |
+| `auto_accept_threshold`  | `0.2`   | Gap-ratio below which auto-accept may fire.                                         |
+| `auto_accept_p_min`      | `0.05`  | Acceptance probability at the threshold edge (interpolates from `1.0`).             |
+| `negotiation_per_day`    | `1`     | Sessions allowed per day (runtime `negotiations_used_today`).                       |
 
 Two reference merchant tunings from `data/yaml/merchant_data.yaml`:
 
@@ -296,19 +294,19 @@ re-roll happened in `MerchantRegistry.advance_day()` →
 
 The engine is symmetric; only orientation and labels change.
 
-| Seller-side (old merchant shop) | Buyer-side (garage sale) |
-| --- | --- |
-| Player pushes price **up** | Player pushes price **down** |
-| Hidden **ceiling** = max merchant will pay | Hidden **floor** = min the seller will accept |
-| `base_offer = Σ item_price` (what merchant initially offers) | `asking_price` = seller's opening number (e.g. `item_price × asking_multiplier > 1`) |
-| Proposals climb toward the ceiling | Proposals descend toward the floor |
-| `proposal > ceiling` → instant max anger | `proposal < floor` → instant max anger (insulting lowball) |
-| Lowball guard: `proposal <= current_offer` | Highball guard: `proposal >= current_offer` (offering *more* than the standing price — auto-accept / confirm) |
-| Counter moves merchant's offer up toward player | Counter moves seller's price down toward player |
-| Accept credits cash, removes items | Accept **debits** cash, **adds** items to cargo/storage |
+| Seller-side (old merchant shop)                              | Buyer-side (garage sale)                                                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| Player pushes price **up**                                   | Player pushes price **down**                                                                                  |
+| Hidden **ceiling** = max merchant will pay                   | Hidden **floor** = min the seller will accept                                                                 |
+| `base_offer = Σ item_price` (what merchant initially offers) | `asking_price` = seller's opening number (e.g. `item_price × asking_multiplier > 1`)                          |
+| Proposals climb toward the ceiling                           | Proposals descend toward the floor                                                                            |
+| `proposal > ceiling` → instant max anger                     | `proposal < floor` → instant max anger (insulting lowball)                                                    |
+| Lowball guard: `proposal <= current_offer`                   | Highball guard: `proposal >= current_offer` (offering _more_ than the standing price — auto-accept / confirm) |
+| Counter moves merchant's offer up toward player              | Counter moves seller's price down toward player                                                               |
+| Accept credits cash, removes items                           | Accept **debits** cash, **adds** items to cargo/storage                                                       |
 
 Mechanically the cleanest implementation keeps the math identical and works in
-"discount space" — negotiate over how far *below* the asking price the deal lands,
+"discount space" — negotiate over how far _below_ the asking price the deal lands,
 so all the existing `>`/`<` comparisons and the greed ratio carry over unchanged.
 The "anger" stays anger; the "ceiling" is relabeled "floor" in the UI; the ±%
 buttons offer discounts instead of markups.

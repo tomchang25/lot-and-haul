@@ -10,8 +10,13 @@ its record lives in `CHANGELOG.md`.
 > The moment an item needs real reasoning, it belongs in `## Draft` as its own `###`
 > sub-section. When a Draft entry grows sub-structure, becomes actionable, or needs to be
 > linked from elsewhere, it graduates to its own file in `dev/docs/plans/`.
+>
+> Within `## Draft`, no `####` headings or `**label:**` bold-label patterns — use
+> plain-text labels (em-dash, colon) and lists for sub-structure.
 
-Multi-step sequenced work and its dependency order live in `ROADMAP.md`, not here.
+In-flight work lives in `## Active` — promoted from `## Plan` when building starts. The
+phase-by-phase detail and ordering stay in the linked `dev/docs/plans/` file, never
+churned into this list.
 
 Actionable line format: `[Scope] one sentence — [ref plans/<x>.md if any]`
 
@@ -83,7 +88,7 @@ Autoload that manages demo state without modifying production scenes — injects
 
 ### Dialog System
 
-Linear dialog first (Uncle branching second). DialogManager overlay autoload with data-driven dialog. Shared by demo runs and eventual full game.
+Linear dialog first (Uncle branching second). DialogManager overlay autoload with data-driven dialog. Shared by demo runs and eventual full game. See `dev/docs/plans/demo_summary.md`.
 
 ### Bank / Bankruptcy
 
@@ -160,13 +165,74 @@ Save dict has no version field — migrations use implicit `parsed.has("key")` c
 
 Two-part content standard. (1) Define super_category / category reference tables: median, mean, stddev, min, max price and condition per category for balancing. (2) Adopt rarity layer distribution as authoring guideline: 8 Common (L1), 8 Uncommon (L1-2), 4 Rare (L2-3), 1 Epic (L3-4), 1 Legendary (L4 + SuperCat). Audit existing YAML items against this standard.
 
+### Combination Naming Rules
+
+A combination rule defines a set of input clue ids and a replacement naming entry (slot, text, priority). When all inputs are revealed on the same item, the combination replaces individual naming entries during display-name composition — e.g. `{Blown Glass, Moser}` → `"Bohemian Moser"`. Authored per category, separate from clue definitions.
+
+Validation — the validator enforces:
+
+- existence of every referenced clue id,
+- same-domain inputs,
+- priority dominance over the individual naming entries it replaces,
+- full-reveal name match (the composed name equals the authored combination name when all inputs are revealed).
+
+Open questions:
+
+- Pairs only, or arbitrary input sets?
+- A single clue participating in multiple combination rules — allowed, and how resolved?
+- Strict text containment vs. free replacement of the individual entries.
+
+Prerequisite: the affix-naming system validated across the full item set (composed == authored) — already in place.
+
+### New Clue Types
+
+Two candidate clue types beyond the current anchor/surface/hidden modifier model.
+
+Override clue — replaces the anchor base price entirely when revealed during Research (e.g. a $200 "old clock" turns out to be a $15,000 Boulle original). Open: does it replace the anchor only or the full appraised value? Do surface adds still apply on top? Validation: hidden type only, max 1 per item.
+
+Conditional clue — a clue whose price effect depends on whether another specific clue is revealed:
+
+```
+if clue A revealed → apply effect_op P, effect_amount N
+else               → apply effect_op T, effect_amount M
+```
+
+Open: evaluation order (reveal time vs. price-compute time), circular-reference risk, YAML representation, and "else" semantics when A is on the item but unrevealed vs. not present.
+
+### Pool-Based Item Generation
+
+Remove `ItemData` as an authored-per-item resource. Instead, generate items at lot-draw time by drawing clues from a category-scoped pool: pick a category, then draw N clues (rarity controls count, tier access, and total value). The true name comes entirely from affix composition; the true value from applying the drawn clue modifiers. This shifts authoring from "define each item" to "define clue pools per category" — a smaller surface with combinatorial variety.
+
+Prerequisites:
+
+1. Clue modifier math validated — no degenerate price combinations from hand-curated items.
+2. Affix naming produces acceptable names for hand-curated items (validator confirms composed == authored).
+3. A balance-tuning tool to preview the value distribution of random pool draws before shipping.
+
+Not now: hand-curated `ItemData` gives full designer control and isolates variables; if the curated version works, the only new risk in pool generation is the draw distribution itself.
+
+---
+
+## Active
+
+Flows currently being built. One-line pointer each — same format as `## Plan`, just
+promoted here when work starts. Phase detail and progress live in the linked
+`dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`,
+leaving this line untouched. All phases shipped → archive the plan file + delete this
+line. Nothing in progress → this section is empty.
+
+- [day-structure] Time-slot day + storage AP economy: 3-slot day (morning/afternoon/evening), 10 AP/day pool for storage actions, customer scaling by slot commitment. See `dev/docs/plans/time_slot_economy.md`.
+
 ---
 
 ## Plan
 
-Committed work, backed by a pre-plan file in `dev/docs/plans/` (`Status: Committed`).
+Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to
+`## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
-_None yet._
+- [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
+- [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
+- [demo] Tutorial 3-run surface (stale — references legacy Skill/Merchant systems); Director + Dialog systems are surviving subsystems — see `dev/docs/plans/demo_summary.md`
 
 ---
 
@@ -180,6 +246,7 @@ One-line, no reasoning, no backing doc.
 - [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
 - [dev] Auto-put won items to cargo grid (dev-only, skips manual packing).
 - [dev] Instant-finish auction at current price (dev-only action).
+- [style] Standardize docstrings across all `.gd` files — file header + public function GDDoc format.
 
 ---
 

@@ -1,5 +1,10 @@
 # Demo Summary — Target Build (6 Days)
 
+> **Stale.** References "Skill system" (replaced by SPECIAL attributes), "Merchant v2"
+> and "Special orders" (replaced by unified customer sell). The demo concept (3-run
+> tutorial + narrative reset) is still valid but the implementation surfaces need
+> updating. Kept as design reference.
+
 ## Overview
 
 A directed 3-run onboarding experience that doubles as a tutorial. The player never feels

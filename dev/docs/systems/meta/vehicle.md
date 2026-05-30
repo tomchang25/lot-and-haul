@@ -67,5 +67,3 @@ The pre-run cost preview built during Location work will already be wired for `f
 ### Related
 
 The separate collectible **vehicle restoration** subsystem (auction parts → assemble → sell at car shop, with select models becoming drivable) is a future plan, documented in `../../plans/vehicle_restoration.md` and tracked in `ROADMAP.md`. It is distinct from the work-vehicle loop covered here and is not yet scheduled.
-
-
