@@ -25,9 +25,7 @@ On Day Pass: `GameManager.go_to_day_summary(summary)`. On Knowledge: `GameManage
 
 ### Data Definitions
 
-No resources owned by this block directly — Hub is a navigation surface over other
-systems' data. The only runtime hook is the Day Pass: it advances one day through
-`MetaManager` and routes the returned summary to the Day Summary scene.
+No resources owned by this block directly — Hub is a navigation surface over other systems' data. The only runtime hook is the Day Pass: it advances one day through `MetaManager` and routes the returned summary to the Day Summary scene.
 
 ### Hub Scene
 

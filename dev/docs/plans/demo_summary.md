@@ -1,16 +1,10 @@
 # Demo Summary — Target Build (6 Days)
 
-> **Stale.** References "Skill system" (replaced by SPECIAL attributes), "Merchant v2"
-> and "Special orders" (replaced by unified customer sell). The demo concept (3-run
-> tutorial + narrative reset) is still valid but the implementation surfaces need
-> updating. Kept as design reference.
+> **Stale.** References "Skill system" (replaced by SPECIAL attributes), "Merchant v2" and "Special orders" (replaced by unified customer sell). The demo concept (3-run tutorial + narrative reset) is still valid but the implementation surfaces need updating. Kept as design reference.
 
 ## Overview
 
-A directed 3-run onboarding experience that doubles as a tutorial. The player never feels
-taught — they feel like they are playing. Each run introduces one new mechanic and ends with
-a clear emotional payoff. The third run ends in a forced narrative reset that justifies
-starting over with a new location.
+A directed 3-run onboarding experience that doubles as a tutorial. The player never feels taught — they feel like they are playing. Each run introduces one new mechanic and ends with a clear emotional payoff. The third run ends in a forced narrative reset that justifies starting over with a new location.
 
 ---
 
@@ -48,29 +42,20 @@ starting over with a new location.
 
 ## DemoDirector Architecture
 
-The DemoDirector is a single autoload that manages demo state without modifying
-production scenes. It is also the foundation of the future tutorial system.
+The DemoDirector is a single autoload that manages demo state without modifying production scenes. It is also the foundation of the future tutorial system.
 
-**Data injection** (zero pollution): Before each run starts, DemoDirector injects
-fixed lot content, car assignment, and perks directly into RunRecord. Production
-scenes receive normal data and are unaware of the override.
+**Data injection** (zero pollution): Before each run starts, DemoDirector injects fixed lot content, car assignment, and perks directly into RunRecord. Production scenes receive normal data and are unaware of the override.
 
-**Signal hooks** (minimal pollution): Two scenes connect to DemoDirector signals
-in their `_ready()` only when `DemoDirector.active` is true. The scenes' own logic
-is unchanged — DemoDirector pushes behavior in from outside.
+**Signal hooks** (minimal pollution): Two scenes connect to DemoDirector signals in their `_ready()` only when `DemoDirector.active` is true. The scenes' own logic is unchanged — DemoDirector pushes behavior in from outside.
 
 - `auction_scene` — receives forced bid signals for Run 1 lot 1 (full lock) and Run 3 crown lot (single forced bid).
 - `cargo_scene` — receives a block signal when cargo count is below threshold (Run 1), and a forced-cargo signal for the crown (Run 3).
 
-**Day pass trigger**: The Run 3 cutscene fires from inside `advance_days()` via a
-single flag check (`DemoDirector.run3_crown_sold`). No other scene is modified.
+**Day pass trigger**: The Run 3 cutscene fires from inside `advance_days()` via a single flag check (`DemoDirector.run3_crown_sold`). No other scene is modified.
 
-**Cutscene**: A standalone scene, entirely demo-only. DemoDirector navigates to it
-directly; it handles the asset wipe and car swap before handing off to normal play.
+**Cutscene**: A standalone scene, entirely demo-only. DemoDirector navigates to it directly; it handles the asset wipe and car swap before handing off to normal play.
 
-**Dialog**: All Uncle dialog routes through DialogManager (a shared overlay autoload).
-DemoDirector emits signals at the appropriate moments; DialogManager handles display.
-No hub or run scene is modified directly.
+**Dialog**: All Uncle dialog routes through DialogManager (a shared overlay autoload). DemoDirector emits signals at the appropriate moments; DialogManager handles display. No hub or run scene is modified directly.
 
 ---
 

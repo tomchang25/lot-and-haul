@@ -1,21 +1,14 @@
 # Data Model
 
-The two layers that hold all game data: **designer resources** (static, authored,
-loaded from `.tres`) and **runtime types** (per-run/per-night state, save-serialized).
-This doc is concept-only — flow, lifecycle, and relationships. Field lists, signatures,
-and tuning constants live in the code docstrings of each file (paths below). If a field
-matters, it's documented where it's declared.
+The two layers that hold all game data: **designer resources** (static, authored, loaded from `.tres`) and **runtime types** (per-run/per-night state, save-serialized). This doc is concept-only — flow, lifecycle, and relationships. Field lists, signatures, and tuning constants live in the code docstrings of each file (paths below). If a field matters, it's documented where it's declared.
 
-> Single source of truth: this doc had previously mirrored every exported field. That
-> duplication went stale (e.g. it claimed Phase 11 customer-sales fields were still
-> "coming" after they shipped). The fields now live only in code.
+> Single source of truth: this doc had previously mirrored every exported field. That duplication went stale (e.g. it claimed Phase 11 customer-sales fields were still "coming" after they shipped). The fields now live only in code.
 
 ---
 
 ## Designer resources (`data/definitions/*.gd` → `data/tres/`)
 
-Authored in YAML, converted to `.tres` by the pipeline (see `autoloads.md`), loaded by
-the matching registry at boot. The chain of ownership:
+Authored in YAML, converted to `.tres` by the pipeline (see `autoloads.md`), loaded by the matching registry at boot. The chain of ownership:
 
 `SuperCategoryData` ← `CategoryData` ← `ItemData` → `Array[ClueData]`
 
@@ -44,18 +37,13 @@ the matching registry at boot. The chain of ownership:
 
 ### Deprecated designer resources
 
-`MerchantData`, `SpecialOrderData`, and `SpecialOrderSlotPoolEntry` belonged to the old
-merchant / negotiation / special-order channels, superseded by the unified nightly
-customer system (`../customer_sell.md`). They still load for save round-tripping but are
-scheduled for deletion; do not author new content against them. Their archived design
-docs are archived under `../../archived/` (the merchant, merchant_shop, and special_orders files).
+`MerchantData`, `SpecialOrderData`, and `SpecialOrderSlotPoolEntry` belonged to the old merchant / negotiation / special-order channels, superseded by the unified nightly customer system (`../customer_sell.md`). They still load for save round-tripping but are scheduled for deletion; do not author new content against them. Their archived design docs are archived under `../../archived/` (the merchant, merchant_shop, and special_orders files).
 
 ---
 
 ## Runtime types (`common/gameplay/*.gd`, sell math in `common/utils/`)
 
-All `RefCounted` value objects — save-serialized where persisted, free of autoload state
-where possible.
+All `RefCounted` value objects — save-serialized where persisted, free of autoload state where possible.
 
 - **RunRecord** — state for one warehouse run. Created in `location_select`, lives on
   `RunManager.run_record` (null between runs), cleared in `run_review`. Accumulates won
@@ -90,12 +78,8 @@ where possible.
 
 ### Sell math (`common/utils/sell_math.gd`)
 
-Pure, stateless, RNG-injectable. Computes item-fit against a customer's tags, the
-conservative multiplier vs. the aggressive dice-pool result, verified-item bonuses, and
-the final car total. See `../customer_sell.md` for how the sell loop uses it.
+Pure, stateless, RNG-injectable. Computes item-fit against a customer's tags, the conservative multiplier vs. the aggressive dice-pool result, verified-item bonuses, and the final car total. See `../customer_sell.md` for how the sell loop uses it.
 
 ### Deprecated runtime types
 
-`SpecialOrder` and `OrderSlot` are the runtime side of the old special-order channel —
-still compile and round-trip through save but superseded by the customer system and
-scheduled for removal. `PriceConfig` and `ItemViewContext` were already removed.
+`SpecialOrder` and `OrderSlot` are the runtime side of the old special-order channel — still compile and round-trip through save but superseded by the customer system and scheduled for removal. `PriceConfig` and `ItemViewContext` were already removed.

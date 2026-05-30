@@ -29,14 +29,9 @@ No scene transitions owned by this system directly; consumed by run scenes (insp
 
 ### Data Definitions
 
-`SaveManager` persists exactly three knowledge fields — category points (mastery layer 1),
-attribute levels, and unlocked perk ids. Category rank, super-category rank, and mastery
-rank are all **derived on demand** from category points — no caching, no stored player
-level. (See `../shared/data_model.md` and `../shared/autoloads.md`.)
+`SaveManager` persists exactly three knowledge fields — category points (mastery layer 1), attribute levels, and unlocked perk ids. Category rank, super-category rank, and mastery rank are all **derived on demand** from category points — no caching, no stored player level. (See `../shared/data_model.md` and `../shared/autoloads.md`.)
 
-`AttributeData` and `PerkData` are designer resources (`data/definitions/*.gd`, instances
-under `data/tres/`); their fields live in `../shared/data_model.md` and the code. Two
-behavioural notes that matter here:
+`AttributeData` and `PerkData` are designer resources (`data/definitions/*.gd`, instances under `data/tres/`); their fields live in `../shared/data_model.md` and the code. Two behavioural notes that matter here:
 
 - An **attribute** is not a level-with-prerequisites resource like the old skills — it's a
   single scalar the player buys up, defaulting to 1. Attributes feed clue-discovery dice
@@ -44,15 +39,7 @@ behavioural notes that matter here:
 - A **perk** is sourced from an attribute threshold: reaching the perk's required attribute
   value is the intended unlock trigger.
 
-`KnowledgeManager` (autoload) is the API surface for all three concerns: mastery (grant
-category points, read the three derived ranks), attributes (read a value — defaulting to 1
-when unset — and upgrade for a flat $1000/level), and perks (unlock and query). It also
-exposes a `KnowledgeAction` enum (Inspect / Reveal / Appraise / Repair / Sell / Restore)
-used to scale point gains, and the **public `RANK_THRESHOLDS` constant** the Mastery Panel
-reads for its progress display. It loads its perk and attribute registries at boot and
-registers with `RegistryCoordinator`, so its `validate()` (perk/attribute registries
-non-empty; every saved perk id resolves) runs at boot with the others. Signatures and the
-threshold/cost constants live in `knowledge_manager.gd`.
+`KnowledgeManager` (autoload) is the API surface for all three concerns: mastery (grant category points, read the three derived ranks), attributes (read a value — defaulting to 1 when unset — and upgrade for a flat $1000/level), and perks (unlock and query). It also exposes a `KnowledgeAction` enum (Inspect / Reveal / Appraise / Repair / Sell / Restore) used to scale point gains, and the **public `RANK_THRESHOLDS` constant** the Mastery Panel reads for its progress display. It loads its perk and attribute registries at boot and registers with `RegistryCoordinator`, so its `validate()` (perk/attribute registries non-empty; every saved perk id resolves) runs at boot with the others. Signatures and the threshold/cost constants live in `knowledge_manager.gd`.
 
 ### Mastery — Four Derived Layers
 

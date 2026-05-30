@@ -113,9 +113,7 @@ Organize tools by function. Register common tasks in `.vscode/tasks.json` for ed
 
 ## game/
 
-Use this folder for **all block-specific game content**: block scene roots,
-UI components, and logic scripts that belong to a specific block or are
-shared across blocks.
+Use this folder for **all block-specific game content**: block scene roots, UI components, and logic scripts that belong to a specific block or are shared across blocks.
 
 ### Structure
 
@@ -126,14 +124,11 @@ game/
   meta/           → out-of-run meta-game blocks
 ```
 
-Top-level `game/` contains exactly these three entries. Every block lives
-inside one of them. Do not add new top-level folders under `game/` without
-updating this document.
+Top-level `game/` contains exactly these three entries. Every block lives inside one of them. Do not add new top-level folders under `game/` without updating this document.
 
 ### game/shared/
 
-Contains UI components and logic helpers that are referenced by more than
-one block — across groups as well as within a group.
+Contains UI components and logic helpers that are referenced by more than one block — across groups as well as within a group.
 
 Rules:
 
@@ -145,9 +140,7 @@ Rules:
 
 ### game/run/
 
-Blocks that are part of a single in-location run. A run begins when the
-player enters a location and ends at run review. Everything the player
-interacts with **during** a run lives here.
+Blocks that are part of a single in-location run. A run begins when the player enters a location and ends at run review. Everything the player interacts with **during** a run lives here.
 
 ```
 game/run/
@@ -160,13 +153,11 @@ game/run/
   run_review/
 ```
 
-Placement test: **does this block only exist while a run is in progress,
-and does leaving it mean the run is over or advancing?** If yes → `run/`.
+Placement test: **does this block only exist while a run is in progress, and does leaving it mean the run is over or advancing?** If yes → `run/`.
 
 ### game/meta/
 
-Blocks that exist **between** runs — the home base, shops, progression
-screens, and day-boundary scenes.
+Blocks that exist **between** runs — the home base, shops, progression screens, and day-boundary scenes.
 
 ```
 game/meta/
@@ -190,11 +181,7 @@ If yes → `meta/`.
 
 #### Sub-grouping inside meta/
 
-`meta/` may contain a second level of grouping when a parent block owns
-several sub-scenes that are only reachable through it. The current example
-is `meta/knowledge/`: `knowledge_hub` is a navigation menu, and
-`skill_panel` / `mastery_panel` / `perk_panel` are its children (their
-back buttons return to `knowledge_hub`).
+`meta/` may contain a second level of grouping when a parent block owns several sub-scenes that are only reachable through it. The current example is `meta/knowledge/`: `knowledge_hub` is a navigation menu, and `skill_panel` / `mastery_panel` / `perk_panel` are its children (their back buttons return to `knowledge_hub`).
 
 Rules for sub-groups:
 
@@ -208,11 +195,9 @@ Rules for sub-groups:
 
 ### Block folder layout
 
-Each block folder contains everything that belongs to that block: scene
-roots, UI component sub-scenes, and logic scripts.
+Each block folder contains everything that belongs to that block: scene roots, UI component sub-scenes, and logic scripts.
 
-Do not split logic and scene files into sub-folders unless the block has
-grown large enough to make the flat layout hard to navigate.
+Do not split logic and scene files into sub-folders unless the block has grown large enough to make the flat layout hard to navigate.
 
 Example layout for a mid-complexity block:
 
@@ -233,8 +218,7 @@ game/run/auction/
   auction_scene.tscn
 ```
 
-Code-generated runtime data structures live in the block folder (or
-`game/shared/`) that owns them, not in `data/`.
+Code-generated runtime data structures live in the block folder (or `game/shared/`) that owns them, not in `data/`.
 
 ---
 

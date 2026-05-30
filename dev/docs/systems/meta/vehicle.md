@@ -28,15 +28,9 @@ On select: returns to `hub`. On purchase: stays in shop, refreshes owned/active 
 
 ### Data Definitions
 
-`CarData` (the cargo grid, weight cap, stamina pool, fuel cost, trailer slots + damage
-risk, shop price, icon) is described in `../shared/data_model.md`; field-level detail
-lives in `data/definitions/car_data.gd`. It's consumed by `RunRecord` (stamina, fuel,
-trailer slots) and the cargo scene (grid, weight, trailer slots).
+`CarData` (the cargo grid, weight cap, stamina pool, fuel cost, trailer slots + damage risk, shop price, icon) is described in `../shared/data_model.md`; field-level detail lives in `data/definitions/car_data.gd`. It's consumed by `RunRecord` (stamina, fuel, trailer slots) and the cargo scene (grid, weight, trailer slots).
 
-The save layer holds the active car and owned cars as `CarData` refs at runtime, but
-serializes only their `car_id`s, rehydrating via `CarRegistry` on load. All vehicle
-mutation (purchase, active-car swap) goes through `MetaManager`, never `SaveManager`
-directly — purchase checks affordability + dedupe, debits cash, appends, and saves.
+The save layer holds the active car and owned cars as `CarData` refs at runtime, but serializes only their `car_id`s, rehydrating via `CarRegistry` on load. All vehicle mutation (purchase, active-car swap) goes through `MetaManager`, never `SaveManager` directly — purchase checks affordability + dedupe, debits cash, appends, and saves.
 
 ### Vehicle Hub
 

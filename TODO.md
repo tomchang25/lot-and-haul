@@ -1,22 +1,12 @@
 # TODO
 
-The single forward surface — open this and you see everything: open work _and_ brewing
-ideas. Every forward item lives in **exactly one** section here (or, once it earns a file,
-in `dev/docs/plans/`). There is deliberately **no "Done" tier** — done = delete the line;
-its record lives in `CHANGELOG.md`.
+The single forward surface — open this and you see everything: open work _and_ brewing ideas. Every forward item lives in **exactly one** section here (or, once it earns a file, in `dev/docs/plans/`). There is deliberately **no "Done" tier** — done = delete the line; its record lives in `CHANGELOG.md`.
 
-> **The one rule (now about sections, not files):** the actionable tiers
-> (`Plan` / `Chore` / `Bug`) are **one line each** — no paragraphs, no tables, no _why_.
-> The moment an item needs real reasoning, it belongs in `## Draft` as its own `###`
-> sub-section. When a Draft entry grows sub-structure, becomes actionable, or needs to be
-> linked from elsewhere, it graduates to its own file in `dev/docs/plans/`.
+> **The one rule (now about sections, not files):** the actionable tiers (`Plan` / `Chore` / `Bug`) are **one line each** — no paragraphs, no tables, no _why_. The moment an item needs real reasoning, it belongs in `## Draft` as its own `###` sub-section. When a Draft entry grows sub-structure, becomes actionable, or needs to be linked from elsewhere, it graduates to its own file in `dev/docs/plans/`.
 >
-> Within `## Draft`, no `####` headings or `**label:**` bold-label patterns — use
-> plain-text labels (em-dash, colon) and lists for sub-structure.
+> Within `## Draft`, no `####` headings or `**label:**` bold-label patterns — use plain-text labels (em-dash, colon) and lists for sub-structure.
 
-In-flight work lives in `## Active` — promoted from `## Plan` when building starts. The
-phase-by-phase detail and ordering stay in the linked `dev/docs/plans/` file, never
-churned into this list.
+In-flight work lives in `## Active` — promoted from `## Plan` when building starts. The phase-by-phase detail and ordering stay in the linked `dev/docs/plans/` file, never churned into this list.
 
 Actionable line format: `[Scope] one sentence — [ref plans/<x>.md if any]`
 
@@ -24,11 +14,7 @@ Actionable line format: `[Scope] one sentence — [ref plans/<x>.md if any]`
 
 ## Draft
 
-Preliminary concepts — bigger than a one-liner, but a single `###` sub-section says
-enough. Not necessarily actionable yet. One `###` heading per idea (nested under this
-`## Draft` so the section stays intact). When an idea outgrows its sub-section / becomes
-actionable / needs a stable link → move it into its own `dev/docs/plans/<x>.md`
-(`Status: Exploring`) and delete it here. Stale and never grew → just delete it.
+Preliminary concepts — bigger than a one-liner, but a single `###` sub-section says enough. Not necessarily actionable yet. One `###` heading per idea (nested under this `## Draft` so the section stays intact). When an idea outgrows its sub-section / becomes actionable / needs a stable link → move it into its own `dev/docs/plans/<x>.md` (`Status: Exploring`) and delete it here. Stale and never grew → just delete it.
 
 ### Category Mastery ↔ Clue Integration
 
@@ -215,11 +201,7 @@ Not now: hand-curated `ItemData` gives full designer control and isolates variab
 
 ## Active
 
-Flows currently being built. One-line pointer each — same format as `## Plan`, just
-promoted here when work starts. Phase detail and progress live in the linked
-`dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`,
-leaving this line untouched. All phases shipped → archive the plan file + delete this
-line. Nothing in progress → this section is empty.
+Flows currently being built. One-line pointer each — same format as `## Plan`, just promoted here when work starts. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress → this section is empty.
 
 - [day-structure] Time-slot day + storage AP economy: 3-slot day (morning/afternoon/evening), 10 AP/day pool for storage actions, customer scaling by slot commitment. See `dev/docs/plans/time_slot_economy.md`.
 
@@ -227,8 +209,7 @@ line. Nothing in progress → this section is empty.
 
 ## Plan
 
-Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to
-`## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
+Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`

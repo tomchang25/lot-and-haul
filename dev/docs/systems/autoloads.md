@@ -36,31 +36,19 @@ Listed in `project.godot` load order. `RegistryCoordinator` orchestrates boot: e
 
 ## RegistryCoordinator
 
-Thin coordinator owning cross-cutting lifecycle hooks. Each registry calls
-`register(self)` at the end of `_ready()`; `GameManager._ready()` then drives two
-optional phases over every registered registry: a `migrate()` pass (idempotent repair
-of save-state vs. data drift) and a `validate()` pass (boot-time audit that every
-save-persisted id still resolves, erroring per problem and failing boot validation on
-any miss). Both are opt-in — a registry that implements neither is skipped. Signatures
-in `registry_coordinator.gd`.
+Thin coordinator owning cross-cutting lifecycle hooks. Each registry calls `register(self)` at the end of `_ready()`; `GameManager._ready()` then drives two optional phases over every registered registry: a `migrate()` pass (idempotent repair of save-state vs. data drift) and a `validate()` pass (boot-time audit that every save-persisted id still resolves, erroring per problem and failing boot validation on any miss). Both are opt-in — a registry that implements neither is skipped. Signatures in `registry_coordinator.gd`.
 
 ---
 
 ## ResourceDirLoader (`global/autoload/resource_dir_loader.gd`)
 
-Static helper that loads every `.tres` in a directory into an `{ id → Resource }`
-dictionary, keyed by a caller-supplied id getter. Every registry's load step goes
-through it.
+Static helper that loads every `.tres` in a directory into an `{ id → Resource }` dictionary, keyed by a caller-supplied id getter. Every registry's load step goes through it.
 
 ---
 
 ## SaveManager
 
-Persists to `user://save.json`. **Serialization only** — it holds no day-advance or
-transaction logic (that's `MetaManager`). It persists the cross-run state: progression
-(category points, attribute levels, unlocked perks), economy (cash, owned/active car),
-storage items, research slots, available locations, the current day and monotonic entry
-id, and the current night's customers + sale ledger. Field list in `save_manager.gd`.
+Persists to `user://save.json`. **Serialization only** — it holds no day-advance or transaction logic (that's `MetaManager`). It persists the cross-run state: progression (category points, attribute levels, unlocked perks), economy (cash, owned/active car), storage items, research slots, available locations, the current day and monotonic entry id, and the current night's customers + sale ledger. Field list in `save_manager.gd`.
 
 ### Migrations on load
 
@@ -70,21 +58,13 @@ id, and the current night's customers + sale ledger. Field list in `save_manager
 - `ResearchSlot.purge_orphaned` drops slots whose item is gone.
 - Legacy merchant save keys (`merchant_negotiations_used_today`, `merchant_orders`, `next_order_id`) → silently ignored on load.
 
-Storage registration, location rolling, day advance, research-slot assignment, and all
-trade operations live on `MetaManager` (below); `SaveManager` itself only exposes save
-and load.
+Storage registration, location rolling, day advance, research-slot assignment, and all trade operations live on `MetaManager` (below); `SaveManager` itself only exposes save and load.
 
 ---
 
 ## MetaManager
 
-Hub-phase transactional authority. Mutates `SaveManager` state and saves; delegates
-computation to value objects / pure helpers. It owns: storage registration (assigning
-ids; auto-verify items reveal hidden clues on entry), rolling available locations, the
-day advance (deduct living cost → tick research slots → clear locations → generate
-nightly customers → save, returning a `DaySummary`), committing customer sales,
-research-slot assign/remove, car purchase + active swap, and run settlement (cash,
-surface auto-reveal, cargo storage, travel days). Signatures in `meta_manager.gd`.
+Hub-phase transactional authority. Mutates `SaveManager` state and saves; delegates computation to value objects / pure helpers. It owns: storage registration (assigning ids; auto-verify items reveal hidden clues on entry), rolling available locations, the day advance (deduct living cost → tick research slots → clear locations → generate nightly customers → save, returning a `DaySummary`), committing customer sales, research-slot assign/remove, car purchase + active swap, and run settlement (cash, surface auto-reveal, cargo storage, travel days). Signatures in `meta_manager.gd`.
 
 ### Research slot ticking
 
@@ -96,8 +76,7 @@ The day-tick dispatches per slot on the research action:
 | Restore  | raises condition toward 1.0         | condition reaches 1.0                                                   |
 | Research | accrues one research day            | rarity-based day threshold → reveals all hidden clues, slot auto-clears |
 
-Completions are reported back in the day summary. Tuning constants and the exact
-formulas live in `research_slot.gd`.
+Completions are reported back in the day summary. Tuning constants and the exact formulas live in `research_slot.gd`.
 
 ---
 

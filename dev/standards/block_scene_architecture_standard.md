@@ -359,8 +359,7 @@ func _populate_rows() -> void:
         _row_container.add_child(row)
 ```
 
-Note: `_build_ui()` is absent from this reference layout. It only appears when runtime node
-construction is required (see Section 11). Most block scenes will match this layout exactly.
+Note: `_build_ui()` is absent from this reference layout. It only appears when runtime node construction is required (see Section 11). Most block scenes will match this layout exactly.
 
 ---
 
@@ -409,8 +408,7 @@ func _ready() -> void:
     # ... rest of setup
 ```
 
-This applies to all signal connections — buttons, custom signals from child nodes, and
-connections to autoloads.
+This applies to all signal connections — buttons, custom signals from child nodes, and connections to autoloads.
 
 ---
 
@@ -436,21 +434,15 @@ Why this order:
 - **`connect()` before `add_child()`** — ensures every listener is attached before any
   signal the child might emit during `_ready()`.
 
-The component's `setup()` is its **apply function**: a single public entry point that
-takes all data the component needs and leaves the component ready to display. Components
-should not rely on setters, direct property assignment, or post-construction tweaking
-from the parent — everything flows through `setup()`.
+The component's `setup()` is its **apply function**: a single public entry point that takes all data the component needs and leaves the component ready to display. Components should not rely on setters, direct property assignment, or post-construction tweaking from the parent — everything flows through `setup()`.
 
-If the component must also support updates after being shown, expose a separate
-`refresh()` (no arguments, re-reads current state) rather than overloading `setup()`.
+If the component must also support updates after being shown, expose a separate `refresh()` (no arguments, re-reads current state) rather than overloading `setup()`.
 
 ---
 
 ## Component `setup()` implementation
 
-A reusable component's `setup()` is its **apply function** — but it has a specific
-internal shape, because it may be called either before or after the component enters
-the scene tree.
+A reusable component's `setup()` is its **apply function** — but it has a specific internal shape, because it may be called either before or after the component enters the scene tree.
 
 The pattern:
 
@@ -523,17 +515,13 @@ Why this shape:
   `_apply()`. There is no second code path in `_ready()` that reads private state and
   writes nodes, so the two cannot drift.
 
-Do **not** write components that paint directly inside `setup()` without the guard —
-they work only when the parent happens to call `setup()` after `add_child()`, and break
-silently the moment someone flips the order.
+Do **not** write components that paint directly inside `setup()` without the guard — they work only when the parent happens to call `setup()` after `add_child()`, and break silently the moment someone flips the order.
 
 ---
 
 ## Component `.tscn` default content
 
-A component's `.tscn` defines the full node tree with neutral **placeholder** values
-in every user-visible field — not blank strings, not real data, not leftover editor
-text from whoever built the scene.
+A component's `.tscn` defines the full node tree with neutral **placeholder** values in every user-visible field — not blank strings, not real data, not leftover editor text from whoever built the scene.
 
 Use values that clearly read as "not yet populated":
 
@@ -543,11 +531,7 @@ text = "? / ?"
 text = "0"
 ```
 
-Reason: between the moment the component enters the tree and the moment `_apply()`
-runs, its nodes are visible. With placeholders the intermediate frame reads as an
-unpopulated shell; with leftover real-looking data it reads as a bug (wrong name,
-wrong price, wrong count). Placeholders also make it obvious during development if a
-field is ever missed by `_apply()` — the `—` will still be there at runtime.
+Reason: between the moment the component enters the tree and the moment `_apply()` runs, its nodes are visible. With placeholders the intermediate frame reads as an unpopulated shell; with leftover real-looking data it reads as a bug (wrong name, wrong price, wrong count). Placeholders also make it obvious during development if a field is ever missed by `_apply()` — the `—` will still be there at runtime.
 
 This applies to `Label.text`, `TextureRect.texture` (leave null), `Button.text` on
 dynamic buttons, and any other field `_apply()` will overwrite.

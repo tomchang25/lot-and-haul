@@ -167,9 +167,7 @@ ITEM_SIZE
 GRID_ORIGIN
 ```
 
-**Exception — preloaded scenes and classes**: Following Godot convention, a constant that holds
-a preloaded `.gd` class or `.tscn` scene uses **PascalCase** instead of UPPER_SNAKE_CASE,
-because it represents a type rather than a value.
+**Exception — preloaded scenes and classes**: Following Godot convention, a constant that holds a preloaded `.gd` class or `.tscn` scene uses **PascalCase** instead of UPPER_SNAKE_CASE, because it represents a type rather than a value.
 
 ```gdscript
 const ItemRowScene := preload("uid://...")          # PascalCase — loaded type
@@ -202,8 +200,7 @@ enum SelectionState {
 }
 ```
 
-Write each member on its own line with a trailing comma. This keeps diffs clean and
-makes it easy to add documentation comments above individual members.
+Write each member on its own line with a trailing comma. This keeps diffs clean and makes it easy to add documentation comments above individual members.
 
 ```gdscript
 # Good
@@ -246,17 +243,13 @@ All GDScript files use **4 spaces** per indent level. Tabs are not used.
 
 # 10. Match Wildcard Rule
 
-The wildcard arm `_:` in `match` statements is reserved for **error handling and
-truly unexpected values**. Do not use it as the default for a value that is a
-normal, expected member of the enum or type being matched.
+The wildcard arm `_:` in `match` statements is reserved for **error handling and truly unexpected values**. Do not use it as the default for a value that is a normal, expected member of the enum or type being matched.
 
 Every expected case must have its own explicit arm. This ensures the compiler
 (and the reader) can verify that all cases are covered, and that adding a new
 enum member later will surface unhandled branches.
 
-If a `match` covers all members of a known enum exhaustively, the wildcard arm
-should either be omitted entirely or contain only a `push_warning` / `push_error`
-to flag unexpected values at runtime (Recommend).
+If a `match` covers all members of a known enum exhaustively, the wildcard arm should either be omitted entirely or contain only a `push_warning` / `push_error` to flag unexpected values at runtime (Recommend).
 
 ---
 
