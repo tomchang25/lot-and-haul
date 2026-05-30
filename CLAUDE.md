@@ -43,7 +43,7 @@ data/         Designer resources: definitions, yaml sources, generated .tres
     attributes/ cars/ categories/ clues/ items/ locations/
     lots/ perks/ super_categories/
 dev/          Development tooling and documentation
-  docs/       Git submodule — architecture docs (archived/, draft/, plans/, systems/)
+  docs/       Git submodule — architecture docs (vision/, systems/, plans/, archived/)
   skills/     AI coding references (commit format, GDScript patterns)
   standards/  Coding conventions, naming, registries, scene architecture
   tools/      YAML↔TRES pipeline (Python scripts + prompts)
@@ -87,7 +87,9 @@ Core loop redesign: Phases 0–11 complete (runtime veil cleanup, AP grid inspec
 - **Price pipeline**: all prices resolve through `ItemEntry.item_price` (`(appraised|verified value) × condition_multiplier`). Appraised value = anchor + revealed surface modifiers (add-then-mul). Verified value includes hidden modifiers. No per-type formulas outside the pipeline.
 - **Iterate resources, not ids**: outside serialization boundaries, pass Resource refs. String ids are for save/load only.
 - **Docstrings**: every `.gd` file starts with `# filename` + one-line purpose. All public functions and complex (>10 lines or non-obvious) private functions get a `##` GDDoc comment. Never strip or reduce existing comments when editing code.
-- **Docs layering**: 3 levels, each fact lives in exactly one. L1 vision (`dev/docs/vision/`, ≤5, rarely changes), L2 systems/plans/draft/TODO (`dev/docs/`, design intent + flow, concept only), L3 detail (code docstrings). Single source of truth — no duplication across levels. Full rules in `dev/docs/README.md`.
+- **Docs layering**: 3 levels, each fact lives in exactly one. L1 vision (`dev/docs/vision/`, ≤5, rarely changes), L2 systems/plans (`dev/docs/`, design intent + flow, present tense, concept only), L3 detail (code docstrings). Single source of truth — no duplication across levels. Full rules in `dev/docs/README.md`.
+- **Tracking lives at repo root, not in `dev/docs/`**: `CHANGELOG.md` (append-only shipped history — the only living "Done" list), `ROADMAP.md` (forward-only active flow + dependency map; cut shipped flows out, don't mark them complete), `TODO.md` (the single forward surface: `Plan`/`Chore`/`Bug` one-liners + a `## Draft` section for concepts, no Done tier, delete the line when done). Ship a flow → append CHANGELOG + cut from ROADMAP + delete TODO lines, same commit.
+- **Maturity scale (one item, one home)**: one line → `TODO.md` tier; bigger but one section says enough → `TODO.md` `## Draft`; earned its own file (grew sub-structure / actionable / needs a stable link) → `dev/docs/plans/<x>.md` with a `Status: Exploring|Committed` header; design locked → graduate conclusion to `systems/` + archive. Never write an item in two places.
 
 ## Don'ts
 
@@ -95,5 +97,8 @@ Core loop redesign: Phases 0–11 complete (runtime veil cleanup, AP grid inspec
 - Don't add display-name wrappers or fallback-to-id accessors on registries.
 - Don't scan ItemRegistry to answer a category/super-category question — use the dedicated registry.
 - Don't put code-level detail (function names, field lists) in `dev/docs/systems/` — that belongs in code comments.
-- Don't leave completed docs in place — move them to `dev/docs/archived/`. When a draft's design locks, graduate the conclusion into `systems/` (same commit as the code), then archive the draft.
-- Don't put anything needing more than one line of reasoning in `TODO.md` — if it grows a paragraph, a table, or a trade-off, it's a `draft/` file, not a checkbox.
+- Don't keep a living "Done" list anywhere except `CHANGELOG.md`. No `## Status`/Done enumeration in `systems/` docs (write them present-tense — that's the status), no "(complete)" tables in `ROADMAP.md`, no Done section in `TODO.md`.
+- Don't put any forward-looking section in a `systems/` doc — no `## Planned`/`## Future`/todo, not even links-only. A system doc describes only the present; route forward items to either an `## Open Questions` section (unresolved design questions about the current system, phrased as questions) or out to `TODO.md`/`ROADMAP.md` (feature ideas / work to build).
+- Don't leave completed docs in place — move them to `dev/docs/archived/`. When a plan's design locks, graduate the conclusion into `systems/` (same commit as the code), then archive the plan.
+- Don't put anything needing more than one line of reasoning in a `TODO.md` actionable tier — if it grows a paragraph, a table, or a trade-off, it goes in the `## Draft` section (and once it earns a file, `dev/docs/plans/`), not inline in `Plan`/`Chore`/`Bug`. Don't fold Chore/Bug into Plan to reduce clutter — lifecycle (delete on done) handles clutter, not tier-merging.
+- Don't create a separate `draft/` folder or draft file — the draft tier is the `## Draft` section of `TODO.md`. Don't write a forward item in two places: it has exactly one home for its maturity.
