@@ -57,6 +57,11 @@ var verified: bool:
 
 var revealed_clue_ids: Array[String] = []
 
+## Accumulated research progress toward each hidden clue, keyed by clue_id.
+## Each Research AP spend adds (5 + investigation attribute) to the target clue's
+## entry. The clue reveals once progress >= clue.dc. Persists across slots and days.
+var research_progress: Dictionary = {}
+
 # ══ Clue helpers ══════════════════════════════════════════════════════════════
 
 
@@ -321,6 +326,37 @@ func reveal_all_hidden() -> void:
     for clue: ClueData in _hidden_clues():
         if not revealed_clue_ids.has(clue.clue_id):
             revealed_clue_ids.append(clue.clue_id)
+
+
+## Returns true if any hidden clue has not yet been revealed.
+func has_unrevealed_hidden() -> bool:
+    for clue: ClueData in _hidden_clues():
+        if not revealed_clue_ids.has(clue.clue_id):
+            return true
+    return false
+
+
+## Deterministic storage research: adds [param progress_amount] to the first
+## unrevealed hidden clue's accumulated progress. Reveals the clue and grants
+## REVEAL XP once progress >= clue.dc. Returns true when a clue is revealed.
+## Never rolls — variance belongs at the on-site auction, not in storage.
+func advance_research(progress_amount: int) -> bool:
+    for clue: ClueData in _hidden_clues():
+        if revealed_clue_ids.has(clue.clue_id):
+            continue
+        var current: int = int(research_progress.get(clue.clue_id, 0))
+        current += progress_amount
+        research_progress[clue.clue_id] = current
+        if current >= clue.dc:
+            revealed_clue_ids.append(clue.clue_id)
+            KnowledgeManager.add_category_points(
+                item_data.category_data,
+                item_data.rarity,
+                KnowledgeManager.KnowledgeAction.REVEAL,
+            )
+            return true
+        return false
+    return false
 
 
 # Idempotent migration applied to every ItemEntry when it enters or is loaded
@@ -651,6 +687,7 @@ func to_dict() -> Dictionary:
         "center_offset": center_offset,
         "verified": verified,
         "revealed_clue_ids": revealed_clue_ids.duplicate(),
+        "research_progress": research_progress.duplicate(),
     }
 
 
@@ -689,6 +726,14 @@ static func from_dict(d: Dictionary) -> ItemEntry:
             if known_ids.has(cid):
                 clean.append(cid)
         entry.revealed_clue_ids = clean
+
+    # research_progress: clue_id → int accumulated progress (new in time-slot economy).
+    # Old saves without this key start with no in-flight progress — their partial
+    # research state is seeded at the SaveManager level during migration.
+    if d.has("research_progress") and d["research_progress"] is Dictionary:
+        for key: Variant in d["research_progress"]:
+            if key is String and d["research_progress"][key] is float:
+                entry.research_progress[key] = int(d["research_progress"][key])
 
     # Legacy migration: old saves stored verified as a bool flag without
     # populating revealed_clue_ids. reveal_all_hidden() is idempotent —

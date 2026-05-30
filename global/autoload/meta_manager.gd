@@ -1,6 +1,18 @@
 extends Node
 
+# ── Pending run economics ─────────────────────────────────────────────────────
+# Set by resolve_run() and folded into the DaySummary by end_day().
+# Cleared to zero after end_day() consumes them.
+
+var _pending_run_onsite: int = 0
+var _pending_run_paid: int = 0
+var _pending_run_entry_fee: int = 0
+var _pending_run_fuel_cost: int = 0
+var _pending_run_cargo_count: int = 0
+var _pending_has_run: bool = false
+
 # ══ Storage registration ══════════════════════════════════════════════════════
+
 
 func register_storage_item(entry: ItemEntry) -> void:
     entry.id = SaveManager.next_entry_id
@@ -15,7 +27,7 @@ func register_storage_items(entries: Array[ItemEntry]) -> void:
         register_storage_item(entry)
     SaveManager.save()
 
-# ══ Location sampling ════════════════════════════════════════════════════════
+# ══ Location sampling ═════════════════════════════════════════════════════════
 
 
 func roll_available_locations() -> void:
@@ -23,35 +35,78 @@ func roll_available_locations() -> void:
     all.shuffle()
     SaveManager.available_locations = all.slice(0, mini(Economy.LOCATION_SAMPLE_SIZE, all.size()))
 
-# ══ Day advancement ═══════════════════════════════════════════════════════════
+# ══ Slot economy — hub actions ════════════════════════════════════════════════
 
 
-func advance_days(days: int) -> DaySummary:
+## Begins a Storage slot: increments current_slot (consuming it) and refreshes
+## storage_ap to a full pool. Call before navigating to the storage scene.
+func begin_storage_slot() -> void:
+    SaveManager.current_slot += 1
+    SaveManager.storage_ap = Economy.STORAGE_AP_MAX
+    SaveManager.save()
+
+
+## Begins an Auction slot: consumes morning + afternoon (slots 1 + 2) by
+## advancing current_slot to 3, returning the player to the evening slot.
+## Call before navigating to location select.
+func begin_auction() -> void:
+    SaveManager.current_slot = 3
+    SaveManager.save()
+
+
+## Begins an Open Shop session: generates nightly customers scaled to the slots
+## committed, clears the nightly sales ledger, and marks current_slot > 3 so
+## the hub ends the day on re-entry after customer_sell completes.
+##
+## [param selling_slots] — 1 (evening only), 2 (afternoon + evening), or
+##   3 (full day). Pass 4 - current_slot at the moment Open Shop is chosen.
+func begin_open_shop(selling_slots: int) -> void:
+    SaveManager.selling_slots_today = selling_slots
+    SaveManager.current_slot = 4 # hub sees > 3 → triggers end_day
+    SaveManager.customer_sales_today.clear()
+    _generate_nightly_customers(selling_slots)
+    SaveManager.save()
+
+
+## Closes out the current calendar day: advances current_day, deducts living
+## cost, captures customer sales, folds pending run economics, resets slot
+## state, saves, and returns a DaySummary for the day summary scene.
+##
+## The hub calls this automatically when current_slot > 3.
+func end_day() -> DaySummary:
     var summary := DaySummary.new()
-    if days <= 0:
-        summary.start_day = SaveManager.current_day
-        summary.end_day = SaveManager.current_day
-        summary.days_elapsed = 0
-        return summary
-
     summary.start_day = SaveManager.current_day
-    summary.days_elapsed = days
-    summary.living_cost = days * Economy.DAILY_BASE_COST
+    summary.days_elapsed = 1
+    summary.living_cost = Economy.DAILY_BASE_COST
 
-    SaveManager.current_day += days
-    SaveManager.cash -= summary.living_cost
-
-    summary.completed_actions = _tick_research_slots(days)
+    SaveManager.current_day += 1
+    SaveManager.cash -= Economy.DAILY_BASE_COST
     summary.end_day = SaveManager.current_day
 
-    SaveManager.available_locations.clear()
-
-    # Capture customer sales before nightly generation clears the ledger.
+    # Capture customer sales recorded during Open Shop.
     for sale in SaveManager.customer_sales_today:
         summary.customer_sales_total += sale.sale_price
         summary.customer_sales_detail.append(sale.duplicate())
 
-    _generate_nightly_customers()
+    # Fold pending run economics (set by resolve_run after the auction).
+    if _pending_has_run:
+        summary.onsite_proceeds = _pending_run_onsite
+        summary.paid_price = _pending_run_paid
+        summary.entry_fee = _pending_run_entry_fee
+        summary.fuel_cost = _pending_run_fuel_cost
+        summary.cargo_count = _pending_run_cargo_count
+        _pending_run_onsite = 0
+        _pending_run_paid = 0
+        _pending_run_entry_fee = 0
+        _pending_run_fuel_cost = 0
+        _pending_run_cargo_count = 0
+        _pending_has_run = false
+
+    # Reset for next day.
+    SaveManager.current_slot = 1
+    SaveManager.storage_ap = 0
+    SaveManager.selling_slots_today = 0
+    SaveManager.available_locations.clear()
 
     SaveManager.save()
     return summary
@@ -59,17 +114,29 @@ func advance_days(days: int) -> DaySummary:
 # ══ Nightly customers ═════════════════════════════════════════════════════════
 
 
-## Generates the nightly customer set for the current day.
-## Delegates to Customer.generate_for_night, stores in SaveManager, and resets
-## the per-night sales ledger that the Day Summary rework (Phase 11) reads.
-func _generate_nightly_customers() -> void:
+## Generates the nightly customer set scaled by [param selling_slots].
+## 1 → 2–3 customers, 2 → 4–6, 3 → 7–10. 0 → no customers.
+func _generate_nightly_customers(selling_slots: int) -> void:
     var rng := RandomNumberGenerator.new()
     rng.randomize()
+    var count := _selling_slots_to_count(rng, selling_slots)
     SaveManager.nightly_customers = Customer.generate_for_night(
         rng,
         SaveManager.storage_items,
+        count,
     )
-    SaveManager.customer_sales_today.clear()
+
+
+func _selling_slots_to_count(rng: RandomNumberGenerator, selling_slots: int) -> int:
+    match selling_slots:
+        1:
+            return rng.randi_range(2, 3)
+        2:
+            return rng.randi_range(4, 6)
+        3:
+            return rng.randi_range(7, 10)
+        _:
+            return 0
 
 
 ## Commits a customer sale: removes items from storage, adds cash, records the
@@ -93,7 +160,6 @@ func resolve_customer_sale(
     for entry: ItemEntry in items:
         sold_ids.append(entry.id)
         SaveManager.storage_items.erase(entry)
-        ResearchSlot.clear_for_item(SaveManager.research_slots, entry.id)
         KnowledgeManager.add_category_points(
             entry.item_data.category_data,
             entry.item_data.rarity,
@@ -116,83 +182,66 @@ func resolve_customer_sale(
 
     SaveManager.save()
 
-
-func _tick_research_slots(days: int) -> Array[Dictionary]:
-    var completions: Array[Dictionary] = []
-
-    for i: int in range(SaveManager.research_slots.size()):
-        var d: Dictionary = SaveManager.research_slots[i]
-        var slot := ResearchSlot.from_dict(d)
-        if slot.is_empty() or slot.completed:
-            continue
-        var entry: ItemEntry = _find_storage_entry(slot.item_id)
-        if entry == null:
-            continue
-
-        var completed_during_tick: bool = false
-        for day: int in range(days):
-            if slot.completed:
-                break
-            match slot.action:
-                ResearchSlot.SlotAction.REPAIR:
-                    ResearchSlot.apply_repair(entry)
-                    slot.completed = ResearchSlot.is_repair_complete(entry)
-                ResearchSlot.SlotAction.RESTORE:
-                    ResearchSlot.apply_restore(entry)
-                    slot.completed = ResearchSlot.is_restore_complete(entry)
-                ResearchSlot.SlotAction.RESEARCH:
-                    slot.research_days_spent += 1
-                    var duration: int = Economy.RESEARCH_DAYS.get(
-                        entry.item_data.rarity,
-                        3,
-                    )
-                    if slot.research_days_spent >= duration:
-                        entry.reveal_all_hidden()
-                        slot.completed = true
-                _:
-                    push_warning("MetaManager: unknown SlotAction %d" % slot.action)
-                    break
-            if slot.completed and not completed_during_tick:
-                completed_during_tick = true
-
-        # RESEARCH auto-clears on completion — verified is computed from
-        # hidden clue coverage; the slot has no further use once verified.
-        # All other actions keep the completed slot until the player removes it.
-        if slot.action == ResearchSlot.SlotAction.RESEARCH and slot.completed:
-            SaveManager.research_slots[i] = ResearchSlot.new().to_dict()
-        else:
-            SaveManager.research_slots[i] = slot.to_dict()
-
-        if completed_during_tick:
-            completions.append(
-                {
-                    "name": entry.display_name,
-                    "effect": _slot_effect_label(slot.action),
-                    "action": ResearchSlot.action_to_string(slot.action),
-                },
-            )
-
-    return completions
+# ══ Storage AP actions ════════════════════════════════════════════════════════
+#
+# Each action follows guard → apply → charge → save. AP is charged only after
+# the effect lands — a disabled or no-op call never costs AP.
 
 
-func _find_storage_entry(item_id: int) -> ItemEntry:
-    for entry: ItemEntry in SaveManager.storage_items:
-        if entry.id == item_id:
-            return entry
-    return null
+## Applies one Repair action to [param entry] from the current storage AP pool.
+## Guard: sufficient AP and condition < 0.5. Returns true when AP was spent.
+func repair_item(entry: ItemEntry) -> bool:
+    if entry == null:
+        return false
+    if SaveManager.storage_ap < Economy.REPAIR_AP_COST:
+        return false
+    if ResearchSlot.is_repair_complete(entry):
+        return false
+    ResearchSlot.apply_repair(entry)
+    SaveManager.storage_ap -= Economy.REPAIR_AP_COST
+    SaveManager.save()
+    return true
 
 
-func _slot_effect_label(action: ResearchSlot.SlotAction) -> String:
-    match action:
-        ResearchSlot.SlotAction.REPAIR:
-            return "Repair complete"
-        ResearchSlot.SlotAction.RESTORE:
-            return "Fully restored"
-        ResearchSlot.SlotAction.RESEARCH:
-            return "Verified"
-        _:
-            push_warning("MetaManager: unknown SlotAction %d" % action)
-            return "Done"
+## Applies one Restore action to [param entry] from the current storage AP pool.
+## Guard: sufficient AP, condition >= 0.5, and condition < 1.0. Returns true
+## when AP was spent.
+func restore_item(entry: ItemEntry) -> bool:
+    if entry == null:
+        return false
+    if SaveManager.storage_ap < Economy.RESTORE_AP_COST:
+        return false
+    if entry.condition < 0.5:
+        return false
+    if ResearchSlot.is_restore_complete(entry):
+        return false
+    ResearchSlot.apply_restore(entry)
+    SaveManager.storage_ap -= Economy.RESTORE_AP_COST
+    SaveManager.save()
+    return true
+
+
+## Applies one Research action to [param entry] from the current storage AP pool.
+## Deterministic — never rolls. Adds (5 + investigation attribute) progress to
+## the first unrevealed hidden clue; reveals it once progress >= clue.dc.
+## Guard: sufficient AP and at least one unrevealed hidden clue. Returns true
+## when AP was spent.
+func research_item(entry: ItemEntry) -> bool:
+    if entry == null:
+        return false
+    if SaveManager.storage_ap < Economy.RESEARCH_AP_COST:
+        return false
+    if not entry.has_unrevealed_hidden():
+        return false
+    var investigation_attr := KnowledgeManager.get_attribute_value("investigation")
+    var progress_amount: int = 5 + investigation_attr
+    entry.advance_research(progress_amount)
+    SaveManager.storage_ap -= Economy.RESEARCH_AP_COST
+    SaveManager.save()
+    return true
+
+# ══ Vehicle management ════════════════════════════════════════════════════════
+
 
 func buy_car(car: CarData) -> bool:
     if car == null:
@@ -213,71 +262,42 @@ func set_active_car(car: CarData) -> void:
     SaveManager.active_car = car
     SaveManager.save()
 
-# ══ Research slot assignment ═════════════════════════════════════════════════
-
-
-func assign_research_slot(entry: ItemEntry, action: ResearchSlot.SlotAction) -> bool:
-    if entry == null:
-        return false
-
-    var new_slot := ResearchSlot.create(action, entry.id)
-    var existing_idx: int = ResearchSlot.find_index(SaveManager.research_slots, entry.id)
-    if existing_idx >= 0:
-        SaveManager.research_slots[existing_idx] = new_slot.to_dict()
-        SaveManager.save()
-        return true
-
-    var empty_idx: int = _find_empty_slot_index()
-    if empty_idx >= 0:
-        SaveManager.research_slots[empty_idx] = new_slot.to_dict()
-        SaveManager.save()
-        return true
-
-    if SaveManager.research_slots.size() < SaveManager.max_research_slots:
-        SaveManager.research_slots.append(new_slot.to_dict())
-        SaveManager.save()
-        return true
-
-    return false
-
-
-func remove_research_slot(entry: ItemEntry) -> void:
-    if entry == null:
-        return
-    var idx: int = ResearchSlot.find_index(SaveManager.research_slots, entry.id)
-    if idx < 0:
-        return
-    SaveManager.research_slots[idx] = ResearchSlot.new().to_dict()
-    SaveManager.save()
-
-
-func _find_empty_slot_index() -> int:
-    for i: int in range(SaveManager.research_slots.size()):
-        var d: Dictionary = SaveManager.research_slots[i]
-        if int(d.get("item_id", -1)) == -1:
-            return i
-    return -1
-
 # ══ Run resolution ════════════════════════════════════════════════════════════
 
 
-func resolve_run(record: RunRecord) -> DaySummary:
+## Resolves a completed run: applies cash, registers cargo, auto-reveals surface
+## clues, stores run economics as pending for end_day(), sets current_slot to 3
+## so the player returns to the hub for the evening slot, and clears run state.
+##
+## Navigation: the caller (run_review_scene) must call GameManager.go_to_hub()
+## after this returns. The day summary fires when the player chooses Open Shop
+## or all slots are exhausted from the hub.
+func resolve_run(record: RunRecord) -> void:
     SaveManager.cash += record.onsite_proceeds - record.paid_price - record.entry_fee - record.fuel_cost
 
-    # Phase 7: Auto-reveal all surface clues on hub return.
+    # Auto-reveal all surface clues on hub return (Phase 7).
     for entry: ItemEntry in record.cargo_items:
         entry.auto_reveal_all_surface()
 
     register_storage_items(record.cargo_items)
 
-    var summary := advance_days(record.location_data.travel_days)
+    # Stash run economics so end_day can fold them into the day summary.
+    _pending_run_onsite = record.onsite_proceeds
+    _pending_run_paid = record.paid_price
+    _pending_run_entry_fee = record.entry_fee
+    _pending_run_fuel_cost = record.fuel_cost
+    _pending_run_cargo_count = record.cargo_items.size()
+    _pending_has_run = true
 
-    summary.onsite_proceeds = record.onsite_proceeds
-    summary.paid_price = record.paid_price
-    summary.entry_fee = record.entry_fee
-    summary.fuel_cost = record.fuel_cost
-    summary.cargo_count = record.cargo_items.size()
+    # Auction consumed morning + afternoon; player returns for the evening slot.
+    SaveManager.current_slot = 3
+    SaveManager.save()
 
     RunManager.clear_run_state()
 
-    return summary
+
+func _find_storage_entry(item_id: int) -> ItemEntry:
+    for entry: ItemEntry in SaveManager.storage_items:
+        if entry.id == item_id:
+            return entry
+    return null

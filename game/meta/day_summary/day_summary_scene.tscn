@@ -77,7 +77,7 @@ text = "Trip"
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="CommoditySalesLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup"]
+[node name="CommoditySalesLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup" unique_id=2064452397]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
@@ -93,25 +93,25 @@ theme_override_font_sizes/font_size = 18
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="CustomerSalesGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox"]
+[node name="CustomerSalesGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox" unique_id=337783078]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="CustomerHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup"]
+[node name="CustomerHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup" unique_id=961533228]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 16
 text = "Customer Sales"
 
-[node name="ConservativeLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup"]
+[node name="ConservativeLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup" unique_id=262069269]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="AggressiveLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup"]
+[node name="AggressiveLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup" unique_id=590603259]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="CustomerTotalLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup"]
+[node name="CustomerTotalLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup" unique_id=1273511848]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 
@@ -128,20 +128,6 @@ text = "Daily"
 [node name="LivingLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup" unique_id=1394461495]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-
-[node name="ActionsGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup" unique_id=2076101955]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="ActionsHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/ActionsGroup" unique_id=757793910]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 16
-text = "Completed Actions"
-
-[node name="ActionsList" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/ActionsGroup" unique_id=345650052]
-layout_mode = 2
-theme_override_constants/separation = 4
 
 [node name="CargoGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox" unique_id=869896661]
 layout_mode = 2
