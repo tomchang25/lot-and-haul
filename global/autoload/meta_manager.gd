@@ -1,15 +1,7 @@
 extends Node
 
-# ── Pending run economics ─────────────────────────────────────────────────────
-# Set by resolve_run() and folded into the DaySummary by end_day().
-# Cleared to zero after end_day() consumes them.
-
-var _pending_run_onsite: int = 0
-var _pending_run_paid: int = 0
-var _pending_run_entry_fee: int = 0
-var _pending_run_fuel_cost: int = 0
-var _pending_run_cargo_count: int = 0
-var _pending_has_run: bool = false
+# Pending run economics are stashed on SaveManager.pending_run (persisted) by
+# resolve_run() and folded into the DaySummary by end_day().
 
 # ══ Storage registration ══════════════════════════════════════════════════════
 
@@ -89,18 +81,14 @@ func end_day() -> DaySummary:
         summary.customer_sales_detail.append(sale.duplicate())
 
     # Fold pending run economics (set by resolve_run after the auction).
-    if _pending_has_run:
-        summary.onsite_proceeds = _pending_run_onsite
-        summary.paid_price = _pending_run_paid
-        summary.entry_fee = _pending_run_entry_fee
-        summary.fuel_cost = _pending_run_fuel_cost
-        summary.cargo_count = _pending_run_cargo_count
-        _pending_run_onsite = 0
-        _pending_run_paid = 0
-        _pending_run_entry_fee = 0
-        _pending_run_fuel_cost = 0
-        _pending_run_cargo_count = 0
-        _pending_has_run = false
+    if not SaveManager.pending_run.is_empty():
+        var pr: Dictionary = SaveManager.pending_run
+        summary.onsite_proceeds = int(pr.get("onsite_proceeds", 0))
+        summary.paid_price = int(pr.get("paid_price", 0))
+        summary.entry_fee = int(pr.get("entry_fee", 0))
+        summary.fuel_cost = int(pr.get("fuel_cost", 0))
+        summary.cargo_count = int(pr.get("cargo_count", 0))
+        SaveManager.pending_run = {}
 
     # Reset for next day.
     SaveManager.current_slot = 1
@@ -167,15 +155,17 @@ func resolve_customer_sale(
         )
     SaveManager.cash += sale_price
 
-    SaveManager.customer_sales_today.append({
-        "day": SaveManager.current_day,
-        "customer_id": customer.customer_id if customer != null else "",
-        "customer_name": customer.display_name if customer != null else "",
-        "strategy": strategy,
-        "item_count": items.size(),
-        "item_ids": sold_ids,
-        "sale_price": sale_price,
-    })
+    SaveManager.customer_sales_today.append(
+        {
+            "day": SaveManager.current_day,
+            "customer_id": customer.customer_id if customer != null else "",
+            "customer_name": customer.display_name if customer != null else "",
+            "strategy": strategy,
+            "item_count": items.size(),
+            "item_ids": sold_ids,
+            "sale_price": sale_price,
+        },
+    )
 
     if customer != null:
         SaveManager.nightly_customers.erase(customer)
@@ -284,22 +274,17 @@ func resolve_run(record: RunRecord) -> void:
     register_storage_items(record.cargo_items)
 
     # Stash run economics so end_day can fold them into the day summary.
-    _pending_run_onsite = record.onsite_proceeds
-    _pending_run_paid = record.paid_price
-    _pending_run_entry_fee = record.entry_fee
-    _pending_run_fuel_cost = record.fuel_cost
-    _pending_run_cargo_count = record.cargo_items.size()
-    _pending_has_run = true
+    # Persisted on SaveManager so a quit before end_day doesn't drop them.
+    SaveManager.pending_run = {
+        "onsite_proceeds": record.onsite_proceeds,
+        "paid_price": record.paid_price,
+        "entry_fee": record.entry_fee,
+        "fuel_cost": record.fuel_cost,
+        "cargo_count": record.cargo_items.size(),
+    }
 
     # Auction consumed morning + afternoon; player returns for the evening slot.
     SaveManager.current_slot = 3
     SaveManager.save()
 
     RunManager.clear_run_state()
-
-
-func _find_storage_entry(item_id: int) -> ItemEntry:
-    for entry: ItemEntry in SaveManager.storage_items:
-        if entry.id == item_id:
-            return entry
-    return null

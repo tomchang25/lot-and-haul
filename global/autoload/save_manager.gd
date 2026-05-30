@@ -33,6 +33,13 @@ var storage_ap: int = 0
 ## consumed by end_day() to populate the DaySummary customer count.
 var selling_slots_today: int = 0
 
+## Run economics awaiting fold-in by end_day(). Populated by resolve_run() after
+## an auction; consumed and cleared by end_day(). Persisted so quitting during
+## the evening slot doesn't drop the run breakdown from the day summary. Empty
+## when no run is pending. Keys (all int): onsite_proceeds, paid_price,
+## entry_fee, fuel_cost, cargo_count.
+var pending_run: Dictionary = {}
+
 # ── Nightly customers ─────────────────────────────────────────────────────────
 
 ## Customers generated for the current night. Array of Customer dicts on disk.
@@ -76,6 +83,7 @@ func save() -> void:
         "current_slot": current_slot,
         "storage_ap": storage_ap,
         "selling_slots_today": selling_slots_today,
+        "pending_run": pending_run,
     }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
     if file == null:
@@ -173,6 +181,14 @@ func _read_save_file() -> void:
         storage_ap = int(parsed["storage_ap"])
     if parsed.has("selling_slots_today") and parsed["selling_slots_today"] is float:
         selling_slots_today = int(parsed["selling_slots_today"])
+
+    # Pending run economics: intify on load (JSON numbers parse as float) so
+    # end_day() reads plain ints. Absent/empty for saves with no run pending.
+    pending_run = {}
+    if parsed.has("pending_run") and parsed["pending_run"] is Dictionary:
+        for key: Variant in parsed["pending_run"]:
+            if key is String and parsed["pending_run"][key] is float:
+                pending_run[key] = int(parsed["pending_run"][key])
 
     # ── Migration: discard legacy research_slots ──────────────────────────────
     # Old saves carried a research_slots array (day-ticker lifecycle). Under the

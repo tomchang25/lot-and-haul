@@ -59,11 +59,41 @@ static func create(location: LocationData, car: CarData) -> RunRecord:
     r.car_data = car
     r.max_stamina = car.stamina_cap
     r.stamina = r.max_stamina
-    # Seed the first lot with a full AP pool.
-    r.actions_remaining = r.inspection_ap_cap
-    r.compute_travel_costs()
 
+    # Resolve auction AP at the single construction point so no caller can forget
+    # to initialize it. Modifier sources fold into the resolvers below; the first
+    # lot opens with a full pool.
+    r.inspection_ap_cap = _resolve_inspection_ap_cap(car)
+    r.refill_metric = _resolve_refill_reserve(car)
+    r.actions_remaining = r.inspection_ap_cap
+
+    r.compute_travel_costs()
     return r
+
+
+# ── Auction AP resolution ─────────────────────────────────────────────────────
+# Single source of truth for a run's starting auction AP. Every modifier source
+# (car, attributes, perks, …) folds in here, so all runs are built identically
+# and no call site can bypass or forget one. Add new terms as the game grows —
+# this is the only place auction AP should be computed.
+
+
+## Resolves the per-lot inspection AP ceiling for a run using [param car].
+@warning_ignore("unused_parameter")
+static func _resolve_inspection_ap_cap(car: CarData) -> int:
+    var cap: int = Economy.INSPECTION_AP_CAP
+    # Future modifiers fold in here, e.g.:
+    #   cap += car.inspection_ap_bonus
+    #   cap += KnowledgeManager.get_attribute_value("perception")
+    return cap
+
+
+## Resolves the inspection AP reserve (lot-boundary refill pool) using [param car].
+@warning_ignore("unused_parameter")
+static func _resolve_refill_reserve(car: CarData) -> int:
+    var reserve: int = Economy.INSPECTION_REFILL_METRIC_DEFAULT
+    # Future modifiers fold in here.
+    return reserve
 
 
 func compute_travel_costs() -> void:

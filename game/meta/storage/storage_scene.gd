@@ -318,10 +318,3 @@ func _configure_action_buttons(entry: ItemEntry) -> void:
         _research_btn.tooltip_text = "Not enough AP (need %d)" % Economy.RESEARCH_AP_COST
     else:
         _research_btn.tooltip_text = ""
-
-
-func _find_entry_by_id(item_id: int) -> ItemEntry:
-    for entry: ItemEntry in SaveManager.storage_items:
-        if entry.id == item_id:
-            return entry
-    return null

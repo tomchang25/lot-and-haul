@@ -20,8 +20,6 @@ extends Control
 @onready var _customer_total_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup/CustomerTotalLabel
 
 @onready var _living_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/LivingLabel
-@onready var _actions_group: VBoxContainer = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/ActionsGroup
-@onready var _actions_list: VBoxContainer = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup/ActionsGroup/ActionsList
 
 @onready var _cargo_group: VBoxContainer = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CargoGroup
 @onready var _cargo_count_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CargoGroup/CargoCountLabel
