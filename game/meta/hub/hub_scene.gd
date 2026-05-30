@@ -13,6 +13,7 @@ const SLOT_NAMES: Array[String] = ["", "Morning", "Afternoon", "Evening"]
 @onready var _mastery_rank_label: Label = $RootVBox/MasteryRankLabel
 @onready var _balance_label: Label = $RootVBox/InfoContainer/BalanceLabel
 @onready var _storage_count_label: Label = $RootVBox/InfoContainer/StorageCountLabel
+@onready var _slot_label: Label = $RootVBox/SlotLabel
 
 # Activity buttons — repurposed from the original layout.
 # NextRunButton → Auction (slot 1 only)
@@ -23,22 +24,11 @@ const SLOT_NAMES: Array[String] = ["", "Morning", "Afternoon", "Evening"]
 @onready var _sell_btn: Button = $RootVBox/ButtonsVBox/MerchantButton
 @onready var _vehicle_btn: Button = $RootVBox/ButtonsVBox/VehicleButton
 @onready var _knowledge_btn: Button = $RootVBox/ButtonsVBox/KnowledgeButton
-@onready var _day_pass_btn: Button = $RootVBox/ButtonsVBox/DayPassButton
-
-# ── Dynamically added ─────────────────────────────────────────────────────────
-
-var _slot_label: Label = null  # inserted above ButtonsVBox at runtime
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
 func _ready() -> void:
-    # Build the slot tray label once.
-    _build_slot_label()
-
-    # Hide the old day-pass button — replaced by the slot economy.
-    _day_pass_btn.hide()
-
     _next_run_btn.pressed.connect(_on_auction_pressed)
     _storage_btn.pressed.connect(_on_storage_pressed)
     _sell_btn.pressed.connect(_on_open_shop_pressed)
@@ -52,23 +42,10 @@ func _ready() -> void:
 
     _refresh_display()
 
-# ══ Dynamic slot label ════════════════════════════════════════════════════════
-
-
-func _build_slot_label() -> void:
-    _slot_label = Label.new()
-    _slot_label.add_theme_font_size_override("font_size", 16)
-    _slot_label.add_theme_color_override("font_color", Color(0.75, 0.85, 1.0))
-    var root_vbox: VBoxContainer = $RootVBox
-    var buttons_vbox: VBoxContainer = $RootVBox/ButtonsVBox
-    root_vbox.add_child(_slot_label)
-    root_vbox.move_child(_slot_label, buttons_vbox.get_index())
-
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
 func _on_auction_pressed() -> void:
-    MetaManager.begin_auction()
     GameManager.go_to_location_select()
 
 
@@ -110,10 +87,7 @@ func _refresh_display() -> void:
 
 
 func _refresh_slot_label() -> void:
-    if _slot_label == null:
-        return
     var slot: int = SaveManager.current_slot
-    # Build a tray string: ● = already spent, ► = current, ○ = future.
     var tray: String = ""
     for i: int in range(1, 4):
         var sname: String = SLOT_NAMES[i]
@@ -130,20 +104,12 @@ func _refresh_activity_buttons() -> void:
     var slot: int = SaveManager.current_slot
 
     # Auction: Morning (slot 1) only.
-    _next_run_btn.text = "Auction  (Morning)"
-    _next_run_btn.visible = true
     _next_run_btn.disabled = (slot != 1)
     _next_run_btn.tooltip_text = "" if slot == 1 else "Auction is only available in the Morning slot"
 
     # Storage: any slot, no restriction.
     _storage_btn.text = "Storage  (work items, %d AP)" % Economy.STORAGE_AP_MAX
-    _storage_btn.visible = true
-    _storage_btn.disabled = false
-    _storage_btn.tooltip_text = ""
 
-    # Open Shop: any slot; label shows how many selling slots the commitment covers.
+    # Open Shop: label shows how many selling slots the commitment covers.
     var selling_slots: int = 4 - slot
     _sell_btn.text = "Open Shop  (%d-slot window)" % selling_slots
-    _sell_btn.visible = true
-    _sell_btn.disabled = false
-    _sell_btn.tooltip_text = ""

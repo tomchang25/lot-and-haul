@@ -32,7 +32,8 @@ var _selected_entry: ItemEntry = null
 @onready var _footer_status_label: Label = %FooterStatusLabel
 @onready var _back_btn: Button = %BackButton
 
-# Right — detail
+# Right — AP bar and detail
+@onready var _ap_label: Label = %APLabel
 @onready var _detail_section: VBoxContainer = %DetailSection
 @onready var _detail_name_label: Label = %DetailNameLabel
 @onready var _auth_tag_label: Label = %AuthTagLabel
@@ -51,10 +52,6 @@ var _selected_entry: ItemEntry = null
 @onready var _restore_btn: Button = %RestoreButton
 @onready var _value_title_label: Label = %ValueTitleLabel
 
-# ── Dynamically added ─────────────────────────────────────────────────────────
-
-var _ap_label: Label = null  # AP display inserted above the action grid
-
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
@@ -62,56 +59,24 @@ func _ready() -> void:
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 
-    _build_ap_label()
-
     _back_btn.pressed.connect(_on_back_pressed)
     _repair_btn.pressed.connect(_on_repair_pressed)
     _research_btn.pressed.connect(_on_research_pressed)
     _restore_btn.pressed.connect(_on_restore_pressed)
 
-    # Hide legacy slot-assignment nodes that are no longer used.
-    if has_node("%RemoveButton"):
-        %RemoveButton.hide()
-    if has_node("%TaskReadyLabel"):
-        %TaskReadyLabel.hide()
-    if has_node("%TaskContainer"):
-        %TaskContainer.hide()
-
     _item_list_panel.row_pressed.connect(_on_row_pressed)
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
     _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
 
+    _refresh_ap_label()
     _populate_rows()
     _refresh_detail()
-
-# ══ AP label (dynamic) ════════════════════════════════════════════════════════
-
-
-func _build_ap_label() -> void:
-    _ap_label = Label.new()
-    _ap_label.add_theme_font_size_override("font_size", 16)
-    _action_grid.get_parent().add_child(_ap_label)
-    _action_grid.get_parent().move_child(_ap_label, _action_grid.get_index())
-    _refresh_ap_label()
-
-
-func _refresh_ap_label() -> void:
-    if _ap_label == null:
-        return
-    var ap: int = SaveManager.storage_ap
-    var max_ap: int = Economy.STORAGE_AP_MAX
-    _ap_label.text = "AP:  %d / %d" % [ap, max_ap]
-    if ap == 0:
-        _ap_label.add_theme_color_override("font_color", Color(0.6, 0.4, 0.4))
-    elif ap <= 4:
-        _ap_label.add_theme_color_override("font_color", Color(0.95, 0.75, 0.3))
-    else:
-        _ap_label.add_theme_color_override("font_color", Color(0.4, 0.85, 1.0))
 
 # ══ Signal handlers ═══════════════════════════════════════════════════════════
 
 
 func _on_back_pressed() -> void:
+    # Slot already committed on entry — leaving returns to hub for the next slot.
     GameManager.go_to_hub()
 
 
@@ -151,6 +116,20 @@ func _on_restore_pressed() -> void:
         _refresh_row(_selected_entry)
         _refresh_ap_label()
         _refresh_detail()
+
+# ══ AP label ══════════════════════════════════════════════════════════════════
+
+
+func _refresh_ap_label() -> void:
+    var ap: int = SaveManager.storage_ap
+    var max_ap: int = Economy.STORAGE_AP_MAX
+    _ap_label.text = "AP:  %d / %d" % [ap, max_ap]
+    if ap == 0:
+        _ap_label.add_theme_color_override("font_color", Color(0.6, 0.4, 0.4))
+    elif ap <= 4:
+        _ap_label.add_theme_color_override("font_color", Color(0.95, 0.75, 0.3))
+    else:
+        _ap_label.add_theme_color_override("font_color", Color(0.4, 0.85, 1.0))
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 
@@ -323,11 +302,18 @@ func _configure_action_buttons(entry: ItemEntry) -> void:
 
     # ── Research ─────────────────────────────────────────────────────────────
     var has_hidden: bool = entry.has_unrevealed_hidden()
-    var can_research: bool = ap >= Economy.RESEARCH_AP_COST and has_hidden
+    var research_needs_repair: bool = entry.condition < 0.5
+    var can_research: bool = (
+        ap >= Economy.RESEARCH_AP_COST
+        and has_hidden
+        and not research_needs_repair
+    )
     _research_btn.disabled = not can_research
     _research_btn.text = "Research  [%d AP]" % Economy.RESEARCH_AP_COST
     if not has_hidden:
         _research_btn.tooltip_text = "No hidden clues remaining"
+    elif research_needs_repair:
+        _research_btn.tooltip_text = "Repair to 50%% condition before researching"
     elif ap < Economy.RESEARCH_AP_COST:
         _research_btn.tooltip_text = "Not enough AP (need %d)" % Economy.RESEARCH_AP_COST
     else:

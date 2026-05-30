@@ -118,7 +118,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "← Back"
+text = "Leave Workshop"
 
 [node name="SidebarSep" type="VSeparator" parent="RootHBox" unique_id=568005494]
 layout_mode = 2
@@ -141,6 +141,7 @@ theme_override_constants/separation = 12
 
 [node name="TaskSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=854617958]
 layout_mode = 2
+visible = false
 theme_override_constants/separation = 8
 
 [node name="TaskHeaderHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection" unique_id=755474436]
@@ -314,6 +315,14 @@ theme_override_font_sizes/font_size = 11
 [node name="DetailSpacer" type="Control" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=302787258]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="APLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=1000000020]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "AP:  0 / 10"
+horizontal_alignment = 1
 
 [node name="ActionGrid" type="GridContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=420510029]
 unique_name_in_owner = true

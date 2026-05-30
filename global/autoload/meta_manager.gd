@@ -231,6 +231,8 @@ func research_item(entry: ItemEntry) -> bool:
         return false
     if SaveManager.storage_ap < Economy.RESEARCH_AP_COST:
         return false
+    if entry.condition < 0.5:
+        return false
     if not entry.has_unrevealed_hidden():
         return false
     var investigation_attr := KnowledgeManager.get_attribute_value("investigation")
