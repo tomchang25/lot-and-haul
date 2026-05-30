@@ -140,8 +140,8 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="TaskSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=854617958]
-layout_mode = 2
 visible = false
+layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="TaskHeaderHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection" unique_id=755474436]
@@ -212,6 +212,7 @@ theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 10
 
 [node name="DetailRarityHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=806539401]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 12
 
@@ -221,6 +222,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 12
 
 [node name="DetailStatsHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=1330949172]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
 
@@ -278,6 +280,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 16
 
 [node name="ConvergencePanel" type="PanelContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=574237905]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="ConvMargin" type="MarginContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ConvergencePanel" unique_id=164997626]
@@ -353,15 +356,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
 text = "Research"
-
-[node name="RemoveButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1949861252]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 36)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 13
-text = "Remove"
 
 [node name="NoSelectionLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=567673002]
 unique_name_in_owner = true

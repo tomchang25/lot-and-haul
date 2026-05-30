@@ -42,6 +42,7 @@ func begin_storage_slot() -> void:
 ## advancing current_slot to 3, returning the player to the evening slot.
 ## Call before navigating to location select.
 func begin_auction() -> void:
+    assert(SaveManager.current_slot == 1, "Auction can only begin in slot 1 (Morning)")
     SaveManager.current_slot = 3
     SaveManager.save()
 

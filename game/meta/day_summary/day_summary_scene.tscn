@@ -77,10 +77,6 @@ text = "Trip"
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="CommoditySalesLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup" unique_id=2064452397]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-
 [node name="EntryFeeLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup" unique_id=2046138955]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18

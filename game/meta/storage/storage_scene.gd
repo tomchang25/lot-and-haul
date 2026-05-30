@@ -39,6 +39,9 @@ var _selected_entry: ItemEntry = null
 @onready var _auth_tag_label: Label = %AuthTagLabel
 @onready var _detail_category_label: Label = %DetailCategoryLabel
 @onready var _detail_rarity_label: Label = %DetailRarityLabel
+@onready var _detail_rarity_hbox: HBoxContainer = %DetailRarityHBox
+@onready var _detail_stats_hbox: HBoxContainer = %DetailStatsHBox
+@onready var _convergence_panel: PanelContainer = %ConvergencePanel
 @onready var _detail_cond_value: Label = %CondValueLabel
 @onready var _detail_est_value: Label = %ValueValueLabel
 @onready var _detail_conv_ratio: Label = %ConvRatioLabel
@@ -184,9 +187,9 @@ func _refresh_detail() -> void:
     _detail_name_label.visible = has_selection
     _auth_tag_label.visible = false
     _detail_category_label.visible = has_selection
-    _detail_section.get_node("DetailRarityHBox").visible = has_selection
-    _detail_section.get_node("DetailStatsHBox").visible = has_selection
-    _detail_section.get_node("ConvergencePanel").visible = has_selection
+    _detail_rarity_hbox.visible = has_selection
+    _detail_stats_hbox.visible = has_selection
+    _convergence_panel.visible = has_selection
     _action_grid.visible = has_selection
     _progress_label.visible = false
 

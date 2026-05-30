@@ -80,10 +80,6 @@ theme_override_font_sizes/font_size = 18
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="CommoditySalesLabel" type="Label" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-
 [node name="OverallLabel" type="Label" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18

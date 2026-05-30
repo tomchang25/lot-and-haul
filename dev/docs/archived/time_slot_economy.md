@@ -51,7 +51,7 @@ Action costs and effects:
 | Action       | AP Cost | Effect                                                                                                                                                                                                       |
 | ------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Repair**   | 2 AP    | Condition rises by a base increment scaled by storage zone and item rarity, capped at 0.5.                                                                                                                   |
-| **Restore**  | 4 AP    | Condition rises by a larger base increment scaled by storage zone, rarity, and the Restoration attribute, capped at 1.0.                                                                                     |
+| **Restore**  | 2 AP    | Condition rises by a larger base increment scaled by storage zone, rarity, and the Restoration attribute, capped at 1.0.                                                                                     |
 | **Research** | 4 AP    | Deterministic — no roll. Each spend adds `5 + Investigation attribute` progress toward one target hidden clue; the clue reveals when accumulated progress ≥ its DC. Unavailable when no hidden clues remain. |
 
 Each action applies immediately on selection — no day-tick delay. One press applies one action's worth of effect.
@@ -60,16 +60,16 @@ Each action applies immediately on selection — no day-tick delay. One press ap
 
 | Single-Slot Plan                     | AP Used | Notes                                  |
 | ------------------------------------ | ------- | -------------------------------------- |
-| 2× Restore + 1× Research             | 12      | Over budget — must drop one            |
 | 2× Research + 1× Repair              | 10      | Research-focused slot, exact fit       |
-| 1× Restore + 1× Research + 1× Repair | 10      | Mixed slot, exact fit                  |
+| 1× Restore + 1× Research + 1× Repair | 8       | Mixed slot, 2 AP leftover              |
+| 1× Restore + 1× Restore + 1× Repair  | 6       | Condition-focused, 4 AP leftover       |
 | 5× Repair                            | 10      | Full-condition push                    |
-| 1× Restore + 1× Research             | 8       | Feasible, 2 AP leftover (room for Repair) |
+| 1× Restore + 1× Research             | 6       | Feasible, 4 AP leftover                |
 | 1× Repair                            | 2       | Light maintenance, rest AP unused      |
 
 A player who wants to do more spends _another slot_ on Storage for a fresh 10 AP — the cost is the auction or selling given up, not a shared daily ceiling.
 
-> **Tuning note:** these numbers were first calibrated against a shared daily pool. With 10 AP now per slot (a 2–3 storage-slot day yields 20–30 AP), the per-slot amount and/or action costs need a retuning pass before release — 10/slot may make full authentication too cheap once slots are stacked.
+> **Tuning note:** Restore currently costs the same 2 AP as Repair — the design intent was a higher Restore cost (4 AP), so this is a likely tuning target. These numbers were first calibrated against a shared daily pool; with 10 AP per slot (2–3 storage slots → 20–30 AP/day), both pool size and action costs need a retuning pass before release — 10/slot may make full authentication too cheap once slots are stacked.
 
 **Why research is deterministic, not a roll:** variance belongs where there is tension and a clock — the on-site auction, where the inspection mechanic stays a gamble. Storage research is a slow, deliberate investment of slots, AP, and living cost; a fail-roll there only punishes commitment and produces "spent three slots, revealed nothing" feel-bad outcomes. Deterministic research gives a clean split — **gamble at the auction, grind in storage.** The clue's DC stays meaningful (it sets how much total research a clue costs) and the Investigation attribute still matters (it raises progress per AP), just without luck. Research progress accumulates per in-progress clue and persists across slots and days, so a single clue can be worked toward over several sessions.
 

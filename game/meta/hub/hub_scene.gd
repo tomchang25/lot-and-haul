@@ -46,6 +46,8 @@ func _ready() -> void:
 
 
 func _on_auction_pressed() -> void:
+    if SaveManager.current_slot != 1:
+        return
     GameManager.go_to_location_select()
 
 
