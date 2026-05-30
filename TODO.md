@@ -41,6 +41,10 @@ Faction reputation system with scam-detection decision branches — builds on th
 
 Unresolved design: a network of appraiser NPCs the player can consult for better value estimates (beyond their own attributes). Pay-per-use or relationship-gated.
 
+### Modalized HUD Navigation
+
+Replace per-scene `_back_btn` / `_continue_btn` / `_reset_btn` manual wiring with a shared modalized HUD overlay. The HUD owns navigation controls and scene-agnostic chrome (cash, day display). Scenes emit navigation requests rather than direct `GameManager.go_to_*()` calls. Reduces boilerplate across ~10 scenes.
+
 ### Museum / Prestige
 
 Prestige system where rare/verified items can be donated or displayed for reputation, unlocking content gates. Design decisions needed first: what does prestige unlock or affect (access tiers, price modifiers, cosmetics, pure achievement)? Is it per-super-category or global? Is the donation UI in storage or a separate scene? The entire path is blocked on deciding the prestige shape.
@@ -53,9 +57,17 @@ An auction modifier variant where every lot contains only base-layer (anchor) cl
 
 Hub-based training resource: spend cash and a day slot to temporarily boost an attribute for the next run. Training button in hub, resource-like expiry model.
 
+### Image v2 (Backgrounds & Decorations)
+
+Location-dependent backgrounds per run (currently plain ColorRect). Lot card decoration with random icon/badge per lot. Phase-dependent decoration: worker loading truck in cargo, auctioneer gavel in auction, etc. Needs asset pipeline — blocked on visual direction.
+
 ### Intel System / Pre-Run Tip-Offs
 
 Pre-run intelligence on available lots — reveal clue counts, surface categories, or estimated value tiers before committing the trip. Waiting on `LocationIntel` resource design.
+
+### ItemEntry Cleanup / Data Standard
+
+`item_entry.gd` (698 lines) mixes price math, display text helpers, serialization, clue mechanics, and factory logic. Split into layers: `ItemEntry` = data + price logic, display getters = separate concern (`ItemDisplay` or similar). Clear boundary: `ItemData` (designer resource, the _what_), `ItemEntry` (runtime instance, the _state+behavior_), display (the _show_).
 
 ### NPC Depth Rolled Price
 
@@ -81,6 +93,10 @@ Daily interest on cash reserves, game-over condition when debt threshold is cros
 
 Weighted tag pools (calendar/event/progression-driven), regular customers with fixed profiles, quality tiers (budget vs. collector), selling-related perks. Builds on the current nightly customer system.
 
+### Debug Mode
+
+Formal dev-mode toggle accessible both via project setting and in-game hotkey/button. Enables: auto-pack cargo grid, instant auction finish, skip scene transitions, reveal all item data overlays, spawn test items. Single gated entry point — no debug code scattered across production scenes.
+
 ### Lot Location Unlock Gating
 
 Perk or mastery rank or unlock fee (or some combination — e.g. a purchasable perk that grants access) to gate which lot kinds are available at which locations. Replaces the simpler "waiting on progression model" placeholder.
@@ -97,6 +113,10 @@ Hub surfaces different warehouse exteriors and lot counts per location variant. 
 
 Additional perks beyond the current attribute-threshold triggers, with full acquisition wiring (content-granted, event-granted, etc.).
 
+### Perk Type System: Gate vs Effect
+
+`PerkData` has no type/kind field — all perks are identical resources. Split into `GATE` perks (content access, checked via `required_perk` on resources) and `EFFECT` perks (formula modifiers: keen_eye → inspection bonus, rarity_affinity → price, quick_study → XP gain). Wire effect perks into actual formulas — `perk_effects.gd` is currently a stub.
+
 ### Content Gates (Mastery Rank)
 
 Use `get_mastery_rank()` directly to gate prestige unlocks, tier-locked auction houses, and NPC reaction tiers.
@@ -104,6 +124,17 @@ Use `get_mastery_rank()` directly to gate prestige unlocks, tier-locked auction 
 ### Fuel Cost Pre-Run Preview
 
 Surface `fuel_cost_per_day × travel_days` in the location selection cost card. Blocked on the location system's cost card.
+
+### Super-Category Diversity
+
+All four super_categories currently share identical value ranges and clue complexity — no mechanical personality. Idea: differentiate by base anchor value distribution, clue count range, and surface/hidden complexity to create distinct "feel" per super_category:
+
+| super_category | anchor range    | clue count | surface complexity | hidden volatility                   |
+| -------------- | --------------- | ---------- | ------------------ | ----------------------------------- |
+| fashion        | wide (100–800)  | 3–5        | many small add/mul | high (can swing ±50%)               |
+| decorative     | tight (150–400) | 2–3        | few flat modifiers | low (mostly surface tells you)      |
+| fine_art       | high (300–1200) | 4–6        | few but large mul  | medium (hidden can double or halve) |
+| weapon         | mid (200–600)   | 2–4        | predictable add    | very low (surface is truth)         |
 
 ### Vehicle Upgrades / Mods
 
@@ -120,6 +151,14 @@ Each vehicle grants a unique gameplay modifier (e.g. "+1 action per lot", "ignor
 ### Vehicle Sell-Back / Trade-In
 
 Sell owned cars for partial value when upgrading, so trading up has a cost offset.
+
+### Version-Based Save Migration
+
+Save dict has no version field — migrations use implicit `parsed.has("key")` checks. Add `"version"` integer field, define version constants, and replace implicit checks with explicit version-switch migration functions. Covers save_manager.gd and item_entry.gd from_dict().
+
+### YAML Data Overhaul
+
+Two-part content standard. (1) Define super_category / category reference tables: median, mean, stddev, min, max price and condition per category for balancing. (2) Adopt rarity layer distribution as authoring guideline: 8 Common (L1), 8 Uncommon (L1-2), 4 Rare (L2-3), 1 Epic (L3-4), 1 Legendary (L4 + SuperCat). Audit existing YAML items against this standard.
 
 ---
 
@@ -139,6 +178,8 @@ One-line, no reasoning, no backing doc.
 - [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
 - [ui] Replace placeholder fade with per-location arrival visuals.
 - [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
+- [dev] Auto-put won items to cargo grid (dev-only, skips manual packing).
+- [dev] Instant-finish auction at current price (dev-only action).
 
 ---
 
