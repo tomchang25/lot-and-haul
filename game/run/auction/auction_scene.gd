@@ -21,6 +21,9 @@ const STEP_RATIO := 0.075
 # Minimum step in currency units — applies to both NPC steps and player bump.
 const MIN_STEP := 20
 
+const LotSummaryRowScene := preload("res://game/run/auction/lot_summary_row/lot_summary_row.tscn")
+const BidHistoryRowScene := preload("res://game/run/auction/bid_history_row/bid_history_row.tscn")
+
 # ── State ─────────────────────────────────────────────────────────────────────
 
 # _rolled_price must never be logged or exposed in any debug UI during playtesting.
@@ -91,6 +94,8 @@ func _ready() -> void:
     var price_area: Control = $RootVBox/Centre/Content/PriceArea
     _circle_node = _CircleProgress.new()
     _circle_node.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+    # node-src: drawn
     price_area.add_child(_circle_node)
     price_area.move_child(_circle_node, 0)
 
@@ -204,12 +209,11 @@ func _build_lot_summary() -> void:
     var lot: LotEntry = RunManager.run_record.lot_entry
 
     for entry: ItemEntry in lot.item_entries:
-        var label := Label.new()
-        label.text = "%s (%s)" % [entry.display_name, entry.estimated_value_text()]
-        label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-        label.add_theme_font_size_override(&"font_size", 15)
-        _lot_summary.add_child(label)
+        var row: LotSummaryRow = LotSummaryRowScene.instantiate()
+        row.setup("%s (%s)" % [entry.display_name, entry.estimated_value_text()])
+        _lot_summary.add_child(row)
 
+    # node-src: ephemeral — separator in rebuilt list
     _lot_summary.add_child(HSeparator.new())
 
     var total_label := Label.new()
@@ -218,6 +222,7 @@ func _build_lot_summary() -> void:
     total_label.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
     total_label.text = lot.get_player_estimate_label()
 
+    # node-src: ephemeral — transient footer, rebuilt per lot
     _lot_summary.add_child(total_label)
 
 # ══ NPC logic ═════════════════════════════════════════════════════════════════
@@ -228,6 +233,7 @@ func _start_npc_timer() -> void:
         _npc_timer = Timer.new()
         _npc_timer.one_shot = true
         _npc_timer.timeout.connect(_on_npc_tick)
+        # node-src: timer
         add_child(_npc_timer)
 
     var progress := float(_current_display_price) / float(_rolled_price)
@@ -303,6 +309,7 @@ func _resolve() -> void:
 
 # ══ Budget refresh ══════════════════════════════════════════════════════════════
 
+
 ## Updates the top-right budget label to reflect cash-on-hand minus committed
 ## run costs (paid_price, entry_fee, fuel_cost). Called on init and after
 ## every player bid so the number stays live.
@@ -311,7 +318,6 @@ func _refresh_budget() -> void:
     var committed := record.paid_price + record.entry_fee + record.fuel_cost
     var remaining := maxi(SaveManager.cash - committed, 0)
     _budget_label.text = "Budget: $%d" % remaining
-
 
 # ══ Display helpers ════════════════════════════════════════════════════════════
 
@@ -330,15 +336,10 @@ func _set_displayed_price(v: float) -> void:
 
 
 func _show_player_bid_in_stack(price: int) -> void:
-    var label := Label.new()
-    label.text = "YOU -- $%d" % price
-    label.add_theme_font_size_override(&"font_size", 14)
-    label.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
-    _npc_history_list.add_child(label)
-
-    var tween := create_tween()
-    tween.tween_interval(3.0)
-    tween.tween_callback(label.queue_free)
+    var row: BidHistoryRow = BidHistoryRowScene.instantiate()
+    row.setup("YOU -- $%d" % price, Color(0.92, 0.72, 0.18), true)
+    _npc_history_list.add_child(row)
+    row.play_expire()
 
 
 func _show_npc_popup(price: int) -> void:
@@ -349,18 +350,10 @@ func _show_npc_popup(price: int) -> void:
     _last_npc_index = new_index
     var npc_name: String = NPC_NAMES[new_index]
 
-    var new_bid_label := Label.new()
-    new_bid_label.text = "%s -- $%d" % [npc_name, price]
-    new_bid_label.add_theme_font_size_override(&"font_size", 14)
-    new_bid_label.modulate.a = 0.0
-
-    _npc_history_list.add_child(new_bid_label)
-
-    var tween := create_tween()
-    tween.tween_property(new_bid_label, "modulate:a", 1.0, 0.15)
-    tween.tween_interval(3.0)
-    tween.tween_property(new_bid_label, "modulate:a", 0.0, 0.5)
-    tween.tween_callback(new_bid_label.queue_free)
+    var row: BidHistoryRow = BidHistoryRowScene.instantiate()
+    row.setup("%s -- $%d" % [npc_name, price])
+    _npc_history_list.add_child(row)
+    row.play_enter_and_expire()
 
     if _npc_history_list.get_child_count() > 5:
         _npc_history_list.get_child(0).queue_free()
@@ -396,4 +389,5 @@ func _init_debug_overlay() -> void:
         lot.lot_data.aggressive_lerp_min,
         lot.lot_data.aggressive_lerp_max,
     ]
+    # node-src: debug
     add_child(_debug_label)

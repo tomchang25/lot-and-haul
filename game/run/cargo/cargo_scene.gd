@@ -12,6 +12,7 @@ const CELL_SIZE := 56
 
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 const CargoItemRowScene: PackedScene = preload("res://game/run/cargo/cargo_item_row.tscn")
+const ExtraSlotCellScene: PackedScene = preload("res://game/run/cargo/extra_slot_cell/extra_slot_cell.tscn")
 
 # ── State ──────────────────────────────────────────────────────────────────────
 
@@ -232,6 +233,34 @@ func _on_extra_slot_pressed(slot_index: int) -> void:
         _place_item_in_extra(slot_index)
 
 
+func _on_extra_slot_hovered(slot_index: int) -> void:
+    _hover_extra_index = slot_index
+    _refresh_extra_slot_visuals()
+
+    if _cargo_grid.phase != PackingGrid.Phase.ITEM_HELD and _extra_slot_items[slot_index] != null:
+        var entry: ItemEntry = _extra_slot_items[slot_index]
+        if _item_rows.has(entry):
+            _item_rows[entry].set_external_highlight(true)
+            _show_tooltip_for_item(entry, _item_rows[entry].get_global_rect())
+        else:
+            _show_tooltip_for_item(entry, _extra_slot_cells[slot_index].get_global_rect())
+
+
+func _on_extra_slot_unhovered(slot_index: int) -> void:
+    if _hover_extra_index == slot_index:
+        _hover_extra_index = -1
+    if slot_index < _extra_slot_items.size() and _extra_slot_items[slot_index] != null \
+    and _item_rows.has(_extra_slot_items[slot_index]):
+        _item_rows[_extra_slot_items[slot_index]].set_external_highlight(false)
+    _refresh_extra_slot_visuals()
+    _hide_tooltip()
+
+
+func _on_extra_slot_cancel(_slot_index: int) -> void:
+    if _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
+        _cargo_grid.cancel_placement()
+
+
 func _on_item_row_pressed(entry: ItemEntry) -> void:
     _hide_tooltip()
     if _item_rows.has(entry):
@@ -335,7 +364,12 @@ func _build_extra_slots() -> void:
     var count := RunManager.run_record.car_data.extra_slot_count
     _trailer_section.visible = count > 0
     for i in count:
-        var cell := _make_extra_slot_cell(i)
+        var cell: ExtraSlotCell = ExtraSlotCellScene.instantiate()
+        cell.setup(i)
+        cell.hovered.connect(_on_extra_slot_hovered)
+        cell.unhovered.connect(_on_extra_slot_unhovered)
+        cell.slot_pressed.connect(_on_extra_slot_pressed)
+        cell.slot_cancel.connect(_on_extra_slot_cancel)
         _extra_slot_container.add_child(cell)
         _extra_slot_cells[i] = cell
 
@@ -480,7 +514,7 @@ func _update_summary(pending_slots: int, pending_weight: float, weight_exceeded:
 
 func _refresh_extra_slot_visuals() -> void:
     for i: int in _extra_slot_cells:
-        var cell: Panel = _extra_slot_cells[i]
+        var cell: ExtraSlotCell = _extra_slot_cells[i]
         var style: StyleBoxFlat
         var entry: ItemEntry = _extra_slot_items[i] if i < _extra_slot_items.size() else null
         if entry != null:
@@ -504,15 +538,13 @@ func _refresh_extra_slot_visuals() -> void:
                 Color(0.18, 0.18, 0.20, 1.0),
                 Color(0.35, 0.35, 0.38, 1.0),
             )
-        cell.add_theme_stylebox_override("panel", style)
-
-        var icon_label: Label = cell.get_node("IconLabel")
+        var icon_text := ""
         if entry != null:
             var words = entry.display_name.split(" ", false)
-            icon_label.text = (words[0].left(1) if words.size() > 0 else "") + (words[1].left(1) if words.size() > 1 else "")
-            icon_label.text = icon_label.text.to_upper()
-        else:
-            icon_label.text = ""
+            icon_text = (words[0].left(1) if words.size() > 0 else "") + (words[1].left(1) if words.size() > 1 else "")
+            icon_text = icon_text.to_upper()
+
+        cell.set_visuals(style, icon_text)
 
 
 func _refresh_item_list_visuals() -> void:
@@ -549,64 +581,6 @@ func _make_stylebox(bg: Color, border: Color) -> StyleBoxFlat:
     s.border_width_bottom = 1
     s.border_color = border
     return s
-
-
-func _make_extra_slot_cell(slot_index: int) -> Panel:
-    var cell := Panel.new()
-    cell.custom_minimum_size = Vector2(CELL_SIZE, CELL_SIZE)
-    cell.set_meta("slot_index", slot_index)
-
-    var style := StyleBoxFlat.new()
-    style.bg_color = Color(0.18, 0.18, 0.20, 1.0)
-    style.border_width_left = 1
-    style.border_width_right = 1
-    style.border_width_top = 1
-    style.border_width_bottom = 1
-    style.border_color = Color(0.35, 0.35, 0.38, 1.0)
-    cell.add_theme_stylebox_override("panel", style)
-
-    var icon_label := Label.new()
-    icon_label.name = "IconLabel"
-    icon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-    icon_label.anchors_preset = Control.PRESET_FULL_RECT
-    icon_label.add_theme_font_size_override("font_size", 14)
-    cell.add_child(icon_label)
-
-    cell.mouse_entered.connect(
-        func() -> void:
-            _hover_extra_index = slot_index
-            _refresh_extra_slot_visuals()
-
-            if _cargo_grid.phase != PackingGrid.Phase.ITEM_HELD and _extra_slot_items[slot_index] != null:
-                var entry: ItemEntry = _extra_slot_items[slot_index]
-                if _item_rows.has(entry):
-                    _item_rows[entry].set_external_highlight(true)
-                    _show_tooltip_for_item(entry, _item_rows[entry].get_global_rect())
-                else:
-                    _show_tooltip_for_item(entry, cell.get_global_rect())
-    )
-    cell.mouse_exited.connect(
-        func() -> void:
-            if _hover_extra_index == slot_index:
-                _hover_extra_index = -1
-            if slot_index < _extra_slot_items.size() and _extra_slot_items[slot_index] != null \
-            and _item_rows.has(_extra_slot_items[slot_index]):
-                _item_rows[_extra_slot_items[slot_index]].set_external_highlight(false)
-            _refresh_extra_slot_visuals()
-            _hide_tooltip()
-    )
-
-    cell.gui_input.connect(
-        func(event: InputEvent) -> void:
-            if event is InputEventMouseButton and event.pressed:
-                if event.button_index == MOUSE_BUTTON_LEFT:
-                    _on_extra_slot_pressed(slot_index)
-                elif event.button_index == MOUSE_BUTTON_RIGHT:
-                    if _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
-                        _cargo_grid.cancel_placement()
-    )
-    return cell
 
 # ══ Tooltip helpers ════════════════════════════════════════════════════════════
 

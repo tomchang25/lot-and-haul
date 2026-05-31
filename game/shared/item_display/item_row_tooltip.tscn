@@ -55,6 +55,13 @@ theme_override_font_sizes/font_size = 13
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 
+[node name="ClueSeparator" type="HSeparator" parent="VBox" unique_id=1000000020]
+layout_mode = 2
+
+[node name="ClueContainer" type="VBoxContainer" parent="VBox" unique_id=1000000021]
+layout_mode = 2
+theme_override_constants/separation = 2
+
 [node name="CargoSeparator" type="HSeparator" parent="VBox" unique_id=1000000012]
 layout_mode = 2
 

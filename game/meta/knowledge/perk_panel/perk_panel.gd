@@ -29,7 +29,10 @@ func _build_content() -> void:
     if perks.is_empty():
         var empty := Label.new()
         empty.text = "No perks discovered"
+
+        # node-src: ephemeral — empty-state label
         _content.add_child(empty)
+
         return
 
     for perk: PerkData in perks:
@@ -43,4 +46,5 @@ func _build_content() -> void:
             perk_label.text = "%s — ???" % perk.display_name
             perk_label.modulate = Color(0.5, 0.5, 0.5)
 
+        # node-src: ephemeral — per-perk label, rebuilt per refresh
         _content.add_child(perk_label)

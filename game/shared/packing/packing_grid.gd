@@ -59,8 +59,8 @@ var additional_validator: Callable
 
 # ── State (public read) ────────────────────────────────────────────────────────
 
-var placement: Dictionary = {}  # Vector2i → Variant (the item)
-var item_rotations: Dictionary = {}  # Variant → int (rotation 0-3)
+var placement: Dictionary = { } # Vector2i → Variant (the item)
+var item_rotations: Dictionary = { } # Variant → int (rotation 0-3)
 
 var phase: Phase = Phase.IDLE
 var active_item = null
@@ -69,11 +69,11 @@ var hover_cell: Vector2i = Vector2i(-1, -1)
 
 # ── Internal ───────────────────────────────────────────────────────────────────
 
-var _cell_nodes: Dictionary = {}  # Vector2i → Panel
+var _cell_nodes: Dictionary = { } # Vector2i → Panel
 var _grid_cols: int = 0
 var _grid_rows: int = 0
-var _hover_item = null         # placed item under cursor in IDLE phase
-var _lift_offset: Vector2i = Vector2i(0, 0)  # offset from item origin to clicked cell
+var _hover_item = null # placed item under cursor in IDLE phase
+var _lift_offset: Vector2i = Vector2i(0, 0) # offset from item origin to clicked cell
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -95,7 +95,7 @@ func _unhandled_input(event: InputEvent) -> void:
 # ══ Public API ════════════════════════════════════════════════════════════════
 
 
-## Initialises the grid with the given dimensions. Safe to call multiple times;
+## Initialises the grid with the given dimensions. Safe to call multiple times
 ## existing cells are freed and state is reset before rebuilding. Callbacks
 ## should be set before calling this so cell construction can use them.
 func setup(cols: int, rows: int) -> void:
@@ -305,7 +305,10 @@ func _build_grid() -> void:
         for col in _grid_cols:
             var pos := Vector2i(col, row)
             var cell := _make_cell(pos)
+
+            # node-src: ephemeral — per-grid cell, dynamic W×H
             add_child(cell)
+
             _cell_nodes[pos] = cell
 
 

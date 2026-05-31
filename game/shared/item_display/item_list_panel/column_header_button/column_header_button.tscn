@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/shared/item_display/item_list_panel/column_header_button/column_header_button.gd" id="1_script"]
+
+[node name="ColumnHeaderButton" type="Button"]
+focus_mode = 0
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+flat = true
+text = " - "
+script = ExtResource("1_script")

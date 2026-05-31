@@ -40,14 +40,20 @@ Only what `lint_standards.py` enforces today:
 - **Node-source rule** (`block_scene_architecture_standard.md` §11). A machine
   can't tell whether a node is persistent, so the convention makes intent
   syntactic: every runtime `add_child` that is *not* a `.instantiate()`'d packed
-  scene must carry a `# node-src: <tag>` marker naming the permitted exception.
+  scene must carry a `# node-src: <tag>` marker (on the line directly above the
+  call, preferred, or trailing it) naming the permitted exception.
   Unmarked → violation. Tags map 1:1 to the standard's exceptions table:
   `instance`, `ephemeral`, `drawn`, `debug`, `timer`.
 
   ```gdscript
-  add_child(_npc_timer)                      # node-src: timer
-  _lot_summary.add_child(HSeparator.new())   # node-src: ephemeral
-  add_child(_debug_label)                    # node-src: debug
+  # node-src: timer
+  add_child(_npc_timer)
+
+  # node-src: ephemeral — separator in rebuilt list
+  _lot_summary.add_child(HSeparator.new())
+
+  # node-src: debug
+  add_child(_debug_label)
   ```
 
   A *wrong* claim (e.g. `# node-src: ephemeral` on a clearly persistent node) is

@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/run/auction/bid_history_row/bid_history_row.gd" id="1_script"]
+
+[node name="BidHistoryRow" type="Label"]
+theme_override_font_sizes/font_size = 14
+text = " - "
+script = ExtResource("1_script")

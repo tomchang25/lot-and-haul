@@ -88,6 +88,8 @@ func _build_customer_tabs() -> void:
         btn.toggle_mode = true
         var idx := i
         btn.pressed.connect(func() -> void: _select_customer(idx))
+
+        # node-src: ephemeral — per-customer tab, dynamic count
         _customer_tabs_row.add_child(btn)
 
 
@@ -160,6 +162,7 @@ func _rebuild_item_list(c: Customer) -> void:
         lbl.text = "No matching items in storage."
         lbl.add_theme_font_size_override("font_size", 14)
         lbl.modulate = Color(0.6, 0.6, 0.6)
+        # node-src: ephemeral — empty-state label
         _item_list_vbox.add_child(lbl)
         return
 
@@ -309,7 +312,7 @@ func _on_aggressive_pressed() -> void:
         child.queue_free()
 
     var rng := RandomNumberGenerator.new()
-    rng.randomize()  # RandomNumberGenerator.new() has a fixed seed in Godot 4.
+    rng.randomize() # RandomNumberGenerator.new() has a fixed seed in Godot 4.
     var rolls := SellMath.roll_dice(pool, rng)
     for i in range(pool):
         var val := rolls[i]
@@ -321,6 +324,7 @@ func _on_aggressive_pressed() -> void:
         btn.add_theme_font_size_override("font_size", 16)
         var idx := i
         btn.toggled.connect(func(toggled: bool) -> void: _on_dice_toggled(idx, toggled))
+        # node-src: ephemeral — per-die toggle, dynamic count
         dice_row.add_child(btn)
         _dice_buttons.append(btn)
 

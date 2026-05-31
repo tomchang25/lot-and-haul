@@ -3,10 +3,15 @@
 # Reads: KnowledgeManager, CategoryRegistry, SuperCategoryRegistry, SaveManager.category_points
 extends Control
 
+# ── Constants ─────────────────────────────────────────────────────────────────
+
+const MasteryRowScene := preload("res://game/meta/knowledge/mastery_panel/mastery_row/mastery_row.tscn")
+
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _back_btn: Button = $RootVBox/Footer/BackButton
-@onready var _content: VBoxContainer = $RootVBox/ScrollContainer/Content
+@onready var _heading_label: Label = $RootVBox/ScrollContainer/Content/HeadingLabel
+@onready var _rows_container: VBoxContainer = $RootVBox/ScrollContainer/Content/RowsContainer
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -25,21 +30,13 @@ func _on_back_pressed() -> void:
 
 
 func _build_content() -> void:
-    var heading := Label.new()
-    heading.add_theme_font_size_override("font_size", 22)
-    heading.text = "Mastery Rank: %d" % KnowledgeManager.get_mastery_rank()
-    _content.add_child(heading)
-
-    _content.add_child(HSeparator.new())
+    _heading_label.text = "Mastery Rank: %d" % KnowledgeManager.get_mastery_rank()
 
     for sc: SuperCategoryData in SuperCategoryRegistry.get_all_super_categories():
         var sc_rank: int = KnowledgeManager.get_super_category_rank(sc)
+        var header_text := "%s — rank %d" % [sc.display_name, sc_rank]
 
-        var sc_label := Label.new()
-        sc_label.add_theme_font_size_override("font_size", 18)
-        sc_label.text = "%s — rank %d" % [sc.display_name, sc_rank]
-        _content.add_child(sc_label)
-
+        var category_lines := PackedStringArray()
         for cat: CategoryData in SuperCategoryRegistry.get_categories_for_super(sc):
             var cat_id: String = cat.category_id
             var points: int = int(SaveManager.category_points.get(cat_id, 0))
@@ -52,8 +49,10 @@ func _build_content() -> void:
                 var next_threshold: int = KnowledgeManager.RANK_THRESHOLDS[rank + 1]
                 progress_text = "%d / %d" % [points, next_threshold]
 
-            var cat_label := Label.new()
-            cat_label.text = "    %s — %s  (rank %d)" % [cat.display_name, progress_text, rank]
-            _content.add_child(cat_label)
+            category_lines.append(
+                "    %s — %s  (rank %d)" % [cat.display_name, progress_text, rank],
+            )
 
-    _content.add_child(HSeparator.new())
+        var row: MasteryRow = MasteryRowScene.instantiate()
+        row.setup(header_text, category_lines)
+        _rows_container.add_child(row)

@@ -1,0 +1,9 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/run/auction/lot_summary_row/lot_summary_row.gd" id="1_script"]
+
+[node name="LotSummaryRow" type="Label"]
+theme_override_font_sizes/font_size = 15
+text = " - "
+horizontal_alignment = 1
+script = ExtResource("1_script")

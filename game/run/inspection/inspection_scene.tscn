@@ -305,6 +305,27 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 
+[node name="CluesVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000090]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="ClueSep" type="HSeparator" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/CluesVBox" unique_id=100000091]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CluesHeader" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/CluesVBox" unique_id=100000092]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.58, 0.63, 1)
+theme_override_font_sizes/font_size = 10
+text = "CLUES"
+
+[node name="ClueRows" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/CluesVBox" unique_id=100000093]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
 [node name="LotActionBar" parent="." unique_id=615668654 instance=ExtResource("3_3483c")]
 layout_mode = 1
 anchors_preset = 7

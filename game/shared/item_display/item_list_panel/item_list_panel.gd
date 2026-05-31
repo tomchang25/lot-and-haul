@@ -13,6 +13,7 @@ signal tooltip_dismissed
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
+const ColumnHeaderButtonScene := preload("res://game/shared/item_display/item_list_panel/column_header_button/column_header_button.tscn")
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
@@ -121,29 +122,16 @@ func _build_header() -> void:
         child.queue_free()
 
     for col: ItemRow.Column in _columns:
-        var btn := Button.new()
-        btn.flat = true
-        btn.focus_mode = Control.FOCUS_NONE
-        btn.add_theme_font_size_override(&"font_size", 14)
-        btn.add_theme_color_override(&"font_color", Color(0.7, 0.7, 0.7, 1))
-
-        var label_text: String = ItemRow.COLUMN_HEADERS[col]
-
-        if col == _sort_column:
-            label_text += " ▲" if _sort_ascending else " ▼"
-
-        btn.text = label_text
-
-        if col == ItemRow.Column.NAME:
-            btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-            btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-        else:
-            btn.custom_minimum_size = Vector2(ItemRow.COLUMN_MIN_WIDTH[col], 0)
-            btn.alignment = HORIZONTAL_ALIGNMENT_CENTER
-
-        var captured_col: ItemRow.Column = col
-        btn.pressed.connect(func() -> void: _on_header_pressed(captured_col))
-
+        var btn: ColumnHeaderButton = ColumnHeaderButtonScene.instantiate()
+        btn.setup(
+            col,
+            ItemRow.COLUMN_HEADERS[col],
+            col == _sort_column,
+            _sort_ascending,
+            col == ItemRow.Column.NAME,
+            ItemRow.COLUMN_MIN_WIDTH[col],
+        )
+        btn.header_pressed.connect(_on_header_pressed)
         _column_header.add_child(btn)
 
 

@@ -56,7 +56,10 @@ func _populate_rows() -> void:
         empty_label.add_theme_font_size_override("font_size", 16)
         empty_label.text = "No cars available — you own them all."
         empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+        # node-src: ephemeral — empty-state label
         _rows_container.add_child(empty_label)
+
         return
 
     for car: CarData in inventory:

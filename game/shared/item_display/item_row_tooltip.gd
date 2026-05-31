@@ -17,23 +17,8 @@ extends PanelContainer
 @onready var _cargo_separator: HSeparator = $VBox/CargoSeparator
 @onready var _weight_label: Label = $VBox/WeightLabel
 @onready var _grid_label: Label = $VBox/GridLabel
-
-# Dynamically created nodes — inserted into VBox in _ready().
-var _clue_separator: HSeparator = null
-var _clue_container: VBoxContainer = null
-
-
-func _ready() -> void:
-    # Clue separator — inserted just before the cargo separator.
-    _clue_separator = HSeparator.new()
-    $VBox.add_child(_clue_separator)
-    $VBox.move_child(_clue_separator, _cargo_separator.get_index())
-
-    # Clue container — inserted right after the clue separator, still before cargo separator.
-    _clue_container = VBoxContainer.new()
-    _clue_container.add_theme_constant_override(&"separation", 2)
-    $VBox.add_child(_clue_container)
-    $VBox.move_child(_clue_container, _clue_separator.get_index() + 1)
+@onready var _clue_separator: HSeparator = $VBox/ClueSeparator
+@onready var _clue_container: VBoxContainer = $VBox/ClueContainer
 
 
 func show_for(entry: ItemEntry, anchor: Rect2) -> void:
@@ -129,6 +114,8 @@ func _populate_clue_section(item: ItemEntry) -> void:
     header.text = "Clues"
     header.add_theme_font_size_override(&"font_size", 11)
     header.add_theme_color_override(&"font_color", Color(0.65, 0.65, 0.65))
+
+    # node-src: ephemeral — clue header, rebuilt per refresh
     _clue_container.add_child(header)
 
     for clue: ClueData in item.item_data.clues:
@@ -144,4 +131,5 @@ func _populate_clue_section(item: ItemEntry) -> void:
             row.text = "○ %s (DC %d, %s)" % [clue.known_text, clue.dc, clue.attribute.capitalize()]
             row.add_theme_color_override(&"font_color", Color(0.55, 0.55, 0.55))
 
+        # node-src: ephemeral — per-clue row, rebuilt per refresh
         _clue_container.add_child(row)

@@ -161,6 +161,8 @@ func _build_shape_icon() -> void:
         rect.size = Vector2(SHAPE_CELL_SIZE, SHAPE_CELL_SIZE)
         rect.position = Vector2(c.x * step + SHAPE_PADDING, c.y * step + SHAPE_PADDING)
         rect.color = Color(0.65, 0.65, 0.70, 1.0)
+
+        # node-src: ephemeral — per-shape cell, rebuilt per refresh
         _shape_icon.add_child(rect)
 
 

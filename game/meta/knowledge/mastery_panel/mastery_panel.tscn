@@ -46,6 +46,21 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
+[node name="HeadingLabel" type="Label" parent="RootVBox/ScrollContainer/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Mastery Rank: -"
+
+[node name="HeadingSep" type="HSeparator" parent="RootVBox/ScrollContainer/Content"]
+layout_mode = 2
+
+[node name="RowsContainer" type="VBoxContainer" parent="RootVBox/ScrollContainer/Content"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TrailingSep" type="HSeparator" parent="RootVBox/ScrollContainer/Content"]
+layout_mode = 2
+
 [node name="Footer" type="HBoxContainer" parent="RootVBox"]
 layout_mode = 2
 alignment = 1

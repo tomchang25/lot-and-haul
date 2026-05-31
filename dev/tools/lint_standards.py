@@ -114,6 +114,14 @@ def check_node_source(path: str, text: str) -> list[Violation]:
 
         arg = m.group(1).strip()
         marker = NODE_SRC_RE.search(line)
+        # The marker may trail the call OR sit on the comment line directly above
+        # it (preferred placement — keeps long calls and notes readable). Only the
+        # immediately-preceding line is consulted, and only if it is a comment, so
+        # a marker can never be borrowed from an unrelated statement.
+        if not marker and i >= 2:
+            prev_line = lines[i - 2]
+            if prev_line.lstrip().startswith("#"):
+                marker = NODE_SRC_RE.search(prev_line)
 
         # Allowed without a marker: inline instantiate, or a variable that was
         # assigned from .instantiate() earlier.
@@ -148,7 +156,8 @@ def check_node_source(path: str, text: str) -> list[Violation]:
                 "scene §11",
                 f"add_child({arg}) has no node-src marker. Persistent nodes "
                 f"belong in the .tscn (@onready). If this is a permitted "
-                f"exception, append a marker, e.g. `# node-src: ephemeral`. "
+                f"exception, add a marker on the line directly above the call "
+                f"(or trailing it), e.g. `# node-src: ephemeral`. "
                 f"Tags: {', '.join(sorted(VALID_NODE_SRC_TAGS))}.",
             )
         )

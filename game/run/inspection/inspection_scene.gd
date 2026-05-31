@@ -11,6 +11,8 @@ const CELL_SIZE := Vector2(64.0, 64.0)
 const UNVEIL_COST := 1
 const CLUE_CHAIN_COST := 2
 
+const ValueRowScene := preload("res://game/run/inspection/value_row/value_row.tscn")
+
 const ACTIVE_BORDER_COLOR := Color(1.0, 0.88, 0.25, 1.0)
 const ACTIVE_BORDER_WIDTH := 3
 
@@ -75,8 +77,9 @@ var _hover_entry: ItemEntry = null
 @onready var _clue_result_section: VBoxContainer = %ClueResultSection
 @onready var _clue_result_label: RichTextLabel = %ClueResultLabel
 
-# Sidebar — revealed clue breakdown (created in _ready, appended to _detail_section)
-var _clues_vbox: VBoxContainer = null
+# Sidebar — revealed clue breakdown (static; rows rebuilt into _clue_rows)
+@onready var _clues_vbox: VBoxContainer = %CluesVBox
+@onready var _clue_rows: VBoxContainer = %ClueRows
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -97,7 +100,6 @@ func _ready() -> void:
     _refresh_found_list()
     _refresh_veiled_list()
     _refresh_total_estimate()
-    _build_clues_vbox()
     _clear_detail_section()
     _clear_clue_result()
 
@@ -130,7 +132,10 @@ func _build_grid_controls() -> void:
             button.pressed.connect(_on_grid_cell_pressed.bind(coord))
             button.gui_input.connect(_on_cell_gui_input.bind(coord))
             button.mouse_entered.connect(_on_grid_cell_mouse_entered.bind(coord))
+
+            # node-src: ephemeral — per-grid cell, dynamic W×H
             _items_grid.add_child(button)
+
             _cell_buttons[coord] = button
 
 
@@ -460,24 +465,16 @@ func _refresh_found_list() -> void:
             continue
         found_count += 1
 
-        var row := HBoxContainer.new()
-        row.add_theme_constant_override(&"separation", 8)
-
-        var name_lbl := Label.new()
-        name_lbl.text = entry.display_name
-        name_lbl.add_theme_font_size_override(&"font_size", 13)
-        name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-        name_lbl.clip_text = true
-        row.add_child(name_lbl)
-
         var price_text := entry.estimated_value_text()
-        if price_text != ItemEntry.UNKNOWN_TEXT:
-            var value_lbl := Label.new()
-            value_lbl.text = price_text
-            value_lbl.add_theme_font_size_override(&"font_size", 13)
-            value_lbl.add_theme_color_override(&"font_color", entry.price_display_color())
-            row.add_child(value_lbl)
+        var has_price := price_text != ItemEntry.UNKNOWN_TEXT
 
+        var row: ValueRow = ValueRowScene.instantiate()
+        row.setup(
+            entry.display_name,
+            price_text if has_price else "",
+            entry.price_display_color() if has_price else Color.WHITE,
+            13,
+        )
         _found_vbox.add_child(row)
 
     _empty_found_label.visible = found_count == 0
@@ -493,22 +490,13 @@ func _refresh_veiled_list() -> void:
             continue
         veiled_count += 1
 
-        var row := HBoxContainer.new()
-        row.add_theme_constant_override(&"separation", 8)
-
-        var name_lbl := Label.new()
-        name_lbl.text = entry.display_name
-        name_lbl.add_theme_font_size_override(&"font_size", 13)
-        name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-        name_lbl.clip_text = true
-        row.add_child(name_lbl)
-
-        var ap_lbl := Label.new()
-        ap_lbl.text = "%d AP" % UNVEIL_COST
-        ap_lbl.add_theme_font_size_override(&"font_size", 13)
-        ap_lbl.add_theme_color_override(&"font_color", Color(0.55, 0.58, 0.63, 1))
-        row.add_child(ap_lbl)
-
+        var row: ValueRow = ValueRowScene.instantiate()
+        row.setup(
+            entry.display_name,
+            "%d AP" % UNVEIL_COST,
+            Color(0.55, 0.58, 0.63, 1),
+            13,
+        )
         _veiled_vbox.add_child(row)
 
     _empty_veiled_label.visible = veiled_count == 0
@@ -575,16 +563,11 @@ func _update_detail_section(entry: ItemEntry) -> void:
     _detail_section.show()
 
 
-func _build_clues_vbox() -> void:
-    _clues_vbox = VBoxContainer.new()
-    _clues_vbox.add_theme_constant_override(&"separation", 2)
-    _detail_section.add_child(_clues_vbox)
-
-
 ## Rebuilds the revealed-clue breakdown rows for the given entry.
 ## Shows anchor (if revealed) then each revealed surface clue with op + amount.
+## The CLUES header and separator are static (.tscn); only the rows rebuild.
 func _refresh_clues_section(entry: ItemEntry) -> void:
-    for child in _clues_vbox.get_children():
+    for child in _clue_rows.get_children():
         child.queue_free()
 
     var rows: Array[Dictionary] = []
@@ -610,27 +593,7 @@ func _refresh_clues_section(entry: ItemEntry) -> void:
         _clues_vbox.hide()
         return
 
-    var sep := HSeparator.new()
-    sep.add_theme_constant_override(&"separation", 6)
-    _clues_vbox.add_child(sep)
-
-    var header := Label.new()
-    header.text = "CLUES"
-    header.add_theme_font_size_override(&"font_size", 10)
-    header.add_theme_color_override(&"font_color", Color(0.55, 0.58, 0.63, 1))
-    _clues_vbox.add_child(header)
-
     for row: Dictionary in rows:
-        var hbox := HBoxContainer.new()
-        hbox.add_theme_constant_override(&"separation", 4)
-
-        var name_lbl := Label.new()
-        name_lbl.text = row["text"]
-        name_lbl.add_theme_font_size_override(&"font_size", 12)
-        name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-        name_lbl.clip_text = true
-        hbox.add_child(name_lbl)
-
         var op: String = row["op"]
         var amount: float = row["amount"]
         var val_text: String
@@ -645,13 +608,9 @@ func _refresh_clues_section(entry: ItemEntry) -> void:
             val_text = "+$%d" % int(amount)
             val_color = Color(0.55, 0.85, 0.60, 1.0)
 
-        var val_lbl := Label.new()
-        val_lbl.text = val_text
-        val_lbl.add_theme_font_size_override(&"font_size", 12)
-        val_lbl.add_theme_color_override(&"font_color", val_color)
-        hbox.add_child(val_lbl)
-
-        _clues_vbox.add_child(hbox)
+        var clue_row: ValueRow = ValueRowScene.instantiate()
+        clue_row.setup(row["text"], val_text, val_color, 12, 4)
+        _clue_rows.add_child(clue_row)
 
     _clues_vbox.show()
 

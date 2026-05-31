@@ -562,16 +562,34 @@ If yes → define it in `.tscn`. If no → creating it in code is acceptable.
 Whether an `add_child(...)` is a violation depends on whether the node is
 persistent — a judgment a linter can't make from the call site alone. To make the
 rule machine-checkable, every runtime `add_child` of a node that is **not** a
-`.instantiate()`'d packed scene must carry a trailing marker declaring which
-permitted exception applies:
+`.instantiate()`'d packed scene must carry a marker declaring which permitted
+exception applies. Put the marker on the comment line **directly above** the call
+(the linter also accepts a trailing marker, but above-the-call is preferred — it
+keeps the call clean and gives the note room):
 
 ```gdscript
-add_child(_npc_timer)                      # node-src: timer
-_lot_summary.add_child(HSeparator.new())   # node-src: ephemeral
-price_area.add_child(_circle_node)         # node-src: drawn
-add_child(_debug_label)                    # node-src: debug
-my_container.add_child(thing)              # node-src: instance   (packed scene not auto-detected)
+# node-src: timer
+add_child(_npc_timer)
+
+# node-src: ephemeral — separator in rebuilt list
+_lot_summary.add_child(HSeparator.new())
+
+# node-src: drawn
+price_area.add_child(_circle_node)
+
+# node-src: debug
+add_child(_debug_label)
+
+# node-src: instance — packed scene not auto-detected
+my_container.add_child(thing)
 ```
+
+An optional note may follow the tag after ` — `; the linter ignores everything
+after the tag. **Keep the note to a short phrase** (the exception category, e.g.
+`empty-state label`, `per-grid cell, dynamic W×H`). If a marker needs a
+full-sentence justification to feel honest, treat that as a signal the node should
+be **extracted into a `.tscn` component** rather than annotated — a long excuse is
+the smell, not the fix.
 
 Tags map 1:1 to the permitted-exceptions table above:
 
