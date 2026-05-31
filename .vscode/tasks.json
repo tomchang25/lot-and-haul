@@ -81,6 +81,40 @@
                 "panel": "shared"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "Standards: lint all",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/dev/tools/lint_standards.py",
+                "--root",
+                "${workspaceFolder}"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Standards: lint current file",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/dev/tools/lint_standards.py",
+                "--root",
+                "${workspaceFolder}",
+                "--files",
+                "${file}"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
         }
     ]
 }

@@ -1,0 +1,29 @@
+#!/bin/sh
+# dev/tools/hooks/pre-commit
+# Standards backstop: lint staged .gd/.tscn before the commit lands.
+#
+# This is the harness-agnostic net (see dev/standards/standards_enforcement.md).
+# The in-loop hook (lint_changed.py) only fires inside Claude Code; this one
+# fires at `git commit` no matter which agent or human wrote the code.
+#
+# Install once (from repo root):
+#     git config core.hooksPath dev/tools/hooks
+#
+# It lints ONLY the files staged in this commit, so adoption stays incremental
+# and a pre-existing backlog never blocks an unrelated commit.
+
+files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(gd|tscn)$')
+[ -z "$files" ] && exit 0
+
+# shellcheck disable=SC2086  # intentional word-splitting: pass each file as an arg
+python dev/tools/lint_standards.py --files $files
+status=$?
+
+if [ "$status" -ne 0 ]; then
+  echo ""
+  echo "Commit blocked by standards lint. Fix the violations above, or run"
+  echo "  python dev/tools/lint_standards.py --files $files"
+  echo "to re-check. (To bypass in an emergency: git commit --no-verify.)"
+fi
+
+exit $status

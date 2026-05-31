@@ -18,8 +18,16 @@ prose and onto a check instead.
     `dev/tools/lint_hook.settings.json` → `.claude/settings.json`) lints only the
     file just edited and feeds violations straight back to the agent, so drift is
     corrected as it happens instead of surviving to review.
-  - *Backstop* — `python dev/tools/lint_standards.py --root .` in CI or a
-    pre-commit hook, so nothing non-conforming lands even if the loop is bypassed.
+  - *Backstop* — the tracked pre-commit hook (`dev/tools/hooks/pre-commit`,
+    installed once with `git config core.hooksPath dev/tools/hooks`) lints the
+    staged `.gd`/`.tscn` at every `git commit`, and/or the same linter runs in
+    CI. This is harness-agnostic: the in-loop hook only fires inside Claude Code,
+    so for any other agent (opencode, a generic LLM) or a hand edit, the
+    pre-commit/CI backstop is the *only* net — it is not optional in a
+    multi-agent workflow. Bypassable in an emergency with `--no-verify`.
+
+A non-Claude-Code agent that can't run hooks should be told, in its own rules,
+to run `python dev/tools/lint_standards.py --files <changed>` before finishing.
 
 Rules a machine genuinely can't decide stay with review and human judgment —
 they are not listed here. Don't pre-declare future checks; a rule earns a check
