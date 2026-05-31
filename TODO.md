@@ -5,6 +5,8 @@ The single forward surface — open this and you see everything: open work _and_
 > **The one rule (now about sections, not files):** the actionable tiers (`Plan` / `Chore` / `Bug`) are **one line each** — no paragraphs, no tables, no _why_. The moment an item needs real reasoning, it belongs in `## Draft` as its own `###` sub-section. When a Draft entry grows sub-structure, becomes actionable, or needs to be linked from elsewhere, it graduates to its own file in `dev/docs/plans/`.
 >
 > Within `## Draft`, no `####` headings or `**label:**` bold-label patterns — use plain-text labels (em-dash, colon) and lists for sub-structure.
+>
+> **Tag format:** the `[Scope]` tag in actionable lines is **snake_case** — short lowercase identifier, no spaces, no parens, no mixed case (e.g. `[customer_sell]`, `[bugfix]`).
 
 In-flight work lives in `## Active` — promoted from `## Plan` when building starts. The phase-by-phase detail and ordering stay in the linked `dev/docs/plans/` file, never churned into this list.
 
@@ -233,5 +235,6 @@ One-line, no reasoning, no backing doc.
 
 One-line defect to fix.
 
-- [Night Market (Customer selling)] can't cancel the item in grid back to temp list. Nor any method to reset whole grid either.
-- [Night Market (Customer selling)] Back to Hub Button location is too confusing and hard to find.
+- [customer_sell] Can't cancel item from grid back to temp list.
+- [customer_sell] No method to reset the whole grid.
+- [customer_sell] Back to Hub button location is confusing and hard to find.
