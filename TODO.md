@@ -238,3 +238,4 @@ One-line defect to fix.
 [customer_sell] The Back to Hub button location is confusing and hard to find.
 [customer_sell] Item flipping feels pretty bad right now; the rotation center keeps changing in player view. I guess this is because the anchor point is not fixed to a specific grid.
 [customer_sell] Customers exceed the screen when there are too many, and the list is not scrollable.
+[customer_sell] Grid won't reflect display change(color and cursor in item list/grid) immidiately, only reflect after moving items
