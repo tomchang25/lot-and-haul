@@ -15,14 +15,12 @@ var _selected_dice_indices: Array[int] = []
 var _pending_sale_price: int = 0
 var _pending_strategy: String = ""
 
-var _grid: PackingGrid = null
-
+@onready var _grid: PackingGrid = $RootVBox/MainArea/GridContainer/CustomerGrid
 @onready var _day_label: Label = $RootVBox/HeaderRow/DayLabel
 @onready var _back_btn: Button = $RootVBox/HeaderRow/BackButton
 @onready var _customer_tabs_row: HBoxContainer = $RootVBox/CustomerTabsRow
 @onready var _main_area: HBoxContainer = $RootVBox/MainArea
 @onready var _item_list_vbox: VBoxContainer = $RootVBox/MainArea/ItemScroll/ItemListVBox
-@onready var _grid_container: Control = $RootVBox/MainArea/GridContainer
 @onready var _sell_panel: VBoxContainer = $RootVBox/MainArea/SellPanel
 @onready var _customer_name_label: Label = $RootVBox/MainArea/SellPanel/CustomerNameLabel
 @onready var _grid_size_label: Label = $RootVBox/MainArea/SellPanel/GridSizeLabel
@@ -31,21 +29,38 @@ var _grid: PackingGrid = null
 @onready var _verified_count_label: Label = $RootVBox/MainArea/SellPanel/VerifiedCountLabel
 @onready var _empty_label: Label = $EmptyLabel
 @onready var _sell_result_popup: ConfirmationDialog = $SellResultPopup
+@onready var _car_clear_btn: Button = $RootVBox/MainArea/SellPanel/CarClearButton
+@onready var _conservative_btn: Button = $RootVBox/MainArea/SellPanel/ConservativeButton
+@onready var _aggressive_btn: Button = $RootVBox/MainArea/SellPanel/AggressiveButton
+@onready var _dice_section: VBoxContainer = $RootVBox/MainArea/SellPanel/DiceSection
+@onready var _dice_sum_label: Label = $RootVBox/MainArea/SellPanel/DiceSection/DiceSumLabel
+@onready var _dice_total_label: Label = $RootVBox/MainArea/SellPanel/DiceSection/DiceTotalLabel
+@onready var _confirm_dice_btn: Button = $RootVBox/MainArea/SellPanel/DiceSection/DiceBtnRow/ConfirmDiceButton
+@onready var _cancel_dice_btn: Button = $RootVBox/MainArea/SellPanel/DiceSection/DiceBtnRow/CancelDiceButton
 
-var _conservative_btn: Button = null
-var _aggressive_btn: Button = null
-var _dice_section: VBoxContainer = null
 var _dice_buttons: Array[Button] = []
-var _dice_sum_label: Label = null
-var _dice_total_label: Label = null
-var _confirm_dice_btn: Button = null
-var _cancel_dice_btn: Button = null
+var _hovered_entry: ItemEntry = null
 
 
 func _ready() -> void:
     _back_btn.pressed.connect(_on_back_pressed)
     _sell_result_popup.confirmed.connect(_on_sell_confirmed)
     _sell_result_popup.canceled.connect(_on_sell_cancelled)
+    _car_clear_btn.pressed.connect(_on_clear_car_pressed)
+    _conservative_btn.pressed.connect(_on_conservative_pressed)
+    _aggressive_btn.pressed.connect(_on_aggressive_pressed)
+    _confirm_dice_btn.pressed.connect(_on_confirm_dice_pressed)
+    _cancel_dice_btn.pressed.connect(_on_cancel_dice_pressed)
+    _conservative_btn.text = "Sell Conservative (×%.1f)" % SellMath.CONSERVATIVE_MULTIPLIER
+
+    _grid.get_shape_cells = _grid_shape_provider
+    _grid.get_item_color = _grid_color_provider
+    _grid.get_item_border_color = _grid_border_provider
+    _grid.item_clicked.connect(_on_grid_item_clicked)
+    _grid.cell_clicked.connect(_on_grid_cell_clicked)
+    _grid.placement_changed.connect(_refresh_display)
+    _grid.hover_started.connect(_on_grid_hover_started)
+    _grid.hover_ended.connect(_on_grid_hover_ended)
 
     _customers = SaveManager.nightly_customers.duplicate()
 
@@ -93,9 +108,10 @@ func _select_customer(idx: int) -> void:
         tag_names.append(clue.known_text if clue != null and clue.known_text != "" else tag)
     _demand_tags_label.text = "Wants: %s" % ", ".join(tag_names)
 
+    _hovered_entry = null
     _rebuild_grid(c)
     _rebuild_item_list(c)
-    _build_sell_controls()
+    _dice_section.visible = false
     _refresh_display()
 
 
@@ -108,27 +124,7 @@ func _update_tab_states() -> void:
 
 
 func _rebuild_grid(c: Customer) -> void:
-    if _grid != null:
-        _grid_container.remove_child(_grid)
-        _grid.queue_free()
-        _grid = null
-
-    _grid = PackingGrid.new()
-    _grid.name = "CustomerGrid"
-    _grid.custom_minimum_size = Vector2(400, 300)
-    _grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    _grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
-
-    _grid.get_shape_cells = _grid_shape_provider
-    _grid.get_item_color = _grid_color_provider
-    _grid.get_item_border_color = _grid_border_provider
-
-    _grid.item_clicked.connect(_on_grid_item_clicked)
-    _grid.cell_clicked.connect(_on_grid_cell_clicked)
-    _grid.placement_changed.connect(_refresh_display)
-
     _grid.setup(c.grid_columns, c.grid_rows)
-    _grid_container.add_child(_grid)
     _main_area.visible = true
 
 
@@ -185,79 +181,6 @@ func _assign_item_colors(items: Array) -> void:
         _item_colors[entry] = Color.from_hsv(hue, 0.55, 0.50)
 
 
-func _build_sell_controls() -> void:
-    if _conservative_btn == null:
-        _conservative_btn = Button.new()
-        _conservative_btn.custom_minimum_size = Vector2(0, 40)
-        _conservative_btn.add_theme_font_size_override("font_size", 15)
-        _conservative_btn.text = "Sell Conservative (×%.1f)" % SellMath.CONSERVATIVE_MULTIPLIER
-        _conservative_btn.pressed.connect(_on_conservative_pressed)
-
-    if _aggressive_btn == null:
-        _aggressive_btn = Button.new()
-        _aggressive_btn.custom_minimum_size = Vector2(0, 40)
-        _aggressive_btn.add_theme_font_size_override("font_size", 15)
-        _aggressive_btn.text = "Sell Aggressive (Roll Dice)"
-        _aggressive_btn.pressed.connect(_on_aggressive_pressed)
-
-    if _dice_section == null:
-        _dice_section = VBoxContainer.new()
-        _dice_section.name = "DiceSection"
-        _dice_section.add_theme_constant_override("separation", 4)
-
-        var dice_title := Label.new()
-        dice_title.text = "Dice Roll Results"
-        dice_title.add_theme_font_size_override("font_size", 14)
-        _dice_section.add_child(dice_title)
-
-        var dice_hint := Label.new()
-        dice_hint.name = "DiceHint"
-        dice_hint.text = "Select 2 dice to keep"
-        dice_hint.add_theme_font_size_override("font_size", 12)
-        dice_hint.modulate = Color(0.7, 0.7, 0.7)
-        _dice_section.add_child(dice_hint)
-
-        var dice_row := HBoxContainer.new()
-        dice_row.name = "DiceRow"
-        dice_row.add_theme_constant_override("separation", 6)
-        _dice_section.add_child(dice_row)
-
-        _dice_sum_label = Label.new()
-        _dice_sum_label.add_theme_font_size_override("font_size", 16)
-        _dice_sum_label.text = "Sum: —"
-        _dice_section.add_child(_dice_sum_label)
-
-        _dice_total_label = Label.new()
-        _dice_total_label.add_theme_font_size_override("font_size", 16)
-        _dice_total_label.text = "Total: —"
-        _dice_section.add_child(_dice_total_label)
-
-        var dice_btn_row := HBoxContainer.new()
-        dice_btn_row.add_theme_constant_override("separation", 8)
-
-        _confirm_dice_btn = Button.new()
-        _confirm_dice_btn.text = "Confirm Dice"
-        _confirm_dice_btn.disabled = true
-        _confirm_dice_btn.pressed.connect(_on_confirm_dice_pressed)
-        dice_btn_row.add_child(_confirm_dice_btn)
-
-        _cancel_dice_btn = Button.new()
-        _cancel_dice_btn.text = "Cancel"
-        _cancel_dice_btn.pressed.connect(_on_cancel_dice_pressed)
-        dice_btn_row.add_child(_cancel_dice_btn)
-
-        _dice_section.add_child(dice_btn_row)
-
-    if _conservative_btn.get_parent() == null:
-        _sell_panel.add_child(_conservative_btn)
-    if _aggressive_btn.get_parent() == null:
-        _sell_panel.add_child(_aggressive_btn)
-    if _dice_section.get_parent() == null:
-        _sell_panel.add_child(_dice_section)
-
-    _dice_section.visible = false
-
-
 func _refresh_display() -> void:
     if _selected_idx < 0:
         return
@@ -312,10 +235,29 @@ func _on_item_row_pressed(entry: ItemEntry) -> void:
         _update_item_row_states()
 
 
+func _on_grid_hover_started(cell_pos: Vector2i) -> void:
+    if _grid == null or _grid.phase == PackingGrid.Phase.ITEM_HELD:
+        return
+    var new_entry: ItemEntry = _grid.placement.get(cell_pos) as ItemEntry
+    if new_entry == _hovered_entry:
+        return
+    if _hovered_entry != null and _item_rows.has(_hovered_entry):
+        _item_rows[_hovered_entry].set_external_highlight(false)
+    _hovered_entry = new_entry
+    if _hovered_entry != null and _item_rows.has(_hovered_entry):
+        _item_rows[_hovered_entry].set_external_highlight(true)
+
+
+func _on_grid_hover_ended() -> void:
+    if _hovered_entry != null and _item_rows.has(_hovered_entry):
+        _item_rows[_hovered_entry].set_external_highlight(false)
+    _hovered_entry = null
+
+
 func _on_grid_item_clicked(item) -> void:
     if _grid != null:
         _grid.lift(item)
-        _update_item_row_states()
+        _refresh_display()
 
 
 func _on_grid_cell_clicked(pos: Vector2i) -> void:
@@ -323,6 +265,12 @@ func _on_grid_cell_clicked(pos: Vector2i) -> void:
         if _grid.can_place(_grid.active_item, pos):
             _grid.place(_grid.active_item, pos)
             _update_item_row_states()
+
+
+func _on_clear_car_pressed() -> void:
+    if _grid != null:
+        _grid.reset()
+        _refresh_display()
 
 
 func _on_conservative_pressed() -> void:
@@ -381,7 +329,6 @@ func _on_aggressive_pressed() -> void:
     _dice_total_label.text = "Total: —"
     _confirm_dice_btn.disabled = true
 
-    _sell_panel.move_child(_dice_section, _sell_panel.get_child_count())
     _dice_section.visible = true
 
 

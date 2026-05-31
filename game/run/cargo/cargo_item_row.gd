@@ -112,12 +112,13 @@ func _apply_state_style() -> void:
         style.border_width_bottom = 2
         style.border_color = Color(0.70, 0.65, 0.25, 1.0)
     elif _holding:
-        style.bg_color = Color(0.25, 0.22, 0.10, 1.0)
+        # Cyan matches the grid's held-ghost border — clearly "this is moving".
+        style.bg_color = Color(0.08, 0.22, 0.28, 1.0)
         style.border_width_left = 2
         style.border_width_right = 2
         style.border_width_top = 2
         style.border_width_bottom = 2
-        style.border_color = Color(0.60, 0.55, 0.20, 1.0)
+        style.border_color = Color(0.35, 0.78, 0.90, 1.0)
     elif _loaded:
         style.bg_color = Color(0.10, 0.28, 0.12, 1.0)
         style.border_width_left = 1

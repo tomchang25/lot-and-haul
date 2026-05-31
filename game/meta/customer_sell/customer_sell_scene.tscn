@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bxrs864dl2cmg"]
 
 [ext_resource type="Script" uid="uid://b61ssm5ecobc4" path="res://game/meta/customer_sell/customer_sell_scene.gd" id="1_css"]
+[ext_resource type="Script" path="res://game/shared/packing/packing_grid.gd" id="2_packing_grid"]
 
 [node name="CustomerSellScene" type="Control" unique_id=331840253]
 layout_mode = 3
@@ -79,6 +80,13 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
+[node name="CustomerGrid" type="GridContainer" parent="RootVBox/MainArea/GridContainer" unique_id=111222333]
+script = ExtResource("2_packing_grid")
+layout_mode = 2
+custom_minimum_size = Vector2(400, 300)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
 [node name="SellPanel" type="VBoxContainer" parent="RootVBox/MainArea" unique_id=709091156]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
@@ -112,6 +120,67 @@ theme_override_font_sizes/font_size = 14
 
 [node name="LabelDivider2" type="HSeparator" parent="RootVBox/MainArea/SellPanel" unique_id=535341362]
 layout_mode = 2
+
+[node name="CarClearButton" type="Button" parent="RootVBox/MainArea/SellPanel" unique_id=111222334]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Clear Car"
+
+[node name="ConservativeButton" type="Button" parent="RootVBox/MainArea/SellPanel" unique_id=111222335]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Sell Conservative"
+
+[node name="AggressiveButton" type="Button" parent="RootVBox/MainArea/SellPanel" unique_id=111222336]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Sell Aggressive (Roll Dice)"
+
+[node name="DiceSection" type="VBoxContainer" parent="RootVBox/MainArea/SellPanel" unique_id=111222337]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="DiceTitleLabel" type="Label" parent="RootVBox/MainArea/SellPanel/DiceSection" unique_id=111222338]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Dice Roll Results"
+
+[node name="DiceHint" type="Label" parent="RootVBox/MainArea/SellPanel/DiceSection" unique_id=111222339]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Select 2 dice to keep"
+
+[node name="DiceRow" type="HBoxContainer" parent="RootVBox/MainArea/SellPanel/DiceSection" unique_id=111222340]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="DiceSumLabel" type="Label" parent="RootVBox/MainArea/SellPanel/DiceSection" unique_id=111222341]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Sum: —"
+
+[node name="DiceTotalLabel" type="Label" parent="RootVBox/MainArea/SellPanel/DiceSection" unique_id=111222342]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Total: —"
+
+[node name="DiceBtnRow" type="HBoxContainer" parent="RootVBox/MainArea/SellPanel/DiceSection" unique_id=111222343]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ConfirmDiceButton" type="Button" parent="RootVBox/MainArea/SellPanel/DiceSection/DiceBtnRow" unique_id=111222344]
+layout_mode = 2
+disabled = true
+text = "Confirm Dice"
+
+[node name="CancelDiceButton" type="Button" parent="RootVBox/MainArea/SellPanel/DiceSection/DiceBtnRow" unique_id=111222345]
+layout_mode = 2
+text = "Cancel"
 
 [node name="EmptyLabel" type="Label" parent="." unique_id=125428447]
 visible = false
