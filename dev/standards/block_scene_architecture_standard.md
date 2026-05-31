@@ -554,3 +554,39 @@ The following may still be created at runtime in code:
 
 The key question: **does this node exist for the full lifetime of the scene?**
 If yes → define it in `.tscn`. If no → creating it in code is acceptable.
+
+---
+
+## `node-src` markers (enforcement)
+
+Whether an `add_child(...)` is a violation depends on whether the node is
+persistent — a judgment a linter can't make from the call site alone. To make the
+rule machine-checkable, every runtime `add_child` of a node that is **not** a
+`.instantiate()`'d packed scene must carry a trailing marker declaring which
+permitted exception applies:
+
+```gdscript
+add_child(_npc_timer)                      # node-src: timer
+_lot_summary.add_child(HSeparator.new())   # node-src: ephemeral
+price_area.add_child(_circle_node)         # node-src: drawn
+add_child(_debug_label)                    # node-src: debug
+my_container.add_child(thing)              # node-src: instance   (packed scene not auto-detected)
+```
+
+Tags map 1:1 to the permitted-exceptions table above:
+
+| Tag | Case |
+| --- | --- |
+| `instance` | packed scene instance not auto-detected from a local `.instantiate()` |
+| `ephemeral` | tooltip, empty-state label, separator in a dynamic list |
+| `drawn` | custom-drawn control (inner class with `_draw()`) |
+| `debug` | debug-only display behind `OS.is_debug_build()` |
+| `timer` | `Timer` node (always created in code) |
+
+`add_child(SomeScene.instantiate())` — and any local variable assigned from
+`.instantiate()` — needs **no** marker; it is recognised automatically.
+
+An unmarked, non-instantiate `add_child` is a lint failure (`lint_standards.py`,
+§11). The marker doesn't prove the node is genuinely ephemeral — it forces the
+author to declare intent so a reviewer can see and judge the claim. See
+`dev/standards/standards_enforcement.md`.
