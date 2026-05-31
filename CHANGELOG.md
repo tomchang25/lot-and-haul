@@ -8,6 +8,10 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Live Budget Label
+
+- 2026-05-31 — [auction] Budget label pinned to top-right corner showing remaining cash minus committed run costs; refreshes live after every player bid
+
 ## Time-Slot Day Structure & Storage AP Economy
 
 - 2026-05-30 — [day-structure] 3-slot day (Morning/Afternoon/Evening); hub slot tray replaces Day Pass; Auction consumes slots 1+2, returns player for Evening

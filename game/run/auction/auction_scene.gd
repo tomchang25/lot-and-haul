@@ -49,6 +49,7 @@ var _price_tween: Tween = null
 @onready var _npc_history_list: VBoxContainer = $RootVBox/Centre/Content/PriceArea/NpcHistoryList
 @onready var _bid_button: Button = $RootVBox/ButtonBar/BidButton
 @onready var _pass_button: Button = $RootVBox/ButtonBar/PassButton
+@onready var _budget_label: Label = $BudgetLabel
 
 # ══ Inner class: circle progress arc ══════════════════════════════════════════
 
@@ -162,6 +163,7 @@ func _on_bid_pressed() -> void:
     _tween_price_to(_current_display_price)
 
     _show_player_bid_in_stack(_current_display_price)
+    _refresh_budget()
 
     _reset_circle()
 
@@ -195,6 +197,7 @@ func _init_auction() -> void:
 
     _build_lot_summary()
     _init_debug_overlay()
+    _refresh_budget()
 
 
 func _build_lot_summary() -> void:
@@ -297,6 +300,18 @@ func _resolve() -> void:
         RunManager.run_record.won_items += current_wins
 
     GameManager.go_to_reveal()
+
+# ══ Budget refresh ══════════════════════════════════════════════════════════════
+
+## Updates the top-right budget label to reflect cash-on-hand minus committed
+## run costs (paid_price, entry_fee, fuel_cost). Called on init and after
+## every player bid so the number stays live.
+func _refresh_budget() -> void:
+    var record := RunManager.run_record
+    var committed := record.paid_price + record.entry_fee + record.fuel_cost
+    var remaining := maxi(SaveManager.cash - committed, 0)
+    _budget_label.text = "Budget: $%d" % remaining
+
 
 # ══ Display helpers ════════════════════════════════════════════════════════════
 
