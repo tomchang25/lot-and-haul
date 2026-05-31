@@ -383,6 +383,8 @@ The exact dash count matters less than visual consistency — copy from an exist
 All persistent nodes in a block scene **must be defined in the `.tscn` file**.
 Reference them at the top of the script using `@onready` under `# ── Node references ──`.
 
+Exceptions: debug-only display nodes (e.g. `_debug_label` behind `OS.is_debug_build()`) and `Timer` nodes — these must always be created in code, never placed in `.tscn`. See the permitted exceptions table below.
+
 ```gdscript
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -547,6 +549,8 @@ The following may still be created at runtime in code:
 | Packed scene instances  | `ItemRowScene.instantiate()`                                | Count unknown at edit time                                 |
 | Ephemeral display nodes | Tooltips, empty-state labels, `HSeparator` in dynamic lists | Created and destroyed during the scene's lifetime          |
 | Custom-drawn controls   | Inner class with `_draw()` override                         | Requires `_draw()` override — cannot be defined in `.tscn` |
+| Debug-only display      | `_debug_label` in `OS.is_debug_build()` guard               | Never shipped — polluting `.tscn` with invisible nodes is misleading |
+| Timer nodes             | `Timer.new()` for timed logic                                | Godot scene timers fire during tool mode, causing phantom ticks in the editor; always create in code |
 
 The key question: **does this node exist for the full lifetime of the scene?**
 If yes → define it in `.tscn`. If no → creating it in code is acceptable.

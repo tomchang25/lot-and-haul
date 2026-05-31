@@ -235,6 +235,6 @@ One-line, no reasoning, no backing doc.
 
 One-line defect to fix.
 
-- [customer_sell] Can't cancel item from grid back to temp list.
-- [customer_sell] No method to reset the whole grid.
-- [customer_sell] Back to Hub button location is confusing and hard to find.
+[customer_sell] The Back to Hub button location is confusing and hard to find.
+[customer_sell] Item flipping feels pretty bad right now; the rotation center keeps changing in player view. I guess this is because the anchor point is not fixed to a specific grid.
+[customer_sell] Customers exceed the screen when there are too many, and the list is not scrollable.
