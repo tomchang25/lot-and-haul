@@ -2,18 +2,15 @@
 # Autoload that loads all LocationData resources at startup and provides query
 # access. Access globally via LocationRegistry.get_location_by_id(location_id) /
 # LocationRegistry.get_all_locations().
-extends Node
-
-var _locations: Dictionary = { } # location_id → LocationData
+extends ResourceRegistry
 
 
-func _ready() -> void:
-    _locations = ResourceDirLoader.load_by_id(
-        DataPaths.LOCATIONS_DIR,
-        func(r: Resource) -> String:
-            return (r as LocationData).location_id if r is LocationData else ""
-    )
-    RegistryCoordinator.register(self)
+func _dir_path() -> String:
+    return DataPaths.LOCATIONS_DIR
+
+
+func _id_of(r: Resource) -> String:
+    return (r as LocationData).location_id if r is LocationData else ""
 
 
 func validate() -> bool:
@@ -25,7 +22,7 @@ func validate() -> bool:
         if location == null:
             push_error("LocationRegistry: SaveManager.available_locations contains a null entry")
             ok = false
-    for location: LocationData in _locations.values():
+    for location: LocationData in get_all():
         for lot: LotData in location.lot_pool:
             for key: String in lot.category_weights.keys():
                 if CategoryRegistry.get_category_by_id(key) == null:
@@ -46,15 +43,11 @@ func validate() -> bool:
 
 # Returns the LocationData with the given location_id, or null if not found.
 func get_location_by_id(location_id: String) -> LocationData:
-    return _locations.get(location_id, null)
+    return get_by_id(location_id) as LocationData
 
 
 func get_all_locations() -> Array[LocationData]:
     var result: Array[LocationData] = []
-    for loc: LocationData in _locations.values():
+    for loc: LocationData in get_all():
         result.append(loc)
     return result
-
-
-func size() -> int:
-    return _locations.size()
