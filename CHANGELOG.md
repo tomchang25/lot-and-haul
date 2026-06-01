@@ -8,6 +8,11 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Template Spine Backport
+
+- 2026-06-01 — [registry] Added `ResourceRegistry` base class; ItemRegistry/CarRegistry/ClueRegistry/CategoryRegistry/LocationRegistry/SuperCategoryRegistry now extend it (override `_dir_path`/`_id_of`), dropping duplicated `_ready`/`size`/`_by_id` boilerplate while keeping per-registry `migrate`/`validate` and typed wrappers
+- 2026-06-01 — [save] SaveManager refactored to section-based dispatch: state fields stay on SaveManager (call sites unchanged), serialization delegated to economy/garage/storage/progress/slot/customers sections via `register_section`/`to_dict`/`from_dict`; new on-disk format `{schema_version, sections}` with backward-compatible read of legacy flat saves; legacy `research_slots`/`skill_levels` migrations moved into the storage/economy sections
+
 ## Customer Sell UX Polish
 
 - 2026-06-01 — [customer-sell] Fixed grid rotation pivot drift: `_grab_index` pins the grabbed cell under the cursor across Q/E rotations; list picks anchor to shape centroid
