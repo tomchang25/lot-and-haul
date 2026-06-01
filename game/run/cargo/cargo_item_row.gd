@@ -134,6 +134,7 @@ func _apply_state_style() -> void:
         style.border_width_bottom = 1
         style.border_color = Color(0.35, 0.35, 0.38, 1.0)
     add_theme_stylebox_override(&"panel", style)
+    queue_redraw()
     mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 
 

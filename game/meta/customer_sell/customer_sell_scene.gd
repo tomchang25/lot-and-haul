@@ -17,8 +17,8 @@ var _pending_strategy: String = ""
 
 @onready var _grid: PackingGrid = $RootVBox/MainArea/GridContainer/CustomerGrid
 @onready var _day_label: Label = $RootVBox/HeaderRow/DayLabel
-@onready var _back_btn: Button = $RootVBox/HeaderRow/BackButton
-@onready var _customer_tabs_row: HBoxContainer = $RootVBox/CustomerTabsRow
+@onready var _back_btn: Button = $RootVBox/FooterRow/BackButton
+@onready var _customer_tabs_row: HBoxContainer = $RootVBox/CustomerTabsScroll/CustomerTabsRow
 @onready var _main_area: HBoxContainer = $RootVBox/MainArea
 @onready var _item_list_vbox: VBoxContainer = $RootVBox/MainArea/ItemScroll/ItemListVBox
 @onready var _sell_panel: VBoxContainer = $RootVBox/MainArea/SellPanel
@@ -172,6 +172,8 @@ func _rebuild_item_list(c: Customer) -> void:
         var row: CargoItemRow = CargoItemRowScene.instantiate()
         row.setup(entry)
         row.row_pressed.connect(_on_item_row_pressed)
+        row.tooltip_requested.connect(_on_item_row_hovered)
+        row.tooltip_dismissed.connect(_on_item_row_hover_ended)
         _item_list_vbox.add_child(row)
         _item_rows[entry] = row
 
@@ -236,6 +238,18 @@ func _on_item_row_pressed(entry: ItemEntry) -> void:
     else:
         _grid.set_held_item(entry, _grid.item_rotations.get(entry, 0))
         _update_item_row_states()
+
+
+## Hovering a list row lights up that item's cells in the grid (the mirror of
+## _on_grid_hover_started, which lights up the row when the grid is hovered).
+func _on_item_row_hovered(entry: ItemEntry, _anchor: Rect2) -> void:
+    if _grid != null:
+        _grid.set_external_hover_item(entry)
+
+
+func _on_item_row_hover_ended() -> void:
+    if _grid != null:
+        _grid.set_external_hover_item(null)
 
 
 func _on_grid_hover_started(cell_pos: Vector2i) -> void:

@@ -73,7 +73,9 @@ var _cell_nodes: Dictionary = { } # Vector2i → Panel
 var _grid_cols: int = 0
 var _grid_rows: int = 0
 var _hover_item = null # placed item under cursor in IDLE phase
+var _ext_hover_item = null # placed item highlighted from an outside source (e.g. list row)
 var _lift_offset: Vector2i = Vector2i(0, 0) # offset from item origin to clicked cell
+var _grab_index: int = -1 # index into the item's base shape cells that is pinned under the cursor
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -85,10 +87,12 @@ func _unhandled_input(event: InputEvent) -> void:
         match event.keycode:
             KEY_Q:
                 active_rotation = (active_rotation + 3) % 4
+                _recompute_lift_offset()
                 refresh_visuals()
                 get_viewport().set_input_as_handled()
             KEY_E:
                 active_rotation = (active_rotation + 1) % 4
+                _recompute_lift_offset()
                 refresh_visuals()
                 get_viewport().set_input_as_handled()
 
@@ -110,7 +114,9 @@ func setup(cols: int, rows: int) -> void:
     hover_cell = Vector2i(-1, -1)
 
     _hover_item = null
+    _ext_hover_item = null
     _lift_offset = Vector2i(0, 0)
+    _grab_index = -1
 
     _grid_cols = cols
     _grid_rows = rows
@@ -168,9 +174,16 @@ func place(item, origin: Vector2i) -> void:
     active_item = null
     active_rotation = 0
     _lift_offset = Vector2i(0, 0)
+    _grab_index = -1
     phase = Phase.IDLE
 
     placement_changed.emit()
+    # Update hover before refresh so the grid renders the correct hover highlight.
+    # During ITEM_HELD, hover_started was suppressed; re-broadcast now that phase
+    # is IDLE so scenes can update list-row highlights too.
+    if hover_cell != Vector2i(-1, -1):
+        _hover_item = placement.get(hover_cell) if placement.has(hover_cell) else null
+        hover_started.emit(hover_cell)
     refresh_visuals()
 
 
@@ -189,16 +202,26 @@ func lift(item) -> void:
     active_item = item
     active_rotation = item_rotations.get(item, 0)
     phase = Phase.ITEM_HELD
+    # Pin the cell the user grabbed (_lift_offset, set by the caller) so it stays
+    # under the cursor through rotations. Order is stable across rotation, so the
+    # index maps the same physical cell in any orientation.
+    _grab_index = get_active_cells(item).find(_lift_offset)
     refresh_visuals()
 
 
 ## Sets the held item without erasing any placement (used for list/extra lifts).
-## Always clears the lift offset — items picked from a list have no grid origin.
+## A list pick has no grabbed grid cell, so the anchor is set to the shape's
+## centroid cell, keeping the item centred under the cursor across rotations.
 func set_held_item(item, rotation: int) -> void:
     active_item = item
     active_rotation = rotation
-    _lift_offset = Vector2i(0, 0)
     phase = Phase.ITEM_HELD
+    # No grabbed cell from a list pick — anchor on the cell nearest the shape's
+    # centroid so the item pivots in place under the cursor instead of unfolding
+    # from a corner when rotated.
+    var cells := get_active_cells(item)
+    _grab_index = _centroid_cell_index(cells)
+    _lift_offset = cells[_grab_index] if _grab_index >= 0 else Vector2i(0, 0)
     refresh_visuals()
 
 
@@ -210,9 +233,14 @@ func cancel_placement() -> void:
     active_item = null
     active_rotation = 0
     _lift_offset = Vector2i(0, 0)
+    _grab_index = -1
     phase = Phase.IDLE
     placement_cancelled.emit(item)
     placement_changed.emit()
+    # Same as place(): update hover before refresh so visuals are correct.
+    if hover_cell != Vector2i(-1, -1):
+        _hover_item = placement.get(hover_cell) if placement.has(hover_cell) else null
+        hover_started.emit(hover_cell)
     refresh_visuals()
 
 
@@ -222,6 +250,8 @@ func reset() -> void:
     item_rotations.clear()
     active_item = null
     active_rotation = 0
+    _lift_offset = Vector2i(0, 0)
+    _grab_index = -1
     phase = Phase.IDLE
     placement_changed.emit()
     refresh_visuals()
@@ -247,6 +277,15 @@ func is_item_placed(item) -> bool:
     return false
 
 
+## Highlights a placed item from an outside source (e.g. a hovered list row).
+## Pass null to clear. Only takes visual effect in IDLE phase.
+func set_external_hover_item(item) -> void:
+    if _ext_hover_item == item:
+        return
+    _ext_hover_item = item
+    refresh_visuals()
+
+
 ## Redraws all cell styleboxes based on current state.
 func refresh_visuals() -> void:
     # Preview: where the held item would land, offset by where the user grabbed it.
@@ -258,11 +297,14 @@ func refresh_visuals() -> void:
         for c: Vector2i in get_active_cells(active_item):
             preview_cells.append(preview_origin + c)
 
-    # Hover highlight: all cells of the item under the cursor (IDLE only).
+    # Hover highlight: all cells of the highlighted item (IDLE only). The item is
+    # either under the cursor (_hover_item) or flagged from an outside source such
+    # as a hovered list row (_ext_hover_item).
+    var highlight_item = _hover_item if _hover_item != null else _ext_hover_item
     var hover_item_cells: Array[Vector2i] = []
-    if phase == Phase.IDLE and _hover_item != null:
+    if phase == Phase.IDLE and highlight_item != null:
         for pos: Vector2i in placement:
-            if placement[pos] == _hover_item:
+            if placement[pos] == highlight_item:
                 hover_item_cells.append(pos)
 
     for pos: Vector2i in _cell_nodes:
@@ -296,8 +338,47 @@ func refresh_visuals() -> void:
             style = _make_stylebox(DEFAULT_BG, DEFAULT_BORDER)
 
         cell.add_theme_stylebox_override("panel", style)
+        cell.queue_redraw()
+
+        # Cursor feedback: a held item shows a drag cursor everywhere so the
+        # "carrying" state is visible the moment the item is picked up; otherwise
+        # only occupied cells offer the pointing-hand "you can grab this" cue.
+        if phase == Phase.ITEM_HELD:
+            cell.mouse_default_cursor_shape = Control.CURSOR_DRAG
+        elif placement.has(pos):
+            cell.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+        else:
+            cell.mouse_default_cursor_shape = Control.CURSOR_ARROW
 
 # ══ Internal ═════════════════════════════════════════════════════════════════
+
+
+## Re-derives _lift_offset for the current rotation from the pinned base-cell
+## index, keeping the grabbed cell under the cursor as the item rotates.
+func _recompute_lift_offset() -> void:
+    if _grab_index < 0 or active_item == null:
+        return
+    var cells := get_active_cells(active_item)
+    if _grab_index < cells.size():
+        _lift_offset = cells[_grab_index]
+
+
+## Returns the index of the cell closest to the shape's centroid, or -1 if empty.
+func _centroid_cell_index(cells: Array[Vector2i]) -> int:
+    if cells.is_empty():
+        return -1
+    var sum := Vector2.ZERO
+    for c: Vector2i in cells:
+        sum += Vector2(c)
+    var centroid := sum / float(cells.size())
+    var best_index := 0
+    var best_dist := INF
+    for i: int in cells.size():
+        var dist := Vector2(cells[i]).distance_squared_to(centroid)
+        if dist < best_dist:
+            best_dist = dist
+            best_index = i
+    return best_index
 
 
 func _build_grid() -> void:
@@ -389,4 +470,9 @@ func _on_cell_gui_input(event: InputEvent, pos: Vector2i) -> void:
             elif phase == Phase.IDLE and placement.has(pos):
                 var item = placement[pos]
                 erase(item)
+                _hover_item = null  # item no longer placed; re-evaluated below
                 placement_changed.emit()
+                refresh_visuals()
+                # Re-broadcast hover so scenes clear the stale _hovered_entry
+                # (the erased item's row would otherwise stay externally highlighted).
+                hover_started.emit(pos)
