@@ -28,7 +28,7 @@ LocationRegistry="*uid://cnpilh6m4wo27"
 CategoryRegistry="*res://global/autoload/registries/category_registry.gd"
 SuperCategoryRegistry="*res://global/autoload/registries/super_category_registry.gd"
 SaveManager="*uid://bi0oymqq1g433"
-KnowledgeManager="*uid://bqosi6h0xps2v"
+KnowledgeManager="*res://global/autoload/knowledge_manager/knowledge_manager.gd"
 MetaManager="*res://global/autoload/meta_manager.gd"
 GameManager="*uid://bnj3y0a2848to"
 

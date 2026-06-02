@@ -14,10 +14,10 @@ func _id_of(r: Resource) -> String:
 
 
 func migrate() -> void:
-    for key in KnowledgeManager.category_points.keys():
+    for key in KnowledgeManager.get_tracked_category_ids():
         if get_category_by_id(key) == null:
             push_warning("CategoryRegistry.migrate: dropping unknown category_points key '%s'" % key)
-            KnowledgeManager.category_points.erase(key)
+            KnowledgeManager.erase_category_points(key)
 
 
 func validate() -> bool:
@@ -25,7 +25,7 @@ func validate() -> bool:
     if size() == 0:
         push_error("CategoryRegistry: registry is empty")
         ok = false
-    for category_id: String in KnowledgeManager.category_points.keys():
+    for category_id: String in KnowledgeManager.get_tracked_category_ids():
         if get_category_by_id(category_id) == null:
             push_error(
                 "CategoryRegistry: KnowledgeManager.category_points key '%s' not found"
