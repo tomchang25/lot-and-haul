@@ -174,16 +174,15 @@ func attribute_count() -> int:
     return _attribute_registry.size()
 
 
-## Upgrades an attribute by one level. Deducts the upgrade cost from
-## MetaManager.cash. Returns false if the attribute is unknown or cash is
-## insufficient.
+## Upgrades an attribute by one level. Deducts the upgrade cost via
+## MetaManager.spend_cash(). Returns false if the attribute is unknown or cash
+## is insufficient.
 func upgrade_attribute(attribute_id: String) -> bool:
     var attr: AttributeData = get_attribute_by_id(attribute_id)
     if attr == null:
         return false
-    if MetaManager.cash < _ATTRIBUTE_UPGRADE_COST:
+    if not MetaManager.spend_cash(_ATTRIBUTE_UPGRADE_COST):
         return false
-    MetaManager.cash -= _ATTRIBUTE_UPGRADE_COST
     var current := attribute_levels.get(attribute_id, attr.starting_value)
     attribute_levels[attribute_id] = current + 1
     SaveManager.save()

@@ -1,10 +1,10 @@
 # meta_manager.gd
 # Hub-phase transactional authority. Holds six domain owners (EconomyOwner,
 # GarageOwner, StorageOwner, SlotOwner, ProgressOwner, CustomersOwner); each
-# owns its domain's live fields and its own save payload. Exposes those fields
-# as transparent proxy properties so scenes need no call-site changes.
-# Cross-domain transactions (day end, run resolution, customer sale) remain
-# here as single coordinated methods.
+# owns its domain's live fields, save payload, and the operations that mutate
+# them. Exposes getter-only proxy properties so scenes need no call-site changes.
+# Cross-domain transactions (day end, run resolution, customer sale) remain here
+# as single coordinated methods that call owner methods and save exactly once.
 extends Node
 
 # ── Domain owners ──────────────────────────────────────────────────────────────
@@ -17,86 +17,67 @@ var _progress: ProgressOwner
 var _customers: CustomersOwner
 
 # ── Proxy properties ──────────────────────────────────────────────────────────
-# Scenes and other autoloads (e.g. KnowledgeManager) access these transparently.
-# Each getter/setter forwards to the owning domain object.
+# Read-only delegates — no setter means no external write path.
+# Value-type fields: getter returns the scalar directly (harmless to read).
+# Reference-type collections: getter returns a shallow duplicate so callers
+# cannot mutate live storage through the returned array.
 
 var cash: int:
     get:
         return _economy.cash
-    set(v):
-        _economy.cash = v
 
 var active_car: CarData:
     get:
         return _garage.active_car
-    set(v):
-        _garage.active_car = v
 
+## Returns a shallow duplicate of the owned-car roster (ItemEntry refs shared).
 var owned_cars: Array[CarData]:
     get:
-        return _garage.owned_cars
-    set(v):
-        _garage.owned_cars = v
+        return _garage.owned_cars.duplicate()
 
+## Returns a shallow duplicate of storage (ItemEntry refs shared — read-only).
 var storage_items: Array:
     get:
-        return _storage.storage_items
-    set(v):
-        _storage.storage_items = v
+        return _storage.storage_items.duplicate()
 
 var next_entry_id: int:
     get:
         return _storage.next_entry_id
-    set(v):
-        _storage.next_entry_id = v
 
+## Returns a shallow duplicate of available locations (LocationData refs shared).
 var available_locations: Array[LocationData]:
     get:
-        return _progress.available_locations
-    set(v):
-        _progress.available_locations = v
+        return _progress.available_locations.duplicate()
 
 var current_slot: int:
     get:
         return _slot.current_slot
-    set(v):
-        _slot.current_slot = v
 
 var storage_ap: int:
     get:
         return _slot.storage_ap
-    set(v):
-        _slot.storage_ap = v
 
 var selling_slots_today: int:
     get:
         return _slot.selling_slots_today
-    set(v):
-        _slot.selling_slots_today = v
 
 var pending_run: Dictionary:
     get:
         return _slot.pending_run
-    set(v):
-        _slot.pending_run = v
 
+## Returns a shallow duplicate of the nightly customer list.
 var nightly_customers: Array[Customer]:
     get:
-        return _customers.nightly_customers
-    set(v):
-        _customers.nightly_customers = v
+        return _customers.nightly_customers.duplicate()
 
+## Returns a shallow duplicate of today's sales ledger.
 var customer_sales_today: Array[Dictionary]:
     get:
-        return _customers.customer_sales_today
-    set(v):
-        _customers.customer_sales_today = v
+        return _customers.customer_sales_today.duplicate()
 
 var current_day: int:
     get:
         return _progress.current_day
-    set(v):
-        _progress.current_day = v
 
 
 func _ready() -> void:
@@ -113,20 +94,22 @@ func _ready() -> void:
     SaveManager.register_section(_slot)
     SaveManager.register_section(_customers)
 
+# ══ Cross-autoload cash helper ════════════════════════════════════════════════
+
+
+## Deducts [param amount] from cash via EconomyOwner.spend(). Does NOT save —
+## this is a sub-operation for caller-managed transactions (e.g.
+## KnowledgeManager.upgrade_attribute) that save at their own commit point.
+## Returns true when the spend succeeded, false when cash was insufficient.
+func spend_cash(amount: int) -> bool:
+    return _economy.spend(amount)
+
 # ══ Storage registration ══════════════════════════════════════════════════════
 
 
-func register_storage_item(entry: ItemEntry) -> void:
-    entry.id = _storage.next_entry_id
-    _storage.next_entry_id += 1
-    _storage.storage_items.append(entry)
-    if entry.item_data != null and entry.item_data.auto_verify:
-        entry.reveal_all_hidden()
-
-
+## Registers [param entries] into storage and saves. Single-domain transaction.
 func register_storage_items(entries: Array[ItemEntry]) -> void:
-    for entry: ItemEntry in entries:
-        register_storage_item(entry)
+    _storage.register_entries(entries)
     SaveManager.save()
 
 # ══ Location sampling ═════════════════════════════════════════════════════════
@@ -135,7 +118,9 @@ func register_storage_items(entries: Array[ItemEntry]) -> void:
 func roll_available_locations() -> void:
     var all := LocationRegistry.get_all_locations()
     all.shuffle()
-    _progress.available_locations = all.slice(0, mini(Economy.LOCATION_SAMPLE_SIZE, all.size()))
+    var sampled: Array[LocationData] = []
+    sampled.assign(all.slice(0, mini(Economy.LOCATION_SAMPLE_SIZE, all.size())))
+    _progress.set_locations(sampled)
 
 # ══ Slot economy — hub actions ════════════════════════════════════════════════
 
@@ -143,7 +128,7 @@ func roll_available_locations() -> void:
 ## Begins a Storage slot: increments current_slot (consuming it) and refreshes
 ## storage_ap to a full pool. Call before navigating to the storage scene.
 func begin_storage_slot() -> void:
-    _slot.current_slot += 1
+    _slot.set_slot(_slot.current_slot + 1)
     _slot.storage_ap = Economy.STORAGE_AP_MAX
     SaveManager.save()
 
@@ -153,7 +138,7 @@ func begin_storage_slot() -> void:
 ## Call before navigating to location select.
 func begin_auction() -> void:
     assert(_slot.current_slot == 1, "Auction can only begin in slot 1 (Morning)")
-    _slot.current_slot = 3
+    _slot.set_slot(3)
     SaveManager.save()
 
 
@@ -165,8 +150,8 @@ func begin_auction() -> void:
 ##   3 (full day). Pass 4 - current_slot at the moment Open Shop is chosen.
 func begin_open_shop(selling_slots: int) -> void:
     _slot.selling_slots_today = selling_slots
-    _slot.current_slot = 4 # hub sees > 3 → triggers end_day
-    _customers.customer_sales_today.clear()
+    _slot.set_slot(4) # hub sees > 3 → triggers end_day
+    _customers.clear_sales()
     _generate_nightly_customers(selling_slots)
     SaveManager.save()
 
@@ -182,8 +167,8 @@ func end_day() -> DaySummary:
     summary.days_elapsed = 1
     summary.living_cost = Economy.DAILY_BASE_COST
 
-    _progress.current_day += 1
-    _economy.cash -= Economy.DAILY_BASE_COST
+    _progress.advance_day()
+    _economy.apply_delta(-Economy.DAILY_BASE_COST)
     summary.end_day = _progress.current_day
 
     # Capture customer sales recorded during Open Shop.
@@ -199,13 +184,13 @@ func end_day() -> DaySummary:
         summary.entry_fee = int(pr.get("entry_fee", 0))
         summary.fuel_cost = int(pr.get("fuel_cost", 0))
         summary.cargo_count = int(pr.get("cargo_count", 0))
-        _slot.pending_run = { }
+        _slot.clear_pending_run()
 
     # Reset for next day.
-    _slot.current_slot = 1
+    _slot.set_slot(1)
     _slot.storage_ap = 0
     _slot.selling_slots_today = 0
-    _progress.available_locations.clear()
+    _progress.clear_locations()
 
     SaveManager.save()
     return summary
@@ -219,10 +204,12 @@ func _generate_nightly_customers(selling_slots: int) -> void:
     var rng := RandomNumberGenerator.new()
     rng.randomize()
     var count := _selling_slots_to_count(rng, selling_slots)
-    _customers.nightly_customers = Customer.generate_for_night(
-        rng,
-        _storage.storage_items,
-        count,
+    _customers.set_customers(
+        Customer.generate_for_night(
+            rng,
+            _storage.storage_items,
+            count,
+        ),
     )
 
 
@@ -255,32 +242,17 @@ func resolve_customer_sale(
         customer: Customer = null,
         strategy: String = "",
 ) -> void:
-    var sold_ids: Array[int] = []
+    var sold_ids: Array = _storage.remove_entries(items)
     for entry: ItemEntry in items:
-        sold_ids.append(entry.id)
-        _storage.storage_items.erase(entry)
         KnowledgeManager.add_category_points(
             entry.item_data.category_data,
             entry.item_data.rarity,
             KnowledgeManager.KnowledgeAction.SELL,
         )
-    _economy.cash += sale_price
-
-    _customers.customer_sales_today.append(
-        {
-            "day": _progress.current_day,
-            "customer_id": customer.customer_id if customer != null else "",
-            "customer_name": customer.display_name if customer != null else "",
-            "strategy": strategy,
-            "item_count": items.size(),
-            "item_ids": sold_ids,
-            "sale_price": sale_price,
-        },
-    )
-
+    _economy.earn(sale_price)
+    _customers.record_sale(_progress.current_day, customer, strategy, sold_ids, sale_price)
     if customer != null:
-        _customers.nightly_customers.erase(customer)
-
+        _customers.remove_customer(customer)
     SaveManager.save()
 
 # ══ Storage AP actions ════════════════════════════════════════════════════════
@@ -299,7 +271,7 @@ func repair_item(entry: ItemEntry) -> bool:
     if ResearchSlot.is_repair_complete(entry):
         return false
     ResearchSlot.apply_repair(entry)
-    _slot.storage_ap -= Economy.REPAIR_AP_COST
+    _slot.charge_ap(Economy.REPAIR_AP_COST)
     SaveManager.save()
     return true
 
@@ -317,7 +289,7 @@ func restore_item(entry: ItemEntry) -> bool:
     if ResearchSlot.is_restore_complete(entry):
         return false
     ResearchSlot.apply_restore(entry)
-    _slot.storage_ap -= Economy.RESTORE_AP_COST
+    _slot.charge_ap(Economy.RESTORE_AP_COST)
     SaveManager.save()
     return true
 
@@ -339,22 +311,23 @@ func research_item(entry: ItemEntry) -> bool:
     var investigation_attr := KnowledgeManager.get_attribute_value("investigation")
     var progress_amount: int = 5 + investigation_attr
     entry.advance_research(progress_amount)
-    _slot.storage_ap -= Economy.RESEARCH_AP_COST
+    _slot.charge_ap(Economy.RESEARCH_AP_COST)
     SaveManager.save()
     return true
 
 # ══ Vehicle management ════════════════════════════════════════════════════════
 
 
+## Purchases [param car]: validates non-null, not already owned, and affordable;
+## deducts cash; appends to the owned roster. Saves on success.
 func buy_car(car: CarData) -> bool:
     if car == null:
         return false
-    if _garage.owned_cars.has(car):
+    if _garage.owns_car(car):
         return false
-    if _economy.cash < car.price:
+    if not _economy.spend(car.price):
         return false
-    _economy.cash -= car.price
-    _garage.owned_cars.append(car)
+    _garage.add_car(car)
     SaveManager.save()
     return true
 
@@ -362,7 +335,7 @@ func buy_car(car: CarData) -> bool:
 func set_active_car(car: CarData) -> void:
     if car == _garage.active_car:
         return
-    _garage.active_car = car
+    _garage.set_active(car)
     SaveManager.save()
 
 # ══ Run resolution ════════════════════════════════════════════════════════════
@@ -376,26 +349,22 @@ func set_active_car(car: CarData) -> void:
 ## after this returns. The day summary fires when the player chooses Open Shop
 ## or all slots are exhausted from the hub.
 func resolve_run(record: RunRecord) -> void:
-    _economy.cash += record.onsite_proceeds - record.paid_price - record.entry_fee - record.fuel_cost
+    _economy.apply_delta(
+        record.onsite_proceeds - record.paid_price - record.entry_fee - record.fuel_cost,
+    )
 
     # Auto-reveal all surface clues on hub return (Phase 7).
     for entry: ItemEntry in record.cargo_items:
         entry.auto_reveal_all_surface()
 
-    register_storage_items(record.cargo_items)
+    _storage.register_entries(record.cargo_items) # no inner save
 
     # Stash run economics so end_day can fold them into the day summary.
     # Persisted so a quit before end_day doesn't drop them.
-    _slot.pending_run = {
-        "onsite_proceeds": record.onsite_proceeds,
-        "paid_price": record.paid_price,
-        "entry_fee": record.entry_fee,
-        "fuel_cost": record.fuel_cost,
-        "cargo_count": record.cargo_items.size(),
-    }
+    _slot.stash_pending_run(record) # no inner save
 
     # Auction consumed morning + afternoon; player returns for the evening slot.
-    _slot.current_slot = 3
-    SaveManager.save()
+    _slot.set_slot(3) # no inner save
 
     RunManager.clear_run_state()
+    SaveManager.save() # single commit

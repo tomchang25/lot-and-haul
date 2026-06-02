@@ -1,10 +1,38 @@
 # economy_owner.gd
-# Economy domain owner: cash. Owns the field and its save payload.
-# Held by MetaManager; not a global singleton.
+# Economy domain owner: cash. Owns the field, its save payload, and all
+# operations that mutate it. Held by MetaManager; not a global singleton.
 class_name EconomyOwner
 extends RefCounted
 
 var cash: int = 0
+
+
+## Returns true if [param amount] can be spent without going negative.
+func can_afford(amount: int) -> bool:
+    return cash >= amount
+
+
+## Deducts [param amount] from cash. Refuses if cash would go negative.
+## Returns true when the spend happened, false when rejected.
+## Asserts non-negative input — negative amounts are a caller bug.
+func spend(amount: int) -> bool:
+    assert(amount >= 0, "spend() expects a non-negative amount")
+    if cash < amount:
+        return false
+    cash -= amount
+    return true
+
+
+## Adds [param amount] to cash. Asserts non-negative input.
+func earn(amount: int) -> void:
+    assert(amount >= 0, "earn() expects a non-negative amount")
+    cash += amount
+
+
+## Applies a signed [param delta] atomically. Use sparingly; prefer earn/spend.
+## Allowed to drive cash negative (e.g. daily living cost, run losses).
+func apply_delta(delta: int) -> void:
+    cash += delta
 
 
 ## Section id for the economy save payload.

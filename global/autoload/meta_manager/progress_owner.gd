@@ -1,6 +1,7 @@
 # progress_owner.gd
 # Progress domain owner: calendar day and sampled available locations. Owns the
-# fields and their save payload. Held by MetaManager; not a global singleton.
+# fields, their save payload, and the operations that mutate them. Held by
+# MetaManager; not a global singleton.
 class_name ProgressOwner
 extends RefCounted
 
@@ -9,6 +10,21 @@ var current_day: int = 0
 
 ## Currently available locations sampled for the run phase.
 var available_locations: Array[LocationData] = []
+
+
+## Increments current_day by one. Does not save.
+func advance_day() -> void:
+    current_day += 1
+
+
+## Replaces available_locations with [param locations]. Does not save.
+func set_locations(locations: Array[LocationData]) -> void:
+    available_locations = locations
+
+
+## Clears available_locations. Does not save.
+func clear_locations() -> void:
+    available_locations.clear()
 
 
 ## Section id for the progress save payload.

@@ -1,6 +1,7 @@
 # customers_owner.gd
 # Customers domain owner: nightly customers and the day's sale ledger. Owns the
-# fields and their save payload. Held by MetaManager; not a global singleton.
+# fields, their save payload, and the operations that mutate them. Held by
+# MetaManager; not a global singleton.
 class_name CustomersOwner
 extends RefCounted
 
@@ -11,6 +12,43 @@ var nightly_customers: Array[Customer] = []
 ## plain Dictionary (day, customer_id/name, strategy, item_count, item_ids,
 ## sale_price). Reset when Open Shop begins.
 var customer_sales_today: Array[Dictionary] = []
+
+
+## Replaces the nightly customer list. Does not save.
+func set_customers(customers: Array[Customer]) -> void:
+    nightly_customers = customers
+
+
+## Removes [param customer] from the nightly set. No-op if not present.
+## Does not save.
+func remove_customer(customer: Customer) -> void:
+    nightly_customers.erase(customer)
+
+
+## Appends a sale record to the daily ledger. Does not save.
+func record_sale(
+        day: int,
+        customer: Customer,
+        strategy: String,
+        sold_ids: Array,
+        sale_price: int,
+) -> void:
+    customer_sales_today.append(
+        {
+            "day": day,
+            "customer_id": customer.customer_id if customer != null else "",
+            "customer_name": customer.display_name if customer != null else "",
+            "strategy": strategy,
+            "item_count": sold_ids.size(),
+            "item_ids": sold_ids,
+            "sale_price": sale_price,
+        },
+    )
+
+
+## Clears the daily sales ledger. Does not save.
+func clear_sales() -> void:
+    customer_sales_today.clear()
 
 
 ## Section id for the customers save payload.

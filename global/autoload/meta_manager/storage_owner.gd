@@ -13,6 +13,33 @@ var storage_items: Array = []
 var next_entry_id: int = 0
 
 
+## Registers a single [param entry]: assigns a stable id, appends to storage,
+## and auto-reveals hidden clues when the item has auto_verify set.
+## Does not save — callers commit via SaveManager.save().
+func register_entry(entry: ItemEntry) -> void:
+    entry.id = next_entry_id
+    next_entry_id += 1
+    storage_items.append(entry)
+    if entry.item_data != null and entry.item_data.auto_verify:
+        entry.reveal_all_hidden()
+
+
+## Registers all entries in [param entries]. No save.
+func register_entries(entries: Array) -> void:
+    for e: ItemEntry in entries:
+        register_entry(e)
+
+
+## Removes each entry in [param entries] from storage. Returns an Array[int] of
+## the ids that were removed. Does not save.
+func remove_entries(entries: Array) -> Array:
+    var ids: Array = []
+    for e: ItemEntry in entries:
+        ids.append(e.id)
+        storage_items.erase(e)
+    return ids
+
+
 ## Section id for the storage save payload.
 func section_id() -> String:
     return "storage"

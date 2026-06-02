@@ -66,11 +66,26 @@ Save-file schema:
 
 ## MetaManager
 
-Hub-phase transactional authority and owner of meta-progression runtime state. Registers six save section providers with SaveManager (`economy`, `garage`, `storage`, `progress`, `slot`, `customers`) via inner section classes that read/write MetaManager fields. It is the single authority for: storage registration (assigning ids; auto-verify items reveal hidden clues on entry), rolling available locations, slot transitions (begin Storage slot, begin Auction, begin Open Shop), immediate storage AP actions (Repair / Restore / Research), the day-end sequence (advance calendar day → deduct living cost → fold pending-run economics and customer sales → reset slot state → save, returning a `DaySummary`), committing customer sales, car purchase + active swap, and run settlement (cash, surface auto-reveal, cargo storage; stashes run economics as pending). Signatures in `meta_manager.gd`; slot/AP rules live in `day_slot_economy.md`.
+Hub-phase transactional authority. Owns six domain objects (`EconomyOwner`, `GarageOwner`, `StorageOwner`, `SlotOwner`, `ProgressOwner`, `CustomersOwner`) held in `global/autoload/meta_manager/`. Each owner owns its domain's live fields, its save payload (registered directly with `SaveManager` in `_ready()`), and the no-save mutator methods that protect its invariants. `MetaManager` itself is a thin coordinator: it exposes getter-only proxy properties for scenes, holds cross-domain transactions that call owner methods and commit exactly one `SaveManager.save()` at the transaction's tail, and contains no raw field arithmetic.
+
+Domain owners and their invariants:
+
+| Owner | Fields | Key invariants |
+|---|---|---|
+| `EconomyOwner` | `cash` | `spend()` refuses to go negative; `apply_delta()` for allowed-negative ops (daily cost, run losses) |
+| `GarageOwner` | `active_car`, `owned_cars` | `add_car()` is idempotent; `set_active()` owns the swap |
+| `StorageOwner` | `storage_items`, `next_entry_id` | `register_entry()` assigns monotonic id + auto-verifies; `remove_entries()` returns removed ids |
+| `SlotOwner` | `current_slot`, `storage_ap`, `selling_slots_today`, `pending_run` | `charge_ap()` called only after effect lands; `stash_pending_run()` builds the economics dict |
+| `ProgressOwner` | `current_day`, `available_locations` | `advance_day()` increments; `set_locations()` / `clear_locations()` own the sample |
+| `CustomersOwner` | `nightly_customers`, `customer_sales_today` | `record_sale()` appends ledger; `clear_sales()` resets it |
+
+Proxy properties for reference-type collections (`storage_items`, `owned_cars`, `nightly_customers`, `customer_sales_today`, `available_locations`) return shallow duplicates so callers cannot mutate live storage through the returned array. Value-type properties (`cash`, `current_slot`, etc.) return the scalar directly. No proxy has a setter — `MetaManager.<field> = x` is a compile error by design.
+
+Cross-domain transactions in `MetaManager`: `resolve_run`, `resolve_customer_sale`, `end_day`, `buy_car`, `set_active_car`, `register_storage_items`, `begin_storage_slot`, `begin_auction`, `begin_open_shop`. Each saves exactly once at its commit point; no helper method inside a transaction calls `SaveManager.save()`. `spend_cash(amount)` is a no-save sub-operation for `KnowledgeManager.upgrade_attribute` (a cross-autoload transaction that manages its own save). Slot/AP rules in `day_slot_economy.md`.
 
 ### Storage AP actions
 
-Each storage action applies immediately on press and follows guard → apply → charge, charging AP only after the effect lands. The condition math (caps, factors, the Restoration coefficient) lives in the static `ResearchSlot` helpers; Research advances deterministic per-clue progress on `ItemEntry`. Costs, the AP pool, and guards are in `day_slot_economy.md`.
+Each storage action follows guard → apply → charge, charging AP only after the effect lands. The condition math lives in the static `ResearchSlot` helpers; Research advances deterministic per-clue progress on `ItemEntry`. Costs, the AP pool, and guards are in `day_slot_economy.md`.
 
 ---
 

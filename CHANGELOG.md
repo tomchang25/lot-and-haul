@@ -11,6 +11,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 ## Meta Domain Decomposition
 
 - 2026-06-02 — [meta] MetaManager decomposed into six domain owners (EconomyOwner, GarageOwner, StorageOwner, SlotOwner, ProgressOwner, CustomersOwner) under global/autoload/meta_manager/; each owns its fields and save payload with sanitize-on-load warnings for unresolved ids; MetaManager exposes transparent proxy properties (GDScript 4 get/set) so all scenes and autoloads need no changes; CarRegistry and LocationRegistry validate() stripped of live-state reads; ItemEntry.from_dict push_error softened to push_warning; six SaveSection adapter files retired to tombstubs
+- 2026-06-02 — [meta] MetaManager owner refactor: behavior moved into each domain owner (EconomyOwner: can_afford/spend/earn/apply_delta; GarageOwner: owns_car/add_car/set_active; StorageOwner: register_entry/register_entries/remove_entries; SlotOwner: set_slot/charge_ap/stash_pending_run/clear_pending_run; ProgressOwner: advance_day/set_locations/clear_locations; CustomersOwner: record_sale/remove_customer/clear_sales/set_customers); proxy setters removed (getter-only, reference collections return shallow duplicate); resolve_run double-save eliminated (single SaveManager.save() at commit); KnowledgeManager.upgrade_attribute routed through MetaManager.spend_cash() instead of direct field write
 
 ## Save State Ownership Refactor
 

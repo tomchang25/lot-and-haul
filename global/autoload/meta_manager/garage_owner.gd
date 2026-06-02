@@ -1,11 +1,28 @@
 # garage_owner.gd
-# Garage domain owner: active car and owned car roster. Owns the fields and
-# their save payload. Held by MetaManager; not a global singleton.
+# Garage domain owner: active car and owned car roster. Owns the fields, their
+# save payload, and operations that mutate them. Held by MetaManager; not a
+# global singleton.
 class_name GarageOwner
 extends RefCounted
 
 var active_car: CarData = null
 var owned_cars: Array[CarData] = []
+
+
+## Returns true if [param car] is already in the owned roster.
+func owns_car(car: CarData) -> bool:
+    return owned_cars.has(car)
+
+
+## Appends [param car] to the owned roster. No-op if already owned.
+func add_car(car: CarData) -> void:
+    if not owned_cars.has(car):
+        owned_cars.append(car)
+
+
+## Sets [param car] as the active car. No-op if already active.
+func set_active(car: CarData) -> void:
+    active_car = car
 
 
 ## Section id for the garage save payload.

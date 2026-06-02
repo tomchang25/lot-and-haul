@@ -1,7 +1,7 @@
 # slot_owner.gd
 # Slot-flow domain owner: current slot, storage AP, committed selling slots, and
-# pending run economics. Owns the fields and their save payload. Held by
-# MetaManager; not a global singleton.
+# pending run economics. Owns the fields, their save payload, and the phase
+# operations that mutate them. Held by MetaManager; not a global singleton.
 class_name SlotOwner
 extends RefCounted
 
@@ -20,6 +20,34 @@ var selling_slots_today: int = 0
 ## an auction; consumed and cleared by end_day(). Empty when no run is pending.
 ## Keys (all int): onsite_proceeds, paid_price, entry_fee, fuel_cost, cargo_count.
 var pending_run: Dictionary = { }
+
+
+## Sets current_slot to [param slot]. Does not save.
+func set_slot(slot: int) -> void:
+    current_slot = slot
+
+
+## Deducts [param cost] AP from the pool. Does not save. Called only after the
+## effect lands — guards live in MetaManager's public AP action methods.
+func charge_ap(cost: int) -> void:
+    storage_ap -= cost
+
+
+## Persists run economics from [param record] into pending_run so end_day can
+## fold them into the day summary. Does not save.
+func stash_pending_run(record: RunRecord) -> void:
+    pending_run = {
+        "onsite_proceeds": record.onsite_proceeds,
+        "paid_price": record.paid_price,
+        "entry_fee": record.entry_fee,
+        "fuel_cost": record.fuel_cost,
+        "cargo_count": record.cargo_items.size(),
+    }
+
+
+## Clears the pending run economics. Does not save.
+func clear_pending_run() -> void:
+    pending_run = { }
 
 
 ## Section id for the slot save payload.
