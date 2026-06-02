@@ -1,6 +1,6 @@
 # mastery_panel.gd
 # Mastery Panel — Read-only display of mastery rank and category progression.
-# Reads: KnowledgeManager, CategoryRegistry, SuperCategoryRegistry, SaveManager.category_points
+# Reads: KnowledgeManager, CategoryRegistry, SuperCategoryRegistry, KnowledgeManager.category_points
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -39,7 +39,7 @@ func _build_content() -> void:
         var category_lines := PackedStringArray()
         for cat: CategoryData in SuperCategoryRegistry.get_categories_for_super(sc):
             var cat_id: String = cat.category_id
-            var points: int = int(SaveManager.category_points.get(cat_id, 0))
+            var points: int = int(KnowledgeManager.category_points.get(cat_id, 0))
             var rank: int = KnowledgeManager.get_category_rank(cat)
 
             var progress_text: String

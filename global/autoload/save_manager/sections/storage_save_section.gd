@@ -1,7 +1,8 @@
 # storage_save_section.gd
 # Save section: storage state — owned ItemEntry instances and the monotonic
 # next_entry_id counter. Also carries the legacy research_slots migration (only
-# present in pre-time-slot flat saves). Registered as the "storage" section.
+# present in pre-time-slot flat saves). Reads/writes the MetaManager singleton;
+# registered with SaveManager as the "storage" section.
 class_name StorageSaveSection
 extends RefCounted
 
@@ -13,26 +14,26 @@ func section_id() -> String:
 
 func to_dict() -> Dictionary:
     var serialized_items: Array = []
-    for entry: ItemEntry in SaveManager.storage_items:
+    for entry: ItemEntry in MetaManager.storage_items:
         serialized_items.append(entry.to_dict())
     return {
         "storage_items": serialized_items,
-        "next_entry_id": SaveManager.next_entry_id,
+        "next_entry_id": MetaManager.next_entry_id,
     }
 
 
 func from_dict(data: Dictionary) -> void:
     if data.has("storage_items") and data["storage_items"] is Array:
-        SaveManager.storage_items = []
+        MetaManager.storage_items = []
         for d: Variant in data["storage_items"]:
             if not d is Dictionary:
                 continue
             var entry: ItemEntry = ItemEntry.from_dict(d)
             if entry != null:
                 entry.apply_storage_migration()
-                SaveManager.storage_items.append(entry)
+                MetaManager.storage_items.append(entry)
     if data.has("next_entry_id") and data["next_entry_id"] is float:
-        SaveManager.next_entry_id = int(data["next_entry_id"])
+        MetaManager.next_entry_id = int(data["next_entry_id"])
 
     # ── Migration: discard legacy research_slots ──────────────────────────────
     # Old (pre-time-slot) flat saves carried a research_slots array. That array
@@ -64,14 +65,14 @@ func _migrate_research_slots(slots: Array) -> void:
         if days_spent <= 0:
             continue
         var entry: ItemEntry = null
-        for e: ItemEntry in SaveManager.storage_items:
+        for e: ItemEntry in MetaManager.storage_items:
             if e.id == item_id:
                 entry = e
                 break
         if entry == null or entry.verified:
             continue
         # Each legacy research day converts to 5 progress points (base rate,
-        # no attribute — the pre-slot system had no attribute bonus for research).
+        # no attribute — the pre-slot system had no attribute bonus).
         var remaining: int = days_spent * 5
         for clue: ClueData in entry.item_data.clues:
             if clue.type != ClueData.ClueType.HIDDEN:

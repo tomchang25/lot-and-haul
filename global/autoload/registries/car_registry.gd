@@ -17,12 +17,12 @@ func _id_of(r: Resource) -> String:
 # repairs saves whose active_car no longer resolves (e.g. the car was
 # removed from the data pipeline). Safe to re-run.
 func migrate() -> void:
-    if SaveManager.owned_cars.is_empty():
+    if MetaManager.owned_cars.is_empty():
         var van: CarData = get_car_by_id("van_basic")
         if van != null:
-            SaveManager.owned_cars.append(van)
-    if SaveManager.active_car == null and not SaveManager.owned_cars.is_empty():
-        SaveManager.active_car = SaveManager.owned_cars[0]
+            MetaManager.owned_cars.append(van)
+    if MetaManager.active_car == null and not MetaManager.owned_cars.is_empty():
+        MetaManager.active_car = MetaManager.owned_cars[0]
 
 
 func validate() -> bool:
@@ -30,12 +30,12 @@ func validate() -> bool:
     if size() == 0:
         push_error("CarRegistry: registry is empty")
         ok = false
-    if SaveManager.active_car == null:
-        push_error("CarRegistry: SaveManager.active_car is null")
+    if MetaManager.active_car == null:
+        push_error("CarRegistry: MetaManager.active_car is null")
         ok = false
-    for car: CarData in SaveManager.owned_cars:
+    for car: CarData in MetaManager.owned_cars:
         if car == null:
-            push_error("CarRegistry: SaveManager.owned_cars contains a null entry")
+            push_error("CarRegistry: MetaManager.owned_cars contains a null entry")
             ok = false
     return ok
 

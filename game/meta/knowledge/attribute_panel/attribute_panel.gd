@@ -34,10 +34,10 @@ func _build_content() -> void:
 
 
 func _add_attribute_row(attr: AttributeData) -> void:
-    var level := SaveManager.attribute_levels.get(attr.attribute_id, attr.starting_value)
+    var level := KnowledgeManager.attribute_levels.get(attr.attribute_id, attr.starting_value)
 
     var row: AttributeRow = AttributeRowScene.instantiate()
-    row.setup(attr, level, UPGRADE_COST, SaveManager.cash >= UPGRADE_COST)
+    row.setup(attr, level, UPGRADE_COST, MetaManager.cash >= UPGRADE_COST)
     row.upgrade_pressed.connect(_on_upgrade_pressed)
     _content.add_child(row)
 

@@ -36,7 +36,7 @@ func _ready() -> void:
     _knowledge_btn.pressed.connect(_on_knowledge_pressed)
 
     # If all slots are spent, end the day immediately instead of showing the hub.
-    if SaveManager.current_slot > 3:
+    if MetaManager.current_slot > 3:
         _end_day_and_navigate()
         return
 
@@ -46,7 +46,7 @@ func _ready() -> void:
 
 
 func _on_auction_pressed() -> void:
-    if SaveManager.current_slot != 1:
+    if MetaManager.current_slot != 1:
         return
     GameManager.go_to_location_select()
 
@@ -57,7 +57,7 @@ func _on_storage_pressed() -> void:
 
 
 func _on_open_shop_pressed() -> void:
-    var selling_slots: int = 4 - SaveManager.current_slot
+    var selling_slots: int = 4 - MetaManager.current_slot
     MetaManager.begin_open_shop(selling_slots)
     GameManager.go_to_customer_sell()
 
@@ -81,15 +81,15 @@ func _end_day_and_navigate() -> void:
 
 func _refresh_display() -> void:
     _mastery_rank_label.text = "Mastery Rank:   %d" % KnowledgeManager.get_mastery_rank()
-    _balance_label.text = "Balance:   $%d" % SaveManager.cash
-    _storage_count_label.text = "Storage:   %d items" % SaveManager.storage_items.size()
+    _balance_label.text = "Balance:   $%d" % MetaManager.cash
+    _storage_count_label.text = "Storage:   %d items" % MetaManager.storage_items.size()
 
     _refresh_slot_label()
     _refresh_activity_buttons()
 
 
 func _refresh_slot_label() -> void:
-    var slot: int = SaveManager.current_slot
+    var slot: int = MetaManager.current_slot
     var tray: String = ""
     for i: int in range(1, 4):
         var sname: String = SLOT_NAMES[i]
@@ -99,11 +99,11 @@ func _refresh_slot_label() -> void:
             tray += "► %s  " % sname
         else:
             tray += "○ %s  " % sname
-    _slot_label.text = "Day %d   |   %s" % [SaveManager.current_day, tray.strip_edges()]
+    _slot_label.text = "Day %d   |   %s" % [MetaManager.current_day, tray.strip_edges()]
 
 
 func _refresh_activity_buttons() -> void:
-    var slot: int = SaveManager.current_slot
+    var slot: int = MetaManager.current_slot
 
     # Auction: Morning (slot 1) only.
     _next_run_btn.disabled = (slot != 1)

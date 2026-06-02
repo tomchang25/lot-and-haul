@@ -18,9 +18,9 @@ func validate() -> bool:
     if size() == 0:
         push_error("LocationRegistry: registry is empty")
         ok = false
-    for location: LocationData in SaveManager.available_locations:
+    for location: LocationData in MetaManager.available_locations:
         if location == null:
-            push_error("LocationRegistry: SaveManager.available_locations contains a null entry")
+            push_error("LocationRegistry: MetaManager.available_locations contains a null entry")
             ok = false
     for location: LocationData in get_all():
         for lot: LotData in location.lot_pool:

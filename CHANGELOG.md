@@ -8,6 +8,10 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Save State Ownership Refactor
+
+- 2026-06-02 — [save] SaveManager becomes a thin coordinator (file IO, schema, dispatch only; no gameplay state fields); KnowledgeManager owns category_points/attribute_levels/unlocked_perks and provides the "knowledge" save section; MetaManager owns all remaining meta-progression state (cash, garage, storage, slot, progress, customers) and registers six inner section providers; schema bumped to 2 with load-time migration that relocates knowledge keys out of the economy section; section .gd files replaced with tombstone stubs; all SaveManager.<field> references removed outside the persistence layer
+
 ## Template Spine Backport
 
 - 2026-06-01 — [registry] Added `ResourceRegistry` base class; ItemRegistry/CarRegistry/ClueRegistry/CategoryRegistry/LocationRegistry/SuperCategoryRegistry now extend it (override `_dir_path`/`_id_of`), dropping duplicated `_ready`/`size`/`_by_id` boilerplate while keeping per-registry `migrate`/`validate` and typed wrappers

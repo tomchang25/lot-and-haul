@@ -1,15 +1,71 @@
+# meta_manager.gd
+# Hub-phase transactional authority. Owns all meta-progression runtime state and
+# mutates it through domain operations. Serialization is delegated to six external
+# SaveSection providers (economy, garage, storage, progress, slot, customers),
+# instantiated and registered with SaveManager in _ready().
 extends Node
 
-# Pending run economics are stashed on SaveManager.pending_run (persisted) by
-# resolve_run() and folded into the DaySummary by end_day().
+# ── Persistent state ──────────────────────────────────────────────────────────
+
+var cash: int = 0
+var active_car: CarData = null
+var owned_cars: Array[CarData] = []
+
+## Array of ItemEntry instances the player currently owns in storage.
+var storage_items: Array = []
+
+## Monotonically increasing counter; never reset. Assigned to ItemEntry.id on
+## registration so each entry has a unique id across the save's lifetime.
+var next_entry_id: int = 0
+
+var available_locations: Array[LocationData] = []
+
+## Current slot index within the active day (1 = Morning, 2 = Afternoon,
+## 3 = Evening). > 3 means the day is ending — hub auto-calls end_day on entry.
+var current_slot: int = 1
+
+## AP remaining in the current storage slot. Refreshed to Economy.STORAGE_AP_MAX
+## at the start of each Storage slot; leftover is discarded when the slot ends.
+var storage_ap: int = 0
+
+## Selling slots committed to Open Shop this day. Set by begin_open_shop(),
+## consumed by end_day() to populate the DaySummary customer count.
+var selling_slots_today: int = 0
+
+## Run economics awaiting fold-in by end_day(). Populated by resolve_run() after
+## an auction; consumed and cleared by end_day(). Persisted so quitting during
+## the evening slot doesn't drop the run breakdown from the day summary. Empty
+## when no run is pending. Keys (all int): onsite_proceeds, paid_price,
+## entry_fee, fuel_cost, cargo_count.
+var pending_run: Dictionary = { }
+
+## Customers generated for the current night. Array of Customer instances.
+var nightly_customers: Array[Customer] = []
+
+## Customer sales resolved during the current night, in order. Each entry is a
+## plain Dictionary (day, customer_id/name, strategy, item_count, item_ids,
+## sale_price). Reset when Open Shop begins (before customer generation).
+var customer_sales_today: Array[Dictionary] = []
+
+## Calendar day counter. Starts at 0, incremented by end_day().
+var current_day: int = 0
+
+
+func _ready() -> void:
+    SaveManager.register_section(EconomySaveSection.new())
+    SaveManager.register_section(GarageSaveSection.new())
+    SaveManager.register_section(StorageSaveSection.new())
+    SaveManager.register_section(ProgressSaveSection.new())
+    SaveManager.register_section(SlotSaveSection.new())
+    SaveManager.register_section(CustomersSaveSection.new())
 
 # ══ Storage registration ══════════════════════════════════════════════════════
 
 
 func register_storage_item(entry: ItemEntry) -> void:
-    entry.id = SaveManager.next_entry_id
-    SaveManager.next_entry_id += 1
-    SaveManager.storage_items.append(entry)
+    entry.id = next_entry_id
+    next_entry_id += 1
+    storage_items.append(entry)
     if entry.item_data != null and entry.item_data.auto_verify:
         entry.reveal_all_hidden()
 
@@ -25,7 +81,7 @@ func register_storage_items(entries: Array[ItemEntry]) -> void:
 func roll_available_locations() -> void:
     var all := LocationRegistry.get_all_locations()
     all.shuffle()
-    SaveManager.available_locations = all.slice(0, mini(Economy.LOCATION_SAMPLE_SIZE, all.size()))
+    available_locations = all.slice(0, mini(Economy.LOCATION_SAMPLE_SIZE, all.size()))
 
 # ══ Slot economy — hub actions ════════════════════════════════════════════════
 
@@ -33,8 +89,8 @@ func roll_available_locations() -> void:
 ## Begins a Storage slot: increments current_slot (consuming it) and refreshes
 ## storage_ap to a full pool. Call before navigating to the storage scene.
 func begin_storage_slot() -> void:
-    SaveManager.current_slot += 1
-    SaveManager.storage_ap = Economy.STORAGE_AP_MAX
+    current_slot += 1
+    storage_ap = Economy.STORAGE_AP_MAX
     SaveManager.save()
 
 
@@ -42,8 +98,8 @@ func begin_storage_slot() -> void:
 ## advancing current_slot to 3, returning the player to the evening slot.
 ## Call before navigating to location select.
 func begin_auction() -> void:
-    assert(SaveManager.current_slot == 1, "Auction can only begin in slot 1 (Morning)")
-    SaveManager.current_slot = 3
+    assert(current_slot == 1, "Auction can only begin in slot 1 (Morning)")
+    current_slot = 3
     SaveManager.save()
 
 
@@ -54,9 +110,9 @@ func begin_auction() -> void:
 ## [param selling_slots] — 1 (evening only), 2 (afternoon + evening), or
 ##   3 (full day). Pass 4 - current_slot at the moment Open Shop is chosen.
 func begin_open_shop(selling_slots: int) -> void:
-    SaveManager.selling_slots_today = selling_slots
-    SaveManager.current_slot = 4 # hub sees > 3 → triggers end_day
-    SaveManager.customer_sales_today.clear()
+    selling_slots_today = selling_slots
+    current_slot = 4 # hub sees > 3 → triggers end_day
+    customer_sales_today.clear()
     _generate_nightly_customers(selling_slots)
     SaveManager.save()
 
@@ -68,34 +124,34 @@ func begin_open_shop(selling_slots: int) -> void:
 ## The hub calls this automatically when current_slot > 3.
 func end_day() -> DaySummary:
     var summary := DaySummary.new()
-    summary.start_day = SaveManager.current_day
+    summary.start_day = current_day
     summary.days_elapsed = 1
     summary.living_cost = Economy.DAILY_BASE_COST
 
-    SaveManager.current_day += 1
-    SaveManager.cash -= Economy.DAILY_BASE_COST
-    summary.end_day = SaveManager.current_day
+    current_day += 1
+    cash -= Economy.DAILY_BASE_COST
+    summary.end_day = current_day
 
     # Capture customer sales recorded during Open Shop.
-    for sale in SaveManager.customer_sales_today:
+    for sale in customer_sales_today:
         summary.customer_sales_total += sale.sale_price
         summary.customer_sales_detail.append(sale.duplicate())
 
     # Fold pending run economics (set by resolve_run after the auction).
-    if not SaveManager.pending_run.is_empty():
-        var pr: Dictionary = SaveManager.pending_run
+    if not pending_run.is_empty():
+        var pr: Dictionary = pending_run
         summary.onsite_proceeds = int(pr.get("onsite_proceeds", 0))
         summary.paid_price = int(pr.get("paid_price", 0))
         summary.entry_fee = int(pr.get("entry_fee", 0))
         summary.fuel_cost = int(pr.get("fuel_cost", 0))
         summary.cargo_count = int(pr.get("cargo_count", 0))
-        SaveManager.pending_run = {}
+        pending_run = { }
 
     # Reset for next day.
-    SaveManager.current_slot = 1
-    SaveManager.storage_ap = 0
-    SaveManager.selling_slots_today = 0
-    SaveManager.available_locations.clear()
+    current_slot = 1
+    storage_ap = 0
+    selling_slots_today = 0
+    available_locations.clear()
 
     SaveManager.save()
     return summary
@@ -109,9 +165,9 @@ func _generate_nightly_customers(selling_slots: int) -> void:
     var rng := RandomNumberGenerator.new()
     rng.randomize()
     var count := _selling_slots_to_count(rng, selling_slots)
-    SaveManager.nightly_customers = Customer.generate_for_night(
+    nightly_customers = Customer.generate_for_night(
         rng,
-        SaveManager.storage_items,
+        storage_items,
         count,
     )
 
@@ -148,17 +204,17 @@ func resolve_customer_sale(
     var sold_ids: Array[int] = []
     for entry: ItemEntry in items:
         sold_ids.append(entry.id)
-        SaveManager.storage_items.erase(entry)
+        storage_items.erase(entry)
         KnowledgeManager.add_category_points(
             entry.item_data.category_data,
             entry.item_data.rarity,
             KnowledgeManager.KnowledgeAction.SELL,
         )
-    SaveManager.cash += sale_price
+    cash += sale_price
 
-    SaveManager.customer_sales_today.append(
+    customer_sales_today.append(
         {
-            "day": SaveManager.current_day,
+            "day": current_day,
             "customer_id": customer.customer_id if customer != null else "",
             "customer_name": customer.display_name if customer != null else "",
             "strategy": strategy,
@@ -169,7 +225,7 @@ func resolve_customer_sale(
     )
 
     if customer != null:
-        SaveManager.nightly_customers.erase(customer)
+        nightly_customers.erase(customer)
 
     SaveManager.save()
 
@@ -184,12 +240,12 @@ func resolve_customer_sale(
 func repair_item(entry: ItemEntry) -> bool:
     if entry == null:
         return false
-    if SaveManager.storage_ap < Economy.REPAIR_AP_COST:
+    if storage_ap < Economy.REPAIR_AP_COST:
         return false
     if ResearchSlot.is_repair_complete(entry):
         return false
     ResearchSlot.apply_repair(entry)
-    SaveManager.storage_ap -= Economy.REPAIR_AP_COST
+    storage_ap -= Economy.REPAIR_AP_COST
     SaveManager.save()
     return true
 
@@ -200,14 +256,14 @@ func repair_item(entry: ItemEntry) -> bool:
 func restore_item(entry: ItemEntry) -> bool:
     if entry == null:
         return false
-    if SaveManager.storage_ap < Economy.RESTORE_AP_COST:
+    if storage_ap < Economy.RESTORE_AP_COST:
         return false
     if entry.condition < 0.5:
         return false
     if ResearchSlot.is_restore_complete(entry):
         return false
     ResearchSlot.apply_restore(entry)
-    SaveManager.storage_ap -= Economy.RESTORE_AP_COST
+    storage_ap -= Economy.RESTORE_AP_COST
     SaveManager.save()
     return true
 
@@ -220,7 +276,7 @@ func restore_item(entry: ItemEntry) -> bool:
 func research_item(entry: ItemEntry) -> bool:
     if entry == null:
         return false
-    if SaveManager.storage_ap < Economy.RESEARCH_AP_COST:
+    if storage_ap < Economy.RESEARCH_AP_COST:
         return false
     if entry.condition < 0.5:
         return false
@@ -229,7 +285,7 @@ func research_item(entry: ItemEntry) -> bool:
     var investigation_attr := KnowledgeManager.get_attribute_value("investigation")
     var progress_amount: int = 5 + investigation_attr
     entry.advance_research(progress_amount)
-    SaveManager.storage_ap -= Economy.RESEARCH_AP_COST
+    storage_ap -= Economy.RESEARCH_AP_COST
     SaveManager.save()
     return true
 
@@ -239,20 +295,20 @@ func research_item(entry: ItemEntry) -> bool:
 func buy_car(car: CarData) -> bool:
     if car == null:
         return false
-    if SaveManager.owned_cars.has(car):
+    if owned_cars.has(car):
         return false
-    if SaveManager.cash < car.price:
+    if cash < car.price:
         return false
-    SaveManager.cash -= car.price
-    SaveManager.owned_cars.append(car)
+    cash -= car.price
+    owned_cars.append(car)
     SaveManager.save()
     return true
 
 
 func set_active_car(car: CarData) -> void:
-    if car == SaveManager.active_car:
+    if car == active_car:
         return
-    SaveManager.active_car = car
+    active_car = car
     SaveManager.save()
 
 # ══ Run resolution ════════════════════════════════════════════════════════════
@@ -266,7 +322,7 @@ func set_active_car(car: CarData) -> void:
 ## after this returns. The day summary fires when the player chooses Open Shop
 ## or all slots are exhausted from the hub.
 func resolve_run(record: RunRecord) -> void:
-    SaveManager.cash += record.onsite_proceeds - record.paid_price - record.entry_fee - record.fuel_cost
+    cash += record.onsite_proceeds - record.paid_price - record.entry_fee - record.fuel_cost
 
     # Auto-reveal all surface clues on hub return (Phase 7).
     for entry: ItemEntry in record.cargo_items:
@@ -275,8 +331,8 @@ func resolve_run(record: RunRecord) -> void:
     register_storage_items(record.cargo_items)
 
     # Stash run economics so end_day can fold them into the day summary.
-    # Persisted on SaveManager so a quit before end_day doesn't drop them.
-    SaveManager.pending_run = {
+    # Persisted so a quit before end_day doesn't drop them.
+    pending_run = {
         "onsite_proceeds": record.onsite_proceeds,
         "paid_price": record.paid_price,
         "entry_fee": record.entry_fee,
@@ -285,7 +341,7 @@ func resolve_run(record: RunRecord) -> void:
     }
 
     # Auction consumed morning + afternoon; player returns for the evening slot.
-    SaveManager.current_slot = 3
+    current_slot = 3
     SaveManager.save()
 
     RunManager.clear_run_state()

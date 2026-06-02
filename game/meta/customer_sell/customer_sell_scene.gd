@@ -1,6 +1,6 @@
 # customer_sell_scene.gd
 # Phase 9 nightly customer sell scene — tag matching, car packing, sell strategy.
-# Reads:  SaveManager.nightly_customers, SaveManager.storage_items
+# Reads:  MetaManager.nightly_customers, MetaManager.storage_items
 # Writes: MetaManager.resolve_customer_sale()
 extends Control
 
@@ -62,14 +62,14 @@ func _ready() -> void:
     _grid.hover_started.connect(_on_grid_hover_started)
     _grid.hover_ended.connect(_on_grid_hover_ended)
 
-    _customers = SaveManager.nightly_customers.duplicate()
+    _customers = MetaManager.nightly_customers.duplicate()
 
     if _customers.is_empty():
         _empty_label.visible = true
         _main_area.visible = false
         return
 
-    _day_label.text = "Day %d" % SaveManager.current_day
+    _day_label.text = "Day %d" % MetaManager.current_day
     _build_customer_tabs()
     _select_customer(0)
 
@@ -156,7 +156,7 @@ func _rebuild_item_list(c: Customer) -> void:
     _item_rows.clear()
     _item_colors.clear()
 
-    var matched: Array = SellMath.matched_items(c, SaveManager.storage_items)
+    var matched: Array = SellMath.matched_items(c, MetaManager.storage_items)
     if matched.is_empty():
         var lbl := Label.new()
         lbl.text = "No matching items in storage."

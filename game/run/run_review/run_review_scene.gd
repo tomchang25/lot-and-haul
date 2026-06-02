@@ -2,7 +2,7 @@
 # Block 06 — Run Review
 # Reads:  RunManager.run_record.cargo_items, RunManager.run_record.paid_price,
 #         RunManager.run_record.onsite_proceeds
-# Writes: SaveManager.cash, SaveManager.storage_items
+# Writes: MetaManager.cash, MetaManager.storage_items (via MetaManager.resolve_run)
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────

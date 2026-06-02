@@ -316,7 +316,7 @@ func _resolve() -> void:
 func _refresh_budget() -> void:
     var record := RunManager.run_record
     var committed := record.paid_price + record.entry_fee + record.fuel_cost
-    var remaining := maxi(SaveManager.cash - committed, 0)
+    var remaining := maxi(MetaManager.cash - committed, 0)
     _budget_label.text = "Budget: $%d" % remaining
 
 # ══ Display helpers ════════════════════════════════════════════════════════════

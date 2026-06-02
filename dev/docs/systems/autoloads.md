@@ -20,9 +20,9 @@ Listed in `project.godot` load order. `RegistryCoordinator` orchestrates boot: e
 | `LocationRegistry`      | `global/autoload/registries/location_registry.gd`       | Loads all `LocationData` `.tres`.                                                                                                        |
 | `CategoryRegistry`      | `global/autoload/registries/category_registry.gd`       | Loads all `CategoryData` `.tres`; owns `get_super_category_for`.                                                                         |
 | `SuperCategoryRegistry` | `global/autoload/registries/super_category_registry.gd` | Loads all `SuperCategoryData` `.tres`; builds the `super_category → Array[CategoryData]` index. Asserts `CategoryRegistry` loaded first. |
-| `KnowledgeManager`      | `global/autoload/knowledge_manager.gd`                  | Category mastery (passive XP via `add_category_points`), attribute values (`get_attribute_value`), and perks. Replaces the skill pillar. |
-| `SaveManager`           | `global/autoload/save_manager.gd`                       | Persistent cross-run data; serialization only. Holds no day-advance logic.                                                               |
-| `MetaManager`           | `global/autoload/meta_manager.gd`                       | Hub-phase transactional authority: day advance, storage registration, research slots, customer sales, car purchases.                     |
+| `KnowledgeManager`      | `global/autoload/knowledge_manager.gd`                  | Owns `category_points`, `attribute_levels`, and `unlocked_perks`; provides the `knowledge` save section. Category mastery, attribute upgrades, and perk management. |
+| `SaveManager`           | `global/autoload/save_manager.gd`                       | Thin persistence coordinator: file IO, schema handling, schema-1→2 knowledge migration, legacy flat-save dispatch, and calls to registered section providers. Holds no gameplay state.                     |
+| `MetaManager`           | `global/autoload/meta_manager.gd`                       | Hub-phase transactional authority. Owns all meta-progression runtime state (cash, garage, storage, slot, progress, customers) and registers six save section providers with SaveManager.                  |
 | `GameManager`           | `global/autoload/game_manager/`                         | Scene transitions only. `go_to_*()` methods; runs `RegistryCoordinator` migrations/validation at boot.                                   |
 
 ### Constants (accessed by `class_name`, not autoloads)
@@ -48,22 +48,25 @@ Static helper that loads every `.tres` in a directory into an `{ id → Resource
 
 ## SaveManager
 
-Persists to `user://save.json`. **Serialization only** — it holds no day-advance or transaction logic (that's `MetaManager`). It persists the cross-run state: progression (category points, attribute levels, unlocked perks), economy (cash, owned/active car), storage items (each with its per-clue `research_progress`), available locations, the current day, the day's slot/AP state (`current_slot`, `storage_ap`, `selling_slots_today`) and pending-run economics, the monotonic entry id, and the current night's customers + sale ledger. Field list in `save_manager.gd`. The slot/AP model is described in `day_slot_economy.md`.
+Thin persistence coordinator. Persists to `user://save.json`. Holds no gameplay state — state lives on the systems that own and mutate it. Responsibilities: file read/write, schema version detection, schema-1→2 knowledge key relocation, legacy flat-save dispatch (pre-sections format), and iterating registered section providers. Systems register as section providers via `register_section(provider)` in their own `_ready()`; `GameManager._ready()` calls `SaveManager.load()` after all autoloads are ready. The slot/AP model is described in `day_slot_economy.md`.
+
+Save-file schema:
+- Schema 1 — sectioned format; `category_points`, `attribute_levels`, `unlocked_perks` nested inside the `economy` section.
+- Schema 2 — `economy` holds cash only; `knowledge` is a standalone section owned by `KnowledgeManager`.
 
 ### Migrations on load
 
-- `skill_levels` (old) → discarded; `attribute_levels` starts fresh.
+- Schema 1 → 2: coordinator relocates knowledge keys from `economy` into `knowledge` before dispatch; no data loss.
+- `skill_levels` (old) → `KnowledgeManager.from_dict` discards and starts fresh.
 - `super_cat_means` / `category_factors_today` (removed MarketManager) → silently ignored.
-- `research_slots` (the old day-ticker lifecycle) → discarded; any in-flight `research_days_spent` is converted into per-clue `ItemEntry.research_progress` so partial work isn't lost.
-- Legacy merchant save keys (`merchant_negotiations_used_today`, `merchant_orders`, `next_order_id`) → silently ignored on load.
-
-Storage registration, location rolling, slot transitions, storage AP actions, and all trade operations live on `MetaManager` (below); `SaveManager` itself only exposes save and load.
+- `research_slots` (old day-ticker) → `MetaManager._StorageSection` converts `research_days_spent` into per-clue `ItemEntry.research_progress` so partial work isn't lost.
+- Legacy merchant keys (`merchant_negotiations_used_today`, `merchant_orders`, `next_order_id`) → silently ignored.
 
 ---
 
 ## MetaManager
 
-Hub-phase transactional authority. Mutates `SaveManager` state and saves; delegates computation to value objects / pure helpers. It is the single authority for slot progression: storage registration (assigning ids; auto-verify items reveal hidden clues on entry), rolling available locations, the slot transitions (begin a Storage slot, begin an Auction, begin Open Shop), the immediate storage AP actions (Repair / Restore / Research), the day-end sequence (advance the calendar day → deduct living cost once → fold pending-run economics and customer sales → reset slot state → save, returning a `DaySummary`), committing customer sales, car purchase + active swap, and run settlement (cash, surface auto-reveal, cargo storage; stashes run economics as pending). Signatures in `meta_manager.gd`; the slot/AP rules live in `day_slot_economy.md`.
+Hub-phase transactional authority and owner of meta-progression runtime state. Registers six save section providers with SaveManager (`economy`, `garage`, `storage`, `progress`, `slot`, `customers`) via inner section classes that read/write MetaManager fields. It is the single authority for: storage registration (assigning ids; auto-verify items reveal hidden clues on entry), rolling available locations, slot transitions (begin Storage slot, begin Auction, begin Open Shop), immediate storage AP actions (Repair / Restore / Research), the day-end sequence (advance calendar day → deduct living cost → fold pending-run economics and customer sales → reset slot state → save, returning a `DaySummary`), committing customer sales, car purchase + active swap, and run settlement (cash, surface auto-reveal, cargo storage; stashes run economics as pending). Signatures in `meta_manager.gd`; slot/AP rules live in `day_slot_economy.md`.
 
 ### Storage AP actions
 
