@@ -2,11 +2,15 @@
 
 Append-only record of shipped work. This is the project's permanent "done" history.
 
-**Why this file exists:** it is the single home for "what got built." Because it is append-only — you only ever add entries, never reconcile them against current code — it cannot go stale. This is what lets every other tracking surface stay forward-only: `systems/` describes the system as it *is* (present tense, no Done lists) and `TODO.md` holds only open work (`## Active` in-flight flows, `Plan`/`Chore`/`Bug`, and `## Draft` concepts), with multi-step flows detailed in `dev/docs/plans/` files. When a phase ships, append one entry here, then cut that phase from its plan file; when a whole flow ships, also delete its `TODO.md` line.
+**Why this file exists:** it is the single home for "what got built." Because it is append-only — you only ever add entries, never reconcile them against current code — it cannot go stale. This is what lets every other tracking surface stay forward-only: `systems/` describes the system as it _is_ (present tense, no Done lists) and `TODO.md` holds only open work (`## Active` in-flight flows, `Plan`/`Chore`/`Bug`, and `## Draft` concepts), with multi-step flows detailed in `dev/docs/plans/` files. When a phase ships, append one entry here, then cut that phase from its plan file; when a whole flow ships, also delete its `TODO.md` line.
 
 This file is the single source of truth for the entry format. Each entry: `- YYYY-MM-DD — [scope] one-line summary (commit/PR ref)`. Group related entries under a `## <Title>` heading — title only, no "Phase"/"Stage" wording.
 
 ---
+
+## Meta Domain Decomposition
+
+- 2026-06-02 — [meta] MetaManager decomposed into six domain owners (EconomyOwner, GarageOwner, StorageOwner, SlotOwner, ProgressOwner, CustomersOwner) under global/autoload/meta_manager/; each owns its fields and save payload with sanitize-on-load warnings for unresolved ids; MetaManager exposes transparent proxy properties (GDScript 4 get/set) so all scenes and autoloads need no changes; CarRegistry and LocationRegistry validate() stripped of live-state reads; ItemEntry.from_dict push_error softened to push_warning; six SaveSection adapter files retired to tombstubs
 
 ## Save State Ownership Refactor
 

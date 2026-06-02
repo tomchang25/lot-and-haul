@@ -4,7 +4,6 @@
 # LocationRegistry.get_all_locations().
 extends ResourceRegistry
 
-
 func _dir_path() -> String:
     return DataPaths.LOCATIONS_DIR
 
@@ -13,15 +12,14 @@ func _id_of(r: Resource) -> String:
     return (r as LocationData).location_id if r is LocationData else ""
 
 
+## Validates content well-formedness: location pool category and super-category
+## weights reference known ids. Referential integrity for live available_locations
+## is handled by ProgressOwner.from_dict() on load.
 func validate() -> bool:
     var ok := true
     if size() == 0:
         push_error("LocationRegistry: registry is empty")
         ok = false
-    for location: LocationData in MetaManager.available_locations:
-        if location == null:
-            push_error("LocationRegistry: MetaManager.available_locations contains a null entry")
-            ok = false
     for location: LocationData in get_all():
         for lot: LotData in location.lot_pool:
             for key: String in lot.category_weights.keys():

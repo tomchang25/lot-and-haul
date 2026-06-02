@@ -4,7 +4,6 @@
 # CarRegistry.get_all_cars().
 extends ResourceRegistry
 
-
 func _dir_path() -> String:
     return DataPaths.CARS_DIR
 
@@ -13,9 +12,9 @@ func _id_of(r: Resource) -> String:
     return (r as CarData).car_id if r is CarData else ""
 
 
-# Idempotent migration: guarantees a fresh save gets the starter van, and
-# repairs saves whose active_car no longer resolves (e.g. the car was
-# removed from the data pipeline). Safe to re-run.
+## Idempotent migration: guarantees a fresh save gets the starter van.
+## GarageOwner.from_dict() sanitizes unresolved ids on load; migrate() handles
+## only the default-state case where no cars have been persisted yet.
 func migrate() -> void:
     if MetaManager.owned_cars.is_empty():
         var van: CarData = get_car_by_id("van_basic")
@@ -30,13 +29,6 @@ func validate() -> bool:
     if size() == 0:
         push_error("CarRegistry: registry is empty")
         ok = false
-    if MetaManager.active_car == null:
-        push_error("CarRegistry: MetaManager.active_car is null")
-        ok = false
-    for car: CarData in MetaManager.owned_cars:
-        if car == null:
-            push_error("CarRegistry: MetaManager.owned_cars contains a null entry")
-            ok = false
     return ok
 
 

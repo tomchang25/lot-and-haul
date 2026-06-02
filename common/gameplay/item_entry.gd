@@ -60,7 +60,7 @@ var revealed_clue_ids: Array[String] = []
 ## Accumulated research progress toward each hidden clue, keyed by clue_id.
 ## Each Research AP spend adds (5 + investigation attribute) to the target clue's
 ## entry. The clue reveals once progress >= clue.dc. Persists across slots and days.
-var research_progress: Dictionary = {}
+var research_progress: Dictionary = { }
 
 # ══ Clue helpers ══════════════════════════════════════════════════════════════
 
@@ -694,7 +694,7 @@ func to_dict() -> Dictionary:
 static func from_dict(d: Dictionary) -> ItemEntry:
     var data: ItemData = ItemRegistry.get_item_by_id(d["item_id"])
     if data == null:
-        push_error("ItemEntry: item not found for id '%s'" % d["item_id"])
+        push_warning("ItemEntry: item_id '%s' not found — entry dropped" % d["item_id"])
         return null
     var entry := ItemEntry.new()
     entry.item_data = data

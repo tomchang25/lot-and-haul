@@ -1,44 +1,54 @@
-# storage_save_section.gd
-# Save section: storage state — owned ItemEntry instances and the monotonic
-# next_entry_id counter. Also carries the legacy research_slots migration (only
-# present in pre-time-slot flat saves). Reads/writes the MetaManager singleton;
-# registered with SaveManager as the "storage" section.
-class_name StorageSaveSection
+# storage_owner.gd
+# Storage domain owner: owned ItemEntry instances and the monotonic next_entry_id
+# counter. Owns the fields and their save payload. Held by MetaManager; not a
+# global singleton.
+class_name StorageOwner
 extends RefCounted
 
+## Array of ItemEntry instances the player currently owns in storage.
+var storage_items: Array = []
 
-## Unique key for this section in the JSON save file.
+## Monotonically increasing counter; never reset. Assigned to ItemEntry.id on
+## registration so each entry has a unique id across the save's lifetime.
+var next_entry_id: int = 0
+
+
+## Section id for the storage save payload.
 func section_id() -> String:
     return "storage"
 
 
+## Serializes storage state to a save payload.
 func to_dict() -> Dictionary:
     var serialized_items: Array = []
-    for entry: ItemEntry in MetaManager.storage_items:
+    for entry: ItemEntry in storage_items:
         serialized_items.append(entry.to_dict())
     return {
         "storage_items": serialized_items,
-        "next_entry_id": MetaManager.next_entry_id,
+        "next_entry_id": next_entry_id,
     }
 
 
+## Restores storage state. ItemEntry instances for unknown item ids are dropped
+## with a warning (push_warning in ItemEntry.from_dict). Includes migration for
+## legacy research_slots saves.
 func from_dict(data: Dictionary) -> void:
     if data.has("storage_items") and data["storage_items"] is Array:
-        MetaManager.storage_items = []
+        storage_items = []
         for d: Variant in data["storage_items"]:
             if not d is Dictionary:
                 continue
             var entry: ItemEntry = ItemEntry.from_dict(d)
-            if entry != null:
-                entry.apply_storage_migration()
-                MetaManager.storage_items.append(entry)
+            if entry == null:
+                continue
+            entry.apply_storage_migration()
+            storage_items.append(entry)
     if data.has("next_entry_id") and data["next_entry_id"] is float:
-        MetaManager.next_entry_id = int(data["next_entry_id"])
+        next_entry_id = int(data["next_entry_id"])
 
     # ── Migration: discard legacy research_slots ──────────────────────────────
-    # Old (pre-time-slot) flat saves carried a research_slots array. That array
-    # is retired; partial research state is seeded into ItemEntry.research_progress
-    # so no player work is lost. Absent from modern sectioned saves.
+    # Old (pre-time-slot) flat saves carried a research_slots array. Absent from
+    # modern sectioned saves.
     if data.has("research_slots") and data["research_slots"] is Array:
         _migrate_research_slots(data["research_slots"])
 
@@ -60,12 +70,16 @@ func _migrate_research_slots(slots: Array) -> void:
         var item_id: int = int(d.get("item_id", -1))
         if item_id == -1:
             continue
-        var days_spent: int = int(d.get("research_days_spent",
-            d.get("authenticate_days_spent", 0)))
+        var days_spent: int = int(
+            d.get(
+                "research_days_spent",
+                d.get("authenticate_days_spent", 0),
+            ),
+        )
         if days_spent <= 0:
             continue
         var entry: ItemEntry = null
-        for e: ItemEntry in MetaManager.storage_items:
+        for e: ItemEntry in storage_items:
             if e.id == item_id:
                 entry = e
                 break
