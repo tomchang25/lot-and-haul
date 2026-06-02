@@ -87,12 +87,7 @@ func _ready() -> void:
     _slot = SlotOwner.new()
     _progress = ProgressOwner.new()
     _customers = CustomersOwner.new()
-    SaveManager.register_section(_economy)
-    SaveManager.register_section(_garage)
-    SaveManager.register_section(_storage)
-    SaveManager.register_section(_progress)
-    SaveManager.register_section(_slot)
-    SaveManager.register_section(_customers)
+    SaveManager.register_sections([_economy, _garage, _storage, _progress, _slot, _customers])
 
 # ══ Cross-autoload cash helper ════════════════════════════════════════════════
 

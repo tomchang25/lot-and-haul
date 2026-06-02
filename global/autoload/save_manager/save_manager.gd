@@ -31,6 +31,12 @@ func register_section(section: Object) -> void:
     _sections.append(section)
 
 
+## Registers several section providers in order. Convenience over register_section.
+func register_sections(sections: Array) -> void:
+    for s: Object in sections:
+        register_section(s)
+
+
 func save() -> void:
     var sections_out: Dictionary = {}
     for section: Object in _sections:

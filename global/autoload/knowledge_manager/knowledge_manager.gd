@@ -39,7 +39,7 @@ func _ready() -> void:
     _load_perk_registry()
     _load_attribute_registry()
     _knowledge = KnowledgeOwner.new()
-    SaveManager.register_section(_knowledge)
+    SaveManager.register_sections([_knowledge])
     RegistryCoordinator.register(self)
 
 # ── Registry validation ────────────────────────────────────────────────────────
