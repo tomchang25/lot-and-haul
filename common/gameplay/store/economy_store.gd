@@ -1,7 +1,7 @@
-# economy_owner.gd
-# Economy domain owner: cash. Owns the field, its save payload, and all
-# operations that mutate it. Held by MetaManager; not a global singleton.
-class_name EconomyOwner
+# economy_store.gd
+# Economy runtime store: cash. Serializable state slice held by MetaManager.
+# Owns the field, its save payload, and all operations that mutate it.
+class_name EconomyStore
 extends RefCounted
 
 var cash: int = 0

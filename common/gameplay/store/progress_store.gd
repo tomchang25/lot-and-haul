@@ -1,8 +1,8 @@
-# progress_owner.gd
-# Progress domain owner: calendar day and sampled available locations. Owns the
-# fields, their save payload, and the operations that mutate them. Held by
-# MetaManager; not a global singleton.
-class_name ProgressOwner
+# progress_store.gd
+# Progress runtime store: calendar day and sampled available locations.
+# Serializable state slice held by MetaManager. Owns the fields, their save
+# payload, and the operations that mutate them.
+class_name ProgressStore
 extends RefCounted
 
 ## Calendar day counter. Starts at 0, incremented by end_day().
@@ -55,7 +55,7 @@ func from_dict(data: Dictionary) -> void:
             var loc := LocationRegistry.get_location_by_id(id_variant as String)
             if loc == null:
                 push_warning(
-                    "ProgressOwner: available_location_id '%s' not found — dropped" % id_variant,
+                    "ProgressStore: available_location_id '%s' not found — dropped" % id_variant,
                 )
                 continue
             available_locations.append(loc)

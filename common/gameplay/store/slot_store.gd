@@ -1,8 +1,8 @@
-# slot_owner.gd
-# Slot-flow domain owner: current slot, storage AP, committed selling slots, and
-# pending run economics. Owns the fields, their save payload, and the phase
-# operations that mutate them. Held by MetaManager; not a global singleton.
-class_name SlotOwner
+# slot_store.gd
+# Slot-flow runtime store: current slot, storage AP, committed selling slots,
+# and pending run economics. Serializable state slice held by MetaManager.
+# Owns the fields, their save payload, and the phase operations that mutate them.
+class_name SlotStore
 extends RefCounted
 
 ## Current slot index within the active day (1 = Morning, 2 = Afternoon,

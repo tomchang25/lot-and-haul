@@ -13,7 +13,7 @@ func _id_of(r: Resource) -> String:
 
 
 ## Idempotent migration: guarantees a fresh save gets the starter van.
-## GarageOwner.from_dict() sanitizes unresolved ids on load; migrate() handles
+## GarageStore.from_dict() sanitizes unresolved ids on load; migrate() handles
 ## only the default-state case where no cars have been persisted yet.
 func migrate() -> void:
     if MetaManager.owned_cars.is_empty():

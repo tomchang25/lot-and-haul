@@ -1,8 +1,8 @@
-# storage_owner.gd
-# Storage domain owner: owned ItemEntry instances and the monotonic next_entry_id
-# counter. Owns the fields and their save payload. Held by MetaManager; not a
-# global singleton.
-class_name StorageOwner
+# storage_store.gd
+# Storage runtime store: owned ItemEntry instances and the monotonic
+# next_entry_id counter. Serializable state slice held by MetaManager.
+# Owns the fields and their save payload.
+class_name StorageStore
 extends RefCounted
 
 ## Array of ItemEntry instances the player currently owns in storage.

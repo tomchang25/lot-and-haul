@@ -20,9 +20,9 @@ Listed in `project.godot` load order. `RegistryCoordinator` orchestrates boot: e
 | `LocationRegistry`      | `global/autoload/registries/location_registry.gd`       | Loads all `LocationData` `.tres`.                                                                                                        |
 | `CategoryRegistry`      | `global/autoload/registries/category_registry.gd`       | Loads all `CategoryData` `.tres`; owns `get_super_category_for`.                                                                         |
 | `SuperCategoryRegistry` | `global/autoload/registries/super_category_registry.gd` | Loads all `SuperCategoryData` `.tres`; builds the `super_category → Array[CategoryData]` index. Asserts `CategoryRegistry` loaded first. |
-| `KnowledgeManager`      | `global/autoload/knowledge_manager.gd`                  | Owns `category_points`, `attribute_levels`, and `unlocked_perks`; provides the `knowledge` save section. Category mastery, attribute upgrades, and perk management. |
+| `KnowledgeManager`      | `global/autoload/knowledge_manager/`                    | Delegates persistent state to `KnowledgeStore`. Category mastery, attribute upgrades, and perk management; registers the Store for the `knowledge` save section. |
 | `SaveManager`           | `global/autoload/save_manager.gd`                       | Thin persistence coordinator: file IO, schema handling, schema-1→2 knowledge migration, legacy flat-save dispatch, and calls to registered section providers. Holds no gameplay state.                     |
-| `MetaManager`           | `global/autoload/meta_manager.gd`                       | Hub-phase transactional authority. Owns all meta-progression runtime state (cash, garage, storage, slot, progress, customers) and registers six save section providers with SaveManager.                  |
+| `MetaManager`           | `global/autoload/meta_manager.gd`                       | Hub-phase transactional authority. Holds six runtime Stores (cash, garage, storage, slot, progress, customers) and registers them as save sections with SaveManager.                                      |
 | `GameManager`           | `global/autoload/game_manager/`                         | Scene transitions only. `go_to_*()` methods; runs `RegistryCoordinator` migrations/validation at boot.                                   |
 
 ### Constants (accessed by `class_name`, not autoloads)
@@ -59,25 +59,25 @@ Save-file schema:
 - Schema 1 → 2: coordinator relocates knowledge keys from `economy` into `knowledge` before dispatch; no data loss.
 - `skill_levels` (old) → `KnowledgeManager.from_dict` discards and starts fresh.
 - `super_cat_means` / `category_factors_today` (removed MarketManager) → silently ignored.
-- `research_slots` (old day-ticker) → `MetaManager._StorageSection` converts `research_days_spent` into per-clue `ItemEntry.research_progress` so partial work isn't lost.
+- `research_slots` (old day-ticker) → `StorageStore.from_dict` converts `research_days_spent` into per-clue `ItemEntry.research_progress` so partial work isn't lost.
 - Legacy merchant keys (`merchant_negotiations_used_today`, `merchant_orders`, `next_order_id`) → silently ignored.
 
 ---
 
 ## MetaManager
 
-Hub-phase transactional authority. Owns six domain objects (`EconomyOwner`, `GarageOwner`, `StorageOwner`, `SlotOwner`, `ProgressOwner`, `CustomersOwner`) held in `global/autoload/meta_manager/`. Each owner owns its domain's live fields, its save payload (registered directly with `SaveManager` in `_ready()`), and the no-save mutator methods that protect its invariants. `MetaManager` itself is a thin coordinator: it exposes getter-only proxy properties for scenes, holds cross-domain transactions that call owner methods and commit exactly one `SaveManager.save()` at the transaction's tail, and contains no raw field arithmetic.
+Hub-phase transactional authority. Holds six runtime stores (`EconomyStore`, `GarageStore`, `StorageStore`, `SlotStore`, `ProgressStore`, `CustomersStore`) now living in `common/gameplay/`. Each store owns its domain's live fields, its save payload (registered with `SaveManager` in `_ready()`), and the no-save mutator methods that protect its invariants. `MetaManager` itself is a thin coordinator: it exposes getter-only proxy properties for scenes, holds cross-domain transactions that call store methods and commit exactly one `SaveManager.save()` at the transaction's tail, and contains no raw field arithmetic.
 
-Domain owners and their invariants:
+Domain stores and their invariants:
 
-| Owner | Fields | Key invariants |
+| Store | Fields | Key invariants |
 |---|---|---|
-| `EconomyOwner` | `cash` | `spend()` refuses to go negative; `apply_delta()` for allowed-negative ops (daily cost, run losses) |
-| `GarageOwner` | `active_car`, `owned_cars` | `add_car()` is idempotent; `set_active()` owns the swap |
-| `StorageOwner` | `storage_items`, `next_entry_id` | `register_entry()` assigns monotonic id + auto-verifies; `remove_entries()` returns removed ids |
-| `SlotOwner` | `current_slot`, `storage_ap`, `selling_slots_today`, `pending_run` | `charge_ap()` called only after effect lands; `stash_pending_run()` builds the economics dict |
-| `ProgressOwner` | `current_day`, `available_locations` | `advance_day()` increments; `set_locations()` / `clear_locations()` own the sample |
-| `CustomersOwner` | `nightly_customers`, `customer_sales_today` | `record_sale()` appends ledger; `clear_sales()` resets it |
+| `EconomyStore` | `cash` | `spend()` refuses to go negative; `apply_delta()` for allowed-negative ops (daily cost, run losses) |
+| `GarageStore` | `active_car`, `owned_cars` | `add_car()` is idempotent; `set_active()` owns the swap |
+| `StorageStore` | `storage_items`, `next_entry_id` | `register_entry()` assigns monotonic id + auto-verifies; `remove_entries()` returns removed ids |
+| `SlotStore` | `current_slot`, `storage_ap`, `selling_slots_today`, `pending_run` | `charge_ap()` called only after effect lands; `stash_pending_run()` builds the economics dict |
+| `ProgressStore` | `current_day`, `available_locations` | `advance_day()` increments; `set_locations()` / `clear_locations()` own the sample |
+| `CustomersStore` | `nightly_customers`, `customer_sales_today` | `record_sale()` appends ledger; `clear_sales()` resets it |
 
 Proxy properties for reference-type collections (`storage_items`, `owned_cars`, `nightly_customers`, `customer_sales_today`, `available_locations`) return shallow duplicates so callers cannot mutate live storage through the returned array. Value-type properties (`cash`, `current_slot`, etc.) return the scalar directly. No proxy has a setter — `MetaManager.<field> = x` is a compile error by design.
 

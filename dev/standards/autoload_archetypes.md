@@ -23,8 +23,8 @@ the role.
 | **Composition Root** (`GameManager` / `AppManager`)    | Boot order: load save, run migrations/validation/audit, initialize systems, hand off to the first scene.                                                             | No                                | Yes                         |
 | **Router** (`SceneRouter`)                             | Scene transitions and short-lived navigation payloads (e.g. a pending hand-off).                                                                                     | No (only ephemeral nav payload)   | Yes                         |
 | **Persistence Coordinator** (`SaveManager`)            | File IO, schema/migration, dispatch to registered providers. The _only_ system that touches the save file.                                                           | No                                | Yes                         |
-| **Domain Manager** (`MetaManager`, `KnowledgeManager`) | One cohesive runtime domain. Holds its Owner(s), exposes a focused command/query API, sequences its domain's transactions (and may call peer Managers' public APIs), registers its Owners for save. | Indirectly, through its Owners    | Yes                         |
-| **Owner** (`EconomyOwner`, …)                          | A persistent state slice: its fields, its invariants, its mutators, and its own `section_id`/`to_dict`/`from_dict`.                                                  | Yes (the actual state lives here) | **Never**                   |
+| **Domain Manager** (`MetaManager`, `KnowledgeManager`) | One cohesive runtime domain. Holds its Store(s), exposes a focused command/query API, sequences its domain's transactions (and may call peer Managers' public APIs), registers its Stores for save. | Indirectly, through its Stores    | Yes                         |
+| **Store** (`EconomyStore`, …)                          | A serializable runtime state slice: its fields, its invariants, its mutators, and its own `section_id`/`to_dict`/`from_dict`. Lives in `common/gameplay/`.           | Yes (the actual state lives here) | **Never**                   |
 | **Coordinator** (`RegistryCoordinator`)                | A registry of peers plus lifecycle fan-out (migrate/validate). Holds no domain state. A state-light Service that knows its participants.                             | No                                | Yes                         |
 | **Registry** (`*Registry`)                             | Load and query of designer resources. No live gameplay state.                                                                                                        | No                                | Yes                         |
 | **Service** (`SellMath`, `*Rules`, `*Calculator`)      | Stateless policy, math, or helper. Takes inputs, returns outputs.                                                                                                    | No                                | No (called, not registered) |
@@ -41,25 +41,25 @@ same domain loop, the aggregate is correct.
 These are the rules that, when broken, rot the architecture. They are the reason
 the archetypes exist.
 
-1. **Owner is the only save section.** A Domain Manager registers the Owners it
+1. **Store is the only save section.** A Domain Manager registers the Stores it
    holds; a Manager or any other autoload is _never itself_ a save section. The
-   persistence coordinator therefore only ever sees Owners — never a mix of Owners
-   and autoload nodes. (Registration is a single call over the Manager's Owner
-   list, not one line per Owner.)
+   persistence coordinator therefore only ever sees Stores — never a mix of Stores
+   and autoload nodes. (Registration is a single call over the Manager's Store
+   list, not one line per Store.)
 
-2. **Owners never reach outward.** An Owner touches only its own domain's state,
-   invariants, and serialization. It never calls another Owner, a Manager, or the
-   persistence coordinator. An Owner is a boundary, not a dependency hub — the
-   moment Owners call each other they become a small God-Object network.
+2. **Stores never reach outward.** A Store touches only its own domain's state,
+   invariants, and serialization. It never calls another Store, a Manager, or the
+   persistence coordinator. A Store is a boundary, not a dependency hub — the
+   moment Stores call each other they become a small God-Object network.
 
 3. **One save per transaction, at the commit point.** The system that _sequences_
    a transaction (a Manager for a single-domain transaction, a use-case for a
-   cross-domain one) calls save exactly once, at the end. Owners never save;
+   cross-domain one) calls save exactly once, at the end. Stores never save;
    helpers and no-save primitives never save. This guarantees the persisted state
    is either pre- or post-transaction, never half-applied.
 
 4. **Transaction placement follows its span:**
-   - _Within one domain's Owners_ → a public method on that domain's Manager.
+   - _Within one domain's Stores_ → a public method on that domain's Manager.
    - _Across two or more Managers, and it mutates state_ → a public method on the
      Manager that owns the flow, calling the other Managers' **public APIs**
      directly; promote it to a thin **use-case** only if it earns its own file
@@ -103,12 +103,12 @@ Every global must answer these unambiguously:
 
 ```
 Does it own persistent gameplay state?
-  yes → Domain Manager (+ Owner[s])
+  yes → Domain Manager (+ Store[s])
   no  → Composition Root / Router / Coordinator / Registry / Service
 
 Does it write the save file?
   only the Persistence Coordinator does file IO
-  only Owners produce/consume section payloads
+  only Stores produce/consume section payloads
 
 Does it sequence cross-domain gameplay that mutates state?
   one domain      → a method on that Domain Manager
@@ -138,7 +138,7 @@ necessarily in every existing project.
 | Navigation              | `SceneRouter`                                  | `Router`                                |
 | Persistence             | `SaveManager`                                  | `Manager` (the persistence coordinator) |
 | Domain authority        | `<Domain>Manager`                              | `Manager`                               |
-| Persistent state slice  | `<Domain>Owner`                                | `Owner`                                 |
+| Persistent state slice  | `<Domain>Store`                                | `Store`                                 |
 | Peer lifecycle fan-out  | `<Thing>Coordinator`                           | `Coordinator`                           |
 | Designer data           | `<Thing>Registry`                              | `Registry`                              |
 | Stateless policy/math   | `<Thing>Rules` / `<Thing>Calculator` / `*Math` | none — never an autoload                |
@@ -150,6 +150,6 @@ necessarily in every existing project.
 These are **review-time** rules today. Consistent with `standards_enforcement.md`,
 a rule earns a machine check only once it has drifted enough to be worth one — none
 of these are pre-declared as future checks. Two are cheaply greppable if drift
-starts (a save provider that is an autoload node rather than an Owner; an Owner
+starts (a save provider that is an autoload node rather than a Store; a Store
 that calls a Manager/`SaveManager`); promote them to `lint_standards.py` only when
 that happens.

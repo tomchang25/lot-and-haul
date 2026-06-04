@@ -14,7 +14,7 @@ func _id_of(r: Resource) -> String:
 
 ## Validates content well-formedness: location pool category and super-category
 ## weights reference known ids. Referential integrity for live available_locations
-## is handled by ProgressOwner.from_dict() on load.
+## is handled by ProgressStore.from_dict() on load.
 func validate() -> bool:
     var ok := true
     if size() == 0:

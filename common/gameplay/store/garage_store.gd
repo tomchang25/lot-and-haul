@@ -1,8 +1,8 @@
-# garage_owner.gd
-# Garage domain owner: active car and owned car roster. Owns the fields, their
-# save payload, and operations that mutate them. Held by MetaManager; not a
-# global singleton.
-class_name GarageOwner
+# garage_store.gd
+# Garage runtime store: active car and owned car roster. Serializable state
+# slice held by MetaManager. Owns the fields, their save payload, and the
+# operations that mutate them.
+class_name GarageStore
 extends RefCounted
 
 var active_car: CarData = null
@@ -50,7 +50,7 @@ func from_dict(data: Dictionary) -> void:
         else:
             var car := CarRegistry.get_car_by_id(id)
             if car == null:
-                push_warning("GarageOwner: active_car_id '%s' not found — dropped" % id)
+                push_warning("GarageStore: active_car_id '%s' not found — dropped" % id)
             active_car = car
     if data.has("owned_car_ids") and data["owned_car_ids"] is Array:
         owned_cars = []
@@ -59,6 +59,6 @@ func from_dict(data: Dictionary) -> void:
                 continue
             var car := CarRegistry.get_car_by_id(id_variant as String)
             if car == null:
-                push_warning("GarageOwner: owned_car_id '%s' not found — dropped" % id_variant)
+                push_warning("GarageStore: owned_car_id '%s' not found — dropped" % id_variant)
                 continue
             owned_cars.append(car)

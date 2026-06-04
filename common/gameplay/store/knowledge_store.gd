@@ -1,8 +1,8 @@
-# knowledge_owner.gd
-# Knowledge domain owner: category mastery, attribute levels, and unlocked perks.
-# Owns the three persistent fields, their serialization, and no-save mutators.
-# Held by KnowledgeManager; not a global singleton.
-class_name KnowledgeOwner
+# knowledge_store.gd
+# Knowledge runtime store: category mastery, attribute levels, and unlocked
+# perks. Serializable state slice held by KnowledgeManager. Owns the three
+# persistent fields, their serialization, and no-save mutators.
+class_name KnowledgeStore
 extends RefCounted
 
 ## Per-category mastery points. Keys are category IDs (String), values are int.

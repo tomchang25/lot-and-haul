@@ -1,8 +1,8 @@
-# customers_owner.gd
-# Customers domain owner: nightly customers and the day's sale ledger. Owns the
-# fields, their save payload, and the operations that mutate them. Held by
-# MetaManager; not a global singleton.
-class_name CustomersOwner
+# customers_store.gd
+# Customers runtime store: nightly customers and the day's sale ledger.
+# Serializable state slice held by MetaManager. Owns the fields, their save
+# payload, and the operations that mutate them.
+class_name CustomersStore
 extends RefCounted
 
 ## Customers generated for the current night.

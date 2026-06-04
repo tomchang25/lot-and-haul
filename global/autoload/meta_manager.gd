@@ -1,20 +1,20 @@
 # meta_manager.gd
-# Hub-phase transactional authority. Holds six domain owners (EconomyOwner,
-# GarageOwner, StorageOwner, SlotOwner, ProgressOwner, CustomersOwner); each
+# Hub-phase transactional authority. Holds six domain stores (EconomyStore,
+# GarageStore, StorageStore, SlotStore, ProgressStore, CustomersStore); each
 # owns its domain's live fields, save payload, and the operations that mutate
 # them. Exposes getter-only proxy properties so scenes need no call-site changes.
 # Cross-domain transactions (day end, run resolution, customer sale) remain here
-# as single coordinated methods that call owner methods and save exactly once.
+# as single coordinated methods that call store methods and save exactly once.
 extends Node
 
-# ── Domain owners ──────────────────────────────────────────────────────────────
+# ── Domain stores ──────────────────────────────────────────────────────────────
 
-var _economy: EconomyOwner
-var _garage: GarageOwner
-var _storage: StorageOwner
-var _slot: SlotOwner
-var _progress: ProgressOwner
-var _customers: CustomersOwner
+var _economy: EconomyStore
+var _garage: GarageStore
+var _storage: StorageStore
+var _slot: SlotStore
+var _progress: ProgressStore
+var _customers: CustomersStore
 
 # ── Proxy properties ──────────────────────────────────────────────────────────
 # Read-only delegates — no setter means no external write path.
@@ -81,12 +81,12 @@ var current_day: int:
 
 
 func _ready() -> void:
-    _economy = EconomyOwner.new()
-    _garage = GarageOwner.new()
-    _storage = StorageOwner.new()
-    _slot = SlotOwner.new()
-    _progress = ProgressOwner.new()
-    _customers = CustomersOwner.new()
+    _economy = EconomyStore.new()
+    _garage = GarageStore.new()
+    _storage = StorageStore.new()
+    _slot = SlotStore.new()
+    _progress = ProgressStore.new()
+    _customers = CustomersStore.new()
     SaveManager.register_sections([_economy, _garage, _storage, _progress, _slot, _customers])
 
 # ══ Cross-autoload cash helper ════════════════════════════════════════════════

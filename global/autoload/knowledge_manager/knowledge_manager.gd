@@ -1,6 +1,6 @@
 # knowledge_manager.gd
 # Knowledge progression: category mastery, attribute levels, and unlocked perks.
-# Delegates persistent state to KnowledgeOwner. Registers the Owner with SaveManager.
+# Delegates persistent state to KnowledgeStore. Registers the Store with SaveManager.
 extends Node
 
 enum KnowledgeAction {
@@ -25,9 +25,9 @@ const RANK_THRESHOLDS: Array[int] = [0, 100, 400, 1600, 6400, 25600]
 
 const _ATTRIBUTE_UPGRADE_COST: int = 1000
 
-# ── Owner (persistent state) ──────────────────────────────────────────────────
+# ── Store (persistent state) ──────────────────────────────────────────────────
 
-var _knowledge: KnowledgeOwner
+var _knowledge: KnowledgeStore
 
 # ── Registry (non-persistent) ─────────────────────────────────────────────────
 
@@ -38,7 +38,7 @@ var _attribute_registry: Dictionary = { } # attribute_id → AttributeData
 func _ready() -> void:
     _load_perk_registry()
     _load_attribute_registry()
-    _knowledge = KnowledgeOwner.new()
+    _knowledge = KnowledgeStore.new()
     SaveManager.register_sections([_knowledge])
     RegistryCoordinator.register(self)
 
