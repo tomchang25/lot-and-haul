@@ -15,7 +15,7 @@ func _ready() -> void:
 
 
 func _on_back_pressed() -> void:
-    GameManager.go_to_knowledge_hub()
+    SceneRouter.go_to_knowledge_hub()
 
 
 func _build_content() -> void:

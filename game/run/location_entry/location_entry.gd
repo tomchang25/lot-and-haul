@@ -29,4 +29,4 @@ func _play_door_animation() -> void:
     tween.tween_property(_texture_rect, "modulate:a", 0.0, 0.4)
     tween.tween_property(_texture_rect, "modulate:a", 1.0, 0.4)
     tween.tween_interval(0.2)
-    tween.tween_callback(GameManager.go_to_lot_browse)
+    tween.tween_callback(SceneRouter.go_to_lot_browse)

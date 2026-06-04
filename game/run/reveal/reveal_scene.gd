@@ -67,7 +67,7 @@ func _on_reveal_pressed() -> void:
 
 
 func _on_continue_pressed() -> void:
-    GameManager.go_to_lot_browse()
+    SceneRouter.go_to_lot_browse()
 
 
 func _on_row_tooltip_requested(

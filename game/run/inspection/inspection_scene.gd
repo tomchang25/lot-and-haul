@@ -639,7 +639,7 @@ func _finish_inspection() -> void:
 
 
 func _on_pass_pressed() -> void:
-    GameManager.go_to_lot_browse()
+    SceneRouter.go_to_lot_browse()
 
 
 func _on_auction_pressed() -> void:
@@ -648,4 +648,4 @@ func _on_auction_pressed() -> void:
 
 
 func _on_auction_confirmed() -> void:
-    GameManager.go_to_auction()
+    SceneRouter.go_to_auction()

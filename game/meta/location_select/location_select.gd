@@ -43,8 +43,8 @@ func _on_card_pressed(card: LocationCard) -> void:
         location,
         MetaManager.active_car,
     )
-    GameManager.go_to_location_entry()
+    SceneRouter.go_to_location_entry()
 
 
 func _on_back_pressed() -> void:
-    GameManager.go_to_hub()
+    SceneRouter.go_to_hub()

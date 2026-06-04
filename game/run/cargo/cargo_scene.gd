@@ -218,7 +218,7 @@ func _on_confirm_popup_confirmed() -> void:
         if entry not in cargo and entry not in trailer:
             unplaced_count += 1
     RunManager.run_record.onsite_proceeds = unplaced_count * ONSITE_SELL_PRICE
-    GameManager.go_to_run_review()
+    SceneRouter.go_to_run_review()
 
 
 func _on_extra_slot_pressed(slot_index: int) -> void:

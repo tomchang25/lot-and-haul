@@ -35,10 +35,10 @@ extends Control
 func _ready() -> void:
     _continue_btn.pressed.connect(_on_continue_pressed)
 
-    var summary: DaySummary = GameManager.consume_pending_day_summary()
+    var summary: DaySummary = SceneRouter.consume_pending_day_summary()
     if summary == null:
         push_warning("DaySummaryScene: no pending summary — returning to hub")
-        GameManager.go_to_hub()
+        SceneRouter.go_to_hub()
         return
 
     _render(summary)
@@ -107,4 +107,4 @@ func _render(summary: DaySummary) -> void:
 
 
 func _on_continue_pressed() -> void:
-    GameManager.go_to_hub()
+    SceneRouter.go_to_hub()

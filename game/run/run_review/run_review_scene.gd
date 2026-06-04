@@ -95,7 +95,7 @@ func _resolve_run_and_navigate() -> void:
     # (player returns for the evening slot). The day summary fires later when
     # the player chooses Open Shop or exhausts all slots from the hub.
     MetaManager.resolve_run(RunManager.run_record)
-    GameManager.go_to_hub()
+    SceneRouter.go_to_hub()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
 

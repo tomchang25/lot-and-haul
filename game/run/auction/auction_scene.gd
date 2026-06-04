@@ -185,7 +185,7 @@ func _on_pass_pressed() -> void:
     if _circle_tween:
         _circle_tween.kill()
 
-    GameManager.go_to_reveal()
+    SceneRouter.go_to_reveal()
 
 # ══ Auction setup ═════════════════════════════════════════════════════════════
 
@@ -305,7 +305,7 @@ func _resolve() -> void:
         RunManager.run_record.paid_price += _current_display_price
         RunManager.run_record.won_items += current_wins
 
-    GameManager.go_to_reveal()
+    SceneRouter.go_to_reveal()
 
 # ══ Budget refresh ══════════════════════════════════════════════════════════════
 

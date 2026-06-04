@@ -27,7 +27,7 @@ func _ready() -> void:
 
 
 func _on_back_pressed() -> void:
-    GameManager.go_to_vehicle_hub()
+    SceneRouter.go_to_vehicle_hub()
 
 
 func _on_buy_pressed(car: CarData) -> void:

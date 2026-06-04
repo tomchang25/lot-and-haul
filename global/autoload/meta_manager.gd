@@ -340,7 +340,7 @@ func set_active_car(car: CarData) -> void:
 ## clues, stores run economics as pending for end_day(), sets current_slot to 3
 ## so the player returns to the hub for the evening slot, and clears run state.
 ##
-## Navigation: the caller (run_review_scene) must call GameManager.go_to_hub()
+## Navigation: the caller (run_review_scene) must call SceneRouter.go_to_hub()
 ## after this returns. The day summary fires when the player chooses Open Shop
 ## or all slots are exhausted from the hub.
 func resolve_run(record: RunRecord) -> void:

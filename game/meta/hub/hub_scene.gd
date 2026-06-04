@@ -48,33 +48,33 @@ func _ready() -> void:
 func _on_auction_pressed() -> void:
     if MetaManager.current_slot != 1:
         return
-    GameManager.go_to_location_select()
+    SceneRouter.go_to_location_select()
 
 
 func _on_storage_pressed() -> void:
     MetaManager.begin_storage_slot()
-    GameManager.go_to_storage()
+    SceneRouter.go_to_storage()
 
 
 func _on_open_shop_pressed() -> void:
     var selling_slots: int = 4 - MetaManager.current_slot
     MetaManager.begin_open_shop(selling_slots)
-    GameManager.go_to_customer_sell()
+    SceneRouter.go_to_customer_sell()
 
 
 func _on_vehicle_pressed() -> void:
-    GameManager.go_to_vehicle_hub()
+    SceneRouter.go_to_vehicle_hub()
 
 
 func _on_knowledge_pressed() -> void:
-    GameManager.go_to_knowledge_hub()
+    SceneRouter.go_to_knowledge_hub()
 
 # ══ Day ending ════════════════════════════════════════════════════════════════
 
 
 func _end_day_and_navigate() -> void:
     var summary := MetaManager.end_day()
-    GameManager.go_to_day_summary(summary)
+    SceneRouter.go_to_day_summary(summary)
 
 # ══ Display ═══════════════════════════════════════════════════════════════════
 

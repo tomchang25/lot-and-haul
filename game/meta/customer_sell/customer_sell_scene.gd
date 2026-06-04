@@ -433,4 +433,4 @@ func _on_sell_cancelled() -> void:
 
 
 func _on_back_pressed() -> void:
-    GameManager.go_to_hub()
+    SceneRouter.go_to_hub()

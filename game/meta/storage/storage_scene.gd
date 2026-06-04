@@ -80,7 +80,7 @@ func _ready() -> void:
 
 func _on_back_pressed() -> void:
     # Slot already committed on entry — leaving returns to hub for the next slot.
-    GameManager.go_to_hub()
+    SceneRouter.go_to_hub()
 
 
 func _on_row_pressed(entry: ItemEntry) -> void:

@@ -20,12 +20,12 @@ func _ready() -> void:
 
 
 func _on_garage_pressed() -> void:
-    GameManager.go_to_car_select()
+    SceneRouter.go_to_car_select()
 
 
 func _on_car_shop_pressed() -> void:
-    GameManager.go_to_car_shop()
+    SceneRouter.go_to_car_shop()
 
 
 func _on_back_pressed() -> void:
-    GameManager.go_to_hub()
+    SceneRouter.go_to_hub()

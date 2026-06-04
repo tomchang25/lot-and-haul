@@ -86,7 +86,7 @@ func _on_enter_pressed() -> void:
     var entry := LotEntry.create(lot_data)
     record.set_lot(entry)
     record.browse_index += 1
-    GameManager.go_to_inspection()
+    SceneRouter.go_to_inspection()
 
 
 func _on_pass_pressed() -> void:
@@ -104,11 +104,11 @@ func _on_skip_pressed() -> void:
 
 
 func _on_skip_confirmed() -> void:
-    GameManager.go_to_cargo()
+    SceneRouter.go_to_cargo()
 
 
 func _on_cargo_pressed() -> void:
-    GameManager.go_to_cargo()
+    SceneRouter.go_to_cargo()
 
 # ══ Sampling ══════════════════════════════════════════════════════════════════
 

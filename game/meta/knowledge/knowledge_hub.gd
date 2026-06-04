@@ -22,16 +22,16 @@ func _ready() -> void:
 
 
 func _on_mastery_pressed() -> void:
-    GameManager.go_to_mastery_panel()
+    SceneRouter.go_to_mastery_panel()
 
 
 func _on_attributes_pressed() -> void:
-    GameManager.go_to_attribute_panel()
+    SceneRouter.go_to_attribute_panel()
 
 
 func _on_perks_pressed() -> void:
-    GameManager.go_to_perk_panel()
+    SceneRouter.go_to_perk_panel()
 
 
 func _on_back_pressed() -> void:
-    GameManager.go_to_hub()
+    SceneRouter.go_to_hub()
