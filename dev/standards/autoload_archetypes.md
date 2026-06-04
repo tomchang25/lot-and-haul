@@ -23,7 +23,7 @@ the role.
 | **Composition Root** (`GameManager` / `AppManager`)    | Boot order: load save, run migrations/validation/audit, initialize systems, hand off to the first scene.                                                             | No                                | Yes                         |
 | **Router** (`SceneRouter`)                             | Scene transitions and short-lived navigation payloads (e.g. a pending hand-off).                                                                                     | No (only ephemeral nav payload)   | Yes                         |
 | **Persistence Coordinator** (`SaveManager`)            | File IO, schema/migration, dispatch to registered providers. The _only_ system that touches the save file.                                                           | No                                | Yes                         |
-| **Domain Manager** (`MetaManager`, `KnowledgeManager`) | One cohesive runtime domain. Holds its Owner(s), exposes a focused command/query API, sequences transactions _within its own domain_, registers its Owners for save. | Indirectly, through its Owners    | Yes                         |
+| **Domain Manager** (`MetaManager`, `KnowledgeManager`) | One cohesive runtime domain. Holds its Owner(s), exposes a focused command/query API, sequences its domain's transactions (and may call peer Managers' public APIs), registers its Owners for save. | Indirectly, through its Owners    | Yes                         |
 | **Owner** (`EconomyOwner`, …)                          | A persistent state slice: its fields, its invariants, its mutators, and its own `section_id`/`to_dict`/`from_dict`.                                                  | Yes (the actual state lives here) | **Never**                   |
 | **Coordinator** (`RegistryCoordinator`)                | A registry of peers plus lifecycle fan-out (migrate/validate). Holds no domain state. A state-light Service that knows its participants.                             | No                                | Yes                         |
 | **Registry** (`*Registry`)                             | Load and query of designer resources. No live gameplay state.                                                                                                        | No                                | Yes                         |
@@ -60,13 +60,19 @@ the archetypes exist.
 
 4. **Transaction placement follows its span:**
    - _Within one domain's Owners_ → a public method on that domain's Manager.
-   - _Across two or more Managers, and it mutates state_ → a thin **use-case** that
-     depends on the involved Managers' **public APIs** and commits once. Do **not**
-     bury it inside one domain Manager (that creates a Manager↔Manager cycle), and
-     do **not** gather all use-cases into one global transaction hub (that _is_ a
-     God Object wearing a cleaner name). That hub is **not** the Coordinator
-     archetype — a Coordinator does lifecycle/dispatch fan-out over peers and never
-     sequences gameplay transactions.
+   - _Across two or more Managers, and it mutates state_ → a public method on the
+     Manager that owns the flow, calling the other Managers' **public APIs**
+     directly; promote it to a thin **use-case** only if it earns its own file
+     (Rule 7). The Manager tier is a public API surface — Manager→Manager
+     public-API calls are accepted, including cohesive cycles. What is **still
+     forbidden**: gathering all transactions into one global transaction hub (that
+     _is_ a God Object wearing a cleaner name; it is **not** the Coordinator
+     archetype, which does lifecycle/dispatch fan-out and never sequences gameplay).
+     Whatever sequences the transaction still commits exactly once (Rule 3), and no
+     Store is dragged across the boundary (Rule 2). _Rationale: in a single-player
+     game with fixed-order autoloads, policing Manager-tier coupling costs more
+     ceremony than it returns; the load-bearing boundaries are the Store edge and
+     the single save commit, not the Manager mesh._
    - _Read-only query across Managers_ → a direct public-API call is fine.
    - _Non-transactional side effect_ (UI refresh, audio, analytics, tutorial hint)
      → an event. Never route a flow that needs a single save commit through events.

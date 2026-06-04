@@ -31,13 +31,13 @@ Owner, and the boot root also owns scene navigation.
    navigation service holds only transitions and short-lived nav payloads, no
    persistent state.
 
-4. The one existing state-mutating transaction that spans two top-level Managers —
-   paying cash to upgrade a knowledge attribute — must move to a thin use-case over
-   the two Managers' public APIs that commits once, because today the knowledge
-   Manager reaches into the economy/meta Manager to spend cash while the meta
-   Manager already calls back into knowledge on a sale, forming a Manager↔Manager
-   cycle. This applies the standard's transaction-placement rule to its single
-   present instance and removes the cycle.
+> **Dropped:** the original Requirement 4 (extract the attribute-upgrade purchase
+> into a use-case to remove the knowledge↔meta Manager cycle) is cut. The Manager
+> tier is now treated as a public API surface where cohesive cross-Manager calls
+> are accepted, so the cycle is allowed by design — see the amended Hard Rule 4 in
+> `dev/standards/autoload_archetypes.md`. The two boundaries that still hold are
+> unchanged: Stores never reach outward (Rule 2), and a transaction commits exactly
+> once (Rule 3) — both already satisfied by today's `spend_cash`-without-save path.
 
 ## Design
 
@@ -65,14 +65,10 @@ Target roles, by the standard:
   Owners (plus a single allowed, unidirectional call into the knowledge Manager for
   the sale reward, which stays).
 
-Attribute-upgrade use-case (Requirement 4): a single entry point that sequences the
-purchase — ask the knowledge Manager for cost and eligibility, check affordability
-against the economy/meta Manager, spend without saving, apply the upgrade without
-saving, then save once — and returns a structured pass/fail outcome (a small
-result value with an `ok` flag and a message) so the calling panel can show "not
-enough cash" versus "cannot upgrade" instead of a bare boolean. It depends on the
-two Managers' public APIs only; it never reaches into an Owner. It is one use-case,
-not a framework — no factory, no shared coordinator.
+The knowledge↔meta cross-Manager spend (attribute upgrade) stays where it is: the
+knowledge Manager calls `MetaManager.spend_cash` (a no-save primitive) and commits
+once at its own end. No use-case extraction — the Manager tier may call across
+itself freely; only Store-inward and single-commit discipline are enforced.
 
 Suggested order, each step leaving the game runnable:
 
@@ -81,7 +77,6 @@ Suggested order, each step leaving the game runnable:
 2. Collapse Owner registration to the single-call convention (Requirement 2) on
    both domain Managers.
 3. Split navigation out of the boot root (Requirement 3).
-4. Relocate the attribute-upgrade purchase to its use-case (Requirement 4).
 
 The standard is the durable artifact; this plan is the one-time alignment. The
 cosmetic rename of the meta domain Manager is deliberately excluded (see
@@ -95,9 +90,11 @@ Non-Goals) so rename churn never mixes into an ownership change.
 2. Do not rename the meta domain Manager — that is cosmetic, high-churn, and
    deferred; the standard generalizes the name without forcing existing renames.
 3. Do not build a general use-case framework, factory, or per-action file
-   scaffolding ahead of need — only the single existing cross-Manager transaction
-   is extracted; future transactions stay on their domain Manager until they earn a
-   file.
+   scaffolding. Cross-Manager transactions stay as methods on whichever Manager
+   owns the flow, calling the other Managers' public APIs directly.
+6. Do not chase Manager↔Manager decoupling. The Manager tier is a public API
+   surface; cohesive cross-calls are accepted spaghetti. The discipline lives one
+   layer down: Stores stay inward-only and each transaction commits once.
 4. Do not reroute transactional flows through events — events stay for
    non-transactional side effects only, because a flow needing a single save commit
    cannot guarantee it through events.
@@ -112,9 +109,6 @@ Non-Goals) so rename churn never mixes into an ownership change.
    an Owner is a one-line change.
 3. The boot root exposes no navigation methods; all scene transitions go through
    the navigation service, which holds no persistent state.
-4. Paying to upgrade a knowledge attribute runs through one entry point that
-   commits once and returns a pass/fail outcome; the knowledge Manager no longer
-   calls the economy/meta Manager, and the Manager↔Manager cycle is gone.
-5. Every autoload resolves to exactly one archetype on the standard's checklist,
+4. Every autoload resolves to exactly one archetype on the standard's checklist,
    and a full day cycle (auction → run resolution → storage actions → open shop →
    customer sales → day end → summary) behaves identically to before.
