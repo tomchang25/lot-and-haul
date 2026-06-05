@@ -46,7 +46,7 @@ All sampled lot cards are visible, but only the current card exposes Enter and P
 
 ### Inspection And List Review
 
-Current inspection is an AP grid, not the older stamina action model. The active lot's item shapes are placed on an 8x8 hidden grid using category shapes. The AP budget is a two-tier pool — a per-lot cap plus a visit-wide reserve that refills the cap (deficit only) at each lot boundary — owned by the run record; the old per-lot `action_quota` no longer drives it. See `day_slot_economy.md` for the full pool model. Car stamina still exists on the run record, but the current inspection UI does not spend it.
+Current inspection is an AP grid. The active lot's item shapes are placed on an 8×8 hidden grid using category shapes. The AP budget is a two-tier pool — a per-lot cap plus a visit-wide reserve that refills the cap (deficit only) at each lot boundary — owned by the run record. See `day_slot_economy.md` for the full pool model. Car stamina exists on the run record but the current inspection UI does not spend it.
 
 Identity is clue-based, not layer-based. Clicking a veiled object spends the unveil AP cost and calls `ItemEntry.unveil()`, which reveals the item's **anchor** clue (its base-value identity) and grants reveal knowledge. There is no layer ladder.
 

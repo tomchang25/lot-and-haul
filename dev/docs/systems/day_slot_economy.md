@@ -76,11 +76,9 @@ Opening shop in slot 1 commits the whole day and yields max traffic; opening aft
 
 Living cost (`Economy.DAILY_BASE_COST` = 100) is deducted once per calendar day during the day-end sequence, regardless of how the day's slots were spent. It is a property of the calendar day, not of slots.
 
-## Persistence & Migration
+## Persistence
 
-Persisted on `SaveManager`: `current_slot`, `storage_ap`, `selling_slots_today`, and the `pending_run` economics dict, all deserialized behind `.has()` guards. Storage AP is effectively ephemeral — it refreshes at each Storage slot and resets to 0 at day-end. Per-clue `research_progress` persists on each `ItemEntry` and serializes with it. Auction AP (both tiers) is run-scoped: seeded at visit construction, cleared with run state, never persisted across sessions.
-
-Legacy saves migrate cleanly: the old `research_slots` array (day-ticker lifecycle) is discarded, and any in-flight `research_days_spent` is converted into `research_progress` so partial work isn't lost. Because the live system no longer uses the rarity→days table, a frozen copy of it (`Economy.RESEARCH_DAYS`) is retained solely for that migration. Condition and revealed clues already persisted, so no in-progress item loses state.
+Persisted on `SlotStore`: `current_slot`, `storage_ap`, `selling_slots_today`, and the `pending_run` economics dict. Storage AP is effectively ephemeral — it refreshes at each Storage slot and resets to 0 at day-end. Per-clue `research_progress` persists on each `ItemEntry` and serializes with it. Auction AP (both tiers) is run-scoped: seeded at visit construction, cleared with run state, never persisted across sessions.
 
 ## Invariants
 

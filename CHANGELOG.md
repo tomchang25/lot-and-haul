@@ -8,6 +8,10 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Systems Docs L2 Audit
+
+- 2026-06-05 — [docs] Audited all 10 systems/ docs against the L2 exclusion rule; lifted the two-layer (designer resource / runtime type) concept to new vision/data_architecture.md; dropped Reads/Writes/Ownership/roster tables to L3 (enriched item_card.gd docstring); trimmed hub_home/knowledge/vehicle/customer_sell/autoloads/item_display/item_system to cross-flow only; archived data_model.md (concept now in vision, field detail in code)
+
 ## Meta Domain Decomposition
 
 - 2026-06-02 — [meta] MetaManager decomposed into six domain owners (EconomyOwner, GarageOwner, StorageOwner, SlotOwner, ProgressOwner, CustomersOwner) under global/autoload/meta_manager/; each owns its fields and save payload with sanitize-on-load warnings for unresolved ids; MetaManager exposes transparent proxy properties (GDScript 4 get/set) so all scenes and autoloads need no changes; CarRegistry and LocationRegistry validate() stripped of live-state reads; ItemEntry.from_dict push_error softened to push_warning; six SaveSection adapter files retired to tombstubs
