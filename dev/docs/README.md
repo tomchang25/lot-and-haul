@@ -128,22 +128,9 @@ One file per standalone design/work item — the place an idea lands once it has
 
 Name: `<scope>_<short_description>.md`. Contains goal (1–2 sentences), context/why now, high-level steps (or phases), and acceptance criteria. Keep it **forward-only**: as each phase ships, cut it out and record it in `CHANGELOG.md` — don't keep a checked-off phase ledger. When its design locks, graduate the conclusion to `systems/`. Archive the plan once it's shipped or superseded.
 
-## Runtime type archetypes (`common/gameplay/`)
-
-Runtime types split into four archetypes by one question — *does it hold mutable state, and does it own the behaviour that maintains it?* The folder a type lives in is the source of truth for its archetype; this section defines the **boundaries**, not the membership (which class is which is read straight off the tree — that's L3).
-
-- **Entry** (`common/gameplay/*.gd`) — a live instance of a designer **Data**: identity + mutable state + the behaviour that maintains it. The runtime twin of an authored resource; self-serializes when persisted.
-- **Store** (`common/gameplay/store/`) — a Manager-held container of one domain's live state. Owns its fields and the mutators that guard their invariants; a Manager autoload holds it and drives it. **Serialization is optional** — a Store carries a save payload (section id + to/from-dict) only when its state must survive save/load. A Store whose state is scoped to a single transient session and never persists is a **Session**: same shape, narrower lifetime, no save payload.
-- **Snapshot** (`common/gameplay/snapshot/`) — a read-only value object derived from state at one instant and handed across a boundary (Manager → scene), then discarded. Computed/getter fields only; no mutators, no serialization, no autoload reads. A projection, not a container.
-- **Service** (`common/gameplay/service/`) — stateless: pure math / helper functions with no per-instance state.
-
-Serialization is an **orthogonal capability, not an archetype**: Entries and Stores may or may not persist; Snapshots and Services never do. **Store is the superset and Session the non-persisting subset** — they are not split into separate base types until a Session actually needs to survive save/load.
-
-Discriminator, in order: no per-instance state → **Service**; read-only, derived, one-shot transport → **Snapshot**; mutable state + invariant-guarding mutators, Manager-held → **Store** (a **Session** if it never persists); a saved/identified instance of a Data → **Entry**.
-
 ## Relationship to other dev/ folders
 
-- `dev/standards/` — coding conventions, naming rules, project structure
+- `dev/standards/` — coding conventions, naming rules, project structure, the runtime type archetype taxonomy (`runtime_type_archetypes.md`)
 - `dev/skills/` — AI coding tool references (commit format, GDScript patterns)
 - `dev/tools/` — build scripts (yaml/tres pipeline)
 

@@ -1,6 +1,6 @@
 # Runtime Archetype Rename: RunRecord→RunStore, DaySummary→DaySnapshot
 
-Implementation spec — see `dev/standards/implementation_spec_standard.md`. Pure rename + move + reclassification under the archetype taxonomy defined in `dev/docs/README.md`. No behavioural change.
+Implementation spec — see `dev/standards/implementation_spec_standard.md`. Pure rename + move + reclassification under the archetype taxonomy defined in `dev/standards/runtime_type_archetypes.md`. No behavioural change.
 
 ## Goal
 

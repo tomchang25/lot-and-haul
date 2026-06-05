@@ -45,4 +45,4 @@ Any system that shows an item to the player must read display values through the
 
 ---
 
-See `../systems/item_system.md` for the item lifecycle (creation → inspection → research → selling) and `../README.md` for the three-level documentation model and the runtime-type archetype taxonomy (Entry, Store, Snapshot, Service).
+See `../systems/item_system.md` for the item lifecycle (creation → inspection → research → selling), `../README.md` for the three-level documentation model, and `../../standards/runtime_type_archetypes.md` for the runtime-type archetype taxonomy (Entry/Instance, Store, Snapshot, Service).
