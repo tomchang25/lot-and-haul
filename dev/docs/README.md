@@ -102,7 +102,15 @@ One file per system. Top-level files cover the cross-phase / core-loop systems (
 
 Write everything in **present tense — describe the system as it is now.** A system doc is a snapshot of current design, not a history of how it got here.
 
-**Goes in:** system purpose + player-facing goal (1 paragraph), conceptual flow (what triggers what), state transitions/lifecycle, current behavior and invariants (the gotchas a future editor must not break, e.g. "AP is per-lot today").
+**What earns an L2 doc — the exclusion rule.** L2 is the danger zone, so membership is defined by exclusion, not invitation. A fact belongs in `systems/` only when **both** hold: (1) **no single file is its natural home**, and (2) it **changes too often to live in `vision/`**. Fail either test and the fact leaves L2 — most "system doc" rot is a fact that should have been at L1 or L3 sitting in the middle, going stale. The three routes:
+
+- A **concept definition** — what a layer _means_ and where its responsibility boundary sits (what counts as Data vs. Service vs. Entry vs. Scene; "a designer resource is authored and immutable, a runtime type is per-instance and saved") — is stable and whole-project. That's **L1 Vision**, not a system doc.
+- **Which concrete class belongs to which category** (this `.gd` is a Service, that one is an Entry) is readable straight off the folder tree and class names. That's **L3** — don't write it down anywhere; the code _is_ the source, and a written copy only rots.
+- A **cross-flow fact** — orchestration that spans scenes/files (inspection→auction→cargo), or a cross-cutting invariant no single file owns ("all prices resolve through `item_price`") — has no single-file home and shifts with redesigns. **This is the residue L2 exists to hold.** If it isn't cross-flow, it isn't L2.
+
+The recurring rot pattern to watch for: per-file `Reads` / `Writes` / `Ownership` lists (SaveManager fields, file paths, who-mutates-what). These are L3 — they break the moment a field is renamed. Keep the _flow_ they imply; drop the field-level enumeration.
+
+**Goes in:** system purpose + player-facing goal (1 paragraph), conceptual flow (what triggers what), state transitions/lifecycle, current behavior and cross-flow invariants (the gotchas a future editor must not break, e.g. "AP is per-lot today").
 
 **Does NOT go in:**
 
@@ -119,6 +127,19 @@ Guiding test: **if renaming a function would make the doc wrong, that detail doe
 One file per standalone design/work item — the place an idea lands once it has outgrown a `TODO.md` `## Draft` section. It holds both still-exploratory designs and committed pre-plans; there is no `Status:` header — whether it's actively being built is expressed by where its pointer sits in `TODO.md` (`## Plan` = queued, `## Active` = building), and a stale plan is retired by moving its content back to `## Draft`.
 
 Name: `<scope>_<short_description>.md`. Contains goal (1–2 sentences), context/why now, high-level steps (or phases), and acceptance criteria. Keep it **forward-only**: as each phase ships, cut it out and record it in `CHANGELOG.md` — don't keep a checked-off phase ledger. When its design locks, graduate the conclusion to `systems/`. Archive the plan once it's shipped or superseded.
+
+## Runtime type archetypes (`common/gameplay/`)
+
+Runtime types split into four archetypes by one question — *does it hold mutable state, and does it own the behaviour that maintains it?* The folder a type lives in is the source of truth for its archetype; this section defines the **boundaries**, not the membership (which class is which is read straight off the tree — that's L3).
+
+- **Entry** (`common/gameplay/*.gd`) — a live instance of a designer **Data**: identity + mutable state + the behaviour that maintains it. The runtime twin of an authored resource; self-serializes when persisted.
+- **Store** (`common/gameplay/store/`) — a Manager-held container of one domain's live state. Owns its fields and the mutators that guard their invariants; a Manager autoload holds it and drives it. **Serialization is optional** — a Store carries a save payload (section id + to/from-dict) only when its state must survive save/load. A Store whose state is scoped to a single transient session and never persists is a **Session**: same shape, narrower lifetime, no save payload.
+- **Snapshot** (`common/gameplay/snapshot/`) — a read-only value object derived from state at one instant and handed across a boundary (Manager → scene), then discarded. Computed/getter fields only; no mutators, no serialization, no autoload reads. A projection, not a container.
+- **Service** (`common/gameplay/service/`) — stateless: pure math / helper functions with no per-instance state.
+
+Serialization is an **orthogonal capability, not an archetype**: Entries and Stores may or may not persist; Snapshots and Services never do. **Store is the superset and Session the non-persisting subset** — they are not split into separate base types until a Session actually needs to survive save/load.
+
+Discriminator, in order: no per-instance state → **Service**; read-only, derived, one-shot transport → **Snapshot**; mutable state + invariant-guarding mutators, Manager-held → **Store** (a **Session** if it never persists); a saved/identified instance of a Data → **Entry**.
 
 ## Relationship to other dev/ folders
 
