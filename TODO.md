@@ -215,6 +215,7 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
 - [demo] Tutorial 3-run surface (stale — references legacy Skill/Merchant systems); Director + Dialog systems are surviving subsystems — see `dev/docs/plans/demo_summary.md`
+- [refactor] Deprecate RegistryCoordinator — relocate migrate/validate to domain owners, fan-out via SaveManager — see `dev/docs/plans/deprecate_registry_coordinator.md`
 
 ---
 
