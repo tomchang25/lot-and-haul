@@ -12,33 +12,6 @@ func _id_of(r: Resource) -> String:
     return (r as LocationData).location_id if r is LocationData else ""
 
 
-## Validates content well-formedness: location pool category and super-category
-## weights reference known ids. Referential integrity for live available_locations
-## is handled by ProgressStore.from_dict() on load.
-func validate() -> bool:
-    var ok := true
-    if size() == 0:
-        push_error("LocationRegistry: registry is empty")
-        ok = false
-    for location: LocationData in get_all():
-        for lot: LotData in location.lot_pool:
-            for key: String in lot.category_weights.keys():
-                if CategoryRegistry.get_category_by_id(key) == null:
-                    push_error(
-                        "LocationRegistry: location '%s' lot '%s' category_weights key '%s' not found"
-                        % [location.location_id, lot.lot_id, key],
-                    )
-                    ok = false
-            for key: String in lot.super_category_weights.keys():
-                if SuperCategoryRegistry.get_super_category_by_id(key) == null:
-                    push_error(
-                        "LocationRegistry: location '%s' lot '%s' super_category_weights key '%s' not found"
-                        % [location.location_id, lot.lot_id, key],
-                    )
-                    ok = false
-    return ok
-
-
 # Returns the LocationData with the given location_id, or null if not found.
 func get_location_by_id(location_id: String) -> LocationData:
     return get_by_id(location_id) as LocationData

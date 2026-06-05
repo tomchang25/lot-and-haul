@@ -72,9 +72,9 @@ stage/        Testbeds, demo runs, and tile sets (mostly empty)
 
 ## Autoloads (load order matters)
 
-EventBus → AudioManager → RegistryCoordinator → ClueRegistry → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → KnowledgeManager → SaveManager → MetaManager → GameManager
+EventBus → AudioManager → ClueRegistry → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → SaveManager → KnowledgeManager → MetaManager → GameManager
 
-`RegistryCoordinator` orchestrates boot: each registry calls `RegistryCoordinator.register(self)` in `_ready()`, then `GameManager._ready()` runs `run_migrations()` and `run_validation()`.
+`SaveManager` drives boot fan-out: MetaManager and KnowledgeManager call `SaveManager.register_manager(self)` in `_ready()`, then `GameManager._ready()` calls `SaveManager.run_migrations()` and `SaveManager.run_validation()`.
 
 ## Data Pipeline
 

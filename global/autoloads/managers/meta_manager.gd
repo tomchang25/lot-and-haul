@@ -88,6 +88,7 @@ func _ready() -> void:
     _progress = ProgressStore.new()
     _customers = CustomersStore.new()
     SaveManager.register_section(self)
+    SaveManager.register_manager(self)
 
 # ══ Save section interface ════════════════════════════════════════════════════
 

@@ -43,9 +43,17 @@ func erase_points(category_id: String) -> void:
 	category_points.erase(category_id)
 
 
-## Migrates stale fields within this section. Idempotent. No-op by default.
+## Idempotent migration: prunes category_points keys that no longer exist in
+## CategoryRegistry. Mirrors the logic previously in CategoryRegistry.migrate().
+## CategoryRegistry is loaded before SaveManager/KnowledgeManager, so it is
+## available here.
 func migrate() -> void:
-	pass
+	for key: String in category_points.keys():
+		if CategoryRegistry.get_category_by_id(key) == null:
+			push_warning(
+				"KnowledgeStore.migrate: dropping unknown category_points key '%s'" % key,
+			)
+			category_points.erase(key)
 
 
 ## Validates invariants within this section. Returns true when all pass.

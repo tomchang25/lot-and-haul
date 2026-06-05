@@ -26,7 +26,7 @@ func _ready() -> void:
         func(r: Resource) -> String:
             return _id_of(r)
     )
-    RegistryCoordinator.register(self)
+    assert(size() > 0, "%s registry is empty after load" % name)
 
 
 ## Returns the resource with the given id, or null if not found.
@@ -43,11 +43,3 @@ func get_all() -> Array:
 ## Returns the number of resources loaded.
 func size() -> int:
     return _by_id.size()
-
-
-## Default validation: registry must be non-empty. Override for cross-checks.
-func validate() -> bool:
-    if size() == 0:
-        push_error("%s: registry is empty" % name)
-        return false
-    return true

@@ -2,6 +2,8 @@
 # Persistence coordinator: file IO, schema handling, and registered section dispatch.
 # Holds no gameplay state. Systems that own gameplay state register themselves as
 # section providers via register_section() before GameManager calls load().
+# Domain managers (MetaManager, KnowledgeManager) register via register_manager()
+# so run_migrations() and run_validation() can fan out without RegistryCoordinator.
 #
 # On-disk format: { "schema_version": int, "sections": { <id>: <payload> } }.
 # Legacy flat saves (no "sections" key) are dispatched in full to each provider —
@@ -21,9 +23,13 @@ const SCHEMA_VERSION := 2
 ## the full sections dict and reads only its own keys.
 var _sections: Array = []
 
+## Domain managers that own migrate() / validate() fan-out. Registered before
+## GameManager calls run_migrations() / run_validation().
+var _managers: Array = []
+
 
 func _ready() -> void:
-    pass  # Sections are registered by owning systems before GameManager calls load().
+    pass  # Sections and managers are registered by owning systems before GameManager runs.
 
 
 ## Registers a save section provider. Call before load() runs (i.e. in _ready()
@@ -37,6 +43,30 @@ func register_section(section: Object) -> void:
 func register_sections(sections: Array) -> void:
     for s: Object in sections:
         register_section(s)
+
+
+## Registers a domain manager for migration and validation fan-out. Call in
+## _ready() of the owning manager. The manager must implement migrate() and
+## validate() -> bool.
+func register_manager(manager: Object) -> void:
+    _managers.append(manager)
+
+
+## Calls migrate() on every registered manager. Idempotent — managers are
+## expected to make their migrations idempotent.
+func run_migrations() -> void:
+    for manager: Object in _managers:
+        manager.migrate()
+
+
+## Calls validate() on every registered manager, accumulates failures, and
+## returns true only if every manager passed.
+func run_validation() -> bool:
+    var ok := true
+    for manager: Object in _managers:
+        if not manager.validate():
+            ok = false
+    return ok
 
 
 func save() -> void:

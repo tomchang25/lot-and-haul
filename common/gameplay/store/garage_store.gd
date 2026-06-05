@@ -64,9 +64,16 @@ func from_dict(data: Dictionary) -> void:
             owned_cars.append(car)
 
 
-## Migrates stale fields within this section. Idempotent. No-op by default.
+## Idempotent migration: guarantees a fresh save gets the starter van.
+## Mirrors the logic previously in CarRegistry.migrate(). CarRegistry is loaded
+## before SaveManager/MetaManager, so it is available here.
 func migrate() -> void:
-    pass
+    if owned_cars.is_empty():
+        var van: CarData = CarRegistry.get_car_by_id("van_basic")
+        if van != null:
+            owned_cars.append(van)
+    if active_car == null and not owned_cars.is_empty():
+        active_car = owned_cars[0]
 
 
 ## Validates invariants within this section. Returns true when all pass.

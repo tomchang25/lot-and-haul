@@ -40,6 +40,7 @@ func _ready() -> void:
     _load_attribute_registry()
     _knowledge = KnowledgeStore.new()
     SaveManager.register_section(self)
+    SaveManager.register_manager(self)
 
 # ── Registry validation ────────────────────────────────────────────────────────
 
