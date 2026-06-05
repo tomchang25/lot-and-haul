@@ -241,7 +241,46 @@ All GDScript files use **4 spaces** per indent level. Tabs are not used.
 
 ---
 
-# 10. Match Wildcard Rule
+# 10. Folder Naming
+
+All folders use **snake_case**. Whether a folder is **singular** or **plural** is
+decided by one semantic test:
+
+> **Is every direct child of this folder an instance of the folder's name (singularized)?**
+>
+> - **Yes → plural** (the folder is a *collection* of like things).
+> - **No → singular** (the folder is a *namespace / grouping* of different things).
+
+```
+managers/                  # each child IS a manager        → plural
+  knowledge_manager.gd
+  meta_manager.gd
+
+data/tres/items/           # each child IS an item           → plural
+  rusty_sword.tres
+  antique_clock.tres
+
+gameplay/                  # children are NOT "gameplays"    → singular
+  instances/               #   ...each of these is a collection → plural
+  services/
+  snapshots/
+```
+
+Notes:
+
+- The test is **semantic**, not lexical. `items/` holds `rusty_sword.tres` (the
+  filename does not contain "item") yet is still a collection, so it is plural.
+  The easy-to-spot sub-case — children sharing a type suffix like
+  `managers/*_manager` — is just the most obvious instance of the same rule.
+- **Each folder is judged independently.** Mixed singular/plural siblings under
+  one parent are correct, not an inconsistency. `global/` legitimately holds
+  `autoloads/` (a collection) next to `theme/` (a single theme).
+- A folder holding exactly one canonical resource stays **singular**
+  (e.g. `theme/`).
+
+---
+
+# 11. Match Wildcard Rule
 
 The wildcard arm `_:` in `match` statements is reserved for **error handling and truly unexpected values**. Do not use it as the default for a value that is a normal, expected member of the enum or type being matched.
 
@@ -269,3 +308,5 @@ If a `match` covers all members of a known enum exhaustively, the wildcard arm s
 | Preloaded types   | PascalCase                    | `ItemRowScene`            |
 | Enums             | PascalCase + UPPER_SNAKE_CASE | `SelectionState.SELECTED` |
 | Nodes             | PascalCase                    | `ConfirmButton`           |
+| Folders (collection) | snake_case, plural         | `managers/`, `items/`     |
+| Folders (namespace)  | snake_case, singular       | `gameplay/`, `theme/`     |

@@ -17,7 +17,7 @@ Cross-cutting boot, persistence, and hub-navigation infrastructure shared across
 
 ## SaveManager
 
-Thin persistence coordinator (`global/autoload/save_manager.gd`). Responsibilities: file read/write, schema version detection, schema-1→2 knowledge key relocation, legacy flat-save dispatch, and iterating registered section providers. It holds **no gameplay state** — state lives on the systems that own and mutate it.
+Thin persistence coordinator (`global/autoloads/save_manager.gd`). Responsibilities: file read/write, schema version detection, schema-1→2 knowledge key relocation, legacy flat-save dispatch, and iterating registered section providers. It holds **no gameplay state** — state lives on the systems that own and mutate it.
 
 Systems register as section providers in their own `_ready()`. The invariant: `SaveManager.save()` is called exactly once per cross-domain transaction, at that transaction's commit point — no helper method inside a transaction calls it independently.
 
@@ -25,7 +25,7 @@ Systems register as section providers in their own `_ready()`. The invariant: `S
 
 ## MetaManager
 
-Hub-phase transactional authority (`global/autoload/meta_manager.gd`). Holds six domain stores (`EconomyStore`, `GarageStore`, `StorageStore`, `SlotStore`, `ProgressStore`, `CustomersStore`); each owns its domain's live fields, save payload, and the mutators that guard its invariants. MetaManager exposes getter-only proxy properties so scenes need no call-site changes; proxy reference collections return shallow duplicates so callers cannot mutate live storage through the returned array.
+Hub-phase transactional authority (`global/autoloads/meta_manager.gd`). Holds six domain stores (`EconomyStore`, `GarageStore`, `StorageStore`, `SlotStore`, `ProgressStore`, `CustomersStore`); each owns its domain's live fields, save payload, and the mutators that guard its invariants. MetaManager exposes getter-only proxy properties so scenes need no call-site changes; proxy reference collections return shallow duplicates so callers cannot mutate live storage through the returned array.
 
 Cross-domain transactions (`resolve_run`, `resolve_customer_sale`, `end_day`, `buy_car`, `set_active_car`, `register_storage_items`, `begin_storage_slot`, `begin_auction`, `begin_open_shop`) save exactly once at their commit point. Store methods and domain invariants live in the store `.gd` files; the slot/AP rules are in `day_slot_economy.md`.
 

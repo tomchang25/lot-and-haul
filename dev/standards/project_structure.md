@@ -279,7 +279,7 @@ The main scene for the current build is registered in `project.godot`.
 | Block-local throwaway runtime state (no archetype)      | `game/[feature]/`                    |
 | Block scene roots, UI components, block logic           | `game/[feature]/`                    |
 | UI components and helpers shared across multiple blocks | `game/_shared/`                      |
-| Global autoloads                                        | `global/autoload/`                   |
+| Global autoloads                                        | `global/autoloads/`                  |
 | Testbed scenes                                          | `stage/testbeds/`                    |
 | Run entry scenes                                        | `stage/runs/`                        |
 | Tilesets and terrain assets                             | `stage/tilesets/`                    |

@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://scene_router_001"]
 
-[ext_resource type="Script" path="res://global/autoload/scene_router/scene_router.gd" id="1_router"]
+[ext_resource type="Script" path="res://global/autoloads/scene_router/scene_router.gd" id="1_router"]
 [ext_resource type="PackedScene" uid="uid://bauctionscn01" path="res://game/run/auction/auction_scene.tscn" id="2_ea43q"]
 [ext_resource type="PackedScene" uid="uid://bed421fg56sjp" path="res://game/run/cargo/cargo_scene.tscn" id="3_yimu3"]
 [ext_resource type="PackedScene" uid="uid://bwhscenetscn1" path="res://game/run/inspection/inspection_scene.tscn" id="4_inspect"]
 [ext_resource type="PackedScene" uid="uid://dsgsj2f826clw" path="res://game/run/reveal/reveal_scene.tscn" id="5_31m1u"]
-[ext_resource type="Script" uid="uid://bvxr6q4cplcj8" path="res://global/autoload/game_manager/scene_registry.gd" id="5_ea43q"]
+[ext_resource type="Script" uid="uid://bvxr6q4cplcj8" path="res://global/autoloads/game_manager/scene_registry.gd" id="5_ea43q"]
 [ext_resource type="PackedScene" uid="uid://cysp2gm1hjmca" path="res://game/run/run_review/run_review_scene.tscn" id="6_f47ts"]
 [ext_resource type="PackedScene" uid="uid://bwrhentry001" path="res://game/run/location_entry/location_entry.tscn" id="6_locentry"]
 [ext_resource type="PackedScene" uid="uid://blocbrowse001" path="res://game/run/lot_browse/lot_browse_scene.tscn" id="7_locbrw"]
