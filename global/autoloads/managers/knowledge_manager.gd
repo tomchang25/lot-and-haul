@@ -39,8 +39,7 @@ func _ready() -> void:
     _load_perk_registry()
     _load_attribute_registry()
     _knowledge = KnowledgeStore.new()
-    SaveManager.register_sections([_knowledge])
-    RegistryCoordinator.register(self)
+    SaveManager.register_section(self)
 
 # ── Registry validation ────────────────────────────────────────────────────────
 
@@ -59,7 +58,27 @@ func validate() -> bool:
                 "KnowledgeManager: unlocked_perks '%s' not found" % perk_id,
             )
             ok = false
+    ok = _knowledge.validate() and ok
     return ok
+
+# ══ Save section interface ════════════════════════════════════════════════════
+
+
+## Serializes KnowledgeManager state into a flat dict with the knowledge section key.
+func to_dict() -> Dictionary:
+    var out: Dictionary = { }
+    out[_knowledge.section_id()] = _knowledge.to_dict()
+    return out
+
+
+## Restores KnowledgeManager state from the full sections dict.
+func from_dict(data: Dictionary) -> void:
+    _knowledge.from_dict(data.get(_knowledge.section_id(), { }))
+
+
+## Aggregates migrate() for the knowledge store. Idempotent.
+func migrate() -> void:
+    _knowledge.migrate()
 
 # ── Mastery ────────────────────────────────────────────────────────────────────
 

@@ -62,3 +62,13 @@ func from_dict(data: Dictionary) -> void:
                 push_warning("GarageStore: owned_car_id '%s' not found — dropped" % id_variant)
                 continue
             owned_cars.append(car)
+
+
+## Migrates stale fields within this section. Idempotent. No-op by default.
+func migrate() -> void:
+    pass
+
+
+## Validates invariants within this section. Returns true when all pass.
+func validate() -> bool:
+    return true

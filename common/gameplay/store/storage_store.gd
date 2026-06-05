@@ -80,6 +80,16 @@ func from_dict(data: Dictionary) -> void:
         _migrate_research_slots(data["research_slots"])
 
 
+## Migrates stale fields within this section. Idempotent. No-op by default.
+func migrate() -> void:
+    pass
+
+
+## Validates invariants within this section. Returns true when all pass.
+func validate() -> bool:
+    return true
+
+
 ## Converts legacy research_slots entries to ItemEntry.research_progress so
 ## in-flight research survives the save format change.
 ##

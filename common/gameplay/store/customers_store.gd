@@ -85,6 +85,16 @@ func from_dict(data: Dictionary) -> void:
             customer_sales_today.append(rec)
 
 
+## Migrates stale fields within this section. Idempotent. No-op by default.
+func migrate() -> void:
+    pass
+
+
+## Validates invariants within this section. Returns true when all pass.
+func validate() -> bool:
+    return true
+
+
 static func _intify_array(arr: Array) -> Array:
     var result: Array = []
     for v: Variant in arr:

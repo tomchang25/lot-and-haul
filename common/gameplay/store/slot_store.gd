@@ -79,3 +79,13 @@ func from_dict(data: Dictionary) -> void:
         for key: Variant in data["pending_run"]:
             if key is String and data["pending_run"][key] is float:
                 pending_run[key] = int(data["pending_run"][key])
+
+
+## Migrates stale fields within this section. Idempotent. No-op by default.
+func migrate() -> void:
+    pass
+
+
+## Validates invariants within this section. Returns true when all pass.
+func validate() -> bool:
+    return true

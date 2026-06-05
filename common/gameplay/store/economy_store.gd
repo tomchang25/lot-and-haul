@@ -49,3 +49,13 @@ func to_dict() -> Dictionary:
 func from_dict(data: Dictionary) -> void:
     if data.has("cash") and data["cash"] is float:
         cash = int(data["cash"])
+
+
+## Migrates stale fields within this section. Idempotent. No-op by default.
+func migrate() -> void:
+    pass
+
+
+## Validates invariants within this section. Returns true when all pass.
+func validate() -> bool:
+    return true

@@ -87,7 +87,54 @@ func _ready() -> void:
     _slot = SlotStore.new()
     _progress = ProgressStore.new()
     _customers = CustomersStore.new()
-    SaveManager.register_sections([_economy, _garage, _storage, _progress, _slot, _customers])
+    SaveManager.register_section(self)
+
+# ══ Save section interface ════════════════════════════════════════════════════
+
+
+## Serializes all MetaManager stores into a flat multi-key dict. Each store's
+## section_id() is used as the key, matching the on-disk layout.
+func to_dict() -> Dictionary:
+    var out: Dictionary = {}
+    out[_economy.section_id()] = _economy.to_dict()
+    out[_garage.section_id()] = _garage.to_dict()
+    out[_storage.section_id()] = _storage.to_dict()
+    out[_slot.section_id()] = _slot.to_dict()
+    out[_progress.section_id()] = _progress.to_dict()
+    out[_customers.section_id()] = _customers.to_dict()
+    return out
+
+
+## Restores all stores from the full sections dict. Each store reads its own key.
+func from_dict(data: Dictionary) -> void:
+    _economy.from_dict(data.get(_economy.section_id(), {}))
+    _garage.from_dict(data.get(_garage.section_id(), {}))
+    _storage.from_dict(data.get(_storage.section_id(), {}))
+    _slot.from_dict(data.get(_slot.section_id(), {}))
+    _progress.from_dict(data.get(_progress.section_id(), {}))
+    _customers.from_dict(data.get(_customers.section_id(), {}))
+
+
+## Aggregates migrate() across all stores. Idempotent.
+func migrate() -> void:
+    _economy.migrate()
+    _garage.migrate()
+    _storage.migrate()
+    _slot.migrate()
+    _progress.migrate()
+    _customers.migrate()
+
+
+## Aggregates validate() across all stores. Returns true when all pass.
+func validate() -> bool:
+    var ok := true
+    ok = _economy.validate() and ok
+    ok = _garage.validate() and ok
+    ok = _storage.validate() and ok
+    ok = _slot.validate() and ok
+    ok = _progress.validate() and ok
+    ok = _customers.validate() and ok
+    return ok
 
 # ══ Cross-autoload cash helper ════════════════════════════════════════════════
 

@@ -59,3 +59,13 @@ func from_dict(data: Dictionary) -> void:
                 )
                 continue
             available_locations.append(loc)
+
+
+## Migrates stale fields within this section. Idempotent. No-op by default.
+func migrate() -> void:
+    pass
+
+
+## Validates invariants within this section. Returns true when all pass.
+func validate() -> bool:
+    return true

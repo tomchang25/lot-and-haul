@@ -42,6 +42,16 @@ func add_perk(perk_id: String) -> bool:
 func erase_points(category_id: String) -> void:
 	category_points.erase(category_id)
 
+
+## Migrates stale fields within this section. Idempotent. No-op by default.
+func migrate() -> void:
+	pass
+
+
+## Validates invariants within this section. Returns true when all pass.
+func validate() -> bool:
+	return true
+
 # ── Save section ───────────────────────────────────────────────────────────────
 
 ## Section id for the knowledge save payload.
