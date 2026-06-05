@@ -42,7 +42,11 @@ assets/       Static assets: car sprites, warehouse images
 common/       Reusable systems (not game-feature-specific)
   audio/      Event-driven audio system (events, presets, audio bus)
   framework/  State machine pattern
-  gameplay/   Runtime types: ItemEntry, LotEntry, RunRecord, etc.
+  gameplay/   Runtime types, organized by archetype subfolder (see Conventions)
+    store/    Manager-held mutable state containers (persisting or session-scoped)
+    snapshot/ Read-only one-shot value objects (derived, then discarded)
+    service/  Stateless pure-math helpers
+    *.gd      Entry/Instance types (ItemEntry, LotEntry, etc.)
   utils/      Random utils, perk effects
 data/         Designer resources: definitions, yaml sources, generated .tres
   definitions/  Resource class scripts (.gd) for each type
@@ -88,6 +92,7 @@ Core loop redesign: Phases 0–11 complete (runtime veil cleanup, AP grid inspec
 
 ## Conventions (quick reference)
 
+- **Runtime type archetypes**: every runtime type in `common/gameplay/` is one of four archetypes — **Entry/Instance** (live instance of a designer Data, identity + mutable state + self-maintaining behaviour, e.g. `ItemEntry`), **Store** (Manager-held domain state container with invariant-guarding mutators; persisting Stores carry `section_id/to_dict/from_dict`, session-scoped Stores do not — session is a lifetime, not a separate type), **Snapshot** (read-only value object, computed once and discarded, no mutators or serialization), **Service** (stateless pure-math helpers). Discriminator in order: no state → Service; read-only one-shot → Snapshot; mutable + Manager-held → Store; saved instance of a Data → Entry/Instance. The subfolder (`store/`, `snapshot/`, `service/`, or root `*.gd`) is the source of truth for archetype. Do not invent new type suffixes or archetypes outside this taxonomy.
 - **Naming**: snake_case files, PascalCase classes, UPPER_SNAKE constants. See `dev/standards/naming_conventions.md`.
 - **Registries**: one autoload per designer resource type, required API: `get_<singular>_by_id`, `get_all_<plural>`, `size`. No display-name wrappers. See `dev/standards/registries.md`.
 - **Scene architecture**: block scenes follow `dev/standards/block_scene_architecture_standard.md` (the single source for these rules). The node-source rule (persistent nodes live in the `.tscn`, not `add_child()`) and "no `[connection]` in `.tscn`" are **lint-enforced** — see `dev/standards/standards_enforcement.md`. Don't restate the rule's detail here; edit the standard. If you are an agent without the in-loop lint hook (i.e. not Claude Code), run `python dev/tools/lint_standards.py --files <changed>` before finishing.
@@ -102,6 +107,7 @@ Core loop redesign: Phases 0–11 complete (runtime veil cleanup, AP grid inspec
 
 ## Don'ts
 
+- Don't invent runtime type names outside the four archetypes (Entry/Instance, Store, Snapshot, Service). If a new type doesn't clearly fit, stop and ask the user before creating or naming it.
 - Don't hand-edit `.tres` files — use the YAML pipeline.
 - Don't add display-name wrappers or fallback-to-id accessors on registries.
 - Don't scan ItemRegistry to answer a category/super-category question — use the dedicated registry.

@@ -130,7 +130,7 @@ Name: `<scope>_<short_description>.md`. Contains goal (1–2 sentences), context
 
 ## Relationship to other dev/ folders
 
-- `dev/standards/` — coding conventions, naming rules, project structure, the runtime type archetype taxonomy (`runtime_type_archetypes.md`)
+- `dev/standards/` — coding conventions, naming rules, project structure (runtime type archetype taxonomy is now in `CLAUDE.md`)
 - `dev/skills/` — AI coding tool references (commit format, GDScript patterns)
 - `dev/tools/` — build scripts (yaml/tres pipeline)
 

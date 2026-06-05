@@ -52,7 +52,6 @@
 ## 📐 Standards（編碼慣例，`dev/standards/`）
 
 - [專案結構 project_structure](../standards/project_structure.md)
-- [執行期型別原型 runtime_type_archetypes](../standards/runtime_type_archetypes.md) — Entry(Instance)/Store/Snapshot/Service 四種執行期型別的分界與歸屬。
 - [命名慣例 naming_conventions](../standards/naming_conventions.md)
 - [Registry 標準 registries](../standards/registries.md)
 - [Block 場景架構 block_scene_architecture_standard](../standards/block_scene_architecture_standard.md)

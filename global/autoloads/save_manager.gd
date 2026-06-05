@@ -29,7 +29,7 @@ var _managers: Array = []
 
 
 func _ready() -> void:
-    pass  # Sections and managers are registered by owning systems before GameManager runs.
+    pass # Sections and managers are registered by owning systems before GameManager runs.
 
 
 ## Registers a save section provider. Call before load() runs (i.e. in _ready()
@@ -70,7 +70,7 @@ func run_validation() -> bool:
 
 
 func save() -> void:
-    var sections_out: Dictionary = {}
+    var sections_out: Dictionary = { }
     for section: Object in _sections:
         sections_out.merge(section.to_dict())
     var data := {
@@ -85,10 +85,6 @@ func save() -> void:
 
 
 func load() -> void:
-    _read_save_file()
-
-
-func _read_save_file() -> void:
     if not FileAccess.file_exists(SAVE_PATH):
         return
     var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
@@ -117,8 +113,8 @@ func _read_save_file() -> void:
     # the "knowledge" section before dispatching so each provider sees only its
     # own keys. No data is lost; the economy provider sees cash only.
     if schema_version < 2:
-        var econ: Dictionary = sections_data.get("economy", {})
-        var knowledge: Dictionary = {}
+        var econ: Dictionary = sections_data.get("economy", { })
+        var knowledge: Dictionary = { }
         for key: String in ["category_points", "attribute_levels", "unlocked_perks"]:
             if econ.has(key):
                 knowledge[key] = econ[key]

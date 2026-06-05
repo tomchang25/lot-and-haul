@@ -59,7 +59,7 @@ Use this folder for **designer-authored content**: Resource class definitions an
 The key question for placement: **who writes this data?**
 
 - A designer fills in values and builds `.tres` files → belongs in `data/`
-- Code creates and mutates the object at runtime → it is a runtime type, not designer content. The four runtime archetypes live in `common/gameplay/` — see `runtime_type_archetypes.md`. Block-local throwaway state with no archetype stays in its owning `game/[feature]/` folder.
+- Code creates and mutates the object at runtime → it is a runtime type, not designer content. The four runtime archetypes live in `common/gameplay/` — see `CLAUDE.md`. Block-local throwaway state with no archetype stays in its owning `game/[feature]/` folder.
 
 ### Structure
 
@@ -85,7 +85,7 @@ Organize `.tres` files by **content type**, not by which block reads them.
 
 ### What does not belong in data/
 
-Code-generated runtime objects are not designer content and do not belong in `data/`. Runtime *types* — the live instances, stores, snapshots, and services the game mutates during play — live in `common/gameplay/`, organized by archetype; see `runtime_type_archetypes.md` for the taxonomy and folder layout. Only block-local throwaway state with no archetype stays in its owning `game/[feature]/` folder.
+Code-generated runtime objects are not designer content and do not belong in `data/`. Runtime *types* — the live instances, stores, snapshots, and services the game mutates during play — live in `common/gameplay/`, organized by archetype; see `CLAUDE.md` for the taxonomy and folder layout. Only block-local throwaway state with no archetype stays in its owning `game/[feature]/` folder.
 
 ---
 
@@ -213,7 +213,7 @@ game/run/auction/
   auction_scene.tscn
 ```
 
-Runtime types (the four archetypes in `common/gameplay/` — see `runtime_type_archetypes.md`) are not designer content and never live in `data/`. Only block-local throwaway state with no archetype lives in its owning block folder.
+Runtime types (the four archetypes in `common/gameplay/` — see `CLAUDE.md`) are not designer content and never live in `data/`. Only block-local throwaway state with no archetype lives in its owning block folder.
 
 ---
 
@@ -275,7 +275,7 @@ The main scene for the current build is registered in `project.godot`.
 | Designer-authored Resource class definitions (`.gd`)    | `data/definitions/`                  |
 | Designer-authored asset files (`.tres`)                 | `data/<type>/`                       |
 | YAML source files for data pipeline                     | `data/yaml/`                         |
-| Runtime types (Entry/Instance, Store, Snapshot, Service) | `common/gameplay/` (see `runtime_type_archetypes.md`) |
+| Runtime types (Entry/Instance, Store, Snapshot, Service) | `common/gameplay/` (see `CLAUDE.md`) |
 | Block-local throwaway runtime state (no archetype)      | `game/[feature]/`                    |
 | Block scene roots, UI components, block logic           | `game/[feature]/`                    |
 | UI components and helpers shared across multiple blocks | `game/_shared/`                      |
