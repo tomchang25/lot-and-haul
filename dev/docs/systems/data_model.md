@@ -1,1 +1,0 @@
-> **Archived.** This doc's two-layer concept has moved to `../vision/data_architecture.md` (L1). Per-resource field detail lives in code docstrings (L3). This file is retained for reference at `../archived/data_model.md`.
