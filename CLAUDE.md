@@ -76,7 +76,7 @@ stage/        Testbeds, demo runs, and tile sets (mostly empty)
 
 ## Autoloads (load order matters)
 
-EventBus → AudioManager → ClueRegistry → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → SaveManager → KnowledgeManager → MetaManager → GameManager
+EventBus → AudioManager → ClueRegistry → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → SaveManager → KnowledgeManager → MetaManager → SceneRouter → GameManager
 
 `SaveManager` drives boot fan-out: MetaManager and KnowledgeManager call `SaveManager.register_manager(self)` in `_ready()`, then `GameManager._ready()` calls `SaveManager.run_migrations()` and `SaveManager.run_validation()`.
 

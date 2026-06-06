@@ -6,12 +6,12 @@ Cross-cutting boot, persistence, and hub-navigation infrastructure shared across
 
 ## Boot Orchestration
 
-`RegistryCoordinator` drives the cross-cutting boot sequence. Each registry calls `RegistryCoordinator.register(self)` at the end of `_ready()`; then `GameManager._ready()` runs two optional phases over every registered registry:
+`SaveManager` owns the cross-cutting boot fan-out. Domain managers (`MetaManager`, `KnowledgeManager`) call `SaveManager.register_manager(self)` in `_ready()`; registries and stores call `SaveManager.register_section(self)`. After `SaveManager.load()` completes, `GameManager._ready()` calls:
 
-1. **migrate()** — idempotent repair of save-state vs. data drift (e.g. dropped clue ids, renamed keys).
-2. **validate()** — boot-time audit that every save-persisted id still resolves. Any miss logs an error and fails boot validation.
+1. **`SaveManager.run_migrations()`** — fans out `migrate()` to every registered manager; idempotent repair of save-state vs. data drift (e.g. dropped clue ids, renamed keys).
+2. **`SaveManager.run_validation()`** — fans out `validate()` to every registered manager; boot-time audit that every save-persisted id still resolves. Any miss logs an error and fails boot validation.
 
-`GameManager._ready()` drives `RegistryCoordinator` only after `SaveManager.load()` completes, so migrate/validate see the loaded save state. Both phases are opt-in; a registry that implements neither is skipped.
+Both phases are opt-in; a manager that implements neither is skipped. Because `load()` runs before either fan-out, migrate/validate always see the loaded save state.
 
 ---
 
@@ -25,7 +25,7 @@ Systems register as section providers in their own `_ready()`. The invariant: `S
 
 ## MetaManager
 
-Hub-phase transactional authority (`global/autoloads/meta_manager.gd`). Holds six domain stores (`EconomyStore`, `GarageStore`, `StorageStore`, `SlotStore`, `ProgressStore`, `CustomersStore`); each owns its domain's live fields, save payload, and the mutators that guard its invariants. MetaManager exposes getter-only proxy properties so scenes need no call-site changes; proxy reference collections return shallow duplicates so callers cannot mutate live storage through the returned array.
+Hub-phase transactional authority (`global/autoloads/meta_manager.gd`). Holds six domain stores (`EconomyStore`, `GarageStore`, `StorageStore`, `SlotStore`, `ProgressStore`, `CustomersStore`) as plain public fields; each store owns its domain's live fields, save payload, and the mutators that guard its invariants. Scenes read state directly via `MetaManager.<store>.<field>` — no proxy layer.
 
 Cross-domain transactions (`resolve_run`, `resolve_customer_sale`, `end_day`, `buy_car`, `set_active_car`, `register_storage_items`, `begin_storage_slot`, `begin_auction`, `begin_open_shop`) save exactly once at their commit point. Store methods and domain invariants live in the store `.gd` files; the slot/AP rules are in `day_slot_economy.md`.
 

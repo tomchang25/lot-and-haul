@@ -3,7 +3,7 @@
 # Holds no gameplay state. Systems that own gameplay state register themselves as
 # section providers via register_section() before GameManager calls load().
 # Domain managers (MetaManager, KnowledgeManager) register via register_manager()
-# so run_migrations() and run_validation() can fan out without RegistryCoordinator.
+# so GameManager can fan out run_migrations() and run_validation() after load().
 #
 # On-disk format: { "schema_version": int, "sections": { <id>: <payload> } }.
 # Legacy flat saves (no "sections" key) are dispatched in full to each provider —
