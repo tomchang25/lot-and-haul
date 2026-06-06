@@ -13,8 +13,8 @@ func _ready() -> void:
 
 
 func refresh_lot(selected_entry: ItemEntry) -> void:
-    var stamina: int = RunManager.run_store.stamina
-    var actions: int = RunManager.run_store.actions_remaining
+    var stamina: int = RunManager.stamina
+    var actions: int = RunManager.actions_remaining
     var actions_ok: bool = actions > 0
 
     var can_inspect: bool = (

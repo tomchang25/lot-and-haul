@@ -33,10 +33,8 @@ func _ready() -> void:
     _cargo_button.pressed.connect(_on_cargo_pressed)
     _skip_confirm_popup.confirmed.connect(_on_skip_confirmed)
 
-    var record: RunStore = RunManager.run_store
-    if record.browse_lots.is_empty():
-        record.browse_lots = _sample_lots(record.location_data)
-        record.browse_index = 0
+    if RunManager.browse_lots.is_empty():
+        RunManager.init_browse_lots(_sample_lots(RunManager.location_data))
 
     _build_all_cards()
     _refresh_view()
@@ -45,13 +43,13 @@ func _ready() -> void:
 
 
 func _build_all_cards() -> void:
-    var record: RunStore = RunManager.run_store
-    var total: int = record.browse_lots.size()
+    var lots := RunManager.browse_lots
+    var total: int = lots.size()
 
     for i in total:
         var card := LotCardScene.instantiate() as LotCard
         _lot_card_container.add_child(card)
-        card.setup(record.browse_lots[i], i, total)
+        card.setup(lots[i], i, total)
 
         card.enter_pressed.connect(_on_enter_pressed)
         card.pass_pressed.connect(_on_pass_pressed)
@@ -59,9 +57,9 @@ func _build_all_cards() -> void:
 
 
 func _refresh_view() -> void:
-    var record: RunStore = RunManager.run_store
+    var idx := RunManager.browse_index
 
-    if record.browse_index >= record.browse_lots.size():
+    if idx >= RunManager.browse_lots.size():
         _show_cargo_state()
         return
 
@@ -69,7 +67,7 @@ func _refresh_view() -> void:
     _lot_card_container.visible = true
 
     for i in _lot_cards.size():
-        _lot_cards[i].set_active(i == record.browse_index)
+        _lot_cards[i].set_active(i == idx)
 
 
 func _show_cargo_state() -> void:
@@ -81,22 +79,20 @@ func _show_cargo_state() -> void:
 
 
 func _on_enter_pressed() -> void:
-    var record: RunStore = RunManager.run_store
-    var lot_data: LotData = record.browse_lots[record.browse_index]
+    var lot_data: LotData = RunManager.browse_lots[RunManager.browse_index]
     var entry := LotEntry.create(lot_data)
-    record.set_lot(entry)
-    record.browse_index += 1
+    RunManager.set_lot(entry)
+    RunManager.advance_browse_index()
     SceneRouter.go_to_inspection()
 
 
 func _on_pass_pressed() -> void:
-    RunManager.run_store.browse_index += 1
+    RunManager.advance_browse_index()
     _refresh_view()
 
 
 func _on_skip_pressed() -> void:
-    var record: RunStore = RunManager.run_store
-    var remaining: int = record.browse_lots.size() - record.browse_index
+    var remaining: int = RunManager.browse_lots.size() - RunManager.browse_index
     _skip_confirm_popup.dialog_text = (
         "Skip the remaining %d lot(s) and go straight to cargo?" % remaining
     )

@@ -384,6 +384,12 @@ func set_active_car(car: CarData) -> void:
 # ══ Run resolution ════════════════════════════════════════════════════════════
 
 
+## Convenience wrapper: resolves the currently active run without the caller
+## needing to pass the RunStore. Delegates to resolve_run.
+func resolve_current_run() -> void:
+    resolve_run(RunManager._run_store)
+
+
 ## Resolves a completed run: applies cash, registers cargo, auto-reveals surface
 ## clues, stores run economics as pending for end_day(), sets current_slot to 3
 ## so the player returns to the hub for the evening slot, and clears run state.

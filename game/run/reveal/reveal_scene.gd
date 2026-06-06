@@ -41,7 +41,7 @@ func _ready() -> void:
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
     _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
 
-    _won_items = RunManager.run_store.last_lot_won_items
+    _won_items = RunManager.last_lot_won_items
     _continue_btn.hide()
 
     if _won_items.is_empty():
@@ -81,7 +81,7 @@ func _on_row_tooltip_requested(
 
 func _populate_rows() -> void:
     _item_list_panel.setup(REVEAL_COLUMNS)
-    _item_list_panel.populate(RunManager.run_store.last_lot_won_items)
+    _item_list_panel.populate(_won_items)
 
 
 func _show_auction_lost_state() -> void:
@@ -93,5 +93,5 @@ func _show_auction_lost_state() -> void:
 
 func _on_reveal_complete() -> void:
     _item_list_panel.rebuild_header()
-    for entry in RunManager.run_store.last_lot_won_items:
+    for entry in _won_items:
         _item_list_panel.refresh_row(entry)
