@@ -53,16 +53,6 @@ func from_dict(data: Dictionary) -> void:
     customers.from_dict(data.get(customers.section_id(), { }))
 
 
-## Aggregates migrate() across all stores. Idempotent.
-func migrate() -> void:
-    economy.migrate()
-    garage.migrate()
-    storage.migrate()
-    slot.migrate()
-    progress.migrate()
-    customers.migrate()
-
-
 ## Aggregates validate() across all stores. Returns true when all pass.
 func validate() -> bool:
     var ok := true

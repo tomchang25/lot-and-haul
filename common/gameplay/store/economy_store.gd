@@ -49,10 +49,12 @@ func section_id() -> String:
 
 ## Serializes economy state to a save payload.
 func to_dict() -> Dictionary:
-    return { "cash": _cash }
+    return { "_version": _store_version(), "cash": _cash }
 
 
 ## Restores economy state. Unrecognised keys are silently ignored.
 func from_dict(data: Dictionary) -> void:
+    var version: int = int(data.get("_version", 1))
+    data = _apply_migrations(data, version)
     if data.has("cash") and data["cash"] is float:
         _cash = int(data["cash"])

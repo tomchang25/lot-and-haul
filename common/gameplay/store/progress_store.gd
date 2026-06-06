@@ -48,6 +48,7 @@ func to_dict() -> Dictionary:
     for loc: LocationData in _available_locations:
         available_location_ids.append(loc.location_id)
     return {
+        "_version": _store_version(),
         "current_day": _current_day,
         "available_location_ids": available_location_ids,
     }
@@ -55,6 +56,8 @@ func to_dict() -> Dictionary:
 
 ## Restores progress state. Unresolved location ids are dropped with a warning.
 func from_dict(data: Dictionary) -> void:
+    var version: int = int(data.get("_version", 1))
+    data = _apply_migrations(data, version)
     if data.has("current_day") and data["current_day"] is float:
         _current_day = int(data["current_day"])
     if data.has("available_location_ids") and data["available_location_ids"] is Array:

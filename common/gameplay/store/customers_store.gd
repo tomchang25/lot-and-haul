@@ -71,6 +71,7 @@ func to_dict() -> Dictionary:
     for c: Customer in _nightly_customers:
         serialized_customers.append(c.to_dict())
     return {
+        "_version": _store_version(),
         "nightly_customers": serialized_customers,
         "customer_sales_today": _customer_sales_today,
     }
@@ -78,6 +79,8 @@ func to_dict() -> Dictionary:
 
 ## Restores customer state. Unrecognised keys are silently ignored.
 func from_dict(data: Dictionary) -> void:
+    var version: int = int(data.get("_version", 1))
+    data = _apply_migrations(data, version)
     _nightly_customers = []
     if data.has("nightly_customers") and data["nightly_customers"] is Array:
         for d: Variant in data["nightly_customers"]:

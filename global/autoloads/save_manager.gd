@@ -2,7 +2,8 @@
 # Persistence coordinator: file IO, schema handling, and registered provider dispatch.
 # Holds no gameplay state. Systems that own gameplay state register themselves via
 # register_provider() before GameManager calls load(). Each provider implements the
-# full StoreBase interface: to_dict(), from_dict(), migrate(), validate().
+# StoreBase save interface: to_dict(), from_dict(), validate(). Per-store versioned
+# migrations run inside each store's from_dict() via _apply_migrations().
 #
 # On-disk format: { "schema_version": int, "sections": { <id>: <payload> } }.
 # schema_version is always SCHEMA_VERSION (2) on new saves; load() requires the
@@ -13,9 +14,9 @@ const SAVE_PATH := "user://save.json"
 const SCHEMA_VERSION := 2
 
 ## Registered providers, in registration order. Each must implement to_dict(),
-## from_dict(), migrate(), and validate(). to_dict() returns a flat multi-key dict
-## (all section keys merged into sections_out); from_dict() receives the full
-## sections dict and reads only its own keys.
+## from_dict(), and validate(). to_dict() returns a flat multi-key dict (all
+## section keys merged into sections_out); from_dict() receives the full sections
+## dict and reads only its own keys.
 var _providers: Array = []
 
 
@@ -25,20 +26,12 @@ func _ready() -> void:
 
 ## Registers a save provider. Call before load() runs (i.e. in _ready() of the
 ## owning autoload). The provider must implement to_dict() -> Dictionary,
-## from_dict(Dictionary), migrate(), and validate() -> bool.
+## from_dict(Dictionary), and validate() -> bool.
 func register_provider(provider: Object) -> void:
     assert(provider.has_method("to_dict"), "register_provider: %s missing to_dict()" % provider)
     assert(provider.has_method("from_dict"), "register_provider: %s missing from_dict()" % provider)
-    assert(provider.has_method("migrate"), "register_provider: %s missing migrate()" % provider)
     assert(provider.has_method("validate"), "register_provider: %s missing validate()" % provider)
     _providers.append(provider)
-
-
-## Calls migrate() on every registered provider. Idempotent — providers are
-## expected to make their migrations idempotent.
-func run_migrations() -> void:
-    for provider: Object in _providers:
-        provider.migrate()
 
 
 ## Calls validate() on every registered provider, accumulates failures, and

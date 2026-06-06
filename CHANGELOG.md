@@ -28,6 +28,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 ## SaveManager Provider Unification & Legacy Cleanup
 
 - 2026-06-06 — [refactor] Merged `_sections` + `_managers` into single `_providers` array in SaveManager; replaced `register_section`, `register_sections`, and `register_manager` with single `register_provider` (asserts all four StoreBase methods); MetaManager and KnowledgeManager each call `register_provider(self)` once; all four iteration sites (`save`, `load`, `run_migrations`, `run_validation`) updated to `_providers`
+- 2026-06-06 — [refactor] Per-store versioned migrations: added `_store_version()` and `_apply_migrations()` to StoreBase; removed `migrate()` from StoreBase, GarageStore, KnowledgeStore, MetaManager, KnowledgeManager, and SaveManager; removed `run_migrations()` from SaveManager and boot call in GameManager; all 6 persisting stores write `_version` in `to_dict()` and read it in `from_dict()`; removed `erase_points()`/`erase_category_points()` dead code; removed `skill_levels` legacy branch from KnowledgeStore
 - 2026-06-06 — [refactor] Removed unreachable legacy paths from SaveManager.load(): flat-save fallback and schema 1→2 migration branch; load() now requires "sections" key (push_error otherwise); removed stale comment about removed systems; removed `research_slots` migration check and `_migrate_research_slots()` from StorageStore (pre-time-slot saves are gone); updated docstrings in both files
 
 ---

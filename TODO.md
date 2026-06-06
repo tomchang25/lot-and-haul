@@ -145,10 +145,6 @@ Each vehicle grants a unique gameplay modifier (e.g. "+1 action per lot", "ignor
 
 Sell owned cars for partial value when upgrading, so trading up has a cost offset.
 
-### Version-Based Save Migration
-
-Save dict has no version field — migrations use implicit `parsed.has("key")` checks. Add `"version"` integer field, define version constants, and replace implicit checks with explicit version-switch migration functions. Covers save_manager.gd and item_entry.gd from_dict().
-
 ### YAML Data Overhaul
 
 Two-part content standard. (1) Define super_category / category reference tables: median, mean, stddev, min, max price and condition per category for balancing. (2) Adopt rarity layer distribution as authoring guideline: 8 Common (L1), 8 Uncommon (L1-2), 4 Rare (L2-3), 1 Epic (L3-4), 1 Legendary (L4 + SuperCat). Audit existing YAML items against this standard.

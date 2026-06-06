@@ -60,6 +60,7 @@ func to_dict() -> Dictionary:
     for entry: ItemEntry in _storage_items:
         serialized_items.append(entry.to_dict())
     return {
+        "_version": _store_version(),
         "storage_items": serialized_items,
         "next_entry_id": _next_entry_id,
     }
@@ -69,6 +70,8 @@ func to_dict() -> Dictionary:
 ## with a warning (push_warning in ItemEntry.from_dict). apply_storage_migration()
 ## is called on each loaded entry to auto-reveal surface clues (not legacy — always runs).
 func from_dict(data: Dictionary) -> void:
+    var version: int = int(data.get("_version", 1))
+    data = _apply_migrations(data, version)
     if data.has("storage_items") and data["storage_items"] is Array:
         _storage_items = []
         for d: Variant in data["storage_items"]:

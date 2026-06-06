@@ -82,10 +82,6 @@ func from_dict(data: Dictionary) -> void:
     _knowledge.from_dict(data.get(_knowledge.section_id(), { }))
 
 
-## Aggregates migrate() for the knowledge store. Idempotent.
-func migrate() -> void:
-    _knowledge.migrate()
-
 # ── Mastery ────────────────────────────────────────────────────────────────────
 
 
@@ -104,12 +100,6 @@ func get_category_points(category: CategoryData) -> int:
 ## Returns the category IDs that currently have mastery points recorded.
 func get_tracked_category_ids() -> Array:
     return _knowledge.category_points.keys()
-
-
-## Removes the mastery-points entry for [param category_id]. Does not save.
-## Used during migration to prune stale category IDs.
-func erase_category_points(category_id: String) -> void:
-    _knowledge.erase_points(category_id)
 
 
 func get_category_rank(category: CategoryData) -> int:

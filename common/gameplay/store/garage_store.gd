@@ -49,6 +49,7 @@ func to_dict() -> Dictionary:
     for car: CarData in _owned_cars:
         owned_car_ids.append(car.car_id)
     return {
+        "_version": _store_version(),
         "active_car_id": _active_car.car_id if _active_car != null else "",
         "owned_car_ids": owned_car_ids,
     }
@@ -56,6 +57,8 @@ func to_dict() -> Dictionary:
 
 ## Restores garage state. Unresolved car ids are dropped with a warning.
 func from_dict(data: Dictionary) -> void:
+    var version: int = int(data.get("_version", 1))
+    data = _apply_migrations(data, version)
     if data.has("active_car_id") and data["active_car_id"] is String:
         var id: String = data["active_car_id"]
         if id.is_empty():
@@ -77,13 +80,3 @@ func from_dict(data: Dictionary) -> void:
             _owned_cars.append(car)
 
 
-## Idempotent migration: guarantees a fresh save gets the starter van.
-## Mirrors the logic previously in CarRegistry.migrate(). CarRegistry is loaded
-## before SaveManager/MetaManager, so it is available here.
-func migrate() -> void:
-    if _owned_cars.is_empty():
-        var van: CarData = CarRegistry.get_car_by_id("van_basic")
-        if van != null:
-            _owned_cars.append(van)
-    if _active_car == null and not _owned_cars.is_empty():
-        _active_car = _owned_cars[0]

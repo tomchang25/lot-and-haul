@@ -48,24 +48,6 @@ func add_perk(perk_id: String) -> bool:
     return true
 
 
-## Removes [param category_id] from category_points. Does not save.
-## Used during migration to prune stale category IDs.
-func erase_points(category_id: String) -> void:
-    _category_points.erase(category_id)
-
-
-## Idempotent migration: prunes category_points keys that no longer exist in
-## CategoryRegistry. Mirrors the logic previously in CategoryRegistry.migrate().
-## CategoryRegistry is loaded before SaveManager/KnowledgeManager, so it is
-## available here.
-func migrate() -> void:
-    for key: String in _category_points.keys():
-        if CategoryRegistry.get_category_by_id(key) == null:
-            push_warning(
-                "KnowledgeStore.migrate: dropping unknown category_points key '%s'" % key,
-            )
-            _category_points.erase(key)
-
 # ── Save section ───────────────────────────────────────────────────────────────
 
 
@@ -77,6 +59,7 @@ func section_id() -> String:
 ## Serializes knowledge progression to a save payload.
 func to_dict() -> Dictionary:
     return {
+        "_version": _store_version(),
         "category_points": _category_points,
         "attribute_levels": _attribute_levels,
         "unlocked_perks": _unlocked_perks,
@@ -84,11 +67,9 @@ func to_dict() -> Dictionary:
 
 
 ## Restores knowledge progression from a save payload.
-##
-## Handles legacy flat saves (keys read directly from the flat dict) and
-## schema-2 sectioned saves (coordinator dispatches the knowledge sub-dict).
-## Also migrates old skill_levels by discarding them and starting fresh.
 func from_dict(data: Dictionary) -> void:
+    var version: int = int(data.get("_version", 1))
+    data = _apply_migrations(data, version)
     if data.has("category_points") and data["category_points"] is Dictionary:
         _category_points = data["category_points"]
     if data.has("unlocked_perks") and data["unlocked_perks"] is Array:
@@ -101,8 +82,3 @@ func from_dict(data: Dictionary) -> void:
         for key: Variant in data["attribute_levels"]:
             if key is String and data["attribute_levels"][key] is float:
                 _attribute_levels[key] = int(data["attribute_levels"][key])
-    elif data.has("skill_levels"):
-        # Migration: discard old skill_levels, start fresh with defaults.
-        _attribute_levels = { }
-    else:
-        _attribute_levels = { }
