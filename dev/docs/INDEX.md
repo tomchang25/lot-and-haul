@@ -44,7 +44,7 @@
 
 - [Demo 摘要 demo_summary](plans/demo_summary.md) — 6 天目標版本。⚠️ 標記為 stale，留作設計參考。
 - [車庫拍賣 garage_sale_auction](plans/garage_sale_auction.md) — 未排程；同時是商人議價機制的備份。
-- [StoreBase + RunRecord 拆分 store_base_and_run_split](plans/store_base_and_run_split.md) — StoreBase 抽取、RunRecord→RunStore 拆分（service 邏輯移至 RunManager）、DaySummary→DaySnapshot。
+- [StoreBase + RunRecord 拆分 store_base_and_run_split](plans/store_base_and_run_split.md) — StoreBase 抽取、RunRecord→RunStore 拆分（service 邏輯移至 RunManager）、DaySummary 作為 Snapshot 原型。
 - [車輛修復 vehicle_restoration](plans/vehicle_restoration.md) — 收藏型子系統：拍賣中收集車輛零件、組裝、販售成品車。
 
 ---

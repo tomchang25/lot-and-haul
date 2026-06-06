@@ -211,11 +211,11 @@ func begin_open_shop(selling_slots: int) -> void:
 
 ## Closes out the current calendar day: advances current_day, deducts living
 ## cost, captures customer sales, folds pending run economics, resets slot
-## state, saves, and returns a DaySnapshot for the day summary scene.
+## state, saves, and returns a DaySummary for the day summary scene.
 ##
 ## The hub calls this automatically when current_slot > 3.
-func end_day() -> DaySnapshot:
-    var summary := DaySnapshot.new()
+func end_day() -> DaySummary:
+    var summary := DaySummary.new()
     summary.start_day = _progress.current_day
     summary.days_elapsed = 1
     summary.living_cost = Economy.DAILY_BASE_COST

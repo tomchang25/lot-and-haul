@@ -7,91 +7,91 @@ extends Node
 
 # ── Day-summary hand-off ─────────────────────────────────────────────────────
 
-var _pending_day_summary: DaySnapshot = null
+var _pending_day_summary: DaySummary = null
 
 
-## Store a DaySnapshot and navigate to the day-summary scene.
-func go_to_day_summary(summary: DaySnapshot) -> void:
-	_pending_day_summary = summary
-	get_tree().change_scene_to_packed(scenes.day_summary)
+## Store a DaySummary and navigate to the day-summary scene.
+func go_to_day_summary(summary: DaySummary) -> void:
+    _pending_day_summary = summary
+    get_tree().change_scene_to_packed(scenes.day_summary)
 
 
-## Consume and return the pending DaySnapshot (called once by day_summary_scene).
-func consume_pending_day_summary() -> DaySnapshot:
-	var summary := _pending_day_summary
-	_pending_day_summary = null
-	return summary
+## Consume and return the pending DaySummary (called once by day_summary_scene).
+func consume_pending_day_summary() -> DaySummary:
+    var summary := _pending_day_summary
+    _pending_day_summary = null
+    return summary
 
 # ── Scene transitions ─────────────────────────────────────────────────────────
 
 
 func go_to_location_select() -> void:
-	get_tree().change_scene_to_packed(scenes.location_select)
+    get_tree().change_scene_to_packed(scenes.location_select)
 
 
 func go_to_location_entry() -> void:
-	get_tree().change_scene_to_packed(scenes.location_entry)
+    get_tree().change_scene_to_packed(scenes.location_entry)
 
 
 func go_to_lot_browse() -> void:
-	get_tree().change_scene_to_packed(scenes.lot_browse)
+    get_tree().change_scene_to_packed(scenes.lot_browse)
 
 
 func go_to_inspection() -> void:
-	get_tree().change_scene_to_packed(scenes.inspection)
+    get_tree().change_scene_to_packed(scenes.inspection)
 
 
 func go_to_auction() -> void:
-	get_tree().change_scene_to_packed(scenes.auction)
+    get_tree().change_scene_to_packed(scenes.auction)
 
 
 func go_to_reveal() -> void:
-	get_tree().change_scene_to_packed(scenes.reveal)
+    get_tree().change_scene_to_packed(scenes.reveal)
 
 
 func go_to_cargo() -> void:
-	get_tree().change_scene_to_packed(scenes.cargo)
+    get_tree().change_scene_to_packed(scenes.cargo)
 
 
 func go_to_run_review() -> void:
-	get_tree().change_scene_to_packed(scenes.run_review)
+    get_tree().change_scene_to_packed(scenes.run_review)
 
 
 func go_to_hub() -> void:
-	get_tree().change_scene_to_packed(scenes.hub)
+    get_tree().change_scene_to_packed(scenes.hub)
 
 
 func go_to_storage() -> void:
-	get_tree().change_scene_to_packed(scenes.storage)
+    get_tree().change_scene_to_packed(scenes.storage)
 
 
 func go_to_attribute_panel() -> void:
-	get_tree().change_scene_to_packed(scenes.attribute_panel)
+    get_tree().change_scene_to_packed(scenes.attribute_panel)
 
 
 func go_to_knowledge_hub() -> void:
-	get_tree().change_scene_to_packed(scenes.knowledge_hub)
+    get_tree().change_scene_to_packed(scenes.knowledge_hub)
 
 
 func go_to_mastery_panel() -> void:
-	get_tree().change_scene_to_packed(scenes.mastery_panel)
+    get_tree().change_scene_to_packed(scenes.mastery_panel)
 
 
 func go_to_perk_panel() -> void:
-	get_tree().change_scene_to_packed(scenes.perk_panel)
+    get_tree().change_scene_to_packed(scenes.perk_panel)
 
 
 func go_to_vehicle_hub() -> void:
-	get_tree().change_scene_to_packed(scenes.vehicle_hub)
+    get_tree().change_scene_to_packed(scenes.vehicle_hub)
 
 
 func go_to_car_select() -> void:
-	get_tree().change_scene_to_packed(scenes.car_select)
+    get_tree().change_scene_to_packed(scenes.car_select)
 
 
 func go_to_car_shop() -> void:
-	get_tree().change_scene_to_packed(scenes.car_shop)
+    get_tree().change_scene_to_packed(scenes.car_shop)
 
 
 func go_to_customer_sell() -> void:
-	get_tree().change_scene_to_packed(scenes.customer_sell)
+    get_tree().change_scene_to_packed(scenes.customer_sell)

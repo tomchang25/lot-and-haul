@@ -13,6 +13,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-06-06 — [refactor] Introduced `StoreBase extends RefCounted` as the shared base for all Store archetypes; all 7 persisting Stores and the new `RunStore` extend it; empty `migrate()`/`validate()` overrides removed from Stores where StoreBase no-ops suffice
 - 2026-06-06 — [refactor] Renamed `RunRecord` → `RunStore` (moved to `common/gameplay/store/`); stripped factory + AP resolution logic out of the class; `RunManager` now owns `create_run_store()`, `_resolve_inspection_ap_cap()`, `_resolve_refill_reserve()`, `_compute_travel_costs()`; `set_lot()` and all state fields remain on `RunStore`; `run_record` accessor renamed to `run_store` across all run-phase scenes
 - 2026-06-06 — [refactor] Reclassified `DaySummary` → `DaySnapshot` (moved to `common/gameplay/snapshot/`); updated `MetaManager.end_day()` return type, `SceneRouter` pending field, and `DaySummaryScene` type annotation; scene/route/packed-scene names unchanged
+- 2026-06-06 — [refactor] Renamed `DaySnapshot` → `DaySummary` (file: `day_snapshot.gd` → `day_summary.gd`, class: `DaySnapshotScene` → `DaySummaryScene`); updated all callers in `MetaManager.end_day()`, `SceneRouter`, and `DaySummaryScene` type annotations
 
 ---
 

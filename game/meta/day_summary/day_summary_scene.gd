@@ -1,7 +1,7 @@
 # day_summary_scene.gd
 # Standalone scene displaying day-advancement results (economics, actions).
 # Both the hub day-pass flow and the run-review flow navigate here.
-class_name DaySnapshotScene
+class_name DaySummaryScene
 extends Control
 
 # ── Node references ───────────────────────────────────────────────────────────
@@ -35,9 +35,9 @@ extends Control
 func _ready() -> void:
     _continue_btn.pressed.connect(_on_continue_pressed)
 
-    var summary: DaySnapshot = SceneRouter.consume_pending_day_summary()
+    var summary: DaySummary = SceneRouter.consume_pending_day_summary()
     if summary == null:
-        push_warning("DaySnapshotScene: no pending summary — returning to hub")
+        push_warning("DaySummaryScene: no pending summary — returning to hub")
         SceneRouter.go_to_hub()
         return
 
@@ -46,7 +46,7 @@ func _ready() -> void:
 # ══ Display ═══════════════════════════════════════════════════════════════════
 
 
-func _render(summary: DaySnapshot) -> void:
+func _render(summary: DaySummary) -> void:
     # Day header
     if summary.days_elapsed > 1:
         _day_header.text = "Day %d → Day %d" % [summary.start_day, summary.end_day]

@@ -16,7 +16,7 @@ The slot tray presents three slots (Morning / Afternoon / Evening). Each open sl
 - **Vehicle** — routes to Vehicle Hub (Garage car select + Car Shop).
 - **Knowledge** — routes to Knowledge Hub (Mastery / Attributes / Perks).
 
-When the day ends — Open Shop chosen, or all three slots spent — the hub asks `MetaManager` to close the day and routes the returned `DaySnapshot` to `DaySummaryScene`. Returning to hub re-runs `_ready()` and refreshes the display.
+When the day ends — Open Shop chosen, or all three slots spent — the hub asks `MetaManager` to close the day and routes the returned `DaySummary` to `DaySummaryScene`. Returning to hub re-runs `_ready()` and refreshes the display.
 
 All slot transitions go through `MetaManager` (one method per activity); the hub never writes `current_day`, living cost, or customer state itself. Full slot/AP rules are in `../day_slot_economy.md`.
 

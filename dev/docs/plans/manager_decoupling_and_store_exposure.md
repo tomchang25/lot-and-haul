@@ -28,7 +28,7 @@ Acceptance criteria:
 
 ## Phase 2 — RunResult value object
 
-Add a `RunResult` snapshot class (same archetype as `DaySnapshot`) in `common/gameplay/snapshot/`. RunManager builds it from `_run_store` via a new `take_run_result() -> RunResult` method, applying `auto_reveal_all_surface()` on cargo items before snapshotting. MetaManager's `resolve_current_run` calls `take_run_result()` instead of `RunManager._run_store`, consumes the result, then calls `RunManager.clear_run_state()`.
+Add a `RunResult` snapshot class (same archetype as `DaySummary`) in `common/gameplay/snapshot/`. RunManager builds it from `_run_store` via a new `take_run_result() -> RunResult` method, applying `auto_reveal_all_surface()` on cargo items before snapshotting. MetaManager's `resolve_current_run` calls `take_run_result()` instead of `RunManager._run_store`, consumes the result, then calls `RunManager.clear_run_state()`.
 
 `_run_store` becomes truly private — no external code references it. The `resolve_run(record: RunStore)` signature changes to `resolve_run(result: RunResult)`.
 

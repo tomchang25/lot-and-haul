@@ -1,8 +1,8 @@
-# day_snapshot.gd
+# day_summary.gd
 # Read-only Snapshot returned by MetaManager.end_day(). Financial recap only —
 # storage feedback is immediate and does not need a deferred summary entry.
 # Consumed once by the day-summary scene; not serialized.
-class_name DaySnapshot
+class_name DaySummary
 extends RefCounted
 
 var start_day: int
