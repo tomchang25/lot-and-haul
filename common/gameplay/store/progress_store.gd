@@ -3,7 +3,7 @@
 # Serializable state slice held by MetaManager. Owns the fields, their save
 # payload, and the operations that mutate them.
 class_name ProgressStore
-extends RefCounted
+extends StoreBase
 
 ## Calendar day counter. Starts at 0, incremented by end_day().
 var current_day: int = 0
@@ -61,11 +61,3 @@ func from_dict(data: Dictionary) -> void:
             available_locations.append(loc)
 
 
-## Migrates stale fields within this section. Idempotent. No-op by default.
-func migrate() -> void:
-    pass
-
-
-## Validates invariants within this section. Returns true when all pass.
-func validate() -> bool:
-    return true

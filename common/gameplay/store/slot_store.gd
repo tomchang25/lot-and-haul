@@ -3,7 +3,7 @@
 # and pending run economics. Serializable state slice held by MetaManager.
 # Owns the fields, their save payload, and the phase operations that mutate them.
 class_name SlotStore
-extends RefCounted
+extends StoreBase
 
 ## Current slot index within the active day (1 = Morning, 2 = Afternoon,
 ## 3 = Evening). > 3 means the day is ending — hub auto-calls end_day on entry.
@@ -35,7 +35,7 @@ func charge_ap(cost: int) -> void:
 
 ## Persists run economics from [param record] into pending_run so end_day can
 ## fold them into the day summary. Does not save.
-func stash_pending_run(record: RunRecord) -> void:
+func stash_pending_run(record: RunStore) -> void:
     pending_run = {
         "onsite_proceeds": record.onsite_proceeds,
         "paid_price": record.paid_price,
@@ -81,11 +81,3 @@ func from_dict(data: Dictionary) -> void:
                 pending_run[key] = int(data["pending_run"][key])
 
 
-## Migrates stale fields within this section. Idempotent. No-op by default.
-func migrate() -> void:
-    pass
-
-
-## Validates invariants within this section. Returns true when all pass.
-func validate() -> bool:
-    return true

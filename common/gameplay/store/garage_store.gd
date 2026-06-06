@@ -3,7 +3,7 @@
 # slice held by MetaManager. Owns the fields, their save payload, and the
 # operations that mutate them.
 class_name GarageStore
-extends RefCounted
+extends StoreBase
 
 var active_car: CarData = null
 var owned_cars: Array[CarData] = []
@@ -76,6 +76,3 @@ func migrate() -> void:
         active_car = owned_cars[0]
 
 
-## Validates invariants within this section. Returns true when all pass.
-func validate() -> bool:
-    return true

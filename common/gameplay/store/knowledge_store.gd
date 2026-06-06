@@ -3,7 +3,7 @@
 # perks. Serializable state slice held by KnowledgeManager. Owns the three
 # persistent fields, their serialization, and no-save mutators.
 class_name KnowledgeStore
-extends RefCounted
+extends StoreBase
 
 ## Per-category mastery points. Keys are category IDs (String), values are int.
 var category_points: Dictionary = {}
@@ -55,10 +55,6 @@ func migrate() -> void:
 			)
 			category_points.erase(key)
 
-
-## Validates invariants within this section. Returns true when all pass.
-func validate() -> bool:
-	return true
 
 # ── Save section ───────────────────────────────────────────────────────────────
 

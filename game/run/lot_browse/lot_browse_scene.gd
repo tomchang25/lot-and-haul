@@ -2,7 +2,7 @@
 # Lot browse loop — player cycles through sampled lots and chooses to
 # Enter (inspect + auction) or Pass each one.
 #
-# State persists across scene transitions via RunRecord.browse_lots / browse_index.
+# State persists across scene transitions via RunStore.browse_lots / browse_index.
 #
 # First load  : browse_lots is empty → sample lots → show index 0.
 # Return visit: browse_lots already populated → resume at current browse_index.
@@ -33,7 +33,7 @@ func _ready() -> void:
     _cargo_button.pressed.connect(_on_cargo_pressed)
     _skip_confirm_popup.confirmed.connect(_on_skip_confirmed)
 
-    var record: RunRecord = RunManager.run_record
+    var record: RunStore = RunManager.run_store
     if record.browse_lots.is_empty():
         record.browse_lots = _sample_lots(record.location_data)
         record.browse_index = 0
@@ -45,7 +45,7 @@ func _ready() -> void:
 
 
 func _build_all_cards() -> void:
-    var record: RunRecord = RunManager.run_record
+    var record: RunStore = RunManager.run_store
     var total: int = record.browse_lots.size()
 
     for i in total:
@@ -59,7 +59,7 @@ func _build_all_cards() -> void:
 
 
 func _refresh_view() -> void:
-    var record: RunRecord = RunManager.run_record
+    var record: RunStore = RunManager.run_store
 
     if record.browse_index >= record.browse_lots.size():
         _show_cargo_state()
@@ -81,7 +81,7 @@ func _show_cargo_state() -> void:
 
 
 func _on_enter_pressed() -> void:
-    var record: RunRecord = RunManager.run_record
+    var record: RunStore = RunManager.run_store
     var lot_data: LotData = record.browse_lots[record.browse_index]
     var entry := LotEntry.create(lot_data)
     record.set_lot(entry)
@@ -90,12 +90,12 @@ func _on_enter_pressed() -> void:
 
 
 func _on_pass_pressed() -> void:
-    RunManager.run_record.browse_index += 1
+    RunManager.run_store.browse_index += 1
     _refresh_view()
 
 
 func _on_skip_pressed() -> void:
-    var record: RunRecord = RunManager.run_record
+    var record: RunStore = RunManager.run_store
     var remaining: int = record.browse_lots.size() - record.browse_index
     _skip_confirm_popup.dialog_text = (
         "Skip the remaining %d lot(s) and go straight to cargo?" % remaining

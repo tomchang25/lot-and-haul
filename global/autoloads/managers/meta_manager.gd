@@ -96,7 +96,7 @@ func _ready() -> void:
 ## Serializes all MetaManager stores into a flat multi-key dict. Each store's
 ## section_id() is used as the key, matching the on-disk layout.
 func to_dict() -> Dictionary:
-    var out: Dictionary = {}
+    var out: Dictionary = { }
     out[_economy.section_id()] = _economy.to_dict()
     out[_garage.section_id()] = _garage.to_dict()
     out[_storage.section_id()] = _storage.to_dict()
@@ -108,12 +108,12 @@ func to_dict() -> Dictionary:
 
 ## Restores all stores from the full sections dict. Each store reads its own key.
 func from_dict(data: Dictionary) -> void:
-    _economy.from_dict(data.get(_economy.section_id(), {}))
-    _garage.from_dict(data.get(_garage.section_id(), {}))
-    _storage.from_dict(data.get(_storage.section_id(), {}))
-    _slot.from_dict(data.get(_slot.section_id(), {}))
-    _progress.from_dict(data.get(_progress.section_id(), {}))
-    _customers.from_dict(data.get(_customers.section_id(), {}))
+    _economy.from_dict(data.get(_economy.section_id(), { }))
+    _garage.from_dict(data.get(_garage.section_id(), { }))
+    _storage.from_dict(data.get(_storage.section_id(), { }))
+    _slot.from_dict(data.get(_slot.section_id(), { }))
+    _progress.from_dict(data.get(_progress.section_id(), { }))
+    _customers.from_dict(data.get(_customers.section_id(), { }))
 
 
 ## Aggregates migrate() across all stores. Idempotent.
@@ -201,11 +201,11 @@ func begin_open_shop(selling_slots: int) -> void:
 
 ## Closes out the current calendar day: advances current_day, deducts living
 ## cost, captures customer sales, folds pending run economics, resets slot
-## state, saves, and returns a DaySummary for the day summary scene.
+## state, saves, and returns a DaySnapshot for the day summary scene.
 ##
 ## The hub calls this automatically when current_slot > 3.
-func end_day() -> DaySummary:
-    var summary := DaySummary.new()
+func end_day() -> DaySnapshot:
+    var summary := DaySnapshot.new()
     summary.start_day = _progress.current_day
     summary.days_elapsed = 1
     summary.living_cost = Economy.DAILY_BASE_COST
@@ -361,7 +361,7 @@ func research_item(entry: ItemEntry) -> bool:
 # ══ Vehicle management ════════════════════════════════════════════════════════
 
 
-## Purchases [param car]: validates non-null, not already owned, and affordable;
+## Purchases [param car]: validates non-null, not already owned, and affordable
 ## deducts cash; appends to the owned roster. Saves on success.
 func buy_car(car: CarData) -> bool:
     if car == null:
@@ -391,7 +391,7 @@ func set_active_car(car: CarData) -> void:
 ## Navigation: the caller (run_review_scene) must call SceneRouter.go_to_hub()
 ## after this returns. The day summary fires when the player chooses Open Shop
 ## or all slots are exhausted from the hub.
-func resolve_run(record: RunRecord) -> void:
+func resolve_run(record: RunStore) -> void:
     _economy.apply_delta(
         record.onsite_proceeds - record.paid_price - record.entry_fee - record.fuel_cost,
     )

@@ -42,7 +42,7 @@ Variance belongs where there is a clock — the on-site auction, whose inspectio
 
 ## Auction Two-Tier AP
 
-Auction inspection runs on its own pool on `RunRecord`, separate from storage AP, with two independent levers:
+Auction inspection runs on its own pool on `RunStore`, separate from storage AP, with two independent levers:
 
 - **Per-lot cap** (`inspection_ap_cap`, default `Economy.INSPECTION_AP_CAP` = 10) — the spendable budget for the _current_ lot. Within one lot AP is pure consume; once spent it never regenerates mid-lot, and it never exceeds the cap no matter how full the reserve. Raising the cap deepens inspection of any single lot.
 - **Reserve** (`refill_metric`, default `Economy.INSPECTION_REFILL_METRIC_DEFAULT` = 30) — a finite pool for the whole visit. Raising it lets the player inspect more lots deeply across one visit.
@@ -58,7 +58,7 @@ Lot4 -10   AP 0  → boundary: deficit 2 (reserve short) → AP 2 / Reserve 0
 Lot5       only 2 AP, no further refill
 ```
 
-Both values are resolved once at run construction through dedicated resolvers on `RunRecord`, the single fold point where future modifiers (car, attributes, perks) will enter. They are currently flat. The first lot of a visit opens at the full cap. This pool replaces the old per-lot fixed `action_quota`; a designer may still cap an individual lot below the pool maximum.
+Both values are resolved once at run construction through dedicated resolvers on `RunManager`, the single fold point where future modifiers (car, attributes, perks) will enter. They are currently flat. The first lot of a visit opens at the full cap. This pool replaces the old per-lot fixed `action_quota`; a designer may still cap an individual lot below the pool maximum.
 
 ## Customer Scaling
 
@@ -91,4 +91,4 @@ Persisted on `SlotStore`: `current_slot`, `storage_ap`, `selling_slots_today`, a
 ## Open Questions
 
 - The AP cost table and pool sizes are flat and untuned; with stacked Storage slots, is 10 AP/slot too generous for full authentication, and should Restore cost more than Repair?
-- Auction AP modifier levers (car, attributes, perks) have fold points reserved in `RunRecord` but no live terms — what raises the cap vs. the reserve?
+- Auction AP modifier levers (car, attributes, perks) have fold points reserved in `RunManager` but no live terms — what raises the cap vs. the reserve?

@@ -8,6 +8,14 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## StoreBase Extraction + RunRecord Decomposition
+
+- 2026-06-06 — [refactor] Introduced `StoreBase extends RefCounted` as the shared base for all Store archetypes; all 7 persisting Stores and the new `RunStore` extend it; empty `migrate()`/`validate()` overrides removed from Stores where StoreBase no-ops suffice
+- 2026-06-06 — [refactor] Renamed `RunRecord` → `RunStore` (moved to `common/gameplay/store/`); stripped factory + AP resolution logic out of the class; `RunManager` now owns `create_run_store()`, `_resolve_inspection_ap_cap()`, `_resolve_refill_reserve()`, `_compute_travel_costs()`; `set_lot()` and all state fields remain on `RunStore`; `run_record` accessor renamed to `run_store` across all run-phase scenes
+- 2026-06-06 — [refactor] Reclassified `DaySummary` → `DaySnapshot` (moved to `common/gameplay/snapshot/`); updated `MetaManager.end_day()` return type, `SceneRouter` pending field, and `DaySummaryScene` type annotation; scene/route/packed-scene names unchanged
+
+---
+
 ## Systems Docs L2 Audit
 
 - 2026-06-05 — [docs] Audited all 10 systems/ docs against the L2 exclusion rule; lifted the two-layer (designer resource / runtime type) concept to new vision/data_architecture.md; dropped Reads/Writes/Ownership/roster tables to L3 (enriched item_card.gd docstring); trimmed hub_home/knowledge/vehicle/customer_sell/autoloads/item_display/item_system to cross-flow only; archived data_model.md (concept now in vision, field detail in code)

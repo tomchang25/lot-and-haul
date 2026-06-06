@@ -31,7 +31,7 @@ var npc_estimate: int = 0
 # Creates a LotEntry by rolling all factors from lot_data ranges
 # and generating one ItemEntry per roll in lot_data.item_count_min/max.
 # Apply external modifiers (player buffs, NPC presence) to the returned entry
-# before passing it to RunRecord.create().
+# before passing it to RunManager.create_run_store().
 static func create(data: LotData) -> LotEntry:
     var entry := LotEntry.new()
     entry.lot_data = data

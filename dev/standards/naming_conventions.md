@@ -21,7 +21,7 @@ Examples:
 player_controller.gd
 item_entry.gd
 item_row.gd
-run_record.gd
+run_store.gd
 lot_browse_scene.gd
 ```
 
@@ -45,7 +45,7 @@ PlayerController
 ItemData
 ItemEntry
 ItemRow
-RunRecord
+RunStore
 StaminaHUD
 ```
 

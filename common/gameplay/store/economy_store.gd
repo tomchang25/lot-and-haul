@@ -2,7 +2,7 @@
 # Economy runtime store: cash. Serializable state slice held by MetaManager.
 # Owns the field, its save payload, and all operations that mutate it.
 class_name EconomyStore
-extends RefCounted
+extends StoreBase
 
 var cash: int = 0
 
@@ -51,11 +51,3 @@ func from_dict(data: Dictionary) -> void:
         cash = int(data["cash"])
 
 
-## Migrates stale fields within this section. Idempotent. No-op by default.
-func migrate() -> void:
-    pass
-
-
-## Validates invariants within this section. Returns true when all pass.
-func validate() -> bool:
-    return true

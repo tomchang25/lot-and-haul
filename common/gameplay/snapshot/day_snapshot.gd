@@ -1,7 +1,8 @@
-# day_summary.gd
-# Value object returned by MetaManager.end_day(). Financial recap only —
+# day_snapshot.gd
+# Read-only Snapshot returned by MetaManager.end_day(). Financial recap only —
 # storage feedback is immediate and does not need a deferred summary entry.
-class_name DaySummary
+# Consumed once by the day-summary scene; not serialized.
+class_name DaySnapshot
 extends RefCounted
 
 var start_day: int
@@ -23,18 +24,18 @@ var customer_sales_total: int = 0
 var customer_sales_detail: Array[Dictionary] = []
 
 var net_change: int:
-    get:
-        return onsite_proceeds + customer_sales_total - paid_price - entry_fee - fuel_cost - living_cost
+	get:
+		return onsite_proceeds + customer_sales_total - paid_price - entry_fee - fuel_cost - living_cost
 
 
 func has_run_data() -> bool:
-    return (
-        onsite_proceeds != 0
-        or paid_price != 0
-        or entry_fee != 0
-        or fuel_cost != 0
-    )
+	return (
+		onsite_proceeds != 0
+		or paid_price != 0
+		or entry_fee != 0
+		or fuel_cost != 0
+	)
 
 
 func has_customer_sales() -> bool:
-    return not customer_sales_detail.is_empty()
+	return not customer_sales_detail.is_empty()

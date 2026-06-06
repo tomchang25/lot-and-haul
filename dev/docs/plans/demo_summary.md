@@ -44,7 +44,7 @@ A directed 3-run onboarding experience that doubles as a tutorial. The player ne
 
 The DemoDirector is a single autoload that manages demo state without modifying production scenes. It is also the foundation of the future tutorial system.
 
-**Data injection** (zero pollution): Before each run starts, DemoDirector injects fixed lot content, car assignment, and perks directly into RunRecord. Production scenes receive normal data and are unaware of the override.
+**Data injection** (zero pollution): Before each run starts, DemoDirector injects fixed lot content, car assignment, and perks directly into RunStore. Production scenes receive normal data and are unaware of the override.
 
 **Signal hooks** (minimal pollution): Two scenes connect to DemoDirector signals in their `_ready()` only when `DemoDirector.active` is true. The scenes' own logic is unchanged — DemoDirector pushes behavior in from outside.
 

@@ -72,7 +72,7 @@ Seasonal / rotating lot pools; one-shot special locations as events. Requires th
 
 ### Director System
 
-Autoload that manages demo state without modifying production scenes — injects fixed lot content, car assignment, and perks into RunRecord before each run. Uses signal hooks on auction/cargo scenes for forced-bid/block behavior. See `dev/docs/plans/demo_summary.md`.
+Autoload that manages demo state without modifying production scenes — injects fixed lot content, car assignment, and perks into RunStore before each run. Uses signal hooks on auction/cargo scenes for forced-bid/block behavior. See `dev/docs/plans/demo_summary.md`.
 
 ### Dialog System
 
@@ -211,7 +211,6 @@ Flows currently being built. One-line pointer each — same format as `## Plan`,
 
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
-- [refactor] StoreBase extraction + RunRecord decomposition (RunStore + RunManager service) + DaySnapshot reclassification — see `dev/docs/plans/store_base_and_run_split.md`
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
 - [demo] Tutorial 3-run surface (stale — references legacy Skill/Merchant systems); Director + Dialog systems are surviving subsystems — see `dev/docs/plans/demo_summary.md`

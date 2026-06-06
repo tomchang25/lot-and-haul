@@ -1,6 +1,6 @@
 # location_entry.gd
 # Run entry point — Location Entry.
-# Assumes RunManager.run_record has already been built by the Location Select
+# Assumes RunManager.run_store has already been built by the Location Select
 # screen. Plays the placeholder arrival fade, then advances to lot browse.
 # No player input required.
 extends Control
@@ -13,8 +13,8 @@ extends Control
 
 
 func _ready() -> void:
-    assert(RunManager.run_record != null, "LocationEntry: RunManager.run_record is null — Location Select must build it before entering.")
-    assert(RunManager.run_record.location_data != null, "LocationEntry: RunManager.run_record.location_data is null — Location Select must assign a LocationData before entering.")
+    assert(RunManager.run_store != null, "LocationEntry: RunManager.run_store is null — Location Select must build it before entering.")
+    assert(RunManager.run_store.location_data != null, "LocationEntry: RunManager.run_store.location_data is null — Location Select must assign a LocationData before entering.")
     _play_door_animation()
 
 # ══ Door animation ════════════════════════════════════════════════════════════

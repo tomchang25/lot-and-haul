@@ -1,8 +1,8 @@
 # run_review_scene.gd
 # Block 06 — Run Review
-# Reads:  RunManager.run_record.cargo_items, RunManager.run_record.paid_price,
-#         RunManager.run_record.onsite_proceeds
-# Writes: MetaManager.cash, MetaManager.storage_items (via MetaManager.resolve_run)
+# Reads:  RunManager.run_store.cargo_items, RunManager.run_store.paid_price,
+#         RunManager.run_store.onsite_proceeds
+# Writes: MetaManager.cash, MetaManager.storage_items (via MetaManager.resolve_run(RunStore))
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -50,7 +50,7 @@ func _ready() -> void:
         _trailer_damage_label.add_theme_color_override(&"font_color", Color(1.0, 0.8, 0.3))
         _trailer_damage_label.visible = true
 
-    _cargo_items = RunManager.run_record.cargo_items + RunManager.run_record.trailer_items
+    _cargo_items = RunManager.run_store.cargo_items + RunManager.run_store.trailer_items
     _review_entries = []
     _review_entries.append_array(_cargo_items)
 
@@ -74,7 +74,7 @@ func _on_row_tooltip_requested(
 
 
 func _apply_trailer_damage() -> int:
-    var r := RunManager.run_record
+    var r: RunStore = RunManager.run_store
     var car := r.car_data
     if car.trailer_damage_chance <= 0.0:
         return 0
@@ -94,7 +94,7 @@ func _resolve_run_and_navigate() -> void:
     # resolve_run stashes run economics as pending and sets current_slot = 3
     # (player returns for the evening slot). The day summary fires later when
     # the player chooses Open Shop or exhausts all slots from the hub.
-    MetaManager.resolve_run(RunManager.run_record)
+    MetaManager.resolve_run(RunManager.run_store)
     SceneRouter.go_to_hub()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════
@@ -106,7 +106,7 @@ func _populate_rows() -> void:
 
 
 func _populate_finance() -> void:
-    var r := RunManager.run_record
+    var r: RunStore = RunManager.run_store
     var cost_cash := r.paid_price + r.entry_fee + r.fuel_cost
     var onsite := r.onsite_proceeds
     var overall := onsite - cost_cash

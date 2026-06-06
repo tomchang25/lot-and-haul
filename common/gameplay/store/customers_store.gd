@@ -3,7 +3,7 @@
 # Serializable state slice held by MetaManager. Owns the fields, their save
 # payload, and the operations that mutate them.
 class_name CustomersStore
-extends RefCounted
+extends StoreBase
 
 ## Customers generated for the current night.
 var nightly_customers: Array[Customer] = []
@@ -83,16 +83,6 @@ func from_dict(data: Dictionary) -> void:
             if rec.has("item_ids") and rec["item_ids"] is Array:
                 rec["item_ids"] = _intify_array(rec["item_ids"])
             customer_sales_today.append(rec)
-
-
-## Migrates stale fields within this section. Idempotent. No-op by default.
-func migrate() -> void:
-    pass
-
-
-## Validates invariants within this section. Returns true when all pass.
-func validate() -> bool:
-    return true
 
 
 static func _intify_array(arr: Array) -> Array:

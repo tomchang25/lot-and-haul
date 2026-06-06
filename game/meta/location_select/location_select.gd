@@ -1,7 +1,7 @@
 # location_select.gd
 # Location Select screen. Fetches all LocationData from LocationRegistry,
 # builds a LocationCard per entry, and — when a card is chosen — constructs
-# the active RunRecord and advances to the Location Entry scene.
+# the active RunStore and advances to the Location Entry scene.
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -39,10 +39,7 @@ func _on_card_pressed(card: LocationCard) -> void:
     var location := card.get_location_data()
 
     MetaManager.begin_auction()
-    RunManager.run_record = RunRecord.create(
-        location,
-        MetaManager.active_car,
-    )
+    RunManager.create_run_store(location, MetaManager.active_car)
     SceneRouter.go_to_location_entry()
 
 

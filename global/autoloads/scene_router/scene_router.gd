@@ -7,17 +7,17 @@ extends Node
 
 # ── Day-summary hand-off ─────────────────────────────────────────────────────
 
-var _pending_day_summary: DaySummary = null
+var _pending_day_summary: DaySnapshot = null
 
 
-## Store a DaySummary and navigate to the day-summary scene.
-func go_to_day_summary(summary: DaySummary) -> void:
+## Store a DaySnapshot and navigate to the day-summary scene.
+func go_to_day_summary(summary: DaySnapshot) -> void:
 	_pending_day_summary = summary
 	get_tree().change_scene_to_packed(scenes.day_summary)
 
 
-## Consume and return the pending DaySummary (called once by day_summary_scene).
-func consume_pending_day_summary() -> DaySummary:
+## Consume and return the pending DaySnapshot (called once by day_summary_scene).
+func consume_pending_day_summary() -> DaySnapshot:
 	var summary := _pending_day_summary
 	_pending_day_summary = null
 	return summary

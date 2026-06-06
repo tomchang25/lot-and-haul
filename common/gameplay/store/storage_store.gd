@@ -3,7 +3,7 @@
 # next_entry_id counter. Serializable state slice held by MetaManager.
 # Owns the fields and their save payload.
 class_name StorageStore
-extends RefCounted
+extends StoreBase
 
 ## Array of ItemEntry instances the player currently owns in storage.
 var storage_items: Array = []
@@ -78,16 +78,6 @@ func from_dict(data: Dictionary) -> void:
     # modern sectioned saves.
     if data.has("research_slots") and data["research_slots"] is Array:
         _migrate_research_slots(data["research_slots"])
-
-
-## Migrates stale fields within this section. Idempotent. No-op by default.
-func migrate() -> void:
-    pass
-
-
-## Validates invariants within this section. Returns true when all pass.
-func validate() -> bool:
-    return true
 
 
 ## Converts legacy research_slots entries to ItemEntry.research_progress so

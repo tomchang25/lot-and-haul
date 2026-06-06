@@ -1,7 +1,7 @@
 # auction_scene.gd
 # Block 04 — The player watches a live bidding sequence and decides when to drop out.
-# Reads:  RunManager.run_record.lot_entry, RunManager.run_record.lot_items
-# Writes: RunManager.run_record.paid_price, RunManager.run_record.won_items
+# Reads:  RunManager.run_store.lot_entry, RunManager.run_store.lot_items
+# Writes: RunManager.run_store.paid_price, RunManager.run_store.won_items
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -191,7 +191,7 @@ func _on_pass_pressed() -> void:
 
 
 func _init_auction() -> void:
-    var lot: LotEntry = RunManager.run_record.lot_entry
+    var lot: LotEntry = RunManager.run_store.lot_entry
 
     _rolled_price = max(lot.get_rolled_price(), MIN_STEP)
 
@@ -206,7 +206,7 @@ func _init_auction() -> void:
 
 
 func _build_lot_summary() -> void:
-    var lot: LotEntry = RunManager.run_record.lot_entry
+    var lot: LotEntry = RunManager.run_store.lot_entry
 
     for entry: ItemEntry in lot.item_entries:
         var row: LotSummaryRow = LotSummaryRowScene.instantiate()
@@ -297,13 +297,13 @@ func _resolve() -> void:
     _bid_button.disabled = true
     _pass_button.disabled = true
 
-    var record = RunManager.run_record
+    var record: RunStore = RunManager.run_store
     if _last_bidder == "player":
         var current_wins: Array[ItemEntry] = record.lot_items.duplicate()
 
-        RunManager.run_record.last_lot_won_items = current_wins
-        RunManager.run_record.paid_price += _current_display_price
-        RunManager.run_record.won_items += current_wins
+        RunManager.run_store.last_lot_won_items = current_wins
+        RunManager.run_store.paid_price += _current_display_price
+        RunManager.run_store.won_items += current_wins
 
     SceneRouter.go_to_reveal()
 
@@ -314,7 +314,7 @@ func _resolve() -> void:
 ## run costs (paid_price, entry_fee, fuel_cost). Called on init and after
 ## every player bid so the number stays live.
 func _refresh_budget() -> void:
-    var record := RunManager.run_record
+    var record := RunManager.run_store
     var committed := record.paid_price + record.entry_fee + record.fuel_cost
     var remaining := maxi(MetaManager.cash - committed, 0)
     _budget_label.text = "Budget: $%d" % remaining
@@ -365,10 +365,10 @@ func _show_npc_popup(price: int) -> void:
 func _init_debug_overlay() -> void:
     if not OS.is_debug_build():
         return
-    var lot: LotEntry = RunManager.run_record.lot_entry
+    var lot: LotEntry = RunManager.run_store.lot_entry
 
     var true_value := 0
-    for entry: ItemEntry in RunManager.run_record.lot_items:
+    for entry: ItemEntry in RunManager.run_store.lot_items:
         if entry.item_data != null:
             true_value += int(entry.full_true_value())
 
