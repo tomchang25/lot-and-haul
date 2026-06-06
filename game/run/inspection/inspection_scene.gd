@@ -145,7 +145,7 @@ func _place_items() -> void:
     _entry_origin.clear()
     _entry_color_by_entry.clear()
 
-    for entry: ItemEntry in RunManager.run.lot_items:
+    for entry: ItemEntry in RunManager.lot.lot_items:
         _place_entry(entry)
 
 
@@ -221,13 +221,13 @@ func _on_grid_cell_pressed(coord: Vector2i) -> void:
         return
 
     if entry.is_veiled():
-        if UNVEIL_COST > RunManager.run.actions_remaining:
+        if UNVEIL_COST > RunManager.lot.actions_remaining:
             return
         _do_unveil(entry)
         return
 
     if entry.has_inspection_clues():
-        if CLUE_CHAIN_COST > RunManager.run.actions_remaining:
+        if CLUE_CHAIN_COST > RunManager.lot.actions_remaining:
             return
         _do_clue_chain(entry)
         return
@@ -289,7 +289,7 @@ func _complete_action(completed_entry: ItemEntry, action_type: int) -> void:
     if _hover_entry == completed_entry:
         _update_detail_section(completed_entry)
 
-    if RunManager.run.actions_remaining <= 0:
+    if RunManager.lot.actions_remaining <= 0:
         _finish_inspection()
 
 
@@ -446,7 +446,7 @@ func _hover_edge_borders(coord: Vector2i) -> Dictionary:
 
 
 func _refresh_hud() -> void:
-    var ap: int = RunManager.run.actions_remaining
+    var ap: int = RunManager.lot.actions_remaining
     # Use the two-tier cap as the HUD maximum — reflects the per-lot ceiling,
     # not the legacy per-lot action_quota.
     var cap: int = RunManager.run.inspection_ap_cap
@@ -505,7 +505,7 @@ func _refresh_veiled_list() -> void:
 
 
 func _refresh_total_estimate() -> void:
-    var lot: LotEntry = RunManager.run.lot_entry
+    var lot: LotEntry = RunManager.lot.lot_entry
     if lot == null:
         _total_est_label.text = "—"
         return

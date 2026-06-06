@@ -1,15 +1,21 @@
 # run_manager.gd
-# Autoload: owns the active RunStore for the duration of a run.
-# Null between runs. Provides the factory, AP resolution, and run-phase
-# mutation methods. Scenes read run state directly via RunManager.run.field.
+# Autoload: owns the active RunStore (per-run) and LotStore (per-lot) for the
+# duration of a run. Both are null between runs. Provides the factory, AP
+# resolution, and run-phase mutation methods. Scenes read run state via
+# RunManager.run.field and lot state via RunManager.lot.field.
 extends Node
 
 ## Full state for the current run. Null between runs.
 ## Scenes in the run phase assert RunManager.is_run_active() on entry and then
-## read directly: RunManager.run.won_items, RunManager.run.actions_remaining, etc.
+## read directly: RunManager.run.won_items, RunManager.run.inspection_ap_cap, etc.
 ## External code must never mutate RunStore fields directly — use RunManager's
 ## mutation methods below.
 var run: RunStore = null
+
+## State for the active lot visit. Null when no lot is loaded.
+## Replaced by the next call to set_lot(); readable through the reveal phase.
+## External code must never mutate LotStore fields directly.
+var lot: LotStore = null
 
 
 ## Creates, initializes, and assigns a new RunStore for [param location] and
@@ -48,9 +54,10 @@ func take_run_result() -> RunResult:
     return result
 
 
-## Clears all per-run state so the next run starts clean.
+## Clears all per-run and per-lot state so the next run starts clean.
 func clear_run_state() -> void:
     run = null
+    lot = null
 
 # ── Run-state queries ──────────────────────────────────────────────────────────
 
@@ -64,17 +71,18 @@ func is_run_active() -> bool:
 
 ## Deducts [param cost] AP from the current lot's inspection pool.
 func spend_ap(cost: int) -> void:
-    if run:
-        run.deduct_ap(cost)
+    if lot:
+        lot.deduct_ap(cost)
 
 
-## Records a won lot auction: stores [param items] as last_lot_won_items, adds
-## [param price] to paid_price, and appends items to won_items. No-op when
-## there is no active run.
+## Records a won lot auction: writes the win to LotStore, then accumulates
+## [param items] and [param price] into the run-level totals. No-op when there
+## is no active run or lot.
 func commit_lot_win(items: Array[ItemEntry], price: int) -> void:
-    if run == null:
+    if run == null or lot == null:
         return
-    run.record_lot_win(items, price)
+    lot.record_win(items, price)
+    run.accumulate_lot_result(items, price)
 
 
 ## Initialises browse state for a fresh location visit: assigns [param lots]
@@ -91,10 +99,28 @@ func advance_browse_index() -> void:
         run.advance_browse_index()
 
 
-## Delegates to RunStore.set_lot, setting the active lot and refilling AP.
+## Creates a new LotStore for [param entry] with deficit-refilled AP, replacing
+## any prior LotStore. AP handoff: (1) compute deficit below the cap from the
+## prior lot's leftover AP, (2) draw that deficit from the run reserve,
+## (3) construct LotStore with prior AP + drawn amount. First lot of a run
+## receives the full cap (no reserve draw needed).
 func set_lot(entry: LotEntry) -> void:
-    if run:
-        run.set_lot(entry)
+    if run == null:
+        return
+    var prior_ap: int = lot.actions_remaining if lot != null else run.inspection_ap_cap
+    var deficit: int = run.inspection_ap_cap - prior_ap
+    var drawn: int = run.draw_ap_from_reserve(deficit)
+    var initial_ap: int = prior_ap + drawn
+    var l := LotStore.new()
+    l.initialize(entry, initial_ap)
+    lot = l
+
+
+## Nulls the active LotStore. Called by reveal_scene after reading results
+## to release the per-lot state. (Superseded by the next set_lot() call in
+## normal flow — explicit clear only needed if exiting without starting a new lot.)
+func clear_lot() -> void:
+    lot = null
 
 
 ## Commits cargo loading result: final [param cargo], [param trailer] items,

@@ -25,6 +25,12 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## LotStore Extraction
+
+- 2026-06-06 — [refactor] Extracted per-lot state from RunStore into new session-scoped LotStore (`common/gameplay/store/lot_store.gd`): owns `lot_entry`, `actions_remaining`, `won_items`, `won_price` with per-lot lifecycle; RunStore retains only per-run cumulative and configuration state; RunStore gains `draw_ap_from_reserve()` and `accumulate_lot_result()`; RunManager gains `var lot: LotStore`, updated `set_lot()` with deficit-refill AP handoff, `clear_lot()`, and updated `spend_ap()`/`commit_lot_win()`/`clear_run_state()`; all scenes migrated from `RunManager.run.lot_*` to `RunManager.lot.*`; `_last_lot_won_items` eliminated
+
+---
+
 ## Systems Docs L2 Audit
 
 - 2026-06-05 — [docs] Audited all 10 systems/ docs against the L2 exclusion rule; lifted the two-layer (designer resource / runtime type) concept to new vision/data_architecture.md; dropped Reads/Writes/Ownership/roster tables to L3 (enriched item_card.gd docstring); trimmed hub_home/knowledge/vehicle/customer_sell/autoloads/item_display/item_system to cross-flow only; archived data_model.md (concept now in vision, field detail in code)

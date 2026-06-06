@@ -1,19 +1,18 @@
 # run_store.gd
-# Session-scoped Store for a single warehouse run. Holds all mutable run state
-# carries no save payload (not registered with SaveManager). Created and owned
-# by RunManager for the duration of a run; null between runs.
+# Session-scoped Store for a single warehouse run. Holds per-run cumulative and
+# configuration state. Carries no save payload (not registered with SaveManager).
+# Created and owned by RunManager for the duration of a run; null between runs.
 #
+# Per-lot mutable state (active entry, AP, win result) lives in LotStore.
 # Fields are read-public via getters. Mutation goes through the owning Manager only.
 class_name RunStore
 extends StoreBase
 
 # ── Backing variables ──────────────────────────────────────────────────────────
 
-var _lot_entry: LotEntry
 var _won_items: Array[ItemEntry] = []
 var _cargo_items: Array[ItemEntry] = []
 var _trailer_items: Array[ItemEntry] = []
-var _last_lot_won_items: Array[ItemEntry] = []
 
 var _onsite_proceeds: int = 0
 var _paid_price: int = 0
@@ -27,23 +26,12 @@ var _car_data: CarData = null
 
 var _inspection_ap_cap: int = Economy.INSPECTION_AP_CAP
 var _refill_metric: int = Economy.INSPECTION_REFILL_METRIC_DEFAULT
-var _actions_remaining: int = 0
 
 var _location_data: LocationData = null
 var _browse_lots: Array[LotData] = []
 var _browse_index: int = 0
 
 # ── Getters (read-public) ──────────────────────────────────────────────────────
-
-var lot_entry: LotEntry:
-    get:
-        return _lot_entry
-
-## Shallow duplicate of the active lot's items (ItemEntry refs shared).
-## Derived from lot_entry.item_entries. Empty when no lot is active.
-var lot_items: Array[ItemEntry]:
-    get:
-        return _lot_entry.item_entries.duplicate() if _lot_entry else []
 
 ## Shallow duplicate of won items accumulated during the run (ItemEntry refs shared).
 var won_items: Array[ItemEntry]:
@@ -59,11 +47,6 @@ var cargo_items: Array[ItemEntry]:
 var trailer_items: Array[ItemEntry]:
     get:
         return _trailer_items.duplicate()
-
-## Shallow duplicate of the last lot's won items (ItemEntry refs shared).
-var last_lot_won_items: Array[ItemEntry]:
-    get:
-        return _last_lot_won_items.duplicate()
 
 var onsite_proceeds: int:
     get:
@@ -107,11 +90,6 @@ var refill_metric: int:
     get:
         return _refill_metric
 
-## Current spendable AP for the active lot.
-var actions_remaining: int:
-    get:
-        return _actions_remaining
-
 var location_data: LocationData:
     get:
         return _location_data
@@ -144,40 +122,26 @@ func initialize(
     _stamina = _max_stamina
     _inspection_ap_cap = p_ap_cap
     _refill_metric = p_refill
-    _actions_remaining = p_ap_cap
     _entry_fee = p_entry_fee
     _fuel_cost = p_fuel_cost
-
-# ══ Lot management ════════════════════════════════════════════════════════════
-
-
-## Sets the active lot entry and refills actions_remaining toward the cap from
-## the reserve, paying only the deficit. Partial refill when reserve is short.
-## No refill when the reserve is already empty — later lots run on leftover AP.
-func set_lot(entry: LotEntry) -> void:
-    _lot_entry = entry
-    _last_lot_won_items.clear()
-
-    # Two-tier deficit refill: only the shortfall below the cap is drawn from
-    # the reserve. Under-spending on a weak lot preserves reserve for later lots.
-    var deficit: int = _inspection_ap_cap - _actions_remaining
-    if deficit > 0 and _refill_metric > 0:
-        var take: int = mini(deficit, _refill_metric)
-        _actions_remaining += take
-        _refill_metric -= take
 
 # ══ Run-phase mutations ════════════════════════════════════════════════════════
 
 
-## Deducts [param cost] AP from the current inspection pool.
-func deduct_ap(cost: int) -> void:
-    _actions_remaining -= cost
+## Draws AP from the reserve to cover [param deficit] points. Returns the actual
+## amount taken (may be less than deficit when the reserve is low). Called by
+## RunManager.set_lot() to compute LotStore's initial AP.
+func draw_ap_from_reserve(deficit: int) -> int:
+    if deficit <= 0 or _refill_metric <= 0:
+        return 0
+    var take: int = mini(deficit, _refill_metric)
+    _refill_metric -= take
+    return take
 
 
-## Records a won lot: saves [param items] as last_lot_won_items, adds
-## [param price] to paid_price, and appends items to the cumulative won list.
-func record_lot_win(items: Array[ItemEntry], price: int) -> void:
-    _last_lot_won_items = items.duplicate()
+## Accumulates [param items] and [param price] from a won lot into the run-level
+## totals. Called by RunManager.commit_lot_win() after LotStore records the win.
+func accumulate_lot_result(items: Array[ItemEntry], price: int) -> void:
     _paid_price += price
     _won_items.append_array(items)
 

@@ -2,7 +2,7 @@
 # Block 05a — Reveal won items before cargo loading.
 # Marks uninspected items as inspected on reveal.
 # One button press reveals ALL items at once instead of one-at-a-time.
-# Reads:  RunManager.run_store.last_lot_won_items,
+# Reads:  RunManager.lot.won_items,
 # Writes: ItemEntry.inspected, ItemEntry.scrutiny
 extends Control
 
@@ -41,7 +41,7 @@ func _ready() -> void:
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
     _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
 
-    _won_items = RunManager.run.last_lot_won_items
+    _won_items = RunManager.lot.won_items
     _continue_btn.hide()
 
     if _won_items.is_empty():
