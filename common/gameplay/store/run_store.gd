@@ -16,7 +16,6 @@ var _trailer_items: Array[ItemEntry] = []
 
 var _onsite_proceeds: int = 0
 var _paid_price: int = 0
-var _net: int = 0
 var _entry_fee: int = 0
 var _fuel_cost: int = 0
 
@@ -55,10 +54,6 @@ var onsite_proceeds: int:
 var paid_price: int:
     get:
         return _paid_price
-
-var net: int:
-    get:
-        return _net
 
 var entry_fee: int:
     get:

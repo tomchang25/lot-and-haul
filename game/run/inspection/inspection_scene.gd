@@ -47,7 +47,6 @@ var _hover_entry: ItemEntry = null
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _items_grid: GridContainer = $RootHBox/LeftVBox/GridMargin/ScrollContainer/ItemsGrid
-@onready var _action_bar: LotActionBar = $LotActionBar
 @onready var _footer: HBoxContainer = $RootHBox/LeftVBox/FooterHBox
 @onready var _pass_button: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/PassButton
 @onready var _start_auction_button: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/StartAuctionButton
@@ -85,7 +84,6 @@ var _hover_entry: ItemEntry = null
 
 
 func _ready() -> void:
-    _action_bar.hide()
     _footer.show()
     _pass_button.show()
     _start_auction_button.show()
