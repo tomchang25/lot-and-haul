@@ -35,7 +35,8 @@ const RESTORE_ATTR_COEFF: float = 0.4
 
 
 ## Applies one AP-unit of repair progress to [param entry]. Mutates condition
-## toward the 0.5 cap and grants REPAIR knowledge XP.
+## toward the 0.5 cap. Mastery XP is awarded by the caller (MetaManager) via
+## EventBus.item_repaired — ResearchSlot has no autoload references.
 static func apply_repair(entry: ItemEntry) -> void:
     var zone_factor: float = REPAIR_ZONE_FACTORS[0.50]
     if entry.condition < 0.25:
@@ -43,29 +44,20 @@ static func apply_repair(entry: ItemEntry) -> void:
     var rarity_factor: float = REPAIR_RARITY_FACTOR[entry.item_data.rarity]
     var delta: float = REPAIR_BASE * zone_factor * rarity_factor
     entry.condition = minf(entry.condition + delta, 0.5)
-    KnowledgeManager.add_category_points(
-        entry.item_data.category_data,
-        entry.item_data.rarity,
-        KnowledgeManager.KnowledgeAction.REPAIR,
-    )
 
 
 ## Applies one AP-unit of restore progress to [param entry]. Mutates condition
-## toward 1.0 using the Restoration attribute and grants RESTORE knowledge XP.
-static func apply_restore(entry: ItemEntry) -> void:
+## toward 1.0. [param restoration_attr] is the player's Restoration attribute
+## value, passed in by the caller (MetaManager) so this method has no autoload
+## references. Mastery XP is awarded by the caller via EventBus.item_restored.
+static func apply_restore(entry: ItemEntry, restoration_attr: int) -> void:
     var zone_factor: float = RESTORE_ZONE_FACTORS[1.0]
     if entry.condition < 0.75:
         zone_factor = RESTORE_ZONE_FACTORS[0.75]
     var rarity_factor: float = RESTORE_RARITY_FACTOR[entry.item_data.rarity]
-    var restoration_attr := KnowledgeManager.get_attribute_value("restoration")
     var attr_mult: float = 1.0 + restoration_attr * RESTORE_ATTR_COEFF
     var delta: float = RESTORE_BASE * zone_factor * rarity_factor * attr_mult
     entry.condition = minf(entry.condition + delta, 1.0)
-    KnowledgeManager.add_category_points(
-        entry.item_data.category_data,
-        entry.item_data.rarity,
-        KnowledgeManager.KnowledgeAction.RESTORE,
-    )
 
 
 ## Returns true when [param entry] has been repaired to the cap (condition >= 0.5).

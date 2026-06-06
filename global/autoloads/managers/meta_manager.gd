@@ -140,12 +140,22 @@ func validate() -> bool:
 # ══ Cross-autoload cash helper ════════════════════════════════════════════════
 
 
-## Deducts [param amount] from cash via EconomyOwner.spend(). Does NOT save —
-## this is a sub-operation for caller-managed transactions (e.g.
-## KnowledgeManager.upgrade_attribute) that save at their own commit point.
+## Deducts [param amount] from cash. Does NOT save — this is a sub-operation for
+## caller-managed transactions that save at their own commit point.
 ## Returns true when the spend succeeded, false when cash was insufficient.
 func spend_cash(amount: int) -> bool:
     return _economy.spend(amount)
+
+
+## Cross-domain transaction: deducts the upgrade cost from cash and raises
+## [param attr] one level in KnowledgeStore. Saves on success.
+## Returns false when cash is insufficient.
+func upgrade_attribute(attr: AttributeData) -> bool:
+    if not _economy.spend(KnowledgeManager.attribute_upgrade_cost()):
+        return false
+    KnowledgeManager.raise_attribute_level(attr)
+    SaveManager.save()
+    return true
 
 # ══ Storage registration ══════════════════════════════════════════════════════
 
@@ -287,11 +297,7 @@ func resolve_customer_sale(
 ) -> void:
     var sold_ids: Array = _storage.remove_entries(items)
     for entry: ItemEntry in items:
-        KnowledgeManager.add_category_points(
-            entry.item_data.category_data,
-            entry.item_data.rarity,
-            KnowledgeManager.KnowledgeAction.SELL,
-        )
+        EventBus.sale_resolved.emit(entry.item_data.category_data, entry.item_data.rarity)
     _economy.earn(sale_price)
     _customers.record_sale(_progress.current_day, customer, strategy, sold_ids, sale_price)
     if customer != null:
@@ -314,6 +320,7 @@ func repair_item(entry: ItemEntry) -> bool:
     if ResearchSlot.is_repair_complete(entry):
         return false
     ResearchSlot.apply_repair(entry)
+    EventBus.item_repaired.emit(entry.item_data.category_data, entry.item_data.rarity)
     _slot.charge_ap(Economy.REPAIR_AP_COST)
     SaveManager.save()
     return true
@@ -331,7 +338,10 @@ func restore_item(entry: ItemEntry) -> bool:
         return false
     if ResearchSlot.is_restore_complete(entry):
         return false
-    ResearchSlot.apply_restore(entry)
+    # One-way read: get_attribute_value has no reverse dependency on MetaManager.
+    var restoration_attr := KnowledgeManager.get_attribute_value("restoration")
+    ResearchSlot.apply_restore(entry, restoration_attr)
+    EventBus.item_restored.emit(entry.item_data.category_data, entry.item_data.rarity)
     _slot.charge_ap(Economy.RESTORE_AP_COST)
     SaveManager.save()
     return true

@@ -42,6 +42,12 @@ func _ready() -> void:
     SaveManager.register_section(self)
     SaveManager.register_manager(self)
 
+    # Subscribe to hub-phase business events emitted by MetaManager so mastery
+    # XP accrues without a direct import dependency (cycle-free).
+    EventBus.sale_resolved.connect(_on_sale_resolved)
+    EventBus.item_repaired.connect(_on_item_repaired)
+    EventBus.item_restored.connect(_on_item_restored)
+
 # ── Registry validation ────────────────────────────────────────────────────────
 
 
@@ -165,15 +171,12 @@ func attribute_upgrade_cost() -> int:
     return _ATTRIBUTE_UPGRADE_COST
 
 
-## Upgrades [param attr] by one level. Deducts the upgrade cost via
-## MetaManager.spend_cash(). Returns false if cash is insufficient.
-func upgrade_attribute(attr: AttributeData) -> bool:
-    if not MetaManager.spend_cash(_ATTRIBUTE_UPGRADE_COST):
-        return false
+## Pure domain mutation: raises [param attr] one level in KnowledgeStore.
+## Does NOT spend cash and does NOT save — the calling transaction
+## (MetaManager.upgrade_attribute) handles both.
+func raise_attribute_level(attr: AttributeData) -> void:
     var current := _knowledge.attribute_levels.get(attr.attribute_id, attr.starting_value)
     _knowledge.set_attribute_level(attr.attribute_id, current + 1)
-    SaveManager.save()
-    return true
 
 # ── Perk registry ──────────────────────────────────────────────────────────────
 
@@ -221,3 +224,17 @@ func _load_attribute_registry() -> void:
         func(r: Resource) -> String:
             return (r as AttributeData).attribute_id if r is AttributeData else ""
     )
+
+# ── EventBus handlers ──────────────────────────────────────────────────────────
+
+
+func _on_sale_resolved(category: CategoryData, rarity: ItemData.Rarity) -> void:
+    add_category_points(category, rarity, KnowledgeAction.SELL)
+
+
+func _on_item_repaired(category: CategoryData, rarity: ItemData.Rarity) -> void:
+    add_category_points(category, rarity, KnowledgeAction.REPAIR)
+
+
+func _on_item_restored(category: CategoryData, rarity: ItemData.Rarity) -> void:
+    add_category_points(category, rarity, KnowledgeAction.RESTORE)

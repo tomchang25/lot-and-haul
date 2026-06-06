@@ -43,7 +43,7 @@ func _add_attribute_row(attr: AttributeData) -> void:
 
 
 func _on_upgrade_pressed(attr: AttributeData) -> void:
-    var ok := KnowledgeManager.upgrade_attribute(attr)
+    var ok := MetaManager.upgrade_attribute(attr)
     if not ok:
         return
     _rebuild_all()
