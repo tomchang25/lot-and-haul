@@ -8,7 +8,7 @@ The manager layer is the backbone of every new feature — customer evolution, g
 
 Fixing these now — before the next feature wave — keeps the cost low (small blast radius, no new systems depending on the current wiring) and establishes the conventions that future features follow.
 
-## Phase 1 — Break the dependency cycle
+## Phase 1 — Break the dependency cycle - Finished
 
 Move the `upgrade_attribute` transaction from KnowledgeManager into MetaManager (it's a cross-domain transaction: spend cash + raise attribute). KnowledgeManager keeps only a pure domain operation `raise_attribute_level(attr)` that mutates its own store without knowing cash exists.
 
@@ -18,15 +18,7 @@ Strip the two `KnowledgeManager.add_category_points()` calls from `ResearchSlot.
 
 After this phase: MetaManager has zero imports of KnowledgeManager. KnowledgeManager has zero imports of MetaManager. ResearchSlot has zero autoload references. The cycle is fully broken.
 
-Acceptance criteria:
-
-1. `MetaManager` never references `KnowledgeManager` by name (no direct call, no `KnowledgeManager.` anywhere in the file). The only remaining read — `get_attribute_value("investigation")` in `research_item` — is a read from a service, not a mutation dependency; move it to a local variable passed from the caller's context or accept it as a tolerated read-only query. If kept, document it as a one-way read with no cycle risk.
-2. `KnowledgeManager` never references `MetaManager` by name.
-3. `ResearchSlot` has no autoload references — all external values arrive as parameters.
-4. `EventBus` defines exactly three new signals: `sale_resolved`, `item_repaired`, `item_restored`.
-5. Mastery XP still accrues correctly for sell, repair, and restore actions (manual smoke test).
-
-## Phase 2 — RunResult value object
+## Phase 2 — RunResult value object - Finished
 
 Add a `RunResult` snapshot class (same archetype as `DaySummary`) in `common/gameplay/snapshot/`. RunManager builds it from `_run_store` via a new `take_run_result() -> RunResult` method, applying `auto_reveal_all_surface()` on cargo items before snapshotting. MetaManager's `resolve_current_run` calls `take_run_result()` instead of `RunManager._run_store`, consumes the result, then calls `RunManager.clear_run_state()`.
 
@@ -34,32 +26,27 @@ Add a `RunResult` snapshot class (same archetype as `DaySummary`) in `common/gam
 
 If EventBus Phase 1 is already landed, emit `EventBus.run_resolved.emit(result)` at the end of `resolve_current_run` (add the signal to EventBus in this phase if not already present).
 
-Acceptance criteria:
-
-1. No code outside `run_manager.gd` references `RunStore` or `_run_store`.
-2. `RunResult` is a snapshot (read-only value object, no mutators, no serialization).
-3. Run resolution still correctly applies cash delta, registers cargo into storage, stashes pending-run economics, and clears run state (manual smoke test: complete a run → hub → day summary shows correct numbers).
-
 ## Phase 3 — Store exposure and proxy removal
 
-Replace private store references with getter-only public properties on MetaManager and RunManager. Scenes read `MetaManager.economy.cash` instead of `MetaManager.cash`.
+Managers stop acting as middlemen for reads. Scenes go directly to the store: `MetaManager.economy.cash` instead of `MetaManager.cash`. Stores protect their own fields with getter-only properties (language-enforced, not convention).
 
-Store-layer changes: scalar fields remain bare public (value-copy on read, harmless). Collection fields get a getter property that returns `.duplicate()` for iteration stability — the protection moves from the manager proxy into the store itself. Document the convention: store fields are read-public, mutation goes through the owning manager only.
+Store-layer changes: every field gets a private backing variable and a getter-only property. Scalars use `var cash: int: get: return _cash` — GDScript enforces no external write (no setter = runtime error on assignment). Collection fields return `.duplicate()` in the getter for iteration stability. Mutation methods stay internal, called only by the owning manager. Document the convention at the top of each store: "Fields are read-public via getters. Mutation goes through the owning Manager only."
 
-Manager-layer changes: replace `var _economy: EconomyStore` + 20 proxy properties with `var _economy: EconomyStore` + `var economy: EconomyStore: get: return _economy` (six lines for MetaManager, one line for RunManager). Delete all proxy properties.
+Manager-layer changes: store references become plain public fields (`var economy: EconomyStore`). No getter-only wrapper needed — reassigning the entire store object is not a realistic accident. Delete all proxy properties (20+ on MetaManager, 15+ on RunManager).
 
-Scene-layer changes: batch rename across ~20 scene files. `MetaManager.cash` → `MetaManager.economy.cash`, `MetaManager.storage_items` → `MetaManager.storage.storage_items`, `RunManager.won_items` → `RunManager.run.won_items`, etc. RunManager's getter returns null between runs, so scenes that read run state need a null guard — but the existing proxy pattern already returns defaults for null, so the scene-side guard is equivalent.
+Scene-layer changes: batch rename across ~20 scene files. `MetaManager.cash` → `MetaManager.economy.cash`, `MetaManager.storage_items` → `MetaManager.storage.storage_items`, `RunManager.won_items` → `RunManager.run.won_items`, etc. RunManager's store is null between runs, so scenes that read run state need a null guard — but run-phase scenes only exist while a run is active, so the guard is a startup assert, not a per-access check.
 
 Also move `ONSITE_SELL_PRICE := 50` from `cargo_scene.gd` into `Economy` constants.
 
 Acceptance criteria:
 
-1. MetaManager and RunManager have zero proxy properties — all store reads go through the exposed store getter.
-2. No scene or external file directly calls a store mutation method (enforced by convention + code review).
+1. MetaManager and RunManager have zero proxy properties — all store reads go through the public store reference.
+2. Every store field uses private backing + getter-only property (no external setter).
 3. Collection getters on stores return `.duplicate()` with a docstring explaining iteration stability and shared-ref semantics.
-4. All scenes compile and run without error after the rename (full run + hub smoke test).
+4. No scene or external file directly calls a store mutation method (enforced by convention + code review).
+5. All scenes compile and run without error after the rename (full run + hub smoke test).
 
 ## Open questions
 
-- **RunManager null-state API for Phase 3**: when `_run_store` is null between runs, `RunManager.run` returns null. Scenes currently get safe defaults (0, empty array) from the proxy. Options: (a) scenes null-check before access, (b) RunManager exposes a static `EMPTY_RUN` sentinel with zero/empty defaults, (c) RunManager always holds a RunStore (cleared to defaults, never null). Leaning (a) — it's honest and the existing proxy defaults were hiding potential bugs anyway.
+- **RunManager null-state API for Phase 3** (resolved): `RunManager.run` is null between runs. Run-phase scenes assert non-null in `_ready()` — they only exist while a run is active, so null means a bug. Hub-phase scenes never read RunManager's store. No sentinel or always-hold needed.
 - **`research_item` reading `KnowledgeManager.get_attribute_value("investigation")`**: this is a one-way read query, not a mutation dependency. Tolerate it as a documented exception to the "Meta never references Knowledge" rule, or inject the value from the scene that calls `research_item`? Leaning tolerate — it's a pure read, no cycle risk, and injecting it from the scene pushes domain knowledge into UI.
