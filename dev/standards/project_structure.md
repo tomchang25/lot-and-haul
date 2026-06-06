@@ -223,11 +223,16 @@ Use this folder for **project-wide global systems** configured as autoloads.
 
 ```
 global/
-  autoload/
+  autoloads/
+    game_manager/ → boot orchestrator + scene registry
+    managers/     → gameplay managers (MetaManager, KnowledgeManager, RunManager)
     registries/   → resource-backed registry autoloads
                     (one file per type, e.g. car_registry.gd)
-    (other files) → managers and systems (SaveManager, GameManager, etc.)
+    scene_router/ → scene navigation + pending data
+    event_bus.gd, save_manager.gd, audio_manager/
+  constants/      → data paths, economy constants
   theme/          → shared theme resources
+  utils/          → registry audit utility
 ```
 
 Only scripts that must be globally accessible at all times belong here.
