@@ -25,8 +25,7 @@ func _ready() -> void:
     slot = SlotStore.new()
     progress = ProgressStore.new()
     customers = CustomersStore.new()
-    SaveManager.register_section(self)
-    SaveManager.register_manager(self)
+    SaveManager.register_provider(self)
 
 # ══ Save section interface ════════════════════════════════════════════════════
 

@@ -25,6 +25,12 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## SaveManager Provider Unification
+
+- 2026-06-06 — [refactor] Merged `_sections` + `_managers` into single `_providers` array in SaveManager; replaced `register_section`, `register_sections`, and `register_manager` with single `register_provider` (asserts all four StoreBase methods); MetaManager and KnowledgeManager each call `register_provider(self)` once; all four iteration sites (`save`, `load`, `run_migrations`, `run_validation`) updated to `_providers`
+
+---
+
 ## LotStore Extraction
 
 - 2026-06-06 — [refactor] Extracted per-lot state from RunStore into new session-scoped LotStore (`common/gameplay/store/lot_store.gd`): owns `lot_entry`, `actions_remaining`, `won_items`, `won_price` with per-lot lifecycle; RunStore retains only per-run cumulative and configuration state; RunStore gains `draw_ap_from_reserve()` and `accumulate_lot_result()`; RunManager gains `var lot: LotStore`, updated `set_lot()` with deficit-refill AP handoff, `clear_lot()`, and updated `spend_ap()`/`commit_lot_win()`/`clear_run_state()`; all scenes migrated from `RunManager.run.lot_*` to `RunManager.lot.*`; `_last_lot_won_items` eliminated

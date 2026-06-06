@@ -39,8 +39,7 @@ func _ready() -> void:
     _load_perk_registry()
     _load_attribute_registry()
     _knowledge = KnowledgeStore.new()
-    SaveManager.register_section(self)
-    SaveManager.register_manager(self)
+    SaveManager.register_provider(self)
 
     # Subscribe to hub-phase business events emitted by MetaManager so mastery
     # XP accrues without a direct import dependency (cycle-free).
