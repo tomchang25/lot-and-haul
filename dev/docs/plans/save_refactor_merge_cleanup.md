@@ -22,7 +22,7 @@ Review `dev/standards/registries.md` and `dev/standards/standards_enforcement.md
 
 ### 4. Squash changelog
 
-Consolidate the multi-section per-commit changelog entries into a single `## Save & Managers Refactor` entry suitable for the squash-merge commit. One heading, concise bullet list of what changed.
+Consolidate the multi-section per-commit changelog entries into a single entry suitable for the squash-merge commit. One heading, concise bullet list of what changed.
 
 ### 5. Clear archived plans
 
