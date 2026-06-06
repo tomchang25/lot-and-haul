@@ -8,6 +8,14 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Manager Decoupling & Store Exposure
+
+- 2026-06-06 — [refactor] Phase 1: `upgrade_attribute` transaction moved from KnowledgeManager into MetaManager; three EventBus signals added (`sale_resolved`, `item_repaired`, `item_restored`); MetaManager emits post-commit, KnowledgeManager subscribes for XP; `ResearchSlot` stripped of all autoload references; Meta↔Knowledge dependency cycle fully broken
+- 2026-06-06 — [refactor] Phase 2: `RunResult` Snapshot added (`common/gameplay/snapshot/`); `RunManager.take_run_result()` auto-reveals surface clues and snapshots economics before handoff; `MetaManager.resolve_current_run` consumes `RunResult` instead of touching `_run_store` directly; `RunManager._run_store` is now truly private; `run_resolved` signal added to EventBus
+- 2026-06-06 — [refactor] Phase 3: all 7 Stores converted to private backing vars + getter-only properties (language-enforced read-only externally); collection getters return `.duplicate()` for iteration stability; 35+ proxy properties deleted from MetaManager and RunManager; store references exposed as plain public fields (`economy`, `garage`, `storage`, `slot`, `progress`, `customers`, `run`); ~20 scene files updated to store-direct access (`MetaManager.economy.cash` etc.); new RunStore mutation methods (`initialize`, `deduct_ap`, `record_lot_win`, `init_browse`, `advance_browse_index`, `set_cargo_result`); new SlotStore mutators (`set_storage_ap`, `set_selling_slots_today`); `ONSITE_SELL_PRICE` moved to `Economy` constants
+
+---
+
 ## StoreBase Extraction + RunRecord Decomposition
 
 - 2026-06-06 — [refactor] Introduced `StoreBase extends RefCounted` as the shared base for all Store archetypes; all 7 persisting Stores and the new `RunStore` extend it; empty `migrate()`/`validate()` overrides removed from Stores where StoreBase no-ops suffice

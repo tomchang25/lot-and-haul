@@ -1,9 +1,9 @@
 # run_review_scene.gd
 # Block 06 — Run Review
-# Reads:  RunManager.cargo_items, RunManager.trailer_items, RunManager.car_data,
-#         RunManager.paid_price, RunManager.entry_fee, RunManager.fuel_cost,
-#         RunManager.onsite_proceeds
-# Writes: MetaManager.cash, MetaManager.storage_items (via MetaManager.resolve_current_run())
+# Reads:  RunManager.run.cargo_items, RunManager.run.trailer_items, RunManager.run.car_data,
+#         RunManager.run.paid_price, RunManager.run.entry_fee, RunManager.run.fuel_cost,
+#         RunManager.run.onsite_proceeds
+# Writes: MetaManager.economy.cash, MetaManager.storage.storage_items (via MetaManager.resolve_current_run())
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ func _ready() -> void:
         _trailer_damage_label.add_theme_color_override(&"font_color", Color(1.0, 0.8, 0.3))
         _trailer_damage_label.visible = true
 
-    _cargo_items = RunManager.cargo_items + RunManager.trailer_items
+    _cargo_items = RunManager.run.cargo_items + RunManager.run.trailer_items
     _review_entries = []
     _review_entries.append_array(_cargo_items)
 
@@ -75,12 +75,12 @@ func _on_row_tooltip_requested(
 
 
 func _apply_trailer_damage() -> int:
-    var car := RunManager.car_data
+    var car := RunManager.run.car_data
     if car.trailer_damage_chance <= 0.0:
         return 0
 
     var cracked := 0
-    for entry: ItemEntry in RunManager.trailer_items:
+    for entry: ItemEntry in RunManager.run.trailer_items:
         if randf() < car.trailer_damage_chance:
             var ratio := randf_range(car.trailer_damage_ratio_min, car.trailer_damage_ratio_max)
             entry.condition = maxf(0.0, entry.condition - ratio)
@@ -106,8 +106,8 @@ func _populate_rows() -> void:
 
 
 func _populate_finance() -> void:
-    var cost_cash := RunManager.paid_price + RunManager.entry_fee + RunManager.fuel_cost
-    var onsite := RunManager.onsite_proceeds
+    var cost_cash := RunManager.run.paid_price + RunManager.run.entry_fee + RunManager.run.fuel_cost
+    var onsite := RunManager.run.onsite_proceeds
     var overall := onsite - cost_cash
 
     _cost_cash_label.text = "Cost Cash:   -$%d" % cost_cash

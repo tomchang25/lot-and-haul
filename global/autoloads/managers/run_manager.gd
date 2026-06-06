@@ -1,93 +1,15 @@
 # run_manager.gd
 # Autoload: owns the active RunStore for the duration of a run.
-# Null between runs. Provides the factory, AP resolution, and a read-only proxy
-# surface (mirroring MetaManager) so no scene touches RunStore directly.
+# Null between runs. Provides the factory, AP resolution, and run-phase
+# mutation methods. Scenes read run state directly via RunManager.run.field.
 extends Node
 
-## Full state for the current run. Truly private — all external access goes
-## through the proxy properties below or take_run_result(). No code outside
-## this file may reference _run_store or RunStore directly.
-var _run_store: RunStore = null
-
-# ── Run-state proxy properties ─────────────────────────────────────────────────
-# Read-only delegates — no setter means no external write path.
-# Null-safe: return sensible defaults when _run_store is null (between runs).
-# Reference-type collections return a shallow duplicate so callers cannot
-# mutate live run state through the returned array.
-
-var location_data: LocationData:
-    get:
-        return _run_store.location_data if _run_store else null
-
-var car_data: CarData:
-    get:
-        return _run_store.car_data if _run_store else null
-
-var lot_entry: LotEntry:
-    get:
-        return _run_store.lot_entry if _run_store else null
-
-## Returns a shallow duplicate of the active lot's items (ItemEntry refs shared).
-var lot_items: Array[ItemEntry]:
-    get:
-        return _run_store.lot_items.duplicate() if _run_store else []
-
-## Returns a shallow duplicate of won items accumulated during the run.
-var won_items: Array[ItemEntry]:
-    get:
-        return _run_store.won_items.duplicate() if _run_store else []
-
-## Returns a shallow duplicate of the last lot's won items.
-var last_lot_won_items: Array[ItemEntry]:
-    get:
-        return _run_store.last_lot_won_items.duplicate() if _run_store else []
-
-## Returns a shallow duplicate of cargo items committed for transport.
-var cargo_items: Array[ItemEntry]:
-    get:
-        return _run_store.cargo_items.duplicate() if _run_store else []
-
-## Returns a shallow duplicate of trailer items committed for transport.
-var trailer_items: Array[ItemEntry]:
-    get:
-        return _run_store.trailer_items.duplicate() if _run_store else []
-
-var onsite_proceeds: int:
-    get:
-        return _run_store.onsite_proceeds if _run_store else 0
-
-var paid_price: int:
-    get:
-        return _run_store.paid_price if _run_store else 0
-
-var entry_fee: int:
-    get:
-        return _run_store.entry_fee if _run_store else 0
-
-var fuel_cost: int:
-    get:
-        return _run_store.fuel_cost if _run_store else 0
-
-var stamina: int:
-    get:
-        return _run_store.stamina if _run_store else 0
-
-var actions_remaining: int:
-    get:
-        return _run_store.actions_remaining if _run_store else 0
-
-var inspection_ap_cap: int:
-    get:
-        return _run_store.inspection_ap_cap if _run_store else 0
-
-## Returns a shallow duplicate of the browse lot list.
-var browse_lots: Array[LotData]:
-    get:
-        return _run_store.browse_lots.duplicate() if _run_store else []
-
-var browse_index: int:
-    get:
-        return _run_store.browse_index if _run_store else 0
+## Full state for the current run. Null between runs.
+## Scenes in the run phase assert RunManager.is_run_active() on entry and then
+## read directly: RunManager.run.won_items, RunManager.run.actions_remaining, etc.
+## External code must never mutate RunStore fields directly — use RunManager's
+## mutation methods below.
+var run: RunStore = null
 
 
 ## Creates, initializes, and assigns a new RunStore for [param location] and
@@ -95,21 +17,17 @@ var browse_index: int:
 ## caller can forget to initialize it. Called by Location Select before the
 ## run phase begins.
 func create_run_store(location: LocationData, car: CarData) -> void:
+    var ap_cap := _resolve_inspection_ap_cap(car)
+    var refill := _resolve_refill_reserve(car)
+    var entry_fee := location.entry_fee if location != null else 0
+    var fuel_cost := (
+        car.fuel_cost_per_day * location.travel_days
+        if location != null and car != null
+        else 0
+    )
     var r := RunStore.new()
-    r.location_data = location
-    r.car_data = car
-    r.max_stamina = car.stamina_cap
-    r.stamina = r.max_stamina
-
-    # Resolve auction AP at the single construction point so no caller can forget
-    # to initialize it. Modifier sources fold into the resolvers below; the first
-    # lot opens with a full pool.
-    r.inspection_ap_cap = _resolve_inspection_ap_cap(car)
-    r.refill_metric = _resolve_refill_reserve(car)
-    r.actions_remaining = r.inspection_ap_cap
-
-    _compute_travel_costs(r)
-    _run_store = r
+    r.initialize(location, car, ap_cap, refill, entry_fee, fuel_cost)
+    run = r
 
 
 ## Builds a RunResult snapshot from the active run: auto-reveals all surface
@@ -118,68 +36,65 @@ func create_run_store(location: LocationData, car: CarData) -> void:
 ## must call clear_run_state() after consuming the result.
 ## Asserts that a run is active — call only when is_run_active() is true.
 func take_run_result() -> RunResult:
-    assert(_run_store != null, "take_run_result called with no active run")
-    for entry: ItemEntry in _run_store.cargo_items:
+    assert(run != null, "take_run_result called with no active run")
+    for entry: ItemEntry in run.cargo_items:
         entry.auto_reveal_all_surface()
     var result := RunResult.new()
-    result.onsite_proceeds = _run_store.onsite_proceeds
-    result.paid_price = _run_store.paid_price
-    result.entry_fee = _run_store.entry_fee
-    result.fuel_cost = _run_store.fuel_cost
-    result.cargo_items.assign(_run_store.cargo_items)
+    result.onsite_proceeds = run.onsite_proceeds
+    result.paid_price = run.paid_price
+    result.entry_fee = run.entry_fee
+    result.fuel_cost = run.fuel_cost
+    result.cargo_items.assign(run.cargo_items)
     return result
 
 
 ## Clears all per-run state so the next run starts clean.
 func clear_run_state() -> void:
-    _run_store = null
+    run = null
 
 # ── Run-state queries ──────────────────────────────────────────────────────────
 
 
-## Returns true when a run is currently active (_run_store is non-null).
+## Returns true when a run is currently active (run is non-null).
 func is_run_active() -> bool:
-    return _run_store != null
+    return run != null
 
 # ── Run-state mutations ────────────────────────────────────────────────────────
 
 
 ## Deducts [param cost] AP from the current lot's inspection pool.
 func spend_ap(cost: int) -> void:
-    if _run_store:
-        _run_store.actions_remaining -= cost
+    if run:
+        run.deduct_ap(cost)
 
 
 ## Records a won lot auction: stores [param items] as last_lot_won_items, adds
 ## [param price] to paid_price, and appends items to won_items. No-op when
 ## there is no active run.
 func commit_lot_win(items: Array[ItemEntry], price: int) -> void:
-    if _run_store == null:
+    if run == null:
         return
-    _run_store.last_lot_won_items = items.duplicate()
-    _run_store.paid_price += price
-    _run_store.won_items.append_array(items)
+    run.record_lot_win(items, price)
 
 
 ## Initialises browse state for a fresh location visit: assigns [param lots]
 ## and resets browse_index to 0. Called when LotBrowseScene first loads.
 func init_browse_lots(lots: Array[LotData]) -> void:
-    if _run_store == null:
+    if run == null:
         return
-    _run_store.browse_lots = lots
-    _run_store.browse_index = 0
+    run.init_browse(lots)
 
 
 ## Advances browse_index by one (player passed or entered a lot).
 func advance_browse_index() -> void:
-    if _run_store:
-        _run_store.browse_index += 1
+    if run:
+        run.advance_browse_index()
 
 
 ## Delegates to RunStore.set_lot, setting the active lot and refilling AP.
 func set_lot(entry: LotEntry) -> void:
-    if _run_store:
-        _run_store.set_lot(entry)
+    if run:
+        run.set_lot(entry)
 
 
 ## Commits cargo loading result: final [param cargo], [param trailer] items,
@@ -189,11 +104,9 @@ func commit_cargo(
         trailer: Array[ItemEntry],
         proceeds: int,
 ) -> void:
-    if _run_store == null:
+    if run == null:
         return
-    _run_store.cargo_items = cargo
-    _run_store.trailer_items = trailer
-    _run_store.onsite_proceeds = proceeds
+    run.set_cargo_result(cargo, trailer, proceeds)
 
 # ── Auction AP resolution ──────────────────────────────────────────────────────
 # Single source of truth for a run's starting auction AP. Every modifier source
@@ -218,14 +131,3 @@ func _resolve_refill_reserve(car: CarData) -> int:
     var reserve: int = Economy.INSPECTION_REFILL_METRIC_DEFAULT
     # Future modifiers fold in here.
     return reserve
-
-
-## Computes travel costs (entry_fee, fuel_cost) on [param store] from its
-## location_data and car_data. Called once at construction time.
-func _compute_travel_costs(store: RunStore) -> void:
-    store.entry_fee = store.location_data.entry_fee if store.location_data else 0
-    store.fuel_cost = (
-        store.car_data.fuel_cost_per_day * store.location_data.travel_days
-        if store.location_data and store.car_data
-        else 0
-    )

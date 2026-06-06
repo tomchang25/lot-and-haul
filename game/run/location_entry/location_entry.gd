@@ -13,8 +13,8 @@ extends Control
 
 
 func _ready() -> void:
-    assert(RunManager.is_run_active(), "LocationEntry: run_store is null — Location Select must build it before entering.")
-    assert(RunManager.location_data != null, "LocationEntry: location_data is null — Location Select must assign a LocationData before entering.")
+    assert(RunManager.is_run_active(), "LocationEntry: run is null — Location Select must build it before entering.")
+    assert(RunManager.run.location_data != null, "LocationEntry: location_data is null — Location Select must assign a LocationData before entering.")
     _play_door_animation()
 
 # ══ Door animation ════════════════════════════════════════════════════════════

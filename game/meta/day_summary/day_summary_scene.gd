@@ -101,7 +101,7 @@ func _render(summary: DaySummary) -> void:
         _net_label.text = "Net:   -$%d" % (-net)
         _net_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
 
-    _balance_label.text = "Balance:   $%d" % MetaManager.cash
+    _balance_label.text = "Balance:   $%d" % MetaManager.economy.cash
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 

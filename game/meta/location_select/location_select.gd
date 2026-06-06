@@ -24,9 +24,9 @@ func _ready() -> void:
 
 
 func _populate_cards() -> void:
-    if MetaManager.available_locations.is_empty():
+    if MetaManager.progress.available_locations.is_empty():
         MetaManager.roll_available_locations()
-    for location: LocationData in MetaManager.available_locations:
+    for location: LocationData in MetaManager.progress.available_locations:
         var card: LocationCard = LocationCardScene.instantiate()
         card.setup(location)
         card.pressed.connect(_on_card_pressed)
@@ -39,7 +39,7 @@ func _on_card_pressed(card: LocationCard) -> void:
     var location := card.get_location_data()
 
     MetaManager.begin_auction()
-    RunManager.create_run_store(location, MetaManager.active_car)
+    RunManager.create_run_store(location, MetaManager.garage.active_car)
     SceneRouter.go_to_location_entry()
 
 

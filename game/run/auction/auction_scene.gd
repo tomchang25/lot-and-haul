@@ -1,7 +1,7 @@
 # auction_scene.gd
 # Block 04 — The player watches a live bidding sequence and decides when to drop out.
-# Reads:  RunManager.lot_entry, RunManager.lot_items, RunManager.paid_price,
-#         RunManager.entry_fee, RunManager.fuel_cost
+# Reads:  RunManager.run.lot_entry, RunManager.run.lot_items,
+#         RunManager.run.paid_price, RunManager.run.entry_fee, RunManager.run.fuel_cost
 # Writes: RunManager.commit_lot_win()
 extends Control
 
@@ -192,7 +192,7 @@ func _on_pass_pressed() -> void:
 
 
 func _init_auction() -> void:
-    var lot: LotEntry = RunManager.lot_entry
+    var lot: LotEntry = RunManager.run.lot_entry
 
     _rolled_price = max(lot.get_rolled_price(), MIN_STEP)
 
@@ -207,7 +207,7 @@ func _init_auction() -> void:
 
 
 func _build_lot_summary() -> void:
-    var lot: LotEntry = RunManager.lot_entry
+    var lot: LotEntry = RunManager.run.lot_entry
 
     for entry: ItemEntry in lot.item_entries:
         var row: LotSummaryRow = LotSummaryRowScene.instantiate()
@@ -301,7 +301,7 @@ func _resolve() -> void:
     if _last_bidder == "player":
         # lot_items proxy already returns a duplicate — use it directly as the
         # canonical won-items snapshot for this lot.
-        RunManager.commit_lot_win(RunManager.lot_items, _current_display_price)
+        RunManager.commit_lot_win(RunManager.run.lot_items, _current_display_price)
 
     SceneRouter.go_to_reveal()
 
@@ -312,8 +312,8 @@ func _resolve() -> void:
 ## run costs (paid_price, entry_fee, fuel_cost). Called on init and after
 ## every player bid so the number stays live.
 func _refresh_budget() -> void:
-    var committed := RunManager.paid_price + RunManager.entry_fee + RunManager.fuel_cost
-    var remaining := maxi(MetaManager.cash - committed, 0)
+    var committed := RunManager.run.paid_price + RunManager.run.entry_fee + RunManager.run.fuel_cost
+    var remaining := maxi(MetaManager.economy.cash - committed, 0)
     _budget_label.text = "Budget: $%d" % remaining
 
 # ══ Display helpers ════════════════════════════════════════════════════════════
@@ -362,10 +362,10 @@ func _show_npc_popup(price: int) -> void:
 func _init_debug_overlay() -> void:
     if not OS.is_debug_build():
         return
-    var lot: LotEntry = RunManager.lot_entry
+    var lot: LotEntry = RunManager.run.lot_entry
 
     var true_value := 0
-    for entry: ItemEntry in RunManager.lot_items:
+    for entry: ItemEntry in RunManager.run.lot_items:
         if entry.item_data != null:
             true_value += int(entry.full_true_value())
 

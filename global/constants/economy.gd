@@ -4,6 +4,7 @@ class_name Economy
 extends RefCounted
 
 const DAILY_BASE_COST: int = 100
+const ONSITE_SELL_PRICE: int = 50
 const LOCATION_SAMPLE_SIZE: int = 3
 
 # ── Storage AP economy ────────────────────────────────────────────────────────

@@ -2,24 +2,33 @@
 # Storage runtime store: owned ItemEntry instances and the monotonic
 # next_entry_id counter. Serializable state slice held by MetaManager.
 # Owns the fields and their save payload.
+#
+# Fields are read-public via getters. Mutation goes through the owning Manager only.
 class_name StorageStore
 extends StoreBase
 
-## Array of ItemEntry instances the player currently owns in storage.
-var storage_items: Array = []
+var _storage_items: Array = []
+var _next_entry_id: int = 0
 
-## Monotonically increasing counter; never reset. Assigned to ItemEntry.id on
-## registration so each entry has a unique id across the save's lifetime.
-var next_entry_id: int = 0
+## Shallow duplicate of the storage array (ItemEntry refs shared). Read-only externally.
+## Returns a duplicate for iteration stability; refs inside are shared.
+var storage_items: Array:
+    get:
+        return _storage_items.duplicate()
+
+## Monotonically increasing entry-id counter. Read-only externally.
+var next_entry_id: int:
+    get:
+        return _next_entry_id
 
 
 ## Registers a single [param entry]: assigns a stable id, appends to storage,
 ## and auto-reveals hidden clues when the item has auto_verify set.
 ## Does not save — callers commit via SaveManager.save().
 func register_entry(entry: ItemEntry) -> void:
-    entry.id = next_entry_id
-    next_entry_id += 1
-    storage_items.append(entry)
+    entry.id = _next_entry_id
+    _next_entry_id += 1
+    _storage_items.append(entry)
     if entry.item_data != null and entry.item_data.auto_verify:
         entry.reveal_all_hidden()
 
@@ -36,7 +45,7 @@ func remove_entries(entries: Array) -> Array:
     var ids: Array = []
     for e: ItemEntry in entries:
         ids.append(e.id)
-        storage_items.erase(e)
+        _storage_items.erase(e)
     return ids
 
 
@@ -48,11 +57,11 @@ func section_id() -> String:
 ## Serializes storage state to a save payload.
 func to_dict() -> Dictionary:
     var serialized_items: Array = []
-    for entry: ItemEntry in storage_items:
+    for entry: ItemEntry in _storage_items:
         serialized_items.append(entry.to_dict())
     return {
         "storage_items": serialized_items,
-        "next_entry_id": next_entry_id,
+        "next_entry_id": _next_entry_id,
     }
 
 
@@ -61,7 +70,7 @@ func to_dict() -> Dictionary:
 ## legacy research_slots saves.
 func from_dict(data: Dictionary) -> void:
     if data.has("storage_items") and data["storage_items"] is Array:
-        storage_items = []
+        _storage_items = []
         for d: Variant in data["storage_items"]:
             if not d is Dictionary:
                 continue
@@ -69,9 +78,9 @@ func from_dict(data: Dictionary) -> void:
             if entry == null:
                 continue
             entry.apply_storage_migration()
-            storage_items.append(entry)
+            _storage_items.append(entry)
     if data.has("next_entry_id") and data["next_entry_id"] is float:
-        next_entry_id = int(data["next_entry_id"])
+        _next_entry_id = int(data["next_entry_id"])
 
     # ── Migration: discard legacy research_slots ──────────────────────────────
     # Old (pre-time-slot) flat saves carried a research_slots array. Absent from
@@ -106,7 +115,7 @@ func _migrate_research_slots(slots: Array) -> void:
         if days_spent <= 0:
             continue
         var entry: ItemEntry = null
-        for e: ItemEntry in storage_items:
+        for e: ItemEntry in _storage_items:
             if e.id == item_id:
                 entry = e
                 break

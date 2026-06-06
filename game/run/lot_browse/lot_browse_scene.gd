@@ -33,8 +33,8 @@ func _ready() -> void:
     _cargo_button.pressed.connect(_on_cargo_pressed)
     _skip_confirm_popup.confirmed.connect(_on_skip_confirmed)
 
-    if RunManager.browse_lots.is_empty():
-        RunManager.init_browse_lots(_sample_lots(RunManager.location_data))
+    if RunManager.run.browse_lots.is_empty():
+        RunManager.init_browse_lots(_sample_lots(RunManager.run.location_data))
 
     _build_all_cards()
     _refresh_view()
@@ -43,7 +43,7 @@ func _ready() -> void:
 
 
 func _build_all_cards() -> void:
-    var lots := RunManager.browse_lots
+    var lots := RunManager.run.browse_lots
     var total: int = lots.size()
 
     for i in total:
@@ -57,9 +57,9 @@ func _build_all_cards() -> void:
 
 
 func _refresh_view() -> void:
-    var idx := RunManager.browse_index
+    var idx := RunManager.run.browse_index
 
-    if idx >= RunManager.browse_lots.size():
+    if idx >= RunManager.run.browse_lots.size():
         _show_cargo_state()
         return
 
@@ -79,7 +79,7 @@ func _show_cargo_state() -> void:
 
 
 func _on_enter_pressed() -> void:
-    var lot_data: LotData = RunManager.browse_lots[RunManager.browse_index]
+    var lot_data: LotData = RunManager.run.browse_lots[RunManager.run.browse_index]
     var entry := LotEntry.create(lot_data)
     RunManager.set_lot(entry)
     RunManager.advance_browse_index()
@@ -92,7 +92,7 @@ func _on_pass_pressed() -> void:
 
 
 func _on_skip_pressed() -> void:
-    var remaining: int = RunManager.browse_lots.size() - RunManager.browse_index
+    var remaining: int = RunManager.run.browse_lots.size() - RunManager.run.browse_index
     _skip_confirm_popup.dialog_text = (
         "Skip the remaining %d lot(s) and go straight to cargo?" % remaining
     )
