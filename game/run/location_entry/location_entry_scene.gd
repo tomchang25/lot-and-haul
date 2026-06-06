@@ -1,4 +1,4 @@
-# location_entry.gd
+# location_entry_scene.gd
 # Run entry point — Location Entry.
 # Assumes RunManager.run_store has already been built by the Location Select
 # screen. Plays the placeholder arrival fade, then advances to lot browse.

@@ -37,7 +37,7 @@ func _ready() -> void:
 
     # If all slots are spent, end the day immediately instead of showing the hub.
     if MetaManager.slot.current_slot > 3:
-        _end_day_and_navigate()
+        _end_day_and_navigate.call_deferred()
         return
 
     _refresh_display()

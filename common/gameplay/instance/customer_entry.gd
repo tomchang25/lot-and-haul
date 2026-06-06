@@ -1,8 +1,8 @@
-# customer.gd
+# customer_entry.gd
 # Runtime value object representing a single nightly customer visit.
 # Each customer arrives with demand tags (clue ids they want to buy) and a car
 # grid (how much cargo space they have).
-class_name Customer
+class_name CustomerEntry
 extends RefCounted
 
 # ── State ──────────────────────────────────────────────────────────────────────
@@ -29,8 +29,8 @@ func to_dict() -> Dictionary:
     }
 
 
-static func from_dict(d: Dictionary) -> Customer:
-    var c := Customer.new()
+static func from_dict(d: Dictionary) -> CustomerEntry:
+    var c := CustomerEntry.new()
     c.customer_id = str(d.get("customer_id", ""))
     c.display_name = str(d.get("display_name", ""))
     c.grid_columns = int(d.get("grid_columns", 2))
@@ -77,8 +77,8 @@ static func generate(
         all_clue_ids: Array[String] = [],
         tag_min: int = DEFAULT_TAG_MIN,
         tag_max: int = DEFAULT_TAG_MAX,
-) -> Customer:
-    var c := Customer.new()
+) -> CustomerEntry:
+    var c := CustomerEntry.new()
     c.customer_id = "cust_%s" % RandomUtils.random_id(rng)
     c.display_name = RandomUtils.random_name(rng)
 
@@ -111,7 +111,7 @@ static func generate_for_night(
         storage_items: Array = [],
         count: int = -1,
         all_clue_ids: Array[String] = [],
-) -> Array[Customer]:
+) -> Array[CustomerEntry]:
     if count < 0:
         count = rng.randi_range(DEFAULT_NIGHT_MIN, DEFAULT_NIGHT_MAX)
 
@@ -124,7 +124,7 @@ static func generate_for_night(
             if not owned_pool.has(tag):
                 owned_pool.append(tag)
 
-    var result: Array[Customer] = []
+    var result: Array[CustomerEntry] = []
     result.resize(count)
     for i in range(count):
         result[i] = generate(rng, owned_pool, all_clue_ids)

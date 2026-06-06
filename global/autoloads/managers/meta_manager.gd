@@ -185,7 +185,7 @@ func _generate_nightly_customers(selling_slots: int) -> void:
     rng.randomize()
     var count := _selling_slots_to_count(rng, selling_slots)
     customers.set_customers(
-        Customer.generate_for_night(
+        CustomerEntry.generate_for_night(
             rng,
             storage.storage_items,
             count,
@@ -219,7 +219,7 @@ func _selling_slots_to_count(rng: RandomNumberGenerator, selling_slots: int) -> 
 func resolve_customer_sale(
         items: Array,
         sale_price: int,
-        customer: Customer = null,
+        customer: CustomerEntry = null,
         strategy: String = "",
 ) -> void:
     var sold_ids: Array = storage.remove_entries(items)

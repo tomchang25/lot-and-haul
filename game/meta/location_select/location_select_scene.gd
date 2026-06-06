@@ -1,4 +1,4 @@
-# location_select.gd
+# location_select_scene.gd
 # Location Select screen. Fetches all LocationData from LocationRegistry,
 # builds a LocationCard per entry, and — when a card is chosen — constructs
 # the active RunStore and advances to the Location Entry scene.

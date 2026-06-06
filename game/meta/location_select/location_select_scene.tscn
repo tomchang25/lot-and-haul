@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://blocsel000001"]
 
-[ext_resource type="Script" uid="uid://ba36wua7kesgv" path="res://game/meta/location_select/location_select.gd" id="1_locsel"]
+[ext_resource type="Script" uid="uid://ba36wua7kesgv" path="res://game/meta/location_select/location_select_scene.gd" id="1_locsel"]
 
 [node name="LocationSelect" type="Control" unique_id=-294967295]
 layout_mode = 3

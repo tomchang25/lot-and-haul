@@ -248,8 +248,8 @@ decided by one semantic test:
 
 > **Is every direct child of this folder an instance of the folder's name (singularized)?**
 >
-> - **Yes → plural** (the folder is a *collection* of like things).
-> - **No → singular** (the folder is a *namespace / grouping* of different things).
+> - **Yes → plural** (the folder is a _collection_ of like things).
+> - **No → singular** (the folder is a _namespace / grouping_ of different things).
 
 ```
 managers/                  # each child IS a manager        → plural
@@ -261,9 +261,9 @@ data/tres/items/           # each child IS an item           → plural
   antique_clock.tres
 
 gameplay/                  # children are NOT "gameplays"    → singular
-  instances/               #   ...each of these is a collection → plural
-  services/
-  snapshots/
+  instance/                #   ...each folder holds one archetype type → singular
+  service/
+  snapshot/
 ```
 
 Notes:
@@ -294,19 +294,19 @@ If a `match` covers all members of a known enum exhaustively, the wildcard arm s
 
 # Summary
 
-| Type              | Style                         | Example                   |
-| ----------------- | ----------------------------- | ------------------------- |
-| Files             | snake_case                    | `item_row.gd`             |
-| Classes           | PascalCase                    | `ItemRow`                 |
-| Variables         | snake_case                    | `won_items`               |
-| Private variables | \_snake_case                  | `_rolled_price`           |
-| Functions         | snake_case                    | `setup()`                 |
-| Private functions | \_snake_case                  | `_populate_rows()`        |
-| Signal callbacks  | \_on_snake_case               | `_on_confirm_pressed()`   |
-| Signals           | snake_case                    | `tooltip_requested`       |
-| Constants         | UPPER_SNAKE_CASE              | `ITEM_COLS`               |
-| Preloaded types   | PascalCase                    | `ItemRowScene`            |
-| Enums             | PascalCase + UPPER_SNAKE_CASE | `SelectionState.SELECTED` |
-| Nodes             | PascalCase                    | `ConfirmButton`           |
-| Folders (collection) | snake_case, plural         | `managers/`, `items/`     |
-| Folders (namespace)  | snake_case, singular       | `gameplay/`, `theme/`     |
+| Type                 | Style                         | Example                   |
+| -------------------- | ----------------------------- | ------------------------- |
+| Files                | snake_case                    | `item_row.gd`             |
+| Classes              | PascalCase                    | `ItemRow`                 |
+| Variables            | snake_case                    | `won_items`               |
+| Private variables    | \_snake_case                  | `_rolled_price`           |
+| Functions            | snake_case                    | `setup()`                 |
+| Private functions    | \_snake_case                  | `_populate_rows()`        |
+| Signal callbacks     | \_on_snake_case               | `_on_confirm_pressed()`   |
+| Signals              | snake_case                    | `tooltip_requested`       |
+| Constants            | UPPER_SNAKE_CASE              | `ITEM_COLS`               |
+| Preloaded types      | PascalCase                    | `ItemRowScene`            |
+| Enums                | PascalCase + UPPER_SNAKE_CASE | `SelectionState.SELECTED` |
+| Nodes                | PascalCase                    | `ConfirmButton`           |
+| Folders (collection) | snake_case, plural            | `managers/`, `items/`     |
+| Folders (namespace)  | snake_case, singular          | `gameplay/`, `theme/`     |

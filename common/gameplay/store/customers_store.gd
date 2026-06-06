@@ -7,12 +7,12 @@
 class_name CustomersStore
 extends StoreBase
 
-var _nightly_customers: Array[Customer] = []
+var _nightly_customers: Array[CustomerEntry] = []
 var _customer_sales_today: Array[Dictionary] = []
 
-## Shallow duplicate of the nightly customer list (Customer refs shared).
+## Shallow duplicate of the nightly customer list (CustomerEntry refs shared).
 ## Read-only externally. Returns a duplicate for iteration stability.
-var nightly_customers: Array[Customer]:
+var nightly_customers: Array[CustomerEntry]:
     get:
         return _nightly_customers.duplicate()
 
@@ -24,20 +24,20 @@ var customer_sales_today: Array[Dictionary]:
 
 
 ## Replaces the nightly customer list. Does not save.
-func set_customers(customers: Array[Customer]) -> void:
+func set_customers(customers: Array[CustomerEntry]) -> void:
     _nightly_customers = customers
 
 
 ## Removes [param customer] from the nightly set. No-op if not present.
 ## Does not save.
-func remove_customer(customer: Customer) -> void:
+func remove_customer(customer: CustomerEntry) -> void:
     _nightly_customers.erase(customer)
 
 
 ## Appends a sale record to the daily ledger. Does not save.
 func record_sale(
         day: int,
-        customer: Customer,
+        customer: CustomerEntry,
         strategy: String,
         sold_ids: Array,
         sale_price: int,
@@ -68,7 +68,7 @@ func section_id() -> String:
 ## Serializes customer state to a save payload.
 func to_dict() -> Dictionary:
     var serialized_customers: Array = []
-    for c: Customer in _nightly_customers:
+    for c: CustomerEntry in _nightly_customers:
         serialized_customers.append(c.to_dict())
     return {
         "_version": _store_version(),
@@ -85,7 +85,7 @@ func from_dict(data: Dictionary) -> void:
     if data.has("nightly_customers") and data["nightly_customers"] is Array:
         for d: Variant in data["nightly_customers"]:
             if d is Dictionary:
-                _nightly_customers.append(Customer.from_dict(d))
+                _nightly_customers.append(CustomerEntry.from_dict(d))
     _customer_sales_today = []
     if data.has("customer_sales_today") and data["customer_sales_today"] is Array:
         for rec: Variant in data["customer_sales_today"]:

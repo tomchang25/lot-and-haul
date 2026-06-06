@@ -25,6 +25,14 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Naming Audit Fixes
+
+- 2026-06-06 — [refactor] Renamed `customer.gd` → `customer_entry.gd`; `class_name Customer` → `CustomerEntry`; updated all six referencing files (`customers_store.gd`, `sell_math.gd`, `customer_sell_scene.gd`, `meta_manager.gd`, plus header comments)
+- 2026-06-06 — [refactor] Renamed `location_select.gd/.tscn` → `location_select_scene.gd/.tscn` and `location_entry.gd/.tscn` → `location_entry_scene.gd/.tscn`; updated `path=` in both `.tscn` files and both `path=` entries in `scene_router.tscn`
+- 2026-06-06 — [docs] Updated `naming_conventions.md` section 10 example: `instances/`/`services/`/`snapshots/` → `instance/`/`service/`/`snapshot/` (singular archetype folder names matching actual codebase); updated `CLAUDE.md` project structure to show `instance/` subfolder and fixed conventions quick-ref subfolder list
+
+---
+
 ## SaveManager Provider Unification & Legacy Cleanup
 
 - 2026-06-06 — [refactor] Merged `_sections` + `_managers` into single `_providers` array in SaveManager; replaced `register_section`, `register_sections`, and `register_manager` with single `register_provider` (asserts all four StoreBase methods); MetaManager and KnowledgeManager each call `register_provider(self)` once; all four iteration sites (`save`, `load`, `run_migrations`, `run_validation`) updated to `_providers`

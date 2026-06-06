@@ -6,7 +6,7 @@ extends Control
 
 const CargoItemRowScene: PackedScene = preload("res://game/run/cargo/cargo_item_row.tscn")
 
-var _customers: Array[Customer] = []
+var _customers: Array[CustomerEntry] = []
 var _selected_idx: int = -1
 var _item_rows: Dictionary = { }
 var _item_colors: Dictionary = { }
@@ -21,7 +21,6 @@ var _pending_strategy: String = ""
 @onready var _customer_tabs_row: HBoxContainer = $RootVBox/CustomerTabsScroll/CustomerTabsRow
 @onready var _main_area: HBoxContainer = $RootVBox/MainArea
 @onready var _item_list_vbox: VBoxContainer = $RootVBox/MainArea/ItemScroll/ItemListVBox
-@onready var _sell_panel: VBoxContainer = $RootVBox/MainArea/SellPanel
 @onready var _customer_name_label: Label = $RootVBox/MainArea/SellPanel/CustomerNameLabel
 @onready var _grid_size_label: Label = $RootVBox/MainArea/SellPanel/GridSizeLabel
 @onready var _demand_tags_label: Label = $RootVBox/MainArea/SellPanel/DemandTagsLabel
@@ -80,7 +79,7 @@ func _build_customer_tabs() -> void:
         child.queue_free()
 
     for i: int in _customers.size():
-        var c: Customer = _customers[i]
+        var c: CustomerEntry = _customers[i]
         var btn := Button.new()
         btn.custom_minimum_size = Vector2(140, 36)
         btn.add_theme_font_size_override("font_size", 14)
@@ -100,7 +99,7 @@ func _select_customer(idx: int) -> void:
     _selected_idx = idx
     _update_tab_states()
 
-    var c: Customer = _customers[idx]
+    var c: CustomerEntry = _customers[idx]
     _customer_name_label.text = c.display_name
     _grid_size_label.text = "Car: %dx%d" % [c.grid_columns, c.grid_rows]
 
@@ -125,7 +124,7 @@ func _update_tab_states() -> void:
         btn.disabled = (_customers[i] == null)
 
 
-func _rebuild_grid(c: Customer) -> void:
+func _rebuild_grid(c: CustomerEntry) -> void:
     _grid.setup(c.grid_columns, c.grid_rows)
     _main_area.visible = true
 
@@ -149,7 +148,7 @@ func _grid_border_provider(item) -> Color:
     return Color(0.40, 0.55, 0.75, 1.0)
 
 
-func _rebuild_item_list(c: Customer) -> void:
+func _rebuild_item_list(c: CustomerEntry) -> void:
     for child: Node in _item_list_vbox.get_children():
         _item_list_vbox.remove_child(child)
         child.queue_free()
@@ -308,7 +307,7 @@ func _on_aggressive_pressed() -> void:
     if _selected_idx < 0:
         return
 
-    var c: Customer = _customers[_selected_idx]
+    var c: CustomerEntry = _customers[_selected_idx]
     var depth := SellMath.best_item_fit_depth(c, placed)
     var verified_count := 0
     for entry in placed:
@@ -409,7 +408,7 @@ func _on_sell_confirmed() -> void:
     if placed.is_empty():
         return
 
-    var sold_customer: Customer = _customers[_selected_idx]
+    var sold_customer: CustomerEntry = _customers[_selected_idx]
     # MetaManager owns the transaction: it commits cash/storage, records the
     # sale for the daily summary, and removes the served customer from the
     # persisted nightly set. The scene only drops it from its local view.
