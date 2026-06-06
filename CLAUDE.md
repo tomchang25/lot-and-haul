@@ -66,7 +66,12 @@ game/         Game feature scenes and logic
   |           lot_browse, reveal, run_review
   shared/     Cross-phase UI: item_display, plus placeholder dirs
 global/       Autoloads and project-wide resources
-  autoload/   All autoload scripts (registries, managers, event bus)
+  autoloads/  All autoload scripts, organized by role:
+    game_manager/ Boot orchestrator + scene registry
+    managers/    Gameplay managers (MetaManager, KnowledgeManager, RunManager)
+    registries/  Designer-resource registries (extend ResourceRegistry)
+    scene_router/ Scene navigation + pending data
+    event_bus.gd, save_manager.gd, audio_manager/
   constants/  Data paths, economy constants
   theme/      Main theme resource
   utils/      Registry audit utility
@@ -78,7 +83,7 @@ stage/        Testbeds, demo runs, and tile sets (mostly empty)
 
 EventBus → AudioManager → ClueRegistry → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → SaveManager → KnowledgeManager → MetaManager → SceneRouter → GameManager
 
-`SaveManager` drives boot fan-out: MetaManager and KnowledgeManager call `SaveManager.register_manager(self)` in `_ready()`, then `GameManager._ready()` calls `SaveManager.run_migrations()` and `SaveManager.run_validation()`.
+MetaManager and KnowledgeManager call `SaveManager.register_provider(self)` in `_ready()`. `GameManager._ready()` calls `SaveManager.load()` then `SaveManager.run_validation()`. Per-store versioned migrations run inside each store's `from_dict()` via `_apply_migrations()` — there is no top-level migration pass. The `schema_version` field in the save file is a legacy stamp; it is always written but never checked on load.
 
 ## Data Pipeline
 
@@ -88,7 +93,7 @@ When authoring new items or clues, use the generation prompts at `dev/tools/prom
 
 ## Current Phase
 
-Core loop redesign: Phases 0–11 complete (runtime veil cleanup, AP grid inspection, item base price, storage authenticate, clue independence + attribute system, inspection refinement, dynamic naming rules, YAML content regeneration, value policy cleanup, day summary rework). Identity layers and skills have been fully replaced by clue-based pricing and SPECIAL-style attributes; all clues carry 1-word known_text and naming entries. `item_price` is now the sole per-item price resolver (`appraised or verified value × condition_multiplier`); MarketManager, PriceConfig, merchant registry, special orders, commodity data, and deprecated selling helpers have been removed. DaySummary captures `customer_sales_today` before nightly generation clears it, net change reflects customer sales revenue, and post-run routes through the day summary scene. StoreBase extraction complete: all 7 persisting Stores and session-scoped RunStore extend StoreBase; RunManager owns RunStore factory + AP resolution; DaySummary is a Snapshot archetype.
+Check TODO.md ## Active Section
 
 ## Conventions (quick reference)
 

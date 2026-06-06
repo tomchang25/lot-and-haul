@@ -8,66 +8,15 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
-## Manager Decoupling & Store Exposure
+## Save & Managers Refactor
 
-- 2026-06-06 — [refactor] Phase 1: `upgrade_attribute` transaction moved from KnowledgeManager into MetaManager; three EventBus signals added (`sale_resolved`, `item_repaired`, `item_restored`); MetaManager emits post-commit, KnowledgeManager subscribes for XP; `ResearchSlot` stripped of all autoload references; Meta↔Knowledge dependency cycle fully broken
-- 2026-06-06 — [refactor] Phase 2: `RunResult` Snapshot added (`common/gameplay/snapshot/`); `RunManager.take_run_result()` auto-reveals surface clues and snapshots economics before handoff; `MetaManager.resolve_current_run` consumes `RunResult` instead of touching `_run_store` directly; `RunManager._run_store` is now truly private; `run_resolved` signal added to EventBus
-- 2026-06-06 — [refactor] Phase 3: all 7 Stores converted to private backing vars + getter-only properties (language-enforced read-only externally); collection getters return `.duplicate()` for iteration stability; 35+ proxy properties deleted from MetaManager and RunManager; store references exposed as plain public fields (`economy`, `garage`, `storage`, `slot`, `progress`, `customers`, `run`); ~20 scene files updated to store-direct access (`MetaManager.economy.cash` etc.); new RunStore mutation methods (`initialize`, `deduct_ap`, `record_lot_win`, `init_browse`, `advance_browse_index`, `set_cargo_result`); new SlotStore mutators (`set_storage_ap`, `set_selling_slots_today`); `ONSITE_SELL_PRICE` moved to `Economy` constants
-
----
-
-## StoreBase Extraction + RunRecord Decomposition
-
-- 2026-06-06 — [refactor] Introduced `StoreBase extends RefCounted` as the shared base for all Store archetypes; all 7 persisting Stores and the new `RunStore` extend it; empty `migrate()`/`validate()` overrides removed from Stores where StoreBase no-ops suffice
-- 2026-06-06 — [refactor] Renamed `RunRecord` → `RunStore` (moved to `common/gameplay/store/`); stripped factory + AP resolution logic out of the class; `RunManager` now owns `create_run_store()`, `_resolve_inspection_ap_cap()`, `_resolve_refill_reserve()`, `_compute_travel_costs()`; `set_lot()` and all state fields remain on `RunStore`; `run_record` accessor renamed to `run_store` across all run-phase scenes
-- 2026-06-06 — [refactor] Reclassified `DaySummary` → `DaySnapshot` (moved to `common/gameplay/snapshot/`); updated `MetaManager.end_day()` return type, `SceneRouter` pending field, and `DaySummaryScene` type annotation; scene/route/packed-scene names unchanged
-- 2026-06-06 — [refactor] Renamed `DaySnapshot` → `DaySummary` (file: `day_snapshot.gd` → `day_summary.gd`, class: `DaySnapshotScene` → `DaySummaryScene`); updated all callers in `MetaManager.end_day()`, `SceneRouter`, and `DaySummaryScene` type annotations
-
----
-
-## Naming Audit Fixes
-
-- 2026-06-06 — [refactor] Renamed `customer.gd` → `customer_entry.gd`; `class_name Customer` → `CustomerEntry`; updated all six referencing files (`customers_store.gd`, `sell_math.gd`, `customer_sell_scene.gd`, `meta_manager.gd`, plus header comments)
-- 2026-06-06 — [refactor] Renamed `location_select.gd/.tscn` → `location_select_scene.gd/.tscn` and `location_entry.gd/.tscn` → `location_entry_scene.gd/.tscn`; updated `path=` in both `.tscn` files and both `path=` entries in `scene_router.tscn`
-- 2026-06-06 — [docs] Updated `naming_conventions.md` section 10 example: `instances/`/`services/`/`snapshots/` → `instance/`/`service/`/`snapshot/` (singular archetype folder names matching actual codebase); updated `CLAUDE.md` project structure to show `instance/` subfolder and fixed conventions quick-ref subfolder list
-
----
-
-## SaveManager Provider Unification & Legacy Cleanup
-
-- 2026-06-06 — [refactor] Merged `_sections` + `_managers` into single `_providers` array in SaveManager; replaced `register_section`, `register_sections`, and `register_manager` with single `register_provider` (asserts all four StoreBase methods); MetaManager and KnowledgeManager each call `register_provider(self)` once; all four iteration sites (`save`, `load`, `run_migrations`, `run_validation`) updated to `_providers`
-- 2026-06-06 — [refactor] Per-store versioned migrations: added `_store_version()` and `_apply_migrations()` to StoreBase; removed `migrate()` from StoreBase, GarageStore, KnowledgeStore, MetaManager, KnowledgeManager, and SaveManager; removed `run_migrations()` from SaveManager and boot call in GameManager; all 6 persisting stores write `_version` in `to_dict()` and read it in `from_dict()`; removed `erase_points()`/`erase_category_points()` dead code; removed `skill_levels` legacy branch from KnowledgeStore
-- 2026-06-06 — [refactor] Removed unreachable legacy paths from SaveManager.load(): flat-save fallback and schema 1→2 migration branch; load() now requires "sections" key (push_error otherwise); removed stale comment about removed systems; removed `research_slots` migration check and `_migrate_research_slots()` from StorageStore (pre-time-slot saves are gone); updated docstrings in both files
-
----
-
-## LotStore Extraction
-
-- 2026-06-06 — [refactor] Extracted per-lot state from RunStore into new session-scoped LotStore (`common/gameplay/store/lot_store.gd`): owns `lot_entry`, `actions_remaining`, `won_items`, `won_price` with per-lot lifecycle; RunStore retains only per-run cumulative and configuration state; RunStore gains `draw_ap_from_reserve()` and `accumulate_lot_result()`; RunManager gains `var lot: LotStore`, updated `set_lot()` with deficit-refill AP handoff, `clear_lot()`, and updated `spend_ap()`/`commit_lot_win()`/`clear_run_state()`; all scenes migrated from `RunManager.run.lot_*` to `RunManager.lot.*`; `_last_lot_won_items` eliminated
-
----
-
-## Systems Docs L2 Audit
-
-- 2026-06-05 — [docs] Audited all 10 systems/ docs against the L2 exclusion rule; lifted the two-layer (designer resource / runtime type) concept to new vision/data_architecture.md; dropped Reads/Writes/Ownership/roster tables to L3 (enriched item_card.gd docstring); trimmed hub_home/knowledge/vehicle/customer_sell/autoloads/item_display/item_system to cross-flow only; archived data_model.md (concept now in vision, field detail in code)
-
-## Meta Domain Decomposition
-
-- 2026-06-02 — [meta] MetaManager decomposed into six domain owners (EconomyOwner, GarageOwner, StorageOwner, SlotOwner, ProgressOwner, CustomersOwner) under global/autoload/meta_manager/; each owns its fields and save payload with sanitize-on-load warnings for unresolved ids; MetaManager exposes transparent proxy properties (GDScript 4 get/set) so all scenes and autoloads need no changes; CarRegistry and LocationRegistry validate() stripped of live-state reads; ItemEntry.from_dict push_error softened to push_warning; six SaveSection adapter files retired to tombstubs
-- 2026-06-02 — [meta] MetaManager owner refactor: behavior moved into each domain owner (EconomyOwner: can_afford/spend/earn/apply_delta; GarageOwner: owns_car/add_car/set_active; StorageOwner: register_entry/register_entries/remove_entries; SlotOwner: set_slot/charge_ap/stash_pending_run/clear_pending_run; ProgressOwner: advance_day/set_locations/clear_locations; CustomersOwner: record_sale/remove_customer/clear_sales/set_customers); proxy setters removed (getter-only, reference collections return shallow duplicate); resolve_run double-save eliminated (single SaveManager.save() at commit); KnowledgeManager.upgrade_attribute routed through MetaManager.spend_cash() instead of direct field write
-
-## Save Section via Manager
-
-- 2026-06-05 — [save] SaveManager section providers changed from 7 individual Stores to 2 Managers (MetaManager, KnowledgeManager); each Manager implements to_dict/from_dict/migrate/validate and fans out to its Stores; save() now merges each provider's flat multi-key dict; load() passes the full sections dict to each provider (Manager self-selects its keys); all 7 Stores gain no-op migrate()/validate() hooks; on-disk format and key layout unchanged
-
-## Save State Ownership Refactor
-
-- 2026-06-02 — [save] SaveManager becomes a thin coordinator (file IO, schema, dispatch only; no gameplay state fields); KnowledgeManager owns category_points/attribute_levels/unlocked_perks and provides the "knowledge" save section; MetaManager owns all remaining meta-progression state (cash, garage, storage, slot, progress, customers) and registers six inner section providers; schema bumped to 2 with load-time migration that relocates knowledge keys out of the economy section; section .gd files replaced with tombstone stubs; all SaveManager.<field> references removed outside the persistence layer
-
-## Template Spine Backport
-
-- 2026-06-01 — [registry] Added `ResourceRegistry` base class; ItemRegistry/CarRegistry/ClueRegistry/CategoryRegistry/LocationRegistry/SuperCategoryRegistry now extend it (override `_dir_path`/`_id_of`), dropping duplicated `_ready`/`size`/`_by_id` boilerplate while keeping per-registry `migrate`/`validate` and typed wrappers
-- 2026-06-01 — [save] SaveManager refactored to section-based dispatch: state fields stay on SaveManager (call sites unchanged), serialization delegated to economy/garage/storage/progress/slot/customers sections via `register_section`/`to_dict`/`from_dict`; new on-disk format `{schema_version, sections}` with backward-compatible read of legacy flat saves; legacy `research_slots`/`skill_levels` migrations moved into the storage/economy sections
+- 2026-06-06 — [refactor] SaveManager stripped to a thin persistence coordinator (81 lines, no gameplay state); gameplay state distributed to 10 Store archetypes under `common/gameplay/store/` — 8 persisting (EconomyStore, GarageStore, StorageStore, SlotStore, ProgressStore, CustomersStore, KnowledgeStore) and 2 session-scoped (RunStore, LotStore) — all extending `StoreBase` with `section_id/to_dict/from_dict/_store_version/_apply_migrations`; Managers (MetaManager, KnowledgeManager) register as providers and coordinate cross-domain transactions; RunManager owns RunStore + LotStore factories and run-phase mutations
+- 2026-06-06 — [refactor] Meta↔Knowledge dependency cycle broken via EventBus signals (`sale_resolved`, `item_repaired`, `item_restored`, `run_resolved`); MetaManager emits post-commit, KnowledgeManager subscribes for XP accrual; `upgrade_attribute` transaction moved to MetaManager
+- 2026-06-06 — [refactor] RunRecord decomposed into RunStore (per-run cumulative state) + LotStore (per-lot mutable state: lot_entry, actions_remaining, won_items); RunManager owns AP deficit-refill handoff at lot boundaries; `RunResult` Snapshot added for run-end economics handoff
+- 2026-06-06 — [refactor] All Stores use private backing vars + getter-only properties (language-enforced read-only); collection getters return `.duplicate()`; 35+ proxy properties removed from managers; scenes access state via `MetaManager.economy.cash`, `RunManager.lot.actions_remaining`, etc.
+- 2026-06-06 — [refactor] Per-store versioned migrations replace top-level `run_migrations()`; legacy flat-save fallback and schema 1→2 migration removed; `RegistryCoordinator` removed; `ResourceRegistry` base class added for all registries
+- 2026-06-06 — [refactor] `autoload/` → `autoloads/` folder rename; runtime types organized into archetype subfolders (`instance/`, `store/`, `snapshot/`, `service/`); `Customer` → `CustomerEntry`; `location_select` / `location_entry` → `*_scene` suffix
+- 2026-06-06 — [docs] Systems docs L2 audit; `data_architecture.md` vision added; naming conventions updated for singular archetype folders; `DaySummary` reclassified as Snapshot
 
 ## Customer Sell UX Polish
 
