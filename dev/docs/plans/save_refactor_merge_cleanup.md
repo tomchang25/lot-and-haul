@@ -8,9 +8,9 @@ Status: Plan
 
 ## Items
 
-### 1. `from_dict()` type-check helper
+### 1. Simplify `from_dict()` type casts
 
-Add `StoreBase._int_from(data, key, default)` to replace the repeated `if data.has(key) and data[key] is float: field = int(data[key])` pattern across all 6 persisting stores. Reduces ~30 `is float` / `int()` pairs to one-liners. Consider `_array_from` and `_dict_from` variants for the same reason.
+Replace the verbose `if data.has(key) and data[key] is float: field = int(data[key])` pattern with direct `field = int(data.get(key, default))` across all 6 persisting stores. The `is float` guards are unnecessary — Godot's JSON always returns numbers as float, and `int()` handles the cast safely.
 
 ### 2. Split agent rules out of CLAUDE.md
 
