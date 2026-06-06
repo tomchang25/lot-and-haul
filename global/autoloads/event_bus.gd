@@ -24,4 +24,11 @@ signal item_repaired(category: CategoryData, rarity: ItemData.Rarity)
 ## [param rarity] — rarity of the restored item.
 signal item_restored(category: CategoryData, rarity: ItemData.Rarity)
 
+# ── Run-phase business events ─────────────────────────────────────────────────
+# Emitted by MetaManager after run resolution is fully committed.
+
+## Emitted after a completed run is resolved: cash applied, cargo registered,
+## run state cleared. [param result] — the RunResult snapshot that was consumed.
+signal run_resolved(result: RunResult)
+
 @warning_ignore_restore("unused_signal")

@@ -4,8 +4,9 @@
 # surface (mirroring MetaManager) so no scene touches RunStore directly.
 extends Node
 
-## Full state for the current run. Private — scenes use the proxy properties
-## below; only manager-layer code (MetaManager.resolve_current_run) reads this.
+## Full state for the current run. Truly private — all external access goes
+## through the proxy properties below or take_run_result(). No code outside
+## this file may reference _run_store or RunStore directly.
 var _run_store: RunStore = null
 
 # ── Run-state proxy properties ─────────────────────────────────────────────────
@@ -109,6 +110,24 @@ func create_run_store(location: LocationData, car: CarData) -> void:
 
     _compute_travel_costs(r)
     _run_store = r
+
+
+## Builds a RunResult snapshot from the active run: auto-reveals all surface
+## clues on cargo items (the hub-return reveal), then copies economics and cargo
+## into the returned value object. The caller (MetaManager.resolve_current_run)
+## must call clear_run_state() after consuming the result.
+## Asserts that a run is active — call only when is_run_active() is true.
+func take_run_result() -> RunResult:
+    assert(_run_store != null, "take_run_result called with no active run")
+    for entry: ItemEntry in _run_store.cargo_items:
+        entry.auto_reveal_all_surface()
+    var result := RunResult.new()
+    result.onsite_proceeds = _run_store.onsite_proceeds
+    result.paid_price = _run_store.paid_price
+    result.entry_fee = _run_store.entry_fee
+    result.fuel_cost = _run_store.fuel_cost
+    result.cargo_items.assign(_run_store.cargo_items)
+    return result
 
 
 ## Clears all per-run state so the next run starts clean.

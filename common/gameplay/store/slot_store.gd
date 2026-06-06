@@ -16,8 +16,8 @@ var storage_ap: int = 0
 ## Selling slots committed to Open Shop this day.
 var selling_slots_today: int = 0
 
-## Run economics awaiting fold-in by end_day(). Populated by resolve_run() after
-## an auction; consumed and cleared by end_day(). Empty when no run is pending.
+## Run economics awaiting fold-in by end_day(). Populated by resolve_current_run()
+## after an auction; consumed and cleared by end_day(). Empty when no run is pending.
 ## Keys (all int): onsite_proceeds, paid_price, entry_fee, fuel_cost, cargo_count.
 var pending_run: Dictionary = { }
 
@@ -33,15 +33,15 @@ func charge_ap(cost: int) -> void:
     storage_ap -= cost
 
 
-## Persists run economics from [param record] into pending_run so end_day can
+## Persists run economics from [param result] into pending_run so end_day can
 ## fold them into the day summary. Does not save.
-func stash_pending_run(record: RunStore) -> void:
+func stash_pending_run(result: RunResult) -> void:
     pending_run = {
-        "onsite_proceeds": record.onsite_proceeds,
-        "paid_price": record.paid_price,
-        "entry_fee": record.entry_fee,
-        "fuel_cost": record.fuel_cost,
-        "cargo_count": record.cargo_items.size(),
+        "onsite_proceeds": result.onsite_proceeds,
+        "paid_price": result.paid_price,
+        "entry_fee": result.entry_fee,
+        "fuel_cost": result.fuel_cost,
+        "cargo_count": result.cargo_items.size(),
     }
 
 
@@ -79,5 +79,3 @@ func from_dict(data: Dictionary) -> void:
         for key: Variant in data["pending_run"]:
             if key is String and data["pending_run"][key] is float:
                 pending_run[key] = int(data["pending_run"][key])
-
-

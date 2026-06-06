@@ -394,36 +394,37 @@ func set_active_car(car: CarData) -> void:
 # ══ Run resolution ════════════════════════════════════════════════════════════
 
 
-## Convenience wrapper: resolves the currently active run without the caller
-## needing to pass the RunStore. Delegates to resolve_run.
-func resolve_current_run() -> void:
-    resolve_run(RunManager._run_store)
-
-
-## Resolves a completed run: applies cash, registers cargo, auto-reveals surface
-## clues, stores run economics as pending for end_day(), sets current_slot to 3
-## so the player returns to the hub for the evening slot, and clears run state.
+## Resolves the currently active run. Calls RunManager.take_run_result() to
+## snapshot economics and auto-reveal surface clues, delegates to resolve_run(),
+## clears run state, and emits run_resolved.
 ##
 ## Navigation: the caller (run_review_scene) must call SceneRouter.go_to_hub()
 ## after this returns. The day summary fires when the player chooses Open Shop
 ## or all slots are exhausted from the hub.
-func resolve_run(record: RunStore) -> void:
+func resolve_current_run() -> void:
+    var result := RunManager.take_run_result()
+    resolve_run(result)
+    RunManager.clear_run_state()
+    EventBus.run_resolved.emit(result)
+
+
+## Resolves a completed run from [param result]: applies cash delta, registers
+## cargo into storage, stashes run economics as pending for end_day(), and sets
+## current_slot to 3 so the player returns to the hub for the evening slot.
+## Saves once at the end. Called only from resolve_current_run().
+func resolve_run(result: RunResult) -> void:
     _economy.apply_delta(
-        record.onsite_proceeds - record.paid_price - record.entry_fee - record.fuel_cost,
+        result.onsite_proceeds - result.paid_price - result.entry_fee - result.fuel_cost,
     )
 
-    # Auto-reveal all surface clues on hub return (Phase 7).
-    for entry: ItemEntry in record.cargo_items:
-        entry.auto_reveal_all_surface()
-
-    _storage.register_entries(record.cargo_items) # no inner save
+    # cargo_items already had auto_reveal_all_surface() applied by take_run_result().
+    _storage.register_entries(result.cargo_items) # no inner save
 
     # Stash run economics so end_day can fold them into the day summary.
     # Persisted so a quit before end_day doesn't drop them.
-    _slot.stash_pending_run(record) # no inner save
+    _slot.stash_pending_run(result) # no inner save
 
     # Auction consumed morning + afternoon; player returns for the evening slot.
     _slot.set_slot(3) # no inner save
 
-    RunManager.clear_run_state()
     SaveManager.save() # single commit
