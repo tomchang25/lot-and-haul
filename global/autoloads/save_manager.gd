@@ -5,12 +5,8 @@
 # full StoreBase interface: to_dict(), from_dict(), migrate(), validate().
 #
 # On-disk format: { "schema_version": int, "sections": { <id>: <payload> } }.
-# Legacy flat saves (no "sections" key) are dispatched in full to each provider —
-# section payload keys do not collide across sections so each reads its own keys.
-#
-# Schema version history:
-#   1 — original sectioned format; knowledge keys nested inside "economy" section.
-#   2 — "economy" holds cash only; "knowledge" is a separate section.
+# schema_version is always SCHEMA_VERSION (2) on new saves; load() requires the
+# "sections" key to be present (push_error otherwise).
 extends Node
 
 const SAVE_PATH := "user://save.json"
@@ -83,34 +79,10 @@ func load() -> void:
         push_error("SaveManager: invalid save data in %s" % SAVE_PATH)
         return
 
-    # Legacy flat saves have no "sections" key — dispatch the whole dict to
-    # every provider (keys don't collide across sections).
-    var is_sectioned: bool = parsed.has("sections") and parsed["sections"] is Dictionary
-    if not is_sectioned:
-        for provider: Object in _providers:
-            provider.from_dict(parsed)
+    if not (parsed.has("sections") and parsed["sections"] is Dictionary):
+        push_error("SaveManager: save missing 'sections' key in %s" % SAVE_PATH)
         return
 
-    var schema_version: int = int(parsed.get("schema_version", 1))
     var sections_data: Dictionary = parsed["sections"].duplicate(true)
-
-    # Schema 1→2 migration: in schema 1, category_points / attribute_levels /
-    # unlocked_perks are nested inside the "economy" section. Relocate them into
-    # the "knowledge" section before dispatching so each provider sees only its
-    # own keys. No data is lost; the economy provider sees cash only.
-    if schema_version < 2:
-        var econ: Dictionary = sections_data.get("economy", { })
-        var knowledge: Dictionary = { }
-        for key: String in ["category_points", "attribute_levels", "unlocked_perks"]:
-            if econ.has(key):
-                knowledge[key] = econ[key]
-                econ.erase(key)
-        sections_data["economy"] = econ
-        sections_data["knowledge"] = knowledge
-
     for provider: Object in _providers:
         provider.from_dict(sections_data)
-
-    # Old saves may contain keys from removed systems (MarketManager,
-    # MerchantRegistry, max_research_slots, etc.) — providers that care handle
-    # their own legacy keys; everything else is silently ignored.
