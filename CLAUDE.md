@@ -2,13 +2,9 @@
 
 A Godot 4.6 single-player game about buying storage lots at auction, inspecting items, and reselling them through various channels. Think "Storage Wars" as a strategy/management game.
 
-## Agent environment note (sandboxed shell vs. real files)
+## Agent Rules
 
-The sandboxed Linux shell can return **phantom file corruption** for files in this repo — blocks of NUL bytes, mid-token truncation, "binary file matches", or wrong byte counts — especially right after a write. This is a mount artifact, NOT real disk damage. The files are intact in VS Code and git in the real environment.
-
-- The Read/Edit file tools are authoritative. After modifying a file, verify it with **Read**, never by `cat`/`hexdump`/`wc`/`grep` through the shell. If Read shows clean content, the file is fine — stop.
-- Never diagnose "corrupted files" from a shell read alone, and never `git restore`/overwrite working-tree files to "recover" from shell-reported corruption — that risks discarding genuine uncommitted work over a false reading.
-- `git` against the object DB (`git show HEAD:<file>`, `git log`, `git diff`) is reliable; working-tree file-content reads through the shell mount are not.
+Agent-specific instructions live in `dev/agent_rules/`. Read them before starting work. Key rules: `sandbox_environment.md` (shell vs. file tools), `lint_before_finish.md` (run linter on changed files).
 
 ## Core Loop
 
@@ -55,6 +51,7 @@ data/         Designer resources: definitions, yaml sources, generated .tres
     attributes/ cars/ categories/ clues/ items/ locations/
     lots/ perks/ super_categories/
 dev/          Development tooling and documentation
+  agent_rules/ Agent-specific instructions (sandbox, lint, etc.)
   docs/       Architecture docs, tracked in this repo (vision/, systems/, plans/, archived/)
   skills/     AI coding references (commit format, GDScript patterns)
   standards/  Coding conventions, naming, registries, scene architecture
@@ -100,7 +97,7 @@ Check TODO.md ## Active Section
 - **Runtime type archetypes**: every runtime type in `common/gameplay/` is one of four archetypes — **Entry/Instance** (live instance of a designer Data, identity + mutable state + self-maintaining behaviour, e.g. `ItemEntry`), **Store** (Manager-held domain state container with invariant-guarding mutators; persisting Stores carry `section_id/to_dict/from_dict`, session-scoped Stores do not — session is a lifetime, not a separate type), **Snapshot** (read-only value object, computed once and discarded, no mutators or serialization), **Service** (stateless pure-math helpers). Discriminator in order: no state → Service; read-only one-shot → Snapshot; mutable + Manager-held → Store; saved instance of a Data → Entry/Instance. The subfolder (`store/`, `snapshot/`, `service/`, `instance/`) is the source of truth for archetype. Do not invent new type suffixes or archetypes outside this taxonomy.
 - **Naming**: snake_case files, PascalCase classes, UPPER_SNAKE constants. See `dev/standards/naming_conventions.md`.
 - **Registries**: one autoload per designer resource type, required API: `get_<singular>_by_id`, `get_all_<plural>`, `size`. No display-name wrappers. See `dev/standards/registries.md`.
-- **Scene architecture**: block scenes follow `dev/standards/block_scene_architecture_standard.md` (the single source for these rules). The node-source rule (persistent nodes live in the `.tscn`, not `add_child()`) and "no `[connection]` in `.tscn`" are **lint-enforced** — see `dev/standards/standards_enforcement.md`. Don't restate the rule's detail here; edit the standard. If you are an agent without the in-loop lint hook (i.e. not Claude Code), run `python dev/tools/lint_standards.py --files <changed>` before finishing.
+- **Scene architecture**: block scenes follow `dev/standards/block_scene_architecture_standard.md` (the single source for these rules). The node-source rule (persistent nodes live in the `.tscn`, not `add_child()`) and "no `[connection]` in `.tscn`" are **lint-enforced** — see `dev/standards/standards_enforcement.md`. Don't restate the rule's detail here; edit the standard.
 - **Commits**: conventional commits format. See `dev/skills/conventional_commits.md`.
 - **Price pipeline**: all prices resolve through `ItemEntry.item_price` (`(appraised|verified value) × condition_multiplier`). Appraised value = anchor + revealed surface modifiers (add-then-mul). Verified value includes hidden modifiers. No per-type formulas outside the pipeline.
 - **Cross-manager communication**: direct call when the caller's correctness depends on the result (transactional dependency — e.g. `spend()` returning false aborts the whole operation). EventBus signal when the caller doesn't care about the outcome (notification — e.g. broadcasting `item_repaired` so KnowledgeManager can award XP; the repair is correct regardless). Test: "if the other side fails or doesn't exist, do I rollback?" Yes → direct call. No → event.
