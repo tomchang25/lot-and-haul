@@ -32,6 +32,7 @@ var _tooltip: ItemRowTooltip = null
 
 
 func _ready() -> void:
+    assert(RunManager.lot != null, "RevealScene: RunManager.lot is null — set_lot() must be called before entering reveal.")
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 

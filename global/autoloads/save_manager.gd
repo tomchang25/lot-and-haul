@@ -36,6 +36,8 @@ func _ready() -> void:
 ## of the owning autoload). The provider must implement to_dict() -> Dictionary
 ## and from_dict(Dictionary).
 func register_section(section: Object) -> void:
+    assert(section.has_method("to_dict"), "register_section: %s missing to_dict()" % section)
+    assert(section.has_method("from_dict"), "register_section: %s missing from_dict()" % section)
     _sections.append(section)
 
 
@@ -49,6 +51,8 @@ func register_sections(sections: Array) -> void:
 ## _ready() of the owning manager. The manager must implement migrate() and
 ## validate() -> bool.
 func register_manager(manager: Object) -> void:
+    assert(manager.has_method("migrate"), "register_manager: %s missing migrate()" % manager)
+    assert(manager.has_method("validate"), "register_manager: %s missing validate()" % manager)
     _managers.append(manager)
 
 

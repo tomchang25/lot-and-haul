@@ -89,6 +89,7 @@ class _CircleProgress extends Control:
 
 
 func _ready() -> void:
+    assert(RunManager.lot != null, "AuctionScene: RunManager.lot is null — set_lot() must be called before entering auction.")
     _pass_button.pressed.connect(_on_pass_pressed)
     _bid_button.pressed.connect(_on_bid_pressed)
 

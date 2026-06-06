@@ -84,6 +84,7 @@ var _hover_entry: ItemEntry = null
 
 
 func _ready() -> void:
+    assert(RunManager.lot != null, "InspectionScene: RunManager.lot is null — set_lot() must be called before entering inspection.")
     _footer.show()
     _pass_button.show()
     _start_auction_button.show()

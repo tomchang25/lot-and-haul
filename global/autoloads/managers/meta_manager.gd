@@ -234,12 +234,12 @@ func resolve_customer_sale(
         strategy: String = "",
 ) -> void:
     var sold_ids: Array = storage.remove_entries(items)
-    for entry: ItemEntry in items:
-        EventBus.sale_resolved.emit(entry.item_data.category_data, entry.item_data.rarity)
     economy.earn(sale_price)
     customers.record_sale(progress.current_day, customer, strategy, sold_ids, sale_price)
     if customer != null:
         customers.remove_customer(customer)
+    for entry: ItemEntry in items:
+        EventBus.sale_resolved.emit(entry.item_data.category_data, entry.item_data.rarity)
     SaveManager.save()
 
 # ══ Storage AP actions ════════════════════════════════════════════════════════
