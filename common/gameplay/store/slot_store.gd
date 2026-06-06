@@ -91,18 +91,14 @@ func to_dict() -> Dictionary:
 
 
 ## Restores slot state. Unrecognised keys are silently ignored.
-## pending_run values are intified (JSON numbers parse as float).
 func from_dict(data: Dictionary) -> void:
     var version: int = int(data.get("_version", 1))
     data = _apply_migrations(data, version)
-    if data.has("current_slot") and data["current_slot"] is float:
-        _current_slot = int(data["current_slot"])
-    if data.has("storage_ap") and data["storage_ap"] is float:
-        _storage_ap = int(data["storage_ap"])
-    if data.has("selling_slots_today") and data["selling_slots_today"] is float:
-        _selling_slots_today = int(data["selling_slots_today"])
+    _current_slot = int(data.get("current_slot", _current_slot))
+    _storage_ap = int(data.get("storage_ap", _storage_ap))
+    _selling_slots_today = int(data.get("selling_slots_today", _selling_slots_today))
     _pending_run = { }
     if data.has("pending_run") and data["pending_run"] is Dictionary:
         for key: Variant in data["pending_run"]:
-            if key is String and data["pending_run"][key] is float:
+            if key is String:
                 _pending_run[key] = int(data["pending_run"][key])

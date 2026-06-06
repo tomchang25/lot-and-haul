@@ -82,5 +82,4 @@ func from_dict(data: Dictionary) -> void:
                 continue
             entry.apply_storage_migration()
             _storage_items.append(entry)
-    if data.has("next_entry_id") and data["next_entry_id"] is float:
-        _next_entry_id = int(data["next_entry_id"])
+    _next_entry_id = int(data.get("next_entry_id", _next_entry_id))

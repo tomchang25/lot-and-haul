@@ -56,5 +56,4 @@ func to_dict() -> Dictionary:
 func from_dict(data: Dictionary) -> void:
     var version: int = int(data.get("_version", 1))
     data = _apply_migrations(data, version)
-    if data.has("cash") and data["cash"] is float:
-        _cash = int(data["cash"])
+    _cash = int(data.get("cash", _cash))

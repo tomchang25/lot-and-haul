@@ -80,5 +80,5 @@ func from_dict(data: Dictionary) -> void:
     if data.has("attribute_levels") and data["attribute_levels"] is Dictionary:
         _attribute_levels = { }
         for key: Variant in data["attribute_levels"]:
-            if key is String and data["attribute_levels"][key] is float:
+            if key is String:
                 _attribute_levels[key] = int(data["attribute_levels"][key])

@@ -58,8 +58,7 @@ func to_dict() -> Dictionary:
 func from_dict(data: Dictionary) -> void:
     var version: int = int(data.get("_version", 1))
     data = _apply_migrations(data, version)
-    if data.has("current_day") and data["current_day"] is float:
-        _current_day = int(data["current_day"])
+    _current_day = int(data.get("current_day", _current_day))
     if data.has("available_location_ids") and data["available_location_ids"] is Array:
         _available_locations = []
         for id_variant: Variant in data["available_location_ids"]:
