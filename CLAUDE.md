@@ -6,6 +6,8 @@ A Godot 4.6 single-player game about buying storage lots at auction, inspecting 
 
 Agent-specific instructions live in `dev/agent_rules/`. Read them before starting work. Key rules: `sandbox_environment.md` (shell vs. file tools), `lint_before_finish.md` (run linter on changed files).
 
+When asked to build a plan or implementation spec, follow the format in `dev/docs/README.md` (plan lifecycle) and `dev/standards/` for any relevant domain standard. Plans go in `dev/docs/plans/` with a one-line pointer in `TODO.md`.
+
 ## Core Loop
 
 1. **Run phase** — Player travels to a Location, browses Lots, inspects items (spending AP to reveal clues), bids in Auctions, and loads won items into Cargo.
@@ -94,29 +96,22 @@ Check TODO.md ## Active Section
 
 ## Conventions (quick reference)
 
-- **Runtime type archetypes**: every runtime type in `common/gameplay/` is one of four archetypes — **Entry/Instance** (live instance of a designer Data, identity + mutable state + self-maintaining behaviour, e.g. `ItemEntry`), **Store** (Manager-held domain state container with invariant-guarding mutators; persisting Stores carry `section_id/to_dict/from_dict`, session-scoped Stores do not — session is a lifetime, not a separate type), **Snapshot** (read-only value object, computed once and discarded, no mutators or serialization), **Service** (stateless pure-math helpers). Discriminator in order: no state → Service; read-only one-shot → Snapshot; mutable + Manager-held → Store; saved instance of a Data → Entry/Instance. The subfolder (`store/`, `snapshot/`, `service/`, `instance/`) is the source of truth for archetype. Do not invent new type suffixes or archetypes outside this taxonomy.
-- **Naming**: snake_case files, PascalCase classes, UPPER_SNAKE constants. See `dev/standards/naming_conventions.md`.
-- **Registries**: one autoload per designer resource type, required API: `get_<singular>_by_id`, `get_all_<plural>`, `size`. No display-name wrappers. See `dev/standards/registries.md`.
-- **Scene architecture**: block scenes follow `dev/standards/block_scene_architecture_standard.md` (the single source for these rules). The node-source rule (persistent nodes live in the `.tscn`, not `add_child()`) and "no `[connection]` in `.tscn`" are **lint-enforced** — see `dev/standards/standards_enforcement.md`. Don't restate the rule's detail here; edit the standard.
-- **Commits**: conventional commits format. See `dev/skills/conventional_commits.md`.
+- **Runtime type archetypes**: every runtime type in `common/gameplay/` is one of four archetypes. The subfolder (`store/`, `snapshot/`, `service/`, `instance/`) is the source of truth for archetype. Do not invent new type suffixes or archetypes outside this taxonomy — if a new type doesn't clearly fit, stop and ask the user before creating or naming it.
+  - **Entry/Instance** — live instance of a designer Data, identity + mutable state + self-maintaining behaviour (e.g. `ItemEntry`). Subfolder: `instance/`.
+  - **Store** — Manager-held domain state container with invariant-guarding mutators. Persisting Stores carry `section_id/to_dict/from_dict`; session-scoped Stores do not. Subfolder: `store/`.
+  - **Snapshot** — read-only value object, computed once and discarded, no mutators or serialization (e.g. `RunResult`, `DaySummary`). Subfolder: `snapshot/`.
+  - **Service** — stateless pure-math helpers (e.g. `ResearchSlot`, `SellMath`). Subfolder: `service/`.
+  - Discriminator: no state → Service; read-only one-shot → Snapshot; mutable + Manager-held → Store; saved instance of a Data → Entry/Instance.
 - **Price pipeline**: all prices resolve through `ItemEntry.item_price` (`(appraised|verified value) × condition_multiplier`). Appraised value = anchor + revealed surface modifiers (add-then-mul). Verified value includes hidden modifiers. No per-type formulas outside the pipeline.
 - **Cross-manager communication**: direct call when the caller's correctness depends on the result (transactional dependency — e.g. `spend()` returning false aborts the whole operation). EventBus signal when the caller doesn't care about the outcome (notification — e.g. broadcasting `item_repaired` so KnowledgeManager can award XP; the repair is correct regardless). Test: "if the other side fails or doesn't exist, do I rollback?" Yes → direct call. No → event.
-- **Iterate resources, not ids**: outside serialization boundaries, pass Resource refs. String ids are for save/load only.
 - **Docstrings**: every `.gd` file starts with `# filename` + one-line purpose. All public functions and complex (>10 lines or non-obvious) private functions get a `##` GDDoc comment. Never strip or reduce existing comments when editing code.
-- **Docs layering**: 3 levels, each fact lives in exactly one. L1 vision (`dev/docs/visions/`, ≤5, rarely changes), L2 systems/plans (`dev/docs/`, design intent + flow, present tense, concept only), L3 detail (code docstrings). Single source of truth — no duplication across levels. Full rules in `dev/docs/README.md`.
-- **Tracking lives at repo root, not in `dev/docs/`**: `CHANGELOG.md` (append-only shipped history — the only living "Done" list) and `TODO.md` (the single forward surface: `## Active` in-flight flows, `Plan`/`Chore`/`Bug` one-liners, and a `## Draft` section for concepts; no Done tier, delete the line when done). Multi-step sequenced work lives as a `dev/docs/plans/<x>.md` file with a one-line pointer in `TODO.md` (`## Plan` when queued, `## Active` when building) — phase detail and ordering stay in that file, never churned into `TODO.md`. Ship a phase → cut it from the plan file + append CHANGELOG, same commit; ship the whole flow → archive the plan file + delete its TODO line.
-- **Maturity scale (one item, one home)**: one line → `TODO.md` tier; bigger but one section says enough → `TODO.md` `## Draft`; earned its own file (grew sub-structure / actionable / needs a stable link) → `dev/docs/plans/<x>.md` + a one-line pointer in `TODO.md` `## Plan` (promote to `## Active` when building, retire back to `## Draft` if it goes stale); design locked → graduate conclusion to `systems/` + archive. Never write an item in two places.
-- **Plans & impl specs**: plan files follow `dev/docs/README.md` lifecycle; implementation specs follow `dev/standards/implementation_spec_standard.md`.
+- **Data pipeline**: never hand-edit `.tres` files — use the YAML pipeline (`dev/tools/`).
 
-## Don'ts
+### Standards (read when touching that domain)
 
-- Don't invent runtime type names outside the four archetypes (Entry/Instance, Store, Snapshot, Service). If a new type doesn't clearly fit, stop and ask the user before creating or naming it.
-- Don't hand-edit `.tres` files — use the YAML pipeline.
-- Don't add display-name wrappers or fallback-to-id accessors on registries.
-- Don't scan ItemRegistry to answer a category/super-category question — use the dedicated registry.
-- Don't put code-level detail (function names, field lists) in `dev/docs/systems/` — that belongs in code comments.
-- Don't keep a living "Done" list anywhere except `CHANGELOG.md`. No `## Status`/Done enumeration in `systems/` docs (write them present-tense — that's the status), no checked-off phase ledger in `dev/docs/plans/` files (cut shipped phases out — their record lives in `CHANGELOG.md`), no Done section in `TODO.md`.
-- Don't put any forward-looking section in a `systems/` doc — no `## Planned`/`## Future`/todo, not even links-only. A system doc describes only the present; route forward items to either an `## Open Questions` section (unresolved design questions about the current system, phrased as questions) or out to `TODO.md` (feature ideas / work to build).
-- Don't leave completed docs in place — move them to `dev/docs/archived/`. When a plan's design locks, graduate the conclusion into `systems/` (same commit as the code), then archive the plan.
-- Don't put anything needing more than one line of reasoning in a `TODO.md` actionable tier — if it grows a paragraph, a table, or a trade-off, it goes in the `## Draft` section (and once it earns a file, `dev/docs/plans/`), not inline in `Plan`/`Chore`/`Bug`. Don't fold Chore/Bug into Plan to reduce clutter — lifecycle (delete on done) handles clutter, not tier-merging.
-- Don't create a separate `draft/` folder or draft file — the draft tier is the `## Draft` section of `TODO.md`. Don't write a forward item in two places: it has exactly one home for its maturity.
+- **Naming** (files, classes, variables, folders): read `dev/standards/naming_conventions.md` when naming anything new or renaming.
+- **Registries** (adding/modifying a registry, writing registry call sites): read `dev/standards/registries.md` — covers required API, forbidden wrappers, iterate-resources-not-ids rule, and inverse lookup patterns.
+- **Scene architecture** (creating or editing block scenes/components): read `dev/standards/block_scene_architecture_standard.md` — covers node-source rule, signal connections, `setup()`/`_apply()` pattern. The node-source rule and no-`[connection]`-in-`.tscn` are **lint-enforced** — see `dev/standards/standards_enforcement.md`.
+- **Project structure** (placing new files or folders): read `dev/standards/project_structure.md`.
+- **Commits**: conventional commits format — read `dev/skills/conventional_commits.md` when writing commit messages.
+- **Docs and tracking** (writing/archiving docs, updating TODO/CHANGELOG, deciding where a forward item lives): read `dev/docs/README.md` — covers the 3-level model, maturity scale, lifecycle rules, and the "no living Done list" principle.
