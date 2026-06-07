@@ -8,6 +8,8 @@ Agent-specific instructions live in `dev/agent_rules/`. Read them before startin
 
 When asked to build a plan or implementation spec, follow the format in `dev/docs/README.md` (plan lifecycle) and `dev/standards/` for any relevant domain standard. Plans go in `dev/docs/plans/` with a one-line pointer in `TODO.md`.
 
+Resolve unknowns by asking me directly during the planning conversation — never emit an `## Open Questions` section or leave unresolved decisions parked in a plan or spec. Stop and ask the moment a decision is unclear; hand over a plan or spec only once every such question has been answered and folded into the relevant Requirement, Design, or Relational Context line.
+
 ## Core Loop
 
 1. **Run phase** — Player travels to a Location, browses Lots, inspects items (spending AP to reveal clues), bids in Auctions, and loads won items into Cargo.

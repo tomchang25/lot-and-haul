@@ -60,7 +60,6 @@ Avoid test names, file paths, and function names.
 - Include no file paths, line numbers, code snippets, or names of functions/classes. Reference existing systems by role, not by symbol.
 - Carry full design depth — numbers, formulas, tables, worked examples are all in scope. The boundary is code coordinates, not detail.
 - State the **why inline** wherever a decision is non-obvious. Never open a standalone rationale section; fold the reason into the Requirement or Design line it justifies.
-- **Open Questions are planning-time scratch only.** While drafting, an `## Open Questions` section may hold unresolved decisions. A Plan is complete only when none remain — delete the section before handing the Plan downstream, and fold each resolution into the relevant Requirement or Design line. A surviving "(Resolved)" question list is a smell.
 - Do not mix future phases into the current feature boundary.
 
 ---
