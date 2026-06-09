@@ -8,6 +8,17 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Start Page & Settings Overlay
+
+- 2026-06-09 — [start_settings] `SettingsStore` autoload added (`global/autoloads/settings_store.gd`): persists master/sfx/music volume, fullscreen, debug_mode to `user://settings.json`; applies audio bus volumes and display mode on boot; toggles settings overlay on `ui_settings` input (Escape)
+- 2026-06-09 — [start_settings] `SettingsOverlay` component added (`game/shared/settings_overlay/`): modal CanvasLayer (layer=100, PROCESS_MODE_ALWAYS) with Audio (Master/SFX/Music sliders), Display (fullscreen), and Gameplay (debug mode) sections; pauses tree on open, unpauses on close via `closed` signal
+- 2026-06-09 — [start_settings] `StartPageScene` added (`game/meta/start/`): boots as `main_scene`; shows "New Game" or "Continue" based on save-file presence; routes to hub, settings overlay, or quit
+- 2026-06-09 — [start_settings] `default_bus_layout.tres` added with Master/SFX/Music/UI buses; registered in `project.godot` under `[audio]`; `SceneRegistry.start_page` wired in `scene_router.tscn`
+- 2026-06-09 — [standards] Block scene architecture standard updated: `%UniqueName` preferred over `$path` for node references in new/edited scenes; `$path` legacy-allowed in untouched code; `unique_name_in_owner = true` must be a property line, not a header attribute
+- 2026-06-09 — [skills] `dev/skills/godot4_tscn_node_properties.md` added: exhaustive list of valid `.tscn` node header attributes (`name`, `type`, `parent`, `instance`, `unique_id`) vs. property lines; `unique_name_in_owner` worked example
+
+---
+
 ## Save & Managers Refactor
 
 - 2026-06-06 — [refactor] SaveManager stripped to a thin persistence coordinator (81 lines, no gameplay state); gameplay state distributed to 10 Store archetypes under `common/gameplay/store/` — 8 persisting (EconomyStore, GarageStore, StorageStore, SlotStore, ProgressStore, CustomersStore, KnowledgeStore) and 2 session-scoped (RunStore, LotStore) — all extending `StoreBase` with `section_id/to_dict/from_dict/_store_version/_apply_migrations`; Managers (MetaManager, KnowledgeManager) register as providers and coordinate cross-domain transactions; RunManager owns RunStore + LotStore factories and run-phase mutations

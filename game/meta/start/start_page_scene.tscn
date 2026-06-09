@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://bn8gpmwab184o"]
+
+[ext_resource type="Script" uid="uid://derysb0knu5gc" path="res://game/meta/start/start_page_scene.gd" id="1_spgd"]
+
+[node name="StartPageScene" type="Control" unique_id=1100000001]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_spgd")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1100000002]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.08, 0.08, 0.1, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="." unique_id=1100000003]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="RootVBox" unique_id=1100000004]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Lot & Haul"
+horizontal_alignment = 1
+
+[node name="ButtonsVBox" type="VBoxContainer" parent="RootVBox" unique_id=1100000005]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 16
+
+[node name="PlayButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000006]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 20
+text = " - "
+
+[node name="SettingsButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000007]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 20
+text = "Settings"
+
+[node name="QuitButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000008]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 20
+text = "Quit"

@@ -11,13 +11,14 @@ config_version=5
 [application]
 
 config/name="Lot and Haul"
-run/main_scene="uid://bhubscene0001"
+run/main_scene="res://game/meta/start/start_page_scene.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 EventBus="*uid://d2nkmaq8dlf5g"
+SettingsStore="*res://global/autoloads/settings_store.gd"
 AudioManager="*uid://bhhaho37wph5e"
 ClueRegistry="*res://global/autoloads/registries/clue_registry.gd"
 ItemRegistry="*uid://cog8cvjixi27d"
@@ -32,10 +33,22 @@ MetaManager="*res://global/autoloads/managers/meta_manager.gd"
 SceneRouter="*res://global/autoloads/scene_router/scene_router.tscn"
 GameManager="*uid://bnj3y0a2848to"
 
+[input]
+
+ui_settings={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":4194305,"physical_keycode":0,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
+
 [debug]
 
 gdscript/warnings/integer_division=0
 gdscript/warnings/inference_on_variant=0
+
+[audio]
+
+default_bus_layout="res://default_bus_layout.tres"
 
 [display]
 

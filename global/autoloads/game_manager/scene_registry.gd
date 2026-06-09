@@ -20,3 +20,4 @@ extends Resource
 @export var car_select: PackedScene
 @export var car_shop: PackedScene
 @export var customer_sell: PackedScene
+@export var start_page: PackedScene

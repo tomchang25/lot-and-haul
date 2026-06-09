@@ -21,6 +21,7 @@
 [ext_resource type="PackedScene" path="res://game/meta/vehicle/car_select/car_select_scene.tscn" id="17_csel"]
 [ext_resource type="PackedScene" path="res://game/meta/vehicle/car_shop/car_shop_scene.tscn" id="18_cshop"]
 [ext_resource type="PackedScene" path="res://game/meta/customer_sell/customer_sell_scene.tscn" id="20_csell"]
+[ext_resource type="PackedScene" uid="uid://bn8gpmwab184o" path="res://game/meta/start/start_page_scene.tscn" id="21_spage"]
 
 [sub_resource type="Resource" id="Resource_scenes"]
 script = ExtResource("5_ea43q")
@@ -43,6 +44,7 @@ vehicle_hub = ExtResource("16_vehhub")
 car_select = ExtResource("17_csel")
 car_shop = ExtResource("18_cshop")
 customer_sell = ExtResource("20_csell")
+start_page = ExtResource("21_spage")
 metadata/_custom_type_script = "uid://bvxr6q4cplcj8"
 
 [node name="SceneRouter" type="Node"]

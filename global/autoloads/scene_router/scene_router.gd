@@ -95,3 +95,7 @@ func go_to_car_shop() -> void:
 
 func go_to_customer_sell() -> void:
     get_tree().change_scene_to_packed(scenes.customer_sell)
+
+
+func go_to_start_page() -> void:
+    get_tree().change_scene_to_packed(scenes.start_page)

@@ -396,10 +396,11 @@ Exceptions: debug-only display nodes (e.g. `_debug_label` behind `OS.is_debug_bu
 @onready var _row_container: VBoxContainer = %RowContainer
 ```
 
-Each referenced node must have `unique_name_in_owner = true` set in the `.tscn`:
+Each referenced node must have `unique_name_in_owner = true` set in the `.tscn` as a **property line**, not a header attribute:
 
 ```
-[node name="ConfirmButton" type="Button" parent="..." unique_name_in_owner=true unique_id=...]
+[node name="ConfirmButton" type="Button" parent="..." unique_id=...]
+unique_name_in_owner = true
 ```
 
 **Legacy** — `$RootVBox/...` full paths are allowed in existing scenes that have not been touched. Do not mix both styles within a single script.

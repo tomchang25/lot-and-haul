@@ -82,7 +82,7 @@ stage/        Testbeds, demo runs, and tile sets (mostly empty)
 
 ## Autoloads (load order matters)
 
-EventBus → AudioManager → ClueRegistry → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → SaveManager → KnowledgeManager → MetaManager → SceneRouter → GameManager
+EventBus → SettingsStore → AudioManager → ClueRegistry → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → SaveManager → KnowledgeManager → MetaManager → SceneRouter → GameManager
 
 MetaManager and KnowledgeManager call `SaveManager.register_provider(self)` in `_ready()`. `GameManager._ready()` calls `SaveManager.load()` then `SaveManager.run_validation()`. Per-store versioned migrations run inside each store's `from_dict()` via `_apply_migrations()` — there is no top-level migration pass. The `schema_version` field in the save file is a legacy stamp; it is always written but never checked on load.
 
