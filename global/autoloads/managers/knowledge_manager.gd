@@ -87,7 +87,6 @@ func from_dict(data: Dictionary) -> void:
 func get_migration_log() -> Array[String]:
     return _knowledge.get_migration_log()
 
-
 # ── Mastery ────────────────────────────────────────────────────────────────────
 
 
@@ -179,7 +178,7 @@ func raise_attribute_level(attr: AttributeData) -> void:
 func unlock_perk(perk: PerkData) -> void:
     if not _knowledge.add_perk(perk.perk_id):
         return
-    SaveManager.save()
+    SaveManager.mark_dirty()
 
 
 func has_perk(perk: PerkData) -> bool:

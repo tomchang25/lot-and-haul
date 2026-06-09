@@ -13,7 +13,7 @@ var _pending_day_summary: DaySummary = null
 ## Store a DaySummary and navigate to the day-summary scene.
 func go_to_day_summary(summary: DaySummary) -> void:
     _pending_day_summary = summary
-    get_tree().change_scene_to_packed(scenes.day_summary)
+    _navigate(scenes.day_summary)
 
 
 ## Consume and return the pending DaySummary (called once by day_summary_scene).
@@ -26,76 +26,84 @@ func consume_pending_day_summary() -> DaySummary:
 
 
 func go_to_location_select() -> void:
-    get_tree().change_scene_to_packed(scenes.location_select)
+    _navigate(scenes.location_select)
 
 
 func go_to_location_entry() -> void:
-    get_tree().change_scene_to_packed(scenes.location_entry)
+    _navigate(scenes.location_entry)
 
 
 func go_to_lot_browse() -> void:
-    get_tree().change_scene_to_packed(scenes.lot_browse)
+    _navigate(scenes.lot_browse)
 
 
 func go_to_inspection() -> void:
-    get_tree().change_scene_to_packed(scenes.inspection)
+    _navigate(scenes.inspection)
 
 
 func go_to_auction() -> void:
-    get_tree().change_scene_to_packed(scenes.auction)
+    _navigate(scenes.auction)
 
 
 func go_to_reveal() -> void:
-    get_tree().change_scene_to_packed(scenes.reveal)
+    _navigate(scenes.reveal)
 
 
 func go_to_cargo() -> void:
-    get_tree().change_scene_to_packed(scenes.cargo)
+    _navigate(scenes.cargo)
 
 
 func go_to_run_review() -> void:
-    get_tree().change_scene_to_packed(scenes.run_review)
+    _navigate(scenes.run_review)
 
 
 func go_to_hub() -> void:
-    get_tree().change_scene_to_packed(scenes.hub)
+    _navigate(scenes.hub)
 
 
 func go_to_storage() -> void:
-    get_tree().change_scene_to_packed(scenes.storage)
+    _navigate(scenes.storage)
 
 
 func go_to_attribute_panel() -> void:
-    get_tree().change_scene_to_packed(scenes.attribute_panel)
+    _navigate(scenes.attribute_panel)
 
 
 func go_to_knowledge_hub() -> void:
-    get_tree().change_scene_to_packed(scenes.knowledge_hub)
+    _navigate(scenes.knowledge_hub)
 
 
 func go_to_mastery_panel() -> void:
-    get_tree().change_scene_to_packed(scenes.mastery_panel)
+    _navigate(scenes.mastery_panel)
 
 
 func go_to_perk_panel() -> void:
-    get_tree().change_scene_to_packed(scenes.perk_panel)
+    _navigate(scenes.perk_panel)
 
 
 func go_to_vehicle_hub() -> void:
-    get_tree().change_scene_to_packed(scenes.vehicle_hub)
+    _navigate(scenes.vehicle_hub)
 
 
 func go_to_car_select() -> void:
-    get_tree().change_scene_to_packed(scenes.car_select)
+    _navigate(scenes.car_select)
 
 
 func go_to_car_shop() -> void:
-    get_tree().change_scene_to_packed(scenes.car_shop)
+    _navigate(scenes.car_shop)
 
 
 func go_to_customer_sell() -> void:
-    get_tree().change_scene_to_packed(scenes.customer_sell)
+    _navigate(scenes.customer_sell)
 
 
 func go_to_start_page() -> void:
-    get_tree().change_scene_to_packed(scenes.start_page)
+    _navigate(scenes.start_page)
+
+
+## Flushes any pending deferred save state, then performs the scene transition.
+## All go_to_* methods route through here so deferred mutations are never lost
+## across scene boundaries.
+func _navigate(scene: PackedScene) -> void:
+    SaveManager.flush()
+    get_tree().change_scene_to_packed(scene)

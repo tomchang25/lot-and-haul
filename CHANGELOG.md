@@ -8,6 +8,15 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Deferred Save Throttle
+
+- 2026-06-09 — [save] `SaveManager` gains two-tier save strategy: `mark_dirty()` sets a dirty flag and starts a throttle clock; `flush()` writes only when dirty; `_process()` auto-flushes at most once per 2 s (`THROTTLE_SEC`); `save()` clears dirty state on entry so a transaction save suppresses any pending deferred flush; `_notification(NOTIFICATION_WM_CLOSE_REQUEST)` flushes on quit
+- 2026-06-09 — [save] `SceneRouter` extracts `_navigate(scene)` helper — calls `SaveManager.flush()` before every `change_scene_to_packed`; all `go_to_*` methods route through it
+- 2026-06-09 — [save] 7 recoverable micro-action call sites reclassified from `SaveManager.save()` to `SaveManager.mark_dirty()`: `repair_item`, `restore_item`, `research_item`, `set_active_car`, `begin_storage_slot`, `register_storage_items` (MetaManager), `unlock_perk` (KnowledgeManager); 7 irreversible transaction call sites unchanged
+- 2026-06-09 — [docs] `dev/docs/systems/autoloads.md` SaveManager section updated to describe the two-tier Transaction Save / Deferred Save model with full call-site classification
+
+---
+
 ## Save System Upgrade
 
 - 2026-06-09 — [save_system] `ToastManager` autoload added (`global/autoloads/toast_manager.gd`): code-built CanvasLayer overlay (layer 128) with `show_warning()` (always visible) and `show_info()` (Debug.enabled only); toasts fade in, hold, then fade out via Tween; registered in `project.godot` after `Debug`

@@ -100,10 +100,11 @@ func upgrade_attribute(attr: AttributeData) -> bool:
 # ══ Storage registration ══════════════════════════════════════════════════════
 
 
-## Registers [param entries] into storage and saves. Single-domain transaction.
+## Registers [param entries] into storage. Deferred save — only called standalone
+## (resolve_run already transaction-saves when registering entries directly).
 func register_storage_items(entries: Array[ItemEntry]) -> void:
     storage.register_entries(entries)
-    SaveManager.save()
+    SaveManager.mark_dirty()
 
 # ══ Location sampling ═════════════════════════════════════════════════════════
 
@@ -120,10 +121,11 @@ func roll_available_locations() -> void:
 
 ## Begins a Storage slot: increments current_slot (consuming it) and refreshes
 ## storage_ap to a full pool. Call before navigating to the storage scene.
+## Deferred save — flushed on the subsequent scene transition.
 func begin_storage_slot() -> void:
     slot.set_slot(slot.current_slot + 1)
     slot.set_storage_ap(Economy.STORAGE_AP_MAX)
-    SaveManager.save()
+    SaveManager.mark_dirty()
 
 
 ## Begins an Auction slot: consumes morning + afternoon (slots 1 + 2) by
@@ -262,7 +264,7 @@ func repair_item(entry: ItemEntry) -> bool:
     ResearchSlot.apply_repair(entry)
     EventBus.item_repaired.emit(entry.item_data.category_data, entry.item_data.rarity)
     slot.charge_ap(Economy.REPAIR_AP_COST)
-    SaveManager.save()
+    SaveManager.mark_dirty()
     return true
 
 
@@ -283,7 +285,7 @@ func restore_item(entry: ItemEntry) -> bool:
     ResearchSlot.apply_restore(entry, restoration_attr)
     EventBus.item_restored.emit(entry.item_data.category_data, entry.item_data.rarity)
     slot.charge_ap(Economy.RESTORE_AP_COST)
-    SaveManager.save()
+    SaveManager.mark_dirty()
     return true
 
 
@@ -305,7 +307,7 @@ func research_item(entry: ItemEntry) -> bool:
     var progress_amount: int = 5 + investigation_attr
     entry.advance_research(progress_amount)
     slot.charge_ap(Economy.RESEARCH_AP_COST)
-    SaveManager.save()
+    SaveManager.mark_dirty()
     return true
 
 # ══ Vehicle management ════════════════════════════════════════════════════════
@@ -329,7 +331,7 @@ func set_active_car(car: CarData) -> void:
     if car == garage.active_car:
         return
     garage.set_active(car)
-    SaveManager.save()
+    SaveManager.mark_dirty()
 
 # ══ Run resolution ════════════════════════════════════════════════════════════
 

@@ -19,7 +19,12 @@ Both phases are opt-in; a manager that implements neither is skipped. Because `l
 
 Thin persistence coordinator (`global/autoloads/save_manager.gd`). Responsibilities: file read/write, schema version detection, schema-1→2 knowledge key relocation, legacy flat-save dispatch, and iterating registered section providers. It holds **no gameplay state** — state lives on the systems that own and mutate it.
 
-Systems register as section providers in their own `_ready()`. The invariant: `SaveManager.save()` is called exactly once per cross-domain transaction, at that transaction's commit point — no helper method inside a transaction calls it independently.
+Systems register as section providers in their own `_ready()`. Two-tier save strategy:
+
+- **Transaction Save** — `SaveManager.save()` called exactly once per irreversible cross-domain commit point (`resolve_run`, `end_day`, `resolve_customer_sale`, `begin_auction`, `begin_open_shop`, `buy_car`, `upgrade_attribute`). Writes to disk immediately and clears the dirty flag.
+- **Deferred Save** — `SaveManager.mark_dirty()` called by recoverable micro-actions (`repair_item`, `restore_item`, `research_item`, `set_active_car`, `unlock_perk`, `begin_storage_slot`, `register_storage_items`). Sets a dirty flag; `_process` flushes at most once per `THROTTLE_SEC` (2 s). `SceneRouter._navigate()` flushes before every scene transition; `_notification(NOTIFICATION_WM_CLOSE_REQUEST)` flushes on quit.
+
+No helper method inside a transaction calls `save()` independently.
 
 ---
 

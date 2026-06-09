@@ -22,11 +22,21 @@ const _MANIFEST_PATH := "user://saves/manifest.json"
 const _LEGACY_PATH := "user://save.json"
 const _MANIFEST_VERSION := 1
 
+## Deferred-save throttle interval in seconds. The first mark_dirty() starts
+## the clock; a flush fires once _elapsed >= THROTTLE_SEC. Tunable.
+const THROTTLE_SEC: float = 5.0
+
 ## Registered providers, in registration order. Each must implement to_dict(),
 ## from_dict(), and validate(). to_dict() returns a flat multi-key dict (all
 ## section keys merged into sections_out); from_dict() receives the full sections
 ## dict and reads only its own keys.
 var _providers: Array = []
+
+## True when at least one store has been mutated since the last disk write.
+var _dirty: bool = false
+
+## Seconds since _dirty was first set on the current cycle.
+var _elapsed: float = 0.0
 
 
 func _ready() -> void:
@@ -43,6 +53,39 @@ func register_provider(provider: Object) -> void:
     _providers.append(provider)
 
 
+## Accumulates delta when dirty and flushes once the throttle interval elapses.
+## Zero cost when clean.
+func _process(delta: float) -> void:
+    if not _dirty:
+        return
+    _elapsed += delta
+    if _elapsed >= THROTTLE_SEC:
+        flush()
+
+
+## Flushes pending deferred state to disk if dirty. Idempotent when clean.
+func flush() -> void:
+    if _dirty:
+        save()
+
+
+## Marks the save state as dirty and starts the throttle clock.
+## Only resets _elapsed on the clean→dirty transition — subsequent calls while
+## already dirty are no-ops on the timer (true throttle: fires at most once per
+## THROTTLE_SEC after the first mutation in a burst).
+func mark_dirty() -> void:
+    if not _dirty:
+        _dirty = true
+        _elapsed = 0.0
+
+
+## Catches OS quit (Alt-F4 / window close) and flushes any pending deferred
+## state before the engine shuts down.
+func _notification(what: int) -> void:
+    if what == NOTIFICATION_WM_CLOSE_REQUEST:
+        flush()
+
+
 ## Calls validate() on every registered provider, accumulates failures, and
 ## returns true only if every provider passed.
 func run_validation() -> bool:
@@ -51,6 +94,7 @@ func run_validation() -> bool:
         if not provider.validate():
             ok = false
     return ok
+
 
 ## Returns true when at least one counter-based save file exists, or the legacy
 ## save.json exists. Use this instead of checking file paths directly.
@@ -66,7 +110,11 @@ func has_save() -> bool:
 ## cleans up files beyond MAX_SAVES. Never modifies or deletes any existing
 ## save file during the write — a crash during write leaves the manifest
 ## pointing to the previous good file.
+## Clears dirty state on entry so a concurrent deferred flush is suppressed
+## after a transaction save.
 func save() -> void:
+    _dirty = false
+    _elapsed = 0.0
     _ensure_save_dir()
     var new_counter := _next_counter()
 
