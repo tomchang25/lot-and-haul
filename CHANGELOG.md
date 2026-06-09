@@ -8,6 +8,17 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Location Entry Backgrounds
+
+- 2026-06-09 — [location_entry] `LocationData` gains `bg_exterior: Texture2D`, `bg_interior: Texture2D`, and `transition_type: String` exports; defaults to `"sliding_door"` when unset
+- 2026-06-09 — [location_entry] `location_entry_scene.gd` rewritten: shows exterior bg on arrival, plays the configured transition wipe (`SlidingDoorTransition` or `FadeTransition`), swaps to interior bg while covered, holds an interior beat, then advances to lot browse; falls back to plain tween fade when textures are null
+- 2026-06-09 — [location_entry] `location_entry_scene.tscn` cleaned up: dead `ClosedView`, `OpenView`, and `Background` ColorRect nodes removed; transition node instantiated at runtime
+- 2026-06-09 — [pipeline] `location.py` `build_tres` auto-generates `bg_exterior`/`bg_interior` ExtResource entries from convention-based PNG paths; `transition_type` written as a string field; `parse_tres` round-trips both; `validate` errors on invalid `transition_type`
+- 2026-06-09 — [pipeline] `gen_placeholder_backgrounds.py` updated: existing single-view functions renamed to `*_exterior`, matching `*_interior` variants added for both locations; existing PNGs renamed to `_exterior` suffix; interior PNGs generated
+- 2026-06-09 — [data] `midtown_warehouse` YAML gains `transition_type: fade`; both location `.tres` files regenerated with texture ExtResources and transition field
+
+---
+
 ## Deferred Save Throttle
 
 - 2026-06-09 — [save] `SaveManager` gains two-tier save strategy: `mark_dirty()` sets a dirty flag and starts a throttle clock; `flush()` writes only when dirty; `_process()` auto-flushes at most once per 2 s (`THROTTLE_SEC`); `save()` clears dirty state on entry so a transaction save suppresses any pending deferred flush; `_notification(NOTIFICATION_WM_CLOSE_REQUEST)` flushes on quit

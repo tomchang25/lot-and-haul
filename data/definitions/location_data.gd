@@ -24,3 +24,17 @@ extends Resource
 
 # Pool of LotData to draw from when the player visits this location.
 @export var lot_pool: Array[LotData] = []
+
+# ── Arrival visuals ───────────────────────────────────────────────────────────
+
+# Background shown before the transition wipe (the exterior / outside view).
+# Null falls back to the plain ColorRect background.
+@export var bg_exterior: Texture2D
+
+# Background revealed after the transition wipe (the interior / inside view).
+# Null falls back to the plain ColorRect background.
+@export var bg_interior: Texture2D
+
+## Which transition wipe to play on arrival. "sliding_door" or "fade".
+## Defaults to "sliding_door" when unset.
+@export var transition_type: String = "sliding_door"

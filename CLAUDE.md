@@ -113,7 +113,7 @@ Check TODO.md ## Active Section
 
 ### Standards (read when touching that domain)
 
-- **Naming** (files, classes, variables, folders): read `dev/standards/naming_conventions.md` when naming anything new or renaming.
+- **Naming & GDScript style** (files, classes, variables, folders, match statements, enums, constants): read `dev/standards/naming_conventions.md` when writing any new GDScript or renaming anything. The match-wildcard rule (§11) is **lint-enforced** — see `dev/standards/standards_enforcement.md`.
 - **Registries** (adding/modifying a registry, writing registry call sites): read `dev/standards/registries.md` — covers required API, forbidden wrappers, iterate-resources-not-ids rule, and inverse lookup patterns.
 - **Scene architecture** (creating or editing block scenes/components): read `dev/standards/block_scene_architecture_standard.md` — covers node-source rule, signal connections, `setup()`/`_apply()` pattern. The node-source rule and no-`[connection]`-in-`.tscn` are **lint-enforced** — see `dev/standards/standards_enforcement.md`.
 - **Theme** (styling, colors, font sizes, styleboxes): read `dev/standards/theme_standard.md` — covers the centralized theme, semantic color palette, typography scale, and rules for when GDScript overrides are acceptable.

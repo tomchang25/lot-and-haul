@@ -18,6 +18,10 @@ Actionable line format: `[Scope] one sentence — [ref plans/<x>.md if any]`
 
 Preliminary concepts — bigger than a one-liner, but a single `###` sub-section says enough. Not necessarily actionable yet. One `###` heading per idea (nested under this `## Draft` so the section stays intact). When an idea outgrows its sub-section / becomes actionable / needs a stable link → move it into its own `dev/docs/plans/<x>.md` (`Status: Exploring`) and delete it here. Stale and never grew → just delete it.
 
+### Image v3 — Lot & Scene Decoration
+
+Lot card decoration with a random icon/badge per lot. Phase-dependent decoration: worker loading truck in cargo, auctioneer gavel in auction, etc. Needs an asset pipeline — blocked on visual direction.
+
 ### Category Mastery ↔ Clue Integration
 
 Mastery (category → super-category → rank) is retained as a progression signal (earned via `KnowledgeManager.add_category_points` on `REVEAL` / `SELL`) but currently has no mechanical effect on clue discovery. Idea: at certain ranks, inspection shows "N unrevealed surface clues remaining"; at higher ranks, the easiest surface clue may auto-reveal (no roll, no AP). Mastery does **not** affect DC or success rate — that is the attribute system. Thresholds TBD.
@@ -49,10 +53,6 @@ An auction modifier variant where every lot contains only base-layer (anchor) cl
 ### Training Courses
 
 Hub-based training resource: spend cash and a day slot to temporarily boost an attribute for the next run. Training button in hub, resource-like expiry model.
-
-### Image v2 (Backgrounds & Decorations)
-
-Location-dependent backgrounds per run (currently plain ColorRect). Lot card decoration with random icon/badge per lot. Phase-dependent decoration: worker loading truck in cargo, auctioneer gavel in auction, etc. Needs asset pipeline — blocked on visual direction.
 
 ### Intel System / Pre-Run Tip-Offs
 
@@ -226,7 +226,6 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 One-line, no reasoning, no backing doc.
 
 - [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
-- [ui] Replace placeholder fade with per-location arrival visuals.
 - [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
 - [dev] Auto-put won items to cargo grid (dev-only, skips manual packing).
 - [dev] Instant-finish auction at current price (dev-only action).

@@ -162,6 +162,7 @@ locations:
     entry_fee: 50
     travel_days: 1
     lot_number: 3
+    transition_type: sliding_door
     lot_pool:
       - beginner_mixed_a
       - beginner_mixed_b
@@ -174,6 +175,7 @@ locations:
     entry_fee: 200
     travel_days: 2
     lot_number: 3
+    transition_type: fade
     lot_pool:
       - midtown_weapons
       - midtown_decor
