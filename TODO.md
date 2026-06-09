@@ -98,10 +98,6 @@ Daily interest on cash reserves, game-over condition when debt threshold is cros
 
 Weighted tag pools (calendar/event/progression-driven), regular customers with fixed profiles, quality tiers (budget vs. collector), selling-related perks. Builds on the current nightly customer system.
 
-### Debug Mode
-
-Formal dev-mode toggle accessible both via project setting and in-game hotkey/button. Enables: auto-pack cargo grid, instant auction finish, skip scene transitions, reveal all item data overlays, spawn test items. Single gated entry point — no debug code scattered across production scenes.
-
 ### Lot Location Unlock Gating
 
 Perk or mastery rank or unlock fee (or some combination — e.g. a purchasable perk that grants access) to gate which lot kinds are available at which locations. Replaces the simpler "waiting on progression model" placeholder.
@@ -212,6 +208,12 @@ Not now: hand-curated `ItemData` gives full designer control and isolates variab
 ## Active
 
 Flows currently being built. One-line pointer each — same format as `## Plan`, just promoted here when work starts. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress → this section is empty.
+
+- [start_settings] Start Page and Settings Overlay — see `dev/docs/plans/start_page_and_settings.md`
+
+### Debug Mode (Generalize the debug port mechanism)
+
+Formal dev-mode toggle accessible both via project setting and in-game hotkey/button. Enables: auto-pack cargo grid, instant auction finish, skip scene transitions, reveal all item data overlays, spawn test items. Single gated entry point — no debug code scattered across production scenes.
 
 ---
 
