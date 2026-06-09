@@ -109,6 +109,7 @@ Check TODO.md ## Active Section
 - **Cross-manager communication**: direct call when the caller's correctness depends on the result (transactional dependency — e.g. `spend()` returning false aborts the whole operation). EventBus signal when the caller doesn't care about the outcome (notification — e.g. broadcasting `item_repaired` so KnowledgeManager can award XP; the repair is correct regardless). Test: "if the other side fails or doesn't exist, do I rollback?" Yes → direct call. No → event.
 - **Docstrings**: every `.gd` file starts with `# filename` + one-line purpose. All public functions and complex (>10 lines or non-obvious) private functions get a `##` GDDoc comment. Never strip or reduce existing comments when editing code.
 - **Data pipeline**: never hand-edit `.tres` files — use the YAML pipeline (`dev/tools/`).
+- **Notifications**: use the `ToastManager` autoload (`global/autoloads/toast_manager.gd`) for passive, ephemeral, scene-independent messages. `show_warning(msg)` is always visible; `show_info(msg)` is debug-only. Do not build per-scene fade-label or tween-label patterns for the same purpose — scene-contextual feedback (item card flashes, bid history rows, inline status counts) is fine, but anything that is a global "something happened" alert belongs in ToastManager.
 
 ### Standards (read when touching that domain)
 
