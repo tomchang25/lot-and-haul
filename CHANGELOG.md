@@ -8,6 +8,17 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Centralized Theme
+
+- 2026-06-09 — [theme] `main_theme.tres` populated with centralized design tokens: color palette (primary/hover/pressed/disabled text), default font size 16, Button StyleBoxes (5 states), PanelContainer panel, TooltipPanel, HSeparator/VSeparator, container separation defaults (HBox/VBox=8, Grid=6×6)
+- 2026-06-09 — [theme] Custom CheckBox icons added (`global/theme/icons/`): bright-border checked/unchecked/disabled PNGs visible on dark backgrounds; CheckBox theme entries with transparent StyleBoxEmpty background
+- 2026-06-09 — [theme] Project-level theme set via `project.godot → [gui] theme/custom`; all scenes inherit automatically
+- 2026-06-09 — [theme] Removed stale `NormalFont.ttf` ext_resource reference (font file was already deleted)
+- 2026-06-09 — [standards] `dev/standards/theme_standard.md` added: documents palette, typography scale, spacing defaults, semantic gameplay colors, override rules, and incremental migration approach
+- 2026-06-09 — [docs] CLAUDE.md updated with theme standard pointer in Standards section
+
+---
+
 ## Start Page & Settings Overlay
 
 - 2026-06-09 — [start_settings] `SettingsStore` autoload added (`global/autoloads/settings_store.gd`): persists master/sfx/music volume, fullscreen, debug_mode to `user://settings.json`; applies audio bus volumes and display mode on boot; toggles settings overlay on `ui_settings` input (Escape)

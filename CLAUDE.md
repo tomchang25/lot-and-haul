@@ -114,6 +114,7 @@ Check TODO.md ## Active Section
 - **Naming** (files, classes, variables, folders): read `dev/standards/naming_conventions.md` when naming anything new or renaming.
 - **Registries** (adding/modifying a registry, writing registry call sites): read `dev/standards/registries.md` — covers required API, forbidden wrappers, iterate-resources-not-ids rule, and inverse lookup patterns.
 - **Scene architecture** (creating or editing block scenes/components): read `dev/standards/block_scene_architecture_standard.md` — covers node-source rule, signal connections, `setup()`/`_apply()` pattern. The node-source rule and no-`[connection]`-in-`.tscn` are **lint-enforced** — see `dev/standards/standards_enforcement.md`.
+- **Theme** (styling, colors, font sizes, styleboxes): read `dev/standards/theme_standard.md` — covers the centralized theme, semantic color palette, typography scale, and rules for when GDScript overrides are acceptable.
 - **Project structure** (placing new files or folders): read `dev/standards/project_structure.md`.
 - **Commits**: conventional commits format — read `dev/skills/conventional_commits.md` when writing commit messages.
 - **Docs and tracking** (writing/archiving docs, updating TODO/CHANGELOG, deciding where a forward item lives): read `dev/docs/README.md` — covers the 3-level model, maturity scale, lifecycle rules, and the "no living Done list" principle.

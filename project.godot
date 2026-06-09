@@ -15,6 +15,10 @@ run/main_scene="res://game/meta/start/start_page_scene.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
+[gui]
+
+theme/custom="res://global/theme/main_theme.tres"
+
 [autoload]
 
 EventBus="*uid://d2nkmaq8dlf5g"
