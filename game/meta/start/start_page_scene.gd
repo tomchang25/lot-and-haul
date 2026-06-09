@@ -20,7 +20,7 @@ func _ready() -> void:
     _settings_btn.pressed.connect(_on_settings_pressed)
     _quit_btn.pressed.connect(_on_quit_pressed)
 
-    _has_save = FileAccess.file_exists(SaveManager.SAVE_PATH)
+    _has_save = SaveManager.has_save()
     _apply()
 
 

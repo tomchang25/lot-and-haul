@@ -53,6 +53,19 @@ func from_dict(data: Dictionary) -> void:
     customers.from_dict(data.get(customers.section_id(), { }))
 
 
+## Aggregates get_migration_log() from all owned stores. Returns and clears
+## each store's log. Call after from_dict() to surface schema-upgrade messages.
+func get_migration_log() -> Array[String]:
+    var out: Array[String] = []
+    out.append_array(economy.get_migration_log())
+    out.append_array(garage.get_migration_log())
+    out.append_array(storage.get_migration_log())
+    out.append_array(slot.get_migration_log())
+    out.append_array(progress.get_migration_log())
+    out.append_array(customers.get_migration_log())
+    return out
+
+
 ## Aggregates validate() across all stores. Returns true when all pass.
 func validate() -> bool:
     var ok := true

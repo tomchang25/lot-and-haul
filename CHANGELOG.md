@@ -8,6 +8,16 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Save System Upgrade
+
+- 2026-06-09 — [save_system] `ToastManager` autoload added (`global/autoloads/toast_manager.gd`): code-built CanvasLayer overlay (layer 128) with `show_warning()` (always visible) and `show_info()` (Debug.enabled only); toasts fade in, hold, then fade out via Tween; registered in `project.godot` after `Debug`
+- 2026-06-09 — [save_system] `StoreBase` gains `_migration_log: Array[String]` and `get_migration_log()` (returns-and-clears); `MetaManager` and `KnowledgeManager` implement `get_migration_log()` aggregating from their owned stores; stores that override `_apply_migrations()` append human-readable entries per schema bump
+- 2026-06-09 — [save_system] `SaveManager` rewritten: append-only counter-based saves at `user://saves/save_N.json`; manifest (`user://saves/manifest.json`) tracks latest counter as load fast-path; load falls back newest-first through candidates, toasting a warning on any skip; corrupt manifest recovers via filename scan; up to 10 files retained with best-effort cleanup; migration logs collected post-load and routed to `ToastManager.show_info()`
+- 2026-06-09 — [save_system] Legacy `user://save.json` auto-migrated to `user://saves/save_1.json` on first boot and deleted best-effort
+- 2026-06-09 — [save_system] `SaveManager.has_save()` API added; `start_page_scene.gd` updated to call it instead of accessing the removed `SAVE_PATH` constant directly
+
+---
+
 ## Unified Debug System
 
 - 2026-06-09 — [debug] `Debug` autoload added (`global/autoloads/debug.gd`): unified gate combining `OS.is_debug_build()` (build-time) and `SettingsStore.debug_mode` (user preference); exposes `enabled` property, `toggled` signal, and `set_debug_mode()` mutator

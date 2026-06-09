@@ -6,6 +6,18 @@
 class_name StoreBase
 extends RefCounted
 
+## Human-readable descriptions appended by _apply_migrations() branches.
+## Cleared and returned by get_migration_log().
+var _migration_log: Array[String] = []
+
+
+## Returns all migration messages accumulated since the last load, then clears
+## the log. Call after from_dict() to collect any schema-upgrade notes.
+func get_migration_log() -> Array[String]:
+	var out := _migration_log.duplicate()
+	_migration_log.clear()
+	return out
+
 
 ## Returns the section key used in the save payload. Returns "" by default;
 ## session-scoped Stores that never register with SaveManager rely on this.

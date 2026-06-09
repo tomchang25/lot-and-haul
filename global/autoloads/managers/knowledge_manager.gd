@@ -82,6 +82,12 @@ func from_dict(data: Dictionary) -> void:
     _knowledge.from_dict(data.get(_knowledge.section_id(), { }))
 
 
+## Aggregates get_migration_log() from all owned stores. Returns and clears
+## each store's log. Call after from_dict() to surface schema-upgrade messages.
+func get_migration_log() -> Array[String]:
+    return _knowledge.get_migration_log()
+
+
 # ── Mastery ────────────────────────────────────────────────────────────────────
 
 
