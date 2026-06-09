@@ -2,6 +2,8 @@
 # Project-wide persistent settings (audio, display, gameplay). Self-persists to user://settings.json. Not a gameplay Store.
 extends Node
 
+signal debug_mode_changed(value: bool)
+
 const SETTINGS_PATH := "user://settings.json"
 const SettingsOverlayScene := preload("res://game/shared/settings_overlay/settings_overlay.tscn")
 
@@ -9,7 +11,12 @@ var master_volume: float = 1.0
 var sfx_volume: float = 1.0
 var music_volume: float = 1.0
 var fullscreen: bool = false
-var debug_mode: bool = false
+var debug_mode: bool = false:
+    set(value):
+        if debug_mode == value:
+            return
+        debug_mode = value
+        debug_mode_changed.emit(value)
 
 var _overlay_instance: CanvasLayer = null
 

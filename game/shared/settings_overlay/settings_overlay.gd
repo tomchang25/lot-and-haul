@@ -62,8 +62,7 @@ func _on_fullscreen_toggled(pressed: bool) -> void:
 
 
 func _on_debug_toggled(pressed: bool) -> void:
-    SettingsStore.debug_mode = pressed
-    SettingsStore.save_settings()
+    Debug.set_debug_mode(pressed)
 
 
 func _on_close_pressed() -> void:

@@ -72,6 +72,7 @@ global/       Autoloads and project-wide resources
     managers/    Gameplay managers (MetaManager, KnowledgeManager, RunManager)
     registries/  Designer-resource registries (extend ResourceRegistry)
     scene_router/ Scene navigation + pending data
+    debug.gd         Unified debug gate (OS.is_debug_build() AND SettingsStore.debug_mode)
     event_bus.gd, save_manager.gd, audio_manager/
   constants/  Data paths, economy constants
   theme/      Main theme resource
@@ -82,7 +83,7 @@ stage/        Testbeds, demo runs, and tile sets (mostly empty)
 
 ## Autoloads (load order matters)
 
-EventBus → SettingsStore → AudioManager → ClueRegistry → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → SaveManager → KnowledgeManager → MetaManager → SceneRouter → GameManager
+EventBus → SettingsStore → Debug → AudioManager → ClueRegistry → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → SaveManager → KnowledgeManager → MetaManager → SceneRouter → GameManager
 
 MetaManager and KnowledgeManager call `SaveManager.register_provider(self)` in `_ready()`. `GameManager._ready()` calls `SaveManager.load()` then `SaveManager.run_validation()`. Per-store versioned migrations run inside each store's `from_dict()` via `_apply_migrations()` — there is no top-level migration pass. The `schema_version` field in the save file is a legacy stamp; it is always written but never checked on load.
 
@@ -115,6 +116,7 @@ Check TODO.md ## Active Section
 - **Registries** (adding/modifying a registry, writing registry call sites): read `dev/standards/registries.md` — covers required API, forbidden wrappers, iterate-resources-not-ids rule, and inverse lookup patterns.
 - **Scene architecture** (creating or editing block scenes/components): read `dev/standards/block_scene_architecture_standard.md` — covers node-source rule, signal connections, `setup()`/`_apply()` pattern. The node-source rule and no-`[connection]`-in-`.tscn` are **lint-enforced** — see `dev/standards/standards_enforcement.md`.
 - **Theme** (styling, colors, font sizes, styleboxes): read `dev/standards/theme_standard.md` — covers the centralized theme, semantic color palette, typography scale, and rules for when GDScript overrides are acceptable.
+- **Debug** (adding debug-conditional code or UI): read `dev/standards/debug_standard.md` — covers the two-layer gate (`OS.is_debug_build()` + `SettingsStore.debug_mode`), the `Debug` autoload API, and node-source rules for debug nodes.
 - **Project structure** (placing new files or folders): read `dev/standards/project_structure.md`.
 - **Commits**: conventional commits format — read `dev/skills/conventional_commits.md` when writing commit messages.
 - **Docs and tracking** (writing/archiving docs, updating TODO/CHANGELOG, deciding where a forward item lives): read `dev/docs/README.md` — covers the 3-level model, maturity scale, lifecycle rules, and the "no living Done list" principle.

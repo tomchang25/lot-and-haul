@@ -8,6 +8,18 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Unified Debug System
+
+- 2026-06-09 — [debug] `Debug` autoload added (`global/autoloads/debug.gd`): unified gate combining `OS.is_debug_build()` (build-time) and `SettingsStore.debug_mode` (user preference); exposes `enabled` property, `toggled` signal, and `set_debug_mode()` mutator
+- 2026-06-09 — [debug] `SettingsStore.debug_mode` wired with setter + `debug_mode_changed` signal so any write (via `Debug.set_debug_mode()` or direct assignment) is runtime-correct
+- 2026-06-09 — [debug] Auction scene debug overlay (`auction_scene.gd`) migrated from `OS.is_debug_build()` to `Debug.enabled`; connects `Debug.toggled` for reactive show/hide
+- 2026-06-09 — [debug] Settings Overlay checkbox routes through `Debug.set_debug_mode()` instead of writing `SettingsStore.debug_mode` directly
+- 2026-06-09 — [standards] `dev/standards/debug_standard.md` added: documents the two-layer debug gate, `Debug` autoload API, coding patterns (one-shot init, reactive toggle, conditional logic), node-source rules, and release safety
+- 2026-06-09 — [standards] `block_scene_architecture_standard.md` updated: debug node references changed from `OS.is_debug_build()` to `Debug.enabled`
+- 2026-06-09 — [docs] CLAUDE.md updated with Debug autoload in load order and debug standard pointer in Standards section
+
+---
+
 ## Centralized Theme
 
 - 2026-06-09 — [theme] `main_theme.tres` populated with centralized design tokens: color palette (primary/hover/pressed/disabled text), default font size 16, Button StyleBoxes (5 states), PanelContainer panel, TooltipPanel, HSeparator/VSeparator, container separation defaults (HBox/VBox=8, Grid=6×6)

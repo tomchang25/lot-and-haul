@@ -23,6 +23,7 @@ theme/custom="res://global/theme/main_theme.tres"
 
 EventBus="*uid://d2nkmaq8dlf5g"
 SettingsStore="*res://global/autoloads/settings_store.gd"
+Debug="*res://global/autoloads/debug.gd"
 AudioManager="*uid://bhhaho37wph5e"
 ClueRegistry="*res://global/autoloads/registries/clue_registry.gd"
 ItemRegistry="*uid://cog8cvjixi27d"

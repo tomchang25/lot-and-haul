@@ -37,7 +37,7 @@ var _bid_enabled: bool = true
 var _shorten_next_npc_tick: bool = false
 var _last_npc_index: int = -1 # tracks the last NPC to prevent repeats
 var _circle_node: _CircleProgress = null
-var _debug_label: Label = null # debug builds only; never exposes _rolled_price in release
+var _debug_label: Label = null # gated by Debug.enabled; never exposes _rolled_price in release
 
 # ── Timer / tween handles ─────────────────────────────────────────────────────
 
@@ -357,11 +357,12 @@ func _show_npc_popup(price: int) -> void:
         _npc_history_list.get_child(0).queue_free()
 
 # ══ Debug overlay ══════════════════════════════════════════════════════════════
-# Visible in debug builds only. Never ship with _rolled_price exposed.
+# Gated by Debug.enabled (OS.is_debug_build() AND SettingsStore.debug_mode).
+# Never ship with _rolled_price exposed.
 
 
 func _init_debug_overlay() -> void:
-    if not OS.is_debug_build():
+    if not Debug.enabled:
         return
     var lot: LotEntry = RunManager.lot.lot_entry
 
@@ -389,3 +390,9 @@ func _init_debug_overlay() -> void:
     ]
     # node-src: debug
     add_child(_debug_label)
+    Debug.toggled.connect(_on_debug_toggled)
+
+
+func _on_debug_toggled(is_enabled: bool) -> void:
+    if _debug_label != null:
+        _debug_label.visible = is_enabled
