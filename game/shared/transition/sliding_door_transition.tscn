@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://cslddoortscn1"]
+
+[ext_resource type="Script" uid="uid://bslddoortrn01" path="res://game/shared/transition/sliding_door_transition.gd" id="1_sdt"]
+
+[node name="SlidingDoorTransition" type="CanvasLayer" unique_id=1300000001]
+layer = 110
+visible = false
+script = ExtResource("1_sdt")
+
+[node name="LeftDoor" type="ColorRect" parent="." unique_id=1300000002]
+unique_name_in_owner = true
+anchor_bottom = 1.0
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="RightDoor" type="ColorRect" parent="." unique_id=1300000003]
+unique_name_in_owner = true
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
