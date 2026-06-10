@@ -2,7 +2,7 @@
 **/.commitsage
 
 **/shader_cache
-**/assets
+# **/assets
 **/addons
 **/script_templates
 **/*_back
