@@ -9,10 +9,9 @@
 
 **/dev/tools/bin
 
-**/*.uid
 **/*.tmp
 **/*.import
 **/*.db-journal
-**/*.tres
+data/tres/
 
 **/__pycache__/
