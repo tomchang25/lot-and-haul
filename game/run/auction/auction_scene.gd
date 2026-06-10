@@ -313,7 +313,7 @@ func _resolve() -> void:
 ## run costs (paid_price, entry_fee, fuel_cost). Called on init and after
 ## every player bid so the number stays live.
 func _refresh_budget() -> void:
-    var committed := RunManager.run.paid_price + RunManager.run.entry_fee + RunManager.run.fuel_cost
+    var committed: int = RunManager.run.paid_price + RunManager.run.entry_fee + RunManager.run.fuel_cost
     var remaining := maxi(MetaManager.economy.cash - committed, 0)
     _budget_label.text = "Budget: $%d" % remaining
 

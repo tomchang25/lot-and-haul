@@ -64,7 +64,7 @@ func from_dict(data: Dictionary) -> void:
         for id_variant: Variant in data["available_location_ids"]:
             if not id_variant is String:
                 continue
-            var loc := LocationRegistry.get_location_by_id(id_variant as String)
+            var loc: LocationData = LocationRegistry.get_location_by_id(id_variant as String)
             if loc == null:
                 push_warning(
                     "ProgressStore: available_location_id '%s' not found — dropped" % id_variant,

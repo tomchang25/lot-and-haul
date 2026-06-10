@@ -64,7 +64,7 @@ func from_dict(data: Dictionary) -> void:
         if id.is_empty():
             _active_car = null
         else:
-            var car := CarRegistry.get_car_by_id(id)
+            var car: CarData = CarRegistry.get_car_by_id(id)
             if car == null:
                 push_warning("GarageStore: active_car_id '%s' not found — dropped" % id)
             _active_car = car
@@ -73,10 +73,8 @@ func from_dict(data: Dictionary) -> void:
         for id_variant: Variant in data["owned_car_ids"]:
             if not id_variant is String:
                 continue
-            var car := CarRegistry.get_car_by_id(id_variant as String)
+            var car: CarData = CarRegistry.get_car_by_id(id_variant as String)
             if car == null:
                 push_warning("GarageStore: owned_car_id '%s' not found — dropped" % id_variant)
                 continue
             _owned_cars.append(car)
-
-

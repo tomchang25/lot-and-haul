@@ -569,7 +569,7 @@ func _refresh_clues_section(entry: ItemEntry) -> void:
 
     # Anchor row
     if entry.anchor_revealed:
-        var anchor := entry.item_data.clues.filter(
+        var anchor: Array[ClueData] = entry.item_data.clues.filter(
             func(c: ClueData) -> bool: return c.type == ClueData.ClueType.ANCHOR
         )
         if not anchor.is_empty():

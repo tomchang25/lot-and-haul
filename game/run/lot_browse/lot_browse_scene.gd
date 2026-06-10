@@ -43,7 +43,7 @@ func _ready() -> void:
 
 
 func _build_all_cards() -> void:
-    var lots := RunManager.run.browse_lots
+    var lots: Array[LotData] = RunManager.run.browse_lots
     var total: int = lots.size()
 
     for i in total:
@@ -57,7 +57,7 @@ func _build_all_cards() -> void:
 
 
 func _refresh_view() -> void:
-    var idx := RunManager.run.browse_index
+    var idx: int = RunManager.run.browse_index
 
     if idx >= RunManager.run.browse_lots.size():
         _show_cargo_state()

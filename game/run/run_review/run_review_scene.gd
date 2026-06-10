@@ -75,7 +75,7 @@ func _on_row_tooltip_requested(
 
 
 func _apply_trailer_damage() -> int:
-    var car := RunManager.run.car_data
+    var car: CarData = RunManager.run.car_data
     if car.trailer_damage_chance <= 0.0:
         return 0
 
@@ -106,9 +106,9 @@ func _populate_rows() -> void:
 
 
 func _populate_finance() -> void:
-    var cost_cash := RunManager.run.paid_price + RunManager.run.entry_fee + RunManager.run.fuel_cost
-    var onsite := RunManager.run.onsite_proceeds
-    var overall := onsite - cost_cash
+    var cost_cash: int = RunManager.run.paid_price + RunManager.run.entry_fee + RunManager.run.fuel_cost
+    var onsite: int = RunManager.run.onsite_proceeds
+    var overall: int = onsite - cost_cash
 
     _cost_cash_label.text = "Cost Cash:   -$%d" % cost_cash
     _finance_onsite_label.text = "Sold On-site:   +$%d" % onsite
@@ -125,7 +125,7 @@ func _populate_finance() -> void:
         estimate_price += (entry.estimated_value_min + entry.estimated_value_max) / 2
     _estimate_price_label.text = "Est. Cargo Value:   $%d" % estimate_price
 
-    var estimate_profit := overall + estimate_price
+    var estimate_profit: int = overall + estimate_price
     if estimate_profit >= 0:
         _estimate_profit_label.text = "Est. Profit:   +$%d" % estimate_profit
         _estimate_profit_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
