@@ -74,10 +74,6 @@ Irregular special-auction announcements published on the calendar days in advanc
 
 Pre-run intelligence on available lots — reveal clue counts, surface categories, or estimated value tiers before committing the trip. Waiting on `LocationIntel` resource design.
 
-### Entry/Instance Archetype — Standardize to Model or Service
-
-The Entry/Instance archetype is in a middle state: it has mutable fields and self-mutating methods (`unveil()`, `attempt_clue()`, `auto_reveal_all_surface()`), but scenes call those methods directly rather than going through a Manager. This makes Entry neither a clean data Model (mutations mediated by Manager, like Stores) nor a stateless Service. Decide which direction Entries should go: thin data holders where Managers own all mutations (aligning with the Store pattern), or self-contained objects with a clear contract for who may call mutation methods and when. This shapes both the ItemEntry cleanup and the encapsulation work below.
-
 ### MetaManager Decomposition
 
 MetaManager holds 6 stores and coordinates slot economy, storage AP, vehicle management, run resolution, customer sale, day-end, and location sampling (~358 lines). Below the pain threshold now, but it's the next candidate for splitting if it grows. The slot economy + storage AP section could become its own manager.
@@ -177,21 +173,13 @@ Open questions:
 
 Prerequisite: the affix-naming system validated across the full item set (composed == authored) — already in place.
 
-### ItemEntry Cleanup / Data Standard
-
-`item_entry.gd` (698 lines) mixes price math, display text helpers, serialization, clue mechanics, and factory logic. Split into layers: `ItemEntry` = data + price logic, display getters = separate concern (`ItemDisplay` or similar). Clear boundary: `ItemData` (designer resource, the _what_), `ItemEntry` (runtime instance, the _state+behavior_), display (the _show_).
-
-### ItemEntry Encapsulation — Manager-Mediated Mutations
-
-Run-phase scenes (`inspection_scene`, `reveal_scene`, `run_review_scene`) mutate ItemEntry directly — `entry.unveil()`, `entry.attempt_clue()`, `entry.condition = ...` — bypassing RunManager. This is inconsistent with the Store/Manager pattern established by the save refactor where all state mutation goes through the owning Manager. Add thin RunManager wrappers (`unveil_item()`, `apply_trailer_damage()`, etc.) so ItemEntry mutations follow the same discipline as Store mutations. Not urgent — harmless today because no one else observes mid-run ItemEntry state — but blocks any future save-on-inspect or mid-run persistence.
-
 ---
 
 ## Active
 
 Flows currently being built. One-line pointer each — same format as `## Plan`, just promoted here when work starts. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress → this section is empty.
 
-- [item_entry_refactor] ItemEntry layer split (data + price vs display) + Manager-mediated mutations, merged into one refactor — plan file pending, reasoning in the ItemEntry / Entry-Instance `## Draft` sections
+- [item_entry_refactor] ItemEntry layer split (data + price vs display) + Manager-mediated mutations + archetype standard — see `dev/docs/plans/item_entry_refactor.md`
 
 ---
 
