@@ -4,7 +4,7 @@ A Godot 4.6 single-player game about buying storage lots at auction, inspecting 
 
 ## Agent Rules
 
-Agent-specific instructions live in `dev/agent_rules/`. Read them before starting work. Key rules: `sandbox_environment.md` (shell vs. file tools), `lint_before_finish.md` (run linter on changed files), `git_operations.md` (git is read-only — never stage/commit, only suggest commit messages).
+Agent-specific instructions live in `dev/agent_rules/`. Read them before starting work. Key rules: `sandbox_environment.md` (shell vs. file tools), `lint_before_finish.md` (run linter on changed files), `git_operations.md` (git is read-only — never stage/commit, only suggest commit messages), `godot_headless_check.md` (never run Godot against the mount — use the /tmp snapshot procedure).
 
 When asked to build a plan or implementation spec, follow the format in `dev/docs/README.md` (plan lifecycle) and `dev/standards/` for any relevant domain standard. Plans go in `dev/docs/plans/` with a one-line pointer in `TODO.md`.
 
