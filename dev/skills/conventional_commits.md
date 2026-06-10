@@ -112,6 +112,29 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ---
 
+## Project Conventions
+
+These rules extend the base specification for this project.
+
+### Body format
+
+- When listing multiple changes in the body, **MUST** use `-` bullet points, one per logical change.
+- Each bullet **SHOULD** be a concise imperative phrase (e.g. `Add --force flag to yaml_to_tres.py`).
+
+### Subject/body separation
+
+- The subject line and body **MUST** be separated by exactly one blank line, per spec §6.
+- Do not run body text directly after the subject without the blank line.
+
+### What to exclude
+
+- **MUST NOT** include administrative housekeeping in commit messages. Examples:
+  - Archiving a plan after shipping it (the plan is done — the commit is the evidence)
+  - Updating `TODO.md` or `CHANGELOG.md` as a listed bullet (these are side-effects, not the change itself)
+- The commit message describes *what changed in the codebase*, not what paperwork moved.
+
+---
+
 ## Why Use Conventional Commits
 
 - Automatically generating CHANGELOGs.
