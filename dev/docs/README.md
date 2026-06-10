@@ -22,16 +22,16 @@ Why this resists rot:
 
 Documentation (this folder) describes **how the project works**. _Tracking_ — what's done, what's planned, what's next — is a separate concern and lives in three root-level files. Keeping them apart is what stops architecture docs from filling with status noise.
 
-| File           | Direction | What it holds                                                                                                                                                                                         | Rots?                                              |
-| -------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `CHANGELOG.md` | backward  | Append-only record of shipped work. The permanent "done" history.                                                                                                                                     | Never — append-only, never reconciled against code |
-| `TODO.md`      | forward   | The single forward surface: `## Active` in-flight flows, open work (Plan/Chore/Bug one-liners), and a `## Draft` section of brewing concepts. Multi-step flows detail out to `dev/docs/plans/` files. | No — done = delete the line                        |
+| File           | Direction | What it holds                                                                                                                                                                                                                                                                  | Rots?                                              |
+| -------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| `CHANGELOG.md` | backward  | Append-only record of shipped work. The permanent "done" history.                                                                                                                                                                                                              | Never — append-only, never reconciled against code |
+| `TODO.md`      | forward   | The single forward surface: `## Active` in-flight flows, `## Pending` (the not-yet-started tail of an in-flight multi-plan flow), open work (Plan/Chore/Bug one-liners), and a `## Draft` section of brewing concepts. Multi-step flows detail out to `dev/docs/plans/` files. | No — done = delete the line                        |
 
 > **The one principle behind all of them: there is no living "Done" list anywhere.** "Done" is recorded once in `CHANGELOG.md` (immutable history) and erased everywhere else. A `systems/` doc never enumerates what was built; a `dev/docs/plans/` file cuts shipped phases out rather than checking them off; `TODO.md` has no Done section. A standing list of finished work is the single most reliable way to rot — so we don't keep one.
 
 ### TODO vs plans/ vs CHANGELOG
 
-- **TODO** = the WHAT-NOW and the single forward surface — every open item and brewing idea, so nothing gets forgotten in a second list. `## Active` holds in-flight flows, `## Plan` holds queued flows backed by a file, `## Draft` holds concepts. Entries are one line; the moment something needs sequencing, a dependency reason, or phases, it earns a `dev/docs/plans/` file and `TODO.md` keeps only a one-line pointer.
+- **TODO** = the WHAT-NOW and the single forward surface — every open item and brewing idea, so nothing gets forgotten in a second list. `## Active` holds in-flight flows, `## Pending` holds the deferred tail of an in-flight multi-plan flow (normally empty — single-plan work skips it), `## Plan` holds queued flows backed by a file, `## Draft` holds concepts. Entries are one line; the moment something needs sequencing, a dependency reason, or phases, it earns a `dev/docs/plans/` file and `TODO.md` keeps only a one-line pointer.
 - **plans/** = the WHY and the _order_. A multi-step flow's phases, dependencies, and acceptance criteria live in its own file. **Forward-only**: ship a phase → cut it out; ship the flow → archive the file.
 - **CHANGELOG** = the permanent record. The only place finished work persists.
 
@@ -55,7 +55,7 @@ There is no separate `draft/` folder and no separate draft file: the draft tier 
 
 ```
 repo root/
-├── TODO.md      Single forward surface: ## Active + Plan/Chore/Bug one-liners + a ## Draft section.
+├── TODO.md      Single forward surface: ## Active + ## Pending + Plan/Chore/Bug one-liners + a ## Draft section.
 └── CHANGELOG.md Append-only shipped history. The permanent "done" record.
 
 dev/docs/
@@ -74,6 +74,7 @@ You will not "tidy docs" on a schedule — so the system must update itself whil
 - **A `## Draft` idea earns a file** → move it to `dev/docs/plans/<x>.md`, leave a one-line pointer in `TODO.md` `## Plan`, and delete the Draft section. A `## Draft` idea (or a stale `## Plan` pointer) that never grew → just delete it / retire it back to Draft.
 - **Ship a phase** → append one entry to `CHANGELOG.md` and cut that phase from its plan file. **Ship the whole flow** → archive the plan file and delete its `TODO.md` line — all in the same commit.
 - **A plan's design gets locked** → write the _conclusion_ (1 paragraph) into the matching `systems/` doc, then move the plan to `archived/`. It never lingers as a competing source of truth.
+- **An implementation spec gets generated from a scout report** → move the scout report (`plans/<plan>_scout.md`) to `archived/` in the same commit. It quotes code, so it is stale the moment implementation begins.
 - **Code detail changes** → it was in L3, so it's already updated in the same commit.
 
 Tie doc maintenance to "marking something done," never to a separate cleanup pass.
@@ -128,8 +129,11 @@ One file per standalone design/work item — the place an idea lands once it has
 
 Name: `<scope>_<short_description>.md`. Contains goal (1–2 sentences), context/why now, high-level steps (or phases), and acceptance criteria. Keep it **forward-only**: as each phase ships, cut it out and record it in `CHANGELOG.md` — don't keep a checked-off phase ledger. When its design locks, graduate the conclusion to `systems/`. Archive the plan once it's shipped or superseded.
 
+A plan moving toward implementation may gain a sibling **scout report** — `<plan>_scout.md`, format in `dev/agent_rules/scout_standard.md` — raw, evidence-backed codebase intelligence gathered for the implementation-spec stage. A scout report quotes code, so it rots faster than any other artifact in `dev/docs/`: move it to `archived/` as soon as its implementation spec is generated, never letting it sit beside an active plan as a competing source of truth.
+
 ## Relationship to other dev/ folders
 
+- `dev/agent_rules/` — agent-specific instructions, including the plan → scout → spec document standards (`plan_standard.md`, `scout_standard.md`, `implementation_spec_standard.md`)
 - `dev/standards/` — coding conventions, naming rules, project structure (runtime type archetype taxonomy is now in `CLAUDE.md`)
 - `dev/skills/` — AI coding tool references (commit format, GDScript patterns)
 - `dev/tools/` — build scripts (yaml/tres pipeline)

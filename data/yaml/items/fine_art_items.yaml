@@ -1,0 +1,233 @@
+items:
+  # ── Painting ──────────────────────────────────────────────────────
+  - item_id: painting_acrylic_unsigned
+    category_id: painting
+    rarity: 0
+    anchor_id: painting_anchor_01
+    surface_ids:
+      - painting_medium_acrylic
+      - painting_signature_absent
+      - painting_canvas_slack
+
+  - item_id: painting_oil_signed
+    category_id: painting
+    rarity: 1
+    anchor_id: painting_anchor_01
+    surface_ids:
+      - painting_medium_oil
+      - painting_canvas_stretched
+      - painting_signature_present
+      - painting_brushwork_loose
+      - painting_provenance_label
+    hidden_ids:
+      - painting_leaf_sargent
+
+  - item_id: painting_renoir_crackled
+    category_id: painting
+    rarity: 1
+    anchor_id: painting_anchor_02
+    surface_ids:
+      - painting_medium_oil
+      - painting_brushwork_loose
+      - painting_craquelure_even
+      - painting_signature_present
+      - painting_frame_original
+      - painting_provenance_label
+    hidden_ids:
+      - painting_leaf_renoir
+
+  - item_id: painting_monet_yellowed
+    category_id: painting
+    rarity: 1
+    anchor_id: painting_anchor_02
+    surface_ids:
+      - painting_medium_oil
+      - painting_canvas_stretched
+      - painting_brushwork_tight
+      - painting_varnish_yellowed
+      - painting_signature_present
+      - painting_frame_original
+    hidden_ids:
+      - painting_leaf_monet
+
+  - item_id: painting_forgery_skilled
+    category_id: painting
+    rarity: 1
+    anchor_id: painting_anchor_02
+    surface_ids:
+      - painting_medium_oil
+      - painting_canvas_stretched
+      - painting_brushwork_loose
+      - painting_signature_present
+      - painting_frame_original
+      - painting_provenance_label
+    hidden_ids:
+      - painting_override_forgery
+
+  - item_id: painting_sargent_exhibited
+    category_id: painting
+    rarity: 2
+    anchor_id: painting_anchor_01
+    surface_ids:
+      - painting_medium_oil
+      - painting_canvas_stretched
+      - painting_brushwork_loose
+      - painting_signature_present
+      - painting_provenance_label
+    hidden_ids:
+      - painting_leaf_sargent
+      - painting_hidden_exhibition_stamp
+
+  - item_id: painting_monet_overpainted
+    category_id: painting
+    rarity: 2
+    anchor_id: painting_anchor_03
+    surface_ids:
+      - painting_medium_oil
+      - painting_canvas_stretched
+      - painting_brushwork_tight
+      - painting_signature_present
+      - painting_frame_original
+      - painting_provenance_label
+    hidden_ids:
+      - painting_leaf_monet
+      - painting_hidden_overpaint
+
+  - item_id: painting_renoir_master
+    category_id: painting
+    rarity: 3
+    anchor_id: painting_anchor_03
+    surface_ids:
+      - painting_medium_oil
+      - painting_canvas_stretched
+      - painting_brushwork_loose
+      - painting_signature_present
+      - painting_frame_original
+      - painting_provenance_label
+    hidden_ids:
+      - painting_leaf_renoir
+      - painting_hidden_exhibition_stamp
+      - painting_hidden_overpaint
+
+  - item_id: painting_monet_legend
+    category_id: painting
+    rarity: 3
+    anchor_id: painting_anchor_03
+    surface_ids:
+      - painting_medium_oil
+      - painting_canvas_stretched
+      - painting_brushwork_tight
+      - painting_signature_present
+      - painting_frame_original
+      - painting_provenance_label
+    hidden_ids:
+      - painting_leaf_monet
+      - painting_hidden_exhibition_stamp
+      - painting_hidden_overpaint
+
+  # ── Sculpture ─────────────────────────────────────────────────────
+  - item_id: sculpture_plaster_study
+    category_id: sculpture
+    rarity: 0
+    anchor_id: sculpture_anchor_01
+    surface_ids:
+      - sculpture_medium_plaster
+      - sculpture_base_blank
+
+  - item_id: sculpture_barye_bronze
+    category_id: sculpture
+    rarity: 1
+    anchor_id: sculpture_anchor_01
+    surface_ids:
+      - sculpture_medium_bronze
+      - sculpture_patina_natural
+      - sculpture_foundry_marked
+      - sculpture_edition_numbered
+      - sculpture_base_signed
+    hidden_ids:
+      - sculpture_leaf_barye
+
+  - item_id: sculpture_degas_pitted
+    category_id: sculpture
+    rarity: 1
+    anchor_id: sculpture_anchor_02
+    surface_ids:
+      - sculpture_medium_bronze
+      - sculpture_patina_natural
+      - sculpture_surface_pitted
+      - sculpture_base_signed
+      - sculpture_edition_numbered
+    hidden_ids:
+      - sculpture_leaf_degas
+
+  - item_id: sculpture_rodin_wax
+    category_id: sculpture
+    rarity: 1
+    anchor_id: sculpture_anchor_02
+    surface_ids:
+      - sculpture_medium_bronze
+      - sculpture_patina_natural
+      - sculpture_foundry_marked
+      - sculpture_base_signed
+      - sculpture_wax_original
+      - sculpture_edition_numbered
+    hidden_ids:
+      - sculpture_leaf_rodin
+
+  - item_id: sculpture_cast_copy
+    category_id: sculpture
+    rarity: 1
+    anchor_id: sculpture_anchor_02
+    surface_ids:
+      - sculpture_medium_bronze
+      - sculpture_patina_artificial
+      - sculpture_foundry_marked
+      - sculpture_base_signed
+      - sculpture_edition_numbered
+    hidden_ids:
+      - sculpture_override_cast_copy
+
+  - item_id: sculpture_rodin_welded
+    category_id: sculpture
+    rarity: 2
+    anchor_id: sculpture_anchor_02
+    surface_ids:
+      - sculpture_medium_bronze
+      - sculpture_patina_natural
+      - sculpture_foundry_marked
+      - sculpture_base_signed
+      - sculpture_edition_numbered
+    hidden_ids:
+      - sculpture_leaf_rodin
+      - sculpture_hidden_weld_repair
+
+  - item_id: sculpture_degas_provenance
+    category_id: sculpture
+    rarity: 2
+    anchor_id: sculpture_anchor_03
+    surface_ids:
+      - sculpture_medium_bronze
+      - sculpture_patina_natural
+      - sculpture_foundry_marked
+      - sculpture_base_signed
+      - sculpture_edition_numbered
+      - sculpture_wax_original
+    hidden_ids:
+      - sculpture_leaf_degas
+      - sculpture_hidden_artist_letter
+
+  - item_id: sculpture_rodin_masterpiece
+    category_id: sculpture
+    rarity: 3
+    anchor_id: sculpture_anchor_03
+    surface_ids:
+      - sculpture_medium_bronze
+      - sculpture_patina_natural
+      - sculpture_foundry_marked
+      - sculpture_base_signed
+      - sculpture_edition_numbered
+      - sculpture_wax_original
+    hidden_ids:
+      - sculpture_leaf_rodin
+      - sculpture_hidden_artist_letter
+      - sculpture_hidden_weld_repair

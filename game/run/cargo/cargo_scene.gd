@@ -89,8 +89,8 @@ func _ready() -> void:
     _assign_item_colors()
 
     # ── Configure PackingGrid ─────────────────────────────────────────────
-    var cols := RunManager.run.car_data.grid_columns
-    var rows := RunManager.run.car_data.grid_rows
+    var cols: int = RunManager.run.car_data.grid_columns
+    var rows: int = RunManager.run.car_data.grid_rows
 
     _cargo_grid.get_shape_cells = _packing_shape_provider
     _cargo_grid.get_item_color = _packing_color_provider
@@ -122,7 +122,7 @@ func _input(event: InputEvent) -> void:
 
 func _packing_shape_provider(item) -> Array[Vector2i]:
     var entry: ItemEntry = item as ItemEntry
-    return entry.item_data.category_data.get_cells()
+    return entry.get_cells()
 
 
 func _packing_color_provider(item) -> Color:
@@ -358,7 +358,7 @@ func _get_item_border_color(entry: ItemEntry) -> Color:
 
 
 func _build_extra_slots() -> void:
-    var count := RunManager.run.car_data.extra_slot_count
+    var count: int = RunManager.run.car_data.extra_slot_count
     _trailer_section.visible = count > 0
     for i in count:
         var cell: ExtraSlotCell = ExtraSlotCellScene.instantiate()
@@ -386,7 +386,7 @@ func _build_item_list() -> void:
 
 func _would_exceed_weight(entry: ItemEntry) -> bool:
     var max_weight: float = RunManager.run.car_data.max_weight
-    var entry_weight: float = entry.item_data.category_data.weight
+    var entry_weight: float = entry.get_weight()
 
     if _cargo_grid.is_item_placed(entry):
         return false
@@ -396,7 +396,7 @@ func _would_exceed_weight(entry: ItemEntry) -> bool:
 func _get_pending_weight(entry: ItemEntry) -> float:
     if _cargo_grid.is_item_placed(entry):
         return 0.0
-    return entry.item_data.category_data.weight
+    return entry.get_weight()
 
 
 func _get_pending_slots(entry: ItemEntry) -> int:
@@ -418,8 +418,8 @@ func _recalc_totals() -> void:
         if entry not in seen:
             seen.append(entry)
             _loaded_items.append(entry)
-            _slots_used += entry.item_data.category_data.get_cells().size()
-            _weight_used += entry.item_data.category_data.weight
+            _slots_used += entry.get_cells().size()
+            _weight_used += entry.get_weight()
 
     for entry: ItemEntry in _extra_slot_items:
         if entry != null and entry not in _loaded_items:
@@ -427,10 +427,10 @@ func _recalc_totals() -> void:
 
 
 func _refresh_ui() -> void:
-    var car := RunManager.run.car_data
-    var cols := car.grid_columns
-    var rows := car.grid_rows
-    var max_slots := cols * rows
+    var car: CarData = RunManager.run.car_data
+    var cols: int = car.grid_columns
+    var rows: int = car.grid_rows
+    var max_slots: int = cols * rows
     var max_weight: float = car.max_weight
 
     var pending_slots := 0

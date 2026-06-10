@@ -4,9 +4,11 @@ A Godot 4.6 single-player game about buying storage lots at auction, inspecting 
 
 ## Agent Rules
 
-Agent-specific instructions live in `dev/agent_rules/`. Read them before starting work. Key rules: `sandbox_environment.md` (shell vs. file tools), `lint_before_finish.md` (run linter on changed files).
+Agent-specific instructions live in `dev/agent_rules/`. Read them before starting work. Key rules: `sandbox_environment.md` (shell vs. file tools), `lint_before_finish.md` (run linter on changed files), `git_operations.md` (git is read-only — never stage/commit, only suggest commit messages), `godot_headless_check.md` (never run Godot against the mount — use the /tmp snapshot procedure).
 
-When asked to build a plan or implementation spec, follow the format in `dev/docs/README.md` (plan lifecycle) and `dev/standards/` for any relevant domain standard. Plans go in `dev/docs/plans/` with a one-line pointer in `TODO.md`.
+**Model-tier gate (Fable / Mythos)**: if you are running as a Fable- or Mythos-class model, do NOT iterate over the codebase without my explicit permission — no commit/diff reviews, multi-file exploration sweeps, codebase-wide searches, lint passes, or refactors. If the task genuinely needs codebase iteration, stop and confirm with me first ("this needs me to read N files / the diff — proceed on this model?") before touching any file. Reading a single named file to answer a direct question is fine. This exists because I sometimes forget to switch models, and one casual "review my commits" on this tier can burn the entire token budget in one shot.
+
+When asked to build a plan, scout report, or implementation spec, follow the matching standard in `dev/agent_rules/` (`plan_standard.md`, `scout_standard.md`, `implementation_spec_standard.md`), the plan lifecycle in `dev/docs/README.md`, and `dev/standards/` for any relevant domain standard. Plans go in `dev/docs/plans/` with a one-line pointer in `TODO.md`; a scout report files beside its plan as `<plan>_scout.md` and moves to `dev/docs/archived/` as soon as its implementation spec is generated.
 
 Resolve unknowns by asking me directly during the planning conversation — never emit an `## Open Questions` section or leave unresolved decisions parked in a plan or spec. Stop and ask the moment a decision is unclear; hand over a plan or spec only once every such question has been answered and folded into the relevant Requirement, Design, or Relational Context line.
 
@@ -119,5 +121,5 @@ Check TODO.md ## Active Section
 - **Theme** (styling, colors, font sizes, styleboxes): read `dev/standards/theme_standard.md` — covers the centralized theme, semantic color palette, typography scale, and rules for when GDScript overrides are acceptable.
 - **Debug** (adding debug-conditional code or UI): read `dev/standards/debug_standard.md` — covers the two-layer gate (`OS.is_debug_build()` + `SettingsStore.debug_mode`), the `Debug` autoload API, and node-source rules for debug nodes.
 - **Project structure** (placing new files or folders): read `dev/standards/project_structure.md`.
-- **Commits**: conventional commits format — read `dev/skills/conventional_commits.md` when writing commit messages.
+- **Commits**: conventional commits format — read `dev/skills/conventional_commits.md` when writing commit messages. Do not hard-wrap prose lines (bullet points, PR descriptions, commit bodies) at a column boundary — let the client handle line wrapping.
 - **Docs and tracking** (writing/archiving docs, updating TODO/CHANGELOG, deciding where a forward item lives): read `dev/docs/README.md` — covers the 3-level model, maturity scale, lifecycle rules, and the "no living Done list" principle.

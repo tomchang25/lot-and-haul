@@ -25,10 +25,13 @@ Players buy mystery lots at auction and identify items over time. Item knowledge
 ## ID Standards
 
 - `category_id`: snake_case category identifier. Must match the generated `.tres` filename stem.
-- `layer_id`: snake_case identity layer identifier. Must be globally unique across generated layers.
+- `anchor_id`: snake_case anchor identifier. Must be globally unique across all anchors in the project.
+- `clue_id`: snake_case clue identifier. Must be globally unique across all clues in the project.
 - `item_id`: snake_case item identifier. Must be globally unique across generated items.
-- Prefer short category prefixes for layer IDs, such as `bag_`, `watch_`, `lamp_`, `rifle_`.
-- Avoid opaque suffixes except for veil variants, where numbered suffixes are required.
+- Prefer short category prefixes for ids, such as `bag_`, `watch_`, `lamp_`, `rifle_`.
+- Anchor ids follow the pattern `<category_prefix>_anchor_NN` (e.g. `clock_anchor_01`, `clock_anchor_02`). Anchors are their own resource (the `anchors:` block), not clues.
+- Hidden identity-reveal clue ids use the suffix `_leaf_{identifier}` (e.g. `lamp_leaf_moser`).
+- Hidden override (counterfeit/sleeper) clue ids use the suffix `_override_{identifier}`.
 
 ## Text Standards
 

@@ -4,6 +4,6 @@ extends Node
 
 func _ready() -> void:
     SaveManager.load()
-    var validation_ok := SaveManager.run_validation()
-    var scene_ok := RegistryAudit.check_scene_registry(SceneRouter.scenes)
-    var _audit_ok := validation_ok and scene_ok
+    var validation_ok: bool = SaveManager.run_validation()
+    var scene_ok: bool = RegistryAudit.check_scene_registry(SceneRouter.scenes)
+    var _audit_ok: bool = validation_ok and scene_ok

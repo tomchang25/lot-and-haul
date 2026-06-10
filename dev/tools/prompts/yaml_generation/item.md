@@ -1,105 +1,162 @@
-# Lot & Haul — Clue & Item YAML Generation Prompt
+# Lot & Haul — Anchor, Clue & Item YAML Generation Prompt
 
-Use this prompt to generate new entries for `data/yaml/clues.yaml` and `data/yaml/items/*.yaml`.
+Use this prompt to generate new entries for `data/yaml/clues.yaml` (which holds **both** the `anchors:` block and the `clues:` block) and `data/yaml/items/*.yaml`.
 
-Clue definitions and item definitions are separate files. Clues are defined once in `clues.yaml`. Items reference clue ids — no clue data is repeated inside an item entry.
+Anchors, clues, and items live in separate blocks. Anchors are defined once under `anchors:`; surface and hidden clues are defined once under `clues:`; items reference an anchor id plus clue ids and never repeat any anchor or clue data inline.
+
+---
+
+## The Three Resources
+
+| Resource   | Block      | Identity    | Role                                                                                               |
+| ---------- | ---------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| **Anchor** | `anchors:` | `anchor_id` | The item's physical body: base value, shape, weight, sprite, value tier. Auto-revealed.            |
+| **Clue**   | `clues:`   | `clue_id`   | A `surface` or `hidden` price modifier. Surface = discovered on inspection; hidden = Authenticate. |
+| **Item**   | `items:`   | `item_id`   | A specific item: one anchor + a list of surface clue ids + a list of hidden clue ids.              |
+
+There is no `anchor` clue `type` any more — anchors are their own resource. Clue `type` is only ever `surface` or `hidden`.
 
 ---
 
 ## Pricing Model
 
-Understanding how clues produce value is required to author correct effect amounts.
+Understanding how values resolve is required to author correct numbers.
 
 ```
-appraised_value = (anchor.effect_amount + Σ revealed_surface_add) × Π revealed_surface_mul
-verified_value  = (appraised_value + Σ revealed_hidden_add) × Π revealed_hidden_mul
+appraised_value = (anchor.base_value + Σ revealed_surface_add) × Π revealed_surface_mul
+
+verified_value  = (effective_base   + Σ all_add) × Π all_mul
 ```
 
-**Add before multiply.** All `add` effects are summed first, then all `mul` effects are applied as a product. Order within the YAML does not affect the result.
-
-The player sees `appraised_value` during the run and in storage until Research completes. `verified_value` replaces it after authentication.
+- **all_add / all_mul** are summed/multiplied over **every** clue (surface and hidden combined) — global add-then-mul: add everything to the base first, then apply every multiplier as a product.
+- **effective_base** = the revealed hidden **override** amount if one has been revealed, otherwise `anchor.base_value`. An override _replaces_ the base; all other adds and muls still apply on top of it. At most one override per item (first wins).
+- The player sees `appraised_value` during the run and in storage until Research completes; `verified_value` replaces it once all hidden clues are revealed.
+- **Verified sell bonus** is ×1.05, applied at sale, not baked into clue amounts.
+- **Condition multiplier** (0.25× broken → 1.0× at half condition → 4.0× mint) is applied on top of the resolved value at price time. Author clue amounts at the **condition-neutral** value; never pre-bake condition.
+- A **COMMON** item (rarity 0, no hidden clues) is verified immediately on acquisition.
 
 ---
 
-## Clue Schema (`clues.yaml`)
+## Rarity == Hidden Count
+
+Rarity is the number of hidden clues. It is not a quality tier.
+
+| Rarity    | Value | Hidden clues | Verified by default?     |
+| --------- | ----- | ------------ | ------------------------ |
+| COMMON    | 0     | 0            | Yes — no research needed |
+| UNCOMMON  | 1     | 1            | No                       |
+| RARE      | 2     | 2            | No                       |
+| EPIC      | 3     | 3            | No                       |
+| LEGENDARY | 4     | 4            | No                       |
+
+A LEGENDARY item carries 4 hidden clues; each may be positive or negative.
+
+---
+
+## Anchor Schema (`anchors:` block of `clues.yaml`)
+
+```yaml
+anchors:
+  - anchor_id: <category_prefix>_anchor_NN # e.g. lamp_anchor_01, clock_anchor_02
+    known_text: "..." # the bare category noun shown as the body name; max 3 words
+    naming_priority: 1 # anchor always occupies the body slot at this priority
+    category_scope: <category_id> # must match a defined category
+    base_value: <number> # > 0; the item's starting visible price (see tier budgets)
+    shape_id: <shape_key> # cargo grid footprint; see valid shapes
+    sprite: "" # sprite key; "" is allowed, conventionally matches anchor_id
+    weight_kg: <float> # >= 0; realistic category weight
+    tier: <1–5> # value tier; used by pool-draw tier weight curves
+```
+
+Anchors carry **no** `dc`, `attribute`, `effect_op`, `type`, `domain`, or `naming` block — only `naming_priority`. They are auto-revealed on first inspect, so they have no discovery roll.
+
+**Each category must define at least two anchor variants at different tiers** (a cheap variant and a premium variant). Different items in the same category reference different anchors. `known_text` is the plain noun (`Lamp`, `Clock`, `Pistol`) — the qualifiers come from clues.
+
+---
+
+## Clue Schema (`clues:` block of `clues.yaml`)
 
 ```yaml
 clues:
-  - clue_id: unique_snake_case_id # globally unique across all clues
-    known_text: "..." # shown to player after reveal; max 3 words
-    type: anchor | surface | hidden
-    domain: generic | <category_id> # use category_id (e.g. oil_lamp) for category-specific clues
-    attribute: appraisal | perception | restoration | negotiation | investigation
-    dc: <int> # difficulty class for discovery roll
-    effect_op: flat | add | mul
-    effect_amount: <number>
-    naming: # optional — enables this clue to contribute to the display name
-      slot: prefix | body | suffix # part of speech in the composed name
-      priority: <int> # higher wins for the same slot; 0 = lowest
+  - clue_id: unique_snake_case_id
+    known_text: "..." # shown after reveal; max 3 words
+    type: surface | hidden
+    domain: generic | <category_id>
+    attribute: appraisal | perception | investigation | restoration # negotiation is sell-phase only
+    dc: <int> # surface 10–18, hidden 20–25
+    effect_op: add | mul | override # 'override' is hidden-only
+    effect_amount: <number> # non-zero; |amount| <= 100000
+    naming: # optional — enables a naming contribution
+      slot: prefix | body | suffix
+      priority: <int> # >= 0
+    exclusive_group: <string> # HIDDEN-ONLY; at most one clue per group per item
 ```
 
-The `known_text` field serves double duty: it appears as the reveal description when the clue is discovered, and when a `naming` block is present, it contributes to the item's progressive display name.
+`exclusive_group` is written only on hidden clues; the converter blanks it on surface clues.
 
-**Three-word ceiling**: `known_text` must be three words or fewer on every clue (enforced by the YAML validator). **Prefer one word when possible** — especially for clues that carry a `naming` block, since prefix + body + suffix are joined with spaces and the composed name must stay readable. Two or three words are appropriate when a single word would be ambiguous or unnatural (e.g. `"Oil Lamp"` as a body is clearer than `"Lamp"` alone). Never pad to three words for the sake of it.
+### Surface clues (2–6 per item, count varies by super-category)
 
-**Naming composition**: as clues are revealed, the highest-priority naming clue for each slot (`prefix`, `body`, `suffix`) contributes its `known_text`. Ties resolve by array order — the first clue in the slot wins. The three parts are concatenated with spaces. Before verification, this forms the player-visible name. After verification, the authored `item_name` is shown directly.
+- `effect_op: add` is the default — a flat addition to the running price. `effect_op: mul` is allowed for proportional quality/wear effects (e.g. `0.85` heavy wear, `1.3` exceptional finish).
+- `effect_amount` must be **non-zero**.
+  - Positive `add`: value-adding detail (maker mark, fine material, good feature).
+  - **Negative required**: every category pool must include at least one value-reducing surface clue — a negative `add` (`-500`…`-20`) or a `mul < 1.0`.
+- `dc`: 10–18.
+- `known_text`: one word preferred; two or three only when one is unclear.
+- `naming`: optional — use for surface clues that identify maker, material, or style (prefix/suffix).
 
-Under full reveal, the composed name must match `item_name` exactly (enforced by the YAML validator).
+### Hidden clues (N per item, N = rarity)
 
-**Naming is the norm, not the exception.** Every standard item must have naming blocks on its clues. At full reveal the naming entries must resolve **at least one body slot and at least one prefix or suffix slot** — the validator enforces both. An item with only a body but no prefix or suffix will display as "Unknown {body}" (e.g. "Unknown Bow") until verification, because the runtime prepends "Unknown" when no qualifier has been revealed yet.
-
-Items with no naming entries at all are a deliberate exception (e.g. a generic commodity or placeholder) and must be treated as such — they show "Unknown Item" until verified. This must be the minority case and should be noted in the item's comment in the YAML file.
-
----
-
-## Rules by Clue Type
-
-### Anchor (exactly 1 per item)
-
-- `effect_op: flat` — sets the perceived base price. This is what the player sees on first reveal.
-- `effect_amount`: positive integer. This is the item's visible starting price.
-- `known_text`: the item's perceived category at first glance. Prefer **one or two words** — this becomes the body slot baseline and must leave room for prefix/suffix clues to join it. Write as a noun, not a sentence. Example: `"Oil Lamp"`, `"Pouch"`, `"Mantel Clock"`. Three words only when necessary for clarity.
-- `dc` and `attribute` are not used (anchor auto-reveals on first inspect). Set `dc: 0` and `attribute: appraisal` as placeholders.
-- `domain`: match the item's `category_id`.
-- `naming`: convention — the anchor clue carries `slot: body` with a low priority (e.g. `priority: 1`), providing a baseline display name. Surface clues for maker, material, or style use `slot: prefix` or `slot: suffix` with higher priorities. Hidden clues for authentication or origin carry the highest priorities and may override the anchor's body text.
-
-### Surface (0 or more per item, typically 2–5)
-
-- `effect_op: add` — adds to the running price total.
-- `effect_amount`: use `0` for lore clues (narrows the estimate spread but adds no value). Use a positive integer for value-adding details.
-- `known_text`: a short label for what the player notices — **one word preferred, two or three only when a single word would be unclear**. Write as a noun or adjective, not a sentence. Examples: `"Blown"`, `"Victorian"`, `"Silver Collar"`, `"French Crystal"`. This text appears in the UI when the clue is revealed and contributes to the display name if a `naming` block is present.
-- `dc`: 10–18. Use 10–12 for obvious details, 14–16 for trained-eye observations, 18 for expert-level reads.
-- `attribute`: choose based on what skill the check represents.
-  - `appraisal` — recognising value, quality, or maker indicators.
-  - `perception` — spotting physical details, wear, or anomalies.
-  - `investigation` — cross-referencing marks, research, or pattern matching.
-  - `restoration` — condition, material degradation, repair evidence.
-
-### Hidden (0 or more per item, typically 0–2)
-
-- Accessible during inspection via the chain reveal mechanic, but DC should be set high enough that in-run discovery is unlikely. Fully revealed by Storage Research on completion.
-- `effect_op`: any of `add`, `mul`. `mul` is most common for hidden clues.
-  - Use `mul` > 1.0 for a positive discovery (e.g., confirmed authentic: `x1.5`).
-  - Use `mul` < 1.0 for a negative discovery (e.g., confirmed forgery: `x0.3`).
-  - Use `add` for a flat bonus (e.g., hidden component adds independent value).
-- `known_text`: a short authentication result — **one or two words preferred**. Write as a terse verdict or specific identity, not a sentence. Examples: `"Forgery"`, `"Hinks & Son"`, `"Boulle"`. When a `naming` block is present this text displaces lower-priority body or suffix text at high priority.
-- `dc`: 20–25. High enough to make inspection discovery rare but not impossible.
-- `attribute`: choose the attribute that fits the nature of the hidden information.
-- Hidden clues make Research a risk/reward decision — the verified value may be higher or lower than the appraised value.
+- `effect_op`:
+  - `mul > 1.0` — positive discovery (genuine, rare variant, premium maker).
+  - `mul < 1.0` — negative discovery (forgery tell, replacement part, damage).
+  - `add` — flat bonus or penalty.
+  - `override` — **base-replacement**: when revealed, replaces the anchor base entirely (a sleeper reveal uses a large override; a counterfeit collapse uses a small one). **At most one override per item.**
+- `effect_amount` must be **non-zero**.
+- `dc`: 20–25.
+- `exclusive_group`: assign an authenticity group string (e.g. `authenticity_lamp`) to hidden clues that are mutually-exclusive interpretations of the same feature. A genuine-maker (`_leaf_`) clue and its counterfeit (`_override_`) clue for the same category share one group so a single item never carries both. **No item may carry two hidden clues in the same group** — they are alternatives the pool draw chooses between, never combined.
+- `naming`: optional — a revealed identity (`_leaf_`) clue typically takes the body slot at high priority to replace the generic noun; an override may prepend a prefix such as `Reproduction`.
 
 ---
 
-## Effect Amount Guidelines
+## Effect Budgets (full tiered scale)
 
-| Type    | effect_op | Reasonable range                       |
-| ------- | --------- | -------------------------------------- |
-| anchor  | flat      | 10–1000 (reflects item tier)           |
-| surface | add       | 0–2000 (proportional to anchor)        |
-| surface | mul       | avoid for now (ordering semantics TBD) |
-| hidden  | mul       | 0.1–3.0                                |
-| hidden  | add       | 0–5000                                 |
+| Resource | effect_op  | Budget                                                                                    |
+| -------- | ---------- | ----------------------------------------------------------------------------------------- |
+| anchor   | base_value | tier 1: 20–150 · tier 2: 150–400 · tier 3: 400–800 · tier 4: 800–1500 · tier 5: 1500–4000 |
+| surface  | add        | positive: 30–2000 · negative: −500…−20                                                    |
+| surface  | mul        | positive: 1.05–1.5 · negative: 0.6–0.95                                                   |
+| hidden   | mul        | positive: 1.1–3.5 · counterfeit: 0.05–0.6                                                 |
+| hidden   | override   | sleeper: 5×–20× anchor base · counterfeit collapse: 10%–40% of anchor base                |
+| hidden   | add        | ±50 to ±3000                                                                              |
 
-Surface add amounts should sum to a total that, combined with the anchor, produces a final appraised value meaningfully below `base_price`. The gap between max appraised and `base_price` represents the value of authenticating.
+**Positive/negative mix (required per category pool):** at least one negative surface clue (negative `add` or `mul < 1.0`) **and** at least one negative hidden clue (`mul < 1.0` or a low-value `override`).
+
+**Research EV constraint:** high-rarity items must keep a **positive long-run expected research value** — players must never learn to skip Legendaries. Keep each category's hidden pool net-positive in expectation: more and higher-weighted positive discoveries than negative ones, with counterfeits the minority risk, not the norm.
+
+---
+
+## Super-Category Personalities
+
+Encode these as data conventions (they shape which tiers and spreads a category draws, not the schema):
+
+| Super-category | Anchor spread     | Surface count | Adds / muls            | Hidden volatility |
+| -------------- | ----------------- | ------------- | ---------------------- | ----------------- |
+| fashion        | wide (tiers 1–4)  | 3–5           | many small adds & muls | high              |
+| decorative     | tight (tiers 1–2) | 2–3           | few, mostly flat adds  | low               |
+| fine_art       | high (tiers 3–5)  | 4–6           | few large muls         | medium            |
+| weapon         | mid (tiers 2–3)   | 2–4           | predictable adds       | very low          |
+
+---
+
+## Valid Shape IDs
+
+```
+s1x1  s1x2  s1x3  s1x4
+s2x2  s2x3  s2x4
+sL11  sL12  sT3
+```
+
+Shape follows category convention (e.g. pistol → sL11, clock → s1x3), but exceptions are allowed. Shape is a prompt rule, validated only for existence.
 
 ---
 
@@ -108,37 +165,45 @@ Surface add amounts should sum to a total that, combined with the anchor, produc
 ```yaml
 items:
   - item_id: snake_case_unique_id
-    item_name: "Display Name Shown After Research"
-    base_price: <positive int> # true verified price, shown only after Research
-    category_id: <category_id> # must exist in category_data.yaml
-    rarity: 0 | 1 | 2 | 3 | 4 # 0=Common, 1=Uncommon, 2=Rare, 3=Epic, 4=Legendary
-    clue_ids:
-      - clue_id_anchor
-      - clue_id_surface_1
-      - clue_id_surface_2
-      - clue_id_hidden_1
+    category_id: <category_id>
+    rarity: 0 | 1 | 2 | 3 | 4 # must equal the number of hidden_ids
+    anchor_id: <category_prefix>_veil_NN # must reference a defined anchor in this category
+    surface_ids:
+      - <surface_clue_id>
+      - <surface_clue_id>
+    hidden_ids: # omit or leave empty for COMMON (rarity 0)
+      - <hidden_clue_id> # one per rarity point
 ```
 
-- `base_price` must be greater than the maximum possible appraised value (anchor + all surface adds). This preserves the authentication value gap.
-- `clue_ids` must include exactly one anchor clue. All referenced ids must exist in `clues.yaml`.
-- `clue_ids` ordering: anchor first, then all surface clues, then all hidden clues. Hidden clues must never appear before a surface clue — this is enforced by the YAML validator.
-- `item_name` is shown to the player only after all hidden clues are revealed (verified state). Before verification, the player sees the progressive affix name assembled from naming clues (see Naming Composition above).
+- **No `item_name`, `base_price`, `auto_verify`, or `clue_ids` fields.** They have been removed. The display name is composed entirely from naming slots (anchor body + clue qualifiers); value derives from the price pipeline.
+- `rarity` must equal `len(hidden_ids)`. The validator enforces this.
+- `anchor_id` is required and must reference a defined anchor whose `category_scope` matches `category_id`.
+- `surface_ids` must all be `type: surface`; `hidden_ids` must all be `type: hidden`.
+- At most one hidden `override` per item; no two hidden clues may share an `exclusive_group`.
+- COMMON items (rarity 0) have no hidden clues and are verified immediately on acquisition.
 
 ---
 
-## Clue ID Naming Convention
+## Structural Naming Requirements (validator-enforced)
+
+At full reveal, the named clue set must resolve:
+
+1. **A body slot** — the anchor always provides it at `naming_priority` (a revealed hidden clue may displace it at higher priority).
+2. **At least one prefix or suffix qualifier** — supplied by a surface or hidden clue with `naming.slot: prefix` or `suffix`. Without one, the item stays "Unknown {body}".
+3. **Non-empty composed name** — no item whose every naming slot is empty.
+
+---
+
+## ID Conventions
 
 ```
-{category_id}_{aspect}_{detail}
+<category_prefix>_anchor_NN           — anchor variants (01, 02, 03 …)
+<category_id>_<aspect>_<detail>        — surface clue
+<category_id>_leaf_<maker>             — hidden positive identity reveal (genuine maker / sleeper)
+<category_id>_override_<identifier>    — hidden override (counterfeit collapse / sleeper base-swap)
 ```
 
-- `{category_id}`: matches the item's domain (e.g. `oil_lamp`, `wristwatch`).
-- `{aspect}`: the thing being examined (e.g. `glass_body`, `maker_mark`, `movement`).
-- `{detail}`: the specific observation (e.g. `clear_font`, `registry_match`).
-
-Anchor clue ids use the suffix `_anchor_NN` (e.g. `clock_anchor_01`). Hidden identity-reveal clue ids use the suffix `_leaf_{identifier}`.
-
-All clue ids must be registered in `clues.yaml` before being referenced by items.
+Short category prefixes for ids are fine (`bag_`, `watch_`, `lamp_`).
 
 ---
 
@@ -149,7 +214,7 @@ appraisal       — recognising value, quality, maker indicators
 perception      — spotting physical details, wear, anomalies
 investigation   — cross-referencing marks, research, pattern matching
 restoration     — condition, material degradation, repair evidence
-negotiation     — (reserved for selling phase, not used in inspection)
+negotiation     — (reserved for the selling phase, not used in inspection)
 ```
 
 ## Valid Category IDs
@@ -164,74 +229,151 @@ vase  poster  painting  sculpture  pistol  rifle  crossbow
 ## Example Output
 
 ```yaml
-# clues.yaml entries
-clues:
-  - clue_id: clock_anchor_01
-    known_text: "Clock" # anchor: one word, body slot baseline
-    type: anchor
-    domain: clock
-    attribute: appraisal
-    dc: 0
-    effect_op: flat
-    effect_amount: 80
-    naming:
-      slot: body
-      priority: 1
+# anchors: + clues: blocks of clues.yaml — two anchor tiers, a negative surface clue,
+# and a mutually-exclusive genuine/counterfeit hidden pair sharing one exclusive_group.
 
-  - clue_id: clock_wooden_case_joinery
-    known_text: "Hand-cut" # surface, no naming — price only
+anchors:
+  - anchor_id: clock_veil_01
+    known_text: Clock
+    naming_priority: 1
+    category_scope: clock
+    base_value: 60
+    shape_id: s1x3
+    sprite: ""
+    weight_kg: 3.5
+    tier: 1
+
+  - anchor_id: clock_veil_02
+    known_text: Clock
+    naming_priority: 1
+    category_scope: clock
+    base_value: 500
+    shape_id: s1x3
+    sprite: ""
+    weight_kg: 4.2
+    tier: 3
+
+clues:
+  - clue_id: clock_case_gilded
+    known_text: Gilded
     type: surface
     domain: clock
-    attribute: appraisal
-    dc: 12
+    attribute: perception
+    dc: 14
     effect_op: add
-    effect_amount: 120
+    effect_amount: 280
+    naming:
+      slot: prefix
+      priority: 2
 
-  - clue_id: clock_case_boulle_veneer
-    known_text: "Boulle" # surface: one word, prefix slot
+  - clue_id: clock_case_cracked
+    known_text: Cracked
+    type: surface
+    domain: clock
+    attribute: restoration
+    dc: 10
+    effect_op: add
+    effect_amount: -60
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: clock_movement_signed
+    known_text: Signed
     type: surface
     domain: clock
     attribute: investigation
     dc: 16
     effect_op: add
-    effect_amount: 800
+    effect_amount: 400
     naming:
-      slot: prefix
-      priority: 5
+      slot: suffix
+      priority: 2
 
   - clue_id: clock_leaf_boulle
-    known_text: "Bracket" # hidden: one word, displaces anchor body at high priority
+    known_text: Boulle
     type: hidden
     domain: clock
     attribute: investigation
-    dc: 20
+    dc: 22
     effect_op: mul
-    effect_amount: 1.85
+    effect_amount: 2.75
+    exclusive_group: authenticity_clock
     naming:
       slot: body
       priority: 10
+
+  - clue_id: clock_override_reproduction
+    known_text: Reproduction
+    type: hidden
+    domain: clock
+    attribute: investigation
+    dc: 22
+    effect_op: override
+    effect_amount: 120
+    exclusive_group: authenticity_clock
+    naming:
+      slot: prefix
+      priority: 10
+
+  - clue_id: clock_movement_swiss
+    known_text: Swiss
+    type: hidden
+    domain: clock
+    attribute: investigation
+    dc: 21
+    effect_op: mul
+    effect_amount: 1.4
 ```
 
 ```yaml
-# items/*.yaml entry
+# items/*.yaml entries
+
 items:
-  - item_id: clock_boulle_marquetry
-    item_name: Boulle Bracket Clock
-    base_price: 4200
+  - item_id: clock_mantel_common
     category_id: clock
-    rarity: 3
-    clue_ids:
-      - clock_anchor_01
-      - clock_wooden_case_joinery
-      - clock_case_boulle_veneer
-      - clock_brass_movement_plate
+    rarity: 0
+    anchor_id: clock_veil_01
+    surface_ids:
+      - clock_case_gilded
+      - clock_case_cracked
+
+  - item_id: clock_signed_uncommon
+    category_id: clock
+    rarity: 1
+    anchor_id: clock_veil_02
+    surface_ids:
+      - clock_case_gilded
+      - clock_movement_signed
+    hidden_ids:
       - clock_leaf_boulle
+
+  - item_id: clock_repro_uncommon
+    category_id: clock
+    rarity: 1
+    anchor_id: clock_veil_02
+    surface_ids:
+      - clock_case_gilded
+    hidden_ids:
+      - clock_override_reproduction
+
+  - item_id: clock_boulle_rare
+    category_id: clock
+    rarity: 2
+    anchor_id: clock_veil_02
+    surface_ids:
+      - clock_case_gilded
+      - clock_case_cracked
+      - clock_movement_signed
+    hidden_ids:
+      - clock_leaf_boulle
+      - clock_movement_swiss
 ```
 
 Notes on the example:
 
-- Under full reveal: `prefix` = "Boulle" (priority 5); `body` = "Bracket" (priority 10, beats anchor's priority 1). Composed: `"Boulle Bracket"` — must match `item_name` exactly (validator enforces this).
-- Before the hidden clue is revealed: `prefix` = "Boulle", `body` = "Clock" (anchor). Composed: `"Boulle Clock"` — specific enough to signal identification in progress.
-- Before any surface naming clue is revealed: only anchor body → `"Clock"`.
-- `clock_wooden_case_joinery` has no `naming` block — contributes price only. One-word `known_text` (`"Hand-cut"`) still satisfies the ceiling.
-- Aim for one word per slot where possible: three single-word slots compose to three words total, which is already a tight readable name.
+- `clock_mantel_common` is COMMON (rarity 0, 0 hidden) — verified immediately, shows "Gilded Clock".
+- `clock_leaf_boulle` and `clock_override_reproduction` both sit in `exclusive_group: authenticity_clock`. They are **alternatives** — `clock_signed_uncommon` draws the genuine `_leaf_`, `clock_repro_uncommon` draws the counterfeit `_override_`. **No single item carries both**, which is exactly what the one-per-group rule enforces.
+- `clock_boulle_rare` is RARE (rarity 2). Its two hidden clues are `clock_leaf_boulle` (group `authenticity_clock`) and `clock_movement_swiss` (**no group**) — so they do not collide, and neither is an `override`, so the one-override limit holds.
+- `clock_case_cracked` is the required negative surface clue; `clock_override_reproduction` is the required negative hidden — on `clock_repro_uncommon` it collapses the tier-3 base (500) to 120 (~24%, within the counterfeit budget).
+- `clock_veil_01` (tier 1, base 60) and `clock_veil_02` (tier 3, base 500) are separate anchors; different items reference different variants.

@@ -170,12 +170,8 @@ func _candidate_origins() -> Array[Vector2i]:
 
 
 func _get_shape_cells(entry: ItemEntry) -> Array[Vector2i]:
-    var category := entry.category_data()
     var fallback: Array[Vector2i] = [Vector2i.ZERO]
-    if category == null:
-        return fallback
-
-    var cells := category.get_cells()
+    var cells := entry.get_cells()
     if cells.is_empty():
         return fallback
     return cells
@@ -572,16 +568,12 @@ func _refresh_clues_section(entry: ItemEntry) -> void:
     var rows: Array[Dictionary] = []
 
     # Anchor row
-    if entry.anchor_revealed:
-        var anchor := entry.item_data.clues.filter(
-            func(c: ClueData) -> bool: return c.type == ClueData.ClueType.ANCHOR
-        )
-        if not anchor.is_empty():
-            var c: ClueData = anchor[0]
-            rows.append({ "text": c.known_text, "op": c.effect_op, "amount": c.effect_amount, "anchor": true })
+    if entry.unveiled and entry.item_data.anchor != null:
+        var a: AnchorData = entry.item_data.anchor
+        rows.append({ "text": a.known_text, "op": "base", "amount": float(a.base_value), "anchor": true })
 
     # Surface clue rows — only revealed
-    for clue: ClueData in entry.item_data.clues:
+    for clue: ClueData in entry.item_data.surface_clues:
         if clue.type != ClueData.ClueType.SURFACE:
             continue
         if not entry.revealed_clue_ids.has(clue.clue_id):

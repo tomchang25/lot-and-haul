@@ -110,7 +110,7 @@ func register_storage_items(entries: Array[ItemEntry]) -> void:
 
 
 func roll_available_locations() -> void:
-    var all := LocationRegistry.get_all_locations()
+    var all: Array[LocationData] = LocationRegistry.get_all_locations()
     all.shuffle()
     var sampled: Array[LocationData] = []
     sampled.assign(all.slice(0, mini(Economy.LOCATION_SAMPLE_SIZE, all.size())))
@@ -344,7 +344,7 @@ func set_active_car(car: CarData) -> void:
 ## after this returns. The day summary fires when the player chooses Open Shop
 ## or all slots are exhausted from the hub.
 func resolve_current_run() -> void:
-    var result := RunManager.take_run_result()
+    var result: RunResult = RunManager.take_run_result()
     resolve_run(result)
     RunManager.clear_run_state()
     EventBus.run_resolved.emit(result)

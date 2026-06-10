@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://do0p7qp4mowea"]
 
-[ext_resource type="Script" uid="uid://bfadetransit01" path="res://game/shared/transition/fade_transition.gd" id="1_ft"]
+[ext_resource type="Script" uid="uid://lcr1wt1he2mj" path="res://game/shared/transition/fade_transition.gd" id="1_ft"]
 
 [node name="FadeTransition" type="CanvasLayer" unique_id=1400000001]
 layer = 110

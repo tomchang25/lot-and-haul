@@ -47,10 +47,10 @@ static func create(data: LotData) -> LotEntry:
         if item != null:
             var item_entry := ItemEntry.create(item)
             # Roll veiled_chance: each item independently starts pre-unveiled
-            # when randf() > veiled_chance. Calls reveal_anchor() directly —
+            # when randf() > veiled_chance. Set unveiled directly —
             # no XP granted for system-level pre-unveils.
             if data.veiled_chance < 1.0 and randf() > data.veiled_chance:
-                item_entry.reveal_anchor()
+                item_entry.unveiled = true
             entry.item_entries.append(item_entry)
 
     entry.item_entries.shuffle()
@@ -158,8 +158,6 @@ func get_opening_bid() -> int:
 func roll_npc_estimate() -> int:
     var total := 0
     for entry: ItemEntry in item_entries:
-        if entry.item_data.clues.is_empty():
-            continue
         total += entry.roll_npc_estimate(lot_data.npc_clue_sight_chance)
     return total
 

@@ -1,265 +1,189 @@
 items:
-  - item_id: handbag_canvas_tote
-    item_name: Canvas Bag
-    base_price: 95
+  # ── Handbag ──────────────────────────────────────────────────────
+  - item_id: handbag_basic_tote
     category_id: handbag
     rarity: 0
-    clue_ids:
-      - bag_veil_01
-      - bag_exterior_fabric
-      - bag_exterior_stitching
+    anchor_id: bag_anchor_01
+    surface_ids:
+      - bag_exterior_synthetic
       - bag_lining_synthetic
-      - bag_leaf_canvas_tote
+      - bag_stitching_frayed
 
-  - item_id: handbag_vinyl_clutch
-    item_name: Clutch Bag
-    base_price: 115
-    category_id: handbag
-    rarity: 0
-    clue_ids:
-      - bag_veil_01
-      - bag_hardware_plated
-      - bag_paint_chipped
-      - bag_leaf_vinyl_clutch
-
-  - item_id: handbag_nylon_crossbody
-    item_name: Nylon Bag
-    base_price: 80
-    category_id: handbag
-    rarity: 0
-    clue_ids:
-      - bag_veil_01
-      - bag_exterior_fabric
-      - bag_exterior_stitching
-      - bag_strap_riveted
-      - bag_leaf_nylon
-
-  - item_id: handbag_straw_bag
-    item_name: Straw Bag
-    base_price: 70
-    category_id: handbag
-    rarity: 0
-    clue_ids:
-      - bag_veil_01
-      - bag_lining_synthetic
-      - bag_strap_riveted
-      - bag_leaf_straw
-
-  - item_id: handbag_faux_leather
-    item_name: Faux Bag
-    base_price: 75
-    category_id: handbag
-    rarity: 0
-    clue_ids:
-      - bag_veil_01
-      - bag_exterior_leather
-      - bag_exterior_stitching
-      - bag_paint_chipped
-      - bag_leaf_faux_leather
-
-  - item_id: handbag_cotton_satchel
-    item_name: Cotton Bag
-    base_price: 105
-    category_id: handbag
-    rarity: 0
-    clue_ids:
-      - bag_veil_01
-      - bag_exterior_fabric
-      - bag_exterior_stitching
-      - bag_lining_synthetic
-      - bag_strap_riveted
-      - bag_leaf_cotton
-
-  - item_id: handbag_replica_designer
-    item_name: Replica Bag
-    base_price: 380
+  - item_id: handbag_brass_crossbody
     category_id: handbag
     rarity: 1
-    clue_ids:
-      - bag_veil_02
+    anchor_id: bag_anchor_02
+    surface_ids:
       - bag_exterior_leather
-      - bag_exterior_stitching
-      - bag_hardware_plated
-      - bag_paint_chipped
-      - bag_serial_stamp
-      - bag_leaf_replica
-
-  - item_id: handbag_coach_leather
-    item_name: Coach Bag
-    base_price: 540
-    category_id: handbag
-    rarity: 1
-    clue_ids:
-      - bag_veil_02
-      - bag_exterior_leather
-      - bag_exterior_stitching
       - bag_hardware_brass
-      - bag_paint_chipped
-      - bag_serial_stamp
+      - bag_stitching_handmade
+      - bag_serial_present
+    hidden_ids:
       - bag_leaf_coach
 
-  - item_id: handbag_louis_vuitton
-    item_name: Vuitton Bag
-    base_price: 1700
+  - item_id: handbag_tarnished_satchel
     category_id: handbag
-    rarity: 2
-    clue_ids:
-      - bag_veil_03
+    rarity: 1
+    anchor_id: bag_anchor_02
+    surface_ids:
       - bag_exterior_leather
-      - bag_exterior_stitching
-      - bag_hardware_brass
-      - bag_paint_chipped
-      - bag_serial_stamp
-      - bag_serial_match
-      - bag_monogram_canvas
+      - bag_hardware_tarnished
       - bag_interior_dated
+      - bag_stitching_frayed
+    hidden_ids:
       - bag_leaf_vuitton
 
-  - item_id: handbag_hermes_birkin
-    item_name: Hermes Bag
-    base_price: 5800
+  - item_id: handbag_replica_vanity
+    category_id: handbag
+    rarity: 1
+    anchor_id: bag_anchor_03
+    surface_ids:
+      - bag_exterior_leather
+      - bag_hardware_palladium
+      - bag_monogram_canvas
+      - bag_serial_present
+      - bag_interior_dated
+    hidden_ids:
+      - bag_override_replica
+
+  - item_id: handbag_croc_limited
+    category_id: handbag
+    rarity: 2
+    anchor_id: bag_anchor_03
+    surface_ids:
+      - bag_exterior_crocodile
+      - bag_hardware_palladium
+      - bag_stitching_handmade
+      - bag_serial_present
+    hidden_ids:
+      - bag_leaf_chanel
+      - bag_hidden_limited_run
+
+  - item_id: handbag_birkin_stained
+    category_id: handbag
+    rarity: 2
+    anchor_id: bag_anchor_04
+    surface_ids:
+      - bag_exterior_crocodile
+      - bag_hardware_palladium
+      - bag_stitching_handmade
+      - bag_blind_stamp
+    hidden_ids:
+      - bag_leaf_hermes
+      - bag_hidden_water_stain
+
+  - item_id: handbag_hermes_grande
     category_id: handbag
     rarity: 3
-    clue_ids:
-      - bag_veil_03
-      - bag_exterior_leather
-      - bag_exterior_stitching
-      - bag_hardware_brass
-      - bag_paint_chipped
-      - bag_serial_stamp
-      - bag_serial_match
+    anchor_id: bag_anchor_04
+    surface_ids:
+      - bag_exterior_crocodile
+      - bag_hardware_palladium
+      - bag_stitching_handmade
+      - bag_monogram_canvas
       - bag_blind_stamp
-      - bag_stitch_handmade
-      - bag_palladium_hw
+    hidden_ids:
       - bag_leaf_hermes
+      - bag_hidden_limited_run
+      - bag_hidden_water_stain
 
-  - item_id: wristwatch_quartz_dress
-    item_name: Quartz Watch
-    base_price: 80
+  # ── Wristwatch ────────────────────────────────────────────────────
+  - item_id: wristwatch_quartz_basic
     category_id: wristwatch
     rarity: 0
-    clue_ids:
-      - watch_veil_01
+    anchor_id: watch_anchor_01
+    surface_ids:
+      - watch_movement_quartz
+      - watch_band_replaced
+      - watch_crystal_scratched
+
+  - item_id: wristwatch_timex_auto
+    category_id: wristwatch
+    rarity: 1
+    anchor_id: watch_anchor_01
+    surface_ids:
       - watch_case_lugs
-      - watch_glass_scratched
-      - watch_leaf_quartz
-
-  - item_id: wristwatch_digital_lcd
-    item_name: Digital Watch
-    base_price: 70
-    category_id: wristwatch
-    rarity: 0
-    clue_ids:
-      - watch_veil_01
-      - watch_case_lugs
-      - watch_glass_scratched
-      - watch_band_replace
-      - watch_leaf_digital
-
-  - item_id: wristwatch_timex_windup
-    item_name: Timex Watch
-    base_price: 105
-    category_id: wristwatch
-    rarity: 0
-    clue_ids:
-      - watch_veil_02
+      - watch_crown_wind
       - watch_dial_patina
-      - watch_band_replace
+    hidden_ids:
       - watch_leaf_timex
 
-  - item_id: wristwatch_russian_field
-    item_name: Russian Watch
-    base_price: 150
-    category_id: wristwatch
-    rarity: 0
-    clue_ids:
-      - watch_veil_02
-      - watch_case_lugs
-      - watch_glass_scratched
-      - watch_case_engraved
-      - watch_leaf_russian
-
-  - item_id: wristwatch_ladies_cocktail
-    item_name: Cocktail Watch
-    base_price: 115
-    category_id: wristwatch
-    rarity: 0
-    clue_ids:
-      - watch_veil_01
-      - watch_case_lugs
-      - watch_glass_scratched
-      - watch_dial_patina
-      - watch_leaf_cocktail
-
-  - item_id: wristwatch_fashion_brand
-    item_name: Fashion Watch
-    base_price: 95
-    category_id: wristwatch
-    rarity: 0
-    clue_ids:
-      - watch_veil_01
-      - watch_case_lugs
-      - watch_glass_scratched
-      - watch_band_replace
-      - watch_leaf_fashion
-
-  - item_id: wristwatch_seiko_auto
-    item_name: Seiko Watch
-    base_price: 560
+  - item_id: wristwatch_seiko_chrono
     category_id: wristwatch
     rarity: 1
-    clue_ids:
-      - watch_veil_02
+    anchor_id: watch_anchor_02
+    surface_ids:
       - watch_case_lugs
-      - watch_glass_scratched
       - watch_crown_wind
-      - watch_movement_bridge
-      - watch_movement_jewelled
+      - watch_movement_chronograph
+      - watch_serial_numbered
+    hidden_ids:
       - watch_leaf_seiko
 
-  - item_id: wristwatch_bulova_accutron
-    item_name: Bulova Watch
-    base_price: 820
+  - item_id: wristwatch_franken_mess
     category_id: wristwatch
     rarity: 1
-    clue_ids:
-      - watch_veil_02
+    anchor_id: watch_anchor_02
+    surface_ids:
+      - watch_dial_refinish
+      - watch_band_replaced
       - watch_case_lugs
-      - watch_glass_scratched
-      - watch_crown_wind
-      - watch_movement_bridge
-      - watch_movement_jewelled
-      - watch_serial_number
-      - watch_leaf_bulova
+    hidden_ids:
+      - watch_override_franken
 
-  - item_id: wristwatch_citizen_chrono
-    item_name: Citizen Watch
-    base_price: 480
-    category_id: wristwatch
-    rarity: 1
-    clue_ids:
-      - watch_veil_01
-      - watch_case_lugs
-      - watch_glass_scratched
-      - watch_crown_wind
-      - watch_movement_bridge
-      - watch_dial_patina
-      - watch_movement_jewelled
-      - watch_leaf_citizen
-
-  - item_id: wristwatch_longines_13zn
-    item_name: Longines Watch
-    base_price: 1450
+  - item_id: wristwatch_longines_boxed
     category_id: wristwatch
     rarity: 2
-    clue_ids:
-      - watch_veil_02
+    anchor_id: watch_anchor_03
+    surface_ids:
       - watch_case_lugs
-      - watch_glass_scratched
-      - watch_crown_wind
-      - watch_movement_bridge
       - watch_movement_jewelled
-      - watch_serial_number
+      - watch_serial_numbered
       - watch_case_engraved
-      - watch_movement_chronograph
+    hidden_ids:
       - watch_leaf_longines
+      - watch_hidden_box_papers
+
+  - item_id: wristwatch_swapped_movement
+    category_id: wristwatch
+    rarity: 2
+    anchor_id: watch_anchor_03
+    surface_ids:
+      - watch_case_lugs
+      - watch_movement_jewelled
+      - watch_dial_patina
+      - watch_serial_numbered
+    hidden_ids:
+      - watch_leaf_roleex
+      - watch_hidden_movement_swap
+
+  - item_id: wristwatch_roleex_grail
+    category_id: wristwatch
+    rarity: 3
+    anchor_id: watch_anchor_04
+    surface_ids:
+      - watch_case_lugs
+      - watch_movement_chronograph
+      - watch_movement_jewelled
+      - watch_serial_numbered
+      - watch_case_engraved
+    hidden_ids:
+      - watch_leaf_roleex
+      - watch_hidden_box_papers
+      - watch_hidden_movement_swap
+
+  - item_id: wristwatch_longines_legend
+    category_id: wristwatch
+    rarity: 3
+    anchor_id: watch_anchor_04
+    surface_ids:
+      - watch_case_lugs
+      - watch_movement_chronograph
+      - watch_movement_jewelled
+      - watch_dial_patina
+      - watch_serial_numbered
+      - watch_case_engraved
+    hidden_ids:
+      - watch_leaf_longines
+      - watch_hidden_box_papers
+      - watch_hidden_movement_swap

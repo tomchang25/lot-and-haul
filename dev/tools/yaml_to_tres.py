@@ -5,6 +5,7 @@ Usage:
     python yaml_to_tres.py --godot-root /path/to/godot/project
     python yaml_to_tres.py --godot-root /path/to/godot/project --dry-run
     python yaml_to_tres.py --godot-root /path/to/godot/project --yaml-dir DIR
+    python yaml_to_tres.py --godot-root /path/to/godot/project --force
 """
 
 import argparse
@@ -47,6 +48,11 @@ def main() -> None:
         help="YAML directory (default: <godot-root>/data/yaml)",
     )
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument(
+        "--force",
+        action="store_true",
+        help="Delete all existing .tres files in output directories before writing."
+    )
     args = ap.parse_args()
 
     root = Path(args.godot_root)
@@ -89,10 +95,15 @@ def main() -> None:
         sys.exit(1)
     print("  OK")
 
-    # Create output directories.
+    # Create output directories (and optionally clean stale .tres files).
     if not args.dry_run:
         for spec in REGISTRY:
-            (tres_root / spec.tres_subdir).mkdir(parents=True, exist_ok=True)
+            out_dir = tres_root / spec.tres_subdir
+            out_dir.mkdir(parents=True, exist_ok=True)
+            if args.force:
+                for stale in out_dir.glob("*.tres"):
+                    stale.unlink()
+                    print(f"  [force] removed {stale.name}")
 
     # Export in registry (dependency) order.
     ctx = BuildCtx(

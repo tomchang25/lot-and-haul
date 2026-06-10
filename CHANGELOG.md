@@ -8,6 +8,42 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Clue Schema Cleanup
+
+- 2026-06-10 — [schema] `AnchorData` resource added (`data/definitions/anchor_data.gd`): anchors extracted out of the clue system into their own designer resource — `anchor_id`, `known_text`, `naming_priority`, `category_data`, `base_value`, and physical identity (`shape_id`, `sprite`, `weight_kg`, `tier`); anchors carry no discovery attribute/DC, effect op, or exclusive group
+- 2026-06-10 — [schema] `ClueData` reduced to surface/hidden: `ClueType.ANCHOR` removed, anchor-only physical fields removed, half-wired `affinity_tags`/`tag_weights` draw metadata removed, `effect_op` domain is now `add | mul | override` (`override` = hidden-only base replacement, renamed from the overloaded "flat")
+- 2026-06-10 — [schema] `ItemData` clue list split three ways: `anchor: AnchorData` + `surface_clues` + `hidden_clues` (plus `all_clues` combined getter); exactly-one-anchor and hidden-after-surface ordering are now guaranteed by construction
+- 2026-06-10 — [runtime] `ItemEntry` veil state re-keyed to a single `unveiled` flag (`is_veiled()` reads it; legacy save keys `anchor_revealed`/`inspected` still accepted on load); anchor ids no longer live in `revealed_clue_ids` and the stale-anchor-id re-add special casing is gone; price pipeline reads `anchor.base_value` and matches the `override` op; `display_name` composes from mixed AnchorData/ClueData entries with anchor → surface → hidden tie-break
+- 2026-06-10 — [registry] `AnchorRegistry` autoload added over `data/tres/anchors/`
+- 2026-06-10 — [pipeline] `anchor_data.py` entity spec added (symmetric build/parse; validates category_scope, base_value > 0, shape whitelist, tier 1–5, known_text word cap); `item.py` rewritten for `anchor_id`/`surface_ids`/`hidden_ids` with list/type-agreement checks, ≤1 hidden override, exclusive-group uniqueness, and anchor-provided body naming; `clue.py` rewritten without anchor/affinity fields
+- 2026-06-10 — [data] full YAML content mechanically converted: anchors authored under an `anchors:` section (`*_veil_NN` ids), items reference anchor/surface/hidden id lists, hidden `flat` renamed to `override`; all `.tres` regenerated including new `data/tres/anchors/`
+- 2026-06-10 — [docs] `dev/docs/plans/clue_schema_cleanup.md` shipped and archived; the content half (generation standard, prompts, reference tables, full regen) lives on as `dev/docs/plans/clue_content_standard_regen.md`
+
+---
+
+## Clue Content Standard
+
+- 2026-06-11 — [docs] Baseline review of post-cleanup YAML set: validator green, `_veil_NN` rename confirmed consistent, no `flat`-op or anchor-as-clue remnants; 5 empty categories + missing negative/override content + `yaml_stats.py` post-cleanup defect documented for the regen plan
+- 2026-06-11 — [docs] Decision: drop `item_name` annotation field from items YAML (pipeline-ignored; display name composes from naming slots)
+- 2026-06-11 — [docs] Draw rules recorded: tier weight curves for anchors, uniform surface/hidden draws, at most one override + one per exclusive_group per item, rarity frequency only (not hidden contents)
+- 2026-06-11 — [prompts] `base.md` updated: `_anchor_NN` → `_veil_NN`, `anchor_id` ID standard added, anchors noted as separate resources not clues
+- 2026-06-11 — [prompts] `category.md` updated: `super_category` field corrected from display strings to snake_case IDs matching `super_categories:` block
+- 2026-06-11 — [prompts] `item.md` fully rewritten against post-cleanup schema: three-resource table, dedicated anchor schema, `add|mul|override` ops (no `flat`), three-way item schema (`anchor_id`/`surface_ids`/`hidden_ids`), effect budgets per tier with positive/negative mix, super-category personalities, fixed example (exclusive-group collision split into separate items)
+- 2026-06-11 — [data] `data/yaml/reference_tables.yaml` added: per-category balancing targets (median, mean, stddev, min, max bands, condition expectations) for all 12 categories, with comparison spec header (band violations → `[WARN]`, schema violations → errors)
+- 2026-06-11 — [docs] `dev/docs/plans/clue_content_standard.md` shipped and archived
+
+---
+
+## Clue Content Regen
+
+- 2026-06-11 — [tool] `yaml_to_tres.py` `--force` flag added: deletes all existing `.tres` files in output directories before writing, ensuring no stale files linger from prior generations
+- 2026-06-11 — [tool] `tres_to_yaml.py` deprecated: round-trip guarantee (AC4) waived; YAML is the sole authoring surface, `.tres` files are build artifacts
+- 2026-06-11 — [tool] `yaml_stats.py` `__main__` guard added: script was unexecutable as a CLI tool despite documented usage; now runs correctly via `python dev/tools/yaml_stats.py --godot-root ...`
+- 2026-06-11 — [audit] Full acceptance criteria audit against current YAML set: validator clean (AC1), all categories have ≥2 anchor variants + hidden==rarity + ≥1 negative surface/hidden per category pool + ≥1 override + no zero-effect clues (AC2), stats tool reports all 12 categories against reference tables with 21 band warnings (AC3), save compatibility confirmed — stale clue ids strip silently, removed items drop with warning (AC5), `item_name` field absent from all items YAML (AC6)
+- 2026-06-11 — [docs] AC4 (yaml→tres→yaml lossless round trip) waived: `tres_to_yaml.py` deprecated; categories lose `shape_id`/`weight` on the reverse hop (entity spec gap), and absent-vs-empty representation differences on optional fields make losslessness impractical without schema harmonization that is not planned
+
+---
+
 ## Location Entry Backgrounds
 
 - 2026-06-09 — [location_entry] `LocationData` gains `bg_exterior: Texture2D`, `bg_interior: Texture2D`, and `transition_type: String` exports; defaults to `"sliding_door"` when unset

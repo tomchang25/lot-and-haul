@@ -26,7 +26,7 @@ categories:
 ## Fields
 
 - `category_id`: unique snake_case ID. Must match the `.tres` filename stem.
-- `super_category`: broad type shown in UI, such as `Fine Art`, `Weapon`, `Furniture`, `Decorative`, `Fashion`.
+- `super_category`: snake_case id of the parent super-category. Must match a `super_category_id` defined in the `super_categories:` block (`fashion`, `decorative`, `fine_art`, `weapon`). Not a display string.
 - `display_name`: fine-grained player-facing category label, such as `Oil Lamp`, `Pocket Watch`, `Handbag`.
 - `weight`: typical item weight in kilograms for this category.
 - `shape_id`: cargo grid footprint.

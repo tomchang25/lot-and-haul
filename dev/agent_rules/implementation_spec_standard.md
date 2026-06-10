@@ -1,6 +1,6 @@
 # Implementation Spec Standard
 
-Use this standard to produce an implementation spec from a completed Plan and codebase exploration.
+Use this standard to produce an implementation spec from a completed Plan, its Scout Report, and targeted codebase spot-checks.
 
 This document gives an implementation agent enough context to execute a change without its own plan-mode phase. Its primary value is the **Relational Context** section, which pre-computes cross-system ownership, call direction, and integration constraints so the implementation agent does not have to reason about them independently.
 
@@ -18,7 +18,7 @@ Do not use this for:
 - Work where you want the agent to discover and propose the approach itself — use a plan-mode prompt instead.
 - Changes that need step-by-step, per-file instruction — use a full per-file plan instead.
 
-Generating this document requires codebase exploration. Read the relevant files before filling Relational Context and Files to Change. Do not generate it from the Plan alone.
+Generating this document requires codebase evidence. The normal input is a Scout Report (`scout_standard.md`) filed beside the Plan as `dev/docs/plans/<plan>_scout.md`. Consume it asymmetrically: **its quotations are trustworthy, its conclusions are not.** Spot-checks are mandatory, not optional — read the cited file yourself for (1) every `[INFERRED]` bullet, (2) every Plan Friction item, and (3) any quoted contract a Relational Context bullet will be built on. If no scout report exists, explore the codebase directly. Never generate the spec from the Plan alone. When the spec is finished, move the scout report to `dev/docs/archived/` — it quotes code and is stale the moment implementation begins.
 
 ---
 
@@ -55,8 +55,8 @@ Short bullet list of what is intentionally out of scope. Keep it tight to preven
 
 ### 4. Files to Change
 
-| File | Change Size | Purpose |
-| --- | --- | --- |
+| File     | Change Size            | Purpose                                          |
+| -------- | ---------------------- | ------------------------------------------------ |
 | `<file>` | Small / Medium / Large | What this file is responsible for in this change |
 
 Identifies ownership and change effort. Does not prescribe line-by-line edits.
@@ -71,8 +71,8 @@ Do not write step-by-step instructions. Do not reproduce logic the agent can rea
 
 ### 6. Edge Cases
 
-| Case | Expected Handling |
-| --- | --- |
+| Case     | Expected Handling     |
+| -------- | --------------------- |
 | `<case>` | `<expected behavior>` |
 
 Omit this section if no meaningful edge cases exist.
@@ -88,13 +88,13 @@ Do not include file paths or function names.
 ## Rules
 
 1. Write entirely in English.
-2. Requires codebase exploration before generating. Do not fill Relational Context or Files to Change from the Plan alone.
+2. Requires codebase evidence before generating. Do not fill Relational Context or Files to Change from the Plan alone. When a Scout Report exists, spot-check every `[INFERRED]` bullet and Plan Friction item against the cited files before relying on it.
 3. Relational Context is a flat list. Do not add subsections.
 4. Apply the completeness rule: every cross-system relationship within the change's blast radius is stated, even the obvious ones — the executing agent does not infer. Relationships outside the blast radius stay undocumented.
 5. Implementation Notes should be shorter than a full per-file plan. If you are writing step-by-step per-file instructions, switch to a full per-file plan.
 6. Do not include implementation detail the agent can discover from the codebase, except where the completeness rule requires stating a relationship explicitly.
 7. Do not mix future scope into this spec.
-8. Target under 600 words. Exceed only when relational complexity genuinely requires it.
+8. Target under 1000 words. Exceed only when relational complexity genuinely requires it.
 
 ---
 
@@ -124,8 +124,8 @@ Do not include file paths or function names.
 
 ## Files to Change
 
-| File | Change Size | Purpose |
-| --- | --- | --- |
+| File     | Change Size            | Purpose   |
+| -------- | ---------------------- | --------- |
 | `<file>` | Small / Medium / Large | <Purpose> |
 
 ## Implementation Notes
@@ -134,8 +134,8 @@ Do not include file paths or function names.
 
 ## Edge Cases
 
-| Case | Expected Handling |
-| --- | --- |
+| Case     | Expected Handling     |
+| -------- | --------------------- |
 | `<case>` | `<expected behavior>` |
 
 ## Acceptance Criteria

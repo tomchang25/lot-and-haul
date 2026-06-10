@@ -131,8 +131,8 @@ func _rebuild_grid(c: CustomerEntry) -> void:
 
 func _grid_shape_provider(item) -> Array[Vector2i]:
     var entry: ItemEntry = item as ItemEntry
-    if entry != null and entry.item_data != null:
-        return entry.item_data.category_data.get_cells()
+    if entry != null:
+        return entry.get_cells()
     return []
 
 

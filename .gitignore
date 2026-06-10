@@ -2,15 +2,16 @@
 **/.commitsage
 
 **/shader_cache
-**/assets
+# **/assets
 **/addons
 **/script_templates
 **/*_back
 
-**/*.uid
+**/dev/tools/bin
+
 **/*.tmp
 **/*.import
 **/*.db-journal
-**/*.tres
+data/tres/
 
 **/__pycache__/
