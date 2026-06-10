@@ -42,6 +42,14 @@ Unresolved design: a network of appraiser NPCs the player can consult for better
 
 Replace per-scene `_back_btn` / `_continue_btn` / `_reset_btn` manual wiring with a shared modalized HUD overlay. The HUD owns navigation controls and scene-agnostic chrome (cash, day display). Scenes emit navigation requests rather than direct `GameManager.go_to_*()` calls. Reduces boilerplate across ~10 scenes.
 
+### Campaign Ending, Achievements & Prestige Perks
+
+A 100-day main-line ending (inspired by Hero's Adventure 大俠立志傳): on day 100 the main storyline resolves into one of several endings with a matching achievement, then the save continues as sandbox where side quest lines remain completable. Achievements are earned from condition completion or quest-line endings and grant Score; at new-game start the player picks starting perks unlocked by accumulated Score / specific achievements (meta-progression across playthroughs). Collection-type achievements also serve as the interim chase layer until the Museum/Prestige shape is decided, so Museum needs no early skeleton.
+
+### Hunter Profile & Statistics
+
+A profile page that makes "better sight" visible as a curve: appraisal-error trend over time, per-category identification counts, best flip records. Pure presentation layer over existing knowledge/run data. Tentative.
+
 ### Museum / Prestige
 
 Prestige system where rare/verified items can be donated or displayed for reputation, unlocking content gates. Design decisions needed first: what does prestige unlock or affect (access tiers, price modifiers, cosmetics, pure achievement)? Is it per-super-category or global? Is the donation UI in storage or a separate scene? The entire path is blocked on deciding the prestige shape.
@@ -53,6 +61,10 @@ An auction modifier variant where every lot contains only base-layer (anchor) cl
 ### Training Courses
 
 Hub-based training resource: spend cash and a day slot to temporarily boost an attribute for the next run. Training button in hub, resource-like expiry model.
+
+### Calendar Special Events
+
+Irregular special-auction announcements published on the calendar days in advance, so the player prepares (save cash, train, clear storage) for known future events — anticipation as a goal. Rides on the Calendar skeleton from the weekly-order flow; future home for Intel tip-offs as calendar events. Requires the Calendar skeleton to ship first.
 
 ### Intel System / Pre-Run Tip-Offs
 
@@ -78,6 +90,10 @@ MetaManager holds 6 stores and coordinates slot economy, storage AP, vehicle man
 
 Full NPC knowledge-level system for rolled price; location-specific bidder personalities. Adds depth to auction encounters beyond the current flat NPC.
 
+### Named Rival NPCs
+
+Two or three persistent named rivals with personalities and favored domains who recur across runs and grow in parallel with the player — beating a named rival is an emotional goal economic numbers alone can't provide. Builds on NPC Depth Rolled Price and the Dialog system. Tentative.
+
 ### Lot Pool Variety
 
 Seasonal / rotating lot pools; one-shot special locations as events. Requires the location/auction system to be stable first.
@@ -92,15 +108,11 @@ Linear dialog first (Uncle branching second). DialogManager overlay autoload wit
 
 ### Bank / Bankruptcy
 
-Daily interest on cash reserves, game-over condition when debt threshold is crossed, optional player-initiated loans. Needs the day-slot economy to be stable first.
+Daily interest on cash reserves, game-over condition when debt threshold is crossed, optional player-initiated loans. Periodic-repayment deadlines (Recettear-style) considered as a floor-pressure driver, but a hard deadline sits uneasily with the calm-hub mood and the survivable-floor pillar — prefer soft daily upkeep (storage rent, fuel) if pressure is needed. Needs the day-slot economy to be stable first.
 
 ### Customer System Evolution
 
 Weighted tag pools (calendar/event/progression-driven), regular customers with fixed profiles, quality tiers (budget vs. collector), selling-related perks. Builds on the current nightly customer system.
-
-### Lot Location Unlock Gating
-
-Perk or mastery rank or unlock fee (or some combination — e.g. a purchasable perk that grants access) to gate which lot kinds are available at which locations. Replaces the simpler "waiting on progression model" placeholder.
 
 ### Garage Sell
 
@@ -120,7 +132,7 @@ Additional perks beyond the current attribute-threshold triggers, with full acqu
 
 ### Content Gates (Mastery Rank)
 
-Use `get_mastery_rank()` directly to gate prestige unlocks, tier-locked auction houses, and NPC reaction tiers.
+Use `get_mastery_rank()` directly to gate prestige unlocks and NPC reaction tiers. Tier-locked auction houses moved to `dev/docs/plans/unlock_gating_location_tiers.md`, whose generic requirement block these gates should reuse.
 
 ### Fuel Cost Pre-Run Preview
 
@@ -215,6 +227,8 @@ Flows currently being built. One-line pointer each — same format as `## Plan`,
 
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
+- [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
+- [unlock_gating] Requirement-gated premium auction tiers + lot kinds, with location tier reference table & audit — see `dev/docs/plans/unlock_gating_location_tiers.md`
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
 - [demo] Tutorial 3-run surface (stale — references legacy Skill/Merchant systems); Director + Dialog systems are surviving subsystems — see `dev/docs/plans/demo_summary.md`
