@@ -1,6 +1,8 @@
 # Clue Schema Cleanup — Anchor Extraction, Base/Override Split, Three-Way Item Lists
 
-Successor to `../archived/clue_schema_content_standard.md` (+ its spec). The code that landed from that overhaul (anchor-sourced physical data, global add-then-mul with override branch, rarity == hidden count, validator suite, verified bonus ×1.05) is the foundation; this plan corrects the schema's remaining structural problems. The content side (generation standard, prompts, reference tables, full regeneration) is split into `clue_content_standard_regen.md` and runs after this plan ships.
+> **Shipped** 2026-06-10 on `clue-schema-refactor` (commit f662867 + follow-ups) — see `CHANGELOG.md` "Clue Schema Cleanup". Minor review leftovers (dead `item_name` annotation in items YAML, anchor-rename consistency pass, baseline validate run) carry into `../plans/clue_content_standard_regen.md`.
+
+Successor to `clue_schema_content_standard.md` (+ its spec, both in this folder). The code that landed from that overhaul (anchor-sourced physical data, global add-then-mul with override branch, rarity == hidden count, validator suite, verified bonus ×1.05) is the foundation; this plan corrects the schema's remaining structural problems. The content side (generation standard, prompts, reference tables, full regeneration) is split into `../plans/clue_content_standard_regen.md` and runs after this plan ships.
 
 ## Goal
 

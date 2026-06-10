@@ -1,6 +1,6 @@
 # Clue Content Standard & Full Regeneration
 
-**Depends on `clue_schema_cleanup.md` having shipped.** This is the content half split out of the schema cleanup: generation standard, prompt rewrite, reference tables, draw-rule documentation, and full YAML regeneration. It is content-judgment-heavy and intentionally scheduled as its own pass. Unlike other plans, this file deliberately carries codebase-relative context (see Relational Context) because it will be executed long after the planning conversation, against the post-cleanup codebase.
+**The schema cleanup (`../archived/clue_schema_cleanup.md`) shipped 2026-06-10** — this is its content half: generation standard, prompt rewrite, reference tables, draw-rule documentation, and full YAML regeneration. It is content-judgment-heavy and intentionally scheduled as its own pass. Unlike other plans, this file deliberately carries codebase-relative context (see Relational Context) because it will be executed long after the planning conversation, against the post-cleanup codebase.
 
 ## Goal
 
@@ -13,6 +13,7 @@ Author the content standard and regenerate the full YAML content set on the corr
 3. Per-category reference tables are authored as balancing targets: median, mean, standard deviation, min, max of full true value, plus condition expectations. The stats tool compares regenerated content against them; band violations are warnings (balance signals), schema violations remain validator errors.
 4. The full content set is regenerated: every category gets at least two anchor variants at distinct tiers with complete physical data; surface and hidden pools include value-reducing clues per the mix; at least one counterfeit-style override exists per the standard; every item's hidden count equals its rarity; super-category personality is expressed through data (anchor spans, surface count ranges, effect composition), not schema.
 5. Saves and compatibility ride on existing behavior — stale clue ids strip silently, removed item ids drop with a warning. No migration code is added; regeneration may freely rename or replace clue and item ids.
+6. Leftovers carried from the schema cleanup's ship review are resolved here: items YAML still carries a dead `item_name` annotation field the pipeline ignores (drop it, or formalize it as an authoring comment in the standard); verify the mechanically converted set is clean (anchor `*_veil_NN` rename consistency, no `flat` op or anchor remnants in `clues.yaml`); run the validator on the converted set as the regeneration baseline; confirm the stats tool degrades gracefully while `reference_tables.yaml` does not yet exist.
 
 ## Relational Context (codebase)
 

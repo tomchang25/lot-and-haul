@@ -8,6 +8,19 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Clue Schema Cleanup
+
+- 2026-06-10 — [schema] `AnchorData` resource added (`data/definitions/anchor_data.gd`): anchors extracted out of the clue system into their own designer resource — `anchor_id`, `known_text`, `naming_priority`, `category_data`, `base_value`, and physical identity (`shape_id`, `sprite`, `weight_kg`, `tier`); anchors carry no discovery attribute/DC, effect op, or exclusive group
+- 2026-06-10 — [schema] `ClueData` reduced to surface/hidden: `ClueType.ANCHOR` removed, anchor-only physical fields removed, half-wired `affinity_tags`/`tag_weights` draw metadata removed, `effect_op` domain is now `add | mul | override` (`override` = hidden-only base replacement, renamed from the overloaded "flat")
+- 2026-06-10 — [schema] `ItemData` clue list split three ways: `anchor: AnchorData` + `surface_clues` + `hidden_clues` (plus `all_clues` combined getter); exactly-one-anchor and hidden-after-surface ordering are now guaranteed by construction
+- 2026-06-10 — [runtime] `ItemEntry` veil state re-keyed to a single `unveiled` flag (`is_veiled()` reads it; legacy save keys `anchor_revealed`/`inspected` still accepted on load); anchor ids no longer live in `revealed_clue_ids` and the stale-anchor-id re-add special casing is gone; price pipeline reads `anchor.base_value` and matches the `override` op; `display_name` composes from mixed AnchorData/ClueData entries with anchor → surface → hidden tie-break
+- 2026-06-10 — [registry] `AnchorRegistry` autoload added over `data/tres/anchors/`
+- 2026-06-10 — [pipeline] `anchor_data.py` entity spec added (symmetric build/parse; validates category_scope, base_value > 0, shape whitelist, tier 1–5, known_text word cap); `item.py` rewritten for `anchor_id`/`surface_ids`/`hidden_ids` with list/type-agreement checks, ≤1 hidden override, exclusive-group uniqueness, and anchor-provided body naming; `clue.py` rewritten without anchor/affinity fields
+- 2026-06-10 — [data] full YAML content mechanically converted: anchors authored under an `anchors:` section (`*_veil_NN` ids), items reference anchor/surface/hidden id lists, hidden `flat` renamed to `override`; all `.tres` regenerated including new `data/tres/anchors/`
+- 2026-06-10 — [docs] `dev/docs/plans/clue_schema_cleanup.md` shipped and archived; the content half (generation standard, prompts, reference tables, full regen) lives on as `dev/docs/plans/clue_content_standard_regen.md`
+
+---
+
 ## Location Entry Backgrounds
 
 - 2026-06-09 — [location_entry] `LocationData` gains `bg_exterior: Texture2D`, `bg_interior: Texture2D`, and `transition_type: String` exports; defaults to `"sliding_door"` when unset
