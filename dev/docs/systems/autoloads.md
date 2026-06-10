@@ -6,18 +6,18 @@ Cross-cutting boot, persistence, and hub-navigation infrastructure shared across
 
 ## Boot Orchestration
 
-`SaveManager` owns the cross-cutting boot fan-out. Domain managers (`MetaManager`, `KnowledgeManager`) call `SaveManager.register_manager(self)` in `_ready()`; registries and stores call `SaveManager.register_section(self)`. After `SaveManager.load()` completes, `GameManager._ready()` calls:
+`SaveManager` owns the cross-cutting boot fan-out. All save providers — domain managers (`MetaManager`, `KnowledgeManager`) and their owned stores — call `SaveManager.register_provider(self)` in `_ready()`. After all providers register, `GameManager._ready()` calls:
 
-1. **`SaveManager.run_migrations()`** — fans out `migrate()` to every registered manager; idempotent repair of save-state vs. data drift (e.g. dropped clue ids, renamed keys).
-2. **`SaveManager.run_validation()`** — fans out `validate()` to every registered manager; boot-time audit that every save-persisted id still resolves. Any miss logs an error and fails boot validation.
+1. **`SaveManager.load()`** — reads the latest counter-based save file and dispatches `from_dict()` to every registered provider; per-store versioned migrations run inside each `from_dict()` via `_apply_migrations()`, so there is no top-level migration fan-out.
+2. **`SaveManager.run_validation()`** — fans out `validate()` to every registered provider; boot-time audit that every save-persisted id still resolves. Any miss logs an error and fails boot validation.
 
-Both phases are opt-in; a manager that implements neither is skipped. Because `load()` runs before either fan-out, migrate/validate always see the loaded save state.
+Both phases are opt-in (a provider that skips `validate()` is skipped). Because `load()` runs before validation, `validate()` always sees loaded and migrated state.
 
 ---
 
 ## SaveManager
 
-Thin persistence coordinator (`global/autoloads/save_manager.gd`). Responsibilities: file read/write, schema version detection, schema-1→2 knowledge key relocation, legacy flat-save dispatch, and iterating registered section providers. It holds **no gameplay state** — state lives on the systems that own and mutate it.
+Thin persistence coordinator (`global/autoloads/save_manager.gd`). Writes counter-based save files (`user://saves/save_N.json`); a manifest tracks the latest counter as a fast-path for load; up to 10 files are retained. One-time legacy migration runs on first boot if the old single-file save exists. It holds **no gameplay state** — state lives on the systems that own and mutate it.
 
 Systems register as section providers in their own `_ready()`. Two-tier save strategy:
 

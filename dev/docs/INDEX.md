@@ -20,8 +20,8 @@
 
 ## L1 — Vision（願景，幾乎不變）
 
-- [核心概念 core_concept](vision/core_concept.md) — 一次讀懂整個遊戲的點子，不含機制細節。
-- [資料架構 data_architecture](vision/data_architecture.md) — 設計資源 vs 執行期型別的兩層原則、擁有權鏈、為何要分離。
+- [核心概念 core_concept](visions/core_concept.md) — 一次讀懂整個遊戲的點子，不含機制細節。
+- [資料架構 data_architecture](visions/data_architecture.md) — 設計資源 vs 執行期型別的兩層原則、擁有權鏈、為何要分離。
 
 ## L2 — Systems（系統設計，present-tense 常青）
 
@@ -55,8 +55,8 @@
 - [Registry 標準 registries](../standards/registries.md)
 - [Block 場景架構 block_scene_architecture_standard](../standards/block_scene_architecture_standard.md)
 - [標準強制執行 standards_enforcement](../standards/standards_enforcement.md)
-- [實作規格標準 implementation_spec_standard](../standards/implementation_spec_standard.md)
-- [Plan 標準 plan_standard](../standards/plan_standard.md)
+- [Debug 標準 debug_standard](../standards/debug_standard.md)
+- [Theme 標準 theme_standard](../standards/theme_standard.md)
 
 ## 🛠 Skills（AI 編碼參考，`dev/skills/`）
 
@@ -64,3 +64,4 @@
 - [語意化版本 semantic_versioning](../skills/semantic_versioning.md)
 - [GDScript 抽象類別 gdscript_abstract](../skills/gdscript_abstract.md)
 - [Godot 4 Theme Override](../skills/godot4_theme_override.md)
+- [Godot 4 TSCN Node Properties](../skills/godot4_tscn_node_properties.md)

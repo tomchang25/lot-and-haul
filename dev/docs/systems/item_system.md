@@ -28,7 +28,7 @@ Display progression: veiled → unveiled (anchor revealed, some clues known) →
 
 3. **Auction & cargo** — Won items enter cargo, constrained by the active vehicle's grid and weight.
 
-4. **Hub return** — `apply_storage_migration()` auto-reveals all surface clues. In a Storage slot the player spends AP on Repair (→0.5 condition cap), Restore (→1.0), or Research (deterministic per-clue hidden-reveal progress). Research never rolls — it accumulates `5 + Investigation` progress per spend toward each clue's DC. Items with `auto_verify` reveal hidden clues immediately on storage entry. See `day_slot_economy.md` for AP rules.
+4. **Hub return** — all surface clues auto-reveal. In a Storage slot the player spends AP on Repair (→0.5 condition cap), Restore (→1.0), or Research (deterministic per-clue hidden-reveal progress). Research never rolls — it accumulates a fixed amount (boosted by the Investigation attribute) toward each clue's DC. Items flagged for auto-verify reveal hidden clues immediately on storage entry. See `day_slot_economy.md` for AP rules.
 
 5. **Selling** — All selling goes through the nightly customer system. Verified items contribute a ×1.2 bonus, add a die to the aggressive pool, and count hidden tags toward customer fit.
 
