@@ -22,6 +22,7 @@
 
 - [核心概念 core_concept](visions/core_concept.md) — 一次讀懂整個遊戲的點子，不含機制細節。
 - [資料架構 data_architecture](visions/data_architecture.md) — 設計資源 vs 執行期型別的兩層原則、擁有權鏈、為何要分離。
+- [三階段上架評估 itchio_review](visions/itchio_review.md) — ⚠️ 全中文（特例）。Stage 1 Playtest / Stage 2 販售 / Stage 3 Steam Demo 各自的完成度與阻擋條件，含半引導 3-run demo 規劃。
 
 ## L2 — Systems（系統設計，present-tense 常青）
 

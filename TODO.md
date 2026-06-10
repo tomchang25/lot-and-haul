@@ -22,6 +22,10 @@ Preliminary concepts — bigger than a one-liner, but a single `###` sub-section
 
 Lot card decoration with a random icon/badge per lot. Phase-dependent decoration: worker loading truck in cargo, auctioneer gavel in auction, etc. Needs an asset pipeline — blocked on visual direction.
 
+### Placeholder SFX Generator
+
+LLM-writes-parameters, deterministic-synth-renders — the yaml→tres philosophy applied to audio. Agent authors sfxr-style parameter YAML (`data/yaml/sfx/*.yaml`); a one-shot CLI (`dev/tools/sfx_generate.py`, numpy or an existing sfxr port like `pyfxr`) renders them to 44.1kHz 16-bit WAV under `assets/audio/sfx/placeholder/`. A generation prompt in `dev/tools/prompts/sfx_generation/` defines the schema plus intent→sound conventions (jump = square pitch-up, hit = noise burst + fast decay, ui click = short low-amp sine). Schema copies sfxr directly (waveform, ADSR, freq start/end/slide, noise, bitcrush) — a twenty-year-proven parameter space the LLM knows well. Only QC is normalize-against-clipping + a length cap; no quality loop, placeholders are allowed to sound bad. YAML is the source of truth, re-running the script reproduces output, generated WAVs are never hand-edited. Undecided: output path/naming conventions, whether to support sequence-type multi-segment SFX.
+
 ### Category Mastery ↔ Clue Integration
 
 Mastery (category → super-category → rank) is retained as a progression signal (earned via `KnowledgeManager.add_category_points` on `REVEAL` / `SELL`) but currently has no mechanical effect on clue discovery. Idea: at certain ranks, inspection shows "N unrevealed surface clues remaining"; at higher ranks, the easiest surface clue may auto-reveal (no roll, no AP). Mastery does **not** affect DC or success rate — that is the attribute system. Thresholds TBD.
@@ -187,6 +191,8 @@ Run-phase scenes (`inspection_scene`, `reveal_scene`, `run_review_scene`) mutate
 
 Flows currently being built. One-line pointer each — same format as `## Plan`, just promoted here when work starts. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress → this section is empty.
 
+- [clue_content_standard] Baseline review + generation standard (draw rules, prompt rewrite, reference tables; absorbs cleanup review leftovers) — see `dev/docs/plans/clue_content_standard.md`
+- [clue_content_regen] Full YAML regeneration on the authored standard + stats-tool table comparison — see `dev/docs/plans/clue_content_regen.md`; depends on clue_content_standard
 
 ---
 
@@ -203,13 +209,11 @@ The deferred tail of an in-flight flow. When a confirmed initiative spans multip
 
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
-- [clue_content_standard] Baseline review + generation standard (draw rules, prompt rewrite, reference tables; absorbs cleanup review leftovers) — see `dev/docs/plans/clue_content_standard.md`
-- [clue_content_regen] Full YAML regeneration on the authored standard + stats-tool table comparison — see `dev/docs/plans/clue_content_regen.md`; depends on clue_content_standard
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 - [unlock_gating] Requirement-gated premium auction tiers + lot kinds, with location tier reference table & audit — see `dev/docs/plans/unlock_gating_location_tiers.md`
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
-- [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
 - [demo] Tutorial 3-run surface (stale — references legacy Skill/Merchant systems); Director + Dialog systems are surviving subsystems — see `dev/docs/plans/demo_summary.md`
+- [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
 
 ---
 
@@ -217,6 +221,7 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 One-line, no reasoning, no backing doc.
 
+- [start] New Game vs Continue share the same path — Unable to start a New Game unless the save file is manually deleted.
 - [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
 - [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
 - [dev] Auto-put won items to cargo grid (dev-only, skips manual packing).

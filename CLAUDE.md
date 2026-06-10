@@ -6,6 +6,8 @@ A Godot 4.6 single-player game about buying storage lots at auction, inspecting 
 
 Agent-specific instructions live in `dev/agent_rules/`. Read them before starting work. Key rules: `sandbox_environment.md` (shell vs. file tools), `lint_before_finish.md` (run linter on changed files), `git_operations.md` (git is read-only — never stage/commit, only suggest commit messages), `godot_headless_check.md` (never run Godot against the mount — use the /tmp snapshot procedure).
 
+**Model-tier gate (Fable / Mythos)**: if you are running as a Fable- or Mythos-class model, do NOT iterate over the codebase without my explicit permission — no commit/diff reviews, multi-file exploration sweeps, codebase-wide searches, lint passes, or refactors. If the task genuinely needs codebase iteration, stop and confirm with me first ("this needs me to read N files / the diff — proceed on this model?") before touching any file. Reading a single named file to answer a direct question is fine. This exists because I sometimes forget to switch models, and one casual "review my commits" on this tier can burn the entire token budget in one shot.
+
 When asked to build a plan or implementation spec, follow the format in `dev/docs/README.md` (plan lifecycle) and `dev/standards/` for any relevant domain standard. Plans go in `dev/docs/plans/` with a one-line pointer in `TODO.md`.
 
 Resolve unknowns by asking me directly during the planning conversation — never emit an `## Open Questions` section or leave unresolved decisions parked in a plan or spec. Stop and ask the moment a decision is unclear; hand over a plan or spec only once every such question has been answered and folded into the relevant Requirement, Design, or Relational Context line.
