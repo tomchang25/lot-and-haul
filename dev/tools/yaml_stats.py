@@ -4,6 +4,10 @@ Print per-super-category statistics for design balancing from the merged YAML
 data set (item count, rarity distribution, anchor value aggregates, surface
 clue counts, and hidden clue distributions).
 
+When data/yaml/reference_tables.yaml exists, also compares per-category actual
+value statistics against the authored reference bands and emits out-of-band
+warnings for any category whose distribution falls outside its target range.
+
 This script is read-only — it never writes or modifies YAML or TRES files.
 
 Usage:
@@ -12,6 +16,7 @@ Usage:
 """
 
 import argparse
+import math
 import sys
 from pathlib import Path
 
@@ -58,6 +63,33 @@ def _load_merged(yaml_dir: Path) -> dict[str, list]:
     return merged
 
 
+def _load_reference_tables(yaml_dir: Path) -> dict[str, dict]:
+    """Load per-category reference bands from reference_tables.yaml.
+
+    Returns a dict keyed by category_id:
+      {
+        "median": {"min": ..., "max": ...},
+        "mean":   {"min": ..., "max": ...},
+        "stddev": {"min": ..., "max": ...},
+        "min":    {"min": ..., "max": ...},
+        "max":    {"min": ..., "max": ...},
+      }
+    Missing file returns an empty dict (no reference checking).
+    """
+    ref_path = yaml_dir / "reference_tables.yaml"
+    if not ref_path.exists():
+        return {}
+    data = yaml.safe_load(ref_path.read_text(encoding="utf-8"))
+    if not data or "reference_tables" not in data:
+        return {}
+    result: dict[str, dict] = {}
+    for entry in data["reference_tables"]:
+        cat_id = entry.get("category_id")
+        if cat_id:
+            result[cat_id] = entry
+    return result
+
+
 # ── Stats helpers ─────────────────────────────────────────────────────────────
 
 
@@ -77,6 +109,50 @@ def _extract_anchor_value(item: dict) -> float | None:
     return None
 
 
+def _full_true_value(item: dict) -> float | None:
+    """Compute the item's full true value (all clues applied, ignoring reveal state).
+
+    Formula mirrors ItemEntry.full_true_value():
+      (effective_base + Σ_surface_add + Σ_hidden_add) × Π_surface_mul × Π_hidden_mul
+    where effective_base = anchor_flat, or the first hidden flat override if present.
+    """
+    clues = item.get("clues", []) or []
+    anchor_val: float | None = None
+    s_add = 0.0
+    s_mul = 1.0
+    h_add = 0.0
+    h_mul = 1.0
+    override: float | None = None
+
+    for clue in clues:
+        ctype = clue.get("type")
+        op = clue.get("effect_op", "")
+        try:
+            amount = float(clue.get("effect_amount", 0))
+        except (ValueError, TypeError):
+            continue
+
+        if ctype == "anchor":
+            anchor_val = amount
+        elif ctype == "surface":
+            if op == "add":
+                s_add += amount
+            elif op == "mul":
+                s_mul *= amount
+        elif ctype == "hidden":
+            if op == "flat" and override is None:
+                override = amount
+            elif op == "add":
+                h_add += amount
+            elif op == "mul":
+                h_mul *= amount
+
+    if anchor_val is None:
+        return None
+    base = override if override is not None else anchor_val
+    return (base + s_add + h_add) * s_mul * h_mul
+
+
 def _count_surface_clues(item: dict) -> int:
     clues = item.get("clues", []) or []
     return sum(1 for c in clues if c.get("type") == "surface")
@@ -85,6 +161,46 @@ def _count_surface_clues(item: dict) -> int:
 def _count_hidden_clues(item: dict) -> int:
     clues = item.get("clues", []) or []
     return sum(1 for c in clues if c.get("type") == "hidden")
+
+
+def _value_stats(values: list[float]) -> dict:
+    """Compute mean, median, stddev, min, max for a list of floats."""
+    if not values:
+        return {}
+    n = len(values)
+    mean = sum(values) / n
+    sorted_v = sorted(values)
+    mid = n // 2
+    median = sorted_v[mid] if n % 2 else (sorted_v[mid - 1] + sorted_v[mid]) / 2.0
+    variance = sum((v - mean) ** 2 for v in values) / n
+    stddev = math.sqrt(variance)
+    return {
+        "mean": mean,
+        "median": median,
+        "stddev": stddev,
+        "min": sorted_v[0],
+        "max": sorted_v[-1],
+        "count": n,
+    }
+
+
+def _check_reference_band(
+    stat_name: str,
+    actual: float,
+    band: dict,
+    cat_id: str,
+    warnings: list[str],
+) -> None:
+    low = band.get("min")
+    high = band.get("max")
+    if low is not None and actual < low:
+        warnings.append(
+            f"  [WARN] {cat_id}: {stat_name} {actual:.1f} is below reference min {low}"
+        )
+    if high is not None and actual > high:
+        warnings.append(
+            f"  [WARN] {cat_id}: {stat_name} {actual:.1f} is above reference max {high}"
+        )
 
 
 def _print_rarity_table(
@@ -150,6 +266,12 @@ def main() -> None:
         sys.exit(f"YAML directory not found: {yaml_dir}")
 
     merged = _load_merged(yaml_dir)
+    ref_tables = _load_reference_tables(yaml_dir)
+
+    if ref_tables:
+        print(f"Reference tables loaded for {len(ref_tables)} categories.")
+    else:
+        print("No reference_tables.yaml found — skipping reference band checks.")
 
     # Build category -> super_category lookup
     cat_to_super: dict[str, str] = {}
@@ -179,6 +301,7 @@ def main() -> None:
     all_anchor_values: list[float] = []
     total_items = 0
     first = True
+    all_ref_warnings: list[str] = []
 
     for super_id in sorted(items_by_super_cat):
         cats_dict = items_by_super_cat[super_id]
@@ -217,6 +340,31 @@ def main() -> None:
             )
             _print_rarity_table(cat_items, indent="      ")
 
+            # ── Reference table comparison ────────────────────────────────
+            if cat_id in ref_tables:
+                ref = ref_tables[cat_id]
+                true_values = [
+                    v for it in cat_items
+                    if (v := _full_true_value(it)) is not None
+                ]
+                stats = _value_stats(true_values)
+                if stats:
+                    ref_warnings: list[str] = []
+                    for stat_name in ("mean", "median", "stddev", "min", "max"):
+                        band = ref.get(stat_name)
+                        if isinstance(band, dict) and stat_name in stats:
+                            _check_reference_band(
+                                stat_name,
+                                stats[stat_name],
+                                band,
+                                cat_id,
+                                ref_warnings,
+                            )
+                    if ref_warnings:
+                        for w in ref_warnings:
+                            print(w)
+                        all_ref_warnings.extend(ref_warnings)
+
         print()
 
     # Grand total
@@ -224,3 +372,8 @@ def main() -> None:
     print(
         f"Total: {total_items} items across {len(items_by_super_cat)} super-categories"
     )
+
+    if all_ref_warnings:
+        print(f"\n{len(all_ref_warnings)} reference band warning(s) — see above for details.")
+    elif ref_tables:
+        print("\nAll categories within reference band targets.")

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-# Maps YAML string values <-> ClueData.ClueType enum integers (ANCHOR=0, SURFACE=1, HIDDEN=2).
-_CLUE_TYPE_TO_INT: dict[str, int] = {"anchor": 0, "surface": 1, "hidden": 2}
+# Maps YAML string values <-> ClueData.ClueType enum integers (SURFACE=0, HIDDEN=1).
+_CLUE_TYPE_TO_INT: dict[str, int] = {"surface": 0, "hidden": 1}
 _INT_TO_CLUE_TYPE: dict[int, str] = {v: k for k, v in _CLUE_TYPE_TO_INT.items()}
 
 from tres_lib.spec import BuildCtx, ParseCtx
@@ -37,6 +37,8 @@ class ClueSpec:
         uid = deterministic_uid(self.uid_prefix, clue_id)
         ctx.uid_cache[clue_id] = uid
 
+        ctype = entry.get("type", "surface")
+
         w = TresWriter("Resource", "ClueData", uid)
         w.add_ext_resource(
             "1_cluedef",
@@ -47,7 +49,7 @@ class ClueSpec:
         w.add_field('script = ExtResource("1_cluedef")')
         w.add_field_str("clue_id", clue_id)
         w.add_field_str("known_text", entry.get("known_text", ""))
-        w.add_field_int("type", _CLUE_TYPE_TO_INT.get(entry.get("type", "surface"), 1))
+        w.add_field_int("type", _CLUE_TYPE_TO_INT.get(ctype, 0))
         w.add_field_str("domain", entry.get("domain", "generic"))
         w.add_field_str("attribute", entry.get("attribute", ""))
         w.add_field_int("dc", int(entry.get("dc", 10)))
@@ -59,6 +61,13 @@ class ClueSpec:
         priority = int(naming.get("priority", 0))
         w.add_field_str("naming_slot", slot)
         w.add_field_int("naming_priority", priority)
+
+        # Hidden-only draw-control field
+        w.add_field_str(
+            "exclusive_group",
+            entry.get("exclusive_group", "") if ctype == "hidden" else "",
+        )
+
         return w.render()
 
     def parse_tres(self, text: str, ctx: ParseCtx) -> dict:
@@ -69,7 +78,9 @@ class ClueSpec:
         return {
             "clue_id": clue_id,
             "known_text": tres_field(text, "known_text") or "",
-            "type": _INT_TO_CLUE_TYPE.get(int(tres_field(text, "type") or 1), "surface"),
+            "type": _INT_TO_CLUE_TYPE.get(
+                int(tres_field(text, "type") or 0), "surface"
+            ),
             "domain": tres_field(text, "domain") or "generic",
             "attribute": tres_field(text, "attribute") or "",
             "dc": int(tres_field(text, "dc") or 10),
@@ -77,12 +88,13 @@ class ClueSpec:
             "effect_amount": float(tres_field(text, "effect_amount") or 0.0),
             "naming_slot": tres_field(text, "naming_slot") or "",
             "naming_priority": int(tres_field(text, "naming_priority") or 0),
+            "exclusive_group": tres_field(text, "exclusive_group") or "",
         }
 
     def validate(self, entries: list, all_data: dict) -> list[str]:
         errors: list[str] = []
         seen_ids: dict[str, int] = {}
-        VALID_OPS = {"flat", "add", "mul"}
+        VALID_OPS = {"add", "mul", "override"}
         EFFECT_AMOUNT_MIN = -100_000.0
         EFFECT_AMOUNT_MAX = 100_000.0
 
@@ -103,13 +115,13 @@ class ClueSpec:
                 errors.append(f"clue '{cid}': known_text is required")
 
             ctype = clue.get("type", "")
-            if ctype not in ("anchor", "surface", "hidden"):
-                errors.append(f"clue '{cid}': type must be anchor/surface/hidden")
+            if ctype not in ("surface", "hidden"):
+                errors.append(f"clue '{cid}': type must be surface/hidden")
 
             op = clue.get("effect_op")
             if op not in VALID_OPS:
                 errors.append(
-                    f"clue '{cid}': unknown effect_op '{op}' (must be 'flat', 'add', or 'mul')"
+                    f"clue '{cid}': unknown effect_op '{op}' (must be 'add', 'mul', or 'override')"
                 )
 
             try:
@@ -122,6 +134,19 @@ class ClueSpec:
                     )
             except (ValueError, TypeError):
                 errors.append(f"clue '{cid}': effect_amount is not a valid number")
+                amount = None
+
+            # "override" is only legal on hidden clues.
+            if op == "override" and ctype != "hidden":
+                errors.append(
+                    f"clue '{cid}': effect_op 'override' is only valid on hidden clues"
+                )
+
+            # All clues must have a non-zero effect_amount.
+            if amount is not None and amount == 0.0:
+                errors.append(
+                    f"clue '{cid}': effect_amount must be non-zero on {ctype} clues"
+                )
 
             # Three-word ceiling on known_text.
             known_text = clue.get("known_text", "")

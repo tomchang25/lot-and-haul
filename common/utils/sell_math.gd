@@ -9,8 +9,10 @@ extends RefCounted
 ## Conservative sell: flat price multiplier, no dice.
 const CONSERVATIVE_MULTIPLIER: float = 1.25
 
-## Verified items get a ×1.2 price bonus on car contribution.
-const VERIFIED_PRICE_BONUS: float = 1.2
+## Verified items get a ×1.05 price bonus on car contribution.
+## Reduced from 1.2: COMMON items (0 hidden) are verified by default and would
+## otherwise carry a free 20% margin with no research investment.
+const VERIFIED_PRICE_BONUS: float = 1.05
 
 ## Base dice pool by fit depth. depth 1 → 2d, 2 → 4d, 3 → 6d.
 const DICE_POOL_BY_DEPTH: Dictionary = {

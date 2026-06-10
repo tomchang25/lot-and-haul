@@ -102,7 +102,11 @@ func _populate_clue_section(item: ItemEntry) -> void:
     for child in _clue_container.get_children():
         child.free()
 
-    if item.item_data == null or item.item_data.clues.is_empty():
+    var all_clues: Array[ClueData] = []
+    if item.item_data != null:
+        all_clues = item.item_data.all_clues
+
+    if item.item_data == null or all_clues.is_empty():
         _clue_separator.hide()
         _clue_container.hide()
         return
@@ -118,7 +122,7 @@ func _populate_clue_section(item: ItemEntry) -> void:
     # node-src: ephemeral — clue header, rebuilt per refresh
     _clue_container.add_child(header)
 
-    for clue: ClueData in item.item_data.clues:
+    for clue: ClueData in all_clues:
         var row := Label.new()
         row.add_theme_font_size_override(&"font_size", 11)
         row.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

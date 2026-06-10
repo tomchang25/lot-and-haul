@@ -136,8 +136,6 @@ static func generate_for_night(
 static func _tag_vocabulary() -> Array[String]:
     var ids: Array[String] = []
     for clue: ClueData in ClueRegistry.get_all_clues():
-        if clue.type == ClueData.ClueType.ANCHOR:
-            continue
         ids.append(clue.clue_id)
     return ids
 

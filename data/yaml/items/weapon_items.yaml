@@ -1,39 +1,38 @@
 items:
   - item_id: pistol_dutch_holster
     item_name: Dutch Pistol
-    base_price: 560
     category_id: pistol
     rarity: 1
-    clue_ids:
-      - pistol_veil_01
+    anchor_id: pistol_veil_01
+    surface_ids:
       - pistol_short_barrel
       - pistol_metal_patina
       - pistol_proof_stamp
       - pistol_proof_inspected
+    hidden_ids:
       - pistol_leaf_dutch
 
   - item_id: pistol_british_naval
     item_name: British Pistol
-    base_price: 1500
     category_id: pistol
-    rarity: 2
-    clue_ids:
-      - pistol_veil_01
+    rarity: 1
+    anchor_id: pistol_veil_01
+    surface_ids:
       - pistol_short_barrel
       - pistol_metal_patina
       - pistol_proof_stamp
       - pistol_proof_inspected
       - pistol_lock_signed
       - pistol_signature_match
+    hidden_ids:
       - pistol_leaf_naval
 
   - item_id: pistol_french_cavalry
     item_name: French Pistol
-    base_price: 5600
     category_id: pistol
-    rarity: 2
-    clue_ids:
-      - pistol_veil_01
+    rarity: 1
+    anchor_id: pistol_veil_01
+    surface_ids:
       - pistol_short_barrel
       - pistol_metal_patina
       - pistol_proof_stamp
@@ -44,15 +43,15 @@ items:
       - pistol_grip_carved
       - pistol_maker_master
       - pistol_maker_referred
+    hidden_ids:
       - pistol_leaf_cavalry
 
   - item_id: pistol_boutet_versailles
     item_name: Boutet Pistol
-    base_price: 14500
     category_id: pistol
-    rarity: 3
-    clue_ids:
-      - pistol_veil_02
+    rarity: 1
+    anchor_id: pistol_veil_02
+    surface_ids:
       - pistol_short_barrel
       - pistol_metal_patina
       - pistol_scroll_grip
@@ -64,28 +63,28 @@ items:
       - pistol_gold_inlay
       - pistol_versailles_mark
       - pistol_walnut_stock
+    hidden_ids:
       - pistol_leaf_boutet
 
   - item_id: rifle_charleville_repro
     item_name: Charleville Rifle
-    base_price: 900
     category_id: rifle
     rarity: 1
-    clue_ids:
-      - rifle_veil_01
+    anchor_id: rifle_veil_01
+    surface_ids:
       - rifle_long_barrel
       - rifle_bore_worn
       - rifle_proof_stamped
       - rifle_lock_pattern
+    hidden_ids:
       - rifle_leaf_charleville
 
   - item_id: rifle_springfield_1861
     item_name: Springfield Rifle
-    base_price: 2300
     category_id: rifle
-    rarity: 2
-    clue_ids:
-      - rifle_veil_01
+    rarity: 1
+    anchor_id: rifle_veil_01
+    surface_ids:
       - rifle_long_barrel
       - rifle_bore_worn
       - rifle_proof_stamped
@@ -93,15 +92,15 @@ items:
       - rifle_brass_buttplate
       - rifle_sling_swivels
       - rifle_bayonet_lug
+    hidden_ids:
       - rifle_leaf_springfield
 
   - item_id: rifle_crimea_enfield
     item_name: Enfield Rifle
-    base_price: 6400
     category_id: rifle
-    rarity: 2
-    clue_ids:
-      - rifle_veil_01
+    rarity: 1
+    anchor_id: rifle_veil_01
+    surface_ids:
       - rifle_long_barrel
       - rifle_bore_worn
       - rifle_proof_stamped
@@ -111,15 +110,15 @@ items:
       - rifle_bayonet_lug
       - rifle_maker_signed
       - rifle_maker_documented
+    hidden_ids:
       - rifle_leaf_regiment
 
   - item_id: rifle_whitworth_sniper
     item_name: Whitworth Rifle
-    base_price: 18000
     category_id: rifle
-    rarity: 3
-    clue_ids:
-      - rifle_veil_01
+    rarity: 1
+    anchor_id: rifle_veil_01
+    surface_ids:
       - rifle_long_barrel
       - rifle_bore_worn
       - rifle_action_engraved
@@ -130,28 +129,28 @@ items:
       - rifle_whitworth_hex
       - rifle_optical_sight
       - rifle_action_fitted
+    hidden_ids:
       - rifle_leaf_whitworth
 
   - item_id: crossbow_german_hunting
     item_name: German Bow
-    base_price: 650
     category_id: crossbow
     rarity: 1
-    clue_ids:
-      - crossbow_veil_01
+    anchor_id: crossbow_veil_01
+    surface_ids:
       - crossbow_wood_tiller
       - crossbow_stock_tooled
       - crossbow_mech_triggered
       - crossbow_iron_work
+    hidden_ids:
       - crossbow_leaf_hunting
 
   - item_id: crossbow_swiss_military
     item_name: Swiss Bow
-    base_price: 2100
     category_id: crossbow
-    rarity: 2
-    clue_ids:
-      - crossbow_veil_01
+    rarity: 1
+    anchor_id: crossbow_veil_01
+    surface_ids:
       - crossbow_wood_tiller
       - crossbow_stock_tooled
       - crossbow_mech_triggered
@@ -159,15 +158,15 @@ items:
       - crossbow_provenance_tag
       - crossbow_provenance_cataloged
       - crossbow_prod_steel
+    hidden_ids:
       - crossbow_leaf_military
 
   - item_id: crossbow_noble_presentation
     item_name: Noble Bow
-    base_price: 7000
     category_id: crossbow
-    rarity: 3
-    clue_ids:
-      - crossbow_veil_01
+    rarity: 1
+    anchor_id: crossbow_veil_01
+    surface_ids:
       - crossbow_wood_tiller
       - crossbow_stock_tooled
       - crossbow_mech_triggered
@@ -179,4 +178,5 @@ items:
       - crossbow_prod_steel
       - crossbow_wire_gilded
       - crossbow_ivory_tip
+    hidden_ids:
       - crossbow_leaf_noble

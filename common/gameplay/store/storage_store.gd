@@ -22,15 +22,14 @@ var next_entry_id: int:
         return _next_entry_id
 
 
-## Registers a single [param entry]: assigns a stable id, appends to storage,
-## and auto-reveals hidden clues when the item has auto_verify set.
+## Registers a single [param entry]: assigns a stable id and appends to storage.
+## Items with zero hidden clues (COMMON rarity) are verified by default via the
+## ItemEntry.verified getter — no explicit reveal needed.
 ## Does not save — callers commit via SaveManager.save().
 func register_entry(entry: ItemEntry) -> void:
     entry.id = _next_entry_id
     _next_entry_id += 1
     _storage_items.append(entry)
-    if entry.item_data != null and entry.item_data.auto_verify:
-        entry.reveal_all_hidden()
 
 
 ## Registers all entries in [param entries]. No save.

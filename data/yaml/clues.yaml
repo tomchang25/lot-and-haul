@@ -1,16 +1,115 @@
-clues:
-  - clue_id: lamp_veil_01
+anchors:
+  - anchor_id: lamp_veil_01
     known_text: Lamp
-    type: anchor
-    domain: oil_lamp
-    attribute: appraisal
-    dc: 0
-    effect_op: flat
-    effect_amount: 40
-    naming:
-      slot: body
-      priority: 1
+    naming_priority: 1
+    category_scope: oil_lamp
+    base_value: 40
+    shape_id: s1x2
+    sprite: ""
+    weight_kg: 1.5
+    tier: 1
 
+  - anchor_id: clock_veil_01
+    known_text: Clock
+    naming_priority: 1
+    category_scope: clock
+    base_value: 60
+    shape_id: s2x2
+    sprite: ""
+    weight_kg: 3.0
+    tier: 1
+
+  - anchor_id: bag_veil_01
+    known_text: Bag
+    naming_priority: 1
+    category_scope: handbag
+    base_value: 10
+    shape_id: s1x1
+    sprite: ""
+    weight_kg: 0.5
+    tier: 1
+
+  - anchor_id: bag_veil_02
+    known_text: Bag
+    naming_priority: 1
+    category_scope: handbag
+    base_value: 25
+    shape_id: s1x1
+    sprite: ""
+    weight_kg: 0.5
+    tier: 2
+
+  - anchor_id: bag_veil_03
+    known_text: Bag
+    naming_priority: 1
+    category_scope: handbag
+    base_value: 50
+    shape_id: s1x1
+    sprite: ""
+    weight_kg: 0.5
+    tier: 3
+
+  - anchor_id: watch_veil_01
+    known_text: Watch
+    naming_priority: 1
+    category_scope: wristwatch
+    base_value: 10
+    shape_id: s1x1
+    sprite: ""
+    weight_kg: 0.1
+    tier: 1
+
+  - anchor_id: watch_veil_02
+    known_text: Watch
+    naming_priority: 1
+    category_scope: wristwatch
+    base_value: 20
+    shape_id: s1x1
+    sprite: ""
+    weight_kg: 0.1
+    tier: 2
+
+  - anchor_id: pistol_veil_01
+    known_text: Pistol
+    naming_priority: 1
+    category_scope: pistol
+    base_value: 40
+    shape_id: s1x2
+    sprite: ""
+    weight_kg: 1.2
+    tier: 1
+
+  - anchor_id: pistol_veil_02
+    known_text: Pistol
+    naming_priority: 1
+    category_scope: pistol
+    base_value: 80
+    shape_id: s1x2
+    sprite: ""
+    weight_kg: 1.2
+    tier: 2
+
+  - anchor_id: rifle_veil_01
+    known_text: Rifle
+    naming_priority: 1
+    category_scope: rifle
+    base_value: 50
+    shape_id: s1x4
+    sprite: ""
+    weight_kg: 4.0
+    tier: 1
+
+  - anchor_id: crossbow_veil_01
+    known_text: Bow
+    naming_priority: 1
+    category_scope: crossbow
+    base_value: 30
+    shape_id: s2x2
+    sprite: ""
+    weight_kg: 3.0
+    tier: 1
+
+clues:
   - clue_id: lamp_glass_blown
     known_text: Blown
     type: surface
@@ -30,7 +129,7 @@ clues:
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -54,7 +153,7 @@ clues:
     attribute: restoration
     dc: 14
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -78,7 +177,7 @@ clues:
     attribute: investigation
     dc: 16
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -102,7 +201,7 @@ clues:
     attribute: investigation
     dc: 16
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -126,7 +225,7 @@ clues:
     attribute: appraisal
     dc: 18
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -179,18 +278,6 @@ clues:
       slot: prefix
       priority: 5
 
-  - clue_id: clock_veil_01
-    known_text: Clock
-    type: anchor
-    domain: clock
-    attribute: appraisal
-    dc: 0
-    effect_op: flat
-    effect_amount: 60
-    naming:
-      slot: body
-      priority: 1
-
   - clue_id: clock_wood_joinery
     known_text: Joinery
     type: surface
@@ -210,7 +297,7 @@ clues:
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -234,7 +321,7 @@ clues:
     attribute: restoration
     dc: 16
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -258,7 +345,7 @@ clues:
     attribute: appraisal
     dc: 18
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -274,42 +361,6 @@ clues:
     naming:
       slot: prefix
       priority: 5
-
-  - clue_id: bag_veil_01
-    known_text: Bag
-    type: anchor
-    domain: handbag
-    attribute: appraisal
-    dc: 0
-    effect_op: flat
-    effect_amount: 10
-    naming:
-      slot: body
-      priority: 1
-
-  - clue_id: bag_veil_02
-    known_text: Bag
-    type: anchor
-    domain: handbag
-    attribute: appraisal
-    dc: 0
-    effect_op: flat
-    effect_amount: 25
-    naming:
-      slot: body
-      priority: 1
-
-  - clue_id: bag_veil_03
-    known_text: Bag
-    type: anchor
-    domain: handbag
-    attribute: appraisal
-    dc: 0
-    effect_op: flat
-    effect_amount: 50
-    naming:
-      slot: body
-      priority: 1
 
   - clue_id: bag_exterior_fabric
     known_text: Fabric
@@ -342,7 +393,7 @@ clues:
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -378,7 +429,7 @@ clues:
     attribute: restoration
     dc: 16
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -414,7 +465,7 @@ clues:
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -438,7 +489,7 @@ clues:
     attribute: appraisal
     dc: 18
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -623,30 +674,6 @@ clues:
       slot: prefix
       priority: 5
 
-  - clue_id: watch_veil_01
-    known_text: Watch
-    type: anchor
-    domain: wristwatch
-    attribute: appraisal
-    dc: 0
-    effect_op: flat
-    effect_amount: 10
-    naming:
-      slot: body
-      priority: 1
-
-  - clue_id: watch_veil_02
-    known_text: Watch
-    type: anchor
-    domain: wristwatch
-    attribute: appraisal
-    dc: 0
-    effect_op: flat
-    effect_amount: 20
-    naming:
-      slot: body
-      priority: 1
-
   - clue_id: watch_case_lugs
     known_text: Lugs
     type: surface
@@ -666,7 +693,7 @@ clues:
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -690,7 +717,7 @@ clues:
     attribute: investigation
     dc: 16
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -714,7 +741,7 @@ clues:
     attribute: restoration
     dc: 14
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -887,30 +914,6 @@ clues:
       slot: prefix
       priority: 5
 
-  - clue_id: pistol_veil_01
-    known_text: Pistol
-    type: anchor
-    domain: pistol
-    attribute: appraisal
-    dc: 0
-    effect_op: flat
-    effect_amount: 40
-    naming:
-      slot: body
-      priority: 1
-
-  - clue_id: pistol_veil_02
-    known_text: Pistol
-    type: anchor
-    domain: pistol
-    attribute: appraisal
-    dc: 0
-    effect_op: flat
-    effect_amount: 80
-    naming:
-      slot: body
-      priority: 1
-
   - clue_id: pistol_short_barrel
     known_text: Barreled
     type: surface
@@ -930,7 +933,7 @@ clues:
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -954,7 +957,7 @@ clues:
     attribute: restoration
     dc: 16
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -978,7 +981,7 @@ clues:
     attribute: appraisal
     dc: 18
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -1002,7 +1005,7 @@ clues:
     attribute: appraisal
     dc: 16
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -1026,7 +1029,7 @@ clues:
     attribute: appraisal
     dc: 18
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -1115,18 +1118,6 @@ clues:
       slot: prefix
       priority: 5
 
-  - clue_id: rifle_veil_01
-    known_text: Rifle
-    type: anchor
-    domain: rifle
-    attribute: appraisal
-    dc: 0
-    effect_op: flat
-    effect_amount: 50
-    naming:
-      slot: body
-      priority: 1
-
   - clue_id: rifle_long_barrel
     known_text: Barreled
     type: surface
@@ -1146,7 +1137,7 @@ clues:
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -1170,7 +1161,7 @@ clues:
     attribute: investigation
     dc: 16
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -1194,7 +1185,7 @@ clues:
     attribute: restoration
     dc: 16
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -1218,7 +1209,7 @@ clues:
     attribute: appraisal
     dc: 18
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -1242,7 +1233,7 @@ clues:
     attribute: restoration
     dc: 14
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -1355,18 +1346,6 @@ clues:
       slot: prefix
       priority: 5
 
-  - clue_id: crossbow_veil_01
-    known_text: Bow
-    type: anchor
-    domain: crossbow
-    attribute: appraisal
-    dc: 0
-    effect_op: flat
-    effect_amount: 30
-    naming:
-      slot: body
-      priority: 1
-
   - clue_id: crossbow_wood_tiller
     known_text: Tiller
     type: surface
@@ -1386,7 +1365,7 @@ clues:
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -1410,7 +1389,7 @@ clues:
     attribute: restoration
     dc: 16
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2
@@ -1434,7 +1413,7 @@ clues:
     attribute: appraisal
     dc: 18
     effect_op: add
-    effect_amount: 0
+    effect_amount: 1
     naming:
       slot: prefix
       priority: 2

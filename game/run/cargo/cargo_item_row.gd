@@ -144,7 +144,7 @@ func _build_shape_icon() -> void:
         _shape_icon.remove_child(child)
         child.queue_free()
 
-    var cells: Array[Vector2i] = _entry.item_data.category_data.get_cells()
+    var cells: Array[Vector2i] = _entry.get_cells()
     if cells.is_empty():
         return
 

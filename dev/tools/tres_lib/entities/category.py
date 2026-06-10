@@ -14,12 +14,6 @@ from tres_lib.tres_format import (
     ext_resources,
 )
 
-_VALID_SHAPE_IDS: frozenset[str] = frozenset({
-    "s1x1", "s1x2", "s1x3", "s1x4",
-    "s2x2", "s2x3", "s2x4",
-    "sL11", "sL12", "sT3",
-})
-
 
 @dataclass
 class CategorySpec:
@@ -61,8 +55,6 @@ class CategorySpec:
         w.add_field_str("category_id", cat_id)
         w.add_field('super_category = ExtResource("2_super")')
         w.add_field_str("display_name", entry["display_name"])
-        w.add_field_float("weight", float(entry.get("weight", 0.0)))
-        w.add_field_str("shape_id", str(entry.get("shape_id", "s1x1")))
         return w.render()
 
     def parse_tres(self, text: str, ctx: ParseCtx) -> dict:
@@ -72,8 +64,6 @@ class CategorySpec:
             ctx.uid_to_id[uid] = cat_id
 
         display_name = tres_field(text, "display_name") or cat_id
-        weight = float(tres_field(text, "weight") or 0.0)
-        shape_id = tres_field(text, "shape_id") or "s1x1"
 
         ext_res = ext_resources(text)
         super_cat_id = ""
@@ -86,8 +76,6 @@ class CategorySpec:
             "category_id": cat_id,
             "super_category": super_cat_id,
             "display_name": display_name,
-            "weight": weight,
-            "shape_id": shape_id,
         }
 
     def validate(self, entries: list, all_data: dict) -> list[str]:
@@ -101,15 +89,6 @@ class CategorySpec:
 
         for cat in entries:
             cid = cat.get("category_id", "?")
-            shape_id = cat.get("shape_id")
-            if shape_id is None:
-                errors.append(f"category '{cid}': missing shape_id")
-            elif shape_id not in _VALID_SHAPE_IDS:
-                errors.append(
-                    f"category '{cid}': unknown shape_id '{shape_id}'"
-                    f" — valid: {sorted(_VALID_SHAPE_IDS)}"
-                )
-
             sc_ref = cat.get("super_category", "")
             if known_super_cat_ids and sc_ref not in known_super_cat_ids:
                 errors.append(

@@ -7,6 +7,8 @@
 **/script_templates
 **/*_back
 
+**/dev/tools/bin
+
 **/*.uid
 **/*.tmp
 **/*.import

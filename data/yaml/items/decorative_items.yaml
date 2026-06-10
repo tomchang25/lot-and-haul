@@ -1,58 +1,58 @@
 items:
   - item_id: lamp_moser_bohemian
     item_name: Moser Lamp
-    base_price: 1250
     category_id: oil_lamp
-    rarity: 2
-    clue_ids:
-      - lamp_veil_01
+    rarity: 1
+    anchor_id: lamp_veil_01
+    surface_ids:
       - lamp_glass_blown
       - lamp_glass_wear_ring
       - lamp_cast_scrollwork
       - lamp_burner_fitting
+    hidden_ids:
       - lamp_leaf_moser
 
   - item_id: lamp_baccarat_crystal
     item_name: Baccarat Lamp
-    base_price: 2100
     category_id: oil_lamp
-    rarity: 2
-    clue_ids:
-      - lamp_veil_01
+    rarity: 1
+    anchor_id: lamp_veil_01
+    surface_ids:
       - lamp_glass_blown
       - lamp_glass_wear_ring
       - lamp_mold_seams
       - lamp_glass_crystal
       - lamp_silver_collar
       - lamp_maker_signature
+    hidden_ids:
       - lamp_leaf_baccarat
 
   - item_id: lamp_hinks_duplex
     item_name: Hinks Lamp
-    base_price: 4200
     category_id: oil_lamp
-    rarity: 3
-    clue_ids:
-      - lamp_veil_01
+    rarity: 1
+    anchor_id: lamp_veil_01
+    surface_ids:
       - lamp_glass_blown
       - lamp_glass_wear_ring
       - lamp_silver_collar
       - lamp_date_letter
       - lamp_maker_stamp
       - lamp_registry_match
+    hidden_ids:
       - lamp_leaf_hinks
 
   - item_id: clock_boulle_mantel
     item_name: Boulle Clock
-    base_price: 6000
     category_id: clock
-    rarity: 3
-    clue_ids:
-      - clock_veil_01
+    rarity: 1
+    anchor_id: clock_veil_01
+    surface_ids:
       - clock_wood_joinery
       - clock_wood_finish
       - clock_case_gilded
       - clock_inlay_quality
       - clock_movement_signed
       - clock_workshop_match
+    hidden_ids:
       - clock_leaf_boulle

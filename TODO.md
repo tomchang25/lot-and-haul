@@ -74,14 +74,6 @@ Pre-run intelligence on available lots — reveal clue counts, surface categorie
 
 The Entry/Instance archetype is in a middle state: it has mutable fields and self-mutating methods (`unveil()`, `attempt_clue()`, `auto_reveal_all_surface()`), but scenes call those methods directly rather than going through a Manager. This makes Entry neither a clean data Model (mutations mediated by Manager, like Stores) nor a stateless Service. Decide which direction Entries should go: thin data holders where Managers own all mutations (aligning with the Store pattern), or self-contained objects with a clear contract for who may call mutation methods and when. This shapes both the ItemEntry cleanup and the encapsulation work below.
 
-### ItemEntry Cleanup / Data Standard
-
-`item_entry.gd` (698 lines) mixes price math, display text helpers, serialization, clue mechanics, and factory logic. Split into layers: `ItemEntry` = data + price logic, display getters = separate concern (`ItemDisplay` or similar). Clear boundary: `ItemData` (designer resource, the _what_), `ItemEntry` (runtime instance, the _state+behavior_), display (the _show_).
-
-### ItemEntry Encapsulation — Manager-Mediated Mutations
-
-Run-phase scenes (`inspection_scene`, `reveal_scene`, `run_review_scene`) mutate ItemEntry directly — `entry.unveil()`, `entry.attempt_clue()`, `entry.condition = ...` — bypassing RunManager. This is inconsistent with the Store/Manager pattern established by the save refactor where all state mutation goes through the owning Manager. Add thin RunManager wrappers (`unveil_item()`, `apply_trailer_damage()`, etc.) so ItemEntry mutations follow the same discipline as Store mutations. Not urgent — harmless today because no one else observes mid-run ItemEntry state — but blocks any future save-on-inspect or mid-run persistence.
-
 ### MetaManager Decomposition
 
 MetaManager holds 6 stores and coordinates slot economy, storage AP, vehicle management, run resolution, customer sale, day-end, and location sampling (~358 lines). Below the pain threshold now, but it's the next candidate for splitting if it grows. The slot economy + storage AP section could become its own manager.
@@ -138,17 +130,6 @@ Use `get_mastery_rank()` directly to gate prestige unlocks and NPC reaction tier
 
 Surface `fuel_cost_per_day × travel_days` in the location selection cost card. Blocked on the location system's cost card.
 
-### Super-Category Diversity
-
-All four super_categories currently share identical value ranges and clue complexity — no mechanical personality. Idea: differentiate by base anchor value distribution, clue count range, and surface/hidden complexity to create distinct "feel" per super_category:
-
-| super_category | anchor range    | clue count | surface complexity | hidden volatility                   |
-| -------------- | --------------- | ---------- | ------------------ | ----------------------------------- |
-| fashion        | wide (100–800)  | 3–5        | many small add/mul | high (can swing ±50%)               |
-| decorative     | tight (150–400) | 2–3        | few flat modifiers | low (mostly surface tells you)      |
-| fine_art       | high (300–1200) | 4–6        | few but large mul  | medium (hidden can double or halve) |
-| weapon         | mid (200–600)   | 2–4        | predictable add    | very low (surface is truth)         |
-
 ### Vehicle Upgrades / Mods
 
 Upgrade system for vehicles: bigger tank, reinforced cargo bay, etc.
@@ -165,9 +146,13 @@ Each vehicle grants a unique gameplay modifier (e.g. "+1 action per lot", "ignor
 
 Sell owned cars for partial value when upgrading, so trading up has a cost offset.
 
-### YAML Data Overhaul
+### Pool-Based Item Generation
 
-Two-part content standard. (1) Define super_category / category reference tables: median, mean, stddev, min, max price and condition per category for balancing. (2) Adopt rarity layer distribution as authoring guideline: 8 Common (L1), 8 Uncommon (L1-2), 4 Rare (L2-3), 1 Epic (L3-4), 1 Legendary (L4 + SuperCat). Audit existing YAML items against this standard.
+Remove `ItemData` as an authored-per-item resource. Instead, generate items at lot-draw time: pick a category, draw an anchor variant (lot/location tier weight curves), draw surface clues uniformly (anchor-conditioned drawing is its own Draft below), draw rarity (lot/location-controlled frequency) then that many hidden clues uniformly from valid non-excluded options. True name from affix composition, true value from drawn modifiers. Draw-control metadata (anchor tiers, exclusive groups) is authored by the clue schema cleanup — see `dev/docs/plans/clue_schema_cleanup.md`. Remaining work here: the generator itself, lot/location tier curves + rarity frequency tables, a balance-tuning tool to preview draw value distributions before shipping, and item serialization moving from registry item-id lookup to stored clue lists (generated items have no registry id). Prerequisites: clue schema cleanup shipped; affix naming validated across the curated set (already in place).
+
+### Anchor-Conditioned Surface Draw
+
+Future pool-generator work: bias surface clue draws by the item's anchor (tier/category affinity) instead of pure uniform. A first half-built attempt — affinity tags plus per-tag weight overrides authored on surface clues — was removed by the clue schema cleanup: the anchor side of the relationship was never defined, and per-clue weight dictionaries degenerate into a disguised per-pair weight matrix. Needs a settled model first (e.g. tags declared on anchors, a single weight function over tag overlap, never per-pair matrices). Blocked on the pool generator existing at all; uniform draw is the shipping behavior until then.
 
 ### Combination Naming Rules
 
@@ -188,38 +173,31 @@ Open questions:
 
 Prerequisite: the affix-naming system validated across the full item set (composed == authored) — already in place.
 
-### New Clue Types
+### ItemEntry Cleanup / Data Standard
 
-Two candidate clue types beyond the current anchor/surface/hidden modifier model.
+`item_entry.gd` (698 lines) mixes price math, display text helpers, serialization, clue mechanics, and factory logic. Split into layers: `ItemEntry` = data + price logic, display getters = separate concern (`ItemDisplay` or similar). Clear boundary: `ItemData` (designer resource, the _what_), `ItemEntry` (runtime instance, the _state+behavior_), display (the _show_).
 
-Override clue — replaces the anchor base price entirely when revealed during Research (e.g. a $200 "old clock" turns out to be a $15,000 Boulle original). Open: does it replace the anchor only or the full appraised value? Do surface adds still apply on top? Validation: hidden type only, max 1 per item.
+### ItemEntry Encapsulation — Manager-Mediated Mutations
 
-Conditional clue — a clue whose price effect depends on whether another specific clue is revealed:
-
-```
-if clue A revealed → apply effect_op P, effect_amount N
-else               → apply effect_op T, effect_amount M
-```
-
-Open: evaluation order (reveal time vs. price-compute time), circular-reference risk, YAML representation, and "else" semantics when A is on the item but unrevealed vs. not present.
-
-### Pool-Based Item Generation
-
-Remove `ItemData` as an authored-per-item resource. Instead, generate items at lot-draw time by drawing clues from a category-scoped pool: pick a category, then draw N clues (rarity controls count, tier access, and total value). The true name comes entirely from affix composition; the true value from applying the drawn clue modifiers. This shifts authoring from "define each item" to "define clue pools per category" — a smaller surface with combinatorial variety.
-
-Prerequisites:
-
-1. Clue modifier math validated — no degenerate price combinations from hand-curated items.
-2. Affix naming produces acceptable names for hand-curated items (validator confirms composed == authored).
-3. A balance-tuning tool to preview the value distribution of random pool draws before shipping.
-
-Not now: hand-curated `ItemData` gives full designer control and isolates variables; if the curated version works, the only new risk in pool generation is the draw distribution itself.
+Run-phase scenes (`inspection_scene`, `reveal_scene`, `run_review_scene`) mutate ItemEntry directly — `entry.unveil()`, `entry.attempt_clue()`, `entry.condition = ...` — bypassing RunManager. This is inconsistent with the Store/Manager pattern established by the save refactor where all state mutation goes through the owning Manager. Add thin RunManager wrappers (`unveil_item()`, `apply_trailer_damage()`, etc.) so ItemEntry mutations follow the same discipline as Store mutations. Not urgent — harmless today because no one else observes mid-run ItemEntry state — but blocks any future save-on-inspect or mid-run persistence.
 
 ---
 
 ## Active
 
 Flows currently being built. One-line pointer each — same format as `## Plan`, just promoted here when work starts. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress → this section is empty.
+
+- [clue_schema] Clue schema cleanup — anchor resource extraction, base/override split, three-way item clue lists, veiled/unveiled flag, affinity field removal, mechanical data conversion — see `dev/docs/plans/clue_schema_cleanup.md`
+
+---
+
+## Pending
+
+The deferred tail of an in-flight flow. When a confirmed initiative spans multiple plans, the parts not being built yet wait here instead of crowding `## Active` — same one-line format, promoted to `## Active` when their turn comes. Normally empty: a small fix or a feature that a single plan covers never uses this tier — it goes straight from `## Plan` to `## Active`.
+
+- [clue_content] Generation standard, prompt rewrite, reference tables + full YAML regen on the post-cleanup schema — see `dev/docs/plans/clue_content_standard_regen.md`; depends on clue_schema
+- [item_entry_refactor] ItemEntry layer split (data + price vs display) + Manager-mediated mutations, merged into one refactor — plan file pending, reasoning in the ItemEntry / Entry-Instance `## Draft` sections
+- [pool_generation] Pool-based item generation (generator, lot/location tier curves, balance tool, clue-list serialization) — plan file pending, reasoning in the Pool-Based `## Draft` section; depends on clue_schema + item_entry_refactor
 
 ---
 

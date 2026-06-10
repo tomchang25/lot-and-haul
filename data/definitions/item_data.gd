@@ -4,6 +4,8 @@
 class_name ItemData
 extends Resource
 
+## Rarity also equals the number of hidden clues on the item.
+## COMMON = 0 hidden (verified immediately); LEGENDARY = 4 hidden.
 enum Rarity {
     COMMON,
     UNCOMMON,
@@ -15,25 +17,26 @@ enum Rarity {
 # Internal identifier. Never displayed to the player.
 @export var item_id: String = ""
 
-## DEPRECATED — Phase 8
-# True item name. Shown only after verification (all hidden clues revealed).
-@export var item_name: String = ""
-
-## DEPRECATED — Phase 7 moved true value into clue modifiers
-## (anchor + surface + hidden). Retained only for YAML pipeline validation
-## and debug sanity checks. Will be removed once pool-based item generation
-## (item_system.md draft) replaces hand-curated ItemData.
-@export var base_price: int = 0
-
-# Physical classification. Holds super_category, category, weight, grid_size.
+# Physical classification. Defines pool scope and display label.
 @export var category_data: CategoryData = null
 
-# Clue-based identity data. Each item has one anchor clue, zero or more
-# surface clues, and zero or more hidden clues.
-@export var clues: Array[ClueData] = []
+# Anchor variant for this item. Carries base value, physical identity (shape,
+# weight, sprite), and the default body naming slot.
+@export var anchor: AnchorData = null
 
-# Lot-draw weighting tier and player-facing display tier.
+# Surface clues: discovered via dice during inspection or auto-revealed on hub return.
+@export var surface_clues: Array[ClueData] = []
+
+# Hidden clues: revealed only by Storage Authenticate. Count must equal rarity value.
+@export var hidden_clues: Array[ClueData] = []
+
+## Rarity == hidden clue count. COMMON (0 hidden) items are verified by default.
 @export var rarity: Rarity = Rarity.COMMON
 
-# If true, entry.verified is set immediately when this item enters storage.
-@export var auto_verify: bool = false
+## All clues on this item — surface and hidden combined, surface-first.
+## Use when iterating all clues and the surface/hidden distinction is irrelevant.
+var all_clues: Array[ClueData]:
+    get:
+        var result: Array[ClueData] = []
+        result.assign(surface_clues + hidden_clues)
+        return result

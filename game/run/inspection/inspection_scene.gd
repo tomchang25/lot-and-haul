@@ -170,12 +170,8 @@ func _candidate_origins() -> Array[Vector2i]:
 
 
 func _get_shape_cells(entry: ItemEntry) -> Array[Vector2i]:
-    var category := entry.category_data()
     var fallback: Array[Vector2i] = [Vector2i.ZERO]
-    if category == null:
-        return fallback
-
-    var cells := category.get_cells()
+    var cells := entry.get_cells()
     if cells.is_empty():
         return fallback
     return cells

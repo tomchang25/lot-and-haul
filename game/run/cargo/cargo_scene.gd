@@ -122,7 +122,7 @@ func _input(event: InputEvent) -> void:
 
 func _packing_shape_provider(item) -> Array[Vector2i]:
     var entry: ItemEntry = item as ItemEntry
-    return entry.item_data.category_data.get_cells()
+    return entry.get_cells()
 
 
 func _packing_color_provider(item) -> Color:
@@ -386,7 +386,7 @@ func _build_item_list() -> void:
 
 func _would_exceed_weight(entry: ItemEntry) -> bool:
     var max_weight: float = RunManager.run.car_data.max_weight
-    var entry_weight: float = entry.item_data.category_data.weight
+    var entry_weight: float = entry.get_weight()
 
     if _cargo_grid.is_item_placed(entry):
         return false
@@ -396,7 +396,7 @@ func _would_exceed_weight(entry: ItemEntry) -> bool:
 func _get_pending_weight(entry: ItemEntry) -> float:
     if _cargo_grid.is_item_placed(entry):
         return 0.0
-    return entry.item_data.category_data.weight
+    return entry.get_weight()
 
 
 func _get_pending_slots(entry: ItemEntry) -> int:
@@ -418,8 +418,8 @@ func _recalc_totals() -> void:
         if entry not in seen:
             seen.append(entry)
             _loaded_items.append(entry)
-            _slots_used += entry.item_data.category_data.get_cells().size()
-            _weight_used += entry.item_data.category_data.weight
+            _slots_used += entry.get_cells().size()
+            _weight_used += entry.get_weight()
 
     for entry: ItemEntry in _extra_slot_items:
         if entry != null and entry not in _loaded_items:

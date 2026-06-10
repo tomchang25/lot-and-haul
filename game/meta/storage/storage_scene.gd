@@ -246,9 +246,7 @@ func _refresh_detail() -> void:
 
     # ── Research progress ─────────────────────────────────────────────────────
     if entry.has_unrevealed_hidden() and not entry.research_progress.is_empty():
-        for clue: ClueData in entry.item_data.clues:
-            if clue.type != ClueData.ClueType.HIDDEN:
-                continue
+        for clue: ClueData in entry.item_data.hidden_clues:
             if entry.revealed_clue_ids.has(clue.clue_id):
                 continue
             var progress: int = int(entry.research_progress.get(clue.clue_id, 0))

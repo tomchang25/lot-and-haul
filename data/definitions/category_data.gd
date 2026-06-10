@@ -1,6 +1,7 @@
 # category_data.gd
-# Designer-authored resource. Holds physical properties shared by all items of
-# the same fine-grained type. ItemData holds a direct reference.
+# Designer-authored resource. Defines pool scope, super-category relationship,
+# and display label for a fine-grained item type. Physical properties (shape,
+# weight) have moved to per-anchor ClueData fields.
 # Place .tres files under data/tres/categories/
 class_name CategoryData
 extends Resource
@@ -13,13 +14,3 @@ extends Resource
 
 # Fine-grained item type shown to the player (e.g. "Painting", "Pocket Watch").
 @export var display_name: String = ""
-
-# Weight in kilograms.
-@export var weight: float = 0.0
-
-# Shape key into CargoShapes.SHAPES.
-@export var shape_id: String = "s1x1"
-
-
-func get_cells() -> Array[Vector2i]:
-    return CargoShapes.get_cells(shape_id)
