@@ -12,7 +12,7 @@
         "**/art/**": true,
         // "**/assets/**": true,
         "**/asset/**": true,
-        "**/dev/docs/lot-and-haul/**": true,
+        "**/dev/docs/archived/**": true,
     },
     // "tree-generator.exclude": {
     //     "**/*.*": true,
@@ -36,4 +36,5 @@
         "editor.detectIndentation": true,
         "editor.tabSize": 4
     },
+    "python-envs.defaultEnvManager": "ms-python.python:system",
 }

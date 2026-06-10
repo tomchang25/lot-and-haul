@@ -1,13 +1,11 @@
 # cargo_scene.gd
 # Block 05 — Cargo Loading (v2: 2-D grid packing)
-# Reads:  RunManager.run_record.won_items, RunManager.run_record.car_data
-# Writes: RunManager.run_record.cargo_items, RunManager.run_record.trailer_items,
-#         RunManager.run_record.onsite_proceeds
+# Reads:  RunManager.run.won_items, RunManager.run.car_data
+# Writes: RunManager.commit_cargo()
 extends Control
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
-const ONSITE_SELL_PRICE := 50
 const CELL_SIZE := 56
 
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
@@ -83,16 +81,16 @@ func _ready() -> void:
     _continue_btn.pressed.connect(_on_continue_pressed)
     _confirm_popup.confirmed.connect(_on_confirm_popup_confirmed)
 
-    _won_items = RunManager.run_record.won_items
+    _won_items = RunManager.run.won_items
 
-    _extra_slot_items.resize(RunManager.run_record.car_data.extra_slot_count)
+    _extra_slot_items.resize(RunManager.run.car_data.extra_slot_count)
     _extra_slot_items.fill(null)
 
     _assign_item_colors()
 
     # ── Configure PackingGrid ─────────────────────────────────────────────
-    var cols := RunManager.run_record.car_data.grid_columns
-    var rows := RunManager.run_record.car_data.grid_rows
+    var cols := RunManager.run.car_data.grid_columns
+    var rows := RunManager.run.car_data.grid_rows
 
     _cargo_grid.get_shape_cells = _packing_shape_provider
     _cargo_grid.get_item_color = _packing_color_provider
@@ -205,20 +203,19 @@ func _on_confirm_popup_confirmed() -> void:
         var entry: ItemEntry = _cargo_grid.placement[pos]
         if entry not in cargo:
             cargo.append(entry)
-    RunManager.run_record.cargo_items = cargo
 
     var trailer: Array[ItemEntry] = []
     for entry: ItemEntry in _extra_slot_items:
         if entry != null:
             trailer.append(entry)
-    RunManager.run_record.trailer_items = trailer
 
     var unplaced_count := 0
     for entry: ItemEntry in _won_items:
         if entry not in cargo and entry not in trailer:
             unplaced_count += 1
-    RunManager.run_record.onsite_proceeds = unplaced_count * ONSITE_SELL_PRICE
-    GameManager.go_to_run_review()
+
+    RunManager.commit_cargo(cargo, trailer, unplaced_count * Economy.ONSITE_SELL_PRICE)
+    SceneRouter.go_to_run_review()
 
 
 func _on_extra_slot_pressed(slot_index: int) -> void:
@@ -361,7 +358,7 @@ func _get_item_border_color(entry: ItemEntry) -> Color:
 
 
 func _build_extra_slots() -> void:
-    var count := RunManager.run_record.car_data.extra_slot_count
+    var count := RunManager.run.car_data.extra_slot_count
     _trailer_section.visible = count > 0
     for i in count:
         var cell: ExtraSlotCell = ExtraSlotCellScene.instantiate()
@@ -388,7 +385,7 @@ func _build_item_list() -> void:
 
 
 func _would_exceed_weight(entry: ItemEntry) -> bool:
-    var max_weight: float = RunManager.run_record.car_data.max_weight
+    var max_weight: float = RunManager.run.car_data.max_weight
     var entry_weight: float = entry.item_data.category_data.weight
 
     if _cargo_grid.is_item_placed(entry):
@@ -430,10 +427,11 @@ func _recalc_totals() -> void:
 
 
 func _refresh_ui() -> void:
-    var cols := RunManager.run_record.car_data.grid_columns
-    var rows := RunManager.run_record.car_data.grid_rows
+    var car := RunManager.run.car_data
+    var cols := car.grid_columns
+    var rows := car.grid_rows
     var max_slots := cols * rows
-    var max_weight: float = RunManager.run_record.car_data.max_weight
+    var max_weight: float = car.max_weight
 
     var pending_slots := 0
     var pending_weight := 0.0
@@ -476,7 +474,7 @@ func _update_summary(pending_slots: int, pending_weight: float, weight_exceeded:
 
     # ── Unloaded items count and on-site sell ───────────────────────────────
     var unplaced_count := _won_items.size() - loaded_count
-    var unplaced_sell := unplaced_count * ONSITE_SELL_PRICE
+    var unplaced_sell := unplaced_count * Economy.ONSITE_SELL_PRICE
     _summary_unloaded_count.text = "%d item%s" % [unplaced_count, "s" if unplaced_count != 1 else ""]
     _summary_unloaded_sell.text = "On-site sell: $%d" % unplaced_sell
 
@@ -504,7 +502,7 @@ func _update_summary(pending_slots: int, pending_weight: float, weight_exceeded:
             has_trailer_items = true
             break
 
-    var trailer_damage: float = RunManager.run_record.car_data.trailer_damage_chance
+    var trailer_damage: float = RunManager.run.car_data.trailer_damage_chance
     if has_trailer_items and trailer_damage > 0.0:
         _summary_trailer_line.visible = true
         _summary_trailer_value.text = "%d%%" % int(trailer_damage * 100)
@@ -562,7 +560,7 @@ func _is_item_loaded(entry: ItemEntry) -> bool:
 func _build_summary_text() -> String:
     var loaded_count := _loaded_items.size()
     var unplaced_count := _won_items.size() - loaded_count
-    var proceeds := unplaced_count * ONSITE_SELL_PRICE
+    var proceeds := unplaced_count * Economy.ONSITE_SELL_PRICE
     return (
         "Loaded items: %d\n" % loaded_count +
         "Left behind: %d  (sold on-site for $%d)\n\n" % [unplaced_count, proceeds] +

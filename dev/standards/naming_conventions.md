@@ -21,7 +21,7 @@ Examples:
 player_controller.gd
 item_entry.gd
 item_row.gd
-run_record.gd
+run_store.gd
 lot_browse_scene.gd
 ```
 
@@ -45,7 +45,7 @@ PlayerController
 ItemData
 ItemEntry
 ItemRow
-RunRecord
+RunStore
 StaminaHUD
 ```
 
@@ -241,7 +241,46 @@ All GDScript files use **4 spaces** per indent level. Tabs are not used.
 
 ---
 
-# 10. Match Wildcard Rule
+# 10. Folder Naming
+
+All folders use **snake_case**. Whether a folder is **singular** or **plural** is
+decided by one semantic test:
+
+> **Is every direct child of this folder an instance of the folder's name (singularized)?**
+>
+> - **Yes → plural** (the folder is a _collection_ of like things).
+> - **No → singular** (the folder is a _namespace / grouping_ of different things).
+
+```
+managers/                  # each child IS a manager        → plural
+  knowledge_manager.gd
+  meta_manager.gd
+
+data/tres/items/           # each child IS an item           → plural
+  rusty_sword.tres
+  antique_clock.tres
+
+gameplay/                  # children are NOT "gameplays"    → singular
+  instance/                #   ...each folder holds one archetype type → singular
+  service/
+  snapshot/
+```
+
+Notes:
+
+- The test is **semantic**, not lexical. `items/` holds `rusty_sword.tres` (the
+  filename does not contain "item") yet is still a collection, so it is plural.
+  The easy-to-spot sub-case — children sharing a type suffix like
+  `managers/*_manager` — is just the most obvious instance of the same rule.
+- **Each folder is judged independently.** Mixed singular/plural siblings under
+  one parent are correct, not an inconsistency. `global/` legitimately holds
+  `autoloads/` (a collection) next to `theme/` (a single theme).
+- A folder holding exactly one canonical resource stays **singular**
+  (e.g. `theme/`).
+
+---
+
+# 11. Match Wildcard Rule
 
 The wildcard arm `_:` in `match` statements is reserved for **error handling and truly unexpected values**. Do not use it as the default for a value that is a normal, expected member of the enum or type being matched.
 
@@ -255,17 +294,19 @@ If a `match` covers all members of a known enum exhaustively, the wildcard arm s
 
 # Summary
 
-| Type              | Style                         | Example                   |
-| ----------------- | ----------------------------- | ------------------------- |
-| Files             | snake_case                    | `item_row.gd`             |
-| Classes           | PascalCase                    | `ItemRow`                 |
-| Variables         | snake_case                    | `won_items`               |
-| Private variables | \_snake_case                  | `_rolled_price`           |
-| Functions         | snake_case                    | `setup()`                 |
-| Private functions | \_snake_case                  | `_populate_rows()`        |
-| Signal callbacks  | \_on_snake_case               | `_on_confirm_pressed()`   |
-| Signals           | snake_case                    | `tooltip_requested`       |
-| Constants         | UPPER_SNAKE_CASE              | `ITEM_COLS`               |
-| Preloaded types   | PascalCase                    | `ItemRowScene`            |
-| Enums             | PascalCase + UPPER_SNAKE_CASE | `SelectionState.SELECTED` |
-| Nodes             | PascalCase                    | `ConfirmButton`           |
+| Type                 | Style                         | Example                   |
+| -------------------- | ----------------------------- | ------------------------- |
+| Files                | snake_case                    | `item_row.gd`             |
+| Classes              | PascalCase                    | `ItemRow`                 |
+| Variables            | snake_case                    | `won_items`               |
+| Private variables    | \_snake_case                  | `_rolled_price`           |
+| Functions            | snake_case                    | `setup()`                 |
+| Private functions    | \_snake_case                  | `_populate_rows()`        |
+| Signal callbacks     | \_on_snake_case               | `_on_confirm_pressed()`   |
+| Signals              | snake_case                    | `tooltip_requested`       |
+| Constants            | UPPER_SNAKE_CASE              | `ITEM_COLS`               |
+| Preloaded types      | PascalCase                    | `ItemRowScene`            |
+| Enums                | PascalCase + UPPER_SNAKE_CASE | `SelectionState.SELECTED` |
+| Nodes                | PascalCase                    | `ConfirmButton`           |
+| Folders (collection) | snake_case, plural            | `managers/`, `items/`     |
+| Folders (namespace)  | snake_case, singular          | `gameplay/`, `theme/`     |

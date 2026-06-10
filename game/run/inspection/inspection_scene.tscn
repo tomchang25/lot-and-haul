@@ -2,8 +2,6 @@
 
 [ext_resource type="Script" uid="uid://bbr8kx3k0jv3c" path="res://game/run/inspection/inspection_scene.gd" id="1_idapx"]
 [ext_resource type="PackedScene" uid="uid://bstamhudtscn1" path="res://game/run/inspection/stamina_hud/stamina_hud.tscn" id="2_j573n"]
-[ext_resource type="PackedScene" uid="uid://dqniv6urp5xob" path="res://game/run/inspection/action_popup/lot_action_bar.tscn" id="3_3483c"]
-
 [node name="InspectionScene" type="Control" unique_id=2043279360]
 layout_mode = 3
 anchors_preset = 15
@@ -325,20 +323,6 @@ text = "CLUES"
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 2
-
-[node name="LotActionBar" parent="." unique_id=615668654 instance=ExtResource("3_3483c")]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -140.0
-offset_top = -116.0
-offset_right = 140.0
-offset_bottom = -72.0
-grow_horizontal = 2
-grow_vertical = 0
 
 [node name="ConfirmPopup" type="ConfirmationDialog" parent="." unique_id=46946476]
 title = "Enter Auction?"

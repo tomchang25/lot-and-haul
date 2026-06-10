@@ -102,7 +102,15 @@ One file per system. Top-level files cover the cross-phase / core-loop systems (
 
 Write everything in **present tense — describe the system as it is now.** A system doc is a snapshot of current design, not a history of how it got here.
 
-**Goes in:** system purpose + player-facing goal (1 paragraph), conceptual flow (what triggers what), state transitions/lifecycle, current behavior and invariants (the gotchas a future editor must not break, e.g. "AP is per-lot today").
+**What earns an L2 doc — the exclusion rule.** L2 is the danger zone, so membership is defined by exclusion, not invitation. A fact belongs in `systems/` only when **both** hold: (1) **no single file is its natural home**, and (2) it **changes too often to live in `vision/`**. Fail either test and the fact leaves L2 — most "system doc" rot is a fact that should have been at L1 or L3 sitting in the middle, going stale. The three routes:
+
+- A **concept definition** — what a layer _means_ and where its responsibility boundary sits (what counts as Data vs. Service vs. Entry vs. Scene; "a designer resource is authored and immutable, a runtime type is per-instance and saved") — is stable and whole-project. That's **L1 Vision**, not a system doc.
+- **Which concrete class belongs to which category** (this `.gd` is a Service, that one is an Entry) is readable straight off the folder tree and class names. That's **L3** — don't write it down anywhere; the code _is_ the source, and a written copy only rots.
+- A **cross-flow fact** — orchestration that spans scenes/files (inspection→auction→cargo), or a cross-cutting invariant no single file owns ("all prices resolve through `item_price`") — has no single-file home and shifts with redesigns. **This is the residue L2 exists to hold.** If it isn't cross-flow, it isn't L2.
+
+The recurring rot pattern to watch for: per-file `Reads` / `Writes` / `Ownership` lists (SaveManager fields, file paths, who-mutates-what). These are L3 — they break the moment a field is renamed. Keep the _flow_ they imply; drop the field-level enumeration.
+
+**Goes in:** system purpose + player-facing goal (1 paragraph), conceptual flow (what triggers what), state transitions/lifecycle, current behavior and cross-flow invariants (the gotchas a future editor must not break, e.g. "AP is per-lot today").
 
 **Does NOT go in:**
 
@@ -122,7 +130,7 @@ Name: `<scope>_<short_description>.md`. Contains goal (1–2 sentences), context
 
 ## Relationship to other dev/ folders
 
-- `dev/standards/` — coding conventions, naming rules, project structure
+- `dev/standards/` — coding conventions, naming rules, project structure (runtime type archetype taxonomy is now in `CLAUDE.md`)
 - `dev/skills/` — AI coding tool references (commit format, GDScript patterns)
 - `dev/tools/` — build scripts (yaml/tres pipeline)
 

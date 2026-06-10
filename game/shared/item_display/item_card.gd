@@ -1,5 +1,11 @@
 # item_card.gd
-# Generalised item card for the inspection grid.
+# Item card widget for the inspection grid. Takes an ItemEntry directly.
+# Veiled items hide super-category / category / rarity / condition / weight /
+# grid and show "???" for price; once unveiled those fields appear.
+# Supports field-change flash tweens via refresh(changed), a border flash
+# (flash_border) when the lot-level action bar targets the card, selection
+# overlay (set_selected), and an intuition shimmer + persistent corner mark
+# (play_intuition_shimmer) for special discovery feedback.
 class_name ItemCard
 extends PanelContainer
 

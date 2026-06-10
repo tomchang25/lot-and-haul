@@ -47,7 +47,6 @@ var _hover_entry: ItemEntry = null
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _items_grid: GridContainer = $RootHBox/LeftVBox/GridMargin/ScrollContainer/ItemsGrid
-@onready var _action_bar: LotActionBar = $LotActionBar
 @onready var _footer: HBoxContainer = $RootHBox/LeftVBox/FooterHBox
 @onready var _pass_button: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/PassButton
 @onready var _start_auction_button: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/StartAuctionButton
@@ -85,7 +84,7 @@ var _hover_entry: ItemEntry = null
 
 
 func _ready() -> void:
-    _action_bar.hide()
+    assert(RunManager.lot != null, "InspectionScene: RunManager.lot is null — set_lot() must be called before entering inspection.")
     _footer.show()
     _pass_button.show()
     _start_auction_button.show()
@@ -145,7 +144,7 @@ func _place_items() -> void:
     _entry_origin.clear()
     _entry_color_by_entry.clear()
 
-    for entry: ItemEntry in RunManager.run_record.lot_items:
+    for entry: ItemEntry in RunManager.lot.lot_items:
         _place_entry(entry)
 
 
@@ -221,13 +220,13 @@ func _on_grid_cell_pressed(coord: Vector2i) -> void:
         return
 
     if entry.is_veiled():
-        if UNVEIL_COST > RunManager.run_record.actions_remaining:
+        if UNVEIL_COST > RunManager.lot.actions_remaining:
             return
         _do_unveil(entry)
         return
 
     if entry.has_inspection_clues():
-        if CLUE_CHAIN_COST > RunManager.run_record.actions_remaining:
+        if CLUE_CHAIN_COST > RunManager.lot.actions_remaining:
             return
         _do_clue_chain(entry)
         return
@@ -238,7 +237,7 @@ func _do_unveil(entry: ItemEntry) -> void:
     _active_action_type = ActionType.UNVEIL
     _active_action_cost = UNVEIL_COST
 
-    RunManager.run_record.actions_remaining -= UNVEIL_COST
+    RunManager.spend_ap(UNVEIL_COST)
     _reveal_item(entry)
 
     _complete_action(entry, ActionType.UNVEIL)
@@ -249,7 +248,7 @@ func _do_clue_chain(entry: ItemEntry) -> void:
     _active_action_type = ActionType.INSPECT_CLUE
     _active_action_cost = CLUE_CHAIN_COST
 
-    RunManager.run_record.actions_remaining -= CLUE_CHAIN_COST
+    RunManager.spend_ap(CLUE_CHAIN_COST)
 
     _clear_clue_result()
     var clue_texts: Array[String] = []
@@ -289,7 +288,7 @@ func _complete_action(completed_entry: ItemEntry, action_type: int) -> void:
     if _hover_entry == completed_entry:
         _update_detail_section(completed_entry)
 
-    if RunManager.run_record.actions_remaining <= 0:
+    if RunManager.lot.actions_remaining <= 0:
         _finish_inspection()
 
 
@@ -446,10 +445,10 @@ func _hover_edge_borders(coord: Vector2i) -> Dictionary:
 
 
 func _refresh_hud() -> void:
-    var ap: int = RunManager.run_record.actions_remaining
+    var ap: int = RunManager.lot.actions_remaining
     # Use the two-tier cap as the HUD maximum — reflects the per-lot ceiling,
     # not the legacy per-lot action_quota.
-    var cap: int = RunManager.run_record.inspection_ap_cap
+    var cap: int = RunManager.run.inspection_ap_cap
     _stamina_hud.update_ap(ap, cap)
 
 # ══ Sidebar — item list ═══════════════════════════════════════════════════════
@@ -505,7 +504,7 @@ func _refresh_veiled_list() -> void:
 
 
 func _refresh_total_estimate() -> void:
-    var lot: LotEntry = RunManager.run_record.lot_entry
+    var lot: LotEntry = RunManager.lot.lot_entry
     if lot == null:
         _total_est_label.text = "—"
         return
@@ -639,7 +638,7 @@ func _finish_inspection() -> void:
 
 
 func _on_pass_pressed() -> void:
-    GameManager.go_to_lot_browse()
+    SceneRouter.go_to_lot_browse()
 
 
 func _on_auction_pressed() -> void:
@@ -648,4 +647,4 @@ func _on_auction_pressed() -> void:
 
 
 func _on_auction_confirmed() -> void:
-    GameManager.go_to_auction()
+    SceneRouter.go_to_auction()

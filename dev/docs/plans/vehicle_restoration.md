@@ -75,7 +75,7 @@ class_name VehicleModelData extends Resource
 @export var drivable_as: CarData            # null = pure collectible; non-null = becomes selectable work vehicle
 ```
 
-Parts probably still use the existing identity-layer unlock system (`vehicle_items.yaml` patterns like `bike_veil → bike_frame_inspected → bike_raleigh_leaf`) so appraisal/mechanical skills stay relevant to the restoration fantasy.
+Parts would use the clue system (anchor + surface + hidden) in the same way other items do — the anchor reveals the part's identity on first inspect, surface clues carry condition and provenance modifiers, and hidden clues (revealed via Storage Research) determine true restoration value. This keeps appraisal attributes relevant to the restoration fantasy without a separate identity-layer mechanism.
 
 ## Open questions
 

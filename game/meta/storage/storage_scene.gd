@@ -2,7 +2,7 @@
 # Storage — Displays stored items and lets the player spend AP on Repair,
 # Restore, and Research actions immediately. No slot-assignment UI.
 # V2 layout: dense table (left) + detail rail (right) with AP bar + action buttons.
-# Reads:  SaveManager.storage_items, SaveManager.storage_ap
+# Reads:  MetaManager.storage.storage_items, MetaManager.slot.storage_ap
 # Writes: MetaManager.repair_item, MetaManager.restore_item, MetaManager.research_item
 extends Control
 
@@ -80,7 +80,7 @@ func _ready() -> void:
 
 func _on_back_pressed() -> void:
     # Slot already committed on entry — leaving returns to hub for the next slot.
-    GameManager.go_to_hub()
+    SceneRouter.go_to_hub()
 
 
 func _on_row_pressed(entry: ItemEntry) -> void:
@@ -124,7 +124,7 @@ func _on_restore_pressed() -> void:
 
 
 func _refresh_ap_label() -> void:
-    var ap: int = SaveManager.storage_ap
+    var ap: int = MetaManager.slot.storage_ap
     var max_ap: int = Economy.STORAGE_AP_MAX
     _ap_label.text = "AP:  %d / %d" % [ap, max_ap]
     if ap == 0:
@@ -138,7 +138,7 @@ func _refresh_ap_label() -> void:
 
 
 func _populate_rows() -> void:
-    if SaveManager.storage_items.is_empty():
+    if MetaManager.storage.storage_items.is_empty():
         _empty_label.visible = true
         _item_list_panel.visible = false
         _footer_status_label.text = "0 items"
@@ -148,14 +148,14 @@ func _populate_rows() -> void:
     _item_list_panel.visible = true
 
     _item_list_panel.setup(STORAGE_COLUMNS)
-    _item_list_panel.populate(SaveManager.storage_items)
+    _item_list_panel.populate(MetaManager.storage.storage_items)
 
-    for entry: ItemEntry in SaveManager.storage_items:
+    for entry: ItemEntry in MetaManager.storage.storage_items:
         var row: ItemRow = _item_list_panel.get_row(entry)
         if row != null:
             row.set_selection_state(ItemRow.SelectionState.AVAILABLE)
 
-    var count: int = SaveManager.storage_items.size()
+    var count: int = MetaManager.storage.storage_items.size()
     _footer_status_label.text = "%d item%s" % [count, "" if count == 1 else "s"]
 
 
@@ -262,7 +262,7 @@ func _refresh_detail() -> void:
 
 
 func _configure_action_buttons(entry: ItemEntry) -> void:
-    var ap: int = SaveManager.storage_ap
+    var ap: int = MetaManager.slot.storage_ap
 
     # ── Repair ──────────────────────────────────────────────────────────────
     var repair_done: bool = ResearchSlot.is_repair_complete(entry)

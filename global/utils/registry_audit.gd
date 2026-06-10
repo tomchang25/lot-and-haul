@@ -4,7 +4,7 @@ extends RefCounted
 # ══ Registry Audit ═══════════════════════════════════════════════════════════
 # Static-only utility for checks that do not belong to any single registry.
 # Per-registry size and save-reference checks now live in the registries
-# themselves (driven by `RegistryCoordinator.run_validation()`); this file
+# themselves (driven by `SaveManager.run_validation()`); this file
 # is only responsible for verifying scene-level wiring.
 
 # Verifies every PackedScene export on the SceneRegistry is populated.

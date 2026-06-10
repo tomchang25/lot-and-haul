@@ -1,6 +1,6 @@
 # Garage-Sale Auction
 
-> Not scheduled. Also serves as the canonical backup of the **merchant negotiation mechanic**, which is being decommissioned with the rest of the merchant system (`game/meta/merchant/`, `MerchantData`, `MerchantRegistry`, special orders) as part of the Phase 9 customer-sell redesign (`../archived/merchant_system_redesign.md`). The negotiation math, state machine, and tuning surface captured here are the reusable core; everything else in the old merchant system is intentionally left to die.
+> Not scheduled. Also serves as the canonical backup of the **merchant negotiation mechanic**, which was decommissioned with the merchant system (`game/meta/merchant/`, `MerchantData`, `MerchantRegistry`, special orders) when the unified customer sell system shipped. The negotiation math, state machine, and tuning surface captured here are the reusable core for a future buyer-side haggling path.
 
 A buy-side run surface. The player visits a garage sale (or estate sale), sees a list of items the seller has laid out, inspects them, picks what to take home by fitting items into a cargo grid, and then haggles the seller's asking price down — trying to pay as little as possible without making the seller dig in and refuse.
 
@@ -266,15 +266,3 @@ The Phase 9 redesign (`../archived/merchant_system_redesign.md`) deletes these a
   once. A garage sale could plausibly haggle item-by-item; basket-level is the
   cheaper reuse and is assumed here unless design says otherwise.
 
-## Source map (for rebuilding after deletion)
-
-- Negotiation logic + UI handlers: `game/meta/merchant/negotiation_dialog/negotiation_dialog.gd`
-- Negotiation UI tree: `game/meta/merchant/negotiation_dialog/negotiation_dialog.tscn`
-- Tuning fields + defaults: `data/definitions/merchant_data.gd` (negotiation block)
-- Reference tunings: `data/yaml/merchant_data.yaml` (`pawn_shop`, `antique_dealer`)
-- Seller-side basket UI + settlement wiring: `game/meta/merchant/merchant_shop/merchant_shop_scene.gd`
-- Settlement: `MetaManager.sell_items()` (`global/autoload/meta_manager.gd`)
-- Daily budget / ceiling orchestration: `MerchantRegistry.advance_day()` (`global/autoload/registries/merchant_registry.gd`)
-- Packing grid (reused as-is): `game/shared/packing/packing_grid.gd`
-- Inspection (reused, unveil pre-completed): `game/run/inspection/inspection_scene.gd`
-- Seller-side prose docs (same engine): `../systems/meta/merchant_shop.md`, `../systems/meta/merchant.md`

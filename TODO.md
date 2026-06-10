@@ -18,6 +18,10 @@ Actionable line format: `[Scope] one sentence — [ref plans/<x>.md if any]`
 
 Preliminary concepts — bigger than a one-liner, but a single `###` sub-section says enough. Not necessarily actionable yet. One `###` heading per idea (nested under this `## Draft` so the section stays intact). When an idea outgrows its sub-section / becomes actionable / needs a stable link → move it into its own `dev/docs/plans/<x>.md` (`Status: Exploring`) and delete it here. Stale and never grew → just delete it.
 
+### Image v3 — Lot & Scene Decoration
+
+Lot card decoration with a random icon/badge per lot. Phase-dependent decoration: worker loading truck in cargo, auctioneer gavel in auction, etc. Needs an asset pipeline — blocked on visual direction.
+
 ### Category Mastery ↔ Clue Integration
 
 Mastery (category → super-category → rank) is retained as a progression signal (earned via `KnowledgeManager.add_category_points` on `REVEAL` / `SELL`) but currently has no mechanical effect on clue discovery. Idea: at certain ranks, inspection shows "N unrevealed surface clues remaining"; at higher ranks, the easiest surface clue may auto-reveal (no roll, no AP). Mastery does **not** affect DC or success rate — that is the attribute system. Thresholds TBD.
@@ -38,6 +42,14 @@ Unresolved design: a network of appraiser NPCs the player can consult for better
 
 Replace per-scene `_back_btn` / `_continue_btn` / `_reset_btn` manual wiring with a shared modalized HUD overlay. The HUD owns navigation controls and scene-agnostic chrome (cash, day display). Scenes emit navigation requests rather than direct `GameManager.go_to_*()` calls. Reduces boilerplate across ~10 scenes.
 
+### Campaign Ending, Achievements & Prestige Perks
+
+A 100-day main-line ending (inspired by Hero's Adventure 大俠立志傳): on day 100 the main storyline resolves into one of several endings with a matching achievement, then the save continues as sandbox where side quest lines remain completable. Achievements are earned from condition completion or quest-line endings and grant Score; at new-game start the player picks starting perks unlocked by accumulated Score / specific achievements (meta-progression across playthroughs). Collection-type achievements also serve as the interim chase layer until the Museum/Prestige shape is decided, so Museum needs no early skeleton.
+
+### Hunter Profile & Statistics
+
+A profile page that makes "better sight" visible as a curve: appraisal-error trend over time, per-category identification counts, best flip records. Pure presentation layer over existing knowledge/run data. Tentative.
+
 ### Museum / Prestige
 
 Prestige system where rare/verified items can be donated or displayed for reputation, unlocking content gates. Design decisions needed first: what does prestige unlock or affect (access tiers, price modifiers, cosmetics, pure achievement)? Is it per-super-category or global? Is the donation UI in storage or a separate scene? The entire path is blocked on deciding the prestige shape.
@@ -50,21 +62,37 @@ An auction modifier variant where every lot contains only base-layer (anchor) cl
 
 Hub-based training resource: spend cash and a day slot to temporarily boost an attribute for the next run. Training button in hub, resource-like expiry model.
 
-### Image v2 (Backgrounds & Decorations)
+### Calendar Special Events
 
-Location-dependent backgrounds per run (currently plain ColorRect). Lot card decoration with random icon/badge per lot. Phase-dependent decoration: worker loading truck in cargo, auctioneer gavel in auction, etc. Needs asset pipeline — blocked on visual direction.
+Irregular special-auction announcements published on the calendar days in advance, so the player prepares (save cash, train, clear storage) for known future events — anticipation as a goal. Rides on the Calendar skeleton from the weekly-order flow; future home for Intel tip-offs as calendar events. Requires the Calendar skeleton to ship first.
 
 ### Intel System / Pre-Run Tip-Offs
 
 Pre-run intelligence on available lots — reveal clue counts, surface categories, or estimated value tiers before committing the trip. Waiting on `LocationIntel` resource design.
 
+### Entry/Instance Archetype — Standardize to Model or Service
+
+The Entry/Instance archetype is in a middle state: it has mutable fields and self-mutating methods (`unveil()`, `attempt_clue()`, `auto_reveal_all_surface()`), but scenes call those methods directly rather than going through a Manager. This makes Entry neither a clean data Model (mutations mediated by Manager, like Stores) nor a stateless Service. Decide which direction Entries should go: thin data holders where Managers own all mutations (aligning with the Store pattern), or self-contained objects with a clear contract for who may call mutation methods and when. This shapes both the ItemEntry cleanup and the encapsulation work below.
+
 ### ItemEntry Cleanup / Data Standard
 
 `item_entry.gd` (698 lines) mixes price math, display text helpers, serialization, clue mechanics, and factory logic. Split into layers: `ItemEntry` = data + price logic, display getters = separate concern (`ItemDisplay` or similar). Clear boundary: `ItemData` (designer resource, the _what_), `ItemEntry` (runtime instance, the _state+behavior_), display (the _show_).
 
+### ItemEntry Encapsulation — Manager-Mediated Mutations
+
+Run-phase scenes (`inspection_scene`, `reveal_scene`, `run_review_scene`) mutate ItemEntry directly — `entry.unveil()`, `entry.attempt_clue()`, `entry.condition = ...` — bypassing RunManager. This is inconsistent with the Store/Manager pattern established by the save refactor where all state mutation goes through the owning Manager. Add thin RunManager wrappers (`unveil_item()`, `apply_trailer_damage()`, etc.) so ItemEntry mutations follow the same discipline as Store mutations. Not urgent — harmless today because no one else observes mid-run ItemEntry state — but blocks any future save-on-inspect or mid-run persistence.
+
+### MetaManager Decomposition
+
+MetaManager holds 6 stores and coordinates slot economy, storage AP, vehicle management, run resolution, customer sale, day-end, and location sampling (~358 lines). Below the pain threshold now, but it's the next candidate for splitting if it grows. The slot economy + storage AP section could become its own manager.
+
 ### NPC Depth Rolled Price
 
 Full NPC knowledge-level system for rolled price; location-specific bidder personalities. Adds depth to auction encounters beyond the current flat NPC.
+
+### Named Rival NPCs
+
+Two or three persistent named rivals with personalities and favored domains who recur across runs and grow in parallel with the player — beating a named rival is an emotional goal economic numbers alone can't provide. Builds on NPC Depth Rolled Price and the Dialog system. Tentative.
 
 ### Lot Pool Variety
 
@@ -72,7 +100,7 @@ Seasonal / rotating lot pools; one-shot special locations as events. Requires th
 
 ### Director System
 
-Autoload that manages demo state without modifying production scenes — injects fixed lot content, car assignment, and perks into RunRecord before each run. Uses signal hooks on auction/cargo scenes for forced-bid/block behavior. See `dev/docs/plans/demo_summary.md`.
+Autoload that manages demo state without modifying production scenes — injects fixed lot content, car assignment, and perks into RunStore before each run. Uses signal hooks on auction/cargo scenes for forced-bid/block behavior. See `dev/docs/plans/demo_summary.md`.
 
 ### Dialog System
 
@@ -80,19 +108,11 @@ Linear dialog first (Uncle branching second). DialogManager overlay autoload wit
 
 ### Bank / Bankruptcy
 
-Daily interest on cash reserves, game-over condition when debt threshold is crossed, optional player-initiated loans. Needs the day-slot economy to be stable first.
+Daily interest on cash reserves, game-over condition when debt threshold is crossed, optional player-initiated loans. Periodic-repayment deadlines (Recettear-style) considered as a floor-pressure driver, but a hard deadline sits uneasily with the calm-hub mood and the survivable-floor pillar — prefer soft daily upkeep (storage rent, fuel) if pressure is needed. Needs the day-slot economy to be stable first.
 
 ### Customer System Evolution
 
 Weighted tag pools (calendar/event/progression-driven), regular customers with fixed profiles, quality tiers (budget vs. collector), selling-related perks. Builds on the current nightly customer system.
-
-### Debug Mode
-
-Formal dev-mode toggle accessible both via project setting and in-game hotkey/button. Enables: auto-pack cargo grid, instant auction finish, skip scene transitions, reveal all item data overlays, spawn test items. Single gated entry point — no debug code scattered across production scenes.
-
-### Lot Location Unlock Gating
-
-Perk or mastery rank or unlock fee (or some combination — e.g. a purchasable perk that grants access) to gate which lot kinds are available at which locations. Replaces the simpler "waiting on progression model" placeholder.
 
 ### Garage Sell
 
@@ -112,7 +132,7 @@ Additional perks beyond the current attribute-threshold triggers, with full acqu
 
 ### Content Gates (Mastery Rank)
 
-Use `get_mastery_rank()` directly to gate prestige unlocks, tier-locked auction houses, and NPC reaction tiers.
+Use `get_mastery_rank()` directly to gate prestige unlocks and NPC reaction tiers. Tier-locked auction houses moved to `dev/docs/plans/unlock_gating_location_tiers.md`, whose generic requirement block these gates should reuse.
 
 ### Fuel Cost Pre-Run Preview
 
@@ -144,10 +164,6 @@ Each vehicle grants a unique gameplay modifier (e.g. "+1 action per lot", "ignor
 ### Vehicle Sell-Back / Trade-In
 
 Sell owned cars for partial value when upgrading, so trading up has a cost offset.
-
-### Version-Based Save Migration
-
-Save dict has no version field — migrations use implicit `parsed.has("key")` checks. Add `"version"` integer field, define version constants, and replace implicit checks with explicit version-switch migration functions. Covers save_manager.gd and item_entry.gd from_dict().
 
 ### YAML Data Overhaul
 
@@ -211,6 +227,8 @@ Flows currently being built. One-line pointer each — same format as `## Plan`,
 
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
+- [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
+- [unlock_gating] Requirement-gated premium auction tiers + lot kinds, with location tier reference table & audit — see `dev/docs/plans/unlock_gating_location_tiers.md`
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
 - [demo] Tutorial 3-run surface (stale — references legacy Skill/Merchant systems); Director + Dialog systems are surviving subsystems — see `dev/docs/plans/demo_summary.md`
@@ -221,9 +239,7 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 One-line, no reasoning, no backing doc.
 
-- [data] Delete ghost `data/tres/commodities/` — `CommodityData` is removed.
 - [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
-- [ui] Replace placeholder fade with per-location arrival visuals.
 - [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
 - [dev] Auto-put won items to cargo grid (dev-only, skips manual packing).
 - [dev] Instant-finish auction at current price (dev-only action).

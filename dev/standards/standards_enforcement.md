@@ -63,6 +63,37 @@ Only what `lint_standards.py` enforces today:
   Any `[connection]` block in a scene file fails; connect signals in `_ready()`
   so the full wiring surface is visible in code.
 
+- **Match wildcard rule** (`naming_conventions.md` §11). A `_:` arm that contains
+  effect code is a Tier-1 violation — the machine can decide this outright.
+  Only `push_error`, `push_warning`, `pass`, or a comment are permitted in a
+  `_:` arm. Effect code that should run for a known value belongs in an
+  explicitly-named arm so that adding a new value later surfaces the gap.
+
+  ```gdscript
+  # OK
+  match t_type:
+      "fade":
+          transition = FADE_SCENE.instantiate()
+      "sliding_door":
+          transition = SLIDING_DOOR_SCENE.instantiate()
+
+  # OK — wildcard used for error guard only
+  match t_type:
+      "fade":
+          transition = FADE_SCENE.instantiate()
+      "sliding_door":
+          transition = SLIDING_DOOR_SCENE.instantiate()
+      _:
+          push_error("unknown transition_type: %s" % t_type)
+
+  # VIOLATION — effect code hidden in wildcard
+  match loc.transition_type:
+      "fade":
+          transition = FADE_SCENE.instantiate()
+      _:
+          transition = SLIDING_DOOR_SCENE.instantiate()
+  ```
+
 ## Adding a check
 
 Each check is a function `(rel_path, text) -> [Violation]` registered in

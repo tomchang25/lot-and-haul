@@ -2,7 +2,7 @@
 # Block 05a — Reveal won items before cargo loading.
 # Marks uninspected items as inspected on reveal.
 # One button press reveals ALL items at once instead of one-at-a-time.
-# Reads:  RunManager.run_record.last_lot_won_items,
+# Reads:  RunManager.lot.won_items,
 # Writes: ItemEntry.inspected, ItemEntry.scrutiny
 extends Control
 
@@ -32,6 +32,7 @@ var _tooltip: ItemRowTooltip = null
 
 
 func _ready() -> void:
+    assert(RunManager.lot != null, "RevealScene: RunManager.lot is null — set_lot() must be called before entering reveal.")
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 
@@ -41,7 +42,7 @@ func _ready() -> void:
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
     _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
 
-    _won_items = RunManager.run_record.last_lot_won_items
+    _won_items = RunManager.lot.won_items
     _continue_btn.hide()
 
     if _won_items.is_empty():
@@ -67,7 +68,7 @@ func _on_reveal_pressed() -> void:
 
 
 func _on_continue_pressed() -> void:
-    GameManager.go_to_lot_browse()
+    SceneRouter.go_to_lot_browse()
 
 
 func _on_row_tooltip_requested(
@@ -81,7 +82,7 @@ func _on_row_tooltip_requested(
 
 func _populate_rows() -> void:
     _item_list_panel.setup(REVEAL_COLUMNS)
-    _item_list_panel.populate(RunManager.run_record.last_lot_won_items)
+    _item_list_panel.populate(_won_items)
 
 
 func _show_auction_lost_state() -> void:
@@ -93,5 +94,5 @@ func _show_auction_lost_state() -> void:
 
 func _on_reveal_complete() -> void:
     _item_list_panel.rebuild_header()
-    for entry in RunManager.run_record.last_lot_won_items:
+    for entry in _won_items:
         _item_list_panel.refresh_row(entry)

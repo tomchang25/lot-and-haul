@@ -1,7 +1,8 @@
 # auction_scene.gd
 # Block 04 — The player watches a live bidding sequence and decides when to drop out.
-# Reads:  RunManager.run_record.lot_entry, RunManager.run_record.lot_items
-# Writes: RunManager.run_record.paid_price, RunManager.run_record.won_items
+# Reads:  RunManager.lot.lot_entry, RunManager.lot.lot_items,
+#         RunManager.run.paid_price, RunManager.run.entry_fee, RunManager.run.fuel_cost
+# Writes: RunManager.commit_lot_win()
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -36,7 +37,7 @@ var _bid_enabled: bool = true
 var _shorten_next_npc_tick: bool = false
 var _last_npc_index: int = -1 # tracks the last NPC to prevent repeats
 var _circle_node: _CircleProgress = null
-var _debug_label: Label = null # debug builds only; never exposes _rolled_price in release
+var _debug_label: Label = null # gated by Debug.enabled; never exposes _rolled_price in release
 
 # ── Timer / tween handles ─────────────────────────────────────────────────────
 
@@ -88,6 +89,7 @@ class _CircleProgress extends Control:
 
 
 func _ready() -> void:
+    assert(RunManager.lot != null, "AuctionScene: RunManager.lot is null — set_lot() must be called before entering auction.")
     _pass_button.pressed.connect(_on_pass_pressed)
     _bid_button.pressed.connect(_on_bid_pressed)
 
@@ -185,13 +187,13 @@ func _on_pass_pressed() -> void:
     if _circle_tween:
         _circle_tween.kill()
 
-    GameManager.go_to_reveal()
+    SceneRouter.go_to_reveal()
 
 # ══ Auction setup ═════════════════════════════════════════════════════════════
 
 
 func _init_auction() -> void:
-    var lot: LotEntry = RunManager.run_record.lot_entry
+    var lot: LotEntry = RunManager.lot.lot_entry
 
     _rolled_price = max(lot.get_rolled_price(), MIN_STEP)
 
@@ -206,7 +208,7 @@ func _init_auction() -> void:
 
 
 func _build_lot_summary() -> void:
-    var lot: LotEntry = RunManager.run_record.lot_entry
+    var lot: LotEntry = RunManager.lot.lot_entry
 
     for entry: ItemEntry in lot.item_entries:
         var row: LotSummaryRow = LotSummaryRowScene.instantiate()
@@ -297,15 +299,12 @@ func _resolve() -> void:
     _bid_button.disabled = true
     _pass_button.disabled = true
 
-    var record = RunManager.run_record
     if _last_bidder == "player":
-        var current_wins: Array[ItemEntry] = record.lot_items.duplicate()
+        # lot_items proxy already returns a duplicate — use it directly as the
+        # canonical won-items snapshot for this lot.
+        RunManager.commit_lot_win(RunManager.lot.lot_items, _current_display_price)
 
-        RunManager.run_record.last_lot_won_items = current_wins
-        RunManager.run_record.paid_price += _current_display_price
-        RunManager.run_record.won_items += current_wins
-
-    GameManager.go_to_reveal()
+    SceneRouter.go_to_reveal()
 
 # ══ Budget refresh ══════════════════════════════════════════════════════════════
 
@@ -314,9 +313,8 @@ func _resolve() -> void:
 ## run costs (paid_price, entry_fee, fuel_cost). Called on init and after
 ## every player bid so the number stays live.
 func _refresh_budget() -> void:
-    var record := RunManager.run_record
-    var committed := record.paid_price + record.entry_fee + record.fuel_cost
-    var remaining := maxi(SaveManager.cash - committed, 0)
+    var committed := RunManager.run.paid_price + RunManager.run.entry_fee + RunManager.run.fuel_cost
+    var remaining := maxi(MetaManager.economy.cash - committed, 0)
     _budget_label.text = "Budget: $%d" % remaining
 
 # ══ Display helpers ════════════════════════════════════════════════════════════
@@ -359,16 +357,17 @@ func _show_npc_popup(price: int) -> void:
         _npc_history_list.get_child(0).queue_free()
 
 # ══ Debug overlay ══════════════════════════════════════════════════════════════
-# Visible in debug builds only. Never ship with _rolled_price exposed.
+# Gated by Debug.enabled (OS.is_debug_build() AND SettingsStore.debug_mode).
+# Never ship with _rolled_price exposed.
 
 
 func _init_debug_overlay() -> void:
-    if not OS.is_debug_build():
+    if not Debug.enabled:
         return
-    var lot: LotEntry = RunManager.run_record.lot_entry
+    var lot: LotEntry = RunManager.lot.lot_entry
 
     var true_value := 0
-    for entry: ItemEntry in RunManager.run_record.lot_items:
+    for entry: ItemEntry in RunManager.lot.lot_items:
         if entry.item_data != null:
             true_value += int(entry.full_true_value())
 
@@ -391,3 +390,9 @@ func _init_debug_overlay() -> void:
     ]
     # node-src: debug
     add_child(_debug_label)
+    Debug.toggled.connect(_on_debug_toggled)
+
+
+func _on_debug_toggled(is_enabled: bool) -> void:
+    if _debug_label != null:
+        _debug_label.visible = is_enabled

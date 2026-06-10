@@ -35,10 +35,10 @@ extends Control
 func _ready() -> void:
     _continue_btn.pressed.connect(_on_continue_pressed)
 
-    var summary: DaySummary = GameManager.consume_pending_day_summary()
+    var summary: DaySummary = SceneRouter.consume_pending_day_summary()
     if summary == null:
         push_warning("DaySummaryScene: no pending summary — returning to hub")
-        GameManager.go_to_hub()
+        SceneRouter.go_to_hub()
         return
 
     _render(summary)
@@ -101,10 +101,10 @@ func _render(summary: DaySummary) -> void:
         _net_label.text = "Net:   -$%d" % (-net)
         _net_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
 
-    _balance_label.text = "Balance:   $%d" % SaveManager.cash
+    _balance_label.text = "Balance:   $%d" % MetaManager.economy.cash
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 
 func _on_continue_pressed() -> void:
-    GameManager.go_to_hub()
+    SceneRouter.go_to_hub()

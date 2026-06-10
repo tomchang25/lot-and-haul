@@ -1,6 +1,6 @@
 # Demo Summary — Target Build (6 Days)
 
-> **Stale.** References "Skill system" (replaced by SPECIAL attributes), "Merchant v2" and "Special orders" (replaced by unified customer sell). The demo concept (3-run tutorial + narrative reset) is still valid but the implementation surfaces need updating. Kept as design reference.
+> **Stale — partial.** The 3-run narrative concept (loop onboarding + emotional reset) and the DemoDirector / Dialog architecture are still valid design. The following are superseded: "Skill system" → SPECIAL Attributes; "Merchant v2" and "Special orders" → unified nightly customer sell; "Research hub" research verb surface → per-slot Storage AP economy. Run 3's special-order crown payoff needs redesigning around the current sell path. Kept as design reference for the surviving subsystems.
 
 ## Overview
 
@@ -44,7 +44,7 @@ A directed 3-run onboarding experience that doubles as a tutorial. The player ne
 
 The DemoDirector is a single autoload that manages demo state without modifying production scenes. It is also the foundation of the future tutorial system.
 
-**Data injection** (zero pollution): Before each run starts, DemoDirector injects fixed lot content, car assignment, and perks directly into RunRecord. Production scenes receive normal data and are unaware of the override.
+**Data injection** (zero pollution): Before each run starts, DemoDirector injects fixed lot content, car assignment, and perks directly into RunStore. Production scenes receive normal data and are unaware of the override.
 
 **Signal hooks** (minimal pollution): Two scenes connect to DemoDirector signals in their `_ready()` only when `DemoDirector.active` is true. The scenes' own logic is unchanged — DemoDirector pushes behavior in from outside.
 
@@ -59,22 +59,15 @@ The DemoDirector is a single autoload that manages demo state without modifying 
 
 ---
 
-## Systems Required
+## Systems Still Needed
 
-| System               | Status | Notes                                                                                      |
-| -------------------- | ------ | ------------------------------------------------------------------------------------------ |
-| Director system      | New    | Autoload; data injection + signal hooks + day-pass trigger; no production scene edits      |
-| Dialog system        | New    | DialogManager overlay autoload; linear with Uncle branching; data-driven from the start    |
-| Skill system         | Done   | Full three-pillar knowledge system implemented (see ../systems/meta/knowledge.md)          |
-| Perk system          | Done   | Registry, X-ray perk, `has_perk()` API all implemented                                     |
-| X-ray inspect action | Done   | Folded into the lot-level Peek action (3 SP); the `xray_inspect` perk boosts Peek success from 50 % to 100 %; uses `entry.unveil()` |
-| Merchant v2          | Done   | Full sell flow with MerchantData, negotiation dialog (including auto-accept), and special-order fulfillment panel |
-| Special orders       | Done   | Slot-pool templates, per-factor pricing flags, partial-delivery toggle, cadence-driven rolls, fulfillment panel with cross-slot eligibility preview |
-| Mastery gate         | New    | Location browse availability check against mastery rank for high-tier auctions             |
-| CarData variants     | Done   | 4+ `.tres` files under `data/tres/cars/` spanning a progression; purchasable via car shop  |
-| Research hub         | Done   | Storage scene owns the research verb surface (Study / Repair / Unlock slots); `SaveManager.research_slots` ticked in `advance_days()` |
-| Test item set        | New    | High base value, shallow layers, tuned for director runs                                   |
-| Demo cutscene        | New    | Standalone scene; asset wipe, car swap, city transition; entirely isolated from production |
+| System          | Notes                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------ |
+| Director system | Autoload; data injection + signal hooks + day-pass trigger; no production scene edits      |
+| Dialog system   | DialogManager overlay autoload; linear with Uncle branching; data-driven from the start    |
+| Mastery gate    | Location browse availability check against mastery rank for high-tier auctions             |
+| Test item set   | High base value, shallow clue depth, tuned for director runs                               |
+| Demo cutscene   | Standalone scene; asset wipe, car swap, city transition; entirely isolated from production |
 
 ---
 

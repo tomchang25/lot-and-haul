@@ -36,8 +36,8 @@ func _ready() -> void:
     _knowledge_btn.pressed.connect(_on_knowledge_pressed)
 
     # If all slots are spent, end the day immediately instead of showing the hub.
-    if SaveManager.current_slot > 3:
-        _end_day_and_navigate()
+    if MetaManager.slot.current_slot > 3:
+        _end_day_and_navigate.call_deferred()
         return
 
     _refresh_display()
@@ -46,50 +46,50 @@ func _ready() -> void:
 
 
 func _on_auction_pressed() -> void:
-    if SaveManager.current_slot != 1:
+    if MetaManager.slot.current_slot != 1:
         return
-    GameManager.go_to_location_select()
+    SceneRouter.go_to_location_select()
 
 
 func _on_storage_pressed() -> void:
     MetaManager.begin_storage_slot()
-    GameManager.go_to_storage()
+    SceneRouter.go_to_storage()
 
 
 func _on_open_shop_pressed() -> void:
-    var selling_slots: int = 4 - SaveManager.current_slot
+    var selling_slots: int = 4 - MetaManager.slot.current_slot
     MetaManager.begin_open_shop(selling_slots)
-    GameManager.go_to_customer_sell()
+    SceneRouter.go_to_customer_sell()
 
 
 func _on_vehicle_pressed() -> void:
-    GameManager.go_to_vehicle_hub()
+    SceneRouter.go_to_vehicle_hub()
 
 
 func _on_knowledge_pressed() -> void:
-    GameManager.go_to_knowledge_hub()
+    SceneRouter.go_to_knowledge_hub()
 
 # ══ Day ending ════════════════════════════════════════════════════════════════
 
 
 func _end_day_and_navigate() -> void:
     var summary := MetaManager.end_day()
-    GameManager.go_to_day_summary(summary)
+    SceneRouter.go_to_day_summary(summary)
 
 # ══ Display ═══════════════════════════════════════════════════════════════════
 
 
 func _refresh_display() -> void:
     _mastery_rank_label.text = "Mastery Rank:   %d" % KnowledgeManager.get_mastery_rank()
-    _balance_label.text = "Balance:   $%d" % SaveManager.cash
-    _storage_count_label.text = "Storage:   %d items" % SaveManager.storage_items.size()
+    _balance_label.text = "Balance:   $%d" % MetaManager.economy.cash
+    _storage_count_label.text = "Storage:   %d items" % MetaManager.storage.storage_items.size()
 
     _refresh_slot_label()
     _refresh_activity_buttons()
 
 
 func _refresh_slot_label() -> void:
-    var slot: int = SaveManager.current_slot
+    var slot: int = MetaManager.slot.current_slot
     var tray: String = ""
     for i: int in range(1, 4):
         var sname: String = SLOT_NAMES[i]
@@ -99,11 +99,11 @@ func _refresh_slot_label() -> void:
             tray += "► %s  " % sname
         else:
             tray += "○ %s  " % sname
-    _slot_label.text = "Day %d   |   %s" % [SaveManager.current_day, tray.strip_edges()]
+    _slot_label.text = "Day %d   |   %s" % [MetaManager.progress.current_day, tray.strip_edges()]
 
 
 func _refresh_activity_buttons() -> void:
-    var slot: int = SaveManager.current_slot
+    var slot: int = MetaManager.slot.current_slot
 
     # Auction: Morning (slot 1) only.
     _next_run_btn.disabled = (slot != 1)

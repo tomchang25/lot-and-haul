@@ -1,6 +1,6 @@
 # sell_math.gd
 # Pure sell-math helpers for the Phase 9 nightly customer system.
-# All functions are stateless and operate on runtime types (Customer, ItemEntry).
+# All functions are stateless and operate on runtime types (CustomerEntry, ItemEntry).
 class_name SellMath
 extends RefCounted
 
@@ -37,7 +37,7 @@ const SUM_BANDS: Array = [
 
 ## Returns storage items with fit ≥ 1 for the customer, i.e. at least one of
 ## the item's revealed clue tags appears in the customer's demand_tags.
-static func matched_items(customer: Customer, storage: Array) -> Array:
+static func matched_items(customer: CustomerEntry, storage: Array) -> Array:
     if customer.demand_tags.is_empty() or storage.is_empty():
         return []
 
@@ -50,7 +50,7 @@ static func matched_items(customer: Customer, storage: Array) -> Array:
 
 ## Fit of a single item for a customer: the number of the item's revealed clue
 ## tags (surface always; hidden only if verified) that match the demand_tags.
-static func item_fit(customer: Customer, entry) -> int:
+static func item_fit(customer: CustomerEntry, entry) -> int:
     if customer.demand_tags.is_empty():
         return 0
     var item_tags: Array = _entry_tags(entry)
@@ -65,7 +65,7 @@ static func item_fit(customer: Customer, entry) -> int:
 
 ## Returns the highest fit of any single item in the car, clamped to 1-3.
 ## Used for aggressive dice-pool sizing (best-fit item in the car).
-static func best_item_fit_depth(customer: Customer, items: Array) -> int:
+static func best_item_fit_depth(customer: CustomerEntry, items: Array) -> int:
     if customer.demand_tags.is_empty() or items.is_empty():
         return 0
     var best := 0
@@ -88,7 +88,7 @@ static func dice_pool_size(depth: int, verified_count: int) -> int:
 ## deterministic under a seeded RNG (the scene passes a randomized RNG).
 static func roll_dice(pool_size: int, rng: RandomNumberGenerator) -> Array[int]:
     var rolls: Array[int] = []
-    for _i in range(maxi(0, pool_size)):
+    for i in range(maxi(0, pool_size)):
         rolls.append(rng.randi_range(1, 6))
     return rolls
 

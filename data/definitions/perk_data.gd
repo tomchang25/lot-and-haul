@@ -7,7 +7,7 @@ class_name PerkData
 extends Resource
 
 # Internal identifier. snake_case. Matches the .tres filename stem.
-# This is the string stored in SaveManager.unlocked_perks.
+# This is the string stored in KnowledgeManager.unlocked_perks.
 @export var perk_id: String = ""
 
 @export var display_name: String = ""

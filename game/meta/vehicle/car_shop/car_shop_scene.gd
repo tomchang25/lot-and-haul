@@ -1,9 +1,9 @@
 # car_shop_scene.gd
 # Car Shop — Lists every car the player does not yet own and lets them buy
 # one with cash. Shop inventory is simply `CarRegistry.get_all_cars()` filtered
-# against `SaveManager.owned_cars`.
-# Reads:  SaveManager.cash, SaveManager.owned_cars, CarRegistry
-# Writes: SaveManager.cash, SaveManager.owned_cars
+# against `MetaManager.garage.owned_cars`.
+# Reads:  MetaManager.economy.cash, MetaManager.garage.owned_cars, CarRegistry
+# Writes: MetaManager.economy.cash, MetaManager.garage.owned_cars
 extends Control
 
 # ── Constants ──────────────────────────────────────────────────────────────────
@@ -27,7 +27,7 @@ func _ready() -> void:
 
 
 func _on_back_pressed() -> void:
-    GameManager.go_to_vehicle_hub()
+    SceneRouter.go_to_vehicle_hub()
 
 
 func _on_buy_pressed(car: CarData) -> void:
@@ -38,7 +38,7 @@ func _on_buy_pressed(car: CarData) -> void:
 
 
 func _refresh() -> void:
-    _balance_label.text = "Balance:   $%d" % SaveManager.cash
+    _balance_label.text = "Balance:   $%d" % MetaManager.economy.cash
     _populate_rows()
 
 
@@ -48,7 +48,7 @@ func _populate_rows() -> void:
 
     var inventory: Array[CarData] = []
     for car: CarData in CarRegistry.get_all_cars():
-        if not SaveManager.owned_cars.has(car):
+        if not MetaManager.garage.owned_cars.has(car):
             inventory.append(car)
 
     if inventory.is_empty():
@@ -64,6 +64,6 @@ func _populate_rows() -> void:
 
     for car: CarData in inventory:
         var card: CarCard = CarCardScene.instantiate()
-        card.setup(car, SaveManager.cash >= car.price)
+        card.setup(car, MetaManager.economy.cash >= car.price)
         card.buy_pressed.connect(_on_buy_pressed)
         _rows_container.add_child(card)

@@ -15,7 +15,7 @@ func _ready() -> void:
 
 
 func _on_back_pressed() -> void:
-    GameManager.go_to_knowledge_hub()
+    SceneRouter.go_to_knowledge_hub()
 
 
 func _build_content() -> void:
@@ -34,16 +34,16 @@ func _build_content() -> void:
 
 
 func _add_attribute_row(attr: AttributeData) -> void:
-    var level := SaveManager.attribute_levels.get(attr.attribute_id, attr.starting_value)
+    var level := KnowledgeManager.get_attribute_value(attr.attribute_id)
 
     var row: AttributeRow = AttributeRowScene.instantiate()
-    row.setup(attr, level, UPGRADE_COST, SaveManager.cash >= UPGRADE_COST)
+    row.setup(attr, level, UPGRADE_COST, MetaManager.economy.cash >= UPGRADE_COST)
     row.upgrade_pressed.connect(_on_upgrade_pressed)
     _content.add_child(row)
 
 
 func _on_upgrade_pressed(attr: AttributeData) -> void:
-    var ok := KnowledgeManager.upgrade_attribute(attr.attribute_id)
+    var ok := MetaManager.upgrade_attribute(attr)
     if not ok:
         return
     _rebuild_all()

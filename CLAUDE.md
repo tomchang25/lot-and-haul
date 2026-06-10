@@ -2,13 +2,13 @@
 
 A Godot 4.6 single-player game about buying storage lots at auction, inspecting items, and reselling them through various channels. Think "Storage Wars" as a strategy/management game.
 
-## Agent environment note (sandboxed shell vs. real files)
+## Agent Rules
 
-The sandboxed Linux shell can return **phantom file corruption** for files in this repo — blocks of NUL bytes, mid-token truncation, "binary file matches", or wrong byte counts — especially right after a write. This is a mount artifact, NOT real disk damage. The files are intact in VS Code and git in the real environment.
+Agent-specific instructions live in `dev/agent_rules/`. Read them before starting work. Key rules: `sandbox_environment.md` (shell vs. file tools), `lint_before_finish.md` (run linter on changed files).
 
-- The Read/Edit file tools are authoritative. After modifying a file, verify it with **Read**, never by `cat`/`hexdump`/`wc`/`grep` through the shell. If Read shows clean content, the file is fine — stop.
-- Never diagnose "corrupted files" from a shell read alone, and never `git restore`/overwrite working-tree files to "recover" from shell-reported corruption — that risks discarding genuine uncommitted work over a false reading.
-- `git` against the object DB (`git show HEAD:<file>`, `git log`, `git diff`) is reliable; working-tree file-content reads through the shell mount are not.
+When asked to build a plan or implementation spec, follow the format in `dev/docs/README.md` (plan lifecycle) and `dev/standards/` for any relevant domain standard. Plans go in `dev/docs/plans/` with a one-line pointer in `TODO.md`.
+
+Resolve unknowns by asking me directly during the planning conversation — never emit an `## Open Questions` section or leave unresolved decisions parked in a plan or spec. Stop and ask the moment a decision is unclear; hand over a plan or spec only once every such question has been answered and folded into the relevant Requirement, Design, or Relational Context line.
 
 ## Core Loop
 
@@ -42,7 +42,11 @@ assets/       Static assets: car sprites, warehouse images
 common/       Reusable systems (not game-feature-specific)
   audio/      Event-driven audio system (events, presets, audio bus)
   framework/  State machine pattern
-  gameplay/   Runtime types: ItemEntry, LotEntry, RunRecord, etc.
+  gameplay/   Runtime types, organized by archetype subfolder (see Conventions)
+    store/    Manager-held mutable state containers (persisting or session-scoped)
+    snapshot/ Read-only one-shot value objects (derived, then discarded)
+    service/  Stateless pure-math helpers
+    instance/ Entry/Instance types (ItemEntry, LotEntry, CustomerEntry, etc.)
   utils/      Random utils, perk effects
 data/         Designer resources: definitions, yaml sources, generated .tres
   definitions/  Resource class scripts (.gd) for each type
@@ -51,6 +55,7 @@ data/         Designer resources: definitions, yaml sources, generated .tres
     attributes/ cars/ categories/ clues/ items/ locations/
     lots/ perks/ super_categories/
 dev/          Development tooling and documentation
+  agent_rules/ Agent-specific instructions (sandbox, lint, etc.)
   docs/       Architecture docs, tracked in this repo (vision/, systems/, plans/, archived/)
   skills/     AI coding references (commit format, GDScript patterns)
   standards/  Coding conventions, naming, registries, scene architecture
@@ -62,7 +67,13 @@ game/         Game feature scenes and logic
   |           lot_browse, reveal, run_review
   shared/     Cross-phase UI: item_display, plus placeholder dirs
 global/       Autoloads and project-wide resources
-  autoload/   All autoload scripts (registries, managers, event bus)
+  autoloads/  All autoload scripts, organized by role:
+    game_manager/ Boot orchestrator + scene registry
+    managers/    Gameplay managers (MetaManager, KnowledgeManager, RunManager)
+    registries/  Designer-resource registries (extend ResourceRegistry)
+    scene_router/ Scene navigation + pending data
+    debug.gd         Unified debug gate (OS.is_debug_build() AND SettingsStore.debug_mode)
+    event_bus.gd, save_manager.gd, audio_manager/
   constants/  Data paths, economy constants
   theme/      Main theme resource
   utils/      Registry audit utility
@@ -72,9 +83,9 @@ stage/        Testbeds, demo runs, and tile sets (mostly empty)
 
 ## Autoloads (load order matters)
 
-EventBus → AudioManager → RegistryCoordinator → ClueRegistry → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → KnowledgeManager → SaveManager → MetaManager → GameManager
+EventBus → SettingsStore → Debug → AudioManager → ClueRegistry → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → SaveManager → KnowledgeManager → MetaManager → SceneRouter → GameManager
 
-`RegistryCoordinator` orchestrates boot: each registry calls `RegistryCoordinator.register(self)` in `_ready()`, then `GameManager._ready()` runs `run_migrations()` and `run_validation()`.
+MetaManager and KnowledgeManager call `SaveManager.register_provider(self)` in `_ready()`. `GameManager._ready()` calls `SaveManager.load()` then `SaveManager.run_validation()`. Per-store versioned migrations run inside each store's `from_dict()` via `_apply_migrations()` — there is no top-level migration pass. The `schema_version` field in the save file is a legacy stamp; it is always written but never checked on load.
 
 ## Data Pipeline
 
@@ -84,29 +95,29 @@ When authoring new items or clues, use the generation prompts at `dev/tools/prom
 
 ## Current Phase
 
-Core loop redesign: Phases 0–11 complete (runtime veil cleanup, AP grid inspection, item base price, storage authenticate, clue independence + attribute system, inspection refinement, dynamic naming rules, YAML content regeneration, value policy cleanup, day summary rework). Identity layers and skills have been fully replaced by clue-based pricing and SPECIAL-style attributes; all clues carry 1-word known_text and naming entries. `item_price` is now the sole per-item price resolver (`appraised or verified value × condition_multiplier`); MarketManager, PriceConfig, merchant registry, special orders, commodity data, and deprecated selling helpers have been removed. DaySummary captures `customer_sales_today` before nightly generation clears it, net change reflects customer sales revenue, and post-run routes through the day summary scene.
+Check TODO.md ## Active Section
 
 ## Conventions (quick reference)
 
-- **Naming**: snake_case files, PascalCase classes, UPPER_SNAKE constants. See `dev/standards/naming_conventions.md`.
-- **Registries**: one autoload per designer resource type, required API: `get_<singular>_by_id`, `get_all_<plural>`, `size`. No display-name wrappers. See `dev/standards/registries.md`.
-- **Scene architecture**: block scenes follow `dev/standards/block_scene_architecture_standard.md` (the single source for these rules). The node-source rule (persistent nodes live in the `.tscn`, not `add_child()`) and "no `[connection]` in `.tscn`" are **lint-enforced** — see `dev/standards/standards_enforcement.md`. Don't restate the rule's detail here; edit the standard. If you are an agent without the in-loop lint hook (i.e. not Claude Code), run `python dev/tools/lint_standards.py --files <changed>` before finishing.
-- **Commits**: conventional commits format. See `dev/skills/conventional_commits.md`.
+- **Runtime type archetypes**: every runtime type in `common/gameplay/` is one of four archetypes. The subfolder (`store/`, `snapshot/`, `service/`, `instance/`) is the source of truth for archetype. Do not invent new type suffixes or archetypes outside this taxonomy — if a new type doesn't clearly fit, stop and ask the user before creating or naming it.
+  - **Entry/Instance** — live instance of a designer Data, identity + mutable state + self-maintaining behaviour (e.g. `ItemEntry`). Subfolder: `instance/`.
+  - **Store** — Manager-held domain state container with invariant-guarding mutators. Persisting Stores carry `section_id/to_dict/from_dict`; session-scoped Stores do not. Subfolder: `store/`.
+  - **Snapshot** — read-only value object, computed once and discarded, no mutators or serialization (e.g. `RunResult`, `DaySummary`). Subfolder: `snapshot/`.
+  - **Service** — stateless pure-math helpers (e.g. `ResearchSlot`, `SellMath`). Subfolder: `service/`.
+  - Discriminator: no state → Service; read-only one-shot → Snapshot; mutable + Manager-held → Store; saved instance of a Data → Entry/Instance.
 - **Price pipeline**: all prices resolve through `ItemEntry.item_price` (`(appraised|verified value) × condition_multiplier`). Appraised value = anchor + revealed surface modifiers (add-then-mul). Verified value includes hidden modifiers. No per-type formulas outside the pipeline.
-- **Iterate resources, not ids**: outside serialization boundaries, pass Resource refs. String ids are for save/load only.
+- **Cross-manager communication**: direct call when the caller's correctness depends on the result (transactional dependency — e.g. `spend()` returning false aborts the whole operation). EventBus signal when the caller doesn't care about the outcome (notification — e.g. broadcasting `item_repaired` so KnowledgeManager can award XP; the repair is correct regardless). Test: "if the other side fails or doesn't exist, do I rollback?" Yes → direct call. No → event.
 - **Docstrings**: every `.gd` file starts with `# filename` + one-line purpose. All public functions and complex (>10 lines or non-obvious) private functions get a `##` GDDoc comment. Never strip or reduce existing comments when editing code.
-- **Docs layering**: 3 levels, each fact lives in exactly one. L1 vision (`dev/docs/vision/`, ≤5, rarely changes), L2 systems/plans (`dev/docs/`, design intent + flow, present tense, concept only), L3 detail (code docstrings). Single source of truth — no duplication across levels. Full rules in `dev/docs/README.md`.
-- **Tracking lives at repo root, not in `dev/docs/`**: `CHANGELOG.md` (append-only shipped history — the only living "Done" list) and `TODO.md` (the single forward surface: `## Active` in-flight flows, `Plan`/`Chore`/`Bug` one-liners, and a `## Draft` section for concepts; no Done tier, delete the line when done). Multi-step sequenced work lives as a `dev/docs/plans/<x>.md` file with a one-line pointer in `TODO.md` (`## Plan` when queued, `## Active` when building) — phase detail and ordering stay in that file, never churned into `TODO.md`. Ship a phase → cut it from the plan file + append CHANGELOG, same commit; ship the whole flow → archive the plan file + delete its TODO line.
-- **Maturity scale (one item, one home)**: one line → `TODO.md` tier; bigger but one section says enough → `TODO.md` `## Draft`; earned its own file (grew sub-structure / actionable / needs a stable link) → `dev/docs/plans/<x>.md` + a one-line pointer in `TODO.md` `## Plan` (promote to `## Active` when building, retire back to `## Draft` if it goes stale); design locked → graduate conclusion to `systems/` + archive. Never write an item in two places.
+- **Data pipeline**: never hand-edit `.tres` files — use the YAML pipeline (`dev/tools/`).
+- **Notifications**: use the `ToastManager` autoload (`global/autoloads/toast_manager.gd`) for passive, ephemeral, scene-independent messages. `show_warning(msg)` is always visible; `show_info(msg)` is debug-only. Do not build per-scene fade-label or tween-label patterns for the same purpose — scene-contextual feedback (item card flashes, bid history rows, inline status counts) is fine, but anything that is a global "something happened" alert belongs in ToastManager.
 
-## Don'ts
+### Standards (read when touching that domain)
 
-- Don't hand-edit `.tres` files — use the YAML pipeline.
-- Don't add display-name wrappers or fallback-to-id accessors on registries.
-- Don't scan ItemRegistry to answer a category/super-category question — use the dedicated registry.
-- Don't put code-level detail (function names, field lists) in `dev/docs/systems/` — that belongs in code comments.
-- Don't keep a living "Done" list anywhere except `CHANGELOG.md`. No `## Status`/Done enumeration in `systems/` docs (write them present-tense — that's the status), no checked-off phase ledger in `dev/docs/plans/` files (cut shipped phases out — their record lives in `CHANGELOG.md`), no Done section in `TODO.md`.
-- Don't put any forward-looking section in a `systems/` doc — no `## Planned`/`## Future`/todo, not even links-only. A system doc describes only the present; route forward items to either an `## Open Questions` section (unresolved design questions about the current system, phrased as questions) or out to `TODO.md` (feature ideas / work to build).
-- Don't leave completed docs in place — move them to `dev/docs/archived/`. When a plan's design locks, graduate the conclusion into `systems/` (same commit as the code), then archive the plan.
-- Don't put anything needing more than one line of reasoning in a `TODO.md` actionable tier — if it grows a paragraph, a table, or a trade-off, it goes in the `## Draft` section (and once it earns a file, `dev/docs/plans/`), not inline in `Plan`/`Chore`/`Bug`. Don't fold Chore/Bug into Plan to reduce clutter — lifecycle (delete on done) handles clutter, not tier-merging.
-- Don't create a separate `draft/` folder or draft file — the draft tier is the `## Draft` section of `TODO.md`. Don't write a forward item in two places: it has exactly one home for its maturity.
+- **Naming & GDScript style** (files, classes, variables, folders, match statements, enums, constants): read `dev/standards/naming_conventions.md` when writing any new GDScript or renaming anything. The match-wildcard rule (§11) is **lint-enforced** — see `dev/standards/standards_enforcement.md`.
+- **Registries** (adding/modifying a registry, writing registry call sites): read `dev/standards/registries.md` — covers required API, forbidden wrappers, iterate-resources-not-ids rule, and inverse lookup patterns.
+- **Scene architecture** (creating or editing block scenes/components): read `dev/standards/block_scene_architecture_standard.md` — covers node-source rule, signal connections, `setup()`/`_apply()` pattern. The node-source rule and no-`[connection]`-in-`.tscn` are **lint-enforced** — see `dev/standards/standards_enforcement.md`.
+- **Theme** (styling, colors, font sizes, styleboxes): read `dev/standards/theme_standard.md` — covers the centralized theme, semantic color palette, typography scale, and rules for when GDScript overrides are acceptable.
+- **Debug** (adding debug-conditional code or UI): read `dev/standards/debug_standard.md` — covers the two-layer gate (`OS.is_debug_build()` + `SettingsStore.debug_mode`), the `Debug` autoload API, and node-source rules for debug nodes.
+- **Project structure** (placing new files or folders): read `dev/standards/project_structure.md`.
+- **Commits**: conventional commits format — read `dev/skills/conventional_commits.md` when writing commit messages.
+- **Docs and tracking** (writing/archiving docs, updating TODO/CHANGELOG, deciding where a forward item lives): read `dev/docs/README.md` — covers the 3-level model, maturity scale, lifecycle rules, and the "no living Done list" principle.

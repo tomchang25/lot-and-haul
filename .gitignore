@@ -5,12 +5,12 @@
 **/assets
 **/addons
 **/script_templates
-**/data/tres
 **/*_back
 
 **/*.uid
 **/*.tmp
 **/*.import
 **/*.db-journal
+**/*.tres
 
 **/__pycache__/

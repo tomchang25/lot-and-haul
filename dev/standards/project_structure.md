@@ -59,7 +59,7 @@ Use this folder for **designer-authored content**: Resource class definitions an
 The key question for placement: **who writes this data?**
 
 - A designer fills in values and builds `.tres` files → belongs in `data/`
-- Code generates the object at runtime (result, context, payload) → stays in the owning block folder under `game/`
+- Code creates and mutates the object at runtime → it is a runtime type, not designer content. The four runtime archetypes live in `common/gameplay/` — see `CLAUDE.md`. Block-local throwaway state with no archetype stays in its owning `game/[feature]/` folder.
 
 ### Structure
 
@@ -85,12 +85,7 @@ Organize `.tres` files by **content type**, not by which block reads them.
 
 ### What does not belong in data/
 
-Code-generated runtime objects are not designer content and do not belong in `data/`.
-
-Examples of what stays in the owning block folder:
-
-- Runtime context objects (e.g. `run_record.gd`) → `game/_shared/` or `game/[feature]/`
-- Per-entity runtime state created during play → owning block folder
+Code-generated runtime objects are not designer content and do not belong in `data/`. Runtime *types* — the live instances, stores, snapshots, and services the game mutates during play — live in `common/gameplay/`, organized by archetype; see `CLAUDE.md` for the taxonomy and folder layout. Only block-local throwaway state with no archetype stays in its owning `game/[feature]/` folder.
 
 ---
 
@@ -218,7 +213,7 @@ game/run/auction/
   auction_scene.tscn
 ```
 
-Code-generated runtime data structures live in the block folder (or `game/shared/`) that owns them, not in `data/`.
+Runtime types (the four archetypes in `common/gameplay/` — see `CLAUDE.md`) are not designer content and never live in `data/`. Only block-local throwaway state with no archetype lives in its owning block folder.
 
 ---
 
@@ -228,11 +223,16 @@ Use this folder for **project-wide global systems** configured as autoloads.
 
 ```
 global/
-  autoload/
+  autoloads/
+    game_manager/ → boot orchestrator + scene registry
+    managers/     → gameplay managers (MetaManager, KnowledgeManager, RunManager)
     registries/   → resource-backed registry autoloads
                     (one file per type, e.g. car_registry.gd)
-    (other files) → managers and systems (SaveManager, GameManager, etc.)
+    scene_router/ → scene navigation + pending data
+    event_bus.gd, save_manager.gd, audio_manager/
+  constants/      → data paths, economy constants
   theme/          → shared theme resources
+  utils/          → registry audit utility
 ```
 
 Only scripts that must be globally accessible at all times belong here.
@@ -280,10 +280,11 @@ The main scene for the current build is registered in `project.godot`.
 | Designer-authored Resource class definitions (`.gd`)    | `data/definitions/`                  |
 | Designer-authored asset files (`.tres`)                 | `data/<type>/`                       |
 | YAML source files for data pipeline                     | `data/yaml/`                         |
-| Code-generated runtime data structures                  | `game/_shared/` or `game/[feature]/` |
+| Runtime types (Entry/Instance, Store, Snapshot, Service) | `common/gameplay/` (see `CLAUDE.md`) |
+| Block-local throwaway runtime state (no archetype)      | `game/[feature]/`                    |
 | Block scene roots, UI components, block logic           | `game/[feature]/`                    |
 | UI components and helpers shared across multiple blocks | `game/_shared/`                      |
-| Global autoloads                                        | `global/autoload/`                   |
+| Global autoloads                                        | `global/autoloads/`                  |
 | Testbed scenes                                          | `stage/testbeds/`                    |
 | Run entry scenes                                        | `stage/runs/`                        |
 | Tilesets and terrain assets                             | `stage/tilesets/`                    |

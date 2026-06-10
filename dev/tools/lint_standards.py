@@ -191,11 +191,74 @@ def check_tscn_connections(path: str, text: str) -> list[Violation]:
     return violations
 
 
+# ── Tier 1: match wildcard rule (naming_conventions.md §11) ──────────────────
+
+# Matches any match arm whose pattern list ends with the `_` wildcard, whether
+# standalone (`    _:`) or after a comma list (`    "foo", _:`).
+# `_\s*:` requires `_` followed immediately by optional space then `:`, which
+# distinguishes the wildcard from identifiers like `_name` (never `_name:`).
+_WILDCARD_ARM_RE = re.compile(r"^(\s+)(?:.*,\s*)?_\s*:\s*(.*?)\s*$")
+_SAFE_WILDCARD_RE = re.compile(r"^(?:push_error\b|push_warning\b|pass\b|#|$)")
+
+
+def check_match_wildcard(path: str, text: str) -> list[Violation]:
+    """_: arms must contain only push_error / push_warning, or be empty.
+    Effect code belongs in explicitly-named arms so that adding a new value
+    later surfaces unhandled branches rather than silently falling through.
+    (naming_conventions.md §11)"""
+    violations: list[Violation] = []
+    lines = text.splitlines()
+    for i, line in enumerate(lines, start=1):
+        m = _WILDCARD_ARM_RE.match(line)
+        if not m:
+            continue
+        arm_indent = len(m.group(1))
+        inline = m.group(2).strip()
+
+        # Inline code on the same line as _: — e.g. `_: x = foo()`.
+        if inline and not _SAFE_WILDCARD_RE.match(inline):
+            violations.append(
+                Violation(
+                    path, i,
+                    "match-wildcard",
+                    "naming §11",
+                    "_: arm contains effect code. Expected values belong in "
+                    "explicit named arms; _: is reserved for push_error / "
+                    "push_warning.",
+                )
+            )
+            continue
+
+        # Multi-line body — scan lines at strictly greater indentation.
+        for j in range(i, len(lines)):
+            body = lines[j]
+            stripped = body.strip()
+            if not stripped:
+                continue
+            body_indent = len(body) - len(body.lstrip())
+            if body_indent <= arm_indent:
+                break
+            if not _SAFE_WILDCARD_RE.match(stripped):
+                violations.append(
+                    Violation(
+                        path, i,
+                        "match-wildcard",
+                        "naming §11",
+                        "_: arm contains effect code. Expected values belong in "
+                        "explicit named arms; _: is reserved for push_error / "
+                        "push_warning.",
+                    )
+                )
+                break
+
+    return violations
+
+
 # ── Dispatch ─────────────────────────────────────────────────────────────────
 
 # (suffix, check fn) pairs. Add new checks here as more rules graduate from the
 # manifest into machine enforcement.
-GD_CHECKS = (check_node_source,)
+GD_CHECKS = (check_node_source, check_match_wildcard)
 TSCN_CHECKS = (check_tscn_connections,)
 
 

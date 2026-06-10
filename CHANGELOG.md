@@ -2,16 +2,85 @@
 
 Append-only record of shipped work. This is the project's permanent "done" history.
 
-**Why this file exists:** it is the single home for "what got built." Because it is append-only — you only ever add entries, never reconcile them against current code — it cannot go stale. This is what lets every other tracking surface stay forward-only: `systems/` describes the system as it *is* (present tense, no Done lists) and `TODO.md` holds only open work (`## Active` in-flight flows, `Plan`/`Chore`/`Bug`, and `## Draft` concepts), with multi-step flows detailed in `dev/docs/plans/` files. When a phase ships, append one entry here, then cut that phase from its plan file; when a whole flow ships, also delete its `TODO.md` line.
+**Why this file exists:** it is the single home for "what got built." Because it is append-only — you only ever add entries, never reconcile them against current code — it cannot go stale. This is what lets every other tracking surface stay forward-only: `systems/` describes the system as it _is_ (present tense, no Done lists) and `TODO.md` holds only open work (`## Active` in-flight flows, `Plan`/`Chore`/`Bug`, and `## Draft` concepts), with multi-step flows detailed in `dev/docs/plans/` files. When a phase ships, append one entry here, then cut that phase from its plan file; when a whole flow ships, also delete its `TODO.md` line.
 
 This file is the single source of truth for the entry format. Each entry: `- YYYY-MM-DD — [scope] one-line summary (commit/PR ref)`. Group related entries under a `## <Title>` heading — title only, no "Phase"/"Stage" wording.
 
 ---
 
-## Template Spine Backport
+## Location Entry Backgrounds
 
-- 2026-06-01 — [registry] Added `ResourceRegistry` base class; ItemRegistry/CarRegistry/ClueRegistry/CategoryRegistry/LocationRegistry/SuperCategoryRegistry now extend it (override `_dir_path`/`_id_of`), dropping duplicated `_ready`/`size`/`_by_id` boilerplate while keeping per-registry `migrate`/`validate` and typed wrappers
-- 2026-06-01 — [save] SaveManager refactored to section-based dispatch: state fields stay on SaveManager (call sites unchanged), serialization delegated to economy/garage/storage/progress/slot/customers sections via `register_section`/`to_dict`/`from_dict`; new on-disk format `{schema_version, sections}` with backward-compatible read of legacy flat saves; legacy `research_slots`/`skill_levels` migrations moved into the storage/economy sections
+- 2026-06-09 — [location_entry] `LocationData` gains `bg_exterior: Texture2D`, `bg_interior: Texture2D`, and `transition_type: String` exports; defaults to `"sliding_door"` when unset
+- 2026-06-09 — [location_entry] `location_entry_scene.gd` rewritten: shows exterior bg on arrival, plays the configured transition wipe (`SlidingDoorTransition` or `FadeTransition`), swaps to interior bg while covered, holds an interior beat, then advances to lot browse; falls back to plain tween fade when textures are null
+- 2026-06-09 — [location_entry] `location_entry_scene.tscn` cleaned up: dead `ClosedView`, `OpenView`, and `Background` ColorRect nodes removed; transition node instantiated at runtime
+- 2026-06-09 — [pipeline] `location.py` `build_tres` auto-generates `bg_exterior`/`bg_interior` ExtResource entries from convention-based PNG paths; `transition_type` written as a string field; `parse_tres` round-trips both; `validate` errors on invalid `transition_type`
+- 2026-06-09 — [pipeline] `gen_placeholder_backgrounds.py` updated: existing single-view functions renamed to `*_exterior`, matching `*_interior` variants added for both locations; existing PNGs renamed to `_exterior` suffix; interior PNGs generated
+- 2026-06-09 — [data] `midtown_warehouse` YAML gains `transition_type: fade`; both location `.tres` files regenerated with texture ExtResources and transition field
+
+---
+
+## Deferred Save Throttle
+
+- 2026-06-09 — [save] `SaveManager` gains two-tier save strategy: `mark_dirty()` sets a dirty flag and starts a throttle clock; `flush()` writes only when dirty; `_process()` auto-flushes at most once per 2 s (`THROTTLE_SEC`); `save()` clears dirty state on entry so a transaction save suppresses any pending deferred flush; `_notification(NOTIFICATION_WM_CLOSE_REQUEST)` flushes on quit
+- 2026-06-09 — [save] `SceneRouter` extracts `_navigate(scene)` helper — calls `SaveManager.flush()` before every `change_scene_to_packed`; all `go_to_*` methods route through it
+- 2026-06-09 — [save] 7 recoverable micro-action call sites reclassified from `SaveManager.save()` to `SaveManager.mark_dirty()`: `repair_item`, `restore_item`, `research_item`, `set_active_car`, `begin_storage_slot`, `register_storage_items` (MetaManager), `unlock_perk` (KnowledgeManager); 7 irreversible transaction call sites unchanged
+- 2026-06-09 — [docs] `dev/docs/systems/autoloads.md` SaveManager section updated to describe the two-tier Transaction Save / Deferred Save model with full call-site classification
+
+---
+
+## Save System Upgrade
+
+- 2026-06-09 — [save_system] `ToastManager` autoload added (`global/autoloads/toast_manager.gd`): code-built CanvasLayer overlay (layer 128) with `show_warning()` (always visible) and `show_info()` (Debug.enabled only); toasts fade in, hold, then fade out via Tween; registered in `project.godot` after `Debug`
+- 2026-06-09 — [save_system] `StoreBase` gains `_migration_log: Array[String]` and `get_migration_log()` (returns-and-clears); `MetaManager` and `KnowledgeManager` implement `get_migration_log()` aggregating from their owned stores; stores that override `_apply_migrations()` append human-readable entries per schema bump
+- 2026-06-09 — [save_system] `SaveManager` rewritten: append-only counter-based saves at `user://saves/save_N.json`; manifest (`user://saves/manifest.json`) tracks latest counter as load fast-path; load falls back newest-first through candidates, toasting a warning on any skip; corrupt manifest recovers via filename scan; up to 10 files retained with best-effort cleanup; migration logs collected post-load and routed to `ToastManager.show_info()`
+- 2026-06-09 — [save_system] Legacy `user://save.json` auto-migrated to `user://saves/save_1.json` on first boot and deleted best-effort
+- 2026-06-09 — [save_system] `SaveManager.has_save()` API added; `start_page_scene.gd` updated to call it instead of accessing the removed `SAVE_PATH` constant directly
+
+---
+
+## Unified Debug System
+
+- 2026-06-09 — [debug] `Debug` autoload added (`global/autoloads/debug.gd`): unified gate combining `OS.is_debug_build()` (build-time) and `SettingsStore.debug_mode` (user preference); exposes `enabled` property, `toggled` signal, and `set_debug_mode()` mutator
+- 2026-06-09 — [debug] `SettingsStore.debug_mode` wired with setter + `debug_mode_changed` signal so any write (via `Debug.set_debug_mode()` or direct assignment) is runtime-correct
+- 2026-06-09 — [debug] Auction scene debug overlay (`auction_scene.gd`) migrated from `OS.is_debug_build()` to `Debug.enabled`; connects `Debug.toggled` for reactive show/hide
+- 2026-06-09 — [debug] Settings Overlay checkbox routes through `Debug.set_debug_mode()` instead of writing `SettingsStore.debug_mode` directly
+- 2026-06-09 — [standards] `dev/standards/debug_standard.md` added: documents the two-layer debug gate, `Debug` autoload API, coding patterns (one-shot init, reactive toggle, conditional logic), node-source rules, and release safety
+- 2026-06-09 — [standards] `block_scene_architecture_standard.md` updated: debug node references changed from `OS.is_debug_build()` to `Debug.enabled`
+- 2026-06-09 — [docs] CLAUDE.md updated with Debug autoload in load order and debug standard pointer in Standards section
+
+---
+
+## Centralized Theme
+
+- 2026-06-09 — [theme] `main_theme.tres` populated with centralized design tokens: color palette (primary/hover/pressed/disabled text), default font size 16, Button StyleBoxes (5 states), PanelContainer panel, TooltipPanel, HSeparator/VSeparator, container separation defaults (HBox/VBox=8, Grid=6×6)
+- 2026-06-09 — [theme] Custom CheckBox icons added (`global/theme/icons/`): bright-border checked/unchecked/disabled PNGs visible on dark backgrounds; CheckBox theme entries with transparent StyleBoxEmpty background
+- 2026-06-09 — [theme] Project-level theme set via `project.godot → [gui] theme/custom`; all scenes inherit automatically
+- 2026-06-09 — [theme] Removed stale `NormalFont.ttf` ext_resource reference (font file was already deleted)
+- 2026-06-09 — [standards] `dev/standards/theme_standard.md` added: documents palette, typography scale, spacing defaults, semantic gameplay colors, override rules, and incremental migration approach
+- 2026-06-09 — [docs] CLAUDE.md updated with theme standard pointer in Standards section
+
+---
+
+## Start Page & Settings Overlay
+
+- 2026-06-09 — [start_settings] `SettingsStore` autoload added (`global/autoloads/settings_store.gd`): persists master/sfx/music volume, fullscreen, debug_mode to `user://settings.json`; applies audio bus volumes and display mode on boot; toggles settings overlay on `ui_settings` input (Escape)
+- 2026-06-09 — [start_settings] `SettingsOverlay` component added (`game/shared/settings_overlay/`): modal CanvasLayer (layer=100, PROCESS_MODE_ALWAYS) with Audio (Master/SFX/Music sliders), Display (fullscreen), and Gameplay (debug mode) sections; pauses tree on open, unpauses on close via `closed` signal
+- 2026-06-09 — [start_settings] `StartPageScene` added (`game/meta/start/`): boots as `main_scene`; shows "New Game" or "Continue" based on save-file presence; routes to hub, settings overlay, or quit
+- 2026-06-09 — [start_settings] `default_bus_layout.tres` added with Master/SFX/Music/UI buses; registered in `project.godot` under `[audio]`; `SceneRegistry.start_page` wired in `scene_router.tscn`
+- 2026-06-09 — [standards] Block scene architecture standard updated: `%UniqueName` preferred over `$path` for node references in new/edited scenes; `$path` legacy-allowed in untouched code; `unique_name_in_owner = true` must be a property line, not a header attribute
+- 2026-06-09 — [skills] `dev/skills/godot4_tscn_node_properties.md` added: exhaustive list of valid `.tscn` node header attributes (`name`, `type`, `parent`, `instance`, `unique_id`) vs. property lines; `unique_name_in_owner` worked example
+
+---
+
+## Save & Managers Refactor
+
+- 2026-06-06 — [refactor] SaveManager stripped to a thin persistence coordinator (81 lines, no gameplay state); gameplay state distributed to 10 Store archetypes under `common/gameplay/store/` — 8 persisting (EconomyStore, GarageStore, StorageStore, SlotStore, ProgressStore, CustomersStore, KnowledgeStore) and 2 session-scoped (RunStore, LotStore) — all extending `StoreBase` with `section_id/to_dict/from_dict/_store_version/_apply_migrations`; Managers (MetaManager, KnowledgeManager) register as providers and coordinate cross-domain transactions; RunManager owns RunStore + LotStore factories and run-phase mutations
+- 2026-06-06 — [refactor] Meta↔Knowledge dependency cycle broken via EventBus signals (`sale_resolved`, `item_repaired`, `item_restored`, `run_resolved`); MetaManager emits post-commit, KnowledgeManager subscribes for XP accrual; `upgrade_attribute` transaction moved to MetaManager
+- 2026-06-06 — [refactor] RunRecord decomposed into RunStore (per-run cumulative state) + LotStore (per-lot mutable state: lot_entry, actions_remaining, won_items); RunManager owns AP deficit-refill handoff at lot boundaries; `RunResult` Snapshot added for run-end economics handoff
+- 2026-06-06 — [refactor] All Stores use private backing vars + getter-only properties (language-enforced read-only); collection getters return `.duplicate()`; 35+ proxy properties removed from managers; scenes access state via `MetaManager.economy.cash`, `RunManager.lot.actions_remaining`, etc.
+- 2026-06-06 — [refactor] Per-store versioned migrations replace top-level `run_migrations()`; legacy flat-save fallback and schema 1→2 migration removed; `RegistryCoordinator` removed; `ResourceRegistry` base class added for all registries
+- 2026-06-06 — [refactor] `autoload/` → `autoloads/` folder rename; runtime types organized into archetype subfolders (`instance/`, `store/`, `snapshot/`, `service/`); `Customer` → `CustomerEntry`; `location_select` / `location_entry` → `*_scene` suffix
+- 2026-06-06 — [docs] Systems docs L2 audit; `data_architecture.md` vision added; naming conventions updated for singular archetype folders; `DaySummary` reclassified as Snapshot
 
 ## Customer Sell UX Polish
 

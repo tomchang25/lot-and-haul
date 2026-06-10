@@ -46,11 +46,11 @@ All sampled lot cards are visible, but only the current card exposes Enter and P
 
 ### Inspection And List Review
 
-Current inspection is an AP grid, not the older stamina action model. The active lot's item shapes are placed on an 8x8 hidden grid using category shapes. The AP budget is a two-tier pool — a per-lot cap plus a visit-wide reserve that refills the cap (deficit only) at each lot boundary — owned by the run record; the old per-lot `action_quota` no longer drives it. See `day_slot_economy.md` for the full pool model. Car stamina still exists on the run record, but the current inspection UI does not spend it.
+Current inspection is an AP grid. The active lot's item shapes are placed on an 8×8 hidden grid using category shapes. The AP budget is a two-tier pool — a per-lot cap plus a visit-wide reserve that refills the cap (deficit only) at each lot boundary — owned by the run record. See `day_slot_economy.md` for the full pool model. Car stamina exists on the run record but the current inspection UI does not spend it.
 
 Identity is clue-based, not layer-based. Clicking a veiled object spends the unveil AP cost and calls `ItemEntry.unveil()`, which reveals the item's **anchor** clue (its base-value identity) and grants reveal knowledge. There is no layer ladder.
 
-Clicking an already-unveiled item that still has discoverable clues (`has_inspection_clues()`) spends the clue-chain AP cost and runs a chain of discovery rolls over its unrevealed surface (and high-DC hidden) clues. Each roll calls `attempt_clue(clue, attribute_bonus)`, where `success_chance = clamp((21 + attribute_bonus − dc) × 5, 5, 95)` and `attribute_bonus` comes from the player's attribute value for that clue's `attribute`. The chain reveals clues until the first failed roll. Revealed surface clues raise `inspection_level` (the revealed-surface ratio), which tightens the estimated price range.
+Clicking an already-unveiled item that still has discoverable clues spends the clue-chain AP cost and runs a chain of discovery rolls over its unrevealed surface (and high-DC hidden) clues. Each roll's success chance scales with the relevant attribute bonus versus the clue's DC; the chain reveals clues until the first failed roll. Revealed surface clues raise `inspection_level` (the revealed-surface ratio), which tightens the estimated price range.
 
 The list review overlay can be opened manually or appears automatically when AP reaches zero. It shows found items, condition/estimate columns, the lot total estimate, and the auction opening bid. Back to inspection is enabled only while AP remains. Passing returns to lot browse; entering auction routes to the auction scene.
 
@@ -58,7 +58,7 @@ Price estimates are hidden for veiled items. Revealed, unverified items show an 
 
 ### Auction
 
-The runtime lot caches an NPC estimate when it is created (`LotEntry.roll_npc_estimate()`). The estimate is clue-based: it sums each item's `ItemEntry.roll_npc_estimate(lot_data.npc_clue_sight_chance)`, where the NPC notices each surface clue with that per-clue probability and computes `(anchor_flat + Σ noticed_add) × Π noticed_mul`. Opening bid and the hidden rolled price both derive from that cached estimate, with lot aggression (`aggressive_lerp`), price variance, floor, and ceiling tuning applied before the auction scene opens.
+The runtime lot caches an NPC estimate when it is created. The estimate is clue-based: the NPC notices each surface clue with a per-clue probability and computes a value from the noticed clues. Opening bid and the hidden rolled price both derive from that cached estimate, with lot aggression, price variance, floor, and ceiling tuning applied before the auction scene opens.
 
 The auction is a simulation, not a negotiation. NPC ticks raise the displayed price toward the rolled threshold while a closing circle controls resolution timing. The player can bid or pass. If the circle resolves after the threshold is reached and the player was the last bidder, the current lot's items are added to accumulated run wins and the current price is added to the accumulated paid total. If an NPC was last bidder, or the player passes, accumulated wins and paid total are left untouched.
 

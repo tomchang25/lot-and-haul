@@ -1,0 +1,180 @@
+[gd_scene format=3 uid="uid://s3da6lc55hky"]
+
+[ext_resource type="Script" uid="uid://do8f0uelvy7ki" path="res://game/shared/settings_overlay/settings_overlay.gd" id="1_sogd"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+bg_color = Color(0.12, 0.12, 0.15, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.25, 0.3, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="SettingsOverlay" type="CanvasLayer" unique_id=1200000001]
+layer = 100
+script = ExtResource("1_sogd")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1200000002]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1200000003]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="CenterContainer" unique_id=1200000004]
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1")
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/Panel" unique_id=1200000005]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="RootVBox" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer" unique_id=1200000006]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000007]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000008]
+layout_mode = 2
+
+[node name="AudioLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000009]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Audio"
+
+[node name="MasterRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000010]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MasterLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/RootVBox/MasterRow" unique_id=1200000011]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Master"
+
+[node name="MasterSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/RootVBox/MasterRow" unique_id=1200000012]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MasterValueLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/RootVBox/MasterRow" unique_id=1200000013]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+text = "100%"
+horizontal_alignment = 2
+
+[node name="SfxRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000014]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SfxLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/RootVBox/SfxRow" unique_id=1200000015]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "SFX"
+
+[node name="SfxSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/RootVBox/SfxRow" unique_id=1200000016]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SfxValueLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/RootVBox/SfxRow" unique_id=1200000017]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+text = "100%"
+horizontal_alignment = 2
+
+[node name="MusicRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000018]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MusicLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/RootVBox/MusicRow" unique_id=1200000019]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Music"
+
+[node name="MusicSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/RootVBox/MusicRow" unique_id=1200000020]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MusicValueLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/RootVBox/MusicRow" unique_id=1200000021]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+text = "100%"
+horizontal_alignment = 2
+
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000022]
+layout_mode = 2
+
+[node name="DisplayLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000023]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Display"
+
+[node name="FullscreenRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000024]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FullscreenLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/RootVBox/FullscreenRow" unique_id=1200000025]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Fullscreen"
+
+[node name="FullscreenCheck" type="CheckBox" parent="CenterContainer/Panel/MarginContainer/RootVBox/FullscreenRow" unique_id=1200000026]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HSeparator3" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000027]
+layout_mode = 2
+
+[node name="GameplayLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000028]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Gameplay"
+
+[node name="DebugRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000029]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DebugLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/RootVBox/DebugRow" unique_id=1200000030]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Debug Mode"
+
+[node name="DebugCheck" type="CheckBox" parent="CenterContainer/Panel/MarginContainer/RootVBox/DebugRow" unique_id=1200000031]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HSeparator4" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000032]
+layout_mode = 2
+
+[node name="CloseButton" type="Button" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000033]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Close"
