@@ -1,0 +1,156 @@
+# reference_tables.yaml
+#
+# Per-category balancing TARGETS for generated clue/item content. Tooling-only:
+# this file is NOT converted to .tres and is ignored by validate_yaml.py and yaml_to_tres.py.
+# yaml_stats.py reads it and emits an out-of-band WARNING when a category's realized
+# statistic falls outside its band. Bands are balance signals, never hard errors.
+#
+# Stat == 'full true value' per item (all clues applied, reveal-state ignored), per
+# common/gameplay/instance/item_entry.gd full_true_value():
+#   base = override.effect_amount if any hidden override else anchor.base_value  (first override wins)
+#   value = (base + Sum_all_add) * Prod_all_mul     # add/mul over BOTH surface and hidden clues
+# Condition multiplier (0.25x..4.0x) is applied at price time and is NOT included here;
+# the condition: block records the expected as-acquired multiplier band per category.
+#
+# Comparison semantics (implemented by yaml_stats.py against the real schema — see regen plan):
+#   - resolve anchor_id -> anchors[].base_value; surface_ids/hidden_ids -> clues[].effect_op/effect_amount
+#   - band violation  -> [WARN] (balance signal)
+#   - schema violation -> validate_yaml.py error (separate tool, hard failure)
+#
+# Bands derived by Monte Carlo (60k samples/category) over the adopted tiered effect
+# budgets + super-category personalities; trimmed to p05-p95 to exclude jackpot/collapse tails.
+# Regenerate: dev/tools/prompts/yaml_generation snapshot — bands are targets, round numbers expected.
+
+reference_tables:
+  - category_id: handbag
+    super_category: fashion            # Handbag
+    median: { min: 350, max: 1100 }
+    mean:   { min: 550, max: 1900 }
+    stddev: { min: 550, max: 2400 }
+    min:    { min: 5, max: 350 }
+    max:    { min: 900, max: 21000 }
+    condition:                        # expected as-acquired condition multiplier (documentation-only)
+      expected_multiplier: { min: 0.63, max: 1.74 }
+      mean_multiplier: 1.17
+
+  - category_id: wristwatch
+    super_category: fashion            # Wristwatch
+    median: { min: 350, max: 1100 }
+    mean:   { min: 550, max: 1900 }
+    stddev: { min: 525, max: 2400 }
+    min:    { min: 5, max: 350 }
+    max:    { min: 900, max: 21000 }
+    condition:                        # expected as-acquired condition multiplier (documentation-only)
+      expected_multiplier: { min: 0.64, max: 1.76 }
+      mean_multiplier: 1.19
+
+  - category_id: oil_lamp
+    super_category: decorative            # Oil Lamp
+    median: { min: 175, max: 625 }
+    mean:   { min: 300, max: 1100 }
+    stddev: { min: 250, max: 1200 }
+    min:    { min: 5, max: 175 }
+    max:    { min: 525, max: 6000 }
+    condition:                        # expected as-acquired condition multiplier (documentation-only)
+      expected_multiplier: { min: 0.67, max: 1.84 }
+      mean_multiplier: 1.24
+
+  - category_id: clock
+    super_category: decorative            # Clock
+    median: { min: 150, max: 625 }
+    mean:   { min: 300, max: 1100 }
+    stddev: { min: 250, max: 1200 }
+    min:    { min: 5, max: 150 }
+    max:    { min: 550, max: 5800 }
+    condition:                        # expected as-acquired condition multiplier (documentation-only)
+      expected_multiplier: { min: 0.66, max: 1.84 }
+      mean_multiplier: 1.24
+
+  - category_id: porcelain_figurine
+    super_category: decorative            # Porcelain Figurine
+    median: { min: 175, max: 625 }
+    mean:   { min: 300, max: 1100 }
+    stddev: { min: 250, max: 1200 }
+    min:    { min: 5, max: 175 }
+    max:    { min: 550, max: 5900 }
+    condition:                        # expected as-acquired condition multiplier (documentation-only)
+      expected_multiplier: { min: 0.67, max: 1.83 }
+      mean_multiplier: 1.25
+
+  - category_id: vase
+    super_category: decorative            # Vase
+    median: { min: 150, max: 625 }
+    mean:   { min: 300, max: 1100 }
+    stddev: { min: 250, max: 1200 }
+    min:    { min: 5, max: 150 }
+    max:    { min: 525, max: 5900 }
+    condition:                        # expected as-acquired condition multiplier (documentation-only)
+      expected_multiplier: { min: 0.67, max: 1.83 }
+      mean_multiplier: 1.25
+
+  - category_id: poster
+    super_category: decorative            # Poster
+    median: { min: 150, max: 625 }
+    mean:   { min: 300, max: 1100 }
+    stddev: { min: 275, max: 1200 }
+    min:    { min: 5, max: 150 }
+    max:    { min: 550, max: 5900 }
+    condition:                        # expected as-acquired condition multiplier (documentation-only)
+      expected_multiplier: { min: 0.67, max: 1.80 }
+      mean_multiplier: 1.23
+
+  - category_id: painting
+    super_category: fine_art            # Painting
+    median: { min: 3500, max: 7400 }
+    mean:   { min: 4400, max: 12000 }
+    stddev: { min: 2800, max: 12500 }
+    min:    { min: 60, max: 3500 }
+    max:    { min: 6500, max: 88000 }
+    condition:                        # expected as-acquired condition multiplier (documentation-only)
+      expected_multiplier: { min: 0.73, max: 1.96 }
+      mean_multiplier: 1.36
+
+  - category_id: sculpture
+    super_category: fine_art            # Sculpture
+    median: { min: 3500, max: 7400 }
+    mean:   { min: 4500, max: 12000 }
+    stddev: { min: 2800, max: 12500 }
+    min:    { min: 55, max: 3500 }
+    max:    { min: 6500, max: 88500 }
+    condition:                        # expected as-acquired condition multiplier (documentation-only)
+      expected_multiplier: { min: 0.72, max: 1.93 }
+      mean_multiplier: 1.34
+
+  - category_id: pistol
+    super_category: weapon            # Pistol
+    median: { min: 525, max: 1300 }
+    mean:   { min: 750, max: 1900 }
+    stddev: { min: 400, max: 1800 }
+    min:    { min: 10, max: 525 }
+    max:    { min: 1100, max: 8200 }
+    condition:                        # expected as-acquired condition multiplier (documentation-only)
+      expected_multiplier: { min: 0.86, max: 2.44 }
+      mean_multiplier: 1.62
+
+  - category_id: rifle
+    super_category: weapon            # Rifle
+    median: { min: 525, max: 1300 }
+    mean:   { min: 750, max: 1900 }
+    stddev: { min: 400, max: 1800 }
+    min:    { min: 10, max: 525 }
+    max:    { min: 1100, max: 8000 }
+    condition:                        # expected as-acquired condition multiplier (documentation-only)
+      expected_multiplier: { min: 0.87, max: 2.47 }
+      mean_multiplier: 1.63
+
+  - category_id: crossbow
+    super_category: weapon            # Crossbow
+    median: { min: 525, max: 1300 }
+    mean:   { min: 750, max: 1900 }
+    stddev: { min: 400, max: 1800 }
+    min:    { min: 10, max: 525 }
+    max:    { min: 1100, max: 8100 }
+    condition:                        # expected as-acquired condition multiplier (documentation-only)
+      expected_multiplier: { min: 0.87, max: 2.47 }
+      mean_multiplier: 1.63
+

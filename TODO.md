@@ -191,8 +191,7 @@ Run-phase scenes (`inspection_scene`, `reveal_scene`, `run_review_scene`) mutate
 
 Flows currently being built. One-line pointer each — same format as `## Plan`, just promoted here when work starts. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress → this section is empty.
 
-- [clue_content_standard] Baseline review + generation standard (draw rules, prompt rewrite, reference tables; absorbs cleanup review leftovers) — see `dev/docs/plans/clue_content_standard.md`
-- [clue_content_regen] Full YAML regeneration on the authored standard + stats-tool table comparison — see `dev/docs/plans/clue_content_regen.md`; depends on clue_content_standard
+- [clue_content_regen] Full YAML regeneration on the authored standard + stats-tool table comparison — see `dev/docs/plans/clue_content_regen.md`; prerequisite shipped
 
 ---
 

@@ -42,3 +42,28 @@ State described here is the expected post-`clue_schema_cleanup` state — verify
 3. The rewritten prompts carry the full standard (effect budgets per tier, positive/negative mix, no zero-effect clues, naming-slot rules, shape conventions) with no stale affinity remnants, and their pricing model matches the price semantics above.
 4. `data/yaml/reference_tables.yaml` exists with median, mean, standard deviation, min, max, and condition expectations per category, plus a written comparison spec (bands → warnings, schema → errors) the regen plan can implement against.
 5. Draw rules are recorded in this plan's successor documentation home (graduating to a `systems/` doc when the design locks) and match what the rewritten prompts assume.
+
+## Baseline Review Findings (2026-06-11)
+
+Reviewed against the actual post-`clue_schema_cleanup` codebase (entity specs in `dev/tools/tres_lib/entities/`, authored `data/yaml/`, and `common/gameplay/instance/item_entry.gd`), not the plan's described state.
+
+1. **Validator / lint: green.** `validate_yaml.py` and the linter pass on the converted set (confirmed on the Windows side). The shell-side validator run is unreliable here — the Linux mount serves a tail-truncated `tres_lib/registry.py` (a phantom-corruption artifact described in `dev/agent_rules/sandbox_environment.md`), so a shell `SyntaxError` there is not a real defect. This is the regeneration baseline.
+2. **`_veil_NN` rename is consistent in content.** All 11 authored anchors use the `_veil_NN` suffix (`lamp_veil_01`, `clock_veil_01`, `bag_veil_01..03`, `watch_veil_01..02`, `pistol_veil_01..02`, `rifle_veil_01`, `crossbow_veil_01`); no `_anchor_NN` remnants remain in `clues.yaml` or items. The generation prompts still documented the old `_anchor_NN` convention — fixed in the prompt rewrite below.
+3. **No `flat`-op or anchor-as-clue remnants.** Anchors are a dedicated `anchors:` block (`AnchorData` resource: `anchor_id`, `category_scope`, `base_value`, `naming_priority`, `shape_id`, `sprite`, `weight_kg`, `tier`) — no `type`/`effect_op`/`dc`/`attribute`/`domain`. Clue `type` is `surface`/`hidden` only (the validator rejects `anchor`); clue `effect_op` is `add`/`mul`/`override` only (the validator rejects `flat`; `override` is hidden-only). Confirmed clean.
+4. **Content coverage gaps (for the regen plan, not fixed here per Non-Goal 1).** Only 11 anchors / 35 items are authored. Five categories — `porcelain_figurine`, `vase`, `poster`, `painting`, `sculpture` — have zero anchors and zero items. Every authored item is rarity 1; no `_override_` counterfeit clue exists, so the required negative-hidden mix is unmet in current content, and `oil_lamp`/`clock`/`rifle`/`crossbow` carry only one anchor tier (the standard requires ≥2). The regen plan fills all of this against the standard authored here.
+5. **`yaml_stats.py` is non-functional against the post-cleanup schema (TOOL DEFECT — reported for the regen plan, not fixed here per Non-Goal 2).** `_load_merged()` loads only `super_categories`/`categories`/`items`, never the `anchors:`/`clues:` tables; `_extract_anchor_value()` and `_full_true_value()` read an obsolete inline `item["clues"]` list and the obsolete `flat` op. Against the real three-way item schema every item resolves to `full_true_value = None`, so reference-band checks silently no-op. Degradation is graceful only in the narrow sense (no crash; an absent `reference_tables.yaml` prints "skipping"). The fix — resolve `anchor_id`/`surface_ids`/`hidden_ids` against the anchors/clues tables and treat `override` as the base-replacement op — belongs to the regen plan's tooling work; the correct `full_true_value` formula and comparison semantics are recorded in `data/yaml/reference_tables.yaml`'s header for it to implement against.
+
+## Decisions
+
+1. **`item_name` annotation field — DROP.** Items YAML still carries an `item_name:` line (e.g. `Moser Lamp`) that the pipeline ignores; the display name composes entirely from naming slots (anchor body + clue qualifiers). The rewritten `item.md` omits `item_name` from the schema. Stripping it from the existing `items/*.yaml` files is the regen plan's job (Non-Goal 1 forbids content edits here); the item validator ignores unknown fields, so the lines are harmless until then.
+
+## Draw Rules (durable standard for the future pool generator)
+
+Recorded here; graduate to a `systems/` doc (e.g. `systems/pool_draw.md`) once the pool generator is built and the design locks (AC 5). The generator runtime itself is Non-Goal 3.
+
+- **Anchors** are drawn via lot/location **tier weight curves** over the anchor `tier` field (1–5). A richer lot or location shifts the weight curve toward higher-tier anchors; it never alters which clues attach.
+- **Surface clues** are drawn **uniformly** from the category's surface pool. (Anchor-conditioned surface drawing is a separate future Draft, not adopted here.)
+- **Hidden clues** are drawn **uniformly** from the category's valid hidden options, subject to the same two item-level invariants the validator enforces: **at most one `override` per item**, and **at most one clue per `exclusive_group` per item** (genuine `_leaf_` and its counterfeit `_override_` are alternatives, never combined).
+- **Lots and locations influence rarity frequency only** (how often high-rarity items appear) — **never hidden contents**. The positive/negative hidden mix is a fixed property of each category pool, so the gamble odds stay globally constant and the player can learn them. Research EV lives in the category pool, not the venue.
+
+These match the rewritten prompts: the `tier` field on anchors, the `override`/`exclusive_group` invariants on hidden pools, and the per-category fixed positive/negative mix.

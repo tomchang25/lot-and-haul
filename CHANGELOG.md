@@ -21,6 +21,19 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Clue Content Standard
+
+- 2026-06-11 — [docs] Baseline review of post-cleanup YAML set: validator green, `_veil_NN` rename confirmed consistent, no `flat`-op or anchor-as-clue remnants; 5 empty categories + missing negative/override content + `yaml_stats.py` post-cleanup defect documented for the regen plan
+- 2026-06-11 — [docs] Decision: drop `item_name` annotation field from items YAML (pipeline-ignored; display name composes from naming slots)
+- 2026-06-11 — [docs] Draw rules recorded: tier weight curves for anchors, uniform surface/hidden draws, at most one override + one per exclusive_group per item, rarity frequency only (not hidden contents)
+- 2026-06-11 — [prompts] `base.md` updated: `_anchor_NN` → `_veil_NN`, `anchor_id` ID standard added, anchors noted as separate resources not clues
+- 2026-06-11 — [prompts] `category.md` updated: `super_category` field corrected from display strings to snake_case IDs matching `super_categories:` block
+- 2026-06-11 — [prompts] `item.md` fully rewritten against post-cleanup schema: three-resource table, dedicated anchor schema, `add|mul|override` ops (no `flat`), three-way item schema (`anchor_id`/`surface_ids`/`hidden_ids`), effect budgets per tier with positive/negative mix, super-category personalities, fixed example (exclusive-group collision split into separate items)
+- 2026-06-11 — [data] `data/yaml/reference_tables.yaml` added: per-category balancing targets (median, mean, stddev, min, max bands, condition expectations) for all 12 categories, with comparison spec header (band violations → `[WARN]`, schema violations → errors)
+- 2026-06-11 — [docs] `dev/docs/plans/clue_content_standard.md` shipped and archived
+
+---
+
 ## Location Entry Backgrounds
 
 - 2026-06-09 — [location_entry] `LocationData` gains `bg_exterior: Texture2D`, `bg_interior: Texture2D`, and `transition_type: String` exports; defaults to `"sliding_door"` when unset
