@@ -50,6 +50,8 @@ def _load_merged(yaml_dir: Path) -> dict[str, list]:
         "super_categories": [],
         "categories": [],
         "items": [],
+        "anchors": [],
+        "clues": [],
     }
 
     for yaml_path in yaml_files:
@@ -97,60 +99,80 @@ def _format_int(value: float) -> str:
     return f"{int(round(value)):,}"
 
 
-def _extract_anchor_value(item: dict) -> float | None:
-    """Extract the anchor clue's price effect as a numeric value."""
-    clues = item.get("clues", []) or []
-    for clue in clues:
-        if clue.get("type") == "anchor":
-            try:
-                return float(clue["effect_amount"])
-            except (KeyError, ValueError, TypeError):
-                return None
+def _extract_anchor_value(item: dict, anchors_by_id: dict[str, dict]) -> float | None:
+    """Extract the anchor base_value from the anchors table."""
+    anchor_id = item.get("anchor_id", "")
+    anchor = anchors_by_id.get(anchor_id)
+    if anchor:
+        try:
+            return float(anchor["base_value"])
+        except (KeyError, ValueError, TypeError):
+            return None
     return None
 
 
-def _full_true_value(item: dict) -> float | None:
+def _full_true_value(
+    item: dict,
+    anchors_by_id: dict[str, dict],
+    clues_by_id: dict[str, dict],
+) -> float | None:
     """Compute the item's full true value (all clues applied, ignoring reveal state).
 
     Formula mirrors ItemEntry.full_true_value():
-      (effective_base + Σ_surface_add + Σ_hidden_add) × Π_surface_mul × Π_hidden_mul
-    where effective_base = anchor_flat, or the first hidden flat override if present.
+      (effective_base + Σ_all_add) × Π_all_mul
+    where effective_base = the first revealed hidden override amount,
+    otherwise anchor.base_value. 'override' replaces the base; no longer 'flat'.
     """
-    clues = item.get("clues", []) or []
-    anchor_val: float | None = None
+    anchor_id = item.get("anchor_id", "")
+    anchor = anchors_by_id.get(anchor_id)
+    if not anchor:
+        return None
+    try:
+        base = float(anchor["base_value"])
+    except (KeyError, ValueError, TypeError):
+        return None
+
+    surface_ids = item.get("surface_ids", []) or []
+    hidden_ids = item.get("hidden_ids", []) or []
+
     s_add = 0.0
     s_mul = 1.0
     h_add = 0.0
     h_mul = 1.0
     override: float | None = None
 
-    for clue in clues:
-        ctype = clue.get("type")
+    for cid in surface_ids:
+        clue = clues_by_id.get(cid)
+        if not clue:
+            continue
         op = clue.get("effect_op", "")
         try:
             amount = float(clue.get("effect_amount", 0))
         except (ValueError, TypeError):
             continue
+        if op == "add":
+            s_add += amount
+        elif op == "mul":
+            s_mul *= amount
 
-        if ctype == "anchor":
-            anchor_val = amount
-        elif ctype == "surface":
-            if op == "add":
-                s_add += amount
-            elif op == "mul":
-                s_mul *= amount
-        elif ctype == "hidden":
-            if op == "flat" and override is None:
-                override = amount
-            elif op == "add":
-                h_add += amount
-            elif op == "mul":
-                h_mul *= amount
+    for cid in hidden_ids:
+        clue = clues_by_id.get(cid)
+        if not clue:
+            continue
+        op = clue.get("effect_op", "")
+        try:
+            amount = float(clue.get("effect_amount", 0))
+        except (ValueError, TypeError):
+            continue
+        if op == "override" and override is None:
+            override = amount
+        elif op == "add":
+            h_add += amount
+        elif op == "mul":
+            h_mul *= amount
 
-    if anchor_val is None:
-        return None
-    base = override if override is not None else anchor_val
-    return (base + s_add + h_add) * s_mul * h_mul
+    effective_base = override if override is not None else base
+    return (effective_base + s_add + h_add) * s_mul * h_mul
 
 
 def _count_surface_clues(item: dict) -> int:
@@ -205,6 +227,7 @@ def _check_reference_band(
 
 def _print_rarity_table(
     items: list[dict],
+    anchors_by_id: dict[str, dict],
     indent: str = "  ",
 ) -> list[float]:
     """Print per-rarity stats and return all anchor values collected."""
@@ -216,7 +239,7 @@ def _print_rarity_table(
         r = int(item.get("rarity", 0))
         rarity_counts[r] = rarity_counts.get(r, 0) + 1
         by_rarity.setdefault(r, []).append(item)
-        val = _extract_anchor_value(item)
+        val = _extract_anchor_value(item, anchors_by_id)
         if val is not None:
             all_anchors.append(val)
 
@@ -273,6 +296,14 @@ def main() -> None:
     else:
         print("No reference_tables.yaml found — skipping reference band checks.")
 
+    # Build lookup tables for the post-cleanup three-way schema.
+    anchors_by_id: dict[str, dict] = {
+        a["anchor_id"]: a for a in merged.get("anchors", [])
+    }
+    clues_by_id: dict[str, dict] = {
+        c["clue_id"]: c for c in merged.get("clues", [])
+    }
+
     # Build category -> super_category lookup
     cat_to_super: dict[str, str] = {}
     for cat in merged.get("categories", []):
@@ -324,7 +355,7 @@ def main() -> None:
             f" avg surface clues: {avg_surface:.1f},"
             f" avg hidden clues: {avg_hidden:.1f})"
         )
-        super_anchors = _print_rarity_table(items, indent="  ")
+        super_anchors = _print_rarity_table(items, anchors_by_id, indent="  ")
         all_anchor_values.extend(super_anchors)
 
         for cat_id in sorted(cats_dict):
@@ -338,14 +369,14 @@ def main() -> None:
                 f" avg surface: {avg_cat_surface:.1f},"
                 f" avg hidden: {avg_cat_hidden:.1f})"
             )
-            _print_rarity_table(cat_items, indent="      ")
+            _print_rarity_table(cat_items, anchors_by_id, indent="      ")
 
             # ── Reference table comparison ────────────────────────────────
             if cat_id in ref_tables:
                 ref = ref_tables[cat_id]
                 true_values = [
                     v for it in cat_items
-                    if (v := _full_true_value(it)) is not None
+                    if (v := _full_true_value(it, anchors_by_id, clues_by_id)) is not None
                 ]
                 stats = _value_stats(true_values)
                 if stats:
@@ -377,3 +408,7 @@ def main() -> None:
         print(f"\n{len(all_ref_warnings)} reference band warning(s) — see above for details.")
     elif ref_tables:
         print("\nAll categories within reference band targets.")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,58 +1,331 @@
 items:
-  - item_id: lamp_moser_bohemian
-    item_name: Moser Lamp
+  # ── Oil Lamp ──────────────────────────────────────────────────────
+  - item_id: lamp_plain_tin
+    category_id: oil_lamp
+    rarity: 0
+    anchor_id: lamp_anchor_01
+    surface_ids:
+      - lamp_glass_mold_seam
+      - lamp_collar_pewter
+
+  - item_id: lamp_moser_scroll
     category_id: oil_lamp
     rarity: 1
-    anchor_id: lamp_veil_01
+    anchor_id: lamp_anchor_01
     surface_ids:
       - lamp_glass_blown
-      - lamp_glass_wear_ring
+      - lamp_collar_silver
       - lamp_cast_scrollwork
-      - lamp_burner_fitting
+      - lamp_maker_stamped
     hidden_ids:
       - lamp_leaf_moser
 
-  - item_id: lamp_baccarat_crystal
-    item_name: Baccarat Lamp
+  - item_id: lamp_baccarat_cracked
     category_id: oil_lamp
     rarity: 1
-    anchor_id: lamp_veil_01
+    anchor_id: lamp_anchor_02
     surface_ids:
       - lamp_glass_blown
-      - lamp_glass_wear_ring
-      - lamp_mold_seams
-      - lamp_glass_crystal
-      - lamp_silver_collar
-      - lamp_maker_signature
+      - lamp_collar_silver
+      - lamp_glass_cracked
+      - lamp_burner_fitted
     hidden_ids:
       - lamp_leaf_baccarat
 
-  - item_id: lamp_hinks_duplex
-    item_name: Hinks Lamp
+  - item_id: lamp_repro_silvered
     category_id: oil_lamp
     rarity: 1
-    anchor_id: lamp_veil_01
+    anchor_id: lamp_anchor_02
     surface_ids:
       - lamp_glass_blown
-      - lamp_glass_wear_ring
-      - lamp_silver_collar
+      - lamp_collar_silver
+      - lamp_cast_scrollwork
       - lamp_date_letter
-      - lamp_maker_stamp
-      - lamp_registry_match
+    hidden_ids:
+      - lamp_override_modern_copy
+
+  - item_id: lamp_hinks_rewired
+    category_id: oil_lamp
+    rarity: 2
+    anchor_id: lamp_anchor_02
+    surface_ids:
+      - lamp_glass_blown
+      - lamp_collar_silver
+      - lamp_cast_scrollwork
+      - lamp_maker_stamped
+      - lamp_date_letter
     hidden_ids:
       - lamp_leaf_hinks
+      - lamp_hidden_rewired
 
-  - item_id: clock_boulle_mantel
-    item_name: Boulle Clock
+  # ── Clock ─────────────────────────────────────────────────────────
+  - item_id: clock_plain_shellac
+    category_id: clock
+    rarity: 0
+    anchor_id: clock_anchor_01
+    surface_ids:
+      - clock_case_veneered
+      - clock_finish_shellac
+
+  - item_id: clock_gilded_mantel
     category_id: clock
     rarity: 1
-    anchor_id: clock_veil_01
+    anchor_id: clock_anchor_01
     surface_ids:
-      - clock_wood_joinery
-      - clock_wood_finish
       - clock_case_gilded
-      - clock_inlay_quality
+      - clock_joinery_dovetail
+      - clock_movement_seven_jewel
+      - clock_workshop_label
+    hidden_ids:
+      - clock_leaf_tompion
+
+  - item_id: clock_graham_unsigned
+    category_id: clock
+    rarity: 1
+    anchor_id: clock_anchor_02
+    surface_ids:
+      - clock_case_gilded
+      - clock_joinery_dovetail
       - clock_movement_signed
-      - clock_workshop_match
+      - clock_workshop_label
+    hidden_ids:
+      - clock_leaf_graham
+
+  - item_id: clock_marriage_piece
+    category_id: clock
+    rarity: 1
+    anchor_id: clock_anchor_02
+    surface_ids:
+      - clock_case_gilded
+      - clock_case_chipped
+      - clock_movement_seven_jewel
+      - clock_workshop_label
+    hidden_ids:
+      - clock_override_marriage
+
+  - item_id: clock_boulle_broken
+    category_id: clock
+    rarity: 2
+    anchor_id: clock_anchor_02
+    surface_ids:
+      - clock_case_gilded
+      - clock_joinery_dovetail
+      - clock_movement_signed
+      - clock_workshop_label
+      - clock_finish_shellac
     hidden_ids:
       - clock_leaf_boulle
+      - clock_hidden_spring_broken
+
+  # ── Porcelain Figurine ────────────────────────────────────────────
+  - item_id: figurine_crazed_minor
+    category_id: porcelain_figurine
+    rarity: 0
+    anchor_id: figurine_anchor_01
+    surface_ids:
+      - figurine_glaze_crazed
+      - figurine_base_unmarked
+
+  - item_id: figurine_meissen_shepherdess
+    category_id: porcelain_figurine
+    rarity: 1
+    anchor_id: figurine_anchor_01
+    surface_ids:
+      - figurine_glaze_celadon
+      - figurine_base_marked
+      - figurine_painting_detail
+      - figurine_form_shepherdess
+    hidden_ids:
+      - figurine_leaf_meissen
+
+  - item_id: figurine_dresden_gilt
+    category_id: porcelain_figurine
+    rarity: 1
+    anchor_id: figurine_anchor_02
+    surface_ids:
+      - figurine_glaze_celadon
+      - figurine_gilding_intact
+      - figurine_painting_detail
+      - figurine_base_marked
+    hidden_ids:
+      - figurine_leaf_dresden
+
+  - item_id: figurine_chipped_capo
+    category_id: porcelain_figurine
+    rarity: 1
+    anchor_id: figurine_anchor_01
+    surface_ids:
+      - figurine_glaze_crazed
+      - figurine_restoration_chip
+      - figurine_base_marked
+      - figurine_painting_detail
+    hidden_ids:
+      - figurine_leaf_capodimonte
+
+  - item_id: figurine_modern_repro
+    category_id: porcelain_figurine
+    rarity: 1
+    anchor_id: figurine_anchor_02
+    surface_ids:
+      - figurine_glaze_celadon
+      - figurine_gilding_intact
+      - figurine_base_marked
+      - figurine_form_shepherdess
+    hidden_ids:
+      - figurine_override_later_copy
+
+  - item_id: figurine_meissen_restored
+    category_id: porcelain_figurine
+    rarity: 2
+    anchor_id: figurine_anchor_02
+    surface_ids:
+      - figurine_glaze_celadon
+      - figurine_gilding_intact
+      - figurine_painting_detail
+      - figurine_base_marked
+      - figurine_form_shepherdess
+    hidden_ids:
+      - figurine_leaf_meissen
+      - figurine_hidden_repair_fill
+
+  # ── Vase ──────────────────────────────────────────────────────────
+  - item_id: vase_basic_bud
+    category_id: vase
+    rarity: 0
+    anchor_id: vase_anchor_01
+    surface_ids:
+      - vase_glass_bubble
+      - vase_form_bud
+
+  - item_id: vase_galle_cameo
+    category_id: vase
+    rarity: 1
+    anchor_id: vase_anchor_01
+    surface_ids:
+      - vase_glass_cased
+      - vase_body_cameo
+      - vase_rim_polished
+      - vase_maker_etched
+    hidden_ids:
+      - vase_leaf_galle
+
+  - item_id: vase_tiffany_etched
+    category_id: vase
+    rarity: 1
+    anchor_id: vase_anchor_02
+    surface_ids:
+      - vase_glass_cased
+      - vase_maker_etched
+      - vase_rim_polished
+      - vase_body_cameo
+    hidden_ids:
+      - vase_leaf_tiffany
+
+  - item_id: vase_lalique_chipped
+    category_id: vase
+    rarity: 1
+    anchor_id: vase_anchor_01
+    surface_ids:
+      - vase_glass_cased
+      - vase_rim_chipped
+      - vase_maker_etched
+      - vase_base_ground
+    hidden_ids:
+      - vase_leaf_lalique
+
+  - item_id: vase_repro_cameo
+    category_id: vase
+    rarity: 1
+    anchor_id: vase_anchor_02
+    surface_ids:
+      - vase_glass_cased
+      - vase_body_cameo
+      - vase_rim_polished
+      - vase_maker_etched
+    hidden_ids:
+      - vase_override_repro
+
+  - item_id: vase_galle_fractured
+    category_id: vase
+    rarity: 2
+    anchor_id: vase_anchor_02
+    surface_ids:
+      - vase_glass_cased
+      - vase_body_cameo
+      - vase_rim_polished
+      - vase_maker_etched
+      - vase_form_bud
+    hidden_ids:
+      - vase_leaf_galle
+      - vase_hidden_internal_fracture
+
+  # ── Poster ────────────────────────────────────────────────────────
+  - item_id: poster_pulp_basic
+    category_id: poster
+    rarity: 0
+    anchor_id: poster_anchor_01
+    surface_ids:
+      - poster_paper_pulp
+      - poster_print_offset
+
+  - item_id: poster_mucha_litho
+    category_id: poster
+    rarity: 1
+    anchor_id: poster_anchor_01
+    surface_ids:
+      - poster_paper_linen
+      - poster_print_lithograph
+      - poster_color_vibrant
+      - poster_backing_linen
+    hidden_ids:
+      - poster_leaf_mucha
+
+  - item_id: poster_lautrec_faded
+    category_id: poster
+    rarity: 1
+    anchor_id: poster_anchor_02
+    surface_ids:
+      - poster_paper_linen
+      - poster_print_lithograph
+      - poster_color_faded
+      - poster_backing_linen
+    hidden_ids:
+      - poster_leaf_lautrec
+
+  - item_id: poster_cassandre_fold
+    category_id: poster
+    rarity: 1
+    anchor_id: poster_anchor_01
+    surface_ids:
+      - poster_paper_linen
+      - poster_print_lithograph
+      - poster_color_vibrant
+      - poster_fold_lines
+    hidden_ids:
+      - poster_leaf_cassandre
+
+  - item_id: poster_reprint_70s
+    category_id: poster
+    rarity: 1
+    anchor_id: poster_anchor_02
+    surface_ids:
+      - poster_paper_linen
+      - poster_print_offset
+      - poster_color_vibrant
+      - poster_backing_linen
+    hidden_ids:
+      - poster_override_reprint
+
+  - item_id: poster_mucha_trimmed
+    category_id: poster
+    rarity: 2
+    anchor_id: poster_anchor_02
+    surface_ids:
+      - poster_paper_linen
+      - poster_print_lithograph
+      - poster_color_vibrant
+      - poster_backing_linen
+      - poster_fold_lines
+    hidden_ids:
+      - poster_leaf_mucha
+      - poster_hidden_trimmed_margin

@@ -1,411 +1,366 @@
 anchors:
-  - anchor_id: lamp_veil_01
+  # ── Fashion: Handbag (wide, tiers 1–4) ──────────────────────────────
+  - anchor_id: bag_anchor_01
+    known_text: Bag
+    naming_priority: 1
+    category_scope: handbag
+    base_value: 40
+    shape_id: s1x2
+    sprite: ""
+    weight_kg: 0.5
+    tier: 1
+
+  - anchor_id: bag_anchor_02
+    known_text: Bag
+    naming_priority: 1
+    category_scope: handbag
+    base_value: 220
+    shape_id: s1x2
+    sprite: ""
+    weight_kg: 0.6
+    tier: 2
+
+  - anchor_id: bag_anchor_03
+    known_text: Bag
+    naming_priority: 1
+    category_scope: handbag
+    base_value: 550
+    shape_id: s1x2
+    sprite: ""
+    weight_kg: 0.7
+    tier: 3
+
+  - anchor_id: bag_anchor_04
+    known_text: Bag
+    naming_priority: 1
+    category_scope: handbag
+    base_value: 1200
+    shape_id: s1x2
+    sprite: ""
+    weight_kg: 0.8
+    tier: 4
+
+  # ── Fashion: Wristwatch (wide, tiers 1–4) ───────────────────────────
+  - anchor_id: watch_anchor_01
+    known_text: Watch
+    naming_priority: 1
+    category_scope: wristwatch
+    base_value: 30
+    shape_id: s1x1
+    sprite: ""
+    weight_kg: 0.1
+    tier: 1
+
+  - anchor_id: watch_anchor_02
+    known_text: Watch
+    naming_priority: 1
+    category_scope: wristwatch
+    base_value: 200
+    shape_id: s1x1
+    sprite: ""
+    weight_kg: 0.12
+    tier: 2
+
+  - anchor_id: watch_anchor_03
+    known_text: Watch
+    naming_priority: 1
+    category_scope: wristwatch
+    base_value: 500
+    shape_id: s1x1
+    sprite: ""
+    weight_kg: 0.14
+    tier: 3
+
+  - anchor_id: watch_anchor_04
+    known_text: Watch
+    naming_priority: 1
+    category_scope: wristwatch
+    base_value: 1100
+    shape_id: s1x1
+    sprite: ""
+    weight_kg: 0.15
+    tier: 4
+
+  # ── Decorative: Oil Lamp (tight, tiers 1–2) ────────────────────────
+  - anchor_id: lamp_anchor_01
     known_text: Lamp
     naming_priority: 1
     category_scope: oil_lamp
-    base_value: 40
+    base_value: 80
     shape_id: s1x2
     sprite: ""
     weight_kg: 1.5
     tier: 1
 
-  - anchor_id: clock_veil_01
+  - anchor_id: lamp_anchor_02
+    known_text: Lamp
+    naming_priority: 1
+    category_scope: oil_lamp
+    base_value: 320
+    shape_id: s1x2
+    sprite: ""
+    weight_kg: 1.8
+    tier: 2
+
+  # ── Decorative: Clock (tight, tiers 1–2) ───────────────────────────
+  - anchor_id: clock_anchor_01
     known_text: Clock
     naming_priority: 1
     category_scope: clock
-    base_value: 60
-    shape_id: s2x2
+    base_value: 70
+    shape_id: s1x3
     sprite: ""
-    weight_kg: 3.0
+    weight_kg: 3.5
     tier: 1
 
-  - anchor_id: bag_veil_01
-    known_text: Bag
+  - anchor_id: clock_anchor_02
+    known_text: Clock
     naming_priority: 1
-    category_scope: handbag
-    base_value: 10
-    shape_id: s1x1
+    category_scope: clock
+    base_value: 350
+    shape_id: s1x3
     sprite: ""
-    weight_kg: 0.5
-    tier: 1
-
-  - anchor_id: bag_veil_02
-    known_text: Bag
-    naming_priority: 1
-    category_scope: handbag
-    base_value: 25
-    shape_id: s1x1
-    sprite: ""
-    weight_kg: 0.5
+    weight_kg: 4.0
     tier: 2
 
-  - anchor_id: bag_veil_03
-    known_text: Bag
+  # ── Decorative: Porcelain Figurine (tight, tiers 1–2) ──────────────
+  - anchor_id: figurine_anchor_01
+    known_text: Figurine
     naming_priority: 1
-    category_scope: handbag
+    category_scope: porcelain_figurine
     base_value: 50
     shape_id: s1x1
     sprite: ""
-    weight_kg: 0.5
+    weight_kg: 0.6
+    tier: 1
+
+  - anchor_id: figurine_anchor_02
+    known_text: Figurine
+    naming_priority: 1
+    category_scope: porcelain_figurine
+    base_value: 280
+    shape_id: s1x1
+    sprite: ""
+    weight_kg: 0.7
+    tier: 2
+
+  # ── Decorative: Vase (tight, tiers 1–2) ────────────────────────────
+  - anchor_id: vase_anchor_01
+    known_text: Vase
+    naming_priority: 1
+    category_scope: vase
+    base_value: 60
+    shape_id: s1x2
+    sprite: ""
+    weight_kg: 1.8
+    tier: 1
+
+  - anchor_id: vase_anchor_02
+    known_text: Vase
+    naming_priority: 1
+    category_scope: vase
+    base_value: 300
+    shape_id: s1x2
+    sprite: ""
+    weight_kg: 2.0
+    tier: 2
+
+  # ── Decorative: Poster (tight, tiers 1–2) ──────────────────────────
+  - anchor_id: poster_anchor_01
+    known_text: Poster
+    naming_priority: 1
+    category_scope: poster
+    base_value: 40
+    shape_id: s1x3
+    sprite: ""
+    weight_kg: 0.2
+    tier: 1
+
+  - anchor_id: poster_anchor_02
+    known_text: Poster
+    naming_priority: 1
+    category_scope: poster
+    base_value: 260
+    shape_id: s1x3
+    sprite: ""
+    weight_kg: 0.2
+    tier: 2
+
+  # ── Fine Art: Painting (high, tiers 3–5) ───────────────────────────
+  - anchor_id: painting_anchor_01
+    known_text: Painting
+    naming_priority: 1
+    category_scope: painting
+    base_value: 600
+    shape_id: s1x3
+    sprite: ""
+    weight_kg: 1.5
     tier: 3
 
-  - anchor_id: watch_veil_01
-    known_text: Watch
+  - anchor_id: painting_anchor_02
+    known_text: Painting
     naming_priority: 1
-    category_scope: wristwatch
-    base_value: 10
-    shape_id: s1x1
+    category_scope: painting
+    base_value: 1200
+    shape_id: s1x3
     sprite: ""
-    weight_kg: 0.1
-    tier: 1
+    weight_kg: 2.0
+    tier: 4
 
-  - anchor_id: watch_veil_02
-    known_text: Watch
+  - anchor_id: painting_anchor_03
+    known_text: Painting
     naming_priority: 1
-    category_scope: wristwatch
-    base_value: 20
-    shape_id: s1x1
+    category_scope: painting
+    base_value: 2800
+    shape_id: s1x3
     sprite: ""
-    weight_kg: 0.1
-    tier: 2
+    weight_kg: 2.5
+    tier: 5
 
-  - anchor_id: pistol_veil_01
+  # ── Fine Art: Sculpture (high, tiers 3–5) ──────────────────────────
+  - anchor_id: sculpture_anchor_01
+    known_text: Sculpture
+    naming_priority: 1
+    category_scope: sculpture
+    base_value: 550
+    shape_id: s1x3
+    sprite: ""
+    weight_kg: 6.0
+    tier: 3
+
+  - anchor_id: sculpture_anchor_02
+    known_text: Sculpture
+    naming_priority: 1
+    category_scope: sculpture
+    base_value: 1300
+    shape_id: s1x3
+    sprite: ""
+    weight_kg: 8.0
+    tier: 4
+
+  - anchor_id: sculpture_anchor_03
+    known_text: Sculpture
+    naming_priority: 1
+    category_scope: sculpture
+    base_value: 3000
+    shape_id: s1x3
+    sprite: ""
+    weight_kg: 10.0
+    tier: 5
+
+  # ── Weapon: Pistol (mid, tiers 2–3) ────────────────────────────────
+  - anchor_id: pistol_anchor_01
     known_text: Pistol
     naming_priority: 1
     category_scope: pistol
-    base_value: 40
-    shape_id: s1x2
-    sprite: ""
-    weight_kg: 1.2
-    tier: 1
-
-  - anchor_id: pistol_veil_02
-    known_text: Pistol
-    naming_priority: 1
-    category_scope: pistol
-    base_value: 80
-    shape_id: s1x2
+    base_value: 180
+    shape_id: sL11
     sprite: ""
     weight_kg: 1.2
     tier: 2
 
-  - anchor_id: rifle_veil_01
+  - anchor_id: pistol_anchor_02
+    known_text: Pistol
+    naming_priority: 1
+    category_scope: pistol
+    base_value: 500
+    shape_id: sL11
+    sprite: ""
+    weight_kg: 1.4
+    tier: 3
+
+  # ── Weapon: Rifle (mid, tiers 2–3) ─────────────────────────────────
+  - anchor_id: rifle_anchor_01
     known_text: Rifle
     naming_priority: 1
     category_scope: rifle
-    base_value: 50
-    shape_id: s1x4
+    base_value: 220
+    shape_id: sL12
     sprite: ""
     weight_kg: 4.0
-    tier: 1
+    tier: 2
 
-  - anchor_id: crossbow_veil_01
+  - anchor_id: rifle_anchor_02
+    known_text: Rifle
+    naming_priority: 1
+    category_scope: rifle
+    base_value: 600
+    shape_id: sL12
+    sprite: ""
+    weight_kg: 4.5
+    tier: 3
+
+  # ── Weapon: Crossbow (mid, tiers 2–3) ──────────────────────────────
+  - anchor_id: crossbow_anchor_01
     known_text: Bow
     naming_priority: 1
     category_scope: crossbow
-    base_value: 30
-    shape_id: s2x2
+    base_value: 200
+    shape_id: sT3
     sprite: ""
     weight_kg: 3.0
-    tier: 1
+    tier: 2
+
+  - anchor_id: crossbow_anchor_02
+    known_text: Bow
+    naming_priority: 1
+    category_scope: crossbow
+    base_value: 520
+    shape_id: sT3
+    sprite: ""
+    weight_kg: 3.5
+    tier: 3
 
 clues:
-  - clue_id: lamp_glass_blown
-    known_text: Blown
-    type: surface
-    domain: oil_lamp
-    attribute: appraisal
-    dc: 12
-    effect_op: add
-    effect_amount: 150
-    naming:
-      slot: prefix
-      priority: 2
+  # ═══════════════════════════════════════════════════════════════════
+  # FASHION — Handbag (wide, many small adds & muls, high volatility)
+  # ═══════════════════════════════════════════════════════════════════
 
-  - clue_id: lamp_glass_wear_ring
-    known_text: Wear
-    type: surface
-    domain: oil_lamp
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: lamp_cast_scrollwork
-    known_text: Scrollwork
-    type: surface
-    domain: oil_lamp
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 230
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: lamp_burner_fitting
-    known_text: Fitting
-    type: surface
-    domain: oil_lamp
-    attribute: restoration
-    dc: 14
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: lamp_mold_seams
-    known_text: Seams
-    type: surface
-    domain: oil_lamp
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 100
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: lamp_glass_crystal
-    known_text: Crystal
-    type: surface
-    domain: oil_lamp
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: lamp_silver_collar
-    known_text: Silver
-    type: surface
-    domain: oil_lamp
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 500
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: lamp_date_letter
-    known_text: Letter
-    type: surface
-    domain: oil_lamp
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: lamp_maker_stamp
-    known_text: Stamp
-    type: surface
-    domain: oil_lamp
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 800
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: lamp_registry_match
-    known_text: Registry
-    type: surface
-    domain: oil_lamp
-    attribute: appraisal
-    dc: 18
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: lamp_maker_signature
-    known_text: Signature
-    type: surface
-    domain: oil_lamp
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 300
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: lamp_leaf_moser
-    known_text: Moser
-    type: hidden
-    domain: oil_lamp
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 2.98
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: lamp_leaf_baccarat
-    known_text: Baccarat
-    type: hidden
-    domain: oil_lamp
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 1.93
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: lamp_leaf_hinks
-    known_text: Hinks
-    type: hidden
-    domain: oil_lamp
-    attribute: investigation
-    dc: 20
-    effect_op: mul
-    effect_amount: 2.82
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: clock_wood_joinery
-    known_text: Joinery
-    type: surface
-    domain: clock
-    attribute: appraisal
-    dc: 12
-    effect_op: add
-    effect_amount: 120
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: clock_wood_finish
-    known_text: Finish
-    type: surface
-    domain: clock
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: clock_case_gilded
-    known_text: Gilded
-    type: surface
-    domain: clock
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 800
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: clock_inlay_quality
-    known_text: Inlay
-    type: surface
-    domain: clock
-    attribute: restoration
-    dc: 16
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: clock_movement_signed
-    known_text: Signed
-    type: surface
-    domain: clock
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 1200
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: clock_workshop_match
-    known_text: Workshop
-    type: surface
-    domain: clock
-    attribute: appraisal
-    dc: 18
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: clock_leaf_boulle
-    known_text: Boulle
-    type: hidden
-    domain: clock
-    attribute: investigation
-    dc: 20
-    effect_op: mul
-    effect_amount: 2.75
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: bag_exterior_fabric
-    known_text: Fabric
-    type: surface
-    domain: handbag
-    attribute: appraisal
-    dc: 10
-    effect_op: add
-    effect_amount: 20
-    naming:
-      slot: prefix
-      priority: 2
-
+  # ── Surface ────────────────────────────────────────────────────────
   - clue_id: bag_exterior_leather
     known_text: Leather
     type: surface
     domain: handbag
     attribute: appraisal
+    dc: 10
+    effect_op: add
+    effect_amount: 60
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: bag_exterior_synthetic
+    known_text: Synthetic
+    type: surface
+    domain: handbag
+    attribute: appraisal
+    dc: 10
+    effect_op: add
+    effect_amount: -40
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: bag_exterior_crocodile
+    known_text: Crocodile
+    type: surface
+    domain: handbag
+    attribute: appraisal
+    dc: 16
+    effect_op: mul
+    effect_amount: 1.25
+    naming:
+      slot: prefix
+      priority: 3
+
+  - clue_id: bag_exterior_faded
+    known_text: Faded
+    type: surface
+    domain: handbag
+    attribute: perception
     dc: 12
-    effect_op: add
-    effect_amount: 40
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: bag_exterior_stitching
-    known_text: Stitching
-    type: surface
-    domain: handbag
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: bag_hardware_plated
-    known_text: Plated
-    type: surface
-    domain: handbag
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 30
+    effect_op: mul
+    effect_amount: 0.85
     naming:
       slot: prefix
       priority: 2
@@ -415,93 +370,57 @@ clues:
     type: surface
     domain: handbag
     attribute: perception
-    dc: 16
+    dc: 12
     effect_op: add
     effect_amount: 120
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: bag_paint_chipped
-    known_text: Chipped
-    type: surface
-    domain: handbag
-    attribute: restoration
-    dc: 16
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: bag_lining_synthetic
-    known_text: Lining
+  - clue_id: bag_hardware_palladium
+    known_text: Palladium
     type: surface
     domain: handbag
     attribute: perception
-    dc: 10
+    dc: 16
     effect_op: add
-    effect_amount: 15
+    effect_amount: 350
     naming:
       slot: prefix
-      priority: 2
+      priority: 3
 
-  - clue_id: bag_zipper_mark
-    known_text: Zipper
+  - clue_id: bag_hardware_tarnished
+    known_text: Tarnished
     type: surface
     domain: handbag
-    attribute: restoration
-    dc: 14
+    attribute: perception
+    dc: 12
     effect_op: add
-    effect_amount: 50
+    effect_amount: -35
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: bag_strap_riveted
-    known_text: Riveted
+  - clue_id: bag_stitching_handmade
+    known_text: Handmade
     type: surface
     domain: handbag
     attribute: perception
     dc: 14
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: bag_serial_stamp
-    known_text: Serial
-    type: surface
-    domain: handbag
-    attribute: investigation
-    dc: 16
     effect_op: add
     effect_amount: 200
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: bag_serial_match
-    known_text: Matched
+  - clue_id: bag_stitching_frayed
+    known_text: Frayed
     type: surface
     domain: handbag
-    attribute: appraisal
-    dc: 18
+    attribute: restoration
+    dc: 12
     effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: bag_monogram_canvas
-    known_text: Monogram
-    type: surface
-    domain: handbag
-    attribute: appraisal
-    dc: 16
-    effect_op: add
-    effect_amount: 250
+    effect_amount: -60
     naming:
       slot: prefix
       priority: 2
@@ -511,271 +430,183 @@ clues:
     type: surface
     domain: handbag
     attribute: investigation
+    dc: 14
+    effect_op: add
+    effect_amount: 100
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: bag_monogram_canvas
+    known_text: Monogram
+    type: surface
+    domain: handbag
+    attribute: investigation
     dc: 16
     effect_op: add
-    effect_amount: 180
+    effect_amount: 250
     naming:
       slot: prefix
+      priority: 3
+
+  - clue_id: bag_serial_present
+    known_text: Serial
+    type: surface
+    domain: handbag
+    attribute: investigation
+    dc: 14
+    effect_op: add
+    effect_amount: 90
+    naming:
+      slot: suffix
       priority: 2
 
   - clue_id: bag_blind_stamp
-    known_text: Blind
+    known_text: Blindstamp
     type: surface
     domain: handbag
     attribute: appraisal
     dc: 18
     effect_op: add
-    effect_amount: 500
+    effect_amount: 400
     naming:
-      slot: prefix
-      priority: 2
+      slot: suffix
+      priority: 3
 
-  - clue_id: bag_stitch_handmade
-    known_text: Handmade
+  - clue_id: bag_lining_synthetic
+    known_text: Lined
     type: surface
     domain: handbag
     attribute: perception
-    dc: 18
-    effect_op: add
-    effect_amount: 650
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: bag_palladium_hw
-    known_text: Palladium
-    type: surface
-    domain: handbag
-    attribute: perception
-    dc: 18
-    effect_op: add
-    effect_amount: 500
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: bag_leaf_canvas_tote
-    known_text: Canvas
-    type: hidden
-    domain: handbag
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 2.11
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: bag_leaf_vinyl_clutch
-    known_text: Clutch
-    type: hidden
-    domain: handbag
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 2.88
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: bag_leaf_nylon
-    known_text: Nylon
-    type: hidden
-    domain: handbag
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 2.67
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: bag_leaf_straw
-    known_text: Straw
-    type: hidden
-    domain: handbag
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 2.8
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: bag_leaf_faux_leather
-    known_text: Faux
-    type: hidden
-    domain: handbag
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 1.5
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: bag_leaf_cotton
-    known_text: Cotton
-    type: hidden
-    domain: handbag
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 2.33
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: bag_leaf_replica
-    known_text: Replica
-    type: hidden
-    domain: handbag
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 1.29
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: bag_leaf_coach
-    known_text: Coach
-    type: hidden
-    domain: handbag
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 1.4
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: bag_leaf_vuitton
-    known_text: Vuitton
-    type: hidden
-    domain: handbag
-    attribute: investigation
-    dc: 20
-    effect_op: mul
-    effect_amount: 2.02
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: bag_leaf_hermes
-    known_text: Hermes
-    type: hidden
-    domain: handbag
-    attribute: investigation
-    dc: 20
-    effect_op: mul
-    effect_amount: 2.82
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: watch_case_lugs
-    known_text: Lugs
-    type: surface
-    domain: wristwatch
-    attribute: appraisal
-    dc: 12
-    effect_op: add
-    effect_amount: 40
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: watch_glass_scratched
-    known_text: Scratched
-    type: surface
-    domain: wristwatch
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: watch_crown_wind
-    known_text: Wind
-    type: surface
-    domain: wristwatch
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 80
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: watch_movement_bridge
-    known_text: Bridged
-    type: surface
-    domain: wristwatch
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: watch_dial_patina
-    known_text: Patina
-    type: surface
-    domain: wristwatch
-    attribute: perception
-    dc: 12
+    dc: 10
     effect_op: add
     effect_amount: 30
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: watch_band_replace
-    known_text: Replaced
-    type: surface
-    domain: wristwatch
-    attribute: restoration
-    dc: 14
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: watch_case_engraved
-    known_text: Engraved
-    type: surface
-    domain: wristwatch
+  # ── Hidden ─────────────────────────────────────────────────────────
+  - clue_id: bag_leaf_hermes
+    known_text: Hermes
+    type: hidden
+    domain: handbag
     attribute: investigation
-    dc: 14
-    effect_op: add
-    effect_amount: 60
+    dc: 22
+    effect_op: mul
+    effect_amount: 3.2
+    exclusive_group: authenticity_handbag
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: bag_leaf_vuitton
+    known_text: Vuitton
+    type: hidden
+    domain: handbag
+    attribute: investigation
+    dc: 21
+    effect_op: mul
+    effect_amount: 2.8
+    exclusive_group: authenticity_handbag
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: bag_leaf_chanel
+    known_text: Chanel
+    type: hidden
+    domain: handbag
+    attribute: investigation
+    dc: 21
+    effect_op: mul
+    effect_amount: 2.6
+    exclusive_group: authenticity_handbag
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: bag_leaf_coach
+    known_text: Coach
+    type: hidden
+    domain: handbag
+    attribute: investigation
+    dc: 20
+    effect_op: mul
+    effect_amount: 1.6
+    exclusive_group: authenticity_handbag
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: bag_override_replica
+    known_text: Reproduction
+    type: hidden
+    domain: handbag
+    attribute: investigation
+    dc: 20
+    effect_op: override
+    effect_amount: 120
+    exclusive_group: authenticity_handbag
     naming:
       slot: prefix
-      priority: 2
+      priority: 10
 
-  - clue_id: watch_movement_jewelled
-    known_text: Jewelled
+  - clue_id: bag_hidden_water_stain
+    known_text: Stained
+    type: hidden
+    domain: handbag
+    attribute: restoration
+    dc: 21
+    effect_op: mul
+    effect_amount: 0.78
+
+  - clue_id: bag_hidden_limited_run
+    known_text: Limited
+    type: hidden
+    domain: handbag
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 1.4
+    naming:
+      slot: suffix
+      priority: 5
+
+  # ═══════════════════════════════════════════════════════════════════
+  # FASHION — Wristwatch
+  # ═══════════════════════════════════════════════════════════════════
+
+  # ── Surface ────────────────────────────────────────────────────────
+  - clue_id: watch_case_lugs
+    known_text: Lugs
     type: surface
     domain: wristwatch
     attribute: appraisal
-    dc: 16
+    dc: 10
     effect_op: add
-    effect_amount: 120
+    effect_amount: 50
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: watch_serial_number
-    known_text: Numbered
+  - clue_id: watch_crystal_scratched
+    known_text: Scratched
     type: surface
     domain: wristwatch
-    attribute: investigation
-    dc: 16
+    attribute: perception
+    dc: 12
+    effect_op: add
+    effect_amount: -50
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: watch_crown_wind
+    known_text: Winding
+    type: surface
+    domain: wristwatch
+    attribute: perception
+    dc: 12
     effect_op: add
     effect_amount: 80
     naming:
@@ -787,161 +618,241 @@ clues:
     type: surface
     domain: wristwatch
     attribute: appraisal
-    dc: 18
+    dc: 16
     effect_op: add
-    effect_amount: 200
+    effect_amount: 220
+    naming:
+      slot: prefix
+      priority: 3
+
+  - clue_id: watch_movement_jewelled
+    known_text: Jewelled
+    type: surface
+    domain: wristwatch
+    attribute: appraisal
+    dc: 14
+    effect_op: add
+    effect_amount: 130
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: watch_leaf_quartz
+  - clue_id: watch_movement_quartz
     known_text: Quartz
-    type: hidden
+    type: surface
     domain: wristwatch
     attribute: investigation
-    dc: 18
+    dc: 12
     effect_op: mul
-    effect_amount: 1.6
+    effect_amount: 0.8
     naming:
       slot: prefix
-      priority: 5
+      priority: 2
 
-  - clue_id: watch_leaf_digital
-    known_text: Digital
-    type: hidden
+  - clue_id: watch_serial_numbered
+    known_text: Numbered
+    type: surface
     domain: wristwatch
     attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 1.4
+    dc: 14
+    effect_op: add
+    effect_amount: 100
     naming:
-      slot: prefix
-      priority: 5
+      slot: suffix
+      priority: 2
 
-  - clue_id: watch_leaf_timex
-    known_text: Timex
-    type: hidden
+  - clue_id: watch_case_engraved
+    known_text: Engraved
+    type: surface
     domain: wristwatch
     attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 2.1
+    dc: 16
+    effect_op: add
+    effect_amount: 180
     naming:
-      slot: prefix
-      priority: 5
+      slot: suffix
+      priority: 2
 
-  - clue_id: watch_leaf_russian
-    known_text: Russian
-    type: hidden
+  - clue_id: watch_dial_patina
+    known_text: Patina
+    type: surface
     domain: wristwatch
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 1.25
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 40
     naming:
       slot: prefix
-      priority: 5
+      priority: 2
 
-  - clue_id: watch_leaf_cocktail
-    known_text: Cocktail
-    type: hidden
+  - clue_id: watch_dial_refinish
+    known_text: Refinished
+    type: surface
     domain: wristwatch
-    attribute: investigation
-    dc: 18
+    attribute: restoration
+    dc: 14
     effect_op: mul
-    effect_amount: 1.44
+    effect_amount: 0.9
     naming:
       slot: prefix
-      priority: 5
+      priority: 2
 
-  - clue_id: watch_leaf_fashion
-    known_text: Fashion
-    type: hidden
+  - clue_id: watch_band_replaced
+    known_text: Replaced
+    type: surface
     domain: wristwatch
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 1.9
+    attribute: restoration
+    dc: 10
+    effect_op: add
+    effect_amount: -30
     naming:
       slot: prefix
-      priority: 5
+      priority: 2
 
-  - clue_id: watch_leaf_seiko
-    known_text: Seiko
+  # ── Hidden ─────────────────────────────────────────────────────────
+  - clue_id: watch_leaf_roleex
+    known_text: Rolex
     type: hidden
     domain: wristwatch
     attribute: investigation
-    dc: 18
+    dc: 22
     effect_op: mul
-    effect_amount: 2.15
+    effect_amount: 3.4
+    exclusive_group: authenticity_wristwatch
     naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: watch_leaf_bulova
-    known_text: Bulova
-    type: hidden
-    domain: wristwatch
-    attribute: investigation
-    dc: 20
-    effect_op: mul
-    effect_amount: 2.41
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: watch_leaf_citizen
-    known_text: Citizen
-    type: hidden
-    domain: wristwatch
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 1.71
-    naming:
-      slot: prefix
-      priority: 5
+      slot: body
+      priority: 10
 
   - clue_id: watch_leaf_longines
     known_text: Longines
     type: hidden
     domain: wristwatch
     attribute: investigation
+    dc: 21
+    effect_op: mul
+    effect_amount: 2.5
+    exclusive_group: authenticity_wristwatch
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: watch_leaf_seiko
+    known_text: Seiko
+    type: hidden
+    domain: wristwatch
+    attribute: investigation
     dc: 20
     effect_op: mul
-    effect_amount: 2.42
+    effect_amount: 1.8
+    exclusive_group: authenticity_wristwatch
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: watch_leaf_timex
+    known_text: Timex
+    type: hidden
+    domain: wristwatch
+    attribute: investigation
+    dc: 20
+    effect_op: mul
+    effect_amount: 1.4
+    exclusive_group: authenticity_wristwatch
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: watch_override_franken
+    known_text: Franken
+    type: hidden
+    domain: wristwatch
+    attribute: investigation
+    dc: 20
+    effect_op: override
+    effect_amount: 80
+    exclusive_group: authenticity_wristwatch
     naming:
       slot: prefix
+      priority: 10
+
+  - clue_id: watch_hidden_movement_swap
+    known_text: Swapped
+    type: hidden
+    domain: wristwatch
+    attribute: restoration
+    dc: 22
+    effect_op: mul
+    effect_amount: 0.65
+
+  - clue_id: watch_hidden_box_papers
+    known_text: Documented
+    type: hidden
+    domain: wristwatch
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 1.35
+    naming:
+      slot: suffix
       priority: 5
 
-  - clue_id: pistol_short_barrel
-    known_text: Barreled
+  # ═══════════════════════════════════════════════════════════════════
+  # DECORATIVE — Oil Lamp
+  # ═══════════════════════════════════════════════════════════════════
+
+  # ── Surface ────────────────────────────────────────────────────────
+  - clue_id: lamp_glass_blown
+    known_text: Blown
     type: surface
-    domain: pistol
+    domain: oil_lamp
     attribute: appraisal
     dc: 12
     effect_op: add
-    effect_amount: 50
+    effect_amount: 120
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: pistol_metal_patina
-    known_text: Patina
+  - clue_id: lamp_glass_mold_seam
+    known_text: Seamed
     type: surface
-    domain: pistol
+    domain: oil_lamp
+    attribute: perception
+    dc: 10
+    effect_op: add
+    effect_amount: -40
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: lamp_cast_scrollwork
+    known_text: Scrollwork
+    type: surface
+    domain: oil_lamp
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 1
+    effect_amount: 200
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: pistol_proof_stamp
-    known_text: Stamped
+  - clue_id: lamp_burner_fitted
+    known_text: Fitted
     type: surface
-    domain: pistol
+    domain: oil_lamp
+    attribute: restoration
+    dc: 12
+    effect_op: add
+    effect_amount: 90
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: lamp_collar_silver
+    known_text: Silver
+    type: surface
+    domain: oil_lamp
     attribute: perception
     dc: 14
     effect_op: add
@@ -950,14 +861,1239 @@ clues:
       slot: prefix
       priority: 2
 
-  - clue_id: pistol_proof_inspected
-    known_text: Inspected
+  - clue_id: lamp_collar_pewter
+    known_text: Pewter
+    type: surface
+    domain: oil_lamp
+    attribute: perception
+    dc: 12
+    effect_op: add
+    effect_amount: 60
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: lamp_maker_stamped
+    known_text: Stamped
+    type: surface
+    domain: oil_lamp
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 160
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: lamp_date_letter
+    known_text: Lettered
+    type: surface
+    domain: oil_lamp
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 110
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: lamp_glass_cracked
+    known_text: Cracked
+    type: surface
+    domain: oil_lamp
+    attribute: restoration
+    dc: 12
+    effect_op: add
+    effect_amount: -80
+    naming:
+      slot: prefix
+      priority: 2
+
+  # ── Hidden ─────────────────────────────────────────────────────────
+  - clue_id: lamp_leaf_moser
+    known_text: Moser
+    type: hidden
+    domain: oil_lamp
+    attribute: investigation
+    dc: 21
+    effect_op: mul
+    effect_amount: 2.5
+    exclusive_group: authenticity_oil_lamp
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: lamp_leaf_baccarat
+    known_text: Baccarat
+    type: hidden
+    domain: oil_lamp
+    attribute: investigation
+    dc: 21
+    effect_op: mul
+    effect_amount: 2.2
+    exclusive_group: authenticity_oil_lamp
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: lamp_leaf_hinks
+    known_text: Hinks
+    type: hidden
+    domain: oil_lamp
+    attribute: investigation
+    dc: 20
+    effect_op: mul
+    effect_amount: 1.9
+    exclusive_group: authenticity_oil_lamp
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: lamp_override_modern_copy
+    known_text: Reproduction
+    type: hidden
+    domain: oil_lamp
+    attribute: investigation
+    dc: 20
+    effect_op: override
+    effect_amount: 60
+    exclusive_group: authenticity_oil_lamp
+    naming:
+      slot: prefix
+      priority: 10
+
+  - clue_id: lamp_hidden_rewired
+    known_text: Rewired
+    type: hidden
+    domain: oil_lamp
+    attribute: restoration
+    dc: 21
+    effect_op: mul
+    effect_amount: 0.72
+
+  # ═══════════════════════════════════════════════════════════════════
+  # DECORATIVE — Clock
+  # ═══════════════════════════════════════════════════════════════════
+
+  # ── Surface ────────────────────────────────────────────────────────
+  - clue_id: clock_case_gilded
+    known_text: Gilded
+    type: surface
+    domain: clock
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 180
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: clock_case_veneered
+    known_text: Veneer
+    type: surface
+    domain: clock
+    attribute: appraisal
+    dc: 12
+    effect_op: add
+    effect_amount: 100
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: clock_case_chipped
+    known_text: Chipped
+    type: surface
+    domain: clock
+    attribute: restoration
+    dc: 10
+    effect_op: add
+    effect_amount: -70
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: clock_joinery_dovetail
+    known_text: Dovetail
+    type: surface
+    domain: clock
+    attribute: appraisal
+    dc: 14
+    effect_op: add
+    effect_amount: 140
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: clock_movement_signed
+    known_text: Signed
+    type: surface
+    domain: clock
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 300
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: clock_movement_seven_jewel
+    known_text: Jewelled
+    type: surface
+    domain: clock
+    attribute: appraisal
+    dc: 14
+    effect_op: add
+    effect_amount: 120
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: clock_workshop_label
+    known_text: Labelled
+    type: surface
+    domain: clock
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 200
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: clock_finish_shellac
+    known_text: Shellac
+    type: surface
+    domain: clock
+    attribute: restoration
+    dc: 14
+    effect_op: add
+    effect_amount: 80
+    naming:
+      slot: prefix
+      priority: 2
+
+  # ── Hidden ─────────────────────────────────────────────────────────
+  - clue_id: clock_leaf_boulle
+    known_text: Boulle
+    type: hidden
+    domain: clock
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 2.4
+    exclusive_group: authenticity_clock
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: clock_leaf_graham
+    known_text: Graham
+    type: hidden
+    domain: clock
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 2.7
+    exclusive_group: authenticity_clock
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: clock_leaf_tompion
+    known_text: Tompion
+    type: hidden
+    domain: clock
+    attribute: investigation
+    dc: 23
+    effect_op: mul
+    effect_amount: 3.1
+    exclusive_group: authenticity_clock
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: clock_override_marriage
+    known_text: Marriage
+    type: hidden
+    domain: clock
+    attribute: investigation
+    dc: 20
+    effect_op: override
+    effect_amount: 100
+    exclusive_group: authenticity_clock
+    naming:
+      slot: prefix
+      priority: 10
+
+  - clue_id: clock_hidden_spring_broken
+    known_text: Broken
+    type: hidden
+    domain: clock
+    attribute: restoration
+    dc: 21
+    effect_op: mul
+    effect_amount: 0.6
+
+  # ═══════════════════════════════════════════════════════════════════
+  # DECORATIVE — Porcelain Figurine
+  # ═══════════════════════════════════════════════════════════════════
+
+  # ── Surface ────────────────────────────────────────────────────────
+  - clue_id: figurine_glaze_celadon
+    known_text: Celadon
+    type: surface
+    domain: porcelain_figurine
+    attribute: appraisal
+    dc: 14
+    effect_op: add
+    effect_amount: 160
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: figurine_glaze_crazed
+    known_text: Crazed
+    type: surface
+    domain: porcelain_figurine
+    attribute: perception
+    dc: 10
+    effect_op: add
+    effect_amount: -45
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: figurine_base_marked
+    known_text: Marked
+    type: surface
+    domain: porcelain_figurine
+    attribute: investigation
+    dc: 14
+    effect_op: add
+    effect_amount: 120
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: figurine_base_unmarked
+    known_text: Unmarked
+    type: surface
+    domain: porcelain_figurine
+    attribute: investigation
+    dc: 12
+    effect_op: add
+    effect_amount: -60
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: figurine_painting_detail
+    known_text: Detailed
+    type: surface
+    domain: porcelain_figurine
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 140
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: figurine_form_shepherdess
+    known_text: Shepherdess
+    type: surface
+    domain: porcelain_figurine
+    attribute: appraisal
+    dc: 12
+    effect_op: add
+    effect_amount: 100
+    naming:
+      slot: suffix
+      priority: 3
+
+  - clue_id: figurine_restoration_chip
+    known_text: Chipped
+    type: surface
+    domain: porcelain_figurine
+    attribute: restoration
+    dc: 12
+    effect_op: add
+    effect_amount: -120
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: figurine_gilding_intact
+    known_text: Gilt
+    type: surface
+    domain: porcelain_figurine
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 180
+    naming:
+      slot: prefix
+      priority: 2
+
+  # ── Hidden ─────────────────────────────────────────────────────────
+  - clue_id: figurine_leaf_meissen
+    known_text: Meissen
+    type: hidden
+    domain: porcelain_figurine
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 2.3
+    exclusive_group: authenticity_porcelain_figurine
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: figurine_leaf_dresden
+    known_text: Dresden
+    type: hidden
+    domain: porcelain_figurine
+    attribute: investigation
+    dc: 21
+    effect_op: mul
+    effect_amount: 2.0
+    exclusive_group: authenticity_porcelain_figurine
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: figurine_leaf_capodimonte
+    known_text: Capodimonte
+    type: hidden
+    domain: porcelain_figurine
+    attribute: investigation
+    dc: 21
+    effect_op: mul
+    effect_amount: 1.8
+    exclusive_group: authenticity_porcelain_figurine
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: figurine_override_later_copy
+    known_text: Reproduction
+    type: hidden
+    domain: porcelain_figurine
+    attribute: investigation
+    dc: 20
+    effect_op: override
+    effect_amount: 70
+    exclusive_group: authenticity_porcelain_figurine
+    naming:
+      slot: prefix
+      priority: 10
+
+  - clue_id: figurine_hidden_repair_fill
+    known_text: Filled
+    type: hidden
+    domain: porcelain_figurine
+    attribute: restoration
+    dc: 21
+    effect_op: mul
+    effect_amount: 0.7
+
+  # ═══════════════════════════════════════════════════════════════════
+  # DECORATIVE — Vase
+  # ═══════════════════════════════════════════════════════════════════
+
+  # ── Surface ────────────────────────────────────────────────────────
+  - clue_id: vase_glass_cased
+    known_text: Cased
+    type: surface
+    domain: vase
+    attribute: appraisal
+    dc: 14
+    effect_op: add
+    effect_amount: 170
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: vase_glass_bubble
+    known_text: Bubbled
+    type: surface
+    domain: vase
+    attribute: perception
+    dc: 10
+    effect_op: add
+    effect_amount: -50
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: vase_rim_polished
+    known_text: Polished
+    type: surface
+    domain: vase
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 130
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: vase_rim_chipped
+    known_text: Chipped
+    type: surface
+    domain: vase
+    attribute: restoration
+    dc: 10
+    effect_op: add
+    effect_amount: -90
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: vase_body_cameo
+    known_text: Cameo
+    type: surface
+    domain: vase
+    attribute: appraisal
+    dc: 16
+    effect_op: add
+    effect_amount: 220
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: vase_maker_etched
+    known_text: Etched
+    type: surface
+    domain: vase
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 160
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: vase_form_bud
+    known_text: Bud
+    type: surface
+    domain: vase
+    attribute: appraisal
+    dc: 12
+    effect_op: add
+    effect_amount: 90
+    naming:
+      slot: suffix
+      priority: 3
+
+  - clue_id: vase_base_ground
+    known_text: Ground
+    type: surface
+    domain: vase
+    attribute: restoration
+    dc: 12
+    effect_op: add
+    effect_amount: -35
+    naming:
+      slot: prefix
+      priority: 2
+
+  # ── Hidden ─────────────────────────────────────────────────────────
+  - clue_id: vase_leaf_galle
+    known_text: Galle
+    type: hidden
+    domain: vase
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 2.6
+    exclusive_group: authenticity_vase
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: vase_leaf_tiffany
+    known_text: Tiffany
+    type: hidden
+    domain: vase
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 2.9
+    exclusive_group: authenticity_vase
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: vase_leaf_lalique
+    known_text: Lalique
+    type: hidden
+    domain: vase
+    attribute: investigation
+    dc: 21
+    effect_op: mul
+    effect_amount: 2.3
+    exclusive_group: authenticity_vase
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: vase_override_repro
+    known_text: Reproduction
+    type: hidden
+    domain: vase
+    attribute: investigation
+    dc: 20
+    effect_op: override
+    effect_amount: 65
+    exclusive_group: authenticity_vase
+    naming:
+      slot: prefix
+      priority: 10
+
+  - clue_id: vase_hidden_internal_fracture
+    known_text: Fractured
+    type: hidden
+    domain: vase
+    attribute: restoration
+    dc: 21
+    effect_op: mul
+    effect_amount: 0.65
+
+  # ═══════════════════════════════════════════════════════════════════
+  # DECORATIVE — Poster
+  # ═══════════════════════════════════════════════════════════════════
+
+  # ── Surface ────────────────────────────────────────────────────────
+  - clue_id: poster_paper_linen
+    known_text: Linen
+    type: surface
+    domain: poster
+    attribute: appraisal
+    dc: 12
+    effect_op: add
+    effect_amount: 110
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: poster_paper_pulp
+    known_text: Pulp
+    type: surface
+    domain: poster
+    attribute: appraisal
+    dc: 10
+    effect_op: add
+    effect_amount: -40
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: poster_print_lithograph
+    known_text: Lithograph
+    type: surface
+    domain: poster
+    attribute: investigation
+    dc: 14
+    effect_op: add
+    effect_amount: 150
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: poster_print_offset
+    known_text: Offset
+    type: surface
+    domain: poster
+    attribute: investigation
+    dc: 12
+    effect_op: add
+    effect_amount: -30
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: poster_color_vibrant
+    known_text: Vibrant
+    type: surface
+    domain: poster
+    attribute: perception
+    dc: 12
+    effect_op: add
+    effect_amount: 90
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: poster_color_faded
+    known_text: Faded
+    type: surface
+    domain: poster
+    attribute: perception
+    dc: 10
+    effect_op: add
+    effect_amount: -65
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: poster_backing_linen
+    known_text: Backed
+    type: surface
+    domain: poster
+    attribute: restoration
+    dc: 14
+    effect_op: add
+    effect_amount: 130
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: poster_fold_lines
+    known_text: Folded
+    type: surface
+    domain: poster
+    attribute: perception
+    dc: 12
+    effect_op: add
+    effect_amount: -80
+    naming:
+      slot: prefix
+      priority: 2
+
+  # ── Hidden ─────────────────────────────────────────────────────────
+  - clue_id: poster_leaf_mucha
+    known_text: Mucha
+    type: hidden
+    domain: poster
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 2.4
+    exclusive_group: authenticity_poster
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: poster_leaf_lautrec
+    known_text: Lautrec
+    type: hidden
+    domain: poster
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 2.7
+    exclusive_group: authenticity_poster
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: poster_leaf_cassandre
+    known_text: Cassandre
+    type: hidden
+    domain: poster
+    attribute: investigation
+    dc: 21
+    effect_op: mul
+    effect_amount: 2.1
+    exclusive_group: authenticity_poster
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: poster_override_reprint
+    known_text: Reprint
+    type: hidden
+    domain: poster
+    attribute: investigation
+    dc: 20
+    effect_op: override
+    effect_amount: 50
+    exclusive_group: authenticity_poster
+    naming:
+      slot: prefix
+      priority: 10
+
+  - clue_id: poster_hidden_trimmed_margin
+    known_text: Trimmed
+    type: hidden
+    domain: poster
+    attribute: restoration
+    dc: 22
+    effect_op: mul
+    effect_amount: 0.68
+
+  # ═══════════════════════════════════════════════════════════════════
+  # FINE ART — Painting
+  # ═══════════════════════════════════════════════════════════════════
+
+  # ── Surface ────────────────────────────────────────────────────────
+  - clue_id: painting_canvas_stretched
+    known_text: Stretched
+    type: surface
+    domain: painting
+    attribute: appraisal
+    dc: 12
+    effect_op: add
+    effect_amount: 150
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: painting_canvas_slack
+    known_text: Slack
+    type: surface
+    domain: painting
+    attribute: perception
+    dc: 10
+    effect_op: add
+    effect_amount: -80
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: painting_medium_oil
+    known_text: Oil
+    type: surface
+    domain: painting
+    attribute: appraisal
+    dc: 14
+    effect_op: add
+    effect_amount: 200
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: painting_medium_acrylic
+    known_text: Acrylic
+    type: surface
+    domain: painting
+    attribute: appraisal
+    dc: 12
+    effect_op: mul
+    effect_amount: 0.85
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: painting_brushwork_loose
+    known_text: Loose
+    type: surface
+    domain: painting
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 120
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: painting_brushwork_tight
+    known_text: Tight
+    type: surface
+    domain: painting
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 100
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: painting_craquelure_even
+    known_text: Crackled
+    type: surface
+    domain: painting
+    attribute: restoration
+    dc: 14
+    effect_op: add
+    effect_amount: -100
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: painting_signature_present
+    known_text: Signed
+    type: surface
+    domain: painting
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 600
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: painting_signature_absent
+    known_text: Unsigned
+    type: surface
+    domain: painting
+    attribute: investigation
+    dc: 14
+    effect_op: add
+    effect_amount: -200
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: painting_frame_original
+    known_text: Framed
+    type: surface
+    domain: painting
+    attribute: appraisal
+    dc: 16
+    effect_op: add
+    effect_amount: 350
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: painting_varnish_yellowed
+    known_text: Yellowed
+    type: surface
+    domain: painting
+    attribute: restoration
+    dc: 12
+    effect_op: mul
+    effect_amount: 0.9
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: painting_provenance_label
+    known_text: Labelled
+    type: surface
+    domain: painting
+    attribute: investigation
+    dc: 18
+    effect_op: add
+    effect_amount: 250
+    naming:
+      slot: suffix
+      priority: 2
+
+  # ── Hidden ─────────────────────────────────────────────────────────
+  - clue_id: painting_leaf_monet
+    known_text: Monet
+    type: hidden
+    domain: painting
+    attribute: investigation
+    dc: 24
+    effect_op: mul
+    effect_amount: 3.3
+    exclusive_group: authenticity_painting
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: painting_leaf_renoir
+    known_text: Renoir
+    type: hidden
+    domain: painting
+    attribute: investigation
+    dc: 23
+    effect_op: mul
+    effect_amount: 2.8
+    exclusive_group: authenticity_painting
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: painting_leaf_sargent
+    known_text: Sargent
+    type: hidden
+    domain: painting
+    attribute: investigation
+    dc: 23
+    effect_op: mul
+    effect_amount: 2.5
+    exclusive_group: authenticity_painting
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: painting_override_forgery
+    known_text: Forgery
+    type: hidden
+    domain: painting
+    attribute: investigation
+    dc: 22
+    effect_op: override
+    effect_amount: 180
+    exclusive_group: authenticity_painting
+    naming:
+      slot: prefix
+      priority: 10
+
+  - clue_id: painting_hidden_overpaint
+    known_text: Overpainted
+    type: hidden
+    domain: painting
+    attribute: restoration
+    dc: 23
+    effect_op: mul
+    effect_amount: 0.55
+
+  - clue_id: painting_hidden_exhibition_stamp
+    known_text: Exhibited
+    type: hidden
+    domain: painting
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 1.35
+    naming:
+      slot: suffix
+      priority: 5
+
+  # ═══════════════════════════════════════════════════════════════════
+  # FINE ART — Sculpture
+  # ═══════════════════════════════════════════════════════════════════
+
+  # ── Surface ────────────────────────────────────────────────────────
+  - clue_id: sculpture_medium_bronze
+    known_text: Bronze
+    type: surface
+    domain: sculpture
+    attribute: appraisal
+    dc: 14
+    effect_op: add
+    effect_amount: 250
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: sculpture_medium_plaster
+    known_text: Plaster
+    type: surface
+    domain: sculpture
+    attribute: appraisal
+    dc: 10
+    effect_op: mul
+    effect_amount: 0.7
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: sculpture_patina_natural
+    known_text: Patinated
+    type: surface
+    domain: sculpture
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 180
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: sculpture_patina_artificial
+    known_text: Refinished
+    type: surface
+    domain: sculpture
+    attribute: restoration
+    dc: 14
+    effect_op: add
+    effect_amount: -150
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: sculpture_foundry_marked
+    known_text: Foundry
+    type: surface
+    domain: sculpture
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 300
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: sculpture_edition_numbered
+    known_text: Numbered
+    type: surface
+    domain: sculpture
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 200
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: sculpture_base_signed
+    known_text: Signed
+    type: surface
+    domain: sculpture
+    attribute: investigation
+    dc: 18
+    effect_op: add
+    effect_amount: 500
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: sculpture_base_blank
+    known_text: Unsigned
+    type: surface
+    domain: sculpture
+    attribute: investigation
+    dc: 14
+    effect_op: add
+    effect_amount: -180
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: sculpture_surface_pitted
+    known_text: Pitted
+    type: surface
+    domain: sculpture
+    attribute: restoration
+    dc: 12
+    effect_op: add
+    effect_amount: -120
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: sculpture_wax_original
+    known_text: Wax
+    type: surface
+    domain: sculpture
+    attribute: appraisal
+    dc: 16
+    effect_op: add
+    effect_amount: 100
+    naming:
+      slot: suffix
+      priority: 2
+
+  # ── Hidden ─────────────────────────────────────────────────────────
+  - clue_id: sculpture_leaf_rodin
+    known_text: Rodin
+    type: hidden
+    domain: sculpture
+    attribute: investigation
+    dc: 24
+    effect_op: mul
+    effect_amount: 3.0
+    exclusive_group: authenticity_sculpture
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: sculpture_leaf_degas
+    known_text: Degas
+    type: hidden
+    domain: sculpture
+    attribute: investigation
+    dc: 23
+    effect_op: mul
+    effect_amount: 2.7
+    exclusive_group: authenticity_sculpture
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: sculpture_leaf_barye
+    known_text: Barye
+    type: hidden
+    domain: sculpture
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 2.3
+    exclusive_group: authenticity_sculpture
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: sculpture_override_cast_copy
+    known_text: Cast
+    type: hidden
+    domain: sculpture
+    attribute: investigation
+    dc: 21
+    effect_op: override
+    effect_amount: 200
+    exclusive_group: authenticity_sculpture
+    naming:
+      slot: prefix
+      priority: 10
+
+  - clue_id: sculpture_hidden_weld_repair
+    known_text: Welded
+    type: hidden
+    domain: sculpture
+    attribute: restoration
+    dc: 22
+    effect_op: mul
+    effect_amount: 0.6
+
+  - clue_id: sculpture_hidden_artist_letter
+    known_text: Documented
+    type: hidden
+    domain: sculpture
+    attribute: investigation
+    dc: 23
+    effect_op: mul
+    effect_amount: 1.4
+    naming:
+      slot: suffix
+      priority: 5
+
+  # ═══════════════════════════════════════════════════════════════════
+  # WEAPON — Pistol
+  # ═══════════════════════════════════════════════════════════════════
+
+  # ── Surface ────────────────────────────────────────────────────────
+  - clue_id: pistol_barrel_short
+    known_text: Short
+    type: surface
+    domain: pistol
+    attribute: appraisal
+    dc: 10
+    effect_op: add
+    effect_amount: 70
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: pistol_barrel_pitted
+    known_text: Pitted
+    type: surface
+    domain: pistol
+    attribute: perception
+    dc: 12
+    effect_op: add
+    effect_amount: -70
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: pistol_proof_stamped
+    known_text: Proofed
+    type: surface
+    domain: pistol
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 160
+    naming:
+      slot: suffix
+      priority: 2
+
+  - clue_id: pistol_lock_fitted
+    known_text: Fitted
     type: surface
     domain: pistol
     attribute: restoration
-    dc: 16
+    dc: 14
     effect_op: add
-    effect_amount: 1
+    effect_amount: 120
     naming:
       slot: prefix
       priority: 2
@@ -969,201 +2105,172 @@ clues:
     attribute: investigation
     dc: 16
     effect_op: add
-    effect_amount: 600
+    effect_amount: 350
     naming:
-      slot: prefix
+      slot: suffix
       priority: 2
 
-  - clue_id: pistol_signature_match
-    known_text: Matched
-    type: surface
-    domain: pistol
-    attribute: appraisal
-    dc: 18
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: pistol_scroll_grip
-    known_text: Grip
+  - clue_id: pistol_grip_scrolled
+    known_text: Scrolled
     type: surface
     domain: pistol
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 350
+    effect_amount: 200
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: pistol_grip_carved
-    known_text: Carved
+  - clue_id: pistol_grip_cracked
+    known_text: Cracked
+    type: surface
+    domain: pistol
+    attribute: restoration
+    dc: 12
+    effect_op: add
+    effect_amount: -90
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: pistol_stock_walnut
+    known_text: Walnut
     type: surface
     domain: pistol
     attribute: appraisal
-    dc: 16
+    dc: 14
     effect_op: add
-    effect_amount: 1
+    effect_amount: 180
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: pistol_maker_master
-    known_text: Master
-    type: surface
-    domain: pistol
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 900
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: pistol_maker_referred
-    known_text: Referred
-    type: surface
-    domain: pistol
-    attribute: appraisal
-    dc: 18
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: pistol_gold_inlay
-    known_text: Gold
+  - clue_id: pistol_inlay_gold
+    known_text: Gilt
     type: surface
     domain: pistol
     attribute: perception
     dc: 18
     effect_op: add
-    effect_amount: 1500
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: pistol_versailles_mark
-    known_text: Versailles
-    type: surface
-    domain: pistol
-    attribute: investigation
-    dc: 18
-    effect_op: add
-    effect_amount: 2000
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: pistol_walnut_stock
-    known_text: Walnut
-    type: surface
-    domain: pistol
-    attribute: restoration
-    dc: 16
-    effect_op: add
     effect_amount: 400
     naming:
       slot: prefix
+      priority: 3
+
+  - clue_id: pistol_maker_documented
+    known_text: Documented
+    type: surface
+    domain: pistol
+    attribute: investigation
+    dc: 18
+    effect_op: add
+    effect_amount: 250
+    naming:
+      slot: suffix
       priority: 2
 
-  - clue_id: pistol_leaf_dutch
-    known_text: Dutch
-    type: hidden
-    domain: pistol
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 2.07
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: pistol_leaf_naval
-    known_text: British
-    type: hidden
-    domain: pistol
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 1.72
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: pistol_leaf_cavalry
-    known_text: French
-    type: hidden
-    domain: pistol
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 2.64
-    naming:
-      slot: prefix
-      priority: 5
-
+  # ── Hidden ─────────────────────────────────────────────────────────
   - clue_id: pistol_leaf_boutet
     known_text: Boutet
     type: hidden
     domain: pistol
     attribute: investigation
-    dc: 20
+    dc: 22
     effect_op: mul
-    effect_amount: 2.47
+    effect_amount: 2.2
+    exclusive_group: authenticity_pistol
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: pistol_leaf_nock
+    known_text: Nock
+    type: hidden
+    domain: pistol
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 1.9
+    exclusive_group: authenticity_pistol
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: pistol_leaf_colt
+    known_text: Colt
+    type: hidden
+    domain: pistol
+    attribute: investigation
+    dc: 21
+    effect_op: mul
+    effect_amount: 1.7
+    exclusive_group: authenticity_pistol
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: pistol_override_conversion
+    known_text: Converted
+    type: hidden
+    domain: pistol
+    attribute: investigation
+    dc: 20
+    effect_op: override
+    effect_amount: 90
+    exclusive_group: authenticity_pistol
     naming:
       slot: prefix
-      priority: 5
+      priority: 10
 
-  - clue_id: rifle_long_barrel
-    known_text: Barreled
+  - clue_id: pistol_hidden_cylinder_mismatch
+    known_text: Mismatched
+    type: hidden
+    domain: pistol
+    attribute: restoration
+    dc: 21
+    effect_op: mul
+    effect_amount: 0.7
+
+  # ═══════════════════════════════════════════════════════════════════
+  # WEAPON — Rifle
+  # ═══════════════════════════════════════════════════════════════════
+
+  # ── Surface ────────────────────────────────────────────────────────
+  - clue_id: rifle_barrel_long
+    known_text: Long
     type: surface
     domain: rifle
     attribute: appraisal
-    dc: 12
+    dc: 10
     effect_op: add
-    effect_amount: 70
+    effect_amount: 80
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: rifle_bore_worn
+  - clue_id: rifle_barrel_worn
     known_text: Worn
     type: surface
     domain: rifle
     attribute: perception
-    dc: 14
+    dc: 12
     effect_op: add
-    effect_amount: 1
+    effect_amount: -90
     naming:
       slot: prefix
       priority: 2
 
   - clue_id: rifle_proof_stamped
-    known_text: Stamped
+    known_text: Proofed
     type: surface
     domain: rifle
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 500
+    effect_amount: 180
     naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: rifle_lock_pattern
-    known_text: Pattern
-    type: surface
-    domain: rifle
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
+      slot: suffix
       priority: 2
 
   - clue_id: rifle_action_engraved
@@ -1173,19 +2280,19 @@ clues:
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 600
+    effect_amount: 220
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: rifle_sight_precision
-    known_text: Sighted
+  - clue_id: rifle_action_rough
+    known_text: Rough
     type: surface
     domain: rifle
     attribute: restoration
-    dc: 16
+    dc: 12
     effect_op: add
-    effect_amount: 1
+    effect_amount: -60
     naming:
       slot: prefix
       priority: 2
@@ -1197,43 +2304,43 @@ clues:
     attribute: investigation
     dc: 16
     effect_op: add
-    effect_amount: 1500
+    effect_amount: 380
     naming:
-      slot: prefix
+      slot: suffix
       priority: 2
 
-  - clue_id: rifle_maker_documented
-    known_text: Documented
+  - clue_id: rifle_stock_figured
+    known_text: Figured
     type: surface
     domain: rifle
     attribute: appraisal
-    dc: 18
+    dc: 14
     effect_op: add
-    effect_amount: 1
+    effect_amount: 250
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: rifle_brass_buttplate
+  - clue_id: rifle_sight_precision
+    known_text: Sighted
+    type: surface
+    domain: rifle
+    attribute: restoration
+    dc: 16
+    effect_op: add
+    effect_amount: 200
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: rifle_buttplate_brass
     known_text: Brass
     type: surface
     domain: rifle
     attribute: perception
     dc: 12
     effect_op: add
-    effect_amount: 100
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: rifle_sling_swivels
-    known_text: Swivel
-    type: surface
-    domain: rifle
-    attribute: restoration
-    dc: 14
-    effect_op: add
-    effect_amount: 1
+    effect_amount: 140
     naming:
       slot: prefix
       priority: 2
@@ -1243,177 +2350,100 @@ clues:
     type: surface
     domain: rifle
     attribute: perception
-    dc: 14
+    dc: 10
     effect_op: add
-    effect_amount: 150
+    effect_amount: 90
     naming:
-      slot: prefix
+      slot: suffix
       priority: 2
 
-  - clue_id: rifle_target_sights
-    known_text: Target
-    type: surface
-    domain: rifle
-    attribute: appraisal
-    dc: 16
-    effect_op: add
-    effect_amount: 500
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: rifle_whitworth_hex
-    known_text: Hex
-    type: surface
-    domain: rifle
-    attribute: appraisal
-    dc: 16
-    effect_op: add
-    effect_amount: 2000
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: rifle_optical_sight
-    known_text: Optical
-    type: surface
-    domain: rifle
-    attribute: perception
-    dc: 18
-    effect_op: add
-    effect_amount: 3000
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: rifle_action_fitted
-    known_text: Fitted
-    type: surface
-    domain: rifle
-    attribute: restoration
-    dc: 16
-    effect_op: add
-    effect_amount: 1500
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: rifle_leaf_charleville
-    known_text: Charleville
+  # ── Hidden ─────────────────────────────────────────────────────────
+  - clue_id: rifle_leaf_whitworth
+    known_text: Whitworth
     type: hidden
     domain: rifle
     attribute: investigation
-    dc: 18
+    dc: 23
     effect_op: mul
-    effect_amount: 1.45
+    effect_amount: 2.3
+    exclusive_group: authenticity_rifle
     naming:
-      slot: prefix
-      priority: 5
+      slot: body
+      priority: 10
+
+  - clue_id: rifle_leaf_purdey
+    known_text: Purdey
+    type: hidden
+    domain: rifle
+    attribute: investigation
+    dc: 23
+    effect_op: mul
+    effect_amount: 2.6
+    exclusive_group: authenticity_rifle
+    naming:
+      slot: body
+      priority: 10
 
   - clue_id: rifle_leaf_springfield
     known_text: Springfield
     type: hidden
     domain: rifle
     attribute: investigation
-    dc: 18
+    dc: 21
     effect_op: mul
-    effect_amount: 2.64
+    effect_amount: 1.8
+    exclusive_group: authenticity_rifle
     naming:
-      slot: prefix
-      priority: 5
+      slot: body
+      priority: 10
 
-  - clue_id: rifle_leaf_regiment
-    known_text: Enfield
-    type: hidden
-    domain: rifle
-    attribute: investigation
-    dc: 18
-    effect_op: mul
-    effect_amount: 2.7
-    naming:
-      slot: prefix
-      priority: 5
-
-  - clue_id: rifle_leaf_whitworth
-    known_text: Whitworth
+  - clue_id: rifle_override_kit_build
+    known_text: Kit
     type: hidden
     domain: rifle
     attribute: investigation
     dc: 20
-    effect_op: mul
-    effect_amount: 1.95
+    effect_op: override
+    effect_amount: 100
+    exclusive_group: authenticity_rifle
     naming:
       slot: prefix
-      priority: 5
+      priority: 10
 
-  - clue_id: crossbow_wood_tiller
-    known_text: Tiller
+  - clue_id: rifle_hidden_bore_ring
+    known_text: Ringed
+    type: hidden
+    domain: rifle
+    attribute: restoration
+    dc: 21
+    effect_op: mul
+    effect_amount: 0.68
+
+  # ═══════════════════════════════════════════════════════════════════
+  # WEAPON — Crossbow
+  # ═══════════════════════════════════════════════════════════════════
+
+  # ── Surface ────────────────────────────────────────────────────────
+  - clue_id: crossbow_tiller_wood
+    known_text: Wood
     type: surface
     domain: crossbow
     attribute: appraisal
+    dc: 10
+    effect_op: add
+    effect_amount: 60
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: crossbow_tiller_splintered
+    known_text: Splintered
+    type: surface
+    domain: crossbow
+    attribute: perception
     dc: 12
     effect_op: add
-    effect_amount: 50
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: crossbow_stock_tooled
-    known_text: Tooled
-    type: surface
-    domain: crossbow
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: crossbow_mech_triggered
-    known_text: Triggered
-    type: surface
-    domain: crossbow
-    attribute: perception
-    dc: 14
-    effect_op: add
-    effect_amount: 150
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: crossbow_iron_work
-    known_text: Iron
-    type: surface
-    domain: crossbow
-    attribute: restoration
-    dc: 16
-    effect_op: add
-    effect_amount: 1
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: crossbow_provenance_tag
-    known_text: Tagged
-    type: surface
-    domain: crossbow
-    attribute: investigation
-    dc: 16
-    effect_op: add
-    effect_amount: 300
-    naming:
-      slot: prefix
-      priority: 2
-
-  - clue_id: crossbow_provenance_cataloged
-    known_text: Cataloged
-    type: surface
-    domain: crossbow
-    attribute: appraisal
-    dc: 18
-    effect_op: add
-    effect_amount: 1
+    effect_amount: -80
     naming:
       slot: prefix
       priority: 2
@@ -1425,19 +2455,31 @@ clues:
     attribute: appraisal
     dc: 14
     effect_op: add
-    effect_amount: 200
+    effect_amount: 160
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: crossbow_tiller_inlaid
-    known_text: Inlaid
+  - clue_id: crossbow_prod_rusted
+    known_text: Rusted
+    type: surface
+    domain: crossbow
+    attribute: restoration
+    dc: 12
+    effect_op: add
+    effect_amount: -100
+    naming:
+      slot: prefix
+      priority: 2
+
+  - clue_id: crossbow_mech_triggered
+    known_text: Triggers
     type: surface
     domain: crossbow
     attribute: perception
-    dc: 16
+    dc: 14
     effect_op: add
-    effect_amount: 400
+    effect_amount: 130
     naming:
       slot: prefix
       priority: 2
@@ -1449,9 +2491,33 @@ clues:
     attribute: perception
     dc: 14
     effect_op: add
-    effect_amount: 250
+    effect_amount: 190
     naming:
       slot: prefix
+      priority: 2
+
+  - clue_id: crossbow_inlay_ivory
+    known_text: Ivory
+    type: surface
+    domain: crossbow
+    attribute: appraisal
+    dc: 16
+    effect_op: add
+    effect_amount: 300
+    naming:
+      slot: prefix
+      priority: 3
+
+  - clue_id: crossbow_provenance_tagged
+    known_text: Tagged
+    type: surface
+    domain: crossbow
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 180
+    naming:
+      slot: suffix
       priority: 2
 
   - clue_id: crossbow_wire_gilded
@@ -1461,55 +2527,81 @@ clues:
     attribute: perception
     dc: 18
     effect_op: add
-    effect_amount: 800
+    effect_amount: 350
     naming:
       slot: prefix
-      priority: 2
+      priority: 3
 
-  - clue_id: crossbow_ivory_tip
-    known_text: Ivory
+  - clue_id: crossbow_iron_fittings
+    known_text: Iron
     type: surface
     domain: crossbow
-    attribute: appraisal
-    dc: 16
+    attribute: restoration
+    dc: 12
     effect_op: add
-    effect_amount: 600
+    effect_amount: 100
     naming:
       slot: prefix
       priority: 2
 
-  - clue_id: crossbow_leaf_hunting
-    known_text: German
+  # ── Hidden ─────────────────────────────────────────────────────────
+  - clue_id: crossbow_leaf_whistler
+    known_text: Whistler
     type: hidden
     domain: crossbow
     attribute: investigation
-    dc: 18
+    dc: 22
     effect_op: mul
-    effect_amount: 2.83
+    effect_amount: 2.1
+    exclusive_group: authenticity_crossbow
     naming:
-      slot: prefix
-      priority: 5
+      slot: body
+      priority: 10
 
-  - clue_id: crossbow_leaf_military
-    known_text: Swiss
+  - clue_id: crossbow_leaf_cranequin
+    known_text: Cranequin
     type: hidden
     domain: crossbow
     attribute: investigation
-    dc: 18
+    dc: 22
     effect_op: mul
-    effect_amount: 2.88
+    effect_amount: 1.8
+    exclusive_group: authenticity_crossbow
     naming:
-      slot: prefix
-      priority: 5
+      slot: body
+      priority: 10
 
-  - clue_id: crossbow_leaf_noble
-    known_text: Noble
+  - clue_id: crossbow_leaf_balestrier
+    known_text: Balestrier
+    type: hidden
+    domain: crossbow
+    attribute: investigation
+    dc: 23
+    effect_op: mul
+    effect_amount: 2.4
+    exclusive_group: authenticity_crossbow
+    naming:
+      slot: body
+      priority: 10
+
+  - clue_id: crossbow_override_replica
+    known_text: Replica
     type: hidden
     domain: crossbow
     attribute: investigation
     dc: 20
-    effect_op: mul
-    effect_amount: 2.52
+    effect_op: override
+    effect_amount: 85
+    exclusive_group: authenticity_crossbow
     naming:
       slot: prefix
-      priority: 5
+      priority: 10
+
+  - clue_id: crossbow_hidden_bowstring_dry
+    known_text: Dry
+    type: hidden
+    domain: crossbow
+    attribute: restoration
+    dc: 21
+    effect_op: mul
+    effect_amount: 0.72

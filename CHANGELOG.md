@@ -34,6 +34,16 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Clue Content Regen
+
+- 2026-06-11 — [tool] `yaml_to_tres.py` `--force` flag added: deletes all existing `.tres` files in output directories before writing, ensuring no stale files linger from prior generations
+- 2026-06-11 — [tool] `tres_to_yaml.py` deprecated: round-trip guarantee (AC4) waived; YAML is the sole authoring surface, `.tres` files are build artifacts
+- 2026-06-11 — [tool] `yaml_stats.py` `__main__` guard added: script was unexecutable as a CLI tool despite documented usage; now runs correctly via `python dev/tools/yaml_stats.py --godot-root ...`
+- 2026-06-11 — [audit] Full acceptance criteria audit against current YAML set: validator clean (AC1), all categories have ≥2 anchor variants + hidden==rarity + ≥1 negative surface/hidden per category pool + ≥1 override + no zero-effect clues (AC2), stats tool reports all 12 categories against reference tables with 21 band warnings (AC3), save compatibility confirmed — stale clue ids strip silently, removed items drop with warning (AC5), `item_name` field absent from all items YAML (AC6)
+- 2026-06-11 — [docs] AC4 (yaml→tres→yaml lossless round trip) waived: `tres_to_yaml.py` deprecated; categories lose `shape_id`/`weight` on the reverse hop (entity spec gap), and absent-vs-empty representation differences on optional fields make losslessness impractical without schema harmonization that is not planned
+
+---
+
 ## Location Entry Backgrounds
 
 - 2026-06-09 — [location_entry] `LocationData` gains `bg_exterior: Texture2D`, `bg_interior: Texture2D`, and `transition_type: String` exports; defaults to `"sliding_door"` when unset

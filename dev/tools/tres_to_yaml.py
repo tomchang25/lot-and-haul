@@ -1,6 +1,9 @@
 """
-tres_to_yaml.py
-Reconstruct YAML source data from .tres asset files under data/tres/.
+tres_to_yaml.py — DEPRECATED
+This tool is no longer maintained. The yaml→tres→yaml round-trip guarantee
+(AC4 of clue_content_regen.md) has been waived. YAML is the sole authoring
+surface; .tres files are generated and treated as build artifacts. If you
+need reversible conversions, use yaml_to_tres.py and version-control the YAML.
 
 Usage:
     python tres_to_yaml.py --godot-root /path/to/godot/project
@@ -21,8 +24,9 @@ from tres_lib.registry import REGISTRY
 
 
 def main() -> None:
+    print("tres_to_yaml.py is DEPRECATED — YAML is the sole authoring surface.", file=sys.stderr)
     parser = argparse.ArgumentParser(
-        description="Reconstruct YAML source data from .tres asset files."
+        description="[DEPRECATED] Reconstruct YAML source data from .tres asset files."
     )
     parser.add_argument("--godot-root", required=True)
     parser.add_argument(

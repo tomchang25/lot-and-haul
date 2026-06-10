@@ -191,7 +191,7 @@ Run-phase scenes (`inspection_scene`, `reveal_scene`, `run_review_scene`) mutate
 
 Flows currently being built. One-line pointer each — same format as `## Plan`, just promoted here when work starts. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress → this section is empty.
 
-- [clue_content_regen] Full YAML regeneration on the authored standard + stats-tool table comparison — see `dev/docs/plans/clue_content_regen.md`; prerequisite shipped
+- [item_entry_refactor] ItemEntry layer split (data + price vs display) + Manager-mediated mutations, merged into one refactor — plan file pending, reasoning in the ItemEntry / Entry-Instance `## Draft` sections
 
 ---
 
@@ -199,7 +199,6 @@ Flows currently being built. One-line pointer each — same format as `## Plan`,
 
 The deferred tail of an in-flight flow. When a confirmed initiative spans multiple plans, the parts not being built yet wait here instead of crowding `## Active` — same one-line format, promoted to `## Active` when their turn comes. Normally empty: a small fix or a feature that a single plan covers never uses this tier — it goes straight from `## Plan` to `## Active`.
 
-- [item_entry_refactor] ItemEntry layer split (data + price vs display) + Manager-mediated mutations, merged into one refactor — plan file pending, reasoning in the ItemEntry / Entry-Instance `## Draft` sections
 - [pool_generation] Pool-based item generation (generator, lot/location tier curves, balance tool, clue-list serialization) — plan file pending, reasoning in the Pool-Based `## Draft` section; depends on clue_content_regen + item_entry_refactor
 
 ---

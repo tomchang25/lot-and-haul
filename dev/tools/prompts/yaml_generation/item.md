@@ -57,7 +57,7 @@ A LEGENDARY item carries 4 hidden clues; each may be positive or negative.
 
 ```yaml
 anchors:
-  - anchor_id: <category_prefix>_veil_NN # e.g. lamp_veil_01, clock_veil_02
+  - anchor_id: <category_prefix>_anchor_NN # e.g. lamp_anchor_01, clock_anchor_02
     known_text: "..." # the bare category noun shown as the body name; max 3 words
     naming_priority: 1 # anchor always occupies the body slot at this priority
     category_scope: <category_id> # must match a defined category
@@ -197,7 +197,7 @@ At full reveal, the named clue set must resolve:
 ## ID Conventions
 
 ```
-<category_prefix>_veil_NN              — anchor variants (01, 02, 03 …)
+<category_prefix>_anchor_NN           — anchor variants (01, 02, 03 …)
 <category_id>_<aspect>_<detail>        — surface clue
 <category_id>_leaf_<maker>             — hidden positive identity reveal (genuine maker / sleeper)
 <category_id>_override_<identifier>    — hidden override (counterfeit collapse / sleeper base-swap)

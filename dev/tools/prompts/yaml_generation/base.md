@@ -29,7 +29,7 @@ Players buy mystery lots at auction and identify items over time. Item knowledge
 - `clue_id`: snake_case clue identifier. Must be globally unique across all clues in the project.
 - `item_id`: snake_case item identifier. Must be globally unique across generated items.
 - Prefer short category prefixes for ids, such as `bag_`, `watch_`, `lamp_`, `rifle_`.
-- Anchor ids use the suffix `_veil_NN` (e.g. `clock_veil_01`, `clock_veil_02`). Anchors are their own resource (the `anchors:` block), not clues.
+- Anchor ids follow the pattern `<category_prefix>_anchor_NN` (e.g. `clock_anchor_01`, `clock_anchor_02`). Anchors are their own resource (the `anchors:` block), not clues.
 - Hidden identity-reveal clue ids use the suffix `_leaf_{identifier}` (e.g. `lamp_leaf_moser`).
 - Hidden override (counterfeit/sleeper) clue ids use the suffix `_override_{identifier}`.
 
