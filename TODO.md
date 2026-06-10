@@ -148,7 +148,7 @@ Sell owned cars for partial value when upgrading, so trading up has a cost offse
 
 ### Pool-Based Item Generation
 
-Remove `ItemData` as an authored-per-item resource. Instead, generate items at lot-draw time: pick a category, draw an anchor variant (lot/location tier weight curves), draw surface clues uniformly (anchor-conditioned drawing is its own Draft below), draw rarity (lot/location-controlled frequency) then that many hidden clues uniformly from valid non-excluded options. True name from affix composition, true value from drawn modifiers. Draw-control metadata (anchor tiers, exclusive groups) shipped with the clue schema cleanup; draw rules and regenerated pools come from `dev/docs/plans/clue_content_standard_regen.md`. Remaining work here: the generator itself, lot/location tier curves + rarity frequency tables, a balance-tuning tool to preview draw value distributions before shipping, and item serialization moving from registry item-id lookup to stored clue lists (generated items have no registry id). Prerequisites: clue content regen shipped; affix naming validated across the curated set (already in place).
+Remove `ItemData` as an authored-per-item resource. Instead, generate items at lot-draw time: pick a category, draw an anchor variant (lot/location tier weight curves), draw surface clues uniformly (anchor-conditioned drawing is its own Draft below), draw rarity (lot/location-controlled frequency) then that many hidden clues uniformly from valid non-excluded options. True name from affix composition, true value from drawn modifiers. Draw-control metadata (anchor tiers, exclusive groups) shipped with the clue schema cleanup; draw rules come from `dev/docs/plans/clue_content_standard.md`, regenerated pools from `dev/docs/plans/clue_content_regen.md`. Remaining work here: the generator itself, lot/location tier curves + rarity frequency tables, a balance-tuning tool to preview draw value distributions before shipping, and item serialization moving from registry item-id lookup to stored clue lists (generated items have no registry id). Prerequisites: clue content regen shipped; affix naming validated across the curated set (already in place).
 
 ### Anchor-Conditioned Surface Draw
 
@@ -195,7 +195,7 @@ Flows currently being built. One-line pointer each — same format as `## Plan`,
 The deferred tail of an in-flight flow. When a confirmed initiative spans multiple plans, the parts not being built yet wait here instead of crowding `## Active` — same one-line format, promoted to `## Active` when their turn comes. Normally empty: a small fix or a feature that a single plan covers never uses this tier — it goes straight from `## Plan` to `## Active`.
 
 - [item_entry_refactor] ItemEntry layer split (data + price vs display) + Manager-mediated mutations, merged into one refactor — plan file pending, reasoning in the ItemEntry / Entry-Instance `## Draft` sections
-- [pool_generation] Pool-based item generation (generator, lot/location tier curves, balance tool, clue-list serialization) — plan file pending, reasoning in the Pool-Based `## Draft` section; depends on clue_content + item_entry_refactor
+- [pool_generation] Pool-based item generation (generator, lot/location tier curves, balance tool, clue-list serialization) — plan file pending, reasoning in the Pool-Based `## Draft` section; depends on clue_content_regen + item_entry_refactor
 
 ---
 
@@ -203,7 +203,8 @@ The deferred tail of an in-flight flow. When a confirmed initiative spans multip
 
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
-- [clue_content] Generation standard, prompt rewrite, reference tables + full YAML regen on the post-cleanup schema (absorbs cleanup review leftovers) — see `dev/docs/plans/clue_content_standard_regen.md`
+- [clue_content_standard] Baseline review + generation standard (draw rules, prompt rewrite, reference tables; absorbs cleanup review leftovers) — see `dev/docs/plans/clue_content_standard.md`
+- [clue_content_regen] Full YAML regeneration on the authored standard + stats-tool table comparison — see `dev/docs/plans/clue_content_regen.md`; depends on clue_content_standard
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 - [unlock_gating] Requirement-gated premium auction tiers + lot kinds, with location tier reference table & audit — see `dev/docs/plans/unlock_gating_location_tiers.md`
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`

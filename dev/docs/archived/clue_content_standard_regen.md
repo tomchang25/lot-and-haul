@@ -1,5 +1,7 @@
 # Clue Content Standard & Full Regeneration
 
+> **Superseded 2026-06-10** — split into `../plans/clue_content_standard.md` (baseline review + generation standard) and `../plans/clue_content_regen.md` (full YAML regeneration). Kept for reference only.
+
 **The schema cleanup (`../archived/clue_schema_cleanup.md`) shipped 2026-06-10** — this is its content half: generation standard, prompt rewrite, reference tables, draw-rule documentation, and full YAML regeneration. It is content-judgment-heavy and intentionally scheduled as its own pass. Unlike other plans, this file deliberately carries codebase-relative context (see Relational Context) because it will be executed long after the planning conversation, against the post-cleanup codebase.
 
 ## Goal
