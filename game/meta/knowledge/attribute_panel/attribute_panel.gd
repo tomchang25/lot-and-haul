@@ -34,7 +34,7 @@ func _build_content() -> void:
 
 
 func _add_attribute_row(attr: AttributeData) -> void:
-    var level := KnowledgeManager.get_attribute_value(attr.attribute_id)
+    var level: int = KnowledgeManager.get_attribute_value(attr.attribute_id)
 
     var row: AttributeRow = AttributeRowScene.instantiate()
     row.setup(attr, level, UPGRADE_COST, MetaManager.economy.cash >= UPGRADE_COST)

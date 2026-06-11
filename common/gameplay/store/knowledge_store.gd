@@ -47,7 +47,6 @@ func add_perk(perk_id: String) -> bool:
     _unlocked_perks.append(perk_id)
     return true
 
-
 # ── Save section ───────────────────────────────────────────────────────────────
 
 
@@ -67,9 +66,9 @@ func to_dict() -> Dictionary:
 
 
 ## Restores knowledge progression from a save payload.
-func from_dict(data: Dictionary) -> void:
+func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
     var version: int = int(data.get("_version", 1))
-    data = _apply_migrations(data, version)
+    data = _apply_migrations(data, version, _ctx)
     if data.has("category_points") and data["category_points"] is Dictionary:
         _category_points = data["category_points"]
     if data.has("unlocked_perks") and data["unlocked_perks"] is Array:

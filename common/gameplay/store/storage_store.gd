@@ -65,20 +65,74 @@ func to_dict() -> Dictionary:
     }
 
 
-## Restores storage state. ItemEntry instances for unknown item ids are dropped
-## with a warning (push_warning in ItemEntry.from_dict). apply_storage_migration()
-## is called on each loaded entry to auto-reveal surface clues (not legacy — always runs).
-func from_dict(data: Dictionary) -> void:
+## Restores storage state. apply_storage_migration() is called on each loaded
+## entry to auto-reveal surface clues (not legacy — always runs).
+## Counts dropped and degraded entries during restore; writes one summary line
+## to [param ctx] via ctx.warn() when any loss occurs.
+func from_dict(data: Dictionary, ctx: SaveLoadContext) -> void:
     var version: int = int(data.get("_version", 1))
-    data = _apply_migrations(data, version)
+    var pre_migration_count := 0
+    if data.has("storage_items") and data["storage_items"] is Array:
+        pre_migration_count = data["storage_items"].size()
+    data = _apply_migrations(data, version, ctx)
+    var post_migration_count := 0
+    if data.has("storage_items") and data["storage_items"] is Array:
+        post_migration_count = data["storage_items"].size()
+    var dropped_count := pre_migration_count - post_migration_count
+    var degraded_count := 0
     if data.has("storage_items") and data["storage_items"] is Array:
         _storage_items = []
         for d: Variant in data["storage_items"]:
             if not d is Dictionary:
                 continue
-            var entry: ItemEntry = ItemEntry.from_dict(d)
+            var entry: ItemEntry = ItemEntry.from_dict(d, ctx)
             if entry == null:
+                dropped_count += 1
                 continue
+            var listed_clues: int = d.get("surface_ids", []).size() + d.get("hidden_ids", []).size()
+            var resolved_clues := entry.surface_clues.size() + entry.hidden_clues.size()
+            if resolved_clues < listed_clues:
+                degraded_count += 1
             entry.apply_storage_migration()
             _storage_items.append(entry)
+        if dropped_count > 0 or degraded_count > 0:
+            ctx.warn(
+                "Storage: %d item(s) could not be restored, %d restored with missing data" % [dropped_count, degraded_count],
+            )
     _next_entry_id = int(data.get("next_entry_id", _next_entry_id))
+
+
+func _store_version() -> int:
+    return 2
+
+
+func _apply_migrations(data: Dictionary, from_version: int, ctx: SaveLoadContext) -> Dictionary:
+    if from_version < 2:
+        var migrated: Array = []
+        for d: Variant in data.get("storage_items", []):
+            if not d is Dictionary:
+                migrated.append(d)
+                continue
+            # Legacy entry: has item_id but no anchor_id (pre-composition format).
+            # ItemData and ItemRegistry no longer exist — items are composition-based
+            # at runtime with no static item definitions to map old item_id values to.
+            # Legacy entries are dropped with a warning (explicit data loss, rule §5).
+            if d.has("item_id") and not d.has("anchor_id"):
+                ctx.info("StorageStore migration: item_id '%s' dropped — no ItemRegistry to resolve (composition-only)" % d["item_id"])
+                continue
+            # Sniffing migrations — legacy keys written by pre-composition (v1) saves.
+            var legacy_veiled := bool(d.get("anchor_revealed", false)) or bool(d.get("inspected", false))
+            d["unveiled"] = bool(d.get("unveiled", false)) or legacy_veiled
+            if bool(d.get("verified", false)):
+                var revealed: Array = d.get("revealed_clue_ids", [])
+                for cid: String in d.get("hidden_ids", []):
+                    if not revealed.has(cid):
+                        revealed.append(cid)
+                d["revealed_clue_ids"] = revealed
+            d.erase("anchor_revealed")
+            d.erase("inspected")
+            d.erase("verified")
+            migrated.append(d)
+        data["storage_items"] = migrated
+        ctx.info("StorageStore: migrated to version 2 (item_id → composition)")
+    return data

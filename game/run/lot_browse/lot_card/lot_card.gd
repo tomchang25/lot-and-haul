@@ -104,8 +104,8 @@ func _rarity_range_text(weights: Dictionary) -> String:
     present.sort()
     var min_r: int = present[0]
     var max_r: int = present[present.size() - 1]
-    var min_name: String = ItemEntryDisplayHelper.RARITY_NAMES[min_r] if min_r < ItemEntryDisplayHelper.RARITY_NAMES.size() else "Unknown"
-    var max_name: String = ItemEntryDisplayHelper.RARITY_NAMES[max_r] if max_r < ItemEntryDisplayHelper.RARITY_NAMES.size() else "Unknown"
+    var min_name: String = Economy.RARITY_NAME.get(min_r as Economy.Rarity, "Unknown")
+    var max_name: String = Economy.RARITY_NAME.get(max_r as Economy.Rarity, "Unknown")
     if min_r == max_r:
         return min_name
     return "%s – %s" % [min_name, max_name]

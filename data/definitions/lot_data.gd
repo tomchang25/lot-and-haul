@@ -51,8 +51,14 @@ extends Resource
 @export var item_count_min: int = 3
 @export var item_count_max: int = 5
 
+# Weighted anchor-tier table for pool draws.
+# Key: tier (int 1–5), Value: weight (int).
+# Example: { 1: 50, 2: 30, 3: 15, 4: 5, 5: 0 }
+# When empty or all-zero, anchors are drawn uniformly across all tiers.
+@export var tier_weights: Dictionary = { }
+
 # Weighted rarity table for item draws.
-# Key: ItemData.Rarity (int enum value), Value: weight (int).
+# Key: Economy.Rarity (int enum value), Value: weight (int).
 # Example: { 0: 60, 1: 25, 2: 10, 3: 4, 4: 1 }
 @export var rarity_weights: Dictionary = { }
 
@@ -67,11 +73,6 @@ extends Resource
 # Key: category_id (String), Value: weight (int).
 # Example: { "bicycle": 1, "handbag": 1, "oil_lamp": 1, "painting": 1 }
 @export var category_weights: Dictionary = { }
-
-# Optional explicit item table.
-# Key: item_id (String), Value: weight (int).
-# When non-empty, item draws use this table directly instead of rarity/category.
-@export var item_weights: Dictionary = { }
 
 # ── Price estimation ──────────────────────────────────────────────────────────
 # Multiplier bounds applied to npc_estimate when rolling the final price.

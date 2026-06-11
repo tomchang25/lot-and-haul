@@ -56,9 +56,9 @@ func to_dict() -> Dictionary:
 
 
 ## Restores garage state. Unresolved car ids are dropped with a warning.
-func from_dict(data: Dictionary) -> void:
+func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
     var version: int = int(data.get("_version", 1))
-    data = _apply_migrations(data, version)
+    data = _apply_migrations(data, version, _ctx)
     if data.has("active_car_id") and data["active_car_id"] is String:
         var id: String = data["active_car_id"]
         if id.is_empty():

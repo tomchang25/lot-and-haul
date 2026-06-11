@@ -166,9 +166,13 @@ func load() -> void:
             continue
         # Valid file found — dispatch to providers.
         var sections_data: Dictionary = result["sections"].duplicate(true)
+        var ctx := SaveLoadContext.new()
         for provider: Object in _providers:
-            provider.from_dict(sections_data)
-        _collect_migration_logs()
+            provider.from_dict(sections_data, ctx)
+        for w: String in ctx.warnings:
+            ToastManager.show_warning(w)
+        for i: String in ctx.infos:
+            ToastManager.show_info(i)
         loaded_counter = counter
         break
 
@@ -240,7 +244,7 @@ func _write_manifest(counter: int) -> void:
 func _scan_save_counters() -> Array[int]:
     var dir := DirAccess.open(_SAVE_DIR)
     if dir == null:
-        return []
+        return [] as Array[int]
     var counters: Array[int] = []
     dir.list_dir_begin()
     var fname := dir.get_next()
@@ -274,7 +278,7 @@ func _build_candidate_list() -> Array[int]:
     var manifest_slot := _read_manifest_slot()
     var scanned := _scan_save_counters()
     if scanned.is_empty():
-        return []
+        return [] as Array[int]
     # Ensure manifest slot is first, then remaining by descending counter.
     var ordered: Array[int] = []
     if manifest_slot > 0 and manifest_slot in scanned:
@@ -348,14 +352,3 @@ func _migrate_legacy() -> void:
     var err := DirAccess.remove_absolute(ProjectSettings.globalize_path(_LEGACY_PATH))
     if err != OK:
         push_warning("SaveManager: could not delete legacy save.json (error %d)" % err)
-
-
-## Collects migration logs from all providers after from_dict(). Sends each
-## message to ToastManager.show_info() (visible only in debug mode).
-func _collect_migration_logs() -> void:
-    for provider: Object in _providers:
-        if not provider.has_method("get_migration_log"):
-            continue
-        var messages: Array = provider.get_migration_log()
-        for msg: String in messages:
-            ToastManager.show_info(msg)

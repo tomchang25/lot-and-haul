@@ -201,9 +201,9 @@ func _refresh_detail() -> void:
     # ── Name and category ─────────────────────────────────────────────────────
     _detail_name_label.text = ItemEntryDisplayHelper.display_name(entry)
     _auth_tag_label.visible = entry.verified
-    if entry.item_data != null and entry.item_data.category_data != null:
+    if entry.category_data != null:
         _detail_category_label.text = "%s · #%d" % [
-            entry.item_data.category_data.display_name,
+            entry.category_data.display_name,
             entry.id,
         ]
     else:
@@ -246,7 +246,7 @@ func _refresh_detail() -> void:
 
     # ── Research progress ─────────────────────────────────────────────────────
     if entry.has_unrevealed_hidden() and not entry.research_progress.is_empty():
-        for clue: ClueData in entry.item_data.hidden_clues:
+        for clue: ClueData in entry.hidden_clues:
             if entry.revealed_clue_ids.has(clue.clue_id):
                 continue
             var progress: int = int(entry.research_progress.get(clue.clue_id, 0))

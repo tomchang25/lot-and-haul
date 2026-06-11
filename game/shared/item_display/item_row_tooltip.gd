@@ -102,11 +102,9 @@ func _populate_clue_section(item: ItemEntry) -> void:
     for child in _clue_container.get_children():
         child.free()
 
-    var all_clues: Array[ClueData] = []
-    if item.item_data != null:
-        all_clues = item.item_data.all_clues
+    var all_clues: Array[ClueData] = item.all_clues
 
-    if item.item_data == null or all_clues.is_empty():
+    if all_clues.is_empty():
         _clue_separator.hide()
         _clue_container.hide()
         return

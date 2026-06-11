@@ -18,7 +18,10 @@ class PriceView extends RefCounted:
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var item_data: ItemData = null
+var anchor: AnchorData = null
+var surface_clues: Array[ClueData] = []
+var hidden_clues: Array[ClueData] = []
+var category_data: CategoryData = null
 
 ## True once the player has unveiled this item (revealed which anchor variant it is).
 ## Veiled items show only their cargo shape and weight; all identity data is masked.
@@ -36,16 +39,28 @@ var id: int = -1
 # inspection so the range always converges on the true value.
 var center_offset: float = 0.0
 
+## Rarity equals the number of hidden clues on this instance.
+var rarity: Economy.Rarity:
+    get:
+        return Economy.rarity_for_clue_count(hidden_clues.size())
+
 # Computed: true when every hidden clue is in revealed_clue_ids.
 # If item has no hidden clues, verified is true by default.
 var verified: bool:
     get:
-        if item_data == null or item_data.hidden_clues.is_empty():
+        if _get_hidden_clues().is_empty():
             return true
-        for clue: ClueData in item_data.hidden_clues:
+        for clue: ClueData in _get_hidden_clues():
             if not revealed_clue_ids.has(clue.clue_id):
                 return false
         return true
+
+## All clues on this item — surface and hidden combined, surface-first.
+var all_clues: Array[ClueData]:
+    get:
+        var result: Array[ClueData] = []
+        result.assign(_get_surface_clues() + _get_hidden_clues())
+        return result
 
 var revealed_clue_ids: Array[String] = []
 
@@ -54,23 +69,37 @@ var revealed_clue_ids: Array[String] = []
 ## entry. The clue reveals once progress >= clue.dc. Persists across slots and days.
 var research_progress: Dictionary = { }
 
+# ══ Private data access helpers ═══════════════════════════════════════════════
+
+
+func _get_anchor() -> AnchorData:
+    return anchor
+
+
+func _get_surface_clues() -> Array[ClueData]:
+    return surface_clues
+
+
+func _get_hidden_clues() -> Array[ClueData]:
+    return hidden_clues
+
+
+func _get_category_data() -> CategoryData:
+    return category_data
+
 # ══ Clue helpers ══════════════════════════════════════════════════════════════
 
 
 func _revealed_surface_count() -> int:
     var count := 0
-    if item_data == null:
-        return 0
-    for clue: ClueData in item_data.surface_clues:
+    for clue: ClueData in _get_surface_clues():
         if revealed_clue_ids.has(clue.clue_id):
             count += 1
     return count
 
 
 func _total_surface_count() -> int:
-    if item_data == null:
-        return 0
-    return item_data.surface_clues.size()
+    return _get_surface_clues().size()
 
 
 func all_surface_revealed() -> bool:
@@ -83,9 +112,7 @@ func all_surface_revealed() -> bool:
 ## it is the base-value identity, not a demand tag.
 func fit_tags() -> Array[String]:
     var tags: Array[String] = []
-    if item_data == null:
-        return tags
-    for clue: ClueData in item_data.all_clues:
+    for clue: ClueData in all_clues:
         if revealed_clue_ids.has(clue.clue_id):
             tags.append(clue.clue_id)
     return tags
@@ -96,11 +123,10 @@ func fit_tags() -> Array[String]:
 func get_naming_clue_pool() -> Array:
     # Returns a mixed array of AnchorData and ClueData entries that participate in naming.
     var result: Array = []
-    if item_data == null:
-        return result
-    if unveiled and item_data.anchor != null:
-        result.append(item_data.anchor)
-    for clue: ClueData in item_data.all_clues:
+    var eff_anchor := _get_anchor()
+    if unveiled and eff_anchor != null:
+        result.append(eff_anchor)
+    for clue: ClueData in all_clues:
         if clue.clue_id in revealed_clue_ids:
             result.append(clue)
     return result
@@ -124,9 +150,10 @@ func _apply_price_effect(base: float, clue: ClueData) -> float:
 
 
 func _anchor_base_value() -> int:
-    if item_data == null or item_data.anchor == null:
+    var eff_anchor := _get_anchor()
+    if eff_anchor == null:
         return 0
-    return int(item_data.anchor.base_value)
+    return int(eff_anchor.base_value)
 
 
 func get_base_value() -> int:
@@ -141,9 +168,7 @@ func get_base_value() -> int:
 func _raw_appraised_value() -> float:
     var add_sum := 0.0
     var mul_product := 1.0
-    if item_data == null:
-        return 0.0
-    for clue: ClueData in item_data.surface_clues:
+    for clue: ClueData in _get_surface_clues():
         if revealed_clue_ids.has(clue.clue_id):
             match clue.effect_op:
                 "add":
@@ -158,9 +183,7 @@ func _raw_appraised_value() -> float:
 ## its effect_amount replaces the anchor base value. Otherwise the anchor base value is used.
 ## Appraised (surface-only) math is unaffected — it always starts from the anchor.
 func _effective_base_value() -> int:
-    if item_data == null:
-        return 0
-    for clue: ClueData in item_data.hidden_clues:
+    for clue: ClueData in _get_hidden_clues():
         if clue.effect_op == "override" and revealed_clue_ids.has(clue.clue_id):
             return int(clue.effect_amount)
     return _anchor_base_value()
@@ -174,15 +197,14 @@ func appraised_with_hidden() -> float:
     var base := float(_effective_base_value())
     var add_sum := 0.0
     var mul_product := 1.0
-    if item_data != null:
-        for clue: ClueData in item_data.all_clues:
-            if revealed_clue_ids.has(clue.clue_id):
-                match clue.effect_op:
-                    "add":
-                        add_sum += clue.effect_amount
-                    "mul":
-                        mul_product *= clue.effect_amount
-                    # "override" already factored into _effective_base_value()
+    for clue: ClueData in all_clues:
+        if revealed_clue_ids.has(clue.clue_id):
+            match clue.effect_op:
+                "add":
+                    add_sum += clue.effect_amount
+                "mul":
+                    mul_product *= clue.effect_amount
+                # "override" already factored into _effective_base_value()
     return (base + add_sum) * mul_product
 
 
@@ -191,21 +213,19 @@ func appraised_with_hidden() -> float:
 ## Uses override base if any hidden override exists (first one wins).
 func full_true_value() -> float:
     var base := float(_anchor_base_value())
-    if item_data != null:
-        for clue: ClueData in item_data.hidden_clues:
-            if clue.effect_op == "override":
-                base = clue.effect_amount
-                break
+    for clue: ClueData in _get_hidden_clues():
+        if clue.effect_op == "override":
+            base = clue.effect_amount
+            break
     var add_sum := 0.0
     var mul_product := 1.0
-    if item_data != null:
-        for clue: ClueData in item_data.all_clues:
-            match clue.effect_op:
-                "add":
-                    add_sum += clue.effect_amount
-                "mul":
-                    mul_product *= clue.effect_amount
-                # "override" already handled above
+    for clue: ClueData in all_clues:
+        match clue.effect_op:
+            "add":
+                add_sum += clue.effect_amount
+            "mul":
+                mul_product *= clue.effect_amount
+            # "override" already handled above
     return (base + add_sum) * mul_product
 
 
@@ -214,11 +234,12 @@ func full_true_value() -> float:
 ## (anchor.base_value + sum noticed_add) * product noticed_mul.
 ## sight_chance: per-clue probability the NPC notices each surface clue.
 func roll_npc_estimate(sight_chance: float) -> int:
-    if item_data == null or item_data.anchor == null:
+    var eff_anchor := _get_anchor()
+    if eff_anchor == null:
         return 0
     var add_sum := 0.0
     var mul_product := 1.0
-    for clue: ClueData in item_data.surface_clues:
+    for clue: ClueData in _get_surface_clues():
         if randf() < sight_chance:
             match clue.effect_op:
                 "add":
@@ -306,36 +327,28 @@ func attempt_clue(clue: ClueData, attribute_bonus: int) -> bool:
 ## Returns all surface and hidden clues not yet revealed. Used by inspection scene
 ## to populate the clue-attempt action list.
 func get_inspection_clues() -> Array[ClueData]:
-    if item_data == null:
-        return []
     var result: Array[ClueData] = []
-    for clue: ClueData in item_data.all_clues:
+    for clue: ClueData in all_clues:
         if not revealed_clue_ids.has(clue.clue_id):
             result.append(clue)
     return result
 
 
 func auto_reveal_all_surface() -> void:
-    if item_data == null:
-        return
-    for clue: ClueData in item_data.surface_clues:
+    for clue: ClueData in _get_surface_clues():
         if not revealed_clue_ids.has(clue.clue_id):
             revealed_clue_ids.append(clue.clue_id)
 
 
 func reveal_all_hidden() -> void:
-    if item_data == null:
-        return
-    for clue: ClueData in item_data.hidden_clues:
+    for clue: ClueData in _get_hidden_clues():
         if not revealed_clue_ids.has(clue.clue_id):
             revealed_clue_ids.append(clue.clue_id)
 
 
 ## Returns true if any hidden clue has not yet been revealed.
 func has_unrevealed_hidden() -> bool:
-    if item_data == null:
-        return false
-    for clue: ClueData in item_data.hidden_clues:
+    for clue: ClueData in _get_hidden_clues():
         if not revealed_clue_ids.has(clue.clue_id):
             return true
     return false
@@ -346,9 +359,7 @@ func has_unrevealed_hidden() -> bool:
 ## >= clue.dc. Returns true when a clue is revealed.
 ## Never rolls — variance belongs at the on-site auction, not in storage.
 func advance_research(progress_amount: int) -> bool:
-    if item_data == null:
-        return false
-    for clue: ClueData in item_data.hidden_clues:
+    for clue: ClueData in _get_hidden_clues():
         if revealed_clue_ids.has(clue.clue_id):
             continue
         var current: int = int(research_progress.get(clue.clue_id, 0))
@@ -386,17 +397,19 @@ var item_price: int:
 ## Returns the item's weight in kg, sourced from the anchor. 0.0 if no anchor.
 ## Weight is observable even when veiled (needed for cargo packing systems).
 func get_weight() -> float:
-    if item_data == null or item_data.anchor == null:
+    var eff_anchor := _get_anchor()
+    if eff_anchor == null:
         return 0.0
-    return item_data.anchor.weight_kg
+    return eff_anchor.weight_kg
 
 
 ## Returns the cargo shape_id from the anchor. "s1x1" if no anchor or empty.
 ## Shape is observable even when veiled (cargo grid placement before unveil).
 func get_shape_id() -> String:
-    if item_data == null or item_data.anchor == null or item_data.anchor.shape_id.is_empty():
+    var eff_anchor := _get_anchor()
+    if eff_anchor == null or eff_anchor.shape_id.is_empty():
         return "s1x1"
-    return item_data.anchor.shape_id
+    return eff_anchor.shape_id
 
 
 ## Returns cargo grid cells from the anchor's shape_id. Empty array if no anchor.
@@ -404,20 +417,16 @@ func get_cells() -> Array[Vector2i]:
     return CargoShapes.get_cells(get_shape_id())
 
 
-func category_data() -> CategoryData:
-    return item_data.category_data if item_data != null else null
-
-
 func super_category_text() -> String:
-    var category := category_data()
-    if category == null or category.super_category == null:
+    var cat := _get_category_data()
+    if cat == null or cat.super_category == null:
         return ""
-    return category.super_category.display_name
+    return cat.super_category.display_name
 
 
 func category_text() -> String:
-    var category := category_data()
-    return category.display_name if category != null else ""
+    var cat := _get_category_data()
+    return cat.display_name if cat != null else ""
 
 
 ## Returns true if the item has any unrevealed surface or hidden clues available
@@ -427,7 +436,7 @@ func has_inspection_clues() -> bool:
         return false
     if not all_surface_revealed():
         return true
-    for clue: ClueData in item_data.hidden_clues:
+    for clue: ClueData in _get_hidden_clues():
         if not revealed_clue_ids.has(clue.clue_id):
             return true
     return false
@@ -455,9 +464,18 @@ func apply_damage(ratio: float) -> void:
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
 
-static func create(data: ItemData) -> ItemEntry:
+## Creates an entry from pool-generated parts.
+static func from_generation(
+        gen_anchor: AnchorData,
+        gen_surface: Array[ClueData],
+        gen_hidden: Array[ClueData],
+        gen_category: CategoryData,
+) -> ItemEntry:
     var entry := ItemEntry.new()
-    entry.item_data = data
+    entry.anchor = gen_anchor
+    entry.surface_clues = gen_surface
+    entry.hidden_clues = gen_hidden
+    entry.category_data = gen_category
 
     entry.condition = randf()
     entry.center_offset = randf_range(-0.5, 0.5)
@@ -469,32 +487,57 @@ static func create(data: ItemData) -> ItemEntry:
 
 
 func to_dict() -> Dictionary:
-    return {
-        "item_id": item_data.item_id,
+    var d := {
         "id": id,
         "unveiled": unveiled,
         "condition": condition,
         "center_offset": center_offset,
-        "verified": verified,
         "revealed_clue_ids": revealed_clue_ids.duplicate(),
         "research_progress": research_progress.duplicate(),
+        "anchor_id": _get_anchor().anchor_id if _get_anchor() != null else "",
+        "surface_ids": [],
+        "hidden_ids": [],
+        "category_id": _get_category_data().category_id if _get_category_data() != null else "",
     }
+    for c: ClueData in _get_surface_clues():
+        d["surface_ids"].append(c.clue_id)
+    for c: ClueData in _get_hidden_clues():
+        d["hidden_ids"].append(c.clue_id)
+    return d
 
 
-static func from_dict(d: Dictionary) -> ItemEntry:
-    var data: ItemData = ItemRegistry.get_item_by_id(d["item_id"])
-    if data == null:
-        push_warning("ItemEntry: item_id '%s' not found — entry dropped" % d["item_id"])
-        return null
+## Restores an item entry from [param d]. Writes per-entry resolution failures
+## to [param ctx] (required). Returns null when the anchor cannot be resolved —
+## a kept entry with anchor = null is silent corruption.
+static func from_dict(d: Dictionary, ctx: SaveLoadContext) -> ItemEntry:
     var entry := ItemEntry.new()
-    entry.item_data = data
 
-    # Accept legacy keys: old saves used "anchor_revealed"; older saves used "inspected".
-    var legacy_anchor_revealed := bool(d.get("anchor_revealed", false))
-    var legacy_inspected := bool(d.get("inspected", false))
-    entry.unveiled = bool(d.get("unveiled", legacy_anchor_revealed or legacy_inspected))
+    # Composition form — all entries arrive here after StorageStore migration.
+    var aid: String = d.get("anchor_id", "")
+    if not aid.is_empty():
+        entry.anchor = AnchorRegistry.get_anchor_by_id(aid)
+        if entry.anchor == null:
+            ctx.info("anchor '%s' not found — entry dropped" % aid)
+            return null
+    for cid: Variant in d.get("surface_ids", []):
+        var clue := ClueRegistry.get_clue_by_id(String(cid))
+        if clue != null:
+            entry.surface_clues.append(clue)
+        else:
+            ctx.info("surface clue '%s' not found" % cid)
+    for cid: Variant in d.get("hidden_ids", []):
+        var clue := ClueRegistry.get_clue_by_id(String(cid))
+        if clue != null:
+            entry.hidden_clues.append(clue)
+        else:
+            ctx.info("hidden clue '%s' not found" % cid)
+    var cat_id: String = d.get("category_id", "")
+    if not cat_id.is_empty():
+        entry.category_data = CategoryRegistry.get_category_by_id(cat_id)
 
-    entry.condition = float(d["condition"])
+    # Common fields
+    entry.unveiled = bool(d.get("unveiled", false))
+    entry.condition = float(d.get("condition", 1.0))
     if d.has("center_offset"):
         entry.center_offset = float(d["center_offset"])
 
@@ -510,7 +553,7 @@ static func from_dict(d: Dictionary) -> ItemEntry:
     # Build known-id set from surface + hidden clues only (anchors are no longer clues).
     if not entry.revealed_clue_ids.is_empty():
         var known_ids: Dictionary = { }
-        for clue: ClueData in entry.item_data.all_clues:
+        for clue: ClueData in entry.all_clues:
             known_ids[clue.clue_id] = true
         var clean: Array[String] = []
         for cid: String in entry.revealed_clue_ids:
@@ -524,9 +567,4 @@ static func from_dict(d: Dictionary) -> ItemEntry:
             if key is String and d["research_progress"][key] is float:
                 entry.research_progress[key] = int(d["research_progress"][key])
 
-    # Legacy migration: old saves stored verified as a bool flag without
-    # populating revealed_clue_ids. reveal_all_hidden() is idempotent —
-    # clue IDs already loaded above are guarded by has(), so no duplicates.
-    if d.has("verified") and bool(d["verified"]):
-        entry.reveal_all_hidden()
     return entry

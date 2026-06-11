@@ -91,9 +91,9 @@ func to_dict() -> Dictionary:
 
 
 ## Restores slot state. Unrecognised keys are silently ignored.
-func from_dict(data: Dictionary) -> void:
+func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
     var version: int = int(data.get("_version", 1))
-    data = _apply_migrations(data, version)
+    data = _apply_migrations(data, version, _ctx)
     _current_slot = int(data.get("current_slot", _current_slot))
     _storage_ap = int(data.get("storage_ap", _storage_ap))
     _selling_slots_today = int(data.get("selling_slots_today", _selling_slots_today))

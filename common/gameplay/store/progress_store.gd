@@ -55,9 +55,9 @@ func to_dict() -> Dictionary:
 
 
 ## Restores progress state. Unresolved location ids are dropped with a warning.
-func from_dict(data: Dictionary) -> void:
+func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
     var version: int = int(data.get("_version", 1))
-    data = _apply_migrations(data, version)
+    data = _apply_migrations(data, version, _ctx)
     _current_day = int(data.get("current_day", _current_day))
     if data.has("available_location_ids") and data["available_location_ids"] is Array:
         _available_locations = []

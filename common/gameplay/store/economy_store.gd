@@ -53,7 +53,7 @@ func to_dict() -> Dictionary:
 
 
 ## Restores economy state. Unrecognised keys are silently ignored.
-func from_dict(data: Dictionary) -> void:
+func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
     var version: int = int(data.get("_version", 1))
-    data = _apply_migrations(data, version)
+    data = _apply_migrations(data, version, _ctx)
     _cash = int(data.get("cash", _cash))

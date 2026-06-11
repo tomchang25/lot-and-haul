@@ -1,7 +1,8 @@
 # lot_entry.gd
 # Runtime context for a single lot within a run.
-# Rolls factor values from LotData ranges and generates ItemEntry instances.
-# Created by location_entry; consumed through the end of auction.
+# Rolls factor values from LotData ranges and generates ItemEntry instances
+# via the pool-based ItemGenerator. Created by location_entry; consumed through
+# the end of auction.
 class_name LotEntry
 extends RefCounted
 
@@ -18,7 +19,7 @@ var aggressive_factor: float = 0.5
 
 var price_variance: float = 1.0
 
-# One entry per item in this lot. Generated from lot_data draw tables.
+# One entry per item in this lot. Generated from pool draws.
 var item_entries: Array[ItemEntry] = []
 
 # Cached NPC estimate rolled once at creation.
@@ -29,7 +30,8 @@ var npc_estimate: int = 0
 
 
 # Creates a LotEntry by rolling all factors from lot_data ranges
-# and generating one ItemEntry per roll in lot_data.item_count_min/max.
+# and generating one ItemEntry per roll in lot_data.item_count_min/max
+# using the pool-based ItemGenerator.
 # Apply external modifiers (player buffs, NPC presence) to the returned entry
 # before passing it to RunManager.create_run_store().
 static func create(data: LotData) -> LotEntry:
@@ -42,16 +44,32 @@ static func create(data: LotData) -> LotEntry:
     var item_count := randi_range(data.item_count_min, data.item_count_max)
 
     for i in range(item_count):
-        var item := _draw_item(data)
+        var category := _draw_category(data)
+        if category == null:
+            continue
 
-        if item != null:
-            var item_entry := ItemEntry.create(item)
-            # Roll veiled_chance: each item independently starts pre-unveiled
-            # when randf() > veiled_chance. Set unveiled directly —
-            # no XP granted for system-level pre-unveils.
-            if data.veiled_chance < 1.0 and randf() > data.veiled_chance:
-                item_entry.unveiled = true
-            entry.item_entries.append(item_entry)
+        var result := ItemGenerator.draw(
+            category,
+            data.tier_weights,
+            data.rarity_weights,
+            Economy.SURFACE_CLUE_MIN,
+            Economy.SURFACE_CLUE_MAX,
+        )
+        if result.anchor == null:
+            continue
+
+        var item_entry := ItemEntry.from_generation(
+            result.anchor,
+            result.surface_clues,
+            result.hidden_clues,
+            category,
+        )
+        # Roll veiled_chance: each item independently starts pre-unveiled
+        # when randf() > veiled_chance. Set unveiled directly —
+        # no XP granted for system-level pre-unveils.
+        if data.veiled_chance < 1.0 and randf() > data.veiled_chance:
+            item_entry.unveiled = true
+        entry.item_entries.append(item_entry)
 
     entry.item_entries.shuffle()
 
@@ -61,48 +79,11 @@ static func create(data: LotData) -> LotEntry:
     return entry
 
 
-# Rolls one item using rarity_weights then category, then picks a random
-# matching item from ItemRegistry. Returns null if no match is found.
-# If super_category_weights is non-empty, rolls a super-category first, then
-# picks uniformly from its member categories. Falls through to category_weights.
-static func _draw_item(data: LotData) -> ItemData:
-    if not data.item_weights.is_empty():
-        return _draw_item_by_weight(data)
-    return _draw_item_by_rarity_and_category(data)
-
-
-static func _draw_item_by_weight(data: LotData) -> ItemData:
-    var item_keys: Array = data.item_weights.keys()
-    var item_values: Array[int] = []
-    for k in item_keys:
-        item_values.append(data.item_weights[k])
-
-    var item_idx := RandomUtils.pick_weighted_index(item_values)
-    if item_idx < 0:
-        push_warning("Item roll failed")
-        return null
-
-    var item_id: String = item_keys[item_idx]
-    var item: ItemData = ItemRegistry.get_item_by_id(item_id)
-    if item == null:
-        push_warning("_draw_item_by_weight: item_id '%s' not found" % item_id)
-    return item
-
-
-static func _draw_item_by_rarity_and_category(data: LotData) -> ItemData:
+# Rolls a category from the lot's weighted tables. Mirrors the original
+# _draw_item_by_rarity_and_category category logic extracted into a helper.
+# Returns null when no category can be resolved.
+static func _draw_category(data: LotData) -> CategoryData:
     for attempt in range(MAX_ATTEMPTS):
-        # Roll rarity
-        var rarity_keys: Array = data.rarity_weights.keys()
-        var rarity_values: Array[int] = []
-        for k in rarity_keys:
-            rarity_values.append(data.rarity_weights[k])
-        var rarity_idx := RandomUtils.pick_weighted_index(rarity_values)
-        if rarity_idx < 0:
-            push_warning("Rarity roll failed")
-            return null
-        var rarity: ItemData.Rarity = rarity_keys[rarity_idx] as ItemData.Rarity
-
-        # Roll category
         var category_id: String = ""
         if not data.super_category_weights.is_empty():
             # Roll super-category, then pick a member category uniformly.
@@ -133,13 +114,11 @@ static func _draw_item_by_rarity_and_category(data: LotData) -> ItemData:
                 return null
             category_id = cat_keys[cat_idx]
 
-        # Pick a random item matching both rarity and category
-        var candidates: Array[ItemData] = ItemRegistry.get_items(rarity, category_id)
-        if candidates.is_empty():
-            continue
-        return candidates[randi() % candidates.size()]
+        var cat := CategoryRegistry.get_category_by_id(category_id)
+        if cat != null:
+            return cat
 
-    push_warning("_draw_item: no candidates found after %d attempts" % MAX_ATTEMPTS)
+    push_warning("_draw_category: no category found after %d attempts" % MAX_ATTEMPTS)
     return null
 
 

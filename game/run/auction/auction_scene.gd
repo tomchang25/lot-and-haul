@@ -368,8 +368,7 @@ func _init_debug_overlay() -> void:
 
     var true_value := 0
     for entry: ItemEntry in RunManager.lot.lot_items:
-        if entry.item_data != null:
-            true_value += int(entry.full_true_value())
+        true_value += int(entry.full_true_value())
 
     _debug_label = Label.new()
     _debug_label.add_theme_font_size_override(&"font_size", 13)

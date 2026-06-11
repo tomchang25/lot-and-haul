@@ -144,7 +144,7 @@ static func _tag_vocabulary() -> Array[String]:
 static func _entry_tags(entry) -> Array[String]:
     if entry != null and entry.has_method("fit_tags"):
         return entry.fit_tags()
-    return []
+    return [] as Array[String]
 
 # ══ Internal ═══════════════════════════════════════════════════════════════════
 
@@ -161,7 +161,7 @@ static func _pick_biased_demand(
         max_count: int,
 ) -> Array[String]:
     if all_pool.is_empty():
-        return []
+        return [] as Array[String]
 
     var hi := mini(max_count, all_pool.size())
     var lo := clampi(min_count, 0, hi)

@@ -23,7 +23,7 @@ def read_script_uid(godot_root: Path, res_path: str) -> str:
     """Read a script's UID from its Godot .gd.uid sidecar file.
 
     ``res_path`` is a Godot resource path like
-    ``res://data/definitions/item_data.gd``. The sidecar is expected at the
+    ``res://data/definitions/lot_data.gd``. The sidecar is expected at the
     same filesystem location with a trailing ``.uid`` suffix.
     """
     if not res_path.startswith("res://"):

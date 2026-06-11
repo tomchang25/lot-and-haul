@@ -133,7 +133,7 @@ func _grid_shape_provider(item) -> Array[Vector2i]:
     var entry: ItemEntry = item as ItemEntry
     if entry != null:
         return entry.get_cells()
-    return []
+    return [] as Array[Vector2i]
 
 
 func _grid_color_provider(item) -> Color:
@@ -204,7 +204,7 @@ func _refresh_display() -> void:
 
 func _get_placed_items() -> Array[ItemEntry]:
     if _grid == null:
-        return []
+        return [] as Array[ItemEntry]
     var seen: Array[ItemEntry] = []
     var result: Array[ItemEntry] = []
     for pos: Vector2i in _grid.placement:
