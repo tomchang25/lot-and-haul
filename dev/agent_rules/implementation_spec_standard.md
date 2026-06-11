@@ -94,7 +94,7 @@ Do not include file paths or function names.
 5. Implementation Notes should be shorter than a full per-file plan. If you are writing step-by-step per-file instructions, switch to a full per-file plan.
 6. Do not include implementation detail the agent can discover from the codebase, except where the completeness rule requires stating a relationship explicitly.
 7. Do not mix future scope into this spec.
-8. Target under 1000 words. Exceed only when relational complexity genuinely requires it.
+8. Do not hard-wrap prose lines at a column boundary — let the client handle line wrapping. Tables and code blocks are exempt.
 
 ---
 

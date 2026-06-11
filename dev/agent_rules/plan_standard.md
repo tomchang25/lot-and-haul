@@ -60,7 +60,7 @@ Avoid test names, file paths, and function names.
 - Include no file paths, line numbers, code snippets, or names of functions/classes. Reference existing systems by role, not by symbol.
 - Carry full design depth — numbers, formulas, tables, worked examples are all in scope. The boundary is code coordinates, not detail.
 - State the **why inline** wherever a decision is non-obvious. Never open a standalone rationale section; fold the reason into the Requirement or Design line it justifies.
-- Do not mix future phases into the current feature boundary.
+- Do not hard-wrap prose lines at a column boundary — let the client handle line wrapping. Tables and code blocks are exempt.
 
 ---
 
