@@ -72,7 +72,7 @@ Irregular special-auction announcements published on the calendar days in advanc
 
 ### Intel System / Pre-Run Tip-Offs
 
-Pre-run intelligence on available lots — reveal clue counts, surface categories, or estimated value tiers before committing the trip. Waiting on `LocationIntel` resource design.
+Pre-run intelligence on available lots — reveal clue counts, surface categories, or estimated value tiers before committing the trip. Waiting on `LocationIntel` resource design. Superseded by Location Review v2 — fold when merging.
 
 ### MetaManager Decomposition
 
@@ -169,15 +169,15 @@ Open questions:
 
 Prerequisite: the affix-naming system validated across the full item set (composed == authored) — already in place.
 
+### Location Review v2
+
+Richer lot-preview functionality on the location-select screen: browse lot contents before committing AP/travel, see special gating requirements (tier locks, perk gates, mastery minimums), and surface other meta-info (estimated value range, clue count hints, category breakdown). Builds on the existing `LocationIntel` concept in Draft — fold that entry here when merging. Currently the location-select scene shows only name, cost, and tagline; this adds depth to the decision layer without requiring a trip to confirm.
+
 ---
 
 ## Active
 
 Flows currently being built or ready to implement — may hold more than one entry. One-line pointer each — same format as `## Plan`, promoted here when building starts or the plan is ready to build. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress or ready → this section is empty.
-
-### Fuel Cost Pre-Run Preview
-
-Surface `fuel_cost_per_day × travel_days` in the location selection cost card. Blocked on the location system's cost card.
 
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 

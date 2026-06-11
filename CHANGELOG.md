@@ -8,6 +8,10 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Location Selection Cost Preview
+
+- 2026-06-11 — [location] Fuel cost line item (`fuel_cost_per_day × travel_days`) surfaced in `LocationCard` scene between lot count and estimated total
+
 ## Save Slots & Start Page New Game
 
 - 2026-06-11 — [save] Three independent save slots (`user://save_slots/slot_N/`): each slot has its own counter-based backup rotation and manifest; top-level `last_active` pointer; `boot_load()` loads last-active slot with newest-slot fallback; `switch_to_slot()` for Load Game, `init_slot()` for New Game; `get_slot_summaries()` returns per-slot day/cash/last-played from manifest (with pre-summary fallback parsing)

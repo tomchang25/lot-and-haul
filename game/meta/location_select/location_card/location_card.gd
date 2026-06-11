@@ -15,6 +15,7 @@ var _location_data: LocationData = null
 @onready var _entry_fee_label: Label = $VBox/StatsGrid/EntryFeeLabel
 @onready var _travel_days_label: Label = $VBox/StatsGrid/TravelDaysLabel
 @onready var _lot_number_label: Label = $VBox/StatsGrid/LotNumberLabel
+@onready var _fuel_cost_label: Label = $VBox/StatsGrid/FuelCostLabel
 @onready var _total_cost_label: Label = $VBox/StatsGrid/TotalCostLabel
 @onready var _select_button: Button = $VBox/SelectButton
 
@@ -52,6 +53,7 @@ func _apply() -> void:
     _lot_number_label.text = "Lots:   %d" % _location_data.lot_number
     var car: CarData = MetaManager.garage.active_car
     var fuel_cost := car.fuel_cost_per_day * _location_data.travel_days if car else 0
+    _fuel_cost_label.text = "Fuel:   $%d" % fuel_cost
     var total_cost := _location_data.entry_fee + fuel_cost
     _total_cost_label.text = "Est. Cost:   $%d" % total_cost
 
