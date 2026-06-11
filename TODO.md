@@ -18,13 +18,50 @@ Actionable line format: `[Scope] one sentence — [ref plans/<x>.md if any]`
 
 Preliminary concepts — bigger than a one-liner, but a single `###` sub-section says enough. Not necessarily actionable yet. One `###` heading per idea (nested under this `## Draft` so the section stays intact). When an idea outgrows its sub-section / becomes actionable / needs a stable link → move it into its own `dev/docs/plans/<x>.md` (`Status: Exploring`) and delete it here. Stale and never grew → just delete it.
 
-### Image v3 — Lot & Scene Decoration
+### Build Automation (tres Generation + Export Presets)
 
-Lot card decoration with a random icon/badge per lot. Phase-dependent decoration: worker loading truck in cargo, auctioneer gavel in auction, etc. Needs an asset pipeline — blocked on visual direction.
+One-press build flow covering the two release blockers from `dev/docs/visions/itchio_review.md`. (1) `data/tres/` is gitignored — all 250 `.tres` files (30 anchors / 184 clues / 12 categories / 4 cars / 6 lots / 4 super-categories / 5 attributes / 3 perks) exist only on disk, so a fresh clone loads zero resources and the game cannot boot; fix via a bootstrap script that runs the YAML pipeline to regenerate them (or un-gitignore the folder). (2) Export presets are not configured — no build can be produced at all. Fold both into one automated step: generate tres → export Windows + Linux builds.
+
+### Release-Safe Assert Replacement
+
+`assert()` is stripped in release exports, turning guards into silent null-pointer crashes. 18 `assert()` calls remain across 10 files (auction / inspection / reveal / save_manager / run_manager, etc.) — e.g. `assert(RunManager.lot != null)`. Replace each with `if` + `push_error` + `return`.
+
+### Simple Tutorial (No-Story)
+
+The tutorial split out from the story demo — Stage 2's "small onboarding" pulled forward to Stage 1. A data-driven tutorial hint panel (step list: scene + trigger condition + hint text, played in order — no branching, no portraits, no story) guides the player through one full run + hub loop: inspect → bid → cargo (blocked from leaving empty) → storage → knowledge → customer sell → end day. The first run is made deterministic and friendly via the Director injection skeleton below (big car, high stamina, high-value low-depth items); free play afterwards, no multi-run scripting. The 3-run story demo (Uncle, X-Ray, Crown cutscene) moves to Stage 3. Panel is reusable in the full game. See `dev/docs/visions/itchio_review.md`.
+
+### Director System — Phase 1 Injection Skeleton
+
+A single autoload that manages scripted state without modifying production scenes — production scenes receive normal data and are unaware of the override. It is also the foundation of the future tutorial system. Two mechanisms:
+
+- Data injection (zero pollution) — before a run starts, the Director writes fixed lot content, car assignment, and stamina directly into RunStore.
+- Signal hooks (minimal pollution) — scenes connect to Director signals in their `_ready()` only when `Director.active` is true; the scenes' own logic is unchanged, behavior is pushed in from outside.
+
+Phase 1 (Stage 1 tutorial) scope: data injection for the first run + one cargo-scene hook that blocks leaving with empty cargo. Deferred to the Stage 3 story demo: multi-run state machine, auction-scene forced-bid hooks, perk grants, and the day-pass cutscene trigger (flag check inside `advance_days()`).
+
+### Dialog System — Deferred to Story Demo
+
+DialogManager, a shared overlay autoload, data-driven from the start — linear dialog first, Uncle branching second. The Director emits signals at the appropriate moments; DialogManager handles display, so no hub or run scene is modified directly. Shared by the story demo and the eventual full game. Deferred to the Stage 3 story demo — Phase 1's tutorial needs only the hint panel from Simple Tutorial above, which the full system can later grow out of.
 
 ### Placeholder SFX Generator
 
 LLM-writes-parameters, deterministic-synth-renders — the yaml→tres philosophy applied to audio. Agent authors sfxr-style parameter YAML (`data/yaml/sfx/*.yaml`); a one-shot CLI (`dev/tools/sfx_generate.py`, numpy or an existing sfxr port like `pyfxr`) renders them to 44.1kHz 16-bit WAV under `assets/audio/sfx/placeholder/`. A generation prompt in `dev/tools/prompts/sfx_generation/` defines the schema plus intent→sound conventions (jump = square pitch-up, hit = noise burst + fast decay, ui click = short low-amp sine). Schema copies sfxr directly (waveform, ADSR, freq start/end/slide, noise, bitcrush) — a twenty-year-proven parameter space the LLM knows well. Only QC is normalize-against-clipping + a length cap; no quality loop, placeholders are allowed to sound bad. YAML is the source of truth, re-running the script reproduces output, generated WAVs are never hand-edited. Undecided: output path/naming conventions, whether to support sequence-type multi-segment SFX.
+
+### SFX Wiring (Key Interactions)
+
+`AudioManager` is complete but no scene calls it — bidding, inspection, and buttons are all silent, which hurts gameplay feel too much for a public build. Wire at least the key interactions: bid confirm, button click, item reveal. Done together with the Placeholder SFX Generator above — the generator produces the assets this wiring plays.
+
+### Perk Type System: Gate vs Effect
+
+`PerkData` has no type/kind field — all perks are identical resources. Split into `GATE` perks (content access, checked via `required_perk` on resources) and `EFFECT` perks (formula modifiers: keen_eye → inspection bonus, rarity_affinity → price, quick_study → XP gain). Wire effect perks into actual formulas — `perk_effects.gd` is currently a stub.
+
+### Image v3 — Lot & Scene Decoration
+
+Lot card decoration with a random icon/badge per lot. Phase-dependent decoration: worker loading truck in cargo, auctioneer gavel in auction, etc. Needs an asset pipeline — blocked on visual direction.
+
+### Modalized HUD Navigation
+
+Replace per-scene `_back_btn` / `_continue_btn` / `_reset_btn` manual wiring with a shared modalized HUD overlay. The HUD owns navigation controls and scene-agnostic chrome (cash, day display). Scenes emit navigation requests rather than direct `GameManager.go_to_*()` calls. Reduces boilerplate across ~10 scenes.
 
 ### Category Mastery ↔ Clue Integration
 
@@ -41,10 +78,6 @@ Faction reputation system with scam-detection decision branches — builds on th
 ### Expert Network (Appraisers)
 
 Unresolved design: a network of appraiser NPCs the player can consult for better value estimates (beyond their own attributes). Pay-per-use or relationship-gated.
-
-### Modalized HUD Navigation
-
-Replace per-scene `_back_btn` / `_continue_btn` / `_reset_btn` manual wiring with a shared modalized HUD overlay. The HUD owns navigation controls and scene-agnostic chrome (cash, day display). Scenes emit navigation requests rather than direct `GameManager.go_to_*()` calls. Reduces boilerplate across ~10 scenes.
 
 ### Campaign Ending, Achievements & Prestige Perks
 
@@ -90,14 +123,6 @@ Two or three persistent named rivals with personalities and favored domains who 
 
 Seasonal / rotating lot pools; one-shot special locations as events. Requires the location/auction system to be stable first.
 
-### Director System
-
-Autoload that manages demo state without modifying production scenes — injects fixed lot content, car assignment, and perks into RunStore before each run. Uses signal hooks on auction/cargo scenes for forced-bid/block behavior. See `dev/docs/plans/demo_summary.md`.
-
-### Dialog System
-
-Linear dialog first (Uncle branching second). DialogManager overlay autoload with data-driven dialog. Shared by demo runs and eventual full game. See `dev/docs/plans/demo_summary.md`.
-
 ### Bank / Bankruptcy
 
 Daily interest on cash reserves, game-over condition when debt threshold is crossed, optional player-initiated loans. Periodic-repayment deadlines (Recettear-style) considered as a floor-pressure driver, but a hard deadline sits uneasily with the calm-hub mood and the survivable-floor pillar — prefer soft daily upkeep (storage rent, fuel) if pressure is needed. Needs the day-slot economy to be stable first.
@@ -117,10 +142,6 @@ Hub surfaces different warehouse exteriors and lot counts per location variant. 
 ### Perk Content Expansion
 
 Additional perks beyond the current attribute-threshold triggers, with full acquisition wiring (content-granted, event-granted, etc.).
-
-### Perk Type System: Gate vs Effect
-
-`PerkData` has no type/kind field — all perks are identical resources. Split into `GATE` perks (content access, checked via `required_perk` on resources) and `EFFECT` perks (formula modifiers: keen_eye → inspection bonus, rarity_affinity → price, quick_study → XP gain). Wire effect perks into actual formulas — `perk_effects.gd` is currently a stub.
 
 ### Content Gates (Mastery Rank)
 
@@ -187,13 +208,14 @@ Flows currently being built or ready to implement — may hold more than one ent
 
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
+- [simple-demo] Stage 1 tutorial split out to the Simple Tutorial draft; Director skeleton + Dialog remain surviving subsystems
+- [dev/auto-auction] Debug-only quick-win buttons: instant player win at opening bid or rolled price (skip NPC bidding loop; rolled path seeds future auto-bid perk) — see `dev/docs/plans/debug_auto_auction.md`
+- [dev/auto-cargo] Debug-only quick-pack buttons: legal one-press auto-pack (seeds future auto-place perk) + stuff-all-and-go ignoring capacity — see `dev/docs/plans/debug_auto_cargo.md`
 - [run_persistence] Mid-run save/resume: phase-stable resume scenes, atomic auction, escrowed run economics — see `dev/docs/plans/run_phase_persistence.md`
 - [unlock_gating] Requirement-gated premium auction tiers + lot kinds, with location tier reference table & audit — see `dev/docs/plans/unlock_gating_location_tiers.md`
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
-- [demo] Tutorial 3-run surface (stale — references legacy Skill/Merchant systems); Director + Dialog systems are surviving subsystems — see `dev/docs/plans/demo_summary.md`
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
-- [dev/auto-auction] Debug-only quick-win buttons: instant player win at opening bid or rolled price (skip NPC bidding loop; rolled path seeds future auto-bid perk) — see `dev/docs/plans/debug_auto_auction.md`
-- [dev/auto-cargo] Debug-only quick-pack buttons: legal one-press auto-pack (seeds future auto-place perk) + stuff-all-and-go ignoring capacity — see `dev/docs/plans/debug_auto_cargo.md`
+- [demo] 3-run story demo, demoted to Stage 3 scope (stale — references legacy Skill/Merchant systems);
 
 ---
 
@@ -201,10 +223,10 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 One-line, no reasoning, no backing doc.
 
+- [data] Display name of clues need more diversity of priority, and might need a baseline of priority(from op value?)
 - [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
 - [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
 - [style] Standardize docstrings across all `.gd` files — file header + public function GDDoc format.
-- [data] Display name of clues need more diversity of priority, and might need a baseline of priority(from op value?)
 
 ---
 
