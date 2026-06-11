@@ -1,75 +1,15 @@
-[gd_resource type="Theme" load_steps=15 format=3 uid="uid://m8fg7e20e3g"]
+[gd_resource type="Theme" format=3 uid="uid://m8fg7e20e3g"]
 
-[ext_resource type="Texture2D" path="res://global/theme/icons/checkbox_unchecked.png" id="cb_unchecked"]
-[ext_resource type="Texture2D" path="res://global/theme/icons/checkbox_checked.png" id="cb_checked"]
-[ext_resource type="Texture2D" path="res://global/theme/icons/checkbox_unchecked_disabled.png" id="cb_unchecked_dis"]
-[ext_resource type="Texture2D" path="res://global/theme/icons/checkbox_checked_disabled.png" id="cb_checked_dis"]
-
-[sub_resource type="StyleBoxFlat" id="panel_bg"]
-bg_color = Color(0.15, 0.15, 0.18, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.25, 0.25, 0.3, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-content_margin_left = 12.0
-content_margin_top = 8.0
-content_margin_right = 12.0
-content_margin_bottom = 8.0
-
-[sub_resource type="StyleBoxFlat" id="btn_normal"]
-bg_color = Color(0.2, 0.2, 0.24, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.3, 0.3, 0.35, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-content_margin_left = 12.0
-content_margin_top = 6.0
-content_margin_right = 12.0
-content_margin_bottom = 6.0
-
-[sub_resource type="StyleBoxFlat" id="btn_hover"]
-bg_color = Color(0.25, 0.25, 0.3, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.4, 0.4, 0.45, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-content_margin_left = 12.0
-content_margin_top = 6.0
-content_margin_right = 12.0
-content_margin_bottom = 6.0
-
-[sub_resource type="StyleBoxFlat" id="btn_pressed"]
-bg_color = Color(0.15, 0.15, 0.18, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.35, 0.35, 0.4, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-content_margin_left = 12.0
-content_margin_top = 6.0
-content_margin_right = 12.0
-content_margin_bottom = 6.0
+[ext_resource type="Texture2D" uid="uid://cp3xu5xln2b8i" path="res://global/theme/icons/checkbox_checked.png" id="cb_checked"]
+[ext_resource type="Texture2D" uid="uid://chf06p43bm6o6" path="res://global/theme/icons/checkbox_checked_disabled.png" id="cb_checked_dis"]
+[ext_resource type="Texture2D" uid="uid://d0f45tudibmqe" path="res://global/theme/icons/checkbox_unchecked.png" id="cb_unchecked"]
+[ext_resource type="Texture2D" uid="uid://dewbwfiipwo25" path="res://global/theme/icons/checkbox_unchecked_disabled.png" id="cb_unchecked_dis"]
 
 [sub_resource type="StyleBoxFlat" id="btn_disabled"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
 bg_color = Color(0.16, 0.16, 0.18, 1)
 border_width_left = 1
 border_width_top = 1
@@ -80,10 +20,6 @@ corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
-content_margin_left = 12.0
-content_margin_top = 6.0
-content_margin_right = 12.0
-content_margin_bottom = 6.0
 
 [sub_resource type="StyleBoxFlat" id="btn_focus"]
 draw_center = false
@@ -97,7 +33,80 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
+[sub_resource type="StyleBoxFlat" id="btn_hover"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.25, 0.25, 0.3, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.4, 0.45, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="btn_normal"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.2, 0.2, 0.24, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.3, 0.35, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="btn_pressed"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.15, 0.15, 0.18, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.35, 0.4, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxEmpty" id="checkbox_bg"]
+
+[sub_resource type="StyleBoxLine" id="separator_line"]
+color = Color(0.25, 0.25, 0.3, 1)
+
+[sub_resource type="StyleBoxFlat" id="panel_bg"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+bg_color = Color(0.15, 0.15, 0.18, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.25, 0.3, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
 [sub_resource type="StyleBoxFlat" id="tooltip_panel"]
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
 bg_color = Color(0.1, 0.1, 0.12, 1)
 border_width_left = 1
 border_width_top = 1
@@ -109,67 +118,49 @@ corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
-content_margin_left = 8.0
-content_margin_top = 6.0
-content_margin_right = 8.0
-content_margin_bottom = 6.0
-
-[sub_resource type="StyleBoxEmpty" id="checkbox_bg"]
-
-[sub_resource type="StyleBoxLine" id="separator_line"]
-color = Color(0.25, 0.25, 0.3, 1)
-thickness = 1
 
 [resource]
 default_font_size = 16
-
-Label/colors/font_color = Color(0.88, 0.88, 0.92, 1)
-Label/font_sizes/font_size = 16
-
 Button/colors/font_color = Color(0.88, 0.88, 0.92, 1)
-Button/colors/font_hover_color = Color(1, 1, 1, 1)
-Button/colors/font_pressed_color = Color(0.75, 0.75, 0.8, 1)
 Button/colors/font_disabled_color = Color(0.45, 0.48, 0.53, 1)
 Button/colors/font_focus_color = Color(0.88, 0.88, 0.92, 1)
+Button/colors/font_hover_color = Color(1, 1, 1, 1)
+Button/colors/font_pressed_color = Color(0.75, 0.75, 0.8, 1)
 Button/font_sizes/font_size = 16
-Button/styles/normal = SubResource("btn_normal")
-Button/styles/hover = SubResource("btn_hover")
-Button/styles/pressed = SubResource("btn_pressed")
 Button/styles/disabled = SubResource("btn_disabled")
 Button/styles/focus = SubResource("btn_focus")
-
+Button/styles/hover = SubResource("btn_hover")
+Button/styles/normal = SubResource("btn_normal")
+Button/styles/pressed = SubResource("btn_pressed")
 CheckBox/colors/font_color = Color(0.88, 0.88, 0.92, 1)
-CheckBox/colors/font_hover_color = Color(1, 1, 1, 1)
-CheckBox/colors/font_pressed_color = Color(0.88, 0.88, 0.92, 1)
 CheckBox/colors/font_disabled_color = Color(0.45, 0.48, 0.53, 1)
 CheckBox/colors/font_focus_color = Color(0.88, 0.88, 0.92, 1)
+CheckBox/colors/font_hover_color = Color(1, 1, 1, 1)
+CheckBox/colors/font_pressed_color = Color(0.88, 0.88, 0.92, 1)
 CheckBox/constants/h_separation = 8
 CheckBox/font_sizes/font_size = 16
 CheckBox/icons/checked = ExtResource("cb_checked")
-CheckBox/icons/unchecked = ExtResource("cb_unchecked")
 CheckBox/icons/checked_disabled = ExtResource("cb_checked_dis")
+CheckBox/icons/unchecked = ExtResource("cb_unchecked")
 CheckBox/icons/unchecked_disabled = ExtResource("cb_unchecked_dis")
-CheckBox/styles/normal = SubResource("checkbox_bg")
-CheckBox/styles/hover = SubResource("checkbox_bg")
-CheckBox/styles/pressed = SubResource("checkbox_bg")
 CheckBox/styles/disabled = SubResource("checkbox_bg")
 CheckBox/styles/focus = SubResource("btn_focus")
-
-PanelContainer/styles/panel = SubResource("panel_bg")
-
-HBoxContainer/constants/separation = 8
-VBoxContainer/constants/separation = 8
+CheckBox/styles/hover = SubResource("checkbox_bg")
+CheckBox/styles/normal = SubResource("checkbox_bg")
+CheckBox/styles/pressed = SubResource("checkbox_bg")
 GridContainer/constants/h_separation = 6
 GridContainer/constants/v_separation = 6
-
-TooltipPanel/styles/panel = SubResource("tooltip_panel")
-TooltipLabel/colors/font_color = Color(0.8, 0.8, 0.85, 1)
-TooltipLabel/font_sizes/font_size = 14
-
-RichTextLabel/colors/default_color = Color(0.88, 0.88, 0.92, 1)
-RichTextLabel/font_sizes/normal_font_size = 16
-
+HBoxContainer/constants/separation = 8
 HSeparator/constants/separation = 8
 HSeparator/styles/separator = SubResource("separator_line")
+Label/colors/font_color = Color(0.88, 0.88, 0.92, 1)
+Label/font_sizes/font_size = 16
+PanelContainer/styles/panel = SubResource("panel_bg")
+RichTextLabel/colors/default_color = Color(0.88, 0.88, 0.92, 1)
+RichTextLabel/font_sizes/normal_font_size = 16
+TooltipLabel/colors/font_color = Color(0.8, 0.8, 0.85, 1)
+TooltipLabel/font_sizes/font_size = 14
+TooltipPanel/styles/panel = SubResource("tooltip_panel")
+VBoxContainer/constants/separation = 8
 VSeparator/constants/separation = 8
 VSeparator/styles/separator = SubResource("separator_line")

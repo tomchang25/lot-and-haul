@@ -37,17 +37,26 @@ text = "Lot & Haul"
 horizontal_alignment = 1
 
 [node name="ButtonsVBox" type="VBoxContainer" parent="RootVBox" unique_id=1100000005]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/separation = 16
 
-[node name="PlayButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000006]
+[node name="NewGameButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000010]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 20
-text = " - "
+text = "New Game"
+
+[node name="LoadGameButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000009]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 20
+text = "Load Game"
 
 [node name="SettingsButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000007]
 unique_name_in_owner = true
@@ -64,3 +73,88 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 20
 text = "Quit"
+
+[node name="NewGameConfirmDialog" type="ConfirmationDialog" parent="." unique_id=1100000011]
+unique_name_in_owner = true
+title = "New Game"
+size = Vector2i(400, 150)
+ok_button_text = "Start New Game"
+dialog_text = "Start a new game? Current progress will be lost."
+dialog_autowrap = true
+
+[node name="SlotPickerPanel" type="Panel" parent="." unique_id=1100000012]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PickerVBox" type="VBoxContainer" parent="SlotPickerPanel" unique_id=1100000013]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="SpacerTop" type="Control" parent="SlotPickerPanel/PickerVBox" unique_id=1100000014]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PickerTitle" type="Label" parent="SlotPickerPanel/PickerVBox" unique_id=1100000015]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Select Slot"
+horizontal_alignment = 1
+
+[node name="SlotsVBox" type="VBoxContainer" parent="SlotPickerPanel/PickerVBox" unique_id=1100000016]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 16
+
+[node name="Slot1Button" type="Button" parent="SlotPickerPanel/PickerVBox/SlotsVBox" unique_id=1100000017]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 72)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 16
+
+[node name="Slot2Button" type="Button" parent="SlotPickerPanel/PickerVBox/SlotsVBox" unique_id=1100000018]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 72)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 16
+
+[node name="Slot3Button" type="Button" parent="SlotPickerPanel/PickerVBox/SlotsVBox" unique_id=1100000019]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 72)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 16
+
+[node name="PickerBackButton" type="Button" parent="SlotPickerPanel/PickerVBox" unique_id=1100000020]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 20
+text = "Back"
+
+[node name="SpacerBottom" type="Control" parent="SlotPickerPanel/PickerVBox" unique_id=1100000021]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="OverwriteDialog" type="ConfirmationDialog" parent="." unique_id=1100000022]
+unique_name_in_owner = true
+title = "Overwrite Slot"
+size = Vector2i(400, 150)
+ok_button_text = "Overwrite"
+dialog_text = "All progress in this slot will be lost."
+dialog_autowrap = true

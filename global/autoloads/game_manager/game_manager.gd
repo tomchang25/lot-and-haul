@@ -3,7 +3,7 @@
 extends Node
 
 func _ready() -> void:
-    SaveManager.load()
+    SaveManager.boot_load()
     var validation_ok: bool = SaveManager.run_validation()
     var scene_ok: bool = RegistryAudit.check_scene_registry(SceneRouter.scenes)
     var _audit_ok: bool = validation_ok and scene_ok
