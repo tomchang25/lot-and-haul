@@ -513,7 +513,7 @@ static func from_dict(d: Dictionary, ctx: SaveLoadContext) -> ItemEntry:
     var entry := ItemEntry.new()
 
     # Composition form — all entries arrive here after StorageStore migration.
-    var aid: String = d["anchor_id"]
+    var aid: String = d.get("anchor_id", "")
     if not aid.is_empty():
         entry.anchor = AnchorRegistry.get_anchor_by_id(aid)
         if entry.anchor == null:
@@ -537,7 +537,7 @@ static func from_dict(d: Dictionary, ctx: SaveLoadContext) -> ItemEntry:
 
     # Common fields
     entry.unveiled = bool(d.get("unveiled", false))
-    entry.condition = float(d["condition"])
+    entry.condition = float(d.get("condition", 1.0))
     if d.has("center_offset"):
         entry.center_offset = float(d["center_offset"])
 

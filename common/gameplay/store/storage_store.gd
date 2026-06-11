@@ -113,13 +113,13 @@ func _apply_migrations(data: Dictionary, from_version: int, ctx: SaveLoadContext
             if not d is Dictionary:
                 migrated.append(d)
                 continue
-                # Legacy entry: has item_id but no anchor_id (pre-composition format).
-                # ItemData and ItemRegistry no longer exist — items are composition-based
-                # at runtime with no static item definitions to map old item_id values to.
-                # Legacy entries are dropped with a warning (explicit data loss, rule §5).
-                if d.has("item_id") and not d.has("anchor_id"):
-                    ctx.info("StorageStore migration: item_id '%s' dropped — no ItemRegistry to resolve (composition-only)" % d["item_id"])
-                    continue
+            # Legacy entry: has item_id but no anchor_id (pre-composition format).
+            # ItemData and ItemRegistry no longer exist — items are composition-based
+            # at runtime with no static item definitions to map old item_id values to.
+            # Legacy entries are dropped with a warning (explicit data loss, rule §5).
+            if d.has("item_id") and not d.has("anchor_id"):
+                ctx.info("StorageStore migration: item_id '%s' dropped — no ItemRegistry to resolve (composition-only)" % d["item_id"])
+                continue
             # Sniffing migrations — legacy keys written by pre-composition (v1) saves.
             var legacy_veiled := bool(d.get("anchor_revealed", false)) or bool(d.get("inspected", false))
             d["unveiled"] = bool(d.get("unveiled", false)) or legacy_veiled
