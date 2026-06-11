@@ -20,8 +20,6 @@ const SCHEMA_VERSION := 2
 const MAX_SAVES := 10
 const SLOT_COUNT := 3
 const _SLOT_BASE_DIR := "user://save_slots"
-const _LEGACY_PATH := "user://save.json"
-const _LEGACY_COUNTER_DIR := "user://saves"
 const _MANIFEST_VERSION := 2
 
 ## Deferred-save throttle interval in seconds. The first mark_dirty() starts
@@ -156,14 +154,9 @@ func _read_slot_summary(slot: int) -> Variant:
     }
 
 
-## Boot entry point: migrates old save data if needed, then loads the
-## last-active slot. Falls back to the newest slot if the pointer is stale.
-## Fresh start (no data anywhere) leaves _active_slot at 0.
+## Boot entry point: loads the last-active slot. Falls back to the newest slot
+## if the pointer is stale. Fresh start (no data anywhere) leaves _active_slot at 0.
 func boot_load() -> void:
-    # One-time migration from old layout.
-    if _should_migrate_to_slots():
-        _migrate_to_slots()
-
     var last_active := _read_last_active()
     if last_active > 0 and has_slot_data(last_active):
         _active_slot = last_active
@@ -328,57 +321,6 @@ func _load_active_slot() -> void:
 
     var summary := _build_summary(sections_data)
     _write_manifest(_active_slot, loaded_counter, summary)
-
-# ══ Migration ═════════════════════════════════════════════════════════════════
-
-
-## Returns true when old save data exists but no slot structure has been created.
-func _should_migrate_to_slots() -> bool:
-    if DirAccess.dir_exists_absolute(ProjectSettings.globalize_path(_SLOT_BASE_DIR)):
-        return false
-    if DirAccess.dir_exists_absolute(ProjectSettings.globalize_path(_LEGACY_COUNTER_DIR)):
-        return true
-    if FileAccess.file_exists(_LEGACY_PATH):
-        return true
-    return false
-
-
-## Migrates old counter-based saves or legacy save.json into slot 1.
-## One-time, best-effort — old files are left in place on failure.
-func _migrate_to_slots() -> void:
-    _ensure_slot_base_dir()
-
-    # Try counter-based old saves first.
-    if DirAccess.dir_exists_absolute(ProjectSettings.globalize_path(_LEGACY_COUNTER_DIR)):
-        var counters := _scan_save_counters_in_dir(_LEGACY_COUNTER_DIR)
-        if not counters.is_empty():
-            _ensure_slot_dir(1)
-            var migrated_counter := -1
-            for counter in counters:
-                var src := _LEGACY_COUNTER_DIR.path_join("save_%d.json" % counter)
-                if not FileAccess.file_exists(src):
-                    continue
-                var content := _read_text_file(src)
-                if content.is_empty():
-                    continue
-                var dst := _slot_counter_path(1, counter)
-                if _write_text_file(dst, content):
-                    if counter > migrated_counter:
-                        migrated_counter = counter
-            if migrated_counter > 0:
-                _write_manifest(1, migrated_counter)
-                _write_last_active(1)
-            return
-
-    # Fall back to legacy single-file save.
-    if FileAccess.file_exists(_LEGACY_PATH):
-        _ensure_slot_dir(1)
-        var content := _read_text_file(_LEGACY_PATH)
-        if not content.is_empty():
-            if _write_text_file(_slot_counter_path(1, 1), content):
-                _write_manifest(1, 1)
-                _write_last_active(1)
-                DirAccess.remove_absolute(ProjectSettings.globalize_path(_LEGACY_PATH))
 
 # ══ Private helpers ═══════════════════════════════════════════════════════════
 
@@ -572,23 +514,3 @@ func _cleanup_old_saves_in_slot(slot: int) -> void:
         )
         if err != OK:
             push_warning("SaveManager: could not delete slot %d save_%d (error %d)" % [slot, oldest, err])
-
-
-## Reads an entire text file. Returns empty string on failure.
-func _read_text_file(path: String) -> String:
-    var file := FileAccess.open(path, FileAccess.READ)
-    if file == null:
-        return ""
-    var text := file.get_as_text()
-    file.close()
-    return text
-
-
-## Writes a text file. Returns true on success.
-func _write_text_file(path: String, content: String) -> bool:
-    var file := FileAccess.open(path, FileAccess.WRITE)
-    if file == null:
-        return false
-    file.store_string(content)
-    file.close()
-    return true
