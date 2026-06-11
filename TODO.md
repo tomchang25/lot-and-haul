@@ -8,7 +8,7 @@ The single forward surface — open this and you see everything: open work _and_
 >
 > **Tag format:** the `[Scope]` tag in actionable lines is **snake_case** — short lowercase identifier, no spaces, no parens, no mixed case (e.g. `[customer_sell]`, `[bugfix]`).
 
-In-flight work lives in `## Active` — promoted from `## Plan` when building starts. The phase-by-phase detail and ordering stay in the linked `dev/docs/plans/` file, never churned into this list.
+In-flight and ready-to-implement work lives in `## Active` — promoted from `## Plan` when building starts or the plan is ready to build; more than one entry is fine. The phase-by-phase detail and ordering stay in the linked `dev/docs/plans/` file, never churned into this list.
 
 Actionable line format: `[Scope] one sentence — [ref plans/<x>.md if any]`
 
@@ -126,10 +126,6 @@ Additional perks beyond the current attribute-threshold triggers, with full acqu
 
 Use `get_mastery_rank()` directly to gate prestige unlocks and NPC reaction tiers. Tier-locked auction houses moved to `dev/docs/plans/unlock_gating_location_tiers.md`, whose generic requirement block these gates should reuse.
 
-### Fuel Cost Pre-Run Preview
-
-Surface `fuel_cost_per_day × travel_days` in the location selection cost card. Blocked on the location system's cost card.
-
 ### Vehicle Upgrades / Mods
 
 Upgrade system for vehicles: bigger tank, reinforced cargo bay, etc.
@@ -177,13 +173,13 @@ Prerequisite: the affix-naming system validated across the full item set (compos
 
 ## Active
 
-Flows currently being built. One-line pointer each — same format as `## Plan`, just promoted here when work starts. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress → this section is empty.
+Flows currently being built or ready to implement — may hold more than one entry. One-line pointer each — same format as `## Plan`, promoted here when building starts or the plan is ready to build. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress or ready → this section is empty.
 
----
+### Fuel Cost Pre-Run Preview
 
-## Pending
+Surface `fuel_cost_per_day × travel_days` in the location selection cost card. Blocked on the location system's cost card.
 
-The deferred tail of an in-flight flow. When a confirmed initiative spans multiple plans, the parts not being built yet wait here instead of crowding `## Active` — same one-line format, promoted to `## Active` when their turn comes. Normally empty: a small fix or a feature that a single plan covers never uses this tier — it goes straight from `## Plan` to `## Active`.
+- [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 
 ---
 
@@ -192,7 +188,6 @@ The deferred tail of an in-flight flow. When a confirmed initiative spans multip
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
 - [run_persistence] Mid-run save/resume: phase-stable resume scenes, atomic auction, escrowed run economics — see `dev/docs/plans/run_phase_persistence.md`
-- [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 - [unlock_gating] Requirement-gated premium auction tiers + lot kinds, with location tier reference table & audit — see `dev/docs/plans/unlock_gating_location_tiers.md`
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
 - [demo] Tutorial 3-run surface (stale — references legacy Skill/Merchant systems); Director + Dialog systems are surviving subsystems — see `dev/docs/plans/demo_summary.md`
