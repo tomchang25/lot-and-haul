@@ -52,6 +52,13 @@ func _ready() -> void:
     EventBus.item_unveiled.connect(_on_item_unveiled)
     EventBus.item_revealed.connect(_on_item_revealed)
 
+
+## Re-instantiates the KnowledgeStore to its default state. Called by
+## SaveManager.reset_providers() during the new-game flow.
+## Signal subscriptions remain intact (already connected in _ready()).
+func reset() -> void:
+    _knowledge = KnowledgeStore.new()
+
 # ── Registry validation ────────────────────────────────────────────────────────
 
 

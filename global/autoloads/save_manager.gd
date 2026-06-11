@@ -5,10 +5,14 @@
 # StoreBase save interface: to_dict(), from_dict(), validate(). Per-store versioned
 # migrations run inside each store's from_dict() via _apply_migrations().
 #
+# Providers may also implement reset() to support the new-game flow; SaveManager
+# calls reset() on any provider that defines it when starting a fresh game.
+#
 # On-disk format: counter-based files user://saves/save_N.json, never overwritten.
-# A manifest (user://saves/manifest.json) tracks the latest counter as a fast-path
-# for load. If the manifest is absent or corrupt, SaveManager scans filenames.
-# Up to MAX_SAVES (10) files are retained; older files are best-effort deleted.
+# A manifest (user://saves/manifest.json) tracks the latest backup counter as a
+# fast-path for load. If the manifest is absent or corrupt, SaveManager scans
+# filenames. Up to MAX_SAVES (10) files are retained; older files are best-effort
+# deleted.
 #
 # Save payload per file is unchanged:
 #   { "schema_version": int, "sections": { <id>: <payload> } }
@@ -79,6 +83,30 @@ func mark_dirty() -> void:
         _elapsed = 0.0
 
 
+## Iterates registered providers and calls reset() on any that implement it.
+## Used by the new-game flow to restore every persistent store to its default
+## state. Providers that do not define reset() are left untouched.
+func reset_providers() -> void:
+    for provider: Object in _providers:
+        if provider.has_method("reset"):
+            provider.reset()
+
+
+## Deletes all counter-based save files and the manifest from disk. Used by the
+## new-game flow before resetting providers and writing a fresh save.
+func wipe_all() -> void:
+    for counter: int in _scan_save_counters():
+        var err := DirAccess.remove_absolute(
+            ProjectSettings.globalize_path(_counter_path(counter)),
+        )
+        if err != OK:
+            push_warning("SaveManager: could not delete %s (error %d)" % [_counter_path(counter), err])
+    if FileAccess.file_exists(_MANIFEST_PATH):
+        var err := DirAccess.remove_absolute(ProjectSettings.globalize_path(_MANIFEST_PATH))
+        if err != OK:
+            push_warning("SaveManager: could not delete manifest (error %d)" % err)
+
+
 ## Catches OS quit (Alt-F4 / window close) and flushes any pending deferred
 ## state before the engine shuts down.
 func _notification(what: int) -> void:
@@ -127,7 +155,7 @@ func save() -> void:
         "sections": sections_out,
     }
 
-    var path := _slot_path(new_counter)
+    var path := _counter_path(new_counter)
     var file := FileAccess.open(path, FileAccess.WRITE)
     if file == null:
         push_error("SaveManager: failed to open %s for writing (error %d)" % [path, FileAccess.get_open_error()])
@@ -159,7 +187,7 @@ func load() -> void:
     var failed_files: Array[String] = []
 
     for counter: int in candidates:
-        var path := _slot_path(counter)
+        var path := _counter_path(counter)
         var result := _try_load_file(path)
         if result == null:
             failed_files.append(path)
@@ -186,7 +214,7 @@ func load() -> void:
     # Warn if we fell back past the most recent file.
     if loaded_counter != highest_counter:
         var skipped := range(loaded_counter + 1, highest_counter + 1).map(
-            func(c: int) -> String: return _slot_path(c)
+            func(c: int) -> String: return _counter_path(c)
         )
         ToastManager.show_warning(
             "Loaded save_%d.json (newest file was corrupt). Skipped: %s" % [
@@ -208,12 +236,14 @@ func _ensure_save_dir() -> void:
 
 
 ## Returns the save path for [param counter].
-func _slot_path(counter: int) -> String:
+func _counter_path(counter: int) -> String:
     return "%s/save_%d.json" % [_SAVE_DIR, counter]
 
 
-## Reads the manifest and returns the stored current_slot, or -1 on failure.
-func _read_manifest_slot() -> int:
+## Reads the manifest and returns the stored current_backup counter, or -1 on
+## failure. Accepts the legacy "current_slot" field name as a fallback so
+## manifests written by the previous build remain readable without migration.
+func _read_manifest_counter() -> int:
     if not FileAccess.file_exists(_MANIFEST_PATH):
         return -1
     var file := FileAccess.open(_MANIFEST_PATH, FileAccess.READ)
@@ -223,19 +253,23 @@ func _read_manifest_slot() -> int:
     file.close()
     if parsed == null or not parsed is Dictionary:
         return -1
-    var slot: Variant = parsed.get("current_slot", -1)
-    if not slot is int or slot < 1:
-        return -1
-    return slot
+    var counter: Variant = parsed.get("current_backup", -1)
+    if counter is int and counter >= 1:
+        return counter
+    # Fallback to the legacy field name.
+    var legacy: Variant = parsed.get("current_slot", -1)
+    if legacy is int and legacy >= 1:
+        return legacy
+    return -1
 
 
-## Writes the manifest with [param counter] as current_slot.
+## Writes the manifest with [param counter] as current_backup.
 func _write_manifest(counter: int) -> void:
     var file := FileAccess.open(_MANIFEST_PATH, FileAccess.WRITE)
     if file == null:
         push_error("SaveManager: failed to write manifest (error %d)" % FileAccess.get_open_error())
         return
-    file.store_string(JSON.stringify({ "current_slot": counter, "version": _MANIFEST_VERSION }))
+    file.store_string(JSON.stringify({ "current_backup": counter, "version": _MANIFEST_VERSION }))
     file.close()
 
 
@@ -263,9 +297,9 @@ func _scan_save_counters() -> Array[int]:
 ## Determines the counter to use for the next save.
 ## Reads manifest first; falls back to filename scan.
 func _next_counter() -> int:
-    var slot := _read_manifest_slot()
-    if slot > 0:
-        return slot + 1
+    var counter := _read_manifest_counter()
+    if counter > 0:
+        return counter + 1
     var existing := _scan_save_counters()
     if existing.is_empty():
         return 1
@@ -273,16 +307,16 @@ func _next_counter() -> int:
 
 
 ## Builds the ordered candidate list for load (newest-first).
-## Starts with the manifest's slot if valid, then includes all scanned files.
+## Starts with the manifest's counter if valid, then includes all scanned files.
 func _build_candidate_list() -> Array[int]:
-    var manifest_slot := _read_manifest_slot()
+    var manifest_counter := _read_manifest_counter()
     var scanned := _scan_save_counters()
     if scanned.is_empty():
         return [] as Array[int]
-    # Ensure manifest slot is first, then remaining by descending counter.
+    # Ensure manifest counter is first, then remaining by descending counter.
     var ordered: Array[int] = []
-    if manifest_slot > 0 and manifest_slot in scanned:
-        ordered.append(manifest_slot)
+    if manifest_counter > 0 and manifest_counter in scanned:
+        ordered.append(manifest_counter)
     for c: int in scanned:
         if c not in ordered:
             ordered.append(c)
@@ -314,10 +348,10 @@ func _cleanup_old_saves() -> void:
     while counters.size() > MAX_SAVES:
         var oldest: int = counters.pop_back()
         var err := DirAccess.remove_absolute(
-            ProjectSettings.globalize_path(_slot_path(oldest)),
+            ProjectSettings.globalize_path(_counter_path(oldest)),
         )
         if err != OK:
-            push_warning("SaveManager: could not delete %s (error %d)" % [_slot_path(oldest), err])
+            push_warning("SaveManager: could not delete %s (error %d)" % [_counter_path(oldest), err])
 
 
 ## Returns true when legacy migration should run: no save_*.json exists but
@@ -338,7 +372,7 @@ func _migrate_legacy() -> void:
     var text := file.get_as_text()
     file.close()
 
-    var target := _slot_path(1)
+    var target := _counter_path(1)
     var out := FileAccess.open(target, FileAccess.WRITE)
     if out == null:
         push_error("SaveManager: could not write legacy migration to %s" % target)

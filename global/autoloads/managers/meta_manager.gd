@@ -27,6 +27,17 @@ func _ready() -> void:
     customers = CustomersStore.new()
     SaveManager.register_provider(self)
 
+
+## Re-instantiates all domain stores to their default state. Called by
+## SaveManager.reset_providers() during the new-game flow.
+func reset() -> void:
+    economy = EconomyStore.new()
+    garage = GarageStore.new()
+    storage = StorageStore.new()
+    slot = SlotStore.new()
+    progress = ProgressStore.new()
+    customers = CustomersStore.new()
+
 # ══ Save section interface ════════════════════════════════════════════════════
 
 
