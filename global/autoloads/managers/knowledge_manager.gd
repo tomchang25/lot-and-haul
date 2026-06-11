@@ -92,6 +92,12 @@ func from_dict(data: Dictionary) -> void:
 func get_migration_log() -> Array[String]:
     return _knowledge.get_migration_log()
 
+
+## Aggregates get_restore_warnings() from all owned stores. Returns and clears
+## each store's warnings. Call after from_dict() to surface data-loss events.
+func get_restore_warnings() -> Array[String]:
+    return _knowledge.get_restore_warnings()
+
 # ── Mastery ────────────────────────────────────────────────────────────────────
 
 

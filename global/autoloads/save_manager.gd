@@ -352,10 +352,16 @@ func _migrate_legacy() -> void:
 
 ## Collects migration logs from all providers after from_dict(). Sends each
 ## message to ToastManager.show_info() (visible only in debug mode).
+## Also collects restore warnings and routes them to ToastManager.show_warning()
+## (always visible) — these indicate data-loss events the player must see.
 func _collect_migration_logs() -> void:
     for provider: Object in _providers:
-        if not provider.has_method("get_migration_log"):
-            continue
-        var messages: Array = provider.get_migration_log()
-        for msg: String in messages:
-            ToastManager.show_info(msg)
+        if provider.has_method("get_migration_log"):
+            var messages: Array = provider.get_migration_log()
+            for msg: String in messages:
+                ToastManager.show_info(msg)
+
+        if provider.has_method("get_restore_warnings"):
+            var warnings: Array = provider.get_restore_warnings()
+            for msg: String in warnings:
+                ToastManager.show_warning(msg)

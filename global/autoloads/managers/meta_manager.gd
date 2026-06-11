@@ -66,6 +66,19 @@ func get_migration_log() -> Array[String]:
     return out
 
 
+## Aggregates get_restore_warnings() from all owned stores. Returns and clears
+## each store's warnings. Call after from_dict() to surface data-loss events.
+func get_restore_warnings() -> Array[String]:
+    var out: Array[String] = []
+    out.append_array(economy.get_restore_warnings())
+    out.append_array(garage.get_restore_warnings())
+    out.append_array(storage.get_restore_warnings())
+    out.append_array(slot.get_restore_warnings())
+    out.append_array(progress.get_restore_warnings())
+    out.append_array(customers.get_restore_warnings())
+    return out
+
+
 ## Aggregates validate() across all stores. Returns true when all pass.
 func validate() -> bool:
     var ok := true

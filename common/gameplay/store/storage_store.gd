@@ -67,49 +67,81 @@ func to_dict() -> Dictionary:
 
 ## Restores storage state. apply_storage_migration() is called on each loaded
 ## entry to auto-reveal surface clues (not legacy — always runs).
+## Counts dropped and degraded entries during restore; appends one summary line
+## to _restore_warnings when any loss occurs.
 func from_dict(data: Dictionary) -> void:
     var version: int = int(data.get("_version", 1))
+    var pre_migration_count := 0
+    if data.has("storage_items") and data["storage_items"] is Array:
+        pre_migration_count = data["storage_items"].size()
     data = _apply_migrations(data, version)
+    var post_migration_count := 0
+    if data.has("storage_items") and data["storage_items"] is Array:
+        post_migration_count = data["storage_items"].size()
+    var dropped_count := pre_migration_count - post_migration_count
+    var degraded_count := 0
     if data.has("storage_items") and data["storage_items"] is Array:
         _storage_items = []
         for d: Variant in data["storage_items"]:
             if not d is Dictionary:
                 continue
-            var entry: ItemEntry = ItemEntry.from_dict(d)
+            var per_issues: Array = []
+            var entry: ItemEntry = ItemEntry.from_dict(d, per_issues)
             if entry == null:
+                dropped_count += 1
                 continue
+            if not per_issues.is_empty():
+                degraded_count += 1
             entry.apply_storage_migration()
             _storage_items.append(entry)
+        if dropped_count > 0 or degraded_count > 0:
+            _restore_warnings.append(
+                "Storage: %d item(s) could not be restored, %d restored with missing data" % [dropped_count, degraded_count],
+            )
     _next_entry_id = int(data.get("next_entry_id", _next_entry_id))
 
 
 func _store_version() -> int:
     return 2
 
-# func _apply_migrations(data: Dictionary, from_version: int) -> Dictionary:
-#     if from_version < 2:
-#         var migrated: Array = []
-#         for d: Variant in data.get("storage_items", []):
-#             if not d is Dictionary:
-#                 migrated.append(d)
-#                 continue
-#             # Legacy entry: has item_id but no anchor_id (composition form).
-#             if d.has("item_id") and not d.has("anchor_id"):
-#                 var item: ItemData = ItemRegistry.get_item_by_id(d["item_id"])
-#                 if item == null:
-#                     push_warning("StorageStore migration: item_id '%s' not found — entry dropped" % d["item_id"])
-#                     continue
-#                 d["anchor_id"] = item.anchor.anchor_id if item.anchor else ""
-#                 var surf_ids: Array[String] = []
-#                 for c: ClueData in item.surface_clues:
-#                     surf_ids.append(c.clue_id)
-#                 d["surface_ids"] = surf_ids
-#                 var hid_ids: Array[String] = []
-#                 for c: ClueData in item.hidden_clues:
-#                     hid_ids.append(c.clue_id)
-#                 d["hidden_ids"] = hid_ids
-#                 d["category_id"] = item.category_data.category_id if item.category_data else ""
-#             migrated.append(d)
-#         data["storage_items"] = migrated
-#         _migration_log.append("StorageStore: migrated to version 2 (item_id → composition)")
-#     return data
+
+func _apply_migrations(data: Dictionary, from_version: int) -> Dictionary:
+    if from_version < 2:
+        var migrated: Array = []
+        for d: Variant in data.get("storage_items", []):
+            if not d is Dictionary:
+                migrated.append(d)
+                continue
+            # Legacy entry: has item_id but no anchor_id (composition form).
+            if d.has("item_id") and not d.has("anchor_id"):
+                # var item: ItemData = ItemRegistry.get_item_by_id(d["item_id"])
+                var item = null
+                if item == null:
+                    push_warning("StorageStore migration: item_id '%s' not found — entry dropped" % d["item_id"])
+                    continue
+                d["anchor_id"] = item.anchor.anchor_id if item.anchor else ""
+                var surf_ids: Array[String] = []
+                for c: ClueData in item.surface_clues:
+                    surf_ids.append(c.clue_id)
+                d["surface_ids"] = surf_ids
+                var hid_ids: Array[String] = []
+                for c: ClueData in item.hidden_clues:
+                    hid_ids.append(c.clue_id)
+                d["hidden_ids"] = hid_ids
+                d["category_id"] = item.category_data.category_id if item.category_data else ""
+            # Sniffing migrations — legacy keys written by pre-composition (v1) saves.
+            var legacy_veiled := bool(d.get("anchor_revealed", false)) or bool(d.get("inspected", false))
+            d["unveiled"] = bool(d.get("unveiled", false)) or legacy_veiled
+            if bool(d.get("verified", false)):
+                var revealed: Array = d.get("revealed_clue_ids", [])
+                for cid: String in d.get("hidden_ids", []):
+                    if not revealed.has(cid):
+                        revealed.append(cid)
+                d["revealed_clue_ids"] = revealed
+            d.erase("anchor_revealed")
+            d.erase("inspected")
+            d.erase("verified")
+            migrated.append(d)
+        data["storage_items"] = migrated
+        _migration_log.append("StorageStore: migrated to version 2 (item_id → composition)")
+    return data

@@ -506,40 +506,40 @@ func to_dict() -> Dictionary:
     return d
 
 
-static func from_dict(d: Dictionary) -> ItemEntry:
+## Restores an item entry from [param d]. Appends per-entry resolution failures
+## to [param issues] (if provided). Returns null when the anchor cannot be
+## resolved — a kept entry with anchor = null is silent corruption.
+static func from_dict(d: Dictionary, issues: Array = []) -> ItemEntry:
     var entry := ItemEntry.new()
 
-    if d.has("anchor_id"):
-        # New composition form
-        var aid: String = d["anchor_id"]
-        if not aid.is_empty():
-            entry.anchor = AnchorRegistry.get_anchor_by_id(aid)
-        for cid: Variant in d.get("surface_ids", []):
-            var clue := ClueRegistry.get_clue_by_id(String(cid))
-            if clue != null:
-                entry.surface_clues.append(clue)
-        for cid: Variant in d.get("hidden_ids", []):
-            var clue := ClueRegistry.get_clue_by_id(String(cid))
-            if clue != null:
-                entry.hidden_clues.append(clue)
-        var cat_id: String = d.get("category_id", "")
-        if not cat_id.is_empty():
-            entry.category_data = CategoryRegistry.get_category_by_id(cat_id)
-    else:
-        # # Legacy item_id form (pre-migration or migration-in-progress).
-        # var data: ItemData = ItemRegistry.get_item_by_id(d["item_id"])
-        # if data == null:
-        # push_warning("ItemEntry: item_id '%s' not found — entry dropped" % d["item_id"])
-        # return null
-        # entry.item_data = data
-        push_warning("ItemEntry: item_id '%s' not found — entry dropped" % d["item_id"])
-        return null
+    # Composition form — all entries arrive here after StorageStore migration.
+    var aid: String = d["anchor_id"]
+    if not aid.is_empty():
+        entry.anchor = AnchorRegistry.get_anchor_by_id(aid)
+        if entry.anchor == null:
+            issues.append("anchor '%s' not found — entry dropped" % aid)
+            push_warning("ItemEntry: anchor '%s' not found — entry dropped" % aid)
+            return null
+    for cid: Variant in d.get("surface_ids", []):
+        var clue := ClueRegistry.get_clue_by_id(String(cid))
+        if clue != null:
+            entry.surface_clues.append(clue)
+        else:
+            issues.append("surface clue '%s' not found" % cid)
+            push_warning("ItemEntry: surface clue '%s' not found" % cid)
+    for cid: Variant in d.get("hidden_ids", []):
+        var clue := ClueRegistry.get_clue_by_id(String(cid))
+        if clue != null:
+            entry.hidden_clues.append(clue)
+        else:
+            issues.append("hidden clue '%s' not found" % cid)
+            push_warning("ItemEntry: hidden clue '%s' not found" % cid)
+    var cat_id: String = d.get("category_id", "")
+    if not cat_id.is_empty():
+        entry.category_data = CategoryRegistry.get_category_by_id(cat_id)
 
     # Common fields
-    var legacy_anchor_revealed := bool(d.get("anchor_revealed", false))
-    var legacy_inspected := bool(d.get("inspected", false))
-    entry.unveiled = bool(d.get("unveiled", legacy_anchor_revealed or legacy_inspected))
-
+    entry.unveiled = bool(d.get("unveiled", false))
     entry.condition = float(d["condition"])
     if d.has("center_offset"):
         entry.center_offset = float(d["center_offset"])
@@ -570,9 +570,4 @@ static func from_dict(d: Dictionary) -> ItemEntry:
             if key is String and d["research_progress"][key] is float:
                 entry.research_progress[key] = int(d["research_progress"][key])
 
-    # Legacy migration: old saves stored verified as a bool flag without
-    # populating revealed_clue_ids. reveal_all_hidden() is idempotent —
-    # clue IDs already loaded above are guarded by has(), so no duplicates.
-    if d.has("verified") and bool(d["verified"]):
-        entry.reveal_all_hidden()
     return entry

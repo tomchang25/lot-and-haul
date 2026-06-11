@@ -10,6 +10,11 @@ extends RefCounted
 ## Cleared and returned by get_migration_log().
 var _migration_log: Array[String] = []
 
+## Human-readable warnings about data-loss events during restore (unresolvable
+## anchors, dropped entries, degraded entries). Cleared and returned by
+## get_restore_warnings().
+var _restore_warnings: Array[String] = []
+
 
 ## Returns all migration messages accumulated since the last load, then clears
 ## the log. Call after from_dict() to collect any schema-upgrade notes.
@@ -19,7 +24,15 @@ func get_migration_log() -> Array[String]:
     return out
 
 
-## Returns the section key used in the save payload. Returns "" by default;
+## Returns all restore warnings accumulated since the last load, then clears
+## the list. Call after from_dict() to surface data-loss events to the player.
+func get_restore_warnings() -> Array[String]:
+    var out := _restore_warnings.duplicate()
+    _restore_warnings.clear()
+    return out
+
+
+## Returns the section key used in the save payload. Returns "" by default
 ## session-scoped Stores that never register with SaveManager rely on this.
 func section_id() -> String:
     return ""
@@ -28,7 +41,7 @@ func section_id() -> String:
 ## Serializes this store's state to a Dictionary for saving.
 ## Returns an empty dict by default.
 func to_dict() -> Dictionary:
-    return {}
+    return { }
 
 
 ## Restores this store's state from [param data]. No-op by default.
