@@ -192,6 +192,8 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
 - [demo] Tutorial 3-run surface (stale — references legacy Skill/Merchant systems); Director + Dialog systems are surviving subsystems — see `dev/docs/plans/demo_summary.md`
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
+- [dev/auto-auction] Debug-only quick-win buttons: instant player win at opening bid or rolled price (skip NPC bidding loop; rolled path seeds future auto-bid perk) — see `dev/docs/plans/debug_auto_auction.md`
+- [dev/auto-cargo] Debug-only quick-pack buttons: legal one-press auto-pack (seeds future auto-place perk) + stuff-all-and-go ignoring capacity — see `dev/docs/plans/debug_auto_cargo.md`
 
 ---
 
@@ -201,8 +203,6 @@ One-line, no reasoning, no backing doc.
 
 - [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
 - [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
-- [dev] Auto-put won items to cargo grid (dev-only, skips manual packing).
-- [dev] Instant-finish auction at current price (dev-only action).
 - [style] Standardize docstrings across all `.gd` files — file header + public function GDDoc format.
 - [data] Display name of clues need more diversity of priority, and might need a baseline of priority(from op value?)
 
