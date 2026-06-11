@@ -95,7 +95,6 @@ func set_active(active: bool) -> void:
 
 
 func _rarity_range_text(weights: Dictionary) -> String:
-    const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
     var present: Array[int] = []
     for key in weights.keys():
         if (weights[key] as int) > 0:
@@ -105,8 +104,8 @@ func _rarity_range_text(weights: Dictionary) -> String:
     present.sort()
     var min_r: int = present[0]
     var max_r: int = present[present.size() - 1]
-    var min_name: String = RARITY_NAMES[min_r] if min_r < RARITY_NAMES.size() else "Unknown"
-    var max_name: String = RARITY_NAMES[max_r] if max_r < RARITY_NAMES.size() else "Unknown"
+    var min_name: String = ItemEntryDisplayHelper.RARITY_NAMES[min_r] if min_r < ItemEntryDisplayHelper.RARITY_NAMES.size() else "Unknown"
+    var max_name: String = ItemEntryDisplayHelper.RARITY_NAMES[max_r] if max_r < ItemEntryDisplayHelper.RARITY_NAMES.size() else "Unknown"
     if min_r == max_r:
         return min_name
     return "%s – %s" % [min_name, max_name]

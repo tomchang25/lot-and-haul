@@ -45,7 +45,7 @@ func _ready() -> void:
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
     _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
 
-    var cracked := _apply_trailer_damage()
+    var cracked := RunManager.apply_trailer_damage()
     if cracked > 0:
         _trailer_damage_label.text = "%d trailer item(s) cracked during transport" % cracked
         _trailer_damage_label.add_theme_color_override(&"font_color", Color(1.0, 0.8, 0.3))
@@ -70,22 +70,6 @@ func _on_row_tooltip_requested(
         anchor: Rect2,
 ) -> void:
     _tooltip.show_for(entry, anchor)
-
-# ══ Trailer damage ════════════════════════════════════════════════════════════
-
-
-func _apply_trailer_damage() -> int:
-    var car: CarData = RunManager.run.car_data
-    if car.trailer_damage_chance <= 0.0:
-        return 0
-
-    var cracked := 0
-    for entry: ItemEntry in RunManager.run.trailer_items:
-        if randf() < car.trailer_damage_chance:
-            var ratio := randf_range(car.trailer_damage_ratio_min, car.trailer_damage_ratio_max)
-            entry.condition = maxf(0.0, entry.condition - ratio)
-            cracked += 1
-    return cracked
 
 # ══ Run resolution ════════════════════════════════════════════════════════════
 
@@ -115,7 +99,7 @@ func _populate_finance() -> void:
 
     if overall >= 0:
         _overall_label.text = "Cash Flow:   +$%d" % overall
-        _overall_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
+        _overall_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.PRICE_COLOR)
     else:
         _overall_label.text = "Cash Flow:   -$%d" % (-overall)
         _overall_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))

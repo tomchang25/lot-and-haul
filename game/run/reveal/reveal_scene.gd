@@ -57,9 +57,9 @@ func _ready() -> void:
 func _on_reveal_pressed() -> void:
     for entry: ItemEntry in _won_items:
         if entry.is_veiled():
-            entry.unveil()
+            RunManager.unveil_item(entry)
 
-        entry.auto_reveal_all_surface()
+        RunManager.auto_reveal_all_surface(entry)
 
     _on_reveal_complete()
 

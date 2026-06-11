@@ -199,7 +199,7 @@ func _refresh_detail() -> void:
     var entry: ItemEntry = _selected_entry
 
     # ── Name and category ─────────────────────────────────────────────────────
-    _detail_name_label.text = entry.display_name
+    _detail_name_label.text = ItemEntryDisplayHelper.display_name(entry)
     _auth_tag_label.visible = entry.verified
     if entry.item_data != null and entry.item_data.category_data != null:
         _detail_category_label.text = "%s · #%d" % [
@@ -211,30 +211,30 @@ func _refresh_detail() -> void:
 
     # ── Rarity ────────────────────────────────────────────────────────────────
     if entry.verified:
-        _detail_rarity_label.text = "%s ✓" % entry.rarity_text()
+        _detail_rarity_label.text = "%s ✓" % ItemEntryDisplayHelper.rarity_text(entry)
     else:
-        _detail_rarity_label.text = entry.rarity_text()
+        _detail_rarity_label.text = ItemEntryDisplayHelper.rarity_text(entry)
 
     # ── Condition ─────────────────────────────────────────────────────────────
-    _detail_cond_value.text = entry.condition_text()
-    _detail_cond_value.modulate = entry.condition_color
+    _detail_cond_value.text = ItemEntryDisplayHelper.condition_text(entry)
+    _detail_cond_value.modulate = ItemEntryDisplayHelper.condition_color(entry)
 
     # ── Estimated value ───────────────────────────────────────────────────────
-    _detail_est_value.text = entry.estimated_value_text()
-    _detail_est_value.add_theme_color_override(&"font_color", entry.price_color)
+    _detail_est_value.text = ItemEntryDisplayHelper.estimated_value_text(entry)
+    _detail_est_value.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_color(entry))
 
     # ── Price convergence / verified value title ──────────────────────────────
     if entry.verified:
         _detail_conv_ratio.text = "Verified"
-        _detail_conv_ratio.modulate = Color(0.4, 1.0, 0.5)
+        _detail_conv_ratio.modulate = ItemEntryDisplayHelper.PRICE_COLOR
         _value_title_label.text = "True Value"
     elif entry.is_veiled():
-        _detail_conv_ratio.text = "???"
+        _detail_conv_ratio.text = ItemEntryDisplayHelper.UNKNOWN_TEXT
         _detail_conv_ratio.modulate = Color(0.5, 0.5, 0.5)
         _value_title_label.text = "Est. Value"
     elif entry.is_price_converged():
         _detail_conv_ratio.text = "Converged"
-        _detail_conv_ratio.modulate = Color(0.4, 1.0, 0.5)
+        _detail_conv_ratio.modulate = ItemEntryDisplayHelper.PRICE_COLOR
         _value_title_label.text = "Est. Value"
     else:
         var lo: int = entry.estimated_value_min

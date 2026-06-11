@@ -112,7 +112,7 @@ func apply_sort() -> void:
 static func get_sort_value(entry: ItemEntry, col: ItemRow.Column) -> Variant:
     if entry == null:
         return 0
-    return entry.sort_value(col)
+    return ItemEntryDisplayHelper.sort_value(entry, col)
 
 # ══ Header ════════════════════════════════════════════════════════════════════
 

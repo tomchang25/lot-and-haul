@@ -87,17 +87,17 @@ func _apply() -> void:
     if _entry == null:
         return
 
-    _name_label.text = _entry.display_name
-    _name_label.add_theme_color_override(&"font_color", _entry.display_name_color())
+    _name_label.text = ItemEntryDisplayHelper.display_name(_entry)
+    _name_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.display_name_color(_entry))
 
-    _value_label.text = _entry.estimated_value_text()
-    _value_label.add_theme_color_override(&"font_color", _entry.price_display_color())
+    _value_label.text = ItemEntryDisplayHelper.estimated_value_text(_entry)
+    _value_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(_entry))
 
-    _weight_label.text = _entry.weight_text()
+    _weight_label.text = ItemEntryDisplayHelper.weight_text(_entry)
     _weight_label.modulate = _weight_label_modulate()
 
-    _condition_label.text = _entry.condition_text()
-    _condition_label.modulate = _entry.condition_display_color()
+    _condition_label.text = ItemEntryDisplayHelper.condition_text(_entry)
+    _condition_label.modulate = ItemEntryDisplayHelper.condition_display_color(_entry)
 
     _build_shape_icon()
 

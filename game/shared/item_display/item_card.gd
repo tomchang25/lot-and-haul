@@ -52,7 +52,7 @@ func _apply() -> void:
     if _entry == null:
         return
 
-    _name_label.text = _entry.display_name
+    _name_label.text = ItemEntryDisplayHelper.display_name(_entry)
 
     if _entry.is_veiled():
         _apply_unknown()
@@ -70,8 +70,8 @@ func _apply_unknown() -> void:
     _weight_label.hide()
     _grid_label.hide()
 
-    _price_label.text = "???"
-    _price_label.add_theme_color_override(&"font_color", _entry.price_display_color())
+    _price_label.text = ItemEntryDisplayHelper.UNKNOWN_TEXT
+    _price_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(_entry))
     _price_label.show()
 
 
@@ -90,32 +90,32 @@ func _apply_known() -> void:
     else:
         _category_label.hide()
 
-    _potential_label.text = _entry.rarity_text()
+    _potential_label.text = ItemEntryDisplayHelper.rarity_text(_entry)
     _potential_label.show()
 
-    _condition_label.text = _entry.condition_text()
-    _condition_label.modulate = _entry.condition_display_color()
+    _condition_label.text = ItemEntryDisplayHelper.condition_text(_entry)
+    _condition_label.modulate = ItemEntryDisplayHelper.condition_display_color(_entry)
     _condition_label.show()
 
-    var condition_secondary := _entry.condition_secondary_text()
+    var condition_secondary := ItemEntryDisplayHelper.condition_secondary_text(_entry)
     if condition_secondary != "":
         _condition_mult_label.text = condition_secondary
         _condition_mult_label.show()
     else:
         _condition_mult_label.hide()
 
-    _price_label.text = _entry.estimated_value_text()
-    _price_label.add_theme_color_override(&"font_color", _entry.price_display_color())
+    _price_label.text = ItemEntryDisplayHelper.estimated_value_text(_entry)
+    _price_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(_entry))
     _price_label.show()
 
-    var weight := _entry.weight_text()
-    var grid := _entry.grid_text()
-    if weight != ItemEntry.UNKNOWN_TEXT:
+    var weight := ItemEntryDisplayHelper.weight_text(_entry)
+    var grid := ItemEntryDisplayHelper.grid_text(_entry)
+    if weight != ItemEntryDisplayHelper.UNKNOWN_TEXT:
         _weight_label.text = weight
         _weight_label.show()
     else:
         _weight_label.hide()
-    if grid != ItemEntry.UNKNOWN_TEXT:
+    if grid != ItemEntryDisplayHelper.UNKNOWN_TEXT:
         _grid_label.text = grid
         _grid_label.show()
     else:

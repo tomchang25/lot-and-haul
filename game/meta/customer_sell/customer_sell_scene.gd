@@ -395,7 +395,7 @@ func _build_result_text(items: Array, price: int, strategy: String) -> String:
     for entry: ItemEntry in items:
         var contrib := SellMath.item_contribution(entry)
         var verified_label := " (verified)" if SellMath.is_item_verified(entry) else ""
-        lines.append("• %s — $%d%s" % [entry.display_name, contrib, verified_label])
+        lines.append("• %s — $%d%s" % [ItemEntryDisplayHelper.display_name(entry), contrib, verified_label])
     lines.append("")
     lines.append("Sell Price: $%d" % price)
     return "\n".join(lines)

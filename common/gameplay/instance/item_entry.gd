@@ -3,14 +3,6 @@
 class_name ItemEntry
 extends RefCounted
 
-# ── Display constants ─────────────────────────────────────────────────────────
-
-const UNKNOWN_TEXT := "???"
-
-# ── Inspection constants ─────────────────────────────────────────────────────
-
-const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
-
 # ── Pricing ──────────────────────────────────────────────────────────────────
 
 const MAX_SPREAD: float = 0.5
@@ -101,7 +93,7 @@ func fit_tags() -> Array[String]:
 
 ## Clues and the anchor that contribute to display_name composition.
 ## The anchor is included when unveiled; surface/hidden clues when in revealed_clue_ids.
-func _naming_clue_pool() -> Array:
+func get_naming_clue_pool() -> Array:
     # Returns a mixed array of AnchorData and ClueData entries that participate in naming.
     var result: Array = []
     if item_data == null:
@@ -137,7 +129,7 @@ func _anchor_base_value() -> int:
     return int(item_data.anchor.base_value)
 
 
-func _base_value() -> int:
+func get_base_value() -> int:
     if is_veiled():
         return 0
     return int(appraised_with_hidden()) if verified else _anchor_base_value()
@@ -247,66 +239,6 @@ var inspection_level: float:
             return 1.0
         return float(_revealed_surface_count()) / float(total)
 
-var display_name: String:
-    get:
-        var pool := _naming_clue_pool()
-        var best_prefix_text: String = ""
-        var best_prefix_prio: int = -1
-        var best_body_text: String = ""
-        var best_body_prio: int = -1
-        var best_suffix_text: String = ""
-        var best_suffix_prio: int = -1
-
-        for entry in pool:
-            var slot: String
-            var priority: int
-            var text: String
-            if entry is AnchorData:
-                slot = "body"
-                priority = (entry as AnchorData).naming_priority
-                text = (entry as AnchorData).known_text
-            elif entry is ClueData:
-                slot = (entry as ClueData).naming_slot
-                priority = (entry as ClueData).naming_priority
-                text = (entry as ClueData).known_text
-            else:
-                continue
-            if slot.is_empty():
-                continue
-            match slot:
-                "prefix":
-                    if priority > best_prefix_prio:
-                        best_prefix_prio = priority
-                        best_prefix_text = text
-                "body":
-                    if priority > best_body_prio:
-                        best_body_prio = priority
-                        best_body_text = text
-                "suffix":
-                    if priority > best_suffix_prio:
-                        best_suffix_prio = priority
-                        best_suffix_text = text
-
-        var parts: Array[String] = []
-        if not best_prefix_text.is_empty():
-            parts.append(best_prefix_text)
-        if not best_body_text.is_empty():
-            parts.append(best_body_text)
-        if not best_suffix_text.is_empty():
-            parts.append(best_suffix_text)
-
-        if parts.is_empty():
-            return "Unknown Item"
-
-        # No prefix or suffix revealed yet: the player knows the category (body)
-        # but not the qualifying characteristic. Prepend "Unknown" to signal
-        # partial identification — e.g. "Unknown Bow" while "Elven" is still hidden.
-        var has_qualifier := (not best_prefix_text.is_empty() or not best_suffix_text.is_empty())
-        if not has_qualifier and not best_body_text.is_empty():
-            return "Unknown " + best_body_text
-
-        return " ".join(parts)
-
 
 ## Single source of truth for estimated range + item_price.
 func resolve_price() -> PriceView:
@@ -368,11 +300,6 @@ func attempt_clue(clue: ClueData, attribute_bonus: int) -> bool:
     var succeeded := roll <= success_chance
     if succeeded and not revealed_clue_ids.has(clue.clue_id):
         revealed_clue_ids.append(clue.clue_id)
-        KnowledgeManager.add_category_points(
-            item_data.category_data,
-            item_data.rarity,
-            KnowledgeManager.KnowledgeAction.REVEAL,
-        )
     return succeeded
 
 
@@ -415,8 +342,8 @@ func has_unrevealed_hidden() -> bool:
 
 
 ## Deterministic storage research: adds [param progress_amount] to the first
-## unrevealed hidden clue's accumulated progress. Reveals the clue and grants
-## REVEAL XP once progress >= clue.dc. Returns true when a clue is revealed.
+## unrevealed hidden clue's accumulated progress. Reveals the clue once progress
+## >= clue.dc. Returns true when a clue is revealed.
 ## Never rolls — variance belongs at the on-site auction, not in storage.
 func advance_research(progress_amount: int) -> bool:
     if item_data == null:
@@ -429,11 +356,6 @@ func advance_research(progress_amount: int) -> bool:
         research_progress[clue.clue_id] = current
         if current >= clue.dc:
             revealed_clue_ids.append(clue.clue_id)
-            KnowledgeManager.add_category_points(
-                item_data.category_data,
-                item_data.rarity,
-                KnowledgeManager.KnowledgeAction.REVEAL,
-            )
             return true
         return false
     return false
@@ -454,91 +376,11 @@ var estimated_value_max: int:
     get:
         return resolve_price().max_value
 
-# ── Display text helpers ──────────────────────────────────────────────────────
-
-
-func estimated_value_text() -> String:
-    var v := resolve_price()
-    if not v.known:
-        return UNKNOWN_TEXT
-    if v.exact or v.max_value <= v.min_value:
-        return "$%d" % v.min_value
-    return "$%d - $%d" % [v.min_value, v.max_value]
-
 ## Resolved item price: appraised or verified value × condition multiplier.
 ## Veiled items should not use this — check is_veiled() at call sites.
 var item_price: int:
     get:
         return resolve_price().point_value
-
-# ── Display colors ────────────────────────────────────────────────────────────
-
-var condition_color: Color:
-    get:
-        if is_veiled():
-            return Color(0.5, 0.5, 0.5)
-        if condition >= 0.8:
-            return Color.GOLD
-        elif condition >= 0.6:
-            return Color.GREEN_YELLOW
-        elif condition >= 0.3:
-            return Color.WHITE
-        else:
-            return Color.LIGHT_CORAL
-
-const PRICE_COLOR := Color(0.4, 1.0, 0.5)
-const PRICE_UNKNOWN_COLOR := Color(0.6, 0.6, 0.6)
-
-var price_color: Color:
-    get:
-        return PRICE_COLOR if resolve_price().known else PRICE_UNKNOWN_COLOR
-
-# ── Per-column price getters ─────────────────────────────────────────────────
-
-
-func estimated_value_sort_value() -> int:
-    return resolve_price().min_value
-
-
-func base_value_sort_value() -> int:
-    return _base_value()
-
-
-func condition_text() -> String:
-    if is_veiled():
-        return UNKNOWN_TEXT
-    return "%d%%" % int(condition * 100)
-
-
-func condition_secondary_text() -> String:
-    if is_veiled():
-        return ""
-    return "x%.2f" % get_condition_multiplier()
-
-
-func condition_detail_text() -> String:
-    var text := condition_text()
-    if text == UNKNOWN_TEXT:
-        return ""
-    return "Condition:  %s (%s)" % [text, condition_secondary_text()]
-
-
-func base_value_text() -> String:
-    var v := _base_value()
-    if v == 0:
-        return UNKNOWN_TEXT
-    return "$%d" % v
-
-
-func rarity_text() -> String:
-    if is_veiled() or item_data == null:
-        return ItemEntry.UNKNOWN_TEXT
-
-    var r: int = item_data.rarity
-    if r >= 0 and r < RARITY_NAMES.size():
-        return RARITY_NAMES[r]
-
-    return ItemEntry.UNKNOWN_TEXT
 
 
 ## Returns the item's weight in kg, sourced from the anchor. 0.0 if no anchor.
@@ -560,46 +402,6 @@ func get_shape_id() -> String:
 ## Returns cargo grid cells from the anchor's shape_id. Empty array if no anchor.
 func get_cells() -> Array[Vector2i]:
     return CargoShapes.get_cells(get_shape_id())
-
-
-func weight_text() -> String:
-    if is_veiled():
-        return ItemEntry.UNKNOWN_TEXT
-    return "%.1f kg" % get_weight()
-
-
-func grid_text() -> String:
-    if is_veiled():
-        return ItemEntry.UNKNOWN_TEXT
-    return "%d  %s" % [get_cells().size(), get_shape_id()]
-
-
-func inspection_text() -> String:
-    return ItemEntry.UNKNOWN_TEXT if is_veiled() else "%d%%" % int(inspection_level * 100)
-
-
-func price_display_color() -> Color:
-    return price_color
-
-
-func condition_display_color() -> Color:
-    return condition_color
-
-
-func display_name_color() -> Color:
-    if is_veiled() or not verified or item_data == null:
-        return Color.WHITE
-    match item_data.rarity:
-        ItemData.Rarity.UNCOMMON:
-            return Color(0.4, 0.8, 0.4)
-        ItemData.Rarity.RARE:
-            return Color(0.3, 0.6, 1.0)
-        ItemData.Rarity.EPIC:
-            return Color(0.7, 0.4, 1.0)
-        ItemData.Rarity.LEGENDARY:
-            return Color(1.0, 0.75, 0.2)
-        _:
-            return Color(0.85, 0.85, 0.85)
 
 
 func category_data() -> CategoryData:
@@ -631,50 +433,24 @@ func has_inspection_clues() -> bool:
     return false
 
 
-func sort_value(column: int) -> Variant:
-    match column:
-        ItemRow.Column.NAME:
-            return display_name
-        ItemRow.Column.CONDITION:
-            if is_veiled():
-                return 0.0
-            return get_condition_multiplier()
-        ItemRow.Column.ESTIMATED_VALUE:
-            return estimated_value_sort_value()
-        ItemRow.Column.BASE_VALUE:
-            return base_value_sort_value()
-        ItemRow.Column.RARITY:
-            if item_data == null:
-                return -1.0
-            var verified_bonus := 10.0 if verified else 0.0
-            return verified_bonus + float(item_data.rarity)
-        ItemRow.Column.WEIGHT:
-            return get_weight()
-        ItemRow.Column.GRID:
-            return get_cells().size()
-        ItemRow.Column.INSPECTION:
-            return inspection_level
-        _:
-            push_warning("Unknown Column: %d" % column)
-            return 0
-
-
 func is_veiled() -> bool:
     return not unveiled
 
 
-## Player-triggered unveil. Marks the item as unveiled and grants REVEAL knowledge XP.
+## Player-triggered unveil. Marks the item as unveiled.
+## Returns true when the flag actually flipped (false if already unveiled).
 ## For system-level pre-unveils (lot generation, migration), set unveiled = true directly.
-func unveil() -> void:
+func unveil() -> bool:
     if not is_veiled():
-        return
+        return false
     unveiled = true
-    if item_data != null and item_data.category_data != null:
-        KnowledgeManager.add_category_points(
-            item_data.category_data,
-            item_data.rarity,
-            KnowledgeManager.KnowledgeAction.REVEAL,
-        )
+    return true
+
+
+## Applies trailer damage: reduces condition by [param ratio], clamped at 0.0.
+## Replaces direct condition field writes from scenes.
+func apply_damage(ratio: float) -> void:
+    condition = maxf(0.0, condition - ratio)
 
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 

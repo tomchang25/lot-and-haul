@@ -81,7 +81,7 @@ Numbered list. Risks and relationships the scout could not verify within the exp
 6. Scope by the Plan's blast radius. Do not inventory systems the Plan cannot plausibly touch.
 7. Read before listing. A file that was not opened does not appear in the report.
 8. Modify nothing. The scout is read-only.
-9. Target under 800 words excluding quoted code. Exceed only when the blast radius genuinely requires it.
+9. Do not hard-wrap prose lines at a column boundary — let the client handle line wrapping. Tables and code blocks are exempt.
 
 ---
 
@@ -132,8 +132,7 @@ Numbered list. Risks and relationships the scout could not verify within the exp
 
 ## Mission
 
-Map the outbound request path and its error handling for the Retry Policy
-Plan. Boundary: the outbound client, its callers, and error classification.
+Map the outbound request path and its error handling for the Retry Policy Plan. Boundary: the outbound client, its callers, and error classification.
 
 ## Systems Inventory
 
@@ -145,13 +144,9 @@ Plan. Boundary: the outbound client, its callers, and error classification.
 
 ## Call Graph Observations
 
-- [VERIFIED] `sync_service.gd` calls `outbound_client.send()` and aborts the
-  whole sync on first error — `game/sync/sync_service.gd`
-  (`if result.is_err(): return result`)
-- [VERIFIED] `outbound_client.send()` constructs `Result` with `ErrKind` but
-  performs no classification beyond the enum — `net/outbound_client.gd`
-- [INFERRED] `telemetry_service.gd` also calls `send()` — matched by grep,
-  call site not read.
+- [VERIFIED] `sync_service.gd` calls `outbound_client.send()` and aborts the whole sync on first error — `game/sync/sync_service.gd` (`if result.is_err(): return result`)
+- [VERIFIED] `outbound_client.send()` constructs `Result` with `ErrKind` but performs no classification beyond the enum — `net/outbound_client.gd`
+- [INFERRED] `telemetry_service.gd` also calls `send()` — matched by grep, call site not read.
 
 ## Existing Contracts
 
@@ -169,15 +164,10 @@ enum ErrKind { TIMEOUT, REFUSED, BAD_REQUEST }
 
 ## Plan Friction
 
-- The Plan assumes failures need transient/permanent classification to be
-  introduced; `ErrKind` already separates `TIMEOUT`/`REFUSED` (plausibly
-  transient) from `BAD_REQUEST` (permanent) — `net/errors.gd`. The spec
-  author should decide whether to map onto this enum or add a new tag.
+- The Plan assumes failures need transient/permanent classification to be introduced; `ErrKind` already separates `TIMEOUT`/`REFUSED` (plausibly transient) from `BAD_REQUEST` (permanent) — `net/errors.gd`. The spec author should decide whether to map onto this enum or add a new tag.
 
 ## Potential Issues
 
-1. `telemetry_service.gd` may require fire-and-forget semantics; added retry
-   latency on its path is an unverified risk.
-2. No existing config surface for per-caller tuning was found; the policy may
-   be introducing the first one.
+1. `telemetry_service.gd` may require fire-and-forget semantics; added retry latency on its path is an unverified risk.
+2. No existing config surface for per-caller tuning was found; the policy may be introducing the first one.
 ````

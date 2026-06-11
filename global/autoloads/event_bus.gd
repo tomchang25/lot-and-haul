@@ -31,4 +31,16 @@ signal item_restored(category: CategoryData, rarity: ItemData.Rarity)
 ## run state cleared. [param result] — the RunResult snapshot that was consumed.
 signal run_resolved(result: RunResult)
 
+# ── Reveal-type business events ────────────────────────────────────────────────
+# Emitted by the owning Manager after a successful reveal-during-play mutation.
+# KnowledgeManager subscribes to award mastery XP without a direct import.
+
+## Emitted after an item's veil is lifted (first reveal during inspection or
+## lot reveal). [param entry] — the ItemEntry that was unveiled.
+signal item_unveiled(entry: ItemEntry)
+
+## Emitted after a surface or hidden clue is revealed through play during a
+## run. [param entry] — the ItemEntry whose clue was revealed.
+signal item_revealed(entry: ItemEntry)
+
 @warning_ignore_restore("unused_signal")

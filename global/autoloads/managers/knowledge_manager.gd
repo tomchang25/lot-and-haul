@@ -47,6 +47,11 @@ func _ready() -> void:
     EventBus.item_repaired.connect(_on_item_repaired)
     EventBus.item_restored.connect(_on_item_restored)
 
+    # Subscribe to reveal-type business events emitted by RunManager/MetaManager
+    # so reveal XP accrues without a direct import from ItemEntry.
+    EventBus.item_unveiled.connect(_on_item_unveiled)
+    EventBus.item_revealed.connect(_on_item_revealed)
+
 # ── Registry validation ────────────────────────────────────────────────────────
 
 
@@ -232,3 +237,12 @@ func _on_item_repaired(category: CategoryData, rarity: ItemData.Rarity) -> void:
 
 func _on_item_restored(category: CategoryData, rarity: ItemData.Rarity) -> void:
     add_category_points(category, rarity, KnowledgeAction.RESTORE)
+
+
+func _on_item_unveiled(entry: ItemEntry) -> void:
+    if entry.item_data != null and entry.item_data.category_data != null:
+        add_category_points(entry.item_data.category_data, entry.item_data.rarity, KnowledgeAction.REVEAL)
+
+
+func _on_item_revealed(entry: ItemEntry) -> void:
+    add_category_points(entry.item_data.category_data, entry.item_data.rarity, KnowledgeAction.REVEAL)
