@@ -8,6 +8,18 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Save Slots & Start Page New Game
+
+- 2026-06-11 — [save] Three independent save slots (`user://save_slots/slot_N/`): each slot has its own counter-based backup rotation and manifest; top-level `last_active` pointer; `boot_load()` loads last-active slot with newest-slot fallback; `switch_to_slot()` for Load Game, `init_slot()` for New Game; `get_slot_summaries()` returns per-slot day/cash/last-played from manifest (with pre-summary fallback parsing)
+- 2026-06-11 — [save] Legacy single-save migration: existing `user://saves/` data auto-migrated into slot 1 and last-active pointer set to slot 1; old `save_N.json` counter filenames unchanged per-slot
+- 2026-06-11 — [save] `reset_providers()` added: calls `reset()` on any registered provider that implements it — `MetaManager` re-instantiates all 6 domain stores, `KnowledgeManager` re-instantiates `KnowledgeStore`
+- 2026-06-11 — [save] `SaveManager.has_save()` deprecated → `has_any_save()`; `has_slot_data(slot)` per-slot check
+- 2026-06-11 — [save] Boot sequence: `SaveManager.load()` renamed to `SaveManager.boot_load()`; `GameManager` calls `boot_load()` instead of `load()`
+- 2026-06-11 — [start] Start page rewritten: `PlayButton` split into `NewGameButton` + `LoadGameButton`; slot picker overlay with 3-slot buttons showing day/cash summaries; New Game mode shows all slots (occupied → overwrite confirmation), Load Game mode shows only occupied slots; confirmation dialogs for overwrite; back button returns to main menu
+- 2026-06-11 — [start] Scene file (`start_page_scene.tscn`): slot picker panel with `PickerTitle`, 3 `Slot*Button`s, `PickerBackButton`, `SpacerTop`/`SpacerBottom`, `OverwriteDialog` confirmation dialog; `PlayButton` → `NewGameButton` + `LoadGameButton` with `unique_name_in_owner = true`
+- 2026-06-11 — [theme] `main_theme.tres`: StyleBoxFlat sub-resource order reorganized (disabled/focus/hover before normal); UID attributes added to checkbox icon ext_resources; minor color tweaks (disabled bg 0.16/.18, border 0.22/.25); focus border style added
+- 2026-06-11 — [docs] `dev/docs/plans/save_slots.md` and `dev/docs/plans/start_page_new_game.md` shipped and archived
+
 ## Save Diagnostics & Restore Hardening
 
 - 2026-06-11 — [save] `SaveLoadContext` (RefCounted) push model replaces per-store pull accumulators: `ctx.warn()` for player-facing data-loss toasts, `ctx.info()` for debug-only detail + console parity
