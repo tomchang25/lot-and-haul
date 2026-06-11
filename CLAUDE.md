@@ -12,6 +12,8 @@ When asked to build a plan, scout report, or implementation spec, follow the mat
 
 Resolve unknowns by asking me directly during the planning conversation — never emit an `## Open Questions` section or leave unresolved decisions parked in a plan or spec. Stop and ask the moment a decision is unclear; hand over a plan or spec only once every such question has been answered and folded into the relevant Requirement, Design, or Relational Context line.
 
+**Batch questions, never spam**: Ask clarifying questions before you start the work, and batch every question you have into a single AskUserQuestion call (multiple questions in one call is fine). Do not ask another round of questions before I've had a chance to answer the previous one.
+
 **Workflow commands** (`/pr`, `/ship`, `/stage-review`): defined in `.claude/commands/` (Claude Code) and mirrored as Cowork skills of the same names. `pr` generates a PR title/description for the current branch, `ship` closes out staged work (CHANGELOG + TODO + archive plan, suggest commit message), `stage-review` checks staged changes against the plan spec and standards lint. If asked to do one of these tasks without the slash command, follow the matching command file. Keep `.claude/commands/` and the skills in sync when editing either.
 
 ## Core Loop
