@@ -1,5 +1,7 @@
 # Scout Standard
 
+> **Retired 2026-06-11.** The scout phase was removed from the dev flow: implementation specs are now generated from direct codebase exploration by the spec author (see `dev/agent_rules/implementation_spec_standard.md`, which absorbed the evidence rule and the Plan Friction section). Kept for reference in case a standalone read-only recon pass is ever wanted again.
+
 Use this standard to produce a scout report — the raw, evidence-backed intelligence gathered from codebase exploration against a completed Plan.
 
 A Scout Report is the input to an Implementation Spec. The scout agent's job is to **read and quote, not to conclude**. The spec author (a stronger model) performs the relational reasoning; the scout's value is reducing the spec author's exploration cost by pre-collecting verifiable facts.

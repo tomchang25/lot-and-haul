@@ -2,7 +2,7 @@
 
 Use this standard to produce a durable, high-level feature plan — the stable design artifact for a feature.
 
-A Plan defines **what** a feature is, **why** it exists, and **how it behaves**. It never specifies **where** (files) or **how it is wired** (functions, classes). A completed Plan is handed to a scout, which gathers evidence-backed codebase intelligence into a Scout Report (`scout_standard.md`); a separate Implementation Spec (`implementation_spec_standard.md`) — generated from that report plus targeted spot-checks — turns the Plan into executable work. Keeping the Plan free of code coordinates is deliberate: it stays valid as the codebase changes, and it forces the spec stage to re-map the design onto the real code every time.
+A Plan defines **what** a feature is, **why** it exists, and **how it behaves**. It never specifies **where** (files) or **how it is wired** (functions, classes). A completed Plan is handed to the Implementation Spec stage (`implementation_spec_standard.md`), whose author explores the codebase directly and turns the Plan into executable work. Keeping the Plan free of code coordinates is deliberate: it stays valid as the codebase changes, and it forces the spec stage to re-map the design onto the real code every time.
 
 Use this for:
 

@@ -74,7 +74,6 @@ You will not "tidy docs" on a schedule — so the system must update itself whil
 - **A `## Draft` idea earns a file** → move it to `dev/docs/plans/<x>.md`, leave a one-line pointer in `TODO.md` `## Plan`, and delete the Draft section. A `## Draft` idea (or a stale `## Plan` pointer) that never grew → just delete it / retire it back to Draft.
 - **Ship a phase** → append one entry to `CHANGELOG.md` and cut that phase from its plan file. **Ship the whole flow** → archive the plan file and delete its `TODO.md` line — all in the same commit.
 - **A plan's design gets locked** → write the _conclusion_ (1 paragraph) into the matching `systems/` doc, then move the plan to `archived/`. It never lingers as a competing source of truth.
-- **An implementation spec gets generated from a scout report** → move the scout report (`plans/<plan>_scout.md`) to `archived/` in the same commit. It quotes code, so it is stale the moment implementation begins.
 - **Code detail changes** → it was in L3, so it's already updated in the same commit.
 
 Tie doc maintenance to "marking something done," never to a separate cleanup pass.
@@ -129,11 +128,9 @@ One file per standalone design/work item — the place an idea lands once it has
 
 Name: `<scope>_<short_description>.md`. Contains goal (1–2 sentences), context/why now, high-level steps (or phases), and acceptance criteria. Keep it **forward-only**: as each phase ships, cut it out and record it in `CHANGELOG.md` — don't keep a checked-off phase ledger. When its design locks, graduate the conclusion to `systems/`. Archive the plan once it's shipped or superseded.
 
-A plan moving toward implementation may gain a sibling **scout report** — `<plan>_scout.md`, format in `dev/agent_rules/scout_standard.md` — raw, evidence-backed codebase intelligence gathered for the implementation-spec stage. A scout report quotes code, so it rots faster than any other artifact in `dev/docs/`: move it to `archived/` as soon as its implementation spec is generated, never letting it sit beside an active plan as a competing source of truth.
-
 ## Relationship to other dev/ folders
 
-- `dev/agent_rules/` — agent-specific instructions, including the plan → scout → spec document standards (`plan_standard.md`, `scout_standard.md`, `implementation_spec_standard.md`)
+- `dev/agent_rules/` — agent-specific instructions, including the plan → spec document standards (`plan_standard.md`, `implementation_spec_standard.md`)
 - `dev/standards/` — coding conventions, naming rules, project structure (runtime type archetype taxonomy is now in `CLAUDE.md`)
 - `dev/skills/` — AI coding tool references (commit format, GDScript patterns)
 - `dev/tools/` — build scripts (yaml/tres pipeline)

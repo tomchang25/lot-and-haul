@@ -1,6 +1,6 @@
 # Implementation Spec Standard
 
-Use this standard to produce an implementation spec from a completed Plan, its Scout Report, and targeted codebase spot-checks.
+Use this standard to produce an implementation spec from a completed Plan and direct codebase exploration.
 
 This document gives an implementation agent enough context to execute a change without its own plan-mode phase. Its primary value is the **Relational Context** section, which pre-computes cross-system ownership, call direction, and integration constraints so the implementation agent does not have to reason about them independently.
 
@@ -18,7 +18,7 @@ Do not use this for:
 - Work where you want the agent to discover and propose the approach itself — use a plan-mode prompt instead.
 - Changes that need step-by-step, per-file instruction — use a full per-file plan instead.
 
-Generating this document requires codebase evidence. The normal input is a Scout Report (`scout_standard.md`) filed beside the Plan as `dev/docs/plans/<plan>_scout.md`. Consume it asymmetrically: **its quotations are trustworthy, its conclusions are not.** Spot-checks are mandatory, not optional — read the cited file yourself for (1) every `[INFERRED]` bullet, (2) every Plan Friction item, and (3) any quoted contract a Relational Context bullet will be built on. If no scout report exists, explore the codebase directly. Never generate the spec from the Plan alone. When the spec is finished, move the scout report to `dev/docs/archived/` — it quotes code and is stale the moment implementation begins.
+Generating this document requires codebase evidence: the spec author explores the codebase directly against the Plan. Never generate the spec from the Plan alone. **Every claim about the codebase as found carries a coordinate** — a file path, symbol name, or quoted declaration. A claim without a coordinate cannot be reviewed cheaply: the reviewer verifies the spec by reading the cited locations, not by re-exploring the codebase, so an uncited claim is an unreviewable one.
 
 ---
 
@@ -43,7 +43,13 @@ Write the constraints and decisions an implementation agent would get wrong with
 
 Do not create subheadings. Do not force entries for categories that do not apply. A simple change may have two bullets within its blast radius; a complex one may have eight or more.
 
-### 3. Scope
+### 3. Plan Friction
+
+Flat bullet list. Every place where the codebase as found disagrees with what the Plan assumes — missing systems, renamed responsibilities, behavior already partially implemented, dead code that looks alive — plus how this spec resolves each one. Each bullet carries evidence like any other claim.
+
+This section exists because friction the spec author swallows silently becomes a wrong Relational Context bullet the reviewer cannot see. Never omit the section: when there is genuinely no friction, say so explicitly with one line — "No friction found between Plan and codebase."
+
+### 4. Scope
 
 #### Included
 
@@ -53,7 +59,7 @@ Short bullet list of what this spec covers.
 
 Short bullet list of what is intentionally out of scope. Keep it tight to prevent scope bleed during implementation.
 
-### 4. Files to Change
+### 5. Files to Change
 
 | File     | Change Size            | Purpose                                          |
 | -------- | ---------------------- | ------------------------------------------------ |
@@ -61,7 +67,7 @@ Short bullet list of what is intentionally out of scope. Keep it tight to preven
 
 Identifies ownership and change effort. Does not prescribe line-by-line edits.
 
-### 5. Implementation Notes
+### 6. Implementation Notes
 
 Write only the decisions and constraints the implementation agent is likely to get wrong.
 
@@ -69,7 +75,7 @@ Organize by file or system when grouping helps. Use bullets or short paragraphs.
 
 Do not write step-by-step instructions. Do not reproduce logic the agent can read from the codebase. Include pseudocode only for non-obvious branching logic or state transitions.
 
-### 6. Edge Cases
+### 7. Edge Cases
 
 | Case     | Expected Handling     |
 | -------- | --------------------- |
@@ -77,7 +83,7 @@ Do not write step-by-step instructions. Do not reproduce logic the agent can rea
 
 Omit this section if no meaningful edge cases exist.
 
-### 7. Acceptance Criteria
+### 8. Acceptance Criteria
 
 Numbered list of observable outcomes, at the same level as the Plan's acceptance criteria.
 
@@ -88,7 +94,7 @@ Do not include file paths or function names.
 ## Rules
 
 1. Write entirely in English.
-2. Requires codebase evidence before generating. Do not fill Relational Context or Files to Change from the Plan alone. When a Scout Report exists, spot-check every `[INFERRED]` bullet and Plan Friction item against the cited files before relying on it.
+2. Requires codebase evidence before generating. Do not fill Relational Context, Plan Friction, or Files to Change from the Plan alone — explore the code directly. Every claim about existing code carries a coordinate (path, symbol, or quoted declaration); no coordinate, no claim.
 3. Relational Context is a flat list. Do not add subsections.
 4. Apply the completeness rule: every cross-system relationship within the change's blast radius is stated, even the obvious ones — the executing agent does not infer. Relationships outside the blast radius stay undocumented.
 5. Implementation Notes should be shorter than a full per-file plan. If you are writing step-by-step per-file instructions, switch to a full per-file plan.
@@ -111,6 +117,10 @@ Do not include file paths or function names.
 
 - <Call direction, ownership rule, changed contract, or wrong shape to avoid.>
 - <Every relationship within the change's blast radius — including the obvious ones.>
+
+## Plan Friction
+
+- <Disagreement between Plan and code, with evidence, and how the spec resolves it — or "No friction found between Plan and codebase.">
 
 ## Scope
 
