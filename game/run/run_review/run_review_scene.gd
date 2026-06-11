@@ -45,7 +45,7 @@ func _ready() -> void:
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
     _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
 
-    var cracked := RunManager.apply_trailer_damage()
+    var cracked: int = RunManager.apply_trailer_damage()
     if cracked > 0:
         _trailer_damage_label.text = "%d trailer item(s) cracked during transport" % cracked
         _trailer_damage_label.add_theme_color_override(&"font_color", Color(1.0, 0.8, 0.3))

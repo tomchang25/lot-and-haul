@@ -251,7 +251,7 @@ func _do_clue_chain(entry: ItemEntry) -> void:
     for clue: ClueData in entry.get_inspection_clues():
         if entry.revealed_clue_ids.has(clue.clue_id):
             continue
-        var succeeded := RunManager.attempt_clue(entry, clue)
+        var succeeded: bool = RunManager.attempt_clue(entry, clue)
         if succeeded:
             clue_texts.append("[color=#66ff80]%s[/color]" % clue.known_text)
         else:
