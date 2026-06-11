@@ -506,10 +506,10 @@ func to_dict() -> Dictionary:
     return d
 
 
-## Restores an item entry from [param d]. Appends per-entry resolution failures
-## to [param issues] (if provided). Returns null when the anchor cannot be
-## resolved — a kept entry with anchor = null is silent corruption.
-static func from_dict(d: Dictionary, issues: Array = []) -> ItemEntry:
+## Restores an item entry from [param d]. Writes per-entry resolution failures
+## to [param ctx] (required). Returns null when the anchor cannot be resolved —
+## a kept entry with anchor = null is silent corruption.
+static func from_dict(d: Dictionary, ctx: SaveLoadContext) -> ItemEntry:
     var entry := ItemEntry.new()
 
     # Composition form — all entries arrive here after StorageStore migration.
@@ -517,23 +517,20 @@ static func from_dict(d: Dictionary, issues: Array = []) -> ItemEntry:
     if not aid.is_empty():
         entry.anchor = AnchorRegistry.get_anchor_by_id(aid)
         if entry.anchor == null:
-            issues.append("anchor '%s' not found — entry dropped" % aid)
-            push_warning("ItemEntry: anchor '%s' not found — entry dropped" % aid)
+            ctx.info("anchor '%s' not found — entry dropped" % aid)
             return null
     for cid: Variant in d.get("surface_ids", []):
         var clue := ClueRegistry.get_clue_by_id(String(cid))
         if clue != null:
             entry.surface_clues.append(clue)
         else:
-            issues.append("surface clue '%s' not found" % cid)
-            push_warning("ItemEntry: surface clue '%s' not found" % cid)
+            ctx.info("surface clue '%s' not found" % cid)
     for cid: Variant in d.get("hidden_ids", []):
         var clue := ClueRegistry.get_clue_by_id(String(cid))
         if clue != null:
             entry.hidden_clues.append(clue)
         else:
-            issues.append("hidden clue '%s' not found" % cid)
-            push_warning("ItemEntry: hidden clue '%s' not found" % cid)
+            ctx.info("hidden clue '%s' not found" % cid)
     var cat_id: String = d.get("category_id", "")
     if not cat_id.is_empty():
         entry.category_data = CategoryRegistry.get_category_by_id(cat_id)

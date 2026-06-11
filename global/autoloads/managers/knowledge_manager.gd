@@ -83,20 +83,9 @@ func to_dict() -> Dictionary:
 
 
 ## Restores KnowledgeManager state from the full sections dict.
-func from_dict(data: Dictionary) -> void:
-    _knowledge.from_dict(data.get(_knowledge.section_id(), { }))
-
-
-## Aggregates get_migration_log() from all owned stores. Returns and clears
-## each store's log. Call after from_dict() to surface schema-upgrade messages.
-func get_migration_log() -> Array[String]:
-    return _knowledge.get_migration_log()
-
-
-## Aggregates get_restore_warnings() from all owned stores. Returns and clears
-## each store's warnings. Call after from_dict() to surface data-loss events.
-func get_restore_warnings() -> Array[String]:
-    return _knowledge.get_restore_warnings()
+## Threads [param ctx] for diagnostics (warnings and migration notes).
+func from_dict(data: Dictionary, ctx: SaveLoadContext) -> void:
+    _knowledge.from_dict(data.get(_knowledge.section_id(), { }), ctx)
 
 # ── Mastery ────────────────────────────────────────────────────────────────────
 

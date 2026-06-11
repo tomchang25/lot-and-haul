@@ -6,32 +6,6 @@
 class_name StoreBase
 extends RefCounted
 
-## Human-readable descriptions appended by _apply_migrations() branches.
-## Cleared and returned by get_migration_log().
-var _migration_log: Array[String] = []
-
-## Human-readable warnings about data-loss events during restore (unresolvable
-## anchors, dropped entries, degraded entries). Cleared and returned by
-## get_restore_warnings().
-var _restore_warnings: Array[String] = []
-
-
-## Returns all migration messages accumulated since the last load, then clears
-## the log. Call after from_dict() to collect any schema-upgrade notes.
-func get_migration_log() -> Array[String]:
-    var out := _migration_log.duplicate()
-    _migration_log.clear()
-    return out
-
-
-## Returns all restore warnings accumulated since the last load, then clears
-## the list. Call after from_dict() to surface data-loss events to the player.
-func get_restore_warnings() -> Array[String]:
-    var out := _restore_warnings.duplicate()
-    _restore_warnings.clear()
-    return out
-
-
 ## Returns the section key used in the save payload. Returns "" by default
 ## session-scoped Stores that never register with SaveManager rely on this.
 func section_id() -> String:
@@ -44,8 +18,9 @@ func to_dict() -> Dictionary:
     return { }
 
 
-## Restores this store's state from [param data]. No-op by default.
-func from_dict(_data: Dictionary) -> void:
+## Restores this store's state from [param data]. Threads [param ctx] for
+## diagnostics (warnings and migration notes). No-op by default.
+func from_dict(_data: Dictionary, _ctx: SaveLoadContext) -> void:
     pass
 
 
@@ -63,7 +38,7 @@ func _store_version() -> int:
 ## Transforms saved data from [param from_version] to the current store version.
 ## Override in subclasses to handle schema changes. Migrations chain sequentially:
 ##
-##   func _apply_migrations(data: Dictionary, from_version: int) -> Dictionary:
+##   func _apply_migrations(data: Dictionary, from_version: int, ctx: SaveLoadContext) -> Dictionary:
 ##       if from_version < 2:
 ##           data["new_field"] = data.get("old_field", 0)
 ##           data.erase("old_field")
@@ -75,5 +50,5 @@ func _store_version() -> int:
 ## Each block transforms data one version forward. The caller (from_dict) handles
 ## reading _version from the payload and passing it here. Returns the dict with
 ## all fields in the current version's shape, ready for field restoration.
-func _apply_migrations(data: Dictionary, _from_version: int) -> Dictionary:
+func _apply_migrations(data: Dictionary, _from_version: int, _ctx: SaveLoadContext) -> Dictionary:
     return data

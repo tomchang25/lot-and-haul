@@ -67,14 +67,14 @@ func to_dict() -> Dictionary:
 
 ## Restores storage state. apply_storage_migration() is called on each loaded
 ## entry to auto-reveal surface clues (not legacy — always runs).
-## Counts dropped and degraded entries during restore; appends one summary line
-## to _restore_warnings when any loss occurs.
-func from_dict(data: Dictionary) -> void:
+## Counts dropped and degraded entries during restore; writes one summary line
+## to [param ctx] via ctx.warn() when any loss occurs.
+func from_dict(data: Dictionary, ctx: SaveLoadContext) -> void:
     var version: int = int(data.get("_version", 1))
     var pre_migration_count := 0
     if data.has("storage_items") and data["storage_items"] is Array:
         pre_migration_count = data["storage_items"].size()
-    data = _apply_migrations(data, version)
+    data = _apply_migrations(data, version, ctx)
     var post_migration_count := 0
     if data.has("storage_items") and data["storage_items"] is Array:
         post_migration_count = data["storage_items"].size()
@@ -85,17 +85,18 @@ func from_dict(data: Dictionary) -> void:
         for d: Variant in data["storage_items"]:
             if not d is Dictionary:
                 continue
-            var per_issues: Array = []
-            var entry: ItemEntry = ItemEntry.from_dict(d, per_issues)
+            var entry: ItemEntry = ItemEntry.from_dict(d, ctx)
             if entry == null:
                 dropped_count += 1
                 continue
-            if not per_issues.is_empty():
+            var listed_clues := d.get("surface_ids", []).size() + d.get("hidden_ids", []).size()
+            var resolved_clues := entry.surface_clues.size() + entry.hidden_clues.size()
+            if resolved_clues < listed_clues:
                 degraded_count += 1
             entry.apply_storage_migration()
             _storage_items.append(entry)
         if dropped_count > 0 or degraded_count > 0:
-            _restore_warnings.append(
+            ctx.warn(
                 "Storage: %d item(s) could not be restored, %d restored with missing data" % [dropped_count, degraded_count],
             )
     _next_entry_id = int(data.get("next_entry_id", _next_entry_id))
@@ -105,7 +106,7 @@ func _store_version() -> int:
     return 2
 
 
-func _apply_migrations(data: Dictionary, from_version: int) -> Dictionary:
+func _apply_migrations(data: Dictionary, from_version: int, ctx: SaveLoadContext) -> Dictionary:
     if from_version < 2:
         var migrated: Array = []
         for d: Variant in data.get("storage_items", []):
@@ -117,7 +118,7 @@ func _apply_migrations(data: Dictionary, from_version: int) -> Dictionary:
                 # var item: ItemData = ItemRegistry.get_item_by_id(d["item_id"])
                 var item = null
                 if item == null:
-                    push_warning("StorageStore migration: item_id '%s' not found — entry dropped" % d["item_id"])
+                    ctx.info("StorageStore migration: item_id '%s' not found — entry dropped" % d["item_id"])
                     continue
                 d["anchor_id"] = item.anchor.anchor_id if item.anchor else ""
                 var surf_ids: Array[String] = []
@@ -143,5 +144,5 @@ func _apply_migrations(data: Dictionary, from_version: int) -> Dictionary:
             d.erase("verified")
             migrated.append(d)
         data["storage_items"] = migrated
-        _migration_log.append("StorageStore: migrated to version 2 (item_id → composition)")
+        ctx.info("StorageStore: migrated to version 2 (item_id → composition)")
     return data

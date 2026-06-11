@@ -78,9 +78,9 @@ func to_dict() -> Dictionary:
 
 
 ## Restores customer state. Unrecognised keys are silently ignored.
-func from_dict(data: Dictionary) -> void:
+func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
     var version: int = int(data.get("_version", 1))
-    data = _apply_migrations(data, version)
+    data = _apply_migrations(data, version, _ctx)
     _nightly_customers = []
     if data.has("nightly_customers") and data["nightly_customers"] is Array:
         for d: Variant in data["nightly_customers"]:

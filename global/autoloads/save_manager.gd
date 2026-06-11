@@ -166,9 +166,13 @@ func load() -> void:
             continue
         # Valid file found — dispatch to providers.
         var sections_data: Dictionary = result["sections"].duplicate(true)
+        var ctx := SaveLoadContext.new()
         for provider: Object in _providers:
-            provider.from_dict(sections_data)
-        _collect_migration_logs()
+            provider.from_dict(sections_data, ctx)
+        for w: String in ctx.warnings:
+            ToastManager.show_warning(w)
+        for i: String in ctx.infos:
+            ToastManager.show_info(i)
         loaded_counter = counter
         break
 
@@ -348,20 +352,3 @@ func _migrate_legacy() -> void:
     var err := DirAccess.remove_absolute(ProjectSettings.globalize_path(_LEGACY_PATH))
     if err != OK:
         push_warning("SaveManager: could not delete legacy save.json (error %d)" % err)
-
-
-## Collects migration logs from all providers after from_dict(). Sends each
-## message to ToastManager.show_info() (visible only in debug mode).
-## Also collects restore warnings and routes them to ToastManager.show_warning()
-## (always visible) — these indicate data-loss events the player must see.
-func _collect_migration_logs() -> void:
-    for provider: Object in _providers:
-        if provider.has_method("get_migration_log"):
-            var messages: Array = provider.get_migration_log()
-            for msg: String in messages:
-                ToastManager.show_info(msg)
-
-        if provider.has_method("get_restore_warnings"):
-            var warnings: Array = provider.get_restore_warnings()
-            for msg: String in warnings:
-                ToastManager.show_warning(msg)

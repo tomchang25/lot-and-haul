@@ -44,39 +44,14 @@ func to_dict() -> Dictionary:
 
 
 ## Restores all stores from the full sections dict. Each store reads its own key.
-func from_dict(data: Dictionary) -> void:
-    economy.from_dict(data.get(economy.section_id(), { }))
-    garage.from_dict(data.get(garage.section_id(), { }))
-    storage.from_dict(data.get(storage.section_id(), { }))
-    slot.from_dict(data.get(slot.section_id(), { }))
-    progress.from_dict(data.get(progress.section_id(), { }))
-    customers.from_dict(data.get(customers.section_id(), { }))
-
-
-## Aggregates get_migration_log() from all owned stores. Returns and clears
-## each store's log. Call after from_dict() to surface schema-upgrade messages.
-func get_migration_log() -> Array[String]:
-    var out: Array[String] = []
-    out.append_array(economy.get_migration_log())
-    out.append_array(garage.get_migration_log())
-    out.append_array(storage.get_migration_log())
-    out.append_array(slot.get_migration_log())
-    out.append_array(progress.get_migration_log())
-    out.append_array(customers.get_migration_log())
-    return out
-
-
-## Aggregates get_restore_warnings() from all owned stores. Returns and clears
-## each store's warnings. Call after from_dict() to surface data-loss events.
-func get_restore_warnings() -> Array[String]:
-    var out: Array[String] = []
-    out.append_array(economy.get_restore_warnings())
-    out.append_array(garage.get_restore_warnings())
-    out.append_array(storage.get_restore_warnings())
-    out.append_array(slot.get_restore_warnings())
-    out.append_array(progress.get_restore_warnings())
-    out.append_array(customers.get_restore_warnings())
-    return out
+## Threads [param ctx] for diagnostics (warnings and migration notes).
+func from_dict(data: Dictionary, ctx: SaveLoadContext) -> void:
+    economy.from_dict(data.get(economy.section_id(), { }), ctx)
+    garage.from_dict(data.get(garage.section_id(), { }), ctx)
+    storage.from_dict(data.get(storage.section_id(), { }), ctx)
+    slot.from_dict(data.get(slot.section_id(), { }), ctx)
+    progress.from_dict(data.get(progress.section_id(), { }), ctx)
+    customers.from_dict(data.get(customers.section_id(), { }), ctx)
 
 
 ## Aggregates validate() across all stores. Returns true when all pass.
