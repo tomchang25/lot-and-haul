@@ -59,6 +59,59 @@ func clear_run_state() -> void:
     run = null
     lot = null
 
+# ── Item mutation wrappers ─────────────────────────────────────────────────────
+# Each wrapper calls the entry's mutator and emits the appropriate EventBus
+# signal on success. Scenes go through these instead of mutating entries directly.
+
+
+## Mediates a player-triggered unveil. Calls entry.unveil() (returns true when
+## the flag actually flipped). On success and when the item has valid category
+## data, emits item_unveiled so KnowledgeManager can award REVEAL XP.
+func unveil_item(entry: ItemEntry) -> void:
+    if entry.unveil() and entry.item_data != null and entry.item_data.category_data != null:
+        EventBus.item_unveiled.emit(entry)
+
+
+## Mediates a clue-attempt roll. Looks up the attribute bonus for
+## [param clue]'s attribute, calls entry.attempt_clue(), and emits
+## item_revealed only when the revealed_clue_ids set grew (new clue revealed).
+## Returns the roll result (succeeded) unchanged to the scene.
+func attempt_clue(entry: ItemEntry, clue: ClueData) -> bool:
+    var attr_value := KnowledgeManager.get_attribute_value(clue.attribute)
+    var attribute_bonus: int = maxi(attr_value - 1, 0)
+    var before := entry.revealed_clue_ids.size()
+    var succeeded := entry.attempt_clue(clue, attribute_bonus)
+    if entry.revealed_clue_ids.size() > before:
+        EventBus.item_revealed.emit(entry)
+    return succeeded
+
+
+## Mediates bulk surface-clue auto-reveal. No signal — this is a hub-return
+## reveal, not a player-triggered discovery.
+func auto_reveal_all_surface(entry: ItemEntry) -> void:
+    entry.auto_reveal_all_surface()
+
+
+## Applies trailer damage to all trailer items in the active run. Rolls each
+## item against [member CarData.trailer_damage_chance], applies a random ratio
+## in [trailer_damage_ratio_min, trailer_damage_ratio_max], and returns the
+## count of cracked items. Returns 0 when there is no active run or the car's
+## damage chance is ≤ 0.0. Call from the run review scene before displaying rows.
+func apply_trailer_damage() -> int:
+    if run == null:
+        return 0
+    var car: CarData = run.car_data
+    if car.trailer_damage_chance <= 0.0:
+        return 0
+
+    var cracked := 0
+    for entry: ItemEntry in run.trailer_items:
+        if randf() < car.trailer_damage_chance:
+            var ratio := randf_range(car.trailer_damage_ratio_min, car.trailer_damage_ratio_max)
+            entry.apply_damage(ratio)
+            cracked += 1
+    return cracked
+
 # ── Run-state queries ──────────────────────────────────────────────────────────
 
 

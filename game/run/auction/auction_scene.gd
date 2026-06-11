@@ -212,7 +212,7 @@ func _build_lot_summary() -> void:
 
     for entry: ItemEntry in lot.item_entries:
         var row: LotSummaryRow = LotSummaryRowScene.instantiate()
-        row.setup("%s (%s)" % [entry.display_name, entry.estimated_value_text()])
+        row.setup("%s (%s)" % [ItemEntryDisplayHelper.display_name(entry), ItemEntryDisplayHelper.estimated_value_text(entry)])
         _lot_summary.add_child(row)
 
     # node-src: ephemeral — separator in rebuilt list

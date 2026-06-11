@@ -157,8 +157,8 @@ func _refresh() -> void:
     _apply_column_order()
 
     # ── NAME ──────────────────────────────────────────────────────────────────
-    _name_label.text = _entry.display_name
-    _name_label.add_theme_color_override(&"font_color", _entry.display_name_color())
+    _name_label.text = ItemEntryDisplayHelper.display_name(_entry)
+    _name_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.display_name_color(_entry))
 
     var item_entry := _entry as ItemEntry
     _auth_tag_label.visible = Column.NAME in _columns \
@@ -166,26 +166,26 @@ func _refresh() -> void:
     and item_entry.verified
 
     # ── CONDITION ─────────────────────────────────────────────────────────────
-    _condition_label.text = _entry.condition_text()
-    _condition_label.modulate = _entry.condition_display_color()
+    _condition_label.text = ItemEntryDisplayHelper.condition_text(_entry)
+    _condition_label.modulate = ItemEntryDisplayHelper.condition_display_color(_entry)
 
     # ── ESTIMATED_VALUE ────────────────────────────────────────────────────────
-    _estimated_value_label.text = _entry.estimated_value_text()
-    _estimated_value_label.add_theme_color_override(&"font_color", _entry.price_display_color())
+    _estimated_value_label.text = ItemEntryDisplayHelper.estimated_value_text(_entry)
+    _estimated_value_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(_entry))
 
     # ── BASE_VALUE ─────────────────────────────────────────────────────────────
-    _base_value_label.text = _entry.base_value_text()
-    _base_value_label.add_theme_color_override(&"font_color", _entry.price_display_color())
+    _base_value_label.text = ItemEntryDisplayHelper.base_value_text(_entry)
+    _base_value_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(_entry))
 
     # ── RARITY ────────────────────────────────────────────────────────────────
-    _rarity_label.text = _entry.rarity_text()
+    _rarity_label.text = ItemEntryDisplayHelper.rarity_text(_entry)
 
     # ── WEIGHT / GRID ─────────────────────────────────────────────────────────
-    _weight_label.text = _entry.weight_text()
-    _grid_label.text = _entry.grid_text()
+    _weight_label.text = ItemEntryDisplayHelper.weight_text(_entry)
+    _grid_label.text = ItemEntryDisplayHelper.grid_text(_entry)
 
     # ── INSPECTION ────────────────────────────────────────────────────────────
-    _inspection_label.text = _entry.inspection_text()
+    _inspection_label.text = ItemEntryDisplayHelper.inspection_text(_entry)
 
 # ══ Column ordering ═══════════════════════════════════════════════════════════
 

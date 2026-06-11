@@ -44,6 +44,19 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## ItemEntry Layer Split & Manager-Mediated Mutations
+
+- 2026-06-11 — [item_entry_refactor] Presentation logic stripped from `ItemEntry` into new `ItemEntryDisplayHelper` (`game/shared/item_display/`): all formatted text, color decisions, display-name composition, sort-key dispatch, and veiled-masking constants; `ItemEntry` now has zero dependencies on `KnowledgeManager` or any UI type
+- 2026-06-11 — [item_entry_refactor] Three `KnowledgeManager.add_category_points()` calls removed from `ItemEntry` (`unveil()`, `attempt_clue()`, `advance_research()`); reveal-type XP flows via `EventBus.item_unveiled` / `EventBus.item_revealed` signals emitted by the owning Manager wrapper; `KnowledgeManager` subscribes and awards `REVEAL` XP
+- 2026-06-11 — [item_entry_refactor] Mutation wrappers added to `RunManager`: `unveil_item(entry)`, `attempt_clue(entry, clue)`, `auto_reveal_all_surface(entry)`, `apply_trailer_damage()`; each calls the entry's mutator and emits the appropriate EventBus signal; `attempt_clue` computes attribute bonus internally; trailer damage loop moved entirely from `run_review_scene.gd` into the Manager
+- 2026-06-11 — [item_entry_refactor] `MetaManager.research_item()` emits `EventBus.item_revealed` when `advance_research()` reveals a clue
+- 2026-06-11 — [item_entry_refactor] `ItemEntry.unveil()` returns `bool` (true when flag actually flips); `apply_damage(ratio)` invariant-guarding mutator added (clamps `condition` at 0.0); `_naming_clue_pool()` → `get_naming_clue_pool()` (public); `_base_value()` → `get_base_value()` (public)
+- 2026-06-11 — [item_entry_refactor] All scenes and UI components routed through Manager wrappers and `ItemEntryDisplayHelper`; direct mutations (`entry.unveil()`, `entry.attempt_clue()`, `entry.condition =`) and direct display calls (`entry.display_name`, `entry.estimated_value_text()`) eliminated from every scene
+- 2026-06-11 — [item_entry_refactor] Hardcoded presentation duplicates in scenes deduplicated: `"???"` → `ItemEntryDisplayHelper.UNKNOWN_TEXT`, `Color(0.4, 1.0, 0.5)` → `ItemEntryDisplayHelper.PRICE_COLOR`, local `RARITY_NAMES` → `ItemEntryDisplayHelper.RARITY_NAMES`
+- 2026-06-11 — [item_entry_refactor] `dev/standards/runtime_type_archetypes.md` created documenting the four archetypes (Entry/Instance, Store, Snapshot, Service) and the mutation-mediation rule ("scenes never mutate an Entry directly"); `CLAUDE.md` conventions updated to point to it
+
+---
+
 ## Location Entry Backgrounds
 
 - 2026-06-09 — [location_entry] `LocationData` gains `bg_exterior: Texture2D`, `bg_interior: Texture2D`, and `transition_type: String` exports; defaults to `"sliding_door"` when unset

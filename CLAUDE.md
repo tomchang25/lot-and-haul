@@ -101,12 +101,7 @@ Check TODO.md ## Active Section
 
 ## Conventions (quick reference)
 
-- **Runtime type archetypes**: every runtime type in `common/gameplay/` is one of four archetypes. The subfolder (`store/`, `snapshot/`, `service/`, `instance/`) is the source of truth for archetype. Do not invent new type suffixes or archetypes outside this taxonomy — if a new type doesn't clearly fit, stop and ask the user before creating or naming it.
-  - **Entry/Instance** — live instance of a designer Data, identity + mutable state + self-maintaining behaviour (e.g. `ItemEntry`). Subfolder: `instance/`.
-  - **Store** — Manager-held domain state container with invariant-guarding mutators. Persisting Stores carry `section_id/to_dict/from_dict`; session-scoped Stores do not. Subfolder: `store/`.
-  - **Snapshot** — read-only value object, computed once and discarded, no mutators or serialization (e.g. `RunResult`, `DaySummary`). Subfolder: `snapshot/`.
-  - **Service** — stateless pure-math helpers (e.g. `ResearchSlot`, `SellMath`). Subfolder: `service/`.
-  - Discriminator: no state → Service; read-only one-shot → Snapshot; mutable + Manager-held → Store; saved instance of a Data → Entry/Instance.
+- **Runtime type archetypes** (every type in `common/gameplay/`): read `dev/standards/runtime_type_archetypes.md` — covers the four archetypes (Entry/Instance, Store, Snapshot, Service), the mutation-mediation rule, and the subfolder-as-truth convention.
 - **Price pipeline**: all prices resolve through `ItemEntry.item_price` (`(appraised|verified value) × condition_multiplier`). Appraised value = anchor + revealed surface modifiers (add-then-mul). Verified value includes hidden modifiers. No per-type formulas outside the pipeline.
 - **Cross-manager communication**: direct call when the caller's correctness depends on the result (transactional dependency — e.g. `spend()` returning false aborts the whole operation). EventBus signal when the caller doesn't care about the outcome (notification — e.g. broadcasting `item_repaired` so KnowledgeManager can award XP; the repair is correct regardless). Test: "if the other side fails or doesn't exist, do I rollback?" Yes → direct call. No → event.
 - **Docstrings**: every `.gd` file starts with `# filename` + one-line purpose. All public functions and complex (>10 lines or non-obvious) private functions get a `##` GDDoc comment. Never strip or reduce existing comments when editing code.
@@ -115,6 +110,7 @@ Check TODO.md ## Active Section
 
 ### Standards (read when touching that domain)
 
+- **Runtime type archetypes & mutations** (placing files in `common/gameplay/`, mutating Entry/Instance types): read `dev/standards/runtime_type_archetypes.md` — covers the four archetypes, the mutation-mediation rule ("scenes never mutate an Entry directly"), and the subfolder-as-truth convention.
 - **Naming & GDScript style** (files, classes, variables, folders, match statements, enums, constants): read `dev/standards/naming_conventions.md` when writing any new GDScript or renaming anything. The match-wildcard rule (§11) is **lint-enforced** — see `dev/standards/standards_enforcement.md`.
 - **Registries** (adding/modifying a registry, writing registry call sites): read `dev/standards/registries.md` — covers required API, forbidden wrappers, iterate-resources-not-ids rule, and inverse lookup patterns.
 - **Scene architecture** (creating or editing block scenes/components): read `dev/standards/block_scene_architecture_standard.md` — covers node-source rule, signal connections, `setup()`/`_apply()` pattern. The node-source rule and no-`[connection]`-in-`.tscn` are **lint-enforced** — see `dev/standards/standards_enforcement.md`.

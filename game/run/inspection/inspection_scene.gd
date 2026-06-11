@@ -158,7 +158,7 @@ func _place_entry(entry: ItemEntry) -> void:
             _commit_shape_placement(entry, shape_cells, origin)
             return
 
-    push_warning("Inspection grid could not place item: %s" % entry.display_name)
+    push_warning("Inspection grid could not place item: %s" % ItemEntryDisplayHelper.display_name(entry))
 
 
 func _candidate_origins() -> Array[Vector2i]:
@@ -251,10 +251,7 @@ func _do_clue_chain(entry: ItemEntry) -> void:
     for clue: ClueData in entry.get_inspection_clues():
         if entry.revealed_clue_ids.has(clue.clue_id):
             continue
-        var attr_value := KnowledgeManager.get_attribute_value(clue.attribute)
-        var attribute_bonus: int = maxi(attr_value - 1, 0)
-        var succeeded := entry.attempt_clue(clue, attribute_bonus)
-        # XP is granted inside attempt_clue() on success.
+        var succeeded := RunManager.attempt_clue(entry, clue)
         if succeeded:
             clue_texts.append("[color=#66ff80]%s[/color]" % clue.known_text)
         else:
@@ -319,8 +316,9 @@ func _clear_clue_result() -> void:
 
 
 func _reveal_item(item: ItemEntry) -> void:
-    # unveil() reveals the anchor and grants REVEAL XP internally.
-    item.unveil()
+    # unveil() reveals the anchor. RunManager.unveil_item() emits item_unveiled
+    # on success; KnowledgeManager subscribes and awards REVEAL XP.
+    RunManager.unveil_item(item)
 
 # ══ Display refresh ═══════════════════════════════════════════════════════════
 
@@ -460,14 +458,14 @@ func _refresh_found_list() -> void:
             continue
         found_count += 1
 
-        var price_text := entry.estimated_value_text()
-        var has_price := price_text != ItemEntry.UNKNOWN_TEXT
+        var price_text := ItemEntryDisplayHelper.estimated_value_text(entry)
+        var has_price := price_text != ItemEntryDisplayHelper.UNKNOWN_TEXT
 
         var row: ValueRow = ValueRowScene.instantiate()
         row.setup(
-            entry.display_name,
+            ItemEntryDisplayHelper.display_name(entry),
             price_text if has_price else "",
-            entry.price_display_color() if has_price else Color.WHITE,
+            ItemEntryDisplayHelper.price_display_color(entry) if has_price else Color.WHITE,
             13,
         )
         _found_vbox.add_child(row)
@@ -487,7 +485,7 @@ func _refresh_veiled_list() -> void:
 
         var row: ValueRow = ValueRowScene.instantiate()
         row.setup(
-            entry.display_name,
+            ItemEntryDisplayHelper.display_name(entry),
             "%d AP" % UNVEIL_COST,
             Color(0.55, 0.58, 0.63, 1),
             13,
@@ -531,23 +529,23 @@ func _update_detail_section(entry: ItemEntry) -> void:
         _clear_detail_section()
         return
 
-    _detail_name_label.text = entry.display_name
+    _detail_name_label.text = ItemEntryDisplayHelper.display_name(entry)
 
     var cat := entry.category_text() if not entry.is_veiled() else ""
     _detail_category_label.text = cat
     _detail_category_label.visible = cat != ""
 
-    var cond := entry.condition_detail_text()
+    var cond := ItemEntryDisplayHelper.condition_detail_text(entry)
     _detail_cond_value_label.text = cond if cond != "" else "—"
     _detail_cond_value_label.add_theme_color_override(
         &"font_color",
-        entry.condition_display_color() if cond != "" else Color(0.55, 0.58, 0.63, 1),
+        ItemEntryDisplayHelper.condition_display_color(entry) if cond != "" else Color(0.55, 0.58, 0.63, 1),
     )
 
-    var price_text := entry.estimated_value_text()
-    if price_text != ItemEntry.UNKNOWN_TEXT:
+    var price_text := ItemEntryDisplayHelper.estimated_value_text(entry)
+    if price_text != ItemEntryDisplayHelper.UNKNOWN_TEXT:
         _detail_value_label.text = price_text
-        _detail_value_label.add_theme_color_override(&"font_color", entry.price_display_color())
+        _detail_value_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(entry))
     else:
         _detail_value_label.text = "—"
         _detail_value_label.add_theme_color_override(&"font_color", Color(0.55, 0.58, 0.63, 1))

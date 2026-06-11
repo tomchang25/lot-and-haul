@@ -96,7 +96,7 @@ func _render(summary: DaySummary) -> void:
     var net: int = summary.net_change
     if net >= 0:
         _net_label.text = "Net:   +$%d" % net
-        _net_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
+        _net_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.PRICE_COLOR)
     else:
         _net_label.text = "Net:   -$%d" % (-net)
         _net_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))

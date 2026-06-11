@@ -179,8 +179,6 @@ Prerequisite: the affix-naming system validated across the full item set (compos
 
 Flows currently being built. One-line pointer each — same format as `## Plan`, just promoted here when work starts. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress → this section is empty.
 
-- [item_entry_refactor] ItemEntry layer split (data + price vs display) + Manager-mediated mutations + archetype standard — see `dev/docs/plans/item_entry_refactor.md`
-
 ---
 
 ## Pending

@@ -26,7 +26,7 @@ func show_for(entry: ItemEntry, anchor: Rect2) -> void:
         return
 
     # ── Display name ─────────────────────────────────────────────────────────
-    _display_name_label.text = entry.display_name
+    _display_name_label.text = ItemEntryDisplayHelper.display_name(entry)
     _display_name_label.show()
 
     # ── Always-visible: category identity ────────────────────────────────────
@@ -42,19 +42,19 @@ func show_for(entry: ItemEntry, anchor: Rect2) -> void:
         _category_label.hide()
 
     # ── Conditional: condition detail ────────────────────────────────────────
-    var cond_text := entry.condition_detail_text()
+    var cond_text := ItemEntryDisplayHelper.condition_detail_text(entry)
     if cond_text != "":
         _condition_label.text = cond_text
-        _condition_label.modulate = entry.condition_display_color()
+        _condition_label.modulate = ItemEntryDisplayHelper.condition_display_color(entry)
         _condition_label.show()
     else:
         _condition_label.hide()
 
     # ── Conditional: price ───────────────────────────────────────────────────
-    var price_text := entry.estimated_value_text()
-    if price_text != ItemEntry.UNKNOWN_TEXT:
+    var price_text := ItemEntryDisplayHelper.estimated_value_text(entry)
+    if price_text != ItemEntryDisplayHelper.UNKNOWN_TEXT:
         _price_label.text = "%s: %s" % [ItemRow.get_price_header(), price_text]
-        _price_label.add_theme_color_override(&"font_color", entry.price_display_color())
+        _price_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(entry))
         _price_label.show()
     else:
         _price_label.hide()
@@ -72,9 +72,9 @@ func show_for(entry: ItemEntry, anchor: Rect2) -> void:
     )
     _cargo_separator.visible = has_inspect_data
 
-    var weight := entry.weight_text()
-    var grid := entry.grid_text()
-    if not entry.is_veiled() and weight != ItemEntry.UNKNOWN_TEXT and grid != ItemEntry.UNKNOWN_TEXT:
+    var weight := ItemEntryDisplayHelper.weight_text(entry)
+    var grid := ItemEntryDisplayHelper.grid_text(entry)
+    if not entry.is_veiled() and weight != ItemEntryDisplayHelper.UNKNOWN_TEXT and grid != ItemEntryDisplayHelper.UNKNOWN_TEXT:
         _weight_label.text = "Weight:  %s" % weight
         _grid_label.text = "Grid:  %s" % grid
         _weight_label.show()

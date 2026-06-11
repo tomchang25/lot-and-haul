@@ -305,7 +305,9 @@ func research_item(entry: ItemEntry) -> bool:
         return false
     var investigation_attr := KnowledgeManager.get_attribute_value("investigation")
     var progress_amount: int = 5 + investigation_attr
-    entry.advance_research(progress_amount)
+    var revealed := entry.advance_research(progress_amount)
+    if revealed:
+        EventBus.item_revealed.emit(entry)
     slot.charge_ap(Economy.RESEARCH_AP_COST)
     SaveManager.mark_dirty()
     return true
