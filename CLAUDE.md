@@ -8,6 +8,8 @@ Agent-specific instructions live in `dev/agent_rules/`. Read them before startin
 
 **Model-tier gate (Fable / Mythos)**: if you are running as a Fable- or Mythos-class model, do NOT iterate over the codebase without my explicit permission — no commit/diff reviews, multi-file exploration sweeps, codebase-wide searches, lint passes, or refactors. If the task genuinely needs codebase iteration, stop and confirm with me first ("this needs me to read N files / the diff — proceed on this model?") before touching any file. Reading a single named file to answer a direct question is fine. This exists because I sometimes forget to switch models, and one casual "review my commits" on this tier can burn the entire token budget in one shot.
 
+**No hard-wrapped prose**: Do not hard-wrap prose lines — let the client handle line wrapping. This is a global rule that applies to all writing, not just commits.
+
 When asked to build a plan or implementation spec, follow the matching standard in `dev/agent_rules/` (`plan_standard.md`, `implementation_spec_standard.md`), the plan lifecycle in `dev/docs/README.md`, and `dev/standards/` for any relevant domain standard. Plans go in `dev/docs/plans/` with a one-line pointer in `TODO.md`. The spec author explores the codebase directly against the plan — there is no separate scout stage.
 
 Resolve unknowns by asking me directly during the planning conversation — never emit an `## Open Questions` section or leave unresolved decisions parked in a plan or spec. Stop and ask the moment a decision is unclear; hand over a plan or spec only once every such question has been answered and folded into the relevant Requirement, Design, or Relational Context line.

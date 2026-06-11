@@ -5,7 +5,7 @@
 class_name AnchorData
 extends Resource
 
-# Unique identifier referenced by ItemData.anchor.
+# Unique identifier for this anchor variant.
 @export var anchor_id: String = ""
 
 # Display text; always the default body naming slot when unveiled.

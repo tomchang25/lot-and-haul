@@ -85,9 +85,6 @@ class LotSpec:
         w.add_field_dict_auto_keys(
             "category_weights", entry.get("category_weights", {}) or {}
         )
-        w.add_field_dict_auto_keys(
-            "item_weights", entry.get("item_weights", {}) or {}
-        )
         w.add_field_float(
             "price_floor_factor",
             float(entry.get("price_floor_factor", 0.6)),
@@ -136,7 +133,6 @@ class LotSpec:
             "rarity_weights",
             "super_category_weights",
             "category_weights",
-            "item_weights",
         ]
 
         lot: dict = {"lot_id": lot_id}
@@ -165,11 +161,6 @@ class LotSpec:
             for sc in all_data.get("super_categories", [])
             if isinstance(sc, dict)
         }
-        known_item_ids: set[str] = {
-            item["item_id"]
-            for item in all_data.get("items", [])
-            if isinstance(item, dict)
-        }
 
         for lot in entries:
             lot_id = lot.get("lot_id", "?")
@@ -184,12 +175,6 @@ class LotSpec:
                 if key not in known_super_cat_ids:
                     errors.append(
                         f"lot '{lot_id}': super_category_weights key '{key}' not defined in super_categories"
-                    )
-
-            for key in (lot.get("item_weights") or {}).keys():
-                if key not in known_item_ids:
-                    errors.append(
-                        f"lot '{lot_id}': item_weights key '{key}' not defined in items"
                     )
 
         return errors

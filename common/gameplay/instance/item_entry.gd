@@ -18,15 +18,10 @@ class PriceView extends RefCounted:
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-# Phase 1: instance fields for generated/migrated items (null for legacy loaded).
 var anchor: AnchorData = null
 var surface_clues: Array[ClueData] = []
 var hidden_clues: Array[ClueData] = []
 var category_data: CategoryData = null
-
-# Phase 1 only: populated by legacy ItemEntry.create() / pre-migration from_dict.
-# Null for generated entries.
-var item_data: ItemData = null
 
 ## True once the player has unveiled this item (revealed which anchor variant it is).
 ## Veiled items show only their cargo shape and weight; all identity data is masked.
@@ -45,14 +40,9 @@ var id: int = -1
 var center_offset: float = 0.0
 
 ## Rarity equals the number of hidden clues on this instance.
-## Falls back to item_data.rarity for legacy pre-migration entries (Phase 1).
 var rarity: Economy.Rarity:
     get:
-        if not hidden_clues.is_empty():
-            return Economy.rarity_for_clue_count(hidden_clues.size())
-        if item_data != null:
-            return item_data.rarity as Economy.Rarity
-        return Economy.Rarity.COMMON
+        return Economy.rarity_for_clue_count(hidden_clues.size())
 
 # Computed: true when every hidden clue is in revealed_clue_ids.
 # If item has no hidden clues, verified is true by default.
@@ -80,32 +70,22 @@ var revealed_clue_ids: Array[String] = []
 var research_progress: Dictionary = { }
 
 # ══ Private data access helpers ═══════════════════════════════════════════════
-# Instance fields are authoritative. item_data is the fallback for legacy
-# pre-migration entries (Phase 1 only).
 
 
 func _get_anchor() -> AnchorData:
-    return anchor if anchor != null else (item_data.anchor if item_data != null else null)
+    return anchor
 
 
 func _get_surface_clues() -> Array[ClueData]:
-    if not surface_clues.is_empty():
-        return surface_clues
-    if item_data != null:
-        return item_data.surface_clues
-    return [] as Array[ClueData]
+    return surface_clues
 
 
 func _get_hidden_clues() -> Array[ClueData]:
-    if not hidden_clues.is_empty():
-        return hidden_clues
-    if item_data != null:
-        return item_data.hidden_clues
-    return [] as Array[ClueData]
+    return hidden_clues
 
 
 func _get_category_data() -> CategoryData:
-    return category_data if category_data != null else (item_data.category_data if item_data != null else null)
+    return category_data
 
 # ══ Clue helpers ══════════════════════════════════════════════════════════════
 
@@ -484,19 +464,7 @@ func apply_damage(ratio: float) -> void:
 # ══ Factory ═══════════════════════════════════════════════════════════════════
 
 
-## Creates an entry from an authored ItemData (legacy path, Phase 1 only).
-static func create(data: ItemData) -> ItemEntry:
-    var entry := ItemEntry.new()
-    entry.item_data = data
-
-    entry.condition = randf()
-    entry.center_offset = randf_range(-0.5, 0.5)
-    entry.unveiled = false
-
-    return entry
-
-
-## Creates an entry from pool-generated parts (new path).
+## Creates an entry from pool-generated parts.
 static func from_generation(
         gen_anchor: AnchorData,
         gen_surface: Array[ClueData],
@@ -535,9 +503,6 @@ func to_dict() -> Dictionary:
         d["surface_ids"].append(c.clue_id)
     for c: ClueData in _get_hidden_clues():
         d["hidden_ids"].append(c.clue_id)
-    # Phase 1: include item_id for migration backward compat
-    if item_data != null:
-        d["item_id"] = item_data.item_id
     return d
 
 
@@ -561,12 +526,14 @@ static func from_dict(d: Dictionary) -> ItemEntry:
         if not cat_id.is_empty():
             entry.category_data = CategoryRegistry.get_category_by_id(cat_id)
     else:
-        # Legacy item_id form (pre-migration or migration-in-progress).
-        var data: ItemData = ItemRegistry.get_item_by_id(d["item_id"])
-        if data == null:
-            push_warning("ItemEntry: item_id '%s' not found — entry dropped" % d["item_id"])
-            return null
-        entry.item_data = data
+        # # Legacy item_id form (pre-migration or migration-in-progress).
+        # var data: ItemData = ItemRegistry.get_item_by_id(d["item_id"])
+        # if data == null:
+        # push_warning("ItemEntry: item_id '%s' not found — entry dropped" % d["item_id"])
+        # return null
+        # entry.item_data = data
+        push_warning("ItemEntry: item_id '%s' not found — entry dropped" % d["item_id"])
+        return null
 
     # Common fields
     var legacy_anchor_revealed := bool(d.get("anchor_revealed", false))
