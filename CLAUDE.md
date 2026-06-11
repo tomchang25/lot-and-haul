@@ -118,4 +118,5 @@ Check TODO.md ## Active Section
 - **Debug** (adding debug-conditional code or UI): read `dev/standards/debug_standard.md` — covers the two-layer gate (`OS.is_debug_build()` + `SettingsStore.debug_mode`), the `Debug` autoload API, and node-source rules for debug nodes.
 - **Project structure** (placing new files or folders): read `dev/standards/project_structure.md`.
 - **Commits**: conventional commits format — read `dev/skills/conventional_commits.md` when writing commit messages. Do not hard-wrap prose lines (bullet points, PR descriptions, commit bodies) at a column boundary — let the client handle line wrapping.
+- **Pull requests**: read `dev/skills/pr_convention.md` when writing PR titles or descriptions — conventional-style title, required Summary/Changes sections, Testing/Breaking-changes when applicable.
 - **Docs and tracking** (writing/archiving docs, updating TODO/CHANGELOG, deciding where a forward item lives): read `dev/docs/README.md` — covers the 3-level model, maturity scale, lifecycle rules, and the "no living Done list" principle.
