@@ -49,7 +49,23 @@ Flat bullet list. Every place where the codebase as found disagrees with what th
 
 This section exists because friction the spec author swallows silently becomes a wrong Relational Context bullet the reviewer cannot see. Never omit the section: when there is genuinely no friction, say so explicitly with one line — "No friction found between Plan and codebase."
 
-### 4. Scope
+**Boundary with Design Gaps — litmus test:** does the plan say something the codebase contradicts? Friction. Does the plan say nothing at all? Design Gap. If the plan assumes something that simply doesn't exist yet and the spec creates it, that belongs in Design Gaps, not here.
+
+**Lifecycle:** the author writes each bullet as claim + coordinate + proposed resolution. After the reviewer approves a bullet, it is rewritten into settled form — prefixed `Settled:`, stating the conclusion the implementer follows as a directive, keeping the coordinate, compressing the narrative. Friction bullets are not folded back into the Plan; they stay in the spec as implementer-facing facts. A spec handed to implementation contains only `Settled:` friction bullets.
+
+### 4. Design Gaps
+
+Flat bullet list. Things the plan left unspecified — constants it assumes but never names, config surfaces it references without defining shape or location, behavioral details it defers — plus the resolution this spec proposes to fill each gap.
+
+Every bullet must carry a proposed resolution — never a naked question. This is what separates Design Gaps from a forbidden `## Open Questions` section: the author is not asking "what do you want?", it is proposing "here is the decision — approve or amend it." The coordinate evidence supports the chosen resolution — where it lands and which existing pattern it follows — since an absence in the plan cannot itself be cited.
+
+Plan Friction resolves contradictions; Design Gaps fill blanks (see the litmus test in Plan Friction). If the plan says "a global configured range" but never says where the constants live, what they're named, or what the defaults are, that's a gap, not friction.
+
+**Lifecycle:** after the reviewer approves a gap's resolution, the decision is folded back into the Plan, and any detail the implementer needs (constant names, locations, defaults) migrates into Implementation Notes, Scope, or Files to Change. The bullet is then removed. A spec handed to implementation must have this section empty.
+
+Never omit the section: when there are no outstanding gaps, say so explicitly — "No outstanding design gaps — the plan fully specifies all new elements."
+
+### 5. Scope
 
 #### Included
 
@@ -59,7 +75,7 @@ Short bullet list of what this spec covers.
 
 Short bullet list of what is intentionally out of scope. Keep it tight to prevent scope bleed during implementation.
 
-### 5. Files to Change
+### 6. Files to Change
 
 | File     | Change Size            | Purpose                                          |
 | -------- | ---------------------- | ------------------------------------------------ |
@@ -67,7 +83,7 @@ Short bullet list of what is intentionally out of scope. Keep it tight to preven
 
 Identifies ownership and change effort. Does not prescribe line-by-line edits.
 
-### 6. Implementation Notes
+### 7. Implementation Notes
 
 Write only the decisions and constraints the implementation agent is likely to get wrong.
 
@@ -75,7 +91,7 @@ Organize by file or system when grouping helps. Use bullets or short paragraphs.
 
 Do not write step-by-step instructions. Do not reproduce logic the agent can read from the codebase. Include pseudocode only for non-obvious branching logic or state transitions.
 
-### 7. Edge Cases
+### 8. Edge Cases
 
 | Case     | Expected Handling     |
 | -------- | --------------------- |
@@ -83,7 +99,7 @@ Do not write step-by-step instructions. Do not reproduce logic the agent can rea
 
 Omit this section if no meaningful edge cases exist.
 
-### 8. Acceptance Criteria
+### 9. Acceptance Criteria
 
 Numbered list of observable outcomes, at the same level as the Plan's acceptance criteria.
 
@@ -94,13 +110,14 @@ Do not include file paths or function names.
 ## Rules
 
 1. Write entirely in English.
-2. Requires codebase evidence before generating. Do not fill Relational Context, Plan Friction, or Files to Change from the Plan alone — explore the code directly. Every claim about existing code carries a coordinate (path, symbol, or quoted declaration); no coordinate, no claim.
+2. Requires codebase evidence before generating. Do not fill Relational Context, Plan Friction, Design Gaps, or Files to Change from the Plan alone — explore the code directly. Every claim about existing code carries a coordinate (path, symbol, or quoted declaration); no coordinate, no claim.
 3. Relational Context is a flat list. Do not add subsections.
 4. Apply the completeness rule: every cross-system relationship within the change's blast radius is stated, even the obvious ones — the executing agent does not infer. Relationships outside the blast radius stay undocumented.
 5. Implementation Notes should be shorter than a full per-file plan. If you are writing step-by-step per-file instructions, switch to a full per-file plan.
 6. Do not include implementation detail the agent can discover from the codebase, except where the completeness rule requires stating a relationship explicitly.
 7. Do not mix future scope into this spec.
-8. Do not hard-wrap prose lines at a column boundary — let the client handle line wrapping. Tables and code blocks are exempt.
+8. A spec with a non-empty Design Gaps section, or any Plan Friction bullet not yet in `Settled:` form, is not approved for execution — resolve and fold back before hand-off.
+9. Do not hard-wrap prose lines at a column boundary — let the client handle line wrapping. Tables and code blocks are exempt.
 
 ---
 
@@ -120,7 +137,12 @@ Do not include file paths or function names.
 
 ## Plan Friction
 
-- <Disagreement between Plan and code, with evidence, and how the spec resolves it — or "No friction found between Plan and codebase.">
+- <Pre-review: disagreement between Plan and code, with evidence, plus proposed resolution.>
+- Settled: <Post-review: the binding conclusion the implementer follows, with coordinate — or "No friction found between Plan and codebase.">
+
+## Design Gaps
+
+- <Something the plan left unspecified, plus the proposed resolution with coordinate, pending review — or "No outstanding design gaps — the plan fully specifies all new elements.">
 
 ## Scope
 
