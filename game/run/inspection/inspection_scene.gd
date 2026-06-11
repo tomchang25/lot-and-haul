@@ -566,12 +566,12 @@ func _refresh_clues_section(entry: ItemEntry) -> void:
     var rows: Array[Dictionary] = []
 
     # Anchor row
-    if entry.unveiled and entry.item_data.anchor != null:
-        var a: AnchorData = entry.item_data.anchor
+    if entry.unveiled and entry.anchor != null:
+        var a: AnchorData = entry.anchor
         rows.append({ "text": a.known_text, "op": "base", "amount": float(a.base_value), "anchor": true })
 
     # Surface clue rows — only revealed
-    for clue: ClueData in entry.item_data.surface_clues:
+    for clue: ClueData in entry.surface_clues:
         if clue.type != ClueData.ClueType.SURFACE:
             continue
         if not entry.revealed_clue_ids.has(clue.clue_id):

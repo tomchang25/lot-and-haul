@@ -16,30 +16,30 @@ var _won_price: int = 0
 # ── Getters (read-public) ──────────────────────────────────────────────────────
 
 var lot_entry: LotEntry:
-	get:
-		return _lot_entry
+    get:
+        return _lot_entry
 
 ## Shallow duplicate of the active lot's items (ItemEntry refs shared).
 ## Derived from lot_entry.item_entries. Empty when no lot is active.
 var lot_items: Array[ItemEntry]:
-	get:
-		return _lot_entry.item_entries.duplicate() if _lot_entry else []
+    get:
+        return _lot_entry.item_entries.duplicate() if _lot_entry else [] as Array[ItemEntry]
 
 ## Current spendable AP for this lot.
 var actions_remaining: int:
-	get:
-		return _actions_remaining
+    get:
+        return _actions_remaining
 
 ## Shallow duplicate of items won at auction for this lot.
 ## Empty when the auction was lost or not yet resolved.
 var won_items: Array[ItemEntry]:
-	get:
-		return _won_items.duplicate()
+    get:
+        return _won_items.duplicate()
 
 ## Price paid at auction for this lot. 0 when auction was lost.
 var won_price: int:
-	get:
-		return _won_price
+    get:
+        return _won_price
 
 # ══ Construction ══════════════════════════════════════════════════════════════
 
@@ -47,19 +47,19 @@ var won_price: int:
 ## Initializes this LotStore for [param p_entry] with [param p_initial_ap]
 ## spendable AP. Called once by RunManager immediately after LotStore.new().
 func initialize(p_entry: LotEntry, p_initial_ap: int) -> void:
-	_lot_entry = p_entry
-	_actions_remaining = p_initial_ap
+    _lot_entry = p_entry
+    _actions_remaining = p_initial_ap
 
 # ══ Mutations ══════════════════════════════════════════════════════════════════
 
 
 ## Deducts [param cost] AP from the inspection pool for this lot.
 func deduct_ap(cost: int) -> void:
-	_actions_remaining -= cost
+    _actions_remaining -= cost
 
 
 ## Records a won auction: saves [param items] and [param price] as this lot's
 ## win result. Called by RunManager.commit_lot_win() on player victory.
 func record_win(items: Array[ItemEntry], price: int) -> void:
-	_won_items = items.duplicate()
-	_won_price = price
+    _won_items = items.duplicate()
+    _won_price = price

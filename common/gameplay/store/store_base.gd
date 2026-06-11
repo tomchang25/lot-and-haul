@@ -14,37 +14,37 @@ var _migration_log: Array[String] = []
 ## Returns all migration messages accumulated since the last load, then clears
 ## the log. Call after from_dict() to collect any schema-upgrade notes.
 func get_migration_log() -> Array[String]:
-	var out := _migration_log.duplicate()
-	_migration_log.clear()
-	return out
+    var out := _migration_log.duplicate()
+    _migration_log.clear()
+    return out
 
 
 ## Returns the section key used in the save payload. Returns "" by default;
 ## session-scoped Stores that never register with SaveManager rely on this.
 func section_id() -> String:
-	return ""
+    return ""
 
 
 ## Serializes this store's state to a Dictionary for saving.
 ## Returns an empty dict by default.
 func to_dict() -> Dictionary:
-	return {}
+    return {}
 
 
 ## Restores this store's state from [param data]. No-op by default.
 func from_dict(_data: Dictionary) -> void:
-	pass
+    pass
 
 
 ## Validates invariants. Returns true by default.
 func validate() -> bool:
-	return true
+    return true
 
 
 ## Returns the current schema version for this store. Override in subclasses
 ## when bumping the version alongside a new _apply_migrations() branch.
 func _store_version() -> int:
-	return 1
+    return 1
 
 
 ## Transforms saved data from [param from_version] to the current store version.
@@ -63,4 +63,4 @@ func _store_version() -> int:
 ## reading _version from the payload and passing it here. Returns the dict with
 ## all fields in the current version's shape, ready for field restoration.
 func _apply_migrations(data: Dictionary, _from_version: int) -> Dictionary:
-	return data
+    return data

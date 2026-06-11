@@ -68,7 +68,7 @@ func clear_run_state() -> void:
 ## the flag actually flipped). On success and when the item has valid category
 ## data, emits item_unveiled so KnowledgeManager can award REVEAL XP.
 func unveil_item(entry: ItemEntry) -> void:
-    if entry.unveil() and entry.item_data != null and entry.item_data.category_data != null:
+    if entry.unveil() and entry.category_data != null:
         EventBus.item_unveiled.emit(entry)
 
 

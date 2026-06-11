@@ -243,7 +243,7 @@ func resolve_customer_sale(
     if customer != null:
         customers.remove_customer(customer)
     for entry: ItemEntry in items:
-        EventBus.sale_resolved.emit(entry.item_data.category_data, entry.item_data.rarity)
+        EventBus.sale_resolved.emit(entry.category_data, entry.rarity)
     SaveManager.save()
 
 # ══ Storage AP actions ════════════════════════════════════════════════════════
@@ -262,7 +262,7 @@ func repair_item(entry: ItemEntry) -> bool:
     if ResearchSlot.is_repair_complete(entry):
         return false
     ResearchSlot.apply_repair(entry)
-    EventBus.item_repaired.emit(entry.item_data.category_data, entry.item_data.rarity)
+    EventBus.item_repaired.emit(entry.category_data, entry.rarity)
     slot.charge_ap(Economy.REPAIR_AP_COST)
     SaveManager.mark_dirty()
     return true
@@ -283,7 +283,7 @@ func restore_item(entry: ItemEntry) -> bool:
     # One-way read: get_attribute_value has no reverse dependency on MetaManager.
     var restoration_attr := KnowledgeManager.get_attribute_value("restoration")
     ResearchSlot.apply_restore(entry, restoration_attr)
-    EventBus.item_restored.emit(entry.item_data.category_data, entry.item_data.rarity)
+    EventBus.item_restored.emit(entry.category_data, entry.rarity)
     slot.charge_ap(Economy.RESTORE_AP_COST)
     SaveManager.mark_dirty()
     return true

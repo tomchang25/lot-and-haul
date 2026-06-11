@@ -82,3 +82,36 @@ func from_dict(data: Dictionary) -> void:
             entry.apply_storage_migration()
             _storage_items.append(entry)
     _next_entry_id = int(data.get("next_entry_id", _next_entry_id))
+
+
+func _store_version() -> int:
+    return 2
+
+
+func _apply_migrations(data: Dictionary, from_version: int) -> Dictionary:
+    if from_version < 2:
+        var migrated: Array = []
+        for d: Variant in data.get("storage_items", []):
+            if not d is Dictionary:
+                migrated.append(d)
+                continue
+            # Legacy entry: has item_id but no anchor_id (composition form).
+            if d.has("item_id") and not d.has("anchor_id"):
+                var item: ItemData = ItemRegistry.get_item_by_id(d["item_id"])
+                if item == null:
+                    push_warning("StorageStore migration: item_id '%s' not found — entry dropped" % d["item_id"])
+                    continue
+                d["anchor_id"] = item.anchor.anchor_id if item.anchor else ""
+                var surf_ids: Array[String] = []
+                for c: ClueData in item.surface_clues:
+                    surf_ids.append(c.clue_id)
+                d["surface_ids"] = surf_ids
+                var hid_ids: Array[String] = []
+                for c: ClueData in item.hidden_clues:
+                    hid_ids.append(c.clue_id)
+                d["hidden_ids"] = hid_ids
+                d["category_id"] = item.category_data.category_id if item.category_data else ""
+            migrated.append(d)
+        data["storage_items"] = migrated
+        _migration_log.append("StorageStore: migrated to version 2 (item_id → composition)")
+    return data

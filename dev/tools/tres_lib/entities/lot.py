@@ -73,6 +73,9 @@ class LotSpec:
             "item_count_max", int(entry.get("item_count_max", 5))
         )
         w.add_field_dict_auto_keys(
+            "tier_weights", entry.get("tier_weights", {}) or {}
+        )
+        w.add_field_dict_auto_keys(
             "rarity_weights", entry.get("rarity_weights", {}) or {}
         )
         w.add_field_dict_auto_keys(
@@ -129,6 +132,7 @@ class LotSpec:
             "action_quota",
         ]
         _DICT_FIELDS = [
+            "tier_weights",
             "rarity_weights",
             "super_category_weights",
             "category_weights",

@@ -240,7 +240,7 @@ func _write_manifest(counter: int) -> void:
 func _scan_save_counters() -> Array[int]:
     var dir := DirAccess.open(_SAVE_DIR)
     if dir == null:
-        return []
+        return [] as Array[int]
     var counters: Array[int] = []
     dir.list_dir_begin()
     var fname := dir.get_next()
@@ -274,7 +274,7 @@ func _build_candidate_list() -> Array[int]:
     var manifest_slot := _read_manifest_slot()
     var scanned := _scan_save_counters()
     if scanned.is_empty():
-        return []
+        return [] as Array[int]
     # Ensure manifest slot is first, then remaining by descending counter.
     var ordered: Array[int] = []
     if manifest_slot > 0 and manifest_slot in scanned:
