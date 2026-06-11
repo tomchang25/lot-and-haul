@@ -10,8 +10,6 @@ extends RefCounted
 
 const UNKNOWN_TEXT := "???"
 
-const RARITY_NAMES: Array[String] = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
-
 const PRICE_COLOR := Color(0.4, 1.0, 0.5)
 const PRICE_UNKNOWN_COLOR := Color(0.6, 0.6, 0.6)
 
@@ -116,9 +114,8 @@ static func rarity_text(entry: ItemEntry) -> String:
     if entry.is_veiled():
         return UNKNOWN_TEXT
 
-    var r: int = entry.rarity
-    if r >= 0 and r < RARITY_NAMES.size():
-        return RARITY_NAMES[r]
+    if Economy.RARITY_NAME.has(entry.rarity):
+        return Economy.RARITY_NAME[entry.rarity]
 
     return UNKNOWN_TEXT
 
@@ -201,7 +198,7 @@ static func sort_value(entry: ItemEntry, column: int) -> Variant:
             return entry.get_base_value()
         ItemRow.Column.RARITY:
             var verified_bonus := 10.0 if entry.verified else 0.0
-            return verified_bonus + float(entry.rarity)
+            return verified_bonus + Economy.RARITY_SORT_WEIGHT[entry.rarity]
         ItemRow.Column.WEIGHT:
             return entry.get_weight()
         ItemRow.Column.GRID:

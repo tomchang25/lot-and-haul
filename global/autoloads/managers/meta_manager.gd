@@ -243,7 +243,7 @@ func resolve_customer_sale(
     if customer != null:
         customers.remove_customer(customer)
     for entry: ItemEntry in items:
-        EventBus.sale_resolved.emit(entry.category_data, entry.rarity)
+        EventBus.sale_resolved.emit(entry)
     SaveManager.save()
 
 # ══ Storage AP actions ════════════════════════════════════════════════════════
@@ -262,7 +262,7 @@ func repair_item(entry: ItemEntry) -> bool:
     if ResearchSlot.is_repair_complete(entry):
         return false
     ResearchSlot.apply_repair(entry)
-    EventBus.item_repaired.emit(entry.category_data, entry.rarity)
+    EventBus.item_repaired.emit(entry)
     slot.charge_ap(Economy.REPAIR_AP_COST)
     SaveManager.mark_dirty()
     return true
@@ -281,9 +281,9 @@ func restore_item(entry: ItemEntry) -> bool:
     if ResearchSlot.is_restore_complete(entry):
         return false
     # One-way read: get_attribute_value has no reverse dependency on MetaManager.
-    var restoration_attr := KnowledgeManager.get_attribute_value("restoration")
+    var restoration_attr: int = KnowledgeManager.get_attribute_value("restoration")
     ResearchSlot.apply_restore(entry, restoration_attr)
-    EventBus.item_restored.emit(entry.category_data, entry.rarity)
+    EventBus.item_restored.emit(entry)
     slot.charge_ap(Economy.RESTORE_AP_COST)
     SaveManager.mark_dirty()
     return true
@@ -303,7 +303,7 @@ func research_item(entry: ItemEntry) -> bool:
         return false
     if not entry.has_unrevealed_hidden():
         return false
-    var investigation_attr := KnowledgeManager.get_attribute_value("investigation")
+    var investigation_attr: int = KnowledgeManager.get_attribute_value("investigation")
     var progress_amount: int = 5 + investigation_attr
     var revealed := entry.advance_research(progress_amount)
     if revealed:

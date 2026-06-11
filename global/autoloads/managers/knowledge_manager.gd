@@ -95,11 +95,11 @@ func get_migration_log() -> Array[String]:
 # ── Mastery ────────────────────────────────────────────────────────────────────
 
 
-func add_category_points(category: CategoryData, rarity: ItemData.Rarity, action: KnowledgeAction) -> void:
+func add_category_points(entry: ItemEntry, action: KnowledgeAction) -> void:
     var base: int = _BASE_MASTERY[action]
-    var rarity_mult: int = rarity + 1
+    var rarity_mult: int = Economy.RARITY_XP_MULT[entry.rarity]
     var gain: int = base * rarity_mult
-    _knowledge.add_points(category.category_id, gain)
+    _knowledge.add_points(entry.category_data.category_id, gain)
 
 
 ## Returns the mastery points recorded for [param category], or 0 if none.
@@ -227,22 +227,21 @@ func _load_attribute_registry() -> void:
 # ── EventBus handlers ──────────────────────────────────────────────────────────
 
 
-func _on_sale_resolved(category: CategoryData, rarity: ItemData.Rarity) -> void:
-    add_category_points(category, rarity, KnowledgeAction.SELL)
+func _on_sale_resolved(entry: ItemEntry) -> void:
+    add_category_points(entry, KnowledgeAction.SELL)
 
 
-func _on_item_repaired(category: CategoryData, rarity: ItemData.Rarity) -> void:
-    add_category_points(category, rarity, KnowledgeAction.REPAIR)
+func _on_item_repaired(entry: ItemEntry) -> void:
+    add_category_points(entry, KnowledgeAction.REPAIR)
 
 
-func _on_item_restored(category: CategoryData, rarity: ItemData.Rarity) -> void:
-    add_category_points(category, rarity, KnowledgeAction.RESTORE)
+func _on_item_restored(entry: ItemEntry) -> void:
+    add_category_points(entry, KnowledgeAction.RESTORE)
 
 
 func _on_item_unveiled(entry: ItemEntry) -> void:
-    if entry.item_data != null and entry.item_data.category_data != null:
-        add_category_points(entry.item_data.category_data, entry.item_data.rarity, KnowledgeAction.REVEAL)
+    add_category_points(entry, KnowledgeAction.REVEAL)
 
 
 func _on_item_revealed(entry: ItemEntry) -> void:
-    add_category_points(entry.item_data.category_data, entry.item_data.rarity, KnowledgeAction.REVEAL)
+    add_category_points(entry, KnowledgeAction.REVEAL)

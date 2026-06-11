@@ -77,7 +77,7 @@ func unveil_item(entry: ItemEntry) -> void:
 ## item_revealed only when the revealed_clue_ids set grew (new clue revealed).
 ## Returns the roll result (succeeded) unchanged to the scene.
 func attempt_clue(entry: ItemEntry, clue: ClueData) -> bool:
-    var attr_value := KnowledgeManager.get_attribute_value(clue.attribute)
+    var attr_value: int = KnowledgeManager.get_attribute_value(clue.attribute)
     var attribute_bonus: int = maxi(attr_value - 1, 0)
     var before := entry.revealed_clue_ids.size()
     var succeeded := entry.attempt_clue(clue, attribute_bonus)

@@ -10,19 +10,16 @@ extends Node
 # KnowledgeManager subscribes to award mastery XP without a direct import.
 
 ## Emitted after a customer sale is fully committed (cash added, items removed).
-## [param category] — CategoryData of the sold item.
-## [param rarity] — rarity of the sold item.
-signal sale_resolved(category: CategoryData, rarity: ItemData.Rarity)
+## [param entry] — the sold ItemEntry.
+signal sale_resolved(entry: ItemEntry)
 
 ## Emitted after one Repair AP-action is applied and saved.
-## [param category] — CategoryData of the repaired item.
-## [param rarity] — rarity of the repaired item.
-signal item_repaired(category: CategoryData, rarity: ItemData.Rarity)
+## [param entry] — the repaired ItemEntry.
+signal item_repaired(entry: ItemEntry)
 
 ## Emitted after one Restore AP-action is applied and saved.
-## [param category] — CategoryData of the restored item.
-## [param rarity] — rarity of the restored item.
-signal item_restored(category: CategoryData, rarity: ItemData.Rarity)
+## [param entry] — the restored ItemEntry.
+signal item_restored(entry: ItemEntry)
 
 # ── Run-phase business events ─────────────────────────────────────────────────
 # Emitted by MetaManager after run resolution is fully committed.

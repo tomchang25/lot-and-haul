@@ -74,11 +74,6 @@ extends Resource
 # Example: { "bicycle": 1, "handbag": 1, "oil_lamp": 1, "painting": 1 }
 @export var category_weights: Dictionary = { }
 
-# Optional explicit item table.
-# Key: item_id (String), Value: weight (int).
-# When non-empty, item draws use this table directly instead of rarity/category.
-@export var item_weights: Dictionary = { }
-
 # ── Price estimation ──────────────────────────────────────────────────────────
 # Multiplier bounds applied to npc_estimate when rolling the final price.
 # rolled_price is clamped to [npc_estimate * price_floor, npc_estimate * price_ceiling].
