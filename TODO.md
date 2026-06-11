@@ -146,9 +146,9 @@ Each vehicle grants a unique gameplay modifier (e.g. "+1 action per lot", "ignor
 
 Sell owned cars for partial value when upgrading, so trading up has a cost offset.
 
-### Pool-Based Item Generation
+### Tier-Linked Surface Clue Count
 
-Remove `ItemData` as an authored-per-item resource. Instead, generate items at lot-draw time: pick a category, draw an anchor variant (lot/location tier weight curves), draw surface clues uniformly (anchor-conditioned drawing is its own Draft below), draw rarity (lot/location-controlled frequency) then that many hidden clues uniformly from valid non-excluded options. True name from affix composition, true value from drawn modifiers. Draw-control metadata (anchor tiers, exclusive groups) shipped with the clue schema cleanup; draw rules come from `dev/docs/plans/clue_content_standard.md`, regenerated pools from `dev/docs/plans/clue_content_regen.md`. Remaining work here: the generator itself, lot/location tier curves + rarity frequency tables, a balance-tuning tool to preview draw value distributions before shipping, and item serialization moving from registry item-id lookup to stored clue lists (generated items have no registry id). Prerequisites: clue content regen shipped; affix naming validated across the curated set (already in place).
+Future pool-generator work: surface clue count scales with the anchor's tier (e.g. tier 1 → 1–2 clues, tier 5 → 3–5) instead of one global range — higher-value items carry deeper information, making inspection investment on them more rational. Blocked on the pool generator shipping with the global range first.
 
 ### Anchor-Conditioned Surface Draw
 
@@ -179,13 +179,13 @@ Prerequisite: the affix-naming system validated across the full item set (compos
 
 Flows currently being built. One-line pointer each — same format as `## Plan`, just promoted here when work starts. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress → this section is empty.
 
+- [pool_generation] Pool-based item generation (generator, lot tier curves, balance tool, composition serialization) — see `dev/docs/plans/pool_generation.md`
+
 ---
 
 ## Pending
 
 The deferred tail of an in-flight flow. When a confirmed initiative spans multiple plans, the parts not being built yet wait here instead of crowding `## Active` — same one-line format, promoted to `## Active` when their turn comes. Normally empty: a small fix or a feature that a single plan covers never uses this tier — it goes straight from `## Plan` to `## Active`.
-
-- [pool_generation] Pool-based item generation (generator, lot/location tier curves, balance tool, clue-list serialization) — plan file pending, reasoning in the Pool-Based `## Draft` section; depends on clue_content_regen + item_entry_refactor
 
 ---
 
