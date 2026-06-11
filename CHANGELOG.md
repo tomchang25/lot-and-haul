@@ -8,6 +8,25 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Save Diagnostics & Restore Hardening
+
+- 2026-06-11 — [save] `SaveLoadContext` (RefCounted) push model replaces per-store pull accumulators: `ctx.warn()` for player-facing data-loss toasts, `ctx.info()` for debug-only detail + console parity
+- 2026-06-11 — [save] `StoreBase.from_dict()` / `_apply_migrations()` require `SaveLoadContext`; `_migration_log` / `_restore_warnings` fields and their getters removed across all stores and managers
+- 2026-06-11 — [save] `ItemEntry.from_dict(d, ctx)` — null returned on unresolvable anchor (was: silent zero-value entry); per-entry resolution failures via `ctx.info()` instead of discarded collector array
+- 2026-06-11 — [save] Degraded detection in `StorageStore.from_dict()` is structural (resolved vs listed clue count) — no collector array needed
+- 2026-06-11 — [save] Sniffing migrations (`anchor_revealed`/`inspected` → `unveiled`, `verified` → `hidden_ids` union) moved from `ItemEntry.from_dict()` into `StorageStore._apply_migrations()` v<2 branch
+- 2026-06-11 — [save] `SaveManager.load()` constructs one `SaveLoadContext`, threads through provider dispatch, drains warnings/infos to `ToastManager`; `has_method` probing for old collector getters removed
+
+## Pool Generation
+
+- 2026-06-11 — [gen] `ItemGenerator` static class with full draw sequence: category → anchor (tier-weighted, nearest-tier fallback) → surface clues (uniform, no replacement, global min/max range) → rarity → hidden clues (domain scope, exclusive-group, at-most-one-override constraints)
+- 2026-06-11 — [gen] `LotEntry.create()` uses `ItemGenerator.draw()` — authored item references replaced with pool-based generation at lot-draw time
+- 2026-06-11 — [gen] `ItemEntry.from_generation()` factory for pool-assembled entries; `to_dict` / `from_dict` serializes composition form (anchor_id + surface_ids + hidden_ids + category_id)
+- 2026-06-11 — [gen] `StorageStore._apply_migrations()` v<2 branch migrates shape keys and drops legacy `item_id` entries (ItemData/ItemRegistry no longer exist — composition-only runtime)
+- 2026-06-11 — [data] Authored `data/yaml/items/*.yaml` (4 files) and `ItemData` resource removed; `ItemRegistry` autoload deleted
+- 2026-06-11 — [tool] `dev/tools/balance_preview.py` added — Python simulation of item value distributions per lot config (10k draws, percentiles, content-health flags)
+- 2026-06-11 — [economy] `Economy.SURFACE_CLUE_MIN` / `Economy.SURFACE_CLUE_MAX` (defaults 2,4) with 1–8 hard clamp
+
 ## Clue Schema Cleanup
 
 - 2026-06-10 — [schema] `AnchorData` resource added (`data/definitions/anchor_data.gd`): anchors extracted out of the clue system into their own designer resource — `anchor_id`, `known_text`, `naming_priority`, `category_data`, `base_value`, and physical identity (`shape_id`, `sprite`, `weight_kg`, `tier`); anchors carry no discovery attribute/DC, effect op, or exclusive group

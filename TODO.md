@@ -179,9 +179,6 @@ Prerequisite: the affix-naming system validated across the full item set (compos
 
 Flows currently being built. One-line pointer each — same format as `## Plan`, just promoted here when work starts. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress → this section is empty.
 
-- [pool_generation] Pool-based item generation (generator, lot tier curves, balance tool, composition serialization) — see `dev/docs/plans/pool_generation.md`
-- [save_diagnostics] Pull→push save diagnostics: thread one SaveLoadContext through from_dict, retire per-store warning/migration accumulators — see `dev/docs/plans/save_diagnostics_context.md`
-- [storage_restore_silent_drop_fix]
 
 ---
 
