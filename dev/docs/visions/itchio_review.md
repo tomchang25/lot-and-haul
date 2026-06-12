@@ -2,7 +2,7 @@
 
 > **Level 1 (vision).** 全中文（特例）。專案預設語言為英文，但此評估讀者是中文母語的專案作者，為確保溝通精確度與效率，破例使用中文。內容為整個專案在三種不同發佈階段的完成度診斷，供作者判斷各階段的前置準備與資源投入方向。
 >
-> **Last reviewed: 2026-06-11** — updated for save-slot refactor, pool-generation rewrite, and clue-schema cleanup.
+> **Last reviewed: 2026-06-12** — updated for audio-audit ship (PR #116, 76 files, +2400/−26 lines: synth pipeline YAML→WAV, SfxButton component, 17+ game-action events wired across all scenes), assert removal (commit `03bf457`, 26 files, three-category error guard system replacing all `assert()` calls), and bootstrap fix (`bootstrap.sh` one-command resource generation; `data/tres` remains gitignored).
 
 ---
 
@@ -44,10 +44,10 @@
 ### 技術阻擋（必須修才能上）
 
 1. **Export Presets 未設定** — 沒有 build 可上傳，這是第零步
-2. **`assert()` 在 release build 會變靜默 crash** — inspection/auction 多處 `assert(RunManager.lot != null)` 與類似 guard 在 export 後會被編譯器移除，變成 null pointer crash。必須換成 `if` + `push_error` + `return`。目前仍有 18 個 `assert()` 分散在 10 個檔案中（auction / inspection / reveal / save_manager / run_manager 等）
+2. ~~**`assert()` 在 release build 會變靜默 crash**~~ — ✅ 已解決（commit `03bf457`）。引入三類錯誤防護系統（runtime guard / programmer error / precondition），所有 18 個 `assert()` 全數移除，改為 `if` + `push_error` + 依照類別使用 `ToastManager.show_error()` 或 `show_dev_error()`。涵蓋 11 個遊戲檔案與多個 autoload。
 3. ~~**New Game vs Continue 路徑相同**~~ — ✅ 已解決。三槽存檔系統 (slot 0–2)，`NewGameButton` 呼叫 `SaveManager.init_slot()` 清空並重置，`LoadGameButton` 呼叫 `switch_to_slot()` 載入。Boot path 透過 `last_active` pointer 決定。合入 PR #115
-4. **音效未接線** — `AudioManager` 完整但沒有任何場景呼叫它。競標無聲、檢查無聲、按鍵無聲，對 gameplay 體驗損害太大。至少 wire 關鍵互動（bid confirm、button click、item reveal）
-5. **data/tres 被 gitignore** — 他人 clone 後 `data/tres/` 是空的，所有 registry 載入零資源，遊戲無法啟動。當前有 250 個 `.tres` 檔案（30 anchors / 184 clues / 12 categories / 4 cars / 6 lots / 4 super-categories / 5 attributes / 3 perks）僅存在磁碟上，git 完全未追蹤。解法：補一鍵 bootstrap script（執行 YAML pipeline 產生 .tres）或將 data/tres 從 gitignore 移除
+4. ~~**音效未接線**~~ — ✅ 已解決（PR #116）。建立確定性合成管線（YAML → WAV + UiAudioEvent.tres）、17+ 種遊戲動作音效事件、SfxButton 元件取代 ClickBinder、所有場景關鍵互動已接線：競標確認、按鈕點擊、物品揭示、格子上架、庫存操作、設定切換等。76 檔案變更，+2400/−26 行。
+5. ~~**data/tres 被 gitignore**~~ — ✅ 已解決。新增 `bootstrap.sh` 一鍵腳本，clone 後執行即可透過 YAML→TRES 管線生成全部 250 個資源並渲染 12 個音效事件，無需手動執行各管線。`data/tres/` 維持 gitignored。
 
 ### 不擋的（Stage 1 可接受）
 
@@ -60,17 +60,17 @@
 - ❌ 車輛共用 placeholder → 功能完整，看得出來是 placeholder
 - ❌ ~~開始畫面樸素~~ → ✅ 已有 game title + 三槽存檔選擇 overlay
 
-### Stage 1 完成度：**65%**
+### Stage 1 完成度：**75%**
 
-（70% 基礎完成度 × 扣除新系統權重。教學拆分後，新建範圍從三個系統（Director/Dialog/Cutscene）縮成 Director 骨架 + 教學提示面板，權重扣除變小，比上次評估 +5%。）
+（70% 基礎完成度 × 扣除新系統權重 + 音效 blocker 清除 + data/tres blocker 清除。教學拆分後，新建範圍從三個系統（Director/Dialog/Cutscene）縮成 Director 骨架 + 教學提示面板，權重扣除變小，比上次評估 +5%。音效 wire 完成後再 +5%。clone bootstrap 障礙清除後再 +5%。）
 
 ### Target Checklist
 
 - [ ] Export Presets 設定（Windows + Linux）
-- [ ] 所有 `assert()` 換成 release-safe error handling
+- [x] 所有 `assert()` 換成 release-safe error handling — commit `03bf457`
 - [x] ~~New Game 路徑修正~~ — ✅ Done (save slot refactor, PR #115)
-- [ ] 關鍵音效 wire（競標確認、物品揭示、按鈕點擊）
-- [ ] data/tres 提交 or bootstrap script
+- [x] 關鍵音效 wire（競標確認、物品揭示、按鈕點擊）— PR #116
+- [x] data/tres 提交 or bootstrap script — `bootstrap.sh`
 - [ ] itch.io page 建立（screenshots + 操作說明）
 - [ ] Director 注入骨架（固定第一 run 配置 + 空 cargo 阻擋）
 - [ ] 教學提示面板 overlay
