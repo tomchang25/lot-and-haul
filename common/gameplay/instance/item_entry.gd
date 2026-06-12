@@ -233,14 +233,15 @@ func full_true_value() -> float:
 ## of surface clues the NPC happens to notice. Uses add-then-mul semantics:
 ## (anchor.base_value + sum noticed_add) * product noticed_mul.
 ## sight_chance: per-clue probability the NPC notices each surface clue.
-func roll_npc_estimate(sight_chance: float) -> int:
+## [param rng] — optional seedable RNG for deterministic generation.
+func roll_npc_estimate(sight_chance: float, rng: RandomNumberGenerator = null) -> int:
     var eff_anchor := _get_anchor()
     if eff_anchor == null:
         return 0
     var add_sum := 0.0
     var mul_product := 1.0
     for clue: ClueData in _get_surface_clues():
-        if randf() < sight_chance:
+        if (rng.randf() if rng else randf()) < sight_chance:
             match clue.effect_op:
                 "add":
                     add_sum += clue.effect_amount
@@ -465,11 +466,14 @@ func apply_damage(ratio: float) -> void:
 
 
 ## Creates an entry from pool-generated parts.
+## [param rng] — optional seedable RNG for deterministic generation.
+## When null, falls back to global rand*() calls.
 static func from_generation(
         gen_anchor: AnchorData,
         gen_surface: Array[ClueData],
         gen_hidden: Array[ClueData],
         gen_category: CategoryData,
+        rng: RandomNumberGenerator = null,
 ) -> ItemEntry:
     var entry := ItemEntry.new()
     entry.anchor = gen_anchor
@@ -477,8 +481,8 @@ static func from_generation(
     entry.hidden_clues = gen_hidden
     entry.category_data = gen_category
 
-    entry.condition = randf()
-    entry.center_offset = randf_range(-0.5, 0.5)
+    entry.condition = rng.randf() if rng else randf()
+    entry.center_offset = rng.randf_range(-0.5, 0.5) if rng else randf_range(-0.5, 0.5)
     entry.unveiled = false
 
     return entry

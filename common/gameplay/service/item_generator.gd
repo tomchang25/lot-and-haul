@@ -13,6 +13,8 @@ class GenerationResult extends RefCounted:
 
 
 ## Draws one item from the configured pools.
+## [param rng] — optional seedable RNG for deterministic generation.
+## When null, creates a fresh randomized RNG (production path).
 ## Returns a GenerationResult (null anchor means the slot should be skipped).
 static func draw(
         category: CategoryData,
@@ -20,31 +22,37 @@ static func draw(
         rarity_weights: Dictionary,
         surface_min: int,
         surface_max: int,
+        rng: RandomNumberGenerator = null,
 ) -> GenerationResult:
+    var resolved_rng := rng
+    if resolved_rng == null:
+        resolved_rng = RandomNumberGenerator.new()
+        resolved_rng.randomize()
+
     var result := GenerationResult.new()
 
     # ── 1. Anchor ────────────────────────────────────────────────────────
-    result.anchor = _draw_anchor(category, tier_weights)
+    result.anchor = _draw_anchor(category, tier_weights, resolved_rng)
     if result.anchor == null:
         return result
 
     # ── 2. Surface clues ─────────────────────────────────────────────────
-    var surface_count := clampi(randi_range(surface_min, surface_max), 1, 8)
-    result.surface_clues = _draw_surface_clues(category, surface_count)
+    var surface_count := clampi(resolved_rng.randi_range(surface_min, surface_max), 1, 8)
+    result.surface_clues = _draw_surface_clues(category, surface_count, resolved_rng)
 
     # ── 3. Rarity ────────────────────────────────────────────────────────
-    var rarity := _pick_rarity(rarity_weights)
+    var rarity := _pick_rarity(rarity_weights, resolved_rng)
 
     # ── 4. Hidden clues ──────────────────────────────────────────────────
-    result.hidden_clues = _draw_hidden_clues(category, rarity)
+    result.hidden_clues = _draw_hidden_clues(category, rarity, resolved_rng)
 
     return result
 
 
 ## Picks an anchor for [param category] using [param tier_weights].
 ## Empty/zero tier_weights → uniform pick from all category anchors (any tier).
-## Non-empty → weight-pick tier, uniform within that tier; fall back to nearest tier.
-static func _draw_anchor(category: CategoryData, tier_weights: Dictionary) -> AnchorData:
+## Non-empty → weight-pick tier, uniform within that tier; fall back to nearest tier.00
+static func _draw_anchor(category: CategoryData, tier_weights: Dictionary, rng: RandomNumberGenerator) -> AnchorData:
     var all_anchors: Array[AnchorData] = AnchorRegistry.get_all_anchors()
     var cat_anchors: Array[AnchorData] = []
     for a: AnchorData in all_anchors:
@@ -62,16 +70,16 @@ static func _draw_anchor(category: CategoryData, tier_weights: Dictionary) -> An
             break
 
     if not has_weight:
-        return cat_anchors[randi() % cat_anchors.size()]
+        return cat_anchors[rng.randi() % cat_anchors.size()]
 
     # Weight-pick tier
     var tier_keys: Array = tier_weights.keys()
     var tier_values: Array[int] = []
     for k in tier_keys:
         tier_values.append(int(tier_weights[k]))
-    var tier_idx := RandomUtils.pick_weighted_index(tier_values)
+    var tier_idx := RandomUtils.pick_weighted_index(tier_values, rng)
     if tier_idx < 0:
-        return cat_anchors[randi() % cat_anchors.size()]
+        return cat_anchors[rng.randi() % cat_anchors.size()]
 
     var picked_tier: int = int(tier_keys[tier_idx])
 
@@ -82,7 +90,7 @@ static func _draw_anchor(category: CategoryData, tier_weights: Dictionary) -> An
             tier_anchors.append(a)
 
     if not tier_anchors.is_empty():
-        return tier_anchors[randi() % tier_anchors.size()]
+        return tier_anchors[rng.randi() % tier_anchors.size()]
 
     # Fall back to nearest tier, preferring lower on ties
     var best_tier: int = -1
@@ -91,32 +99,31 @@ static func _draw_anchor(category: CategoryData, tier_weights: Dictionary) -> An
         var dist := abs(t - picked_tier)
         if dist > best_dist:
             continue
-        # Check if any anchors exist at this tier
-        var has := false
+        var has_anchor := false
         for a: AnchorData in cat_anchors:
             if a.tier == t:
-                has = true
+                has_anchor = true
                 break
-        if not has:
+        if not has_anchor:
             continue
         if dist < best_dist or (dist == best_dist and t < best_tier):
             best_dist = dist
             best_tier = t
 
     if best_tier < 0:
-        return cat_anchors[randi() % cat_anchors.size()]
+        return cat_anchors[rng.randi() % cat_anchors.size()]
 
     var fallback: Array[AnchorData] = []
     for a: AnchorData in cat_anchors:
         if a.tier == best_tier:
             fallback.append(a)
-    return fallback[randi() % fallback.size()]
+    return fallback[rng.randi() % fallback.size()]
 
 
 ## Draws [param count] surface clues without replacement from valid pool.
 ## Valid: type == SURFACE and domain is "generic" or matches category_id.
 ## If pool is smaller than count, takes everything.
-static func _draw_surface_clues(category: CategoryData, count: int) -> Array[ClueData]:
+static func _draw_surface_clues(category: CategoryData, count: int, rng: RandomNumberGenerator) -> Array[ClueData]:
     var pool: Array[ClueData] = []
     for c: ClueData in ClueRegistry.get_all_clues():
         if c.type != ClueData.ClueType.SURFACE:
@@ -133,10 +140,10 @@ static func _draw_surface_clues(category: CategoryData, count: int) -> Array[Clu
     var chosen: Array[ClueData] = []
     var used: Array[int] = []
     for i in range(actual):
-        var idx := randi() % pool.size()
+        var idx := rng.randi() % pool.size()
         var attempts := 0
         while idx in used and attempts < 100:
-            idx = randi() % pool.size()
+            idx = rng.randi() % pool.size()
             attempts += 1
         if idx in used:
             continue
@@ -147,14 +154,14 @@ static func _draw_surface_clues(category: CategoryData, count: int) -> Array[Clu
 
 ## Picks a rarity value from [param rarity_weights] weighted table.
 ## Returns int 0–4 matching Economy.Rarity enum values.
-static func _pick_rarity(rarity_weights: Dictionary) -> int:
+static func _pick_rarity(rarity_weights: Dictionary, rng: RandomNumberGenerator) -> int:
     if rarity_weights.is_empty():
         return 0
     var keys: Array = rarity_weights.keys()
     var values: Array[int] = []
     for k in keys:
         values.append(int(rarity_weights[k]))
-    var idx := RandomUtils.pick_weighted_index(values)
+    var idx := RandomUtils.pick_weighted_index(values, rng)
     if idx < 0:
         return 0
     return int(keys[idx])
@@ -164,7 +171,7 @@ static func _pick_rarity(rarity_weights: Dictionary) -> int:
 ## Valid: type == HIDDEN and domain is "generic" or matches category_id.
 ## Constraints: at most one per exclusive_group, at most one override.
 ## If pool dries before count is met, returns what was drawn.
-static func _draw_hidden_clues(category: CategoryData, count: int) -> Array[ClueData]:
+static func _draw_hidden_clues(category: CategoryData, count: int, rng: RandomNumberGenerator) -> Array[ClueData]:
     if count <= 0:
         return [] as Array[ClueData]
 
@@ -182,19 +189,16 @@ static func _draw_hidden_clues(category: CategoryData, count: int) -> Array[Clue
     var used_groups: Array[String] = []
     var has_override := false
 
-    # Shuffle pool copy for uniform draw without replacement
     var shuffled := pool.duplicate()
-    shuffled.shuffle()
+    RandomUtils.shuffle(shuffled, rng)
 
     for clue: ClueData in shuffled:
         if chosen.size() >= count:
             break
 
-        # Skip if exclusive_group already used
         if not clue.exclusive_group.is_empty() and clue.exclusive_group in used_groups:
             continue
 
-        # Skip second override
         if clue.effect_op == "override":
             if has_override:
                 continue

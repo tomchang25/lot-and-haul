@@ -54,8 +54,9 @@ func initialize(p_entry: LotEntry, p_initial_ap: int) -> void:
 
 
 ## Deducts [param cost] AP from the inspection pool for this lot.
+## Clamped at 0 — AP never goes negative.
 func deduct_ap(cost: int) -> void:
-    _actions_remaining -= cost
+    _actions_remaining = maxi(_actions_remaining - cost, 0)
 
 
 ## Records a won auction: saves [param items] and [param price] as this lot's

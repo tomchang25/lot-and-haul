@@ -1,0 +1,161 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  GODOT_VERSION: "4.6.3"
+  GODOT_ZIP: "Godot_v4.6.3-stable_linux.x86_64.zip"
+  GODOT_BINARY: "Godot_v4.6.3-stable_linux.x86_64"
+  GODOT_CACHE_KEY: "godot-4.6.3-linux-x64"
+
+jobs:
+  # ── Setup: generate .tres files from YAML sources ──────────────────────────
+  generate-tres:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install PyYAML
+        run: pip install pyyaml
+      - name: Generate .tres files from YAML
+        run: python3 dev/tools/yaml_to_tres.py --godot-root "$PWD"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: data-tres
+          path: data/tres/
+          retention-days: 1
+
+  # ── Setup: render synth SFX (WAV + UiAudioEvent .tres) from YAML ─────────
+  render-sfx:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install PyYAML
+        run: pip install pyyaml
+      - name: Render SFX from YAML synth patches
+        run: python3 dev/tools/render_sfx.py --dir data/yaml/sfx/ --godot-root "$PWD"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sfx-data
+          path: |
+            data/tres/audio_events/
+            assets/audio/placeholder/
+          retention-days: 1
+
+  # ── Layer 1 — GUT unit tests ──────────────────────────────────────────────
+  unit-tests:
+    needs: [generate-tres, render-sfx]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache Godot binary
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: /tmp/godot-bin
+          key: ${{ env.GODOT_CACHE_KEY }}
+      - name: Install Godot headless
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p /tmp/godot-bin
+          wget -q "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/${GODOT_ZIP}" -O /tmp/godot.zip
+          unzip -q /tmp/godot.zip -d /tmp/godot-bin/
+          chmod +x /tmp/godot-bin/${GODOT_BINARY}
+      - name: Restore data/tres
+        uses: actions/download-artifact@v4
+        with:
+          name: data-tres
+          path: data/tres/
+      - name: Restore SFX data
+        uses: actions/download-artifact@v4
+        with:
+          name: sfx-data
+          path: ./
+      - name: Run unit tests
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          /tmp/godot-bin/${GODOT_BINARY} --headless --path "$PWD" --test-unit 2>&1 | tee /tmp/unit-output.log
+          exit_code=$?
+          # Guard: ensure at least one test script ran.
+          if grep -q 'TestRunner: 0 scripts' /tmp/unit-output.log; then
+            echo "::error::No test scripts executed — project may have parse errors or no test files found"
+            exit 1
+          fi
+          exit $exit_code
+      - name: Check for script errors in unit output
+        if: always()
+        run: |
+          if grep -n "SCRIPT ERROR" /tmp/unit-output.log | grep .; then
+            echo "::error::SCRIPT ERROR lines detected in unit test output"
+            exit 1
+          fi
+
+  # ── Layer 2 — Headless smoke test ─────────────────────────────────────────
+  smoke-test:
+    needs: [generate-tres, render-sfx]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache Godot binary
+        id: cache-godot-smoke
+        uses: actions/cache@v4
+        with:
+          path: /tmp/godot-bin
+          key: ${{ env.GODOT_CACHE_KEY }}
+      - name: Install Godot headless
+        if: steps.cache-godot-smoke.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p /tmp/godot-bin
+          wget -q "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/${GODOT_ZIP}" -O /tmp/godot.zip
+          unzip -q /tmp/godot.zip -d /tmp/godot-bin/
+          chmod +x /tmp/godot-bin/${GODOT_BINARY}
+      - name: Restore data/tres
+        uses: actions/download-artifact@v4
+        with:
+          name: data-tres
+          path: data/tres/
+      - name: Restore SFX data
+        uses: actions/download-artifact@v4
+        with:
+          name: sfx-data
+          path: ./
+      - name: Run CI pilot
+        id: pilot
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          /tmp/godot-bin/${GODOT_BINARY} --headless --path "$PWD" --ci-run 2>&1 | tee /tmp/ci-output.log
+          # Guard: ci-run must print autopilot result — if missing, Godot likely crashed.
+          if ! grep -q "CI Pilot: autopilot" /tmp/ci-output.log; then
+            echo "::error::CI pilot did not complete — possible crash or parse error"
+            exit 1
+          fi
+          if grep -q "CI Pilot: autopilot FAILED" /tmp/ci-output.log; then
+            exit 1
+          fi
+      - name: Check for error-level log lines
+        if: always()
+        run: |
+          set +o pipefail
+          # Any SCRIPT ERROR, ERROR:, push_error, or FATAL is a hard fail.
+          # Only unavoidable headless-mode engine noise is filtered.
+          if grep -n -E "(SCRIPT ERROR|ERROR:|push_error|FATAL)" /tmp/ci-output.log \
+            | grep -v -E "(AudioServer|DisplayServer)" \
+            | grep -v -E "(PulseAudio|ALSA|D3D12|WASAPI|CoreAudio)" \
+            | grep .; then
+            echo "::error::Error-level log lines detected in CI output"
+            exit 1
+          else
+            echo "No unexpected error lines found"
+            exit 0
+          fi

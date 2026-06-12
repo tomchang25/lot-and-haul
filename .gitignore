@@ -1,12 +1,12 @@
+# **/assets
+
 **/.godot
 **/.commitsage
 
 **/shader_cache
-# **/assets
-**/addons
 **/script_templates
 **/*_back
-**/test
+**/test/test_data
 
 **/dev/tools/bin
 

@@ -112,6 +112,35 @@ static func random_name(rng: RandomNumberGenerator) -> String:
     return "%s %s" % [first, last]
 
 
+## Dispatches to rng.randi_range() or global randi_range() based on rng presence.
+static func randi_range_rng(from: int, to: int, rng: RandomNumberGenerator = null) -> int:
+    return rng.randi_range(from, to) if rng else randi_range(from, to)
+
+
+## Dispatches to rng.randi() or global randi() based on rng presence.
+static func randi_rng(rng: RandomNumberGenerator = null) -> int:
+    return rng.randi() if rng else randi()
+
+
+## Dispatches to rng.randf() or global randf() based on rng presence.
+static func randf_rng(rng: RandomNumberGenerator = null) -> float:
+    return rng.randf() if rng else randf()
+
+
+## Shuffles [param array] in-place using Fisher-Yates with [param rng].
+## Falls back to built-in Array.shuffle() when rng is null.
+static func shuffle(array: Array, rng: RandomNumberGenerator = null) -> void:
+    if rng == null:
+        array.shuffle()
+        return
+    var n := array.size()
+    for i in range(n - 1, 0, -1):
+        var j := rng.randi_range(0, i)
+        var tmp = array[i]
+        array[i] = array[j]
+        array[j] = tmp
+
+
 ## Picks [param count] unique items from [param pool] using [param rng].
 ## Returns fewer items if the pool is smaller than count.
 static func pick_unique(rng: RandomNumberGenerator, pool: Array, count: int) -> Array:

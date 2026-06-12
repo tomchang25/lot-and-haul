@@ -4,7 +4,7 @@ A Godot 4.6 single-player game about buying storage lots at auction, inspecting 
 
 ## Agent Rules
 
-Agent-specific instructions live in `dev/agent_rules/`. Read them before starting work. Key rules: `sandbox_environment.md` (shell vs. file tools), `lint_before_finish.md` (run linter on changed files), `git_operations.md` (git is read-only — never stage/commit, only suggest commit messages), `godot_headless_check.md` (never run Godot against the mount — use the /tmp snapshot procedure), `save_migrations.md` (never delete migration code).
+Agent-specific instructions live in `dev/agent_rules/`. Read them before starting work. Key rules: `sandbox_environment.md` (shell vs. file tools), `lint_before_finish.md` (run linter on changed files), `git_operations.md` (git is read-only — never stage/commit, only suggest commit messages), `godot_headless_check.md` (never run Godot against the mount — use the /tmp snapshot procedure), `godot_tests.md` (how to run the GUT unit suite and CI smoke test), `save_migrations.md` (never delete migration code).
 
 **Model-tier gate (Fable)**: if you are running as a Fable-class model, you may freely read individual files. If a task requires reading 10 or more files in a single operation (e.g. codebase-wide search sweeps, bulk lint passes, large diff reviews), stop and confirm with me first before proceeding.
 

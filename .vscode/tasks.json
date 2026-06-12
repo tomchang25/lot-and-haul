@@ -152,6 +152,40 @@
                 "panel": "shared"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "CI: unit tests",
+            "type": "shell",
+            "command": "godot_console",
+            "args": [
+                "--headless",
+                "--path",
+                "${workspaceFolder}",
+                "--test-unit"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "CI: smoke test",
+            "type": "shell",
+            "command": "godot_console",
+            "args": [
+                "--headless",
+                "--path",
+                "${workspaceFolder}",
+                "--ci-run"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
         }
     ]
 }
