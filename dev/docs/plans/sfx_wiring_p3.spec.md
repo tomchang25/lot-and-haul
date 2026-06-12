@@ -26,6 +26,10 @@ Wire the generated sound set into the game: a global click binder that connects 
 - Settled: **Reveal sound call site.** In `reveal_scene.gd:_on_reveal_pressed()`, play the `reveal_good` sound for each item. The rate limiter on the event resource caps the actual playback. For `_do_unveil()` and `_do_clue_chain()` in `inspection_scene.gd`: on success (unveil or clue succeeded), play `reveal_good`; on failure (clue failed), play `reveal_bad`.
 - Settled: **Blocked/error sound call sites.** Not every `push_warning` or `ToastManager.show_error` gets a sound — only user-facing blocked actions: insufficient AP (inspection scene), can't bid (bid button disabled), can't sell with empty car. These are gated at the interaction point where the user action is rejected, not at the error display.
 - Settled: **Cash credited sound call sites.** Play when `run_review_scene.gd:_resolve_run_and_navigate()` calls `MetaManager.resolve_current_run()` (cash credited via run economics) and when `customer_sell_scene.gd:_on_sell_confirmed()` calls `MetaManager.resolve_customer_sale()` (customer sale cash). The `cash_credited` event has its own limiter key so rapid-fire calls don't overlap.
+- Settled: **button_hover, generic confirm, cancel_dismiss exist as assets but are unwired in v1.** Phase 2 produced them but Phase 3 wiring scope is limited to the original 9 interaction sounds. These three are available for future binding passes.
+- Settled: **Hover sounds are explicitly excluded from the ClickBinder.** The binder wires `pressed` only. Adding `mouse_entered`/`mouse_exited` would require per-button cooldown logic (to avoid machine-gunning on list navigation) and a separate opt-out meta — not worth the complexity for placeholder tier. If hover feedback is needed later, it gets its own binder pass.
+- Settled: **Generic `confirm` sound is not wired by the ClickBinder.** The binder plays the shared `click` event for all buttons. Using `confirm` for OK/action buttons would require per-button classification (e.g. a new meta `sfx_sound_override = &"confirm"`) — out of scope for v1. Only `bid_confirm` (auction-specific) is wired at its semantic call site.
+- Settled: **`cancel_dismiss` has no call site in v1.** No back/navigate-away or "No"/"Cancel" button is wired in the current scene set. The sound exists for future use when those call sites are added.
 
 ## Scope
 
@@ -54,6 +58,9 @@ Wire the generated sound set into the game: a global click binder that connects 
 - No changes to the audio system itself — only consuming its existing API.
 - No new UI elements for sound volume/control — the bus layout handles that.
 - No sound for the `start_page` scene (menu buttons are low-priority and can be added later).
+- `button_hover` is not wired — the ClickBinder only connects `pressed`, not `mouse_entered`/`mouse_exited`.
+- `cancel_dismiss` is not wired — no back/cancel call site exists in the current scene set.
+- Generic `confirm` is not wired — the ClickBinder plays the shared `click` event for all buttons; `confirm` is reserved for future per-button override use.
 
 ## Files to Change
 
