@@ -10,7 +10,7 @@ Agent-specific instructions live in `dev/agent_rules/`. Read them before startin
 
 **No hard-wrapped prose**: Do not hard-wrap prose lines — let the client handle line wrapping. This is a global rule that applies to all writing, not just commits.
 
-When asked to build a plan or implementation spec, follow the matching standard in `dev/agent_rules/` (`plan_standard.md`, `implementation_spec_standard.md`), the plan lifecycle in `dev/docs/README.md`, and `dev/standards/` for any relevant domain standard. Plans go in `dev/docs/plans/` with a one-line pointer in `TODO.md`. The spec author explores the codebase directly against the plan — there is no separate scout stage.
+When asked to build a plan, implementation spec, or sketch, follow the matching standard in `dev/agent_rules/` (`plan_standard.md`, `implementation_spec_standard.md`, `sketch_standard.md`), the plan lifecycle in `dev/docs/README.md`, and `dev/standards/` for any relevant domain standard. Plans and sketches go in `dev/docs/plans/` with a one-line pointer in `TODO.md`. The spec author explores the codebase directly against the plan — there is no separate scout stage. Small features with conversation-settled design take the sketch route (one document, non-normative code allowed, no spec).
 
 Resolve unknowns by asking me directly during the planning conversation — never emit an `## Open Questions` section or leave unresolved decisions parked in a plan or spec. Stop and ask the moment a decision is unclear; hand over a plan or spec only once every such question has been answered and folded into the relevant Requirement, Design, or Relational Context line.
 

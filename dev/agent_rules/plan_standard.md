@@ -10,7 +10,7 @@ Use this for:
 - Architecture-level changes that need scope control.
 - Any design whose intent is worth reviewing before code is touched.
 
-Do not use this for small bug fixes, config changes, or narrow refactors — those go straight to a compact implementation note.
+Do not use this for small bug fixes, config changes, or narrow refactors — those go straight to a compact implementation note. For a small feature whose design is already settled in conversation, skip both Plan and Spec and write a single sketch instead (`sketch_standard.md`).
 
 ---
 

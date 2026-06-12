@@ -14,7 +14,7 @@ Use this for:
 
 Do not use this for:
 
-- Small bounded changes with no meaningful cross-system interaction — use a compact implementation note.
+- Small bounded changes with no meaningful cross-system interaction — use a compact implementation note, or a sketch (`sketch_standard.md`) when the change deserves a standing document but not a retrieval pass.
 - Work where you want the agent to discover and propose the approach itself — use a plan-mode prompt instead.
 - Changes that need step-by-step, per-file instruction — use a full per-file plan instead.
 
