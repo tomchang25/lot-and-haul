@@ -1,23 +1,23 @@
-sound_id: confirm
-seed: 110
-variant_count: 2
+sound_id: cash_credited
+seed: 700
+variant_count: 1
 source:
   waveform: sine
   duty_cycle: 0.5
 pitch:
-  start_hz: 1200
-  end_hz: 800
+  start_hz: 500
+  end_hz: 500
   slide_curve: 0.0
   vibrato_depth: 0.0
   vibrato_rate: 0.0
-  arpeggio_shifts: []
-  arpeggio_step_time: 0.0
+  arpeggio_shifts: [0, 4, 7, 12]
+  arpeggio_step_time: 0.04
 envelope:
   attack_s: 0.002
-  decay_s: 0.04
-  sustain_s: 0.02
-  release_s: 0.02
-  sustain_level: 0.3
+  decay_s: 0.001
+  sustain_s: 0.15
+  release_s: 0.08
+  sustain_level: 0.8
   sustain_punch: 0.0
 color:
   lp_cutoff_hz: 0
@@ -27,6 +27,6 @@ playback:
   volume_db: -6.0
   pitch_random_min: 0.98
   pitch_random_max: 1.02
-  limiter_key: ""
-  max_per_window: 8
-  window_sec: 0.05
+  limiter_key: "cash"
+  max_per_window: 2
+  window_sec: 1.0

@@ -1,12 +1,12 @@
-sound_id: click
-seed: 42
+sound_id: reveal_good
+seed: 400
 variant_count: 3
 source:
-  waveform: square
-  duty_cycle: 0.3
+  waveform: sine
+  duty_cycle: 0.5
 pitch:
-  start_hz: 1000
-  end_hz: 600
+  start_hz: 800
+  end_hz: 1400
   slide_curve: 0.0
   vibrato_depth: 0.0
   vibrato_rate: 0.0
@@ -14,19 +14,19 @@ pitch:
   arpeggio_step_time: 0.0
 envelope:
   attack_s: 0.001
-  decay_s: 0.005
+  decay_s: 0.08
   sustain_s: 0.0
-  release_s: 0.01
-  sustain_level: 0.3
+  release_s: 0.06
+  sustain_level: 0.6
   sustain_punch: 0.0
 color:
   lp_cutoff_hz: 0
   hp_cutoff_hz: 0
   bitcrush_bits: 16
 playback:
-  volume_db: -9.0
+  volume_db: -7.0
   pitch_random_min: 0.98
   pitch_random_max: 1.02
-  limiter_key: ""
-  max_per_window: 8
-  window_sec: 0.05
+  limiter_key: "reveal"
+  max_per_window: 4
+  window_sec: 0.3

@@ -144,14 +144,17 @@ The `bus` is always `UI` (the generated `.tres` hardcodes `bus_id = 2`). Do not 
 | Playback | `max_per_window`     | 8       |
 | Playback | `window_sec`         | 0.05    |
 
+> Error, warn, and info notifications do not need SFX — they go through ToastManager.
+
 ## Intent → Convention Mapping
 
 Use this table when authoring sounds from gameplay intent. Match the closest row, then adapt pitch, envelope, and waveform to fit.
 
 | Intent                  | Waveform | Start Hz | End Hz | Envelope                                   | Notes                                         |
 | ----------------------- | -------- | -------- | ------ | ------------------------------------------ | --------------------------------------------- |
-| Confirm / success       | sine     | 1200     | 800    | A 0.002 / D 0.04 / S 0.02 / R 0.02 SL 0.3  | Short pitch-up blip                           |
-| Error / blocked         | square   | 200      | 100    | A 0.01 / D 0.1 / S 0.0 / R 0.05 SL 0.5     | Low buzz, fast decay                          |
+| Confirm / success       | sine     | 1200     | 800    | A 0.002 / D 0.04 / S 0.02 / R 0.02 SL 0.3  | Generic fallback (`confirm.yaml`); override with context-specific IDs like `bid_confirm` when a unique version is needed |
+| Button hover            | sine     | 600      | 600    | A 0.001 / D 0.002 / S 0.0 / R 0.002 SL 0.0 | Very soft tick, quiet (-15 dB), 1 variant     |
+| Cancel / dismiss        | square   | 400      | 200    | A 0.003 / D 0.02 / S 0.0 / R 0.02 SL 0.2   | Short downward blip, mirror of confirm        |
 | Reveal (good)           | triangle | 1800     | 900    | A 0.001 / D 0.05 / S 0.1 / R 0.03 SL 0.5   | Bright chime, moderate length                 |
 | Reveal (bad / negative) | saw      | 300      | 150    | A 0.005 / D 0.15 / S 0.0 / R 0.1 SL 0.4    | Dark descending tone                          |
 | Hit / impact            | noise    | —        | —      | A 0.001 / D 0.02 / S 0.0 / R 0.01 SL 0.0   | Noise burst with instant decay                |
