@@ -22,10 +22,6 @@ Preliminary concepts — bigger than a one-liner, but a single `###` sub-section
 
 One-press build flow covering the two release blockers from `dev/docs/visions/itchio_review.md`. (1) `data/tres/` is gitignored — all 250 `.tres` files (30 anchors / 184 clues / 12 categories / 4 cars / 6 lots / 4 super-categories / 5 attributes / 3 perks) exist only on disk, so a fresh clone loads zero resources and the game cannot boot; fix via a bootstrap script that runs the YAML pipeline to regenerate them (or un-gitignore the folder). (2) Export presets are not configured — no build can be produced at all. Fold both into one automated step: generate tres → export Windows + Linux builds.
 
-### Release-Safe Assert Replacement
-
-`assert()` is stripped in release exports, turning guards into silent null-pointer crashes. 18 `assert()` calls remain across 10 files (auction / inspection / reveal / save_manager / run_manager, etc.) — e.g. `assert(RunManager.lot != null)`. Replace each with `if` + `push_error` + `return`.
-
 ### Simple Tutorial (No-Story)
 
 The tutorial split out from the story demo — Stage 2's "small onboarding" pulled forward to Stage 1. A data-driven tutorial hint panel (step list: scene + trigger condition + hint text, played in order — no branching, no portraits, no story) guides the player through one full run + hub loop: inspect → bid → cargo (blocked from leaving empty) → storage → knowledge → customer sell → end day. The first run is made deterministic and friendly via the Director injection skeleton below (big car, high stamina, high-value low-depth items); free play afterwards, no multi-run scripting. The 3-run story demo (Uncle, X-Ray, Crown cutscene) moves to Stage 3. Panel is reusable in the full game. See `dev/docs/visions/itchio_review.md`.
@@ -42,14 +38,6 @@ Phase 1 (Stage 1 tutorial) scope: data injection for the first run + one cargo-s
 ### Dialog System — Deferred to Story Demo
 
 DialogManager, a shared overlay autoload, data-driven from the start — linear dialog first, Uncle branching second. The Director emits signals at the appropriate moments; DialogManager handles display, so no hub or run scene is modified directly. Shared by the story demo and the eventual full game. Deferred to the Stage 3 story demo — Phase 1's tutorial needs only the hint panel from Simple Tutorial above, which the full system can later grow out of.
-
-### Placeholder SFX Generator
-
-LLM-writes-parameters, deterministic-synth-renders — the yaml→tres philosophy applied to audio. Agent authors sfxr-style parameter YAML (`data/yaml/sfx/*.yaml`); a one-shot CLI (`dev/tools/sfx_generate.py`, numpy or an existing sfxr port like `pyfxr`) renders them to 44.1kHz 16-bit WAV under `assets/audio/sfx/placeholder/`. A generation prompt in `dev/tools/prompts/sfx_generation/` defines the schema plus intent→sound conventions (jump = square pitch-up, hit = noise burst + fast decay, ui click = short low-amp sine). Schema copies sfxr directly (waveform, ADSR, freq start/end/slide, noise, bitcrush) — a twenty-year-proven parameter space the LLM knows well. Only QC is normalize-against-clipping + a length cap; no quality loop, placeholders are allowed to sound bad. YAML is the source of truth, re-running the script reproduces output, generated WAVs are never hand-edited. Undecided: output path/naming conventions, whether to support sequence-type multi-segment SFX.
-
-### SFX Wiring (Key Interactions)
-
-`AudioManager` is complete but no scene calls it — bidding, inspection, and buttons are all silent, which hurts gameplay feel too much for a public build. Wire at least the key interactions: bid confirm, button click, item reveal. Done together with the Placeholder SFX Generator above — the generator produces the assets this wiring plays.
 
 ### Perk Type System: Gate vs Effect
 
@@ -201,6 +189,7 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 Flows currently being built or ready to implement — may hold more than one entry. One-line pointer each — same format as `## Plan`, promoted here when building starts or the plan is ready to build. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress or ready → this section is empty.
 
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
+- [sfx] Placeholder SFX pipeline — Phase 1 Generator: `dev/docs/plans/sfx_pipeline_generator_p1.spec.md`, Phase 2 Authoring: `dev/docs/plans/sfx_authoring_p2.spec.md`, Phase 3 Wiring: `dev/docs/plans/sfx_wiring_p3.spec.md`
 
 ---
 
@@ -215,6 +204,7 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 - [unlock_gating] Requirement-gated premium auction tiers + lot kinds, with location tier reference table & audit — see `dev/docs/plans/unlock_gating_location_tiers.md`
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
+
 - [demo] 3-run story demo, demoted to Stage 3 scope (stale — references legacy Skill/Merchant systems);
 
 ---
