@@ -1,6 +1,14 @@
 # Changelog
 
-Append-only record of shipped work. This is the project's permanent "done" history.
+Append-only record of shipped work.
+
+## CI Headless Run-Loop Test Suite
+
+- 2026-06-12 — [ci] RNG injection refactor: `ItemEntry`, `LotEntry`, `ItemGenerator` gain optional seedable RNG parameter with null-fallback preserving all production call sites; `RandomUtils` extended
+- 2026-06-12 — [ci] GUT plugin installed + Layer 1 manager unit tests: AP lifecycle, clue hit/miss, cargo commit, trailer damage, full scratch-to-hub traversal; test-flag boot gate skips save loading and scene routing
+- 2026-06-12 — [ci] CI pilot autoload (`CIPilot`) auto-pilots one full run headless with force-win hook; Layer 2 smoke test via log grep with known-benign allowlist
+- 2026-06-12 — [ci] GitHub Actions workflow (`ci.yml`): parallel unit test + smoke test jobs, Godot binary caching, YAML pipeline prereq, 5-minute timeout
+- 2026-06-12 — [docs] `dev/docs/plans/ci_run_loop_tests.md` shipped and archived This is the project's permanent "done" history.
 
 **Why this file exists:** it is the single home for "what got built." Because it is append-only — you only ever add entries, never reconcile them against current code — it cannot go stale. This is what lets every other tracking surface stay forward-only: `systems/` describes the system as it _is_ (present tense, no Done lists) and `TODO.md` holds only open work (`## Active` in-flight flows, `Plan`/`Chore`/`Bug`, and `## Draft` concepts), with multi-step flows detailed in `dev/docs/plans/` files. When a phase ships, append one entry here, then cut that phase from its plan file; when a whole flow ships, also delete its `TODO.md` line.
 
