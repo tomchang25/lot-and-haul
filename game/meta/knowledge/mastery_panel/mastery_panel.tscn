@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" uid="uid://cwkjcpiuhnjar" path="res://game/meta/knowledge/mastery_panel/mastery_panel.gd" id="1_script"]
+[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="MasteryPanel" type="Control"]
 layout_mode = 3
@@ -66,6 +67,7 @@ layout_mode = 2
 alignment = 1
 
 [node name="BackButton" type="Button" parent="RootVBox/Footer"]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(200, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18

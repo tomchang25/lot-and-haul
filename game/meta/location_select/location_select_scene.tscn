@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://blocsel000001"]
 
 [ext_resource type="Script" uid="uid://ba36wua7kesgv" path="res://game/meta/location_select/location_select_scene.gd" id="1_locsel"]
+[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="LocationSelect" type="Control" unique_id=-294967295]
 layout_mode = 3
@@ -52,6 +53,7 @@ theme_override_constants/separation = 16
 alignment = 1
 
 [node name="BackButton" type="Button" parent="RootVBox" unique_id=-294967290]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 size_flags_horizontal = 4

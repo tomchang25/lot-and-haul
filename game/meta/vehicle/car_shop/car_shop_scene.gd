@@ -8,6 +8,7 @@ extends Control
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
+const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
 const CarCardScene := preload("res://game/meta/vehicle/car_shop/car_card/car_card.tscn")
 
 # ── Node references ───────────────────────────────────────────────────────────
@@ -21,6 +22,7 @@ const CarCardScene := preload("res://game/meta/vehicle/car_shop/car_card/car_car
 
 func _ready() -> void:
     _back_btn.pressed.connect(_on_back_pressed)
+    _back_btn.press_event = CANCEL
     _refresh()
 
 # ══ Signal handlers ═══════════════════════════════════════════════════════════

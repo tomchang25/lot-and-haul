@@ -7,6 +7,7 @@ extends Control
 # ── Constants ───────────────────────────────────────────────────────────
 
 const CASH_CREDITED: UiAudioEvent = preload("res://data/tres/audio_events/cash_credited.tres")
+const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres")
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -38,6 +39,7 @@ const CASH_CREDITED: UiAudioEvent = preload("res://data/tres/audio_events/cash_c
 
 func _ready() -> void:
     _continue_btn.pressed.connect(_on_continue_pressed)
+    _continue_btn.press_event = CONFIRM
 
     var summary: DaySummary = SceneRouter.consume_pending_day_summary()
     if summary == null:

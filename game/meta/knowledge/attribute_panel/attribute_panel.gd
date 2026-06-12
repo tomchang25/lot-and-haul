@@ -2,6 +2,7 @@
 # Attribute Panel — Upgrade player attributes with cash.
 extends Control
 
+const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
 const UPGRADE_COST := 1000
 const AttributeRowScene := preload("res://game/meta/knowledge/attribute_panel/attribute_row/attribute_row.tscn")
 
@@ -11,6 +12,7 @@ const AttributeRowScene := preload("res://game/meta/knowledge/attribute_panel/at
 
 func _ready() -> void:
     _back_btn.pressed.connect(_on_back_pressed)
+    _back_btn.press_event = CANCEL
     _build_content()
 
 

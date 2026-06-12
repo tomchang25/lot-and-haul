@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://blocbrowse001"]
 
 [ext_resource type="Script" uid="uid://oaqiu5lk0e6d" path="res://game/run/lot_browse/lot_browse_scene.gd" id="1_lbscene"]
+[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="LotBrowseScene" type="Control" unique_id=200000001]
 layout_mode = 3
@@ -63,12 +64,14 @@ custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 
 [node name="CargoButton" type="Button" parent="RootVBox/CargoPanel" unique_id=200000009]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(200, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Cargo"
 
 [node name="SkipButton" type="Button" parent="RootVBox" unique_id=200000010]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 10

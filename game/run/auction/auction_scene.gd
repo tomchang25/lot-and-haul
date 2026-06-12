@@ -99,7 +99,7 @@ func _ready() -> void:
 
     _pass_button.pressed.connect(_on_pass_pressed)
     _bid_button.pressed.connect(_on_bid_pressed)
-    _bid_button.set_meta("sfx_click_ignore", true)
+    _bid_button.press_event = null
 
     var price_area: Control = $RootVBox/Centre/Content/PriceArea
     _circle_node = _CircleProgress.new()

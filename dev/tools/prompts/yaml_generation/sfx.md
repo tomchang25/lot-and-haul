@@ -148,22 +148,38 @@ The `bus` is always `UI` (the generated `.tres` hardcodes `bus_id = 2`). Do not 
 
 ## Intent → Convention Mapping
 
-Use this table when authoring sounds from gameplay intent. Match the closest row, then adapt pitch, envelope, and waveform to fit.
+Use these tables when authoring sounds from gameplay intent. Match the closest row, then adapt pitch, envelope, and waveform to fit. Which scene or button plays which sound is wiring, not generation — that truth lives in the scenes and call sites, not in this file. The Notes column only carries reuse directives ("do not author a new file for X, reuse this id") because those prevent duplicate sound files at authoring time.
 
-| Intent                  | Waveform | Start Hz | End Hz | Envelope                                   | Notes                                         |
-| ----------------------- | -------- | -------- | ------ | ------------------------------------------ | --------------------------------------------- |
-| Confirm / success       | sine     | 1200     | 800    | A 0.002 / D 0.04 / S 0.02 / R 0.02 SL 0.3  | Generic fallback (`confirm.yaml`); override with context-specific IDs like `bid_confirm` when a unique version is needed |
-| Button hover            | sine     | 600      | 600    | A 0.001 / D 0.002 / S 0.0 / R 0.002 SL 0.0 | Very soft tick, quiet (-15 dB), 1 variant     |
-| Cancel / dismiss        | square   | 400      | 200    | A 0.003 / D 0.02 / S 0.0 / R 0.02 SL 0.2   | Short downward blip, mirror of confirm        |
-| Reveal (good)           | triangle | 1800     | 900    | A 0.001 / D 0.05 / S 0.1 / R 0.03 SL 0.5   | Bright chime, moderate length                 |
-| Reveal (bad / negative) | saw      | 300      | 150    | A 0.005 / D 0.15 / S 0.0 / R 0.1 SL 0.4    | Dark descending tone                          |
-| Hit / impact            | noise    | —        | —      | A 0.001 / D 0.02 / S 0.0 / R 0.01 SL 0.0   | Noise burst with instant decay                |
-| Click / button          | square   | 1500     | 500    | A 0.001 / D 0.005 / S 0.0 / R 0.005 SL 0.0 | Very short spike, duty = 0.1                  |
-| Cash / coin             | sine     | 2000     | 3200   | A 0.001 / D 0.15 / S 0.0 / R 0.05 SL 0.6   | Rising arpeggio (shifts: [0, 7, 12])          |
-| Sale complete           | triangle | 500      | 600    | A 0.01 / D 0.1 / S 0.3 / R 0.15 SL 0.5     | Medium sustained chord-like                   |
-| Auction won             | saw      | 400      | 1200   | A 0.02 / D 0.2 / S 0.3 / R 0.1 SL 0.7      | Rising fanfare with vibrato (depth 2, rate 8) |
-| Auction lost            | square   | 600      | 100    | A 0.01 / D 0.3 / S 0.0 / R 0.2 SL 0.3      | Descending tone, low sustain                  |
-| Reveal batch done       | sine     | 1000     | 800    | A 0.005 / D 0.1 / S 0.05 / R 0.05 SL 0.4   | Soft settling tone                            |
+### Generic UI
+
+Cross-scene UI furniture. One file each, reused everywhere; never author per-scene copies of these.
+
+| Intent                    | Waveform | Start Hz | End Hz | Envelope                                   | Notes                                                                                                                                                                                                               |
+| ------------------------- | -------- | -------- | ------ | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Click / button            | square   | 1500     | 500    | A 0.001 / D 0.005 / S 0.0 / R 0.005 SL 0.0 | Very short spike, duty = 0.1                                                                                                                                                                                        |
+| Button hover              | sine     | 600      | 600    | A 0.001 / D 0.002 / S 0.0 / R 0.002 SL 0.0 | Very soft tick, quiet (-15 dB), 1 variant                                                                                                                                                                           |
+| Confirm / success         | sine     | 1200     | 800    | A 0.002 / D 0.04 / S 0.02 / R 0.02 SL 0.3  | Generic fallback (`confirm.yaml`) for any confirm/continue/select/success action — reuse the id, do not author per-action copies. Context-specific IDs like `bid_confirm` only when the action needs a unique voice |
+| Cancel / dismiss          | square   | 400      | 200    | A 0.003 / D 0.02 / S 0.0 / R 0.02 SL 0.2   | Short downward blip, mirror of confirm. Generic fallback for any leave/cancel/dismiss/fail action — reuse the id                                                                                                    |
+| Setting toggle / checkbox | square   | 1000     | 1500   | A 0.001 / D 0.005 / S 0.0 / R 0.005 SL 0.0 | Quick toggle tick, duty = 0.5                                                                                                                                                                                       |
+
+### Game-Specific
+
+Semantic sounds for one gameplay moment each.
+
+| Intent                     | Waveform | Start Hz | End Hz | Envelope                                 | Notes                                         |
+| -------------------------- | -------- | -------- | ------ | ---------------------------------------- | --------------------------------------------- |
+| Reveal (good)              | triangle | 1800     | 900    | A 0.001 / D 0.05 / S 0.1 / R 0.03 SL 0.5 | Bright chime, moderate length                 |
+| Reveal (bad / negative)    | saw      | 300      | 150    | A 0.005 / D 0.15 / S 0.0 / R 0.1 SL 0.4  | Dark descending tone                          |
+| Hit / impact               | noise    | —        | —      | A 0.001 / D 0.02 / S 0.0 / R 0.01 SL 0.0 | Noise burst with instant decay                |
+| Cash / coin                | sine     | 2000     | 3200   | A 0.001 / D 0.15 / S 0.0 / R 0.05 SL 0.6 | Rising arpeggio (shifts: [0, 7, 12])          |
+| Sale complete              | triangle | 500      | 600    | A 0.01 / D 0.1 / S 0.3 / R 0.15 SL 0.5   | Medium sustained chord-like                   |
+| Auction won                | saw      | 400      | 1200   | A 0.02 / D 0.2 / S 0.3 / R 0.1 SL 0.7    | Rising fanfare with vibrato (depth 2, rate 8) |
+| Auction lost               | square   | 600      | 100    | A 0.01 / D 0.3 / S 0.0 / R 0.2 SL 0.3    | Descending tone, low sustain                  |
+| Reveal batch done          | sine     | 1000     | 800    | A 0.005 / D 0.1 / S 0.05 / R 0.05 SL 0.4 | Soft settling tone                            |
+| Selling - lift up          | sine     | 600      | 900    | A 0.005 / D 0.04 / S 0.0 / R 0.04 SL 0.3 | Rising tone, short                            |
+| Selling - put down         | sine     | 500      | 300    | A 0.002 / D 0.03 / S 0.0 / R 0.03 SL 0.4 | Descending tone, short                        |
+| Storage - Research         | noise    | —        | —      | A 0.05 / D 0.1 / S 0.15 / R 0.05 SL 0.3  | Soft whir, filtered (lp 2000)                 |
+| Storage - Restore / Repair | saw      | 400      | 400    | A 0.01 / D 0.05 / S 0.08 / R 0.04 SL 0.5 | Short mechanical buzz                         |
 
 For `pitch` fields, use `slide_curve: 0.0` (linear) unless a specific curve shape is desired. Add `variant_count: 2` or `3` for sounds that play frequently (click, confirm) to add audible variety.
 

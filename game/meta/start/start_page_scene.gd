@@ -5,6 +5,9 @@ extends Control
 
 enum PickerMode { NEW_GAME, LOAD }
 
+const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres")
+const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
+
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _new_game_btn: Button = %NewGameButton
@@ -41,6 +44,7 @@ func _ready() -> void:
     _confirm_dialog.confirmed.connect(_on_new_game_confirmed)
     _overwrite_dialog.confirmed.connect(_on_overwrite_confirmed)
     _picker_back_btn.pressed.connect(_on_picker_back_pressed)
+    _picker_back_btn.press_event = CANCEL
 
     for i: int in 3:
         _slot_btns[i].pressed.connect(_on_slot_pressed.bind(i + 1))
@@ -90,6 +94,7 @@ func _on_slot_pressed(slot: int) -> void:
 
     match _picker_mode:
         PickerMode.NEW_GAME:
+            AudioManager.play_event(CONFIRM)
             if is_occupied:
                 _pending_slot = slot
                 _overwrite_dialog.dialog_text = "Start a new game in Slot %d? All progress in this slot will be lost." % slot
@@ -97,6 +102,7 @@ func _on_slot_pressed(slot: int) -> void:
             else:
                 _execute_new_game(slot)
         PickerMode.LOAD:
+            AudioManager.play_event(CONFIRM)
             if is_occupied:
                 _execute_load_game(slot)
 

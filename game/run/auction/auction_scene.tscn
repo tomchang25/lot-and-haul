@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bauctionscn01"]
 
 [ext_resource type="Script" uid="uid://cuw7v0qpqfq4l" path="res://game/run/auction/auction_scene.gd" id="1_auction"]
+[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="AuctionScene" type="Control" unique_id=1003257590]
 layout_mode = 3
@@ -87,11 +88,13 @@ theme_override_constants/separation = 24
 alignment = 1
 
 [node name="PassButton" type="Button" parent="RootVBox/ButtonBar" unique_id=451666721]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 text = "Pass"
 
 [node name="BidButton" type="Button" parent="RootVBox/ButtonBar" unique_id=702685876]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 text = "Bid"

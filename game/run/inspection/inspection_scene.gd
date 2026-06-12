@@ -129,7 +129,7 @@ func _build_grid_controls() -> void:
     for row in GRID_ROWS:
         for col in GRID_COLS:
             var coord := Vector2i(col, row)
-            var button := Button.new()
+            var button := SfxButton.new()
             button.custom_minimum_size = CELL_SIZE
             button.focus_mode = Control.FOCUS_NONE
             button.text = ""
@@ -215,7 +215,9 @@ func _commit_shape_placement(
 
 func _on_grid_cell_pressed(coord: Vector2i) -> void:
     if _inspection_finished:
+        AudioManager.play_event(BLOCKED_ERROR)
         return
+
     if _active_entry != null:
         return
 

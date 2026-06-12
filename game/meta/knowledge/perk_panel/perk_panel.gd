@@ -3,6 +3,8 @@
 # Reads: KnowledgeManager
 extends Control
 
+const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
+
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _back_btn: Button = $RootVBox/Footer/BackButton
@@ -13,6 +15,7 @@ extends Control
 
 func _ready() -> void:
     _back_btn.pressed.connect(_on_back_pressed)
+    _back_btn.press_event = CANCEL
     _build_content()
 
 # ══ Signal handlers ═══════════════════════════════════════════════════════════

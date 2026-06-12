@@ -9,6 +9,9 @@ extends Control
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
+const STORAGE_RESEARCH: UiAudioEvent = preload("res://data/tres/audio_events/storage_research.tres")
+const STORAGE_REPAIR_RESTORE: UiAudioEvent = preload("res://data/tres/audio_events/storage_repair_restore.tres")
+const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
 
 const STORAGE_COLUMNS: Array = [
     ItemRow.Column.NAME,
@@ -63,6 +66,7 @@ func _ready() -> void:
     add_child(_tooltip)
 
     _back_btn.pressed.connect(_on_back_pressed)
+    _back_btn.press_event = CANCEL
     _repair_btn.pressed.connect(_on_repair_pressed)
     _research_btn.pressed.connect(_on_research_pressed)
     _restore_btn.pressed.connect(_on_restore_pressed)
@@ -98,6 +102,7 @@ func _on_repair_pressed() -> void:
     if _selected_entry == null:
         return
     if MetaManager.repair_item(_selected_entry):
+        AudioManager.play_event(STORAGE_REPAIR_RESTORE)
         _refresh_row(_selected_entry)
         _refresh_ap_label()
         _refresh_detail()
@@ -107,6 +112,7 @@ func _on_research_pressed() -> void:
     if _selected_entry == null:
         return
     if MetaManager.research_item(_selected_entry):
+        AudioManager.play_event(STORAGE_RESEARCH)
         _refresh_row(_selected_entry)
         _refresh_ap_label()
         _refresh_detail()
@@ -116,6 +122,7 @@ func _on_restore_pressed() -> void:
     if _selected_entry == null:
         return
     if MetaManager.restore_item(_selected_entry):
+        AudioManager.play_event(STORAGE_REPAIR_RESTORE)
         _refresh_row(_selected_entry)
         _refresh_ap_label()
         _refresh_detail()

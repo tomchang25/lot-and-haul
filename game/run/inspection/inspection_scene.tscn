@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bbr8kx3k0jv3c" path="res://game/run/inspection/inspection_scene.gd" id="1_idapx"]
 [ext_resource type="PackedScene" uid="uid://bstamhudtscn1" path="res://game/run/inspection/stamina_hud/stamina_hud.tscn" id="2_j573n"]
+[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 [node name="InspectionScene" type="Control" unique_id=2043279360]
 layout_mode = 3
 anchors_preset = 15
@@ -108,11 +109,13 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="PassButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=1473063044]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Pass"
 
 [node name="StartAuctionButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=1061694818]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Start Auction"

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bloccard00001"]
 
 [ext_resource type="Script" uid="uid://cwpgqlmeh6scl" path="res://game/meta/location_select/location_card/location_card.gd" id="1_loccard"]
+[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="LocationCard" type="PanelContainer" unique_id=3000000001]
 custom_minimum_size = Vector2(260, 240)
@@ -59,6 +60,7 @@ text = "Est. Cost:   $0"
 horizontal_alignment = 1
 
 [node name="SelectButton" type="Button" parent="VBox" unique_id=3000000009]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 4

@@ -10,6 +10,7 @@ extends Control
 
 const REVEAL_GOOD: UiAudioEvent = preload("res://data/tres/audio_events/reveal_good.tres")
 const AUCTION_LOST: UiAudioEvent = preload("res://data/tres/audio_events/auction_lost.tres")
+const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres")
 
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 
@@ -44,9 +45,9 @@ func _ready() -> void:
     add_child(_tooltip)
 
     _reveal_btn.pressed.connect(_on_reveal_pressed)
-    _reveal_btn.set_meta("sfx_click_ignore", true)
+    _reveal_btn.press_event = null
     _continue_btn.pressed.connect(_on_continue_pressed)
-    _continue_btn.set_meta("sfx_click_ignore", true)
+    _continue_btn.press_event = CONFIRM
 
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
     _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)

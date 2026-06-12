@@ -24,9 +24,9 @@ color:
   hp_cutoff_hz: 0
   bitcrush_bits: 16
 playback:
-  volume_db: -15.0
+  volume_db: -8.0
   pitch_random_min: 0.99
   pitch_random_max: 1.01
-  limiter_key: ""
-  max_per_window: 16
-  window_sec: 0.05
+  limiter_key: "hover"
+  max_per_window: 2
+  window_sec: 0.08

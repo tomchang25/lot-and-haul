@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://kkse0j0m2aq7"]
 
 [ext_resource type="Script" uid="uid://herl5nijad6n" path="res://game/meta/day_summary/day_summary_scene.gd" id="1_script"]
+[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="DaySummaryScene" type="Control" unique_id=903261577]
 layout_mode = 3
@@ -158,6 +159,7 @@ layout_mode = 2
 alignment = 1
 
 [node name="ContinueButton" type="Button" parent="RootVBox/Footer" unique_id=620917211]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(160, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16

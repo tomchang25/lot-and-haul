@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://blotcardscn01"]
 
 [ext_resource type="Script" uid="uid://d0tg23ijvhn0j" path="res://game/run/lot_browse/lot_card/lot_card.gd" id="1_lotcard"]
+[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="LotCard" type="VBoxContainer" unique_id=100000001]
 alignment = 1
@@ -45,12 +46,14 @@ layout_mode = 2
 alignment = 1
 
 [node name="PassButton" type="Button" parent="ButtonBar" unique_id=100000009]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Pass"
 
 [node name="EnterButton" type="Button" parent="ButtonBar" unique_id=100000008]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18

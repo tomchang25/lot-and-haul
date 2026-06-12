@@ -3,7 +3,7 @@
 # sort-direction arrow when it is the active sort column, and emits
 # header_pressed(column) on click. The panel owns sort state and rebuilds.
 class_name ColumnHeaderButton
-extends Button
+extends SfxButton
 
 signal header_pressed(column: int)
 
@@ -21,6 +21,7 @@ var _min_width: float = 0.0
 
 
 func _ready() -> void:
+    super()
     pressed.connect(func() -> void: header_pressed.emit(_column))
     if _configured:
         _apply()

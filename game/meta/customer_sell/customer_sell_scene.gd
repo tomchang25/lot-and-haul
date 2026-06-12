@@ -6,6 +6,10 @@ extends Control
 
 const SALE_COMPLETED: UiAudioEvent = preload("res://data/tres/audio_events/sale_completed.tres")
 const CASH_CREDITED: UiAudioEvent = preload("res://data/tres/audio_events/cash_credited.tres")
+const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres")
+const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
+const SELL_GRID_LIFT: UiAudioEvent = preload("res://data/tres/audio_events/sell_grid_lift.tres")
+const SELL_GRID_PUT_DOWN: UiAudioEvent = preload("res://data/tres/audio_events/sell_grid_put_down.tres")
 
 const CargoItemRowScene: PackedScene = preload("res://game/run/cargo/cargo_item_row.tscn")
 
@@ -46,6 +50,7 @@ var _hovered_entry: ItemEntry = null
 
 func _ready() -> void:
     _back_btn.pressed.connect(_on_back_pressed)
+    _back_btn.press_event = CANCEL
     _sell_result_popup.confirmed.connect(_on_sell_confirmed)
     _sell_result_popup.canceled.connect(_on_sell_cancelled)
     _car_clear_btn.pressed.connect(_on_clear_car_pressed)
@@ -83,7 +88,7 @@ func _build_customer_tabs() -> void:
 
     for i: int in _customers.size():
         var c: CustomerEntry = _customers[i]
-        var btn := Button.new()
+        var btn := SfxButton.new()
         btn.custom_minimum_size = Vector2(140, 36)
         btn.add_theme_font_size_override("font_size", 14)
         btn.text = c.display_name
@@ -236,9 +241,11 @@ func _on_item_row_pressed(entry: ItemEntry) -> void:
         return
     if _grid.is_item_placed(entry):
         _grid.lift(entry)
+        AudioManager.play_event(SELL_GRID_LIFT)
         _update_item_row_states()
     else:
         _grid.set_held_item(entry, _grid.item_rotations.get(entry, 0))
+        AudioManager.play_event(SELL_GRID_LIFT)
         _update_item_row_states()
 
 
@@ -276,6 +283,7 @@ func _on_grid_hover_ended() -> void:
 func _on_grid_item_clicked(item) -> void:
     if _grid != null:
         _grid.lift(item)
+        AudioManager.play_event(SELL_GRID_LIFT)
         _refresh_display()
 
 
@@ -283,6 +291,7 @@ func _on_grid_cell_clicked(pos: Vector2i) -> void:
     if _grid != null and _grid.active_item != null:
         if _grid.can_place(_grid.active_item, pos):
             _grid.place(_grid.active_item, pos)
+            AudioManager.play_event(SELL_GRID_PUT_DOWN)
             _update_item_row_states()
 
 
@@ -295,6 +304,7 @@ func _on_clear_car_pressed() -> void:
 func _on_conservative_pressed() -> void:
     var placed: Array = _get_placed_items()
     if placed.is_empty():
+        AudioManager.play_event(CANCEL)
         return
     var price := SellMath.conservative_total(placed)
     _pending_sale_price = price
@@ -306,6 +316,7 @@ func _on_conservative_pressed() -> void:
 func _on_aggressive_pressed() -> void:
     var placed: Array = _get_placed_items()
     if placed.is_empty():
+        AudioManager.play_event(CANCEL)
         return
     if _selected_idx < 0:
         return
@@ -333,7 +344,7 @@ func _on_aggressive_pressed() -> void:
     for i in range(pool):
         var val := rolls[i]
         _dice_rolls.append(val)
-        var btn := Button.new()
+        var btn := SfxButton.new()
         btn.custom_minimum_size = Vector2(44, 44)
         btn.text = str(val)
         btn.toggle_mode = true
@@ -379,6 +390,7 @@ func _on_dice_toggled(idx: int, toggled: bool) -> void:
 
 
 func _on_confirm_dice_pressed() -> void:
+    AudioManager.play_event(CONFIRM)
     _dice_section.visible = false
     _pending_strategy = "aggressive"
     var placed: Array = _get_placed_items()
@@ -387,6 +399,7 @@ func _on_confirm_dice_pressed() -> void:
 
 
 func _on_cancel_dice_pressed() -> void:
+    AudioManager.play_event(CANCEL)
     _dice_section.visible = false
 
 
@@ -416,6 +429,7 @@ func _on_sell_confirmed() -> void:
     # sale for the daily summary, and removes the served customer from the
     # persisted nightly set. The scene only drops it from its local view.
     MetaManager.resolve_customer_sale(placed, _pending_sale_price, sold_customer, _pending_strategy)
+    AudioManager.play_event(CONFIRM)
     AudioManager.play_event(SALE_COMPLETED)
     AudioManager.play_event(CASH_CREDITED)
     _customers.remove_at(_selected_idx)
@@ -432,6 +446,7 @@ func _on_sell_confirmed() -> void:
 
 
 func _on_sell_cancelled() -> void:
+    AudioManager.play_event(CANCEL)
     _pending_sale_price = 0
     _pending_strategy = ""
 
