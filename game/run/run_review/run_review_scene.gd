@@ -8,6 +8,9 @@ extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
+const CASH_CREDITED: UiAudioEvent = preload("res://data/tres/audio_events/cash_credited.tres")
+const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres")
+
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 
 const REVIEW_COLUMNS: Array = [
@@ -41,6 +44,7 @@ func _ready() -> void:
     add_child(_tooltip)
 
     _continue_btn.pressed.connect(_on_continue_pressed)
+    _continue_btn.press_event = CONFIRM
 
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
     _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
@@ -79,6 +83,7 @@ func _resolve_run_and_navigate() -> void:
     # (player returns for the evening slot). The day summary fires later when
     # the player chooses Open Shop or exhausts all slots from the hub.
     MetaManager.resolve_current_run()
+    AudioManager.play_event(CASH_CREDITED)
     SceneRouter.go_to_hub()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════

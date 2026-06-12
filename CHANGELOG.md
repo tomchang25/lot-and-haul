@@ -8,6 +8,16 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Placeholder SFX Pipeline
+
+- 2026-06-12 — [sfx] Deterministic synth pipeline (`render_sfx.py` + `sfx_synth.py`): YAML → WAV + `UiAudioEvent` `.tres` rendering with seed-based determinism, QC pass (peak-normalize, fade-out, length cap), variant support, and idempotent re-run
+- 2026-06-12 — [sfx] Standard interaction sound set authored (12 YAML files under `data/yaml/sfx/`): click, bid_confirm, auction_won, auction_lost, reveal_good, reveal_bad, sale_completed, cash_credited, blocked_error, confirm, cancel_dismiss, button_hover
+- 2026-06-12 — [sfx] SFX generation prompt (`dev/tools/prompts/yaml_generation/sfx.md`) with full schema, real-unit field definitions, intent→sound convention mapping table
+- 2026-06-12 — [sfx] `SfxButton` component (`game/shared/sfx_button/`): Button subclass with default press/hover audio events, per-button override/mute via inspector exports, hover spam rate-limiting; migrated across all game scenes (~45 buttons)
+- 2026-06-12 — [sfx] Semantic sound call sites across 8 game scenes: auction (bid_confirm, auction_won), inspection (reveal_good/reveal_bad, blocked_error), reveal (reveal_good, auction_lost), cargo (blocked_error, grid placement sounds), customer_sell (sale_completed, cash_credited, confirm/cancel, grid lift/put-down), day_summary (cash_credited), run_review (cash_credited)
+- 2026-06-12 — [sfx] `scene_changed` signal added to `SceneRouter` for scene-transition hooks
+- 2026-06-12 — [sfx] UI bus default lowered to −8 dB for quieter overall HUD loudness
+
 ## Error Guard System
 
 - 2026-06-12 — [toast] `ToastManager.show_error()` always-visible red error channel added (8 s duration) for runtime error fallback alerts

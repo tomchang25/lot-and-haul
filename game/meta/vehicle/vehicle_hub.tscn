@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://game/meta/vehicle/vehicle_hub.gd" id="1_script"]
+[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="VehicleHub" type="Control"]
 layout_mode = 3
@@ -45,6 +46,7 @@ theme_override_constants/separation = 12
 alignment = 1
 
 [node name="GarageButton" type="Button" parent="RootVBox/ButtonsVBox"]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -52,6 +54,7 @@ theme_override_font_sizes/font_size = 18
 text = "Garage"
 
 [node name="CarShopButton" type="Button" parent="RootVBox/ButtonsVBox"]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -63,6 +66,7 @@ layout_mode = 2
 alignment = 1
 
 [node name="BackButton" type="Button" parent="RootVBox/Footer"]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(200, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18

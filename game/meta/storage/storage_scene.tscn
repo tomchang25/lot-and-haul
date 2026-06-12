@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://u48bbtcw2fm4" path="res://game/meta/storage/storage_scene.gd" id="1_uoidr"]
 [ext_resource type="PackedScene" uid="uid://cilp5a1xr3e8m" path="res://game/shared/item_display/item_list_panel/item_list_panel.tscn" id="2_ilp"]
+[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="StorageScene" type="Control" unique_id=303272155]
 layout_mode = 3
@@ -114,6 +115,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="BackButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=716854204]
+script = ExtResource("99_sfx")
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
@@ -335,6 +337,7 @@ theme_override_constants/v_separation = 6
 columns = 2
 
 [node name="RepairButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=807638114]
+script = ExtResource("99_sfx")
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
@@ -343,6 +346,7 @@ theme_override_font_sizes/font_size = 13
 text = "Repair"
 
 [node name="RestoreButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1111111111]
+script = ExtResource("99_sfx")
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
@@ -351,6 +355,7 @@ theme_override_font_sizes/font_size = 13
 text = "Restore"
 
 [node name="ResearchButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1962471177]
+script = ExtResource("99_sfx")
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3

@@ -6,6 +6,7 @@ extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
+const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
 const LocationCardScene := preload("res://game/meta/location_select/location_card/location_card.tscn")
 
 # ── Node references ───────────────────────────────────────────────────────────
@@ -18,6 +19,7 @@ const LocationCardScene := preload("res://game/meta/location_select/location_car
 
 func _ready() -> void:
     _back_button.pressed.connect(_on_back_pressed)
+    _back_button.press_event = CANCEL
     _populate_cards()
 
 # ══ Population ════════════════════════════════════════════════════════════════

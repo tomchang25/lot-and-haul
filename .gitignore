@@ -16,3 +16,7 @@
 data/tres/
 
 **/__pycache__/
+
+# Generated SFX assets (never hand-edit)
+assets/audio/placeholder/*.wav
+data/tres/audio_events/*.tres

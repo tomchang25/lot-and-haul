@@ -7,6 +7,8 @@ extends Control
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
+const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres")
+const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
 const CarRowScene := preload("res://game/meta/vehicle/car_select/car_row/car_row.tscn")
 
 # ── State ──────────────────────────────────────────────────────────────────────
@@ -23,6 +25,7 @@ var _rows: Array[CarRow] = []
 
 func _ready() -> void:
     _back_btn.pressed.connect(_on_back_pressed)
+    _back_btn.press_event = CANCEL
     _populate_rows()
 
 # ══ Signal handlers ═══════════════════════════════════════════════════════════
@@ -36,6 +39,7 @@ func _on_select_pressed(car: CarData) -> void:
     if car == MetaManager.garage.active_car:
         return
     MetaManager.set_active_car(car)
+    AudioManager.play_event(CONFIRM)
     _refresh_active_state()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════

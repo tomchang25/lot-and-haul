@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://s3da6lc55hky"]
 
 [ext_resource type="Script" uid="uid://do8f0uelvy7ki" path="res://game/shared/settings_overlay/settings_overlay.gd" id="1_sogd"]
+[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
 bg_color = Color(0.12, 0.12, 0.15, 1)
@@ -173,6 +174,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="CloseButton" type="Button" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000033]
+script = ExtResource("99_sfx")
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2

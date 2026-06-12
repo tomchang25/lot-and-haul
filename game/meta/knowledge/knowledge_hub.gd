@@ -2,6 +2,8 @@
 # Knowledge Hub — Navigation menu for mastery, attributes, and perks.
 extends Control
 
+const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
+
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _mastery_btn: Button = $RootVBox/ButtonsVBox/MasteryButton
@@ -17,6 +19,7 @@ func _ready() -> void:
     _attributes_btn.pressed.connect(_on_attributes_pressed)
     _perks_btn.pressed.connect(_on_perks_pressed)
     _back_btn.pressed.connect(_on_back_pressed)
+    _back_btn.press_event = CANCEL
 
 # ══ Signal handlers ═══════════════════════════════════════════════════════════
 

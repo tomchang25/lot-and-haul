@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b61ssm5ecobc4" path="res://game/meta/customer_sell/customer_sell_scene.gd" id="1_css"]
 [ext_resource type="Script" path="res://game/shared/packing/packing_grid.gd" id="2_packing_grid"]
+[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="CustomerSellScene" type="Control" unique_id=331840253]
 layout_mode = 3
@@ -122,18 +123,21 @@ theme_override_font_sizes/font_size = 14
 layout_mode = 2
 
 [node name="CarClearButton" type="Button" parent="RootVBox/MainArea/SellPanel" unique_id=111222334]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 text = "Clear Car"
 
 [node name="ConservativeButton" type="Button" parent="RootVBox/MainArea/SellPanel" unique_id=111222335]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 text = "Sell Conservative"
 
 [node name="AggressiveButton" type="Button" parent="RootVBox/MainArea/SellPanel" unique_id=111222336]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
@@ -174,11 +178,13 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="ConfirmDiceButton" type="Button" parent="RootVBox/MainArea/SellPanel/DiceSection/DiceBtnRow" unique_id=111222344]
+script = ExtResource("99_sfx")
 layout_mode = 2
 disabled = true
 text = "Confirm Dice"
 
 [node name="CancelDiceButton" type="Button" parent="RootVBox/MainArea/SellPanel/DiceSection/DiceBtnRow" unique_id=111222345]
+script = ExtResource("99_sfx")
 layout_mode = 2
 text = "Cancel"
 
@@ -188,6 +194,7 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="BackButton" type="Button" parent="RootVBox/FooterRow" unique_id=1597092715]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16

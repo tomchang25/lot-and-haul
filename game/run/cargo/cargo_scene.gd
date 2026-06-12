@@ -6,6 +6,11 @@ extends Control
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
+const BLOCKED_ERROR: UiAudioEvent = preload("res://data/tres/audio_events/blocked_error.tres")
+const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres")
+const SELL_GRID_LIFT: UiAudioEvent = preload("res://data/tres/audio_events/sell_grid_lift.tres")
+const SELL_GRID_PUT_DOWN: UiAudioEvent = preload("res://data/tres/audio_events/sell_grid_put_down.tres")
+
 const CELL_SIZE := 56
 
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
@@ -79,6 +84,7 @@ func _ready() -> void:
 
     _reset_btn.pressed.connect(_on_reset_pressed)
     _continue_btn.pressed.connect(_on_continue_pressed)
+    _continue_btn.press_event = CONFIRM
     _confirm_popup.confirmed.connect(_on_confirm_popup_confirmed)
 
     _won_items = RunManager.run.won_items
@@ -144,6 +150,7 @@ func _on_packing_grid_item_clicked(item) -> void:
     var entry: ItemEntry = item as ItemEntry
     if _item_rows.has(entry):
         _item_rows[entry].set_external_highlight(false)
+    AudioManager.play_event(SELL_GRID_LIFT)
     _lift_from_cargo(entry)
 
 
@@ -151,9 +158,12 @@ func _on_packing_grid_cell_clicked(pos: Vector2i) -> void:
     var item = _cargo_grid.active_item
     if item != null and _cargo_grid.can_place(item, pos):
         _cargo_grid.place(item, pos)
+        AudioManager.play_event(SELL_GRID_PUT_DOWN)
         _active_origin = ""
         _recalc_totals()
         _refresh_ui()
+    elif item != null:
+        AudioManager.play_event(BLOCKED_ERROR)
 
 
 func _on_packing_grid_placement_cancelled(item) -> void:
@@ -292,12 +302,14 @@ func _is_item_in_extra(entry: ItemEntry) -> bool:
 
 
 func _lift_from_list(entry: ItemEntry) -> void:
+    AudioManager.play_event(SELL_GRID_LIFT)
     _active_origin = "list"
     _cargo_grid.set_held_item(entry, _cargo_grid.item_rotations.get(entry, 0))
     _refresh_ui()
 
 
 func _lift_from_cargo(entry: ItemEntry) -> void:
+    AudioManager.play_event(SELL_GRID_LIFT)
     _active_origin = "cargo"
     _cargo_grid.lift(entry)
     _refresh_ui()
@@ -305,6 +317,7 @@ func _lift_from_cargo(entry: ItemEntry) -> void:
 
 func _lift_from_extra(slot_index: int) -> void:
     var entry: ItemEntry = _extra_slot_items[slot_index]
+    AudioManager.play_event(SELL_GRID_LIFT)
     _active_origin = "extra"
     _active_origin_extra_index = slot_index
     _extra_slot_items[slot_index] = null
@@ -324,6 +337,7 @@ func _place_item_in_extra(slot_index: int) -> void:
     if _cargo_grid.is_item_placed(item):
         _cargo_grid.erase(item)
 
+    AudioManager.play_event(SELL_GRID_PUT_DOWN)
     _extra_slot_items[slot_index] = item
     _active_origin = ""
     _active_origin_extra_index = -1

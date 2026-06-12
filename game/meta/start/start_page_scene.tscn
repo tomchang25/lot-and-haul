@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bn8gpmwab184o"]
 
 [ext_resource type="Script" uid="uid://derysb0knu5gc" path="res://game/meta/start/start_page_scene.gd" id="1_spgd"]
+[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="StartPageScene" type="Control" unique_id=1100000001]
 layout_mode = 3
@@ -49,6 +50,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 20
 text = "New Game"
+script = ExtResource("99_sfx")
 
 [node name="LoadGameButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000009]
 unique_name_in_owner = true
@@ -57,6 +59,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 20
 text = "Load Game"
+script = ExtResource("99_sfx")
 
 [node name="SettingsButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000007]
 unique_name_in_owner = true
@@ -65,6 +68,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 20
 text = "Settings"
+script = ExtResource("99_sfx")
 
 [node name="QuitButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000008]
 unique_name_in_owner = true
@@ -73,6 +77,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 20
 text = "Quit"
+script = ExtResource("99_sfx")
 
 [node name="NewGameConfirmDialog" type="ConfirmationDialog" parent="." unique_id=1100000011]
 unique_name_in_owner = true
@@ -124,6 +129,7 @@ custom_minimum_size = Vector2(300, 72)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 16
+script = ExtResource("99_sfx")
 
 [node name="Slot2Button" type="Button" parent="SlotPickerPanel/PickerVBox/SlotsVBox" unique_id=1100000018]
 unique_name_in_owner = true
@@ -131,6 +137,7 @@ custom_minimum_size = Vector2(300, 72)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 16
+script = ExtResource("99_sfx")
 
 [node name="Slot3Button" type="Button" parent="SlotPickerPanel/PickerVBox/SlotsVBox" unique_id=1100000019]
 unique_name_in_owner = true
@@ -138,6 +145,7 @@ custom_minimum_size = Vector2(300, 72)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 16
+script = ExtResource("99_sfx")
 
 [node name="PickerBackButton" type="Button" parent="SlotPickerPanel/PickerVBox" unique_id=1100000020]
 unique_name_in_owner = true
@@ -146,6 +154,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 20
 text = "Back"
+script = ExtResource("99_sfx")
 
 [node name="SpacerBottom" type="Control" parent="SlotPickerPanel/PickerVBox" unique_id=1100000021]
 layout_mode = 2

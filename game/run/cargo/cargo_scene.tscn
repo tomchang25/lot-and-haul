@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bmkpu1bykwvjt" path="res://game/run/cargo/cargo_scene.gd" id="1_cargov2"]
 [ext_resource type="Script" path="res://game/shared/packing/packing_grid.gd" id="2_packing_grid"]
+[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="CargoSceneV2" type="Control" unique_id=1664710573]
 layout_mode = 3
@@ -173,6 +174,7 @@ theme_override_font_sizes/font_size = 14
 text = " - "
 
 [node name="ResetButton" type="Button" parent="." unique_id=1359420237]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 1
 anchors_preset = 2
@@ -187,6 +189,7 @@ theme_override_font_sizes/font_size = 15
 text = "Reset"
 
 [node name="ContinueButton" type="Button" parent="." unique_id=362281920]
+script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(160, 40)
 layout_mode = 1
 anchors_preset = 3

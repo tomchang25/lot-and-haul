@@ -4,6 +4,8 @@ extends CanvasLayer
 
 signal closed
 
+const SETTING_TOGGLE: UiAudioEvent = preload("res://data/tres/audio_events/setting_toggle.tres")
+
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _master_slider: HSlider = %MasterSlider
@@ -57,11 +59,13 @@ func _on_music_changed(value: float) -> void:
 
 func _on_fullscreen_toggled(pressed: bool) -> void:
     SettingsStore.fullscreen = pressed
+    AudioManager.play_event(SETTING_TOGGLE)
     SettingsStore.apply_display()
     SettingsStore.save_settings()
 
 
 func _on_debug_toggled(pressed: bool) -> void:
+    AudioManager.play_event(SETTING_TOGGLE)
     Debug.set_debug_mode(pressed)
 
 

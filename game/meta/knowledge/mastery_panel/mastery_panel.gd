@@ -5,6 +5,7 @@ extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
+const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
 const MasteryRowScene := preload("res://game/meta/knowledge/mastery_panel/mastery_row/mastery_row.tscn")
 
 # ── Node references ───────────────────────────────────────────────────────────
@@ -18,6 +19,7 @@ const MasteryRowScene := preload("res://game/meta/knowledge/mastery_panel/master
 
 func _ready() -> void:
     _back_btn.pressed.connect(_on_back_pressed)
+    _back_btn.press_event = CANCEL
     _build_content()
 
 # ══ Signal handlers ═══════════════════════════════════════════════════════════

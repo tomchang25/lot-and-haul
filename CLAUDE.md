@@ -16,6 +16,8 @@ Resolve unknowns by asking me directly during the planning conversation — neve
 
 **Batch questions, never spam**: Ask clarifying questions before you start the work, and batch every question you have into a single AskUserQuestion call (multiple questions in one call is fine). Do not ask another round of questions before I've had a chance to answer the previous one.
 
+**Answer my questions before implementing**: when my message contains a question — even alongside a work request — answer the question in conversation first, before doing the work. If the answer could change what gets built, wait for my confirmation instead of proceeding on assumptions. Never bury the answer in a wrap-up after the implementation is already done.
+
 **Workflow commands** (`/pr`, `/ship`, `/stage-review`): defined in `.claude/commands/`. `pr` generates a PR title/description for the current branch, `ship` closes out completed work — staged changes or a feature branch covering one or more plans (CHANGELOG + TODO + archive plans, suggest commit message), `stage-review` checks staged changes against the plan spec and standards lint. If asked to do one of these tasks without the slash command, follow the matching command file.
 
 ## Core Loop

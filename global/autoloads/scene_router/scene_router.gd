@@ -3,6 +3,8 @@
 # GameManager._ready() calls into SceneRouter for the scene registry audit.
 extends Node
 
+signal scene_changed
+
 @export var scenes: SceneRegistry
 
 # ── Day-summary hand-off ─────────────────────────────────────────────────────
@@ -107,3 +109,4 @@ func go_to_start_page() -> void:
 func _navigate(scene: PackedScene) -> void:
     SaveManager.flush()
     get_tree().change_scene_to_packed(scene)
+    scene_changed.emit()
