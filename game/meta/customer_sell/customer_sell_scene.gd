@@ -17,7 +17,6 @@ const CargoItemRowScene: PackedScene = preload("res://game/run/cargo/cargo_item_
 var _customers: Array[CustomerEntry] = []
 var _selected_idx: int = -1
 var _item_rows: Dictionary = { }
-var _item_colors: Dictionary = { }
 var _dice_rolls: Array[int] = []
 var _selected_dice_indices: Array[int] = []
 var _pending_sale_price: int = 0
@@ -61,9 +60,6 @@ func _ready() -> void:
     _cancel_dice_btn.pressed.connect(_on_cancel_dice_pressed)
     _conservative_btn.text = "Sell Conservative (×%.1f)" % SellMath.CONSERVATIVE_MULTIPLIER
 
-    _grid.get_shape_cells = _grid_shape_provider
-    _grid.get_item_color = _grid_color_provider
-    _grid.get_item_border_color = _grid_border_provider
     _grid.item_clicked.connect(_on_grid_item_clicked)
     _grid.cell_clicked.connect(_on_grid_cell_clicked)
     _grid.placement_changed.connect(_refresh_display)
@@ -138,31 +134,11 @@ func _rebuild_grid(c: CustomerEntry) -> void:
     _main_area.visible = true
 
 
-func _grid_shape_provider(item) -> Array[Vector2i]:
-    var entry: ItemEntry = item as ItemEntry
-    if entry != null:
-        return entry.get_cells()
-    return [] as Array[Vector2i]
-
-
-func _grid_color_provider(item) -> Color:
-    if _item_colors.has(item):
-        return _item_colors[item]
-    return Color(0.22, 0.30, 0.42, 1.0)
-
-
-func _grid_border_provider(item) -> Color:
-    if _item_colors.has(item):
-        return _item_colors[item].lightened(0.35)
-    return Color(0.40, 0.55, 0.75, 1.0)
-
-
 func _rebuild_item_list(c: CustomerEntry) -> void:
     for child: Node in _item_list_vbox.get_children():
         _item_list_vbox.remove_child(child)
         child.queue_free()
     _item_rows.clear()
-    _item_colors.clear()
 
     var matched: Array = SellMath.matched_items(c, MetaManager.storage.storage_items)
     if matched.is_empty():
@@ -174,7 +150,7 @@ func _rebuild_item_list(c: CustomerEntry) -> void:
         _item_list_vbox.add_child(lbl)
         return
 
-    _assign_item_colors(matched)
+    _grid.setup_default_callbacks(matched)
 
     for entry: ItemEntry in matched:
         var row: CargoItemRow = CargoItemRowScene.instantiate()
@@ -186,19 +162,11 @@ func _rebuild_item_list(c: CustomerEntry) -> void:
         _item_rows[entry] = row
 
 
-func _assign_item_colors(items: Array) -> void:
-    var golden_ratio := 0.618033988749895
-    var hue := randf()
-    for entry: ItemEntry in items:
-        hue = fmod(hue + golden_ratio, 1.0)
-        _item_colors[entry] = Color.from_hsv(hue, 0.55, 0.50)
-
-
 func _refresh_display() -> void:
     if _selected_idx < 0:
         return
 
-    var placed: Array = _get_placed_items()
+    var placed: Array = _grid.get_placed_items()
     var total := SellMath.car_total(placed, 1.0)
     var verified_count := 0
     for entry in placed:
@@ -209,19 +177,6 @@ func _refresh_display() -> void:
     _verified_count_label.text = "Verified: %d / %d" % [verified_count, placed.size()]
 
     _update_item_row_states()
-
-
-func _get_placed_items() -> Array[ItemEntry]:
-    if _grid == null:
-        return [] as Array[ItemEntry]
-    var seen: Array[ItemEntry] = []
-    var result: Array[ItemEntry] = []
-    for pos: Vector2i in _grid.placement:
-        var entry: ItemEntry = _grid.placement[pos] as ItemEntry
-        if entry != null and entry not in seen:
-            seen.append(entry)
-            result.append(entry)
-    return result
 
 
 func _update_item_row_states() -> void:
@@ -305,7 +260,7 @@ func _on_clear_car_pressed() -> void:
 
 
 func _on_conservative_pressed() -> void:
-    var placed: Array = _get_placed_items()
+    var placed: Array = _grid.get_placed_items()
     if placed.is_empty():
         AudioManager.play_event(CANCEL)
         return
@@ -317,7 +272,7 @@ func _on_conservative_pressed() -> void:
 
 
 func _on_aggressive_pressed() -> void:
-    var placed: Array = _get_placed_items()
+    var placed: Array = _grid.get_placed_items()
     if placed.is_empty():
         AudioManager.play_event(CANCEL)
         return
@@ -378,7 +333,7 @@ func _on_dice_toggled(idx: int, toggled: bool) -> void:
     if _selected_dice_indices.size() == 2:
         var sum := _dice_rolls[_selected_dice_indices[0]] + _dice_rolls[_selected_dice_indices[1]]
         var mult := SellMath.dice_multiplier(sum)
-        var placed: Array = _get_placed_items()
+        var placed: Array = _grid.get_placed_items()
         var total := SellMath.aggressive_total(placed, sum)
         _pending_sale_price = total
 
@@ -396,7 +351,7 @@ func _on_confirm_dice_pressed() -> void:
     AudioManager.play_event(CONFIRM)
     _dice_section.visible = false
     _pending_strategy = "aggressive"
-    var placed: Array = _get_placed_items()
+    var placed: Array = _grid.get_placed_items()
     _sell_result_popup.dialog_text = _build_result_text(placed, _pending_sale_price, "aggressive")
     _sell_result_popup.popup_centered()
 
@@ -423,7 +378,7 @@ func _build_result_text(items: Array, price: int, strategy: String) -> String:
 func _on_sell_confirmed() -> void:
     if _selected_idx < 0:
         return
-    var placed: Array = _get_placed_items()
+    var placed: Array = _grid.get_placed_items()
     if placed.is_empty():
         return
 

@@ -34,14 +34,12 @@ var _extra_slot_cells: Dictionary = { }
 # ── Item List State ────────────────────────────────────────────────────────────
 
 var _item_rows: Dictionary = { }
-var _loaded_items: Array[ItemEntry] = []
+var _loaded_items: Array = []
 
 # ── Stats ──────────────────────────────────────────────────────────────────────
 
 var _slots_used: int = 0
 var _weight_used: float = 0.0
-var _item_colors: Dictionary = { }
-
 # ── Tooltip Support ────────────────────────────────────────────────────────────
 
 var _tooltip: ItemRowTooltip = null
@@ -71,12 +69,17 @@ var _hovered_item: ItemEntry = null
 
 
 func _ready() -> void:
+    if RunManager.run == null:
+        ToastManager.show_error("Cargo scene failed to load. Returning to hub.")
+        SceneRouter.go_to_hub.call_deferred()
+        return
+
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 
     _run_summary.add_theme_stylebox_override(
         &"panel",
-        _make_stylebox(
+        PackingGrid.make_stylebox(
             Color(0.15, 0.15, 0.18, 1.0),
             Color(0.40, 0.40, 0.45, 1.0),
         ),
@@ -92,16 +95,11 @@ func _ready() -> void:
     _extra_slot_items.resize(RunManager.run.car_data.extra_slot_count)
     _extra_slot_items.fill(null)
 
-    _assign_item_colors()
-
     # ── Configure PackingGrid ─────────────────────────────────────────────
+    _cargo_grid.setup_default_callbacks(_won_items)
+    _cargo_grid.additional_validator = _packing_weight_validator
     var cols: int = RunManager.run.car_data.grid_columns
     var rows: int = RunManager.run.car_data.grid_rows
-
-    _cargo_grid.get_shape_cells = _packing_shape_provider
-    _cargo_grid.get_item_color = _packing_color_provider
-    _cargo_grid.get_item_border_color = _packing_border_provider
-    _cargo_grid.additional_validator = _packing_weight_validator
 
     _cargo_grid.item_clicked.connect(_on_packing_grid_item_clicked)
     _cargo_grid.cell_clicked.connect(_on_packing_grid_cell_clicked)
@@ -124,19 +122,6 @@ func _input(event: InputEvent) -> void:
             accept_event()
 
 # ══ PackingGrid callbacks ═══════════════════════════════════════════════════════
-
-
-func _packing_shape_provider(item) -> Array[Vector2i]:
-    var entry: ItemEntry = item as ItemEntry
-    return entry.get_cells()
-
-
-func _packing_color_provider(item) -> Color:
-    return _get_item_color(item)
-
-
-func _packing_border_provider(item) -> Color:
-    return _get_item_border_color(item)
 
 
 func _packing_weight_validator(item, origin: Vector2i) -> bool:
@@ -209,11 +194,8 @@ func _on_continue_pressed() -> void:
 
 func _on_confirm_popup_confirmed() -> void:
     var cargo: Array[ItemEntry] = []
-    for pos: Vector2i in _cargo_grid.placement:
-        var entry: ItemEntry = _cargo_grid.placement[pos]
-        if entry not in cargo:
-            cargo.append(entry)
-
+    for entry: ItemEntry in _cargo_grid.get_placed_items():
+        cargo.append(entry)
     var trailer: Array[ItemEntry] = []
     for entry: ItemEntry in _extra_slot_items:
         if entry != null:
@@ -229,6 +211,9 @@ func _on_confirm_popup_confirmed() -> void:
 
 
 func _on_extra_slot_pressed(slot_index: int) -> void:
+    if slot_index < 0 or slot_index >= _extra_slot_items.size():
+        ToastManager.show_dev_error("extra_slot_pressed with index out of range: %d (size %d)" % [slot_index, _extra_slot_items.size()])
+        return
     _hide_tooltip()
     if _cargo_grid.phase == PackingGrid.Phase.IDLE:
         if _extra_slot_items[slot_index] != null:
@@ -241,6 +226,16 @@ func _on_extra_slot_pressed(slot_index: int) -> void:
 
 
 func _on_extra_slot_hovered(slot_index: int) -> void:
+    if slot_index < 0 or slot_index >= _extra_slot_items.size() or not _extra_slot_cells.has(slot_index):
+        ToastManager.show_dev_error(
+            "extra_slot_hovered with index out of range: %d (items size %d, cells size %d)" % [
+                slot_index,
+                _extra_slot_items.size(),
+                _extra_slot_cells.size(),
+            ],
+        )
+        return
+
     _hover_extra_index = slot_index
     _refresh_extra_slot_visuals()
 
@@ -327,6 +322,10 @@ func _lift_from_extra(slot_index: int) -> void:
 
 
 func _place_item_in_extra(slot_index: int) -> void:
+    if slot_index < 0 or slot_index >= _extra_slot_items.size():
+        ToastManager.show_dev_error("place_item_in_extra with index out of range: %d (size %d)" % [slot_index, _extra_slot_items.size()])
+        return
+
     if _extra_slot_items[slot_index] != null:
         return
 
@@ -342,31 +341,6 @@ func _place_item_in_extra(slot_index: int) -> void:
     _active_origin = ""
     _active_origin_extra_index = -1
     _cargo_grid.cancel_placement()
-
-# ══ Color assignment ═══════════════════════════════════════════════════════════
-
-
-func _assign_item_colors() -> void:
-    var golden_ratio := 0.618033988749895
-    var hue := randf()
-
-    for entry: ItemEntry in _won_items:
-        hue = fmod(hue + golden_ratio, 1.0)
-        var color := Color.from_hsv(hue, 0.55, 0.50)
-        _item_colors[entry] = color
-
-
-func _get_item_color(entry: ItemEntry) -> Color:
-    if _item_colors.has(entry):
-        return _item_colors[entry]
-    return Color(0.22, 0.30, 0.42, 1.0)
-
-
-func _get_item_border_color(entry: ItemEntry) -> Color:
-    if _item_colors.has(entry):
-        var base: Color = _item_colors[entry]
-        return base.lightened(0.35)
-    return Color(0.40, 0.55, 0.75, 1.0)
 
 # ══ Grid construction (PackingGrid delegates) ══════════════════════════════════
 
@@ -399,6 +373,10 @@ func _build_item_list() -> void:
 
 
 func _would_exceed_weight(entry: ItemEntry) -> bool:
+    if RunManager.run == null:
+        ToastManager.show_dev_error("would_exceed_weight called with no active run")
+        return true
+
     var max_weight: float = RunManager.run.car_data.max_weight
     var entry_weight: float = entry.get_weight()
 
@@ -424,16 +402,11 @@ func _get_pending_slots(entry: ItemEntry) -> int:
 func _recalc_totals() -> void:
     _slots_used = 0
     _weight_used = 0.0
-    _loaded_items.clear()
+    _loaded_items = _cargo_grid.get_placed_items()
 
-    var seen: Array[ItemEntry] = []
-    for pos: Vector2i in _cargo_grid.placement:
-        var entry: ItemEntry = _cargo_grid.placement[pos]
-        if entry not in seen:
-            seen.append(entry)
-            _loaded_items.append(entry)
-            _slots_used += entry.get_cells().size()
-            _weight_used += entry.get_weight()
+    for entry: ItemEntry in _loaded_items:
+        _slots_used += entry.get_cells().size()
+        _weight_used += entry.get_weight()
 
     for entry: ItemEntry in _extra_slot_items:
         if entry != null and entry not in _loaded_items:
@@ -531,22 +504,22 @@ func _refresh_extra_slot_visuals() -> void:
         var entry: ItemEntry = _extra_slot_items[i] if i < _extra_slot_items.size() else null
         if entry != null:
             if i == _hover_extra_index and _cargo_grid.phase != PackingGrid.Phase.ITEM_HELD:
-                style = _make_stylebox(
-                    _get_item_color(entry).lightened(0.2),
-                    _get_item_border_color(entry).lightened(0.15),
+                style = PackingGrid.make_stylebox(
+                    _cargo_grid.resolve_color(entry).lightened(0.2),
+                    _cargo_grid.resolve_border_color(entry).lightened(0.15),
                 )
             else:
-                style = _make_stylebox(
-                    _get_item_color(entry),
-                    _get_item_border_color(entry),
+                style = PackingGrid.make_stylebox(
+                    _cargo_grid.resolve_color(entry),
+                    _cargo_grid.resolve_border_color(entry),
                 )
         elif i == _hover_extra_index and _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
-            style = _make_stylebox(
+            style = PackingGrid.make_stylebox(
                 Color(0.20, 0.45, 0.22, 1.0),
                 Color(0.35, 0.75, 0.40, 1.0),
             )
         else:
-            style = _make_stylebox(
+            style = PackingGrid.make_stylebox(
                 Color(0.18, 0.18, 0.20, 1.0),
                 Color(0.35, 0.35, 0.38, 1.0),
             )
@@ -580,19 +553,6 @@ func _build_summary_text() -> String:
         "Left behind: %d  (sold on-site for $%d)\n\n" % [unplaced_count, proceeds] +
         "Continue to settlement?"
     )
-
-# ══ Cell builders ══════════════════════════════════════════════════════════════
-
-
-func _make_stylebox(bg: Color, border: Color) -> StyleBoxFlat:
-    var s := StyleBoxFlat.new()
-    s.bg_color = bg
-    s.border_width_left = 1
-    s.border_width_right = 1
-    s.border_width_top = 1
-    s.border_width_bottom = 1
-    s.border_color = border
-    return s
 
 # ══ Tooltip helpers ════════════════════════════════════════════════════════════
 

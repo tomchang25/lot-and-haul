@@ -280,6 +280,46 @@ func is_item_placed(item) -> bool:
             return true
     return false
 
+# ══ Color assignment ═══════════════════════════════════════════════════════════
+
+
+## Returns all unique placed items (deduplicated across cells).
+func get_placed_items() -> Array:
+    var seen: Array = []
+    var result: Array = []
+    for pos: Vector2i in placement:
+        var item = placement[pos]
+        if item not in seen:
+            seen.append(item)
+            result.append(item)
+    return result
+
+
+## Assigns visually distinct golden-ratio colours to each item in the list.
+## Returns a Dictionary mapping each item → Color.
+static func assign_golden_ratio_colors(items: Array) -> Dictionary:
+    var golden_ratio := 0.618033988749895
+    var hue := randf()
+    var colors: Dictionary = { }
+    for item in items:
+        hue = fmod(hue + golden_ratio, 1.0)
+        colors[item] = Color.from_hsv(hue, 0.55, 0.50)
+    return colors
+
+
+## One-shot convenience that wires get_shape_cells, get_item_color, and
+## get_item_border_color using golden-ratio colours for the given items.
+## Callbacks are set as closures — call this again if the item set changes.
+func setup_default_callbacks(items: Array) -> void:
+    var colors := assign_golden_ratio_colors(items)
+    get_shape_cells = func(item) -> Array[Vector2i]:
+        var entry := item as ItemEntry
+        return entry.get_cells() if entry != null else []
+    get_item_color = func(item) -> Color:
+        return colors.get(item, Color(0.22, 0.30, 0.42, 1.0))
+    get_item_border_color = func(item) -> Color:
+        return colors.get(item, Color(0.22, 0.30, 0.42, 1.0)).lightened(0.35)
+
 
 ## Highlights a placed item from an outside source (e.g. a hovered list row).
 ## Pass null to clear. Only takes visual effect in IDLE phase.
@@ -317,29 +357,29 @@ func refresh_visuals() -> void:
 
         if pos in preview_cells:
             if preview_valid:
-                style = _make_stylebox(PREVIEW_VALID_BG, PREVIEW_VALID_BORDER)
+                style = make_stylebox(PREVIEW_VALID_BG, PREVIEW_VALID_BORDER)
             else:
-                style = _make_stylebox(PREVIEW_INVALID_BG, PREVIEW_INVALID_BORDER)
+                style = make_stylebox(PREVIEW_INVALID_BG, PREVIEW_INVALID_BORDER)
         elif placement.has(pos):
             var entry = placement[pos]
-            var base_color := _resolve_color(entry)
-            var base_border := _resolve_border_color(entry)
+            var base_color := resolve_color(entry)
+            var base_border := resolve_border_color(entry)
             if phase == Phase.ITEM_HELD and active_item == entry:
                 # Ghost of the held item — dimmed with a cyan border to signal "moving".
-                style = _make_stylebox(
+                style = make_stylebox(
                     base_color.lightened(0.10),
                     Color(0.35, 0.78, 0.90, 1.0),
                 )
             elif pos in hover_item_cells:
                 # Hovered item in IDLE — noticeably brighter than the held ghost.
-                style = _make_stylebox(
+                style = make_stylebox(
                     base_color.lightened(0.42),
                     base_border.lightened(0.35),
                 )
             else:
-                style = _make_stylebox(base_color, base_border)
+                style = make_stylebox(base_color, base_border)
         else:
-            style = _make_stylebox(DEFAULT_BG, DEFAULT_BORDER)
+            style = make_stylebox(DEFAULT_BG, DEFAULT_BORDER)
 
         cell.add_theme_stylebox_override("panel", style)
         cell.queue_redraw()
@@ -418,19 +458,19 @@ func _make_cell(pos: Vector2i) -> Panel:
     return cell
 
 
-func _resolve_color(item) -> Color:
+func resolve_color(item) -> Color:
     if get_item_color.is_valid():
         return get_item_color.call(item)
     return Color(0.22, 0.30, 0.42, 1.0)
 
 
-func _resolve_border_color(item) -> Color:
+func resolve_border_color(item) -> Color:
     if get_item_border_color.is_valid():
         return get_item_border_color.call(item)
     return Color(0.40, 0.55, 0.75, 1.0)
 
 
-func _make_stylebox(bg: Color, border: Color) -> StyleBoxFlat:
+static func make_stylebox(bg: Color, border: Color) -> StyleBoxFlat:
     var s := StyleBoxFlat.new()
     s.bg_color = bg
     s.border_width_left = 1
