@@ -22,6 +22,14 @@ Preliminary concepts — bigger than a one-liner, but a single `###` sub-section
 
 One-press build flow covering the two release blockers from `dev/docs/visions/itchio_review.md`. (1) `data/tres/` is gitignored — all 250 `.tres` files (30 anchors / 184 clues / 12 categories / 4 cars / 6 lots / 4 super-categories / 5 attributes / 3 perks) exist only on disk, so a fresh clone loads zero resources and the game cannot boot; fix via a bootstrap script that runs the YAML pipeline to regenerate them (or un-gitignore the folder). (2) Export presets are not configured — no build can be produced at all. Fold both into one automated step: generate tres → export Windows + Linux builds.
 
+### Director v2 — Highlight Target Component + Anchor Fill-to-Screen
+
+The Director's `_position_near_anchor` and `_update_dim_hole` assume anchors are bounded UI regions. When an anchor fills the screen (e.g. a full-viewport PanelContainer used as a layout root), the hole cutout covers everything and `_position_near_anchor` shoves the hint panel off-screen or into a corner.
+
+Add a dedicated `HighlightTarget` component (Control subclass or plain node with a Rect2 export) that scenes place in their tree to define a tutorial-highlightable region. The Director consumes these instead of raw Control references. Benefits: the component can specify a logical bounding box independent of the node's actual screen-filling rect, include a named id matching the script's `anchor_id`, and optionally define hint-panel placement preference (above/below/left/right/auto). Scenes that need no tutorial highlight don't add the node — zero-cost for non-tutorial code paths.
+
+Fix for the current fill-to-screen case: detect anchors whose global rect ≈ viewport size and fall back to popup-style centered display with offset, or use the Director's screen-edge margin defaults instead of positioning relative to the anchor's edges.
+
 ### Simple Tutorial (No-Story)
 
 The tutorial split out from the story demo — Stage 2's "small onboarding" pulled forward to Stage 1. A data-driven tutorial hint panel (step list: scene + trigger condition + hint text, played in order — no branching, no portraits, no story) guides the player through one full run + hub loop: inspect → bid → cargo (blocked from leaving empty) → storage → knowledge → customer sell → end day. The first run is made deterministic and friendly via the Director injection skeleton below (big car, high stamina, high-value low-depth items); free play afterwards, no multi-run scripting. The 3-run story demo (Uncle, X-Ray, Crown cutscene) moves to Stage 3. Panel is reusable in the full game. See `dev/docs/visions/itchio_review.md`. The hub + storage explain-only slice is promoted to `dev/docs/plans/tutorial_hint_panel.sketch.md`; this entry keeps the run-phase tutorial and injection scope.
@@ -188,9 +196,7 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 
 Flows currently being built or ready to implement — may hold more than one entry. One-line pointer each — same format as `## Plan`, promoted here when building starts or the plan is ready to build. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress or ready → this section is empty.
 
-- [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
-- [tutorial] Hub guidance + Storage tutorial hint panel (Director step playback, dim-and-highlight overlay, Help replay) — see `dev/docs/plans/tutorial_hint_panel.sketch.md`
-
+- [tutorial_shot] Flag-gated ShotPilot autoload: per-step tutorial screenshots for agent visual review — see `dev/docs/plans/tutorial_shot_harness.sketch.md`
 
 ---
 
@@ -199,6 +205,8 @@ Flows currently being built or ready to implement — may hold more than one ent
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
 - [simple-demo] Stage 1 tutorial split out to the Simple Tutorial draft; Director skeleton + Dialog remain surviving subsystems
+- [tutorial_shot] Flag-gated ShotPilot autoload: per-step tutorial screenshots for agent visual review — see `dev/docs/plans/tutorial_shot_harness.sketch.md`
+- [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 - [dev/auto-auction] Debug-only quick-win buttons: instant player win at opening bid or rolled price (skip NPC bidding loop; rolled path seeds future auto-bid perk) — see `dev/docs/plans/debug_auto_auction.md`
 - [dev/auto-cargo] Debug-only quick-pack buttons: legal one-press auto-pack (seeds future auto-place perk) + stuff-all-and-go ignoring capacity — see `dev/docs/plans/debug_auto_cargo.md`
 - [run_persistence] Mid-run save/resume: phase-stable resume scenes, atomic auction, escrowed run economics — see `dev/docs/plans/run_phase_persistence.md`
