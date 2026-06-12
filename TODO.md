@@ -189,8 +189,7 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 Flows currently being built or ready to implement — may hold more than one entry. One-line pointer each — same format as `## Plan`, promoted here when building starts or the plan is ready to build. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress or ready → this section is empty.
 
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
-- [sfx] Placeholder SFX pipeline — Phase 1 Generator: `dev/docs/plans/sfx_pipeline_generator_p1.spec.md`, Phase 2 Authoring: `dev/docs/plans/sfx_authoring_p2.spec.md`, Phase 3 Wiring: `dev/docs/plans/sfx_wiring_p3.spec.md`
-- [sfx] Button hover+press SFX via sound-enabled button type, ClickBinder removal, UI bus loudness — see `dev/docs/plans/sfx_button_hover_press.sketch.md`
+
 
 ---
 
