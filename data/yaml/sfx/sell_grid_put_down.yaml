@@ -1,0 +1,32 @@
+sound_id: sell_grid_put_down
+seed: 340
+variant_count: 1
+source:
+  waveform: square
+  duty_cycle: 0.3
+pitch:
+  start_hz: 1000
+  end_hz: 600
+  slide_curve: 0.0
+  vibrato_depth: 0.0
+  vibrato_rate: 0.0
+  arpeggio_shifts: []
+  arpeggio_step_time: 0.0
+envelope:
+  attack_s: 0.001
+  decay_s: 0.005
+  sustain_s: 0.0
+  release_s: 0.01
+  sustain_level: 0.3
+  sustain_punch: 0.0
+color:
+  lp_cutoff_hz: 0
+  hp_cutoff_hz: 0
+  bitcrush_bits: 16
+playback:
+  volume_db: -10.0
+  pitch_random_min: 0.98
+  pitch_random_max: 1.02
+  limiter_key: "sell_grid_put_down"
+  max_per_window: 8
+  window_sec: 0.05

@@ -8,6 +8,7 @@ const SALE_COMPLETED: UiAudioEvent = preload("res://data/tres/audio_events/sale_
 const CASH_CREDITED: UiAudioEvent = preload("res://data/tres/audio_events/cash_credited.tres")
 const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres")
 const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
+const BLOCKED_ERROR: UiAudioEvent = preload("res://data/tres/audio_events/blocked_error.tres")
 const SELL_GRID_LIFT: UiAudioEvent = preload("res://data/tres/audio_events/sell_grid_lift.tres")
 const SELL_GRID_PUT_DOWN: UiAudioEvent = preload("res://data/tres/audio_events/sell_grid_put_down.tres")
 
@@ -293,6 +294,8 @@ func _on_grid_cell_clicked(pos: Vector2i) -> void:
             _grid.place(_grid.active_item, pos)
             AudioManager.play_event(SELL_GRID_PUT_DOWN)
             _update_item_row_states()
+        else:
+            AudioManager.play_event(BLOCKED_ERROR)
 
 
 func _on_clear_car_pressed() -> void:

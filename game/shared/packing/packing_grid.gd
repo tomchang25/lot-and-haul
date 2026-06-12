@@ -5,6 +5,8 @@
 class_name PackingGrid
 extends GridContainer
 
+const ROTATE: UiAudioEvent = preload("res://data/tres/audio_events/rotate.tres")
+
 # ── Signals ────────────────────────────────────────────────────────────────────
 
 ## Emitted when a placed item is left-clicked while in IDLE phase.
@@ -89,11 +91,13 @@ func _unhandled_input(event: InputEvent) -> void:
                 active_rotation = (active_rotation + 3) % 4
                 _recompute_lift_offset()
                 refresh_visuals()
+                AudioManager.play_event(ROTATE)
                 get_viewport().set_input_as_handled()
             KEY_E:
                 active_rotation = (active_rotation + 1) % 4
                 _recompute_lift_offset()
                 refresh_visuals()
+                AudioManager.play_event(ROTATE)
                 get_viewport().set_input_as_handled()
 
 # ══ Public API ════════════════════════════════════════════════════════════════
@@ -470,7 +474,7 @@ func _on_cell_gui_input(event: InputEvent, pos: Vector2i) -> void:
             elif phase == Phase.IDLE and placement.has(pos):
                 var item = placement[pos]
                 erase(item)
-                _hover_item = null  # item no longer placed; re-evaluated below
+                _hover_item = null # item no longer placed; re-evaluated below
                 placement_changed.emit()
                 refresh_visuals()
                 # Re-broadcast hover so scenes clear the stale _hovered_entry
