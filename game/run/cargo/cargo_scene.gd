@@ -6,6 +6,8 @@ extends Control
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
+const BLOCKED_ERROR: UiAudioEvent = preload("res://data/tres/audio_events/blocked_error.tres")
+
 const CELL_SIZE := 56
 
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
@@ -154,6 +156,8 @@ func _on_packing_grid_cell_clicked(pos: Vector2i) -> void:
         _active_origin = ""
         _recalc_totals()
         _refresh_ui()
+    elif item != null:
+        AudioManager.play_event(BLOCKED_ERROR)
 
 
 func _on_packing_grid_placement_cancelled(item) -> void:

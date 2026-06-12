@@ -4,6 +4,10 @@
 class_name DaySummaryScene
 extends Control
 
+# ── Constants ───────────────────────────────────────────────────────────
+
+const CASH_CREDITED: UiAudioEvent = preload("res://data/tres/audio_events/cash_credited.tres")
+
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _day_header: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DayHeader
@@ -97,6 +101,7 @@ func _render(summary: DaySummary) -> void:
     if net >= 0:
         _net_label.text = "Net:   +$%d" % net
         _net_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.PRICE_COLOR)
+        AudioManager.play_event(CASH_CREDITED)
     else:
         _net_label.text = "Net:   -$%d" % (-net)
         _net_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))

@@ -13,6 +13,10 @@ const CLUE_CHAIN_COST := 2
 
 const ValueRowScene := preload("res://game/run/inspection/value_row/value_row.tscn")
 
+const REVEAL_GOOD: UiAudioEvent = preload("res://data/tres/audio_events/reveal_good.tres")
+const REVEAL_BAD: UiAudioEvent = preload("res://data/tres/audio_events/reveal_bad.tres")
+const BLOCKED_ERROR: UiAudioEvent = preload("res://data/tres/audio_events/blocked_error.tres")
+
 const ACTIVE_BORDER_COLOR := Color(1.0, 0.88, 0.25, 1.0)
 const ACTIVE_BORDER_WIDTH := 3
 
@@ -221,12 +225,14 @@ func _on_grid_cell_pressed(coord: Vector2i) -> void:
 
     if entry.is_veiled():
         if UNVEIL_COST > RunManager.lot.actions_remaining:
+            AudioManager.play_event(BLOCKED_ERROR)
             return
         _do_unveil(entry)
         return
 
     if entry.has_inspection_clues():
         if CLUE_CHAIN_COST > RunManager.lot.actions_remaining:
+            AudioManager.play_event(BLOCKED_ERROR)
             return
         _do_clue_chain(entry)
         return
@@ -239,6 +245,7 @@ func _do_unveil(entry: ItemEntry) -> void:
 
     RunManager.spend_ap(UNVEIL_COST)
     _reveal_item(entry)
+    AudioManager.play_event(REVEAL_GOOD)
 
     _complete_action(entry, ActionType.UNVEIL)
 
@@ -257,8 +264,10 @@ func _do_clue_chain(entry: ItemEntry) -> void:
             continue
         var succeeded: bool = RunManager.attempt_clue(entry, clue)
         if succeeded:
+            AudioManager.play_event(REVEAL_GOOD)
             clue_texts.append("[color=#66ff80]%s[/color]" % clue.known_text)
         else:
+            AudioManager.play_event(REVEAL_BAD)
             clue_texts.append("[color=#8c949f]Failed: %s[/color]" % clue.known_text)
             break
 

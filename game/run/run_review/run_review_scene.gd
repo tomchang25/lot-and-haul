@@ -8,6 +8,8 @@ extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
+const CASH_CREDITED: UiAudioEvent = preload("res://data/tres/audio_events/cash_credited.tres")
+
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 
 const REVIEW_COLUMNS: Array = [
@@ -79,6 +81,7 @@ func _resolve_run_and_navigate() -> void:
     # (player returns for the evening slot). The day summary fires later when
     # the player chooses Open Shop or exhausts all slots from the hub.
     MetaManager.resolve_current_run()
+    AudioManager.play_event(CASH_CREDITED)
     SceneRouter.go_to_hub()
 
 # ══ Rows ══════════════════════════════════════════════════════════════════════

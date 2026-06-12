@@ -190,6 +190,7 @@ Flows currently being built or ready to implement — may hold more than one ent
 
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 - [sfx] Placeholder SFX pipeline — Phase 1 Generator: `dev/docs/plans/sfx_pipeline_generator_p1.spec.md`, Phase 2 Authoring: `dev/docs/plans/sfx_authoring_p2.spec.md`, Phase 3 Wiring: `dev/docs/plans/sfx_wiring_p3.spec.md`
+- [sfx] Button hover+press SFX via sound-enabled button type, ClickBinder removal, UI bus loudness — see `dev/docs/plans/sfx_button_hover_press.sketch.md`
 
 ---
 

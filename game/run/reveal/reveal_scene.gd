@@ -8,6 +8,9 @@ extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
+const REVEAL_GOOD: UiAudioEvent = preload("res://data/tres/audio_events/reveal_good.tres")
+const AUCTION_LOST: UiAudioEvent = preload("res://data/tres/audio_events/auction_lost.tres")
+
 const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
 
 const REVEAL_COLUMNS: Array = [
@@ -41,7 +44,9 @@ func _ready() -> void:
     add_child(_tooltip)
 
     _reveal_btn.pressed.connect(_on_reveal_pressed)
+    _reveal_btn.set_meta("sfx_click_ignore", true)
     _continue_btn.pressed.connect(_on_continue_pressed)
+    _continue_btn.set_meta("sfx_click_ignore", true)
 
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
     _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
@@ -64,6 +69,7 @@ func _on_reveal_pressed() -> void:
             RunManager.unveil_item(entry)
 
         RunManager.auto_reveal_all_surface(entry)
+        AudioManager.play_event(REVEAL_GOOD)
 
     _on_reveal_complete()
 
@@ -91,6 +97,7 @@ func _populate_rows() -> void:
 
 func _show_auction_lost_state() -> void:
     _title_label.text = "Auction Lost"
+    AudioManager.play_event(AUCTION_LOST)
     _item_list_panel.hide()
     _reveal_btn.hide()
     _continue_btn.show()

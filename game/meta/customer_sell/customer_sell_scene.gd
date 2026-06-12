@@ -4,6 +4,9 @@
 # Writes: MetaManager.resolve_customer_sale()
 extends Control
 
+const SALE_COMPLETED: UiAudioEvent = preload("res://data/tres/audio_events/sale_completed.tres")
+const CASH_CREDITED: UiAudioEvent = preload("res://data/tres/audio_events/cash_credited.tres")
+
 const CargoItemRowScene: PackedScene = preload("res://game/run/cargo/cargo_item_row.tscn")
 
 var _customers: Array[CustomerEntry] = []
@@ -413,6 +416,8 @@ func _on_sell_confirmed() -> void:
     # sale for the daily summary, and removes the served customer from the
     # persisted nightly set. The scene only drops it from its local view.
     MetaManager.resolve_customer_sale(placed, _pending_sale_price, sold_customer, _pending_strategy)
+    AudioManager.play_event(SALE_COMPLETED)
+    AudioManager.play_event(CASH_CREDITED)
     _customers.remove_at(_selected_idx)
 
     if _customers.is_empty():

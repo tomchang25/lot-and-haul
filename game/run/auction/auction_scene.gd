@@ -22,6 +22,9 @@ const STEP_RATIO := 0.075
 # Minimum step in currency units — applies to both NPC steps and player bump.
 const MIN_STEP := 20
 
+const BID_CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/bid_confirm.tres")
+const AUCTION_WON: UiAudioEvent = preload("res://data/tres/audio_events/auction_won.tres")
+
 const LotSummaryRowScene := preload("res://game/run/auction/lot_summary_row/lot_summary_row.tscn")
 const BidHistoryRowScene := preload("res://game/run/auction/bid_history_row/bid_history_row.tscn")
 
@@ -96,6 +99,7 @@ func _ready() -> void:
 
     _pass_button.pressed.connect(_on_pass_pressed)
     _bid_button.pressed.connect(_on_bid_pressed)
+    _bid_button.set_meta("sfx_click_ignore", true)
 
     var price_area: Control = $RootVBox/Centre/Content/PriceArea
     _circle_node = _CircleProgress.new()
@@ -182,7 +186,7 @@ func _on_bid_pressed() -> void:
         _in_reach = true
 
     _shorten_next_npc_tick = true
-    # TODO: play confirm sound via AudioManager
+    AudioManager.play_event(BID_CONFIRM)
 
 
 func _on_pass_pressed() -> void:
@@ -307,6 +311,7 @@ func _resolve() -> void:
         # lot_items proxy already returns a duplicate — use it directly as the
         # canonical won-items snapshot for this lot.
         RunManager.commit_lot_win(RunManager.lot.lot_items, _current_display_price)
+        AudioManager.play_event(AUCTION_WON)
 
     SceneRouter.go_to_reveal()
 
