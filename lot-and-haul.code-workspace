@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "dev/docs"
+		}
+	],
+	"settings": {
+		"godotTools.editorPath.godot4": "e:\\Application\\godot\\Godot_v4.4.1-stable_win64\\Godot_v4.4.1-stable_win64.exe",
+		"godotTools.lsp.serverPort": 6005,
+		"python-envs.defaultEnvManager": "ms-python.python:system"
+	}
+}
