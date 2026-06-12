@@ -15,7 +15,7 @@ var _locked := false
 
 func _ready() -> void:
     if state_id == -1:
-        push_error("State must have a state_id")
+        ToastManager.show_dev_error("State must have a state_id")
 
 
 func _enter() -> void:

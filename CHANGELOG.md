@@ -8,6 +8,16 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
+## Error Guard System
+
+- 2026-06-12 — [toast] `ToastManager.show_error()` always-visible red error channel added (8 s duration) for runtime error fallback alerts
+- 2026-06-12 — [toast] `ToastManager.show_dev_error()` one-call programmer-error guard added: always logs `push_error("[DEV] " + msg)`, shows red toast only when `Debug.enabled`, session fire-once dedupe
+- 2026-06-12 — [standard] `dev/standards/error_guard_standard.md` created: three-category guard system (runtime guard, programmer error, precondition guard) replacing `assert()` with explicit `if` + ToastManager channel; §3a bans bare `push_error` at call sites (exceptions: `toast_manager.gd` itself, boot-phase code with `# push-error: boot` marker)
+- 2026-06-12 — [lint] `lint_standards.py` gains bare-push-error check across all project GDScript dirs (`game`, `stage`, `common`, `global`, `data`); check dispatch restructured into `GD_SCENE_CHECKS` / `GD_ERROR_GUARD_CHECKS` scopes; match-wildcard safe-set updated from `push_error` to `ToastManager.show_dev_error`
+- 2026-06-12 — [standard] `standards_enforcement.md` documents bare push_error ban as active check; `naming_conventions.md` match-wildcard reference updated to `show_dev_error`
+- 2026-06-12 — [docs] CLAUDE.md updated: Notifications section adds `show_error`/`show_dev_error` mentions, Error guards section added with standard pointer
+- 2026-06-12 — [error_guard] 17 files migrated from `assert()` / bare `push_error` to typed guards: `auction_scene.gd`, `inspection_scene.gd`, `location_entry_scene.gd` (2×), `reveal_scene.gd` (runtime — `show_error` + navigate); `state.gd`, `state_machine.gd` (2×), `cargo_shapes.gd`, `economy_store.gd` (2×), `audio_manager.gd`, `knowledge_manager.gd` (3×), `meta_manager.gd`, `run_manager.gd`, `resource_registry.gd`, `super_category_registry.gd`, `resource_dir_loader.gd`, `save_manager.gd` (7× — 5 precondition + 2 runtime I/O), `registry_audit.gd` (programmer error — `show_dev_error` + return/sentinel); `settings_store.gd` (4×) annotated with boot markers
+
 ## Location Selection Cost Preview
 
 - 2026-06-11 — [location] Fuel cost line item (`fuel_cost_per_day × travel_days`) surfaced in `LocationCard` scene between lot count and estimated total

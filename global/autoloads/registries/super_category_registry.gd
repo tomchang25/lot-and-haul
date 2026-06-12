@@ -5,7 +5,7 @@
 # SuperCategoryRegistry.get_all_super_categories() /
 # SuperCategoryRegistry.get_categories_for_super(sc).
 #
-# Load-order note: depends on CategoryRegistry loading first. The assert in
+# Load-order note: depends on CategoryRegistry loading first. The guard in
 # _ready will fire if project.godot is reordered incorrectly.
 extends ResourceRegistry
 
@@ -22,7 +22,11 @@ func _id_of(r: Resource) -> String:
 
 func _ready() -> void:
     super._ready()
-    assert(CategoryRegistry.size() > 0, "SuperCategoryRegistry requires CategoryRegistry to load first")
+
+    if CategoryRegistry.size() <= 0:
+        ToastManager.show_dev_error("SuperCategoryRegistry requires CategoryRegistry to load first")
+        return
+
     _build_categories_by_super_index()
 
 

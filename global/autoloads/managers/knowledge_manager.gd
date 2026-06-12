@@ -65,14 +65,14 @@ func reset() -> void:
 func validate() -> bool:
     var ok := true
     if perk_count() == 0:
-        push_error("KnowledgeManager: perk registry is empty")
+        ToastManager.show_dev_error("KnowledgeManager: perk registry is empty")
         ok = false
     if attribute_count() == 0:
-        push_error("KnowledgeManager: attribute registry is empty")
+        ToastManager.show_dev_error("KnowledgeManager: attribute registry is empty")
         ok = false
     for perk_id: String in _knowledge.unlocked_perks:
         if get_perk_by_id(perk_id) == null:
-            push_error(
+            ToastManager.show_dev_error(
                 "KnowledgeManager: unlocked_perks '%s' not found" % perk_id,
             )
             ok = false

@@ -84,7 +84,11 @@ var _hover_entry: ItemEntry = null
 
 
 func _ready() -> void:
-    assert(RunManager.lot != null, "InspectionScene: RunManager.lot is null — set_lot() must be called before entering inspection.")
+    if RunManager.lot == null:
+        ToastManager.show_error("Inspection scene failed to load. Returning to hub.")
+        SceneRouter.go_to_hub.call_deferred()
+        return
+
     _footer.show()
     _pass_button.show()
     _start_auction_button.show()

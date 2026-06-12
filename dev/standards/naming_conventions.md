@@ -288,7 +288,7 @@ Every expected case must have its own explicit arm. This ensures the compiler
 (and the reader) can verify that all cases are covered, and that adding a new
 enum member later will surface unhandled branches.
 
-If a `match` covers all members of a known enum exhaustively, the wildcard arm should either be omitted entirely or contain only a `push_warning` / `push_error` to flag unexpected values at runtime (Recommend).
+If a `match` covers all members of a known enum exhaustively, the wildcard arm should either be omitted entirely or contain only a `ToastManager.show_dev_error()` / `push_warning` to flag unexpected values at runtime (Recommend). Bare `push_error` is banned by the error-guard standard (`error_guard_standard.md` §3a) — an unexpected match value is a programmer error, so the guard is `show_dev_error`.
 
 ---
 

@@ -61,7 +61,7 @@ func get_bus_name(bus_id: int) -> StringName:
 
 func _resolve_bus_name(event: AudioEvent, fallback_bus_id: int) -> StringName:
     if event.bus_id == AudioBus.Id.NONE:
-        push_error("AudioEvent: bus_id is NONE")
+        ToastManager.show_dev_error("AudioEvent: bus_id is NONE")
 
     if event.bus_id != AudioBus.Id.OTHER:
         return get_bus_name(event.bus_id)

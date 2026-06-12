@@ -26,7 +26,9 @@ func _ready() -> void:
         func(r: Resource) -> String:
             return _id_of(r)
     )
-    assert(size() > 0, "%s registry is empty after load" % name)
+    if size() <= 0:
+        ToastManager.show_dev_error("%s registry is empty after load" % name)
+        return
 
 
 ## Returns the resource with the given id, or null if not found.

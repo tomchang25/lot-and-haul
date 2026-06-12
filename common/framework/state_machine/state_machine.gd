@@ -49,11 +49,11 @@ func _ready() -> void:
                 state.transition_requested.connect(_on_transition_requested)
 
     if initial_state == null:
-        push_error("StateMachine must have an initial_state")
+        ToastManager.show_dev_error("StateMachine must have an initial_state")
         return
 
     if not states.has(initial_state.state_id):
-        push_error("StateMachine initial_state is not registered in children")
+        ToastManager.show_dev_error("StateMachine initial_state is not registered in children")
         return
 
     # Spread tick phases so multiple machines don't all fire on the same frame.

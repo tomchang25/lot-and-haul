@@ -20,7 +20,7 @@ const SHAPES: Dictionary = {
 
 static func get_cells(shape_id: String) -> Array[Vector2i]:
     if not SHAPES.has(shape_id):
-        push_error("CargoShapes: unknown shape_id '%s'" % shape_id)
+        ToastManager.show_dev_error("CargoShapes: unknown shape_id '%s'" % shape_id)
         return [] as Array[Vector2i]
     var cells: Array[Vector2i] = []
     cells.assign(SHAPES[shape_id])

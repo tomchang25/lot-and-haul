@@ -55,9 +55,18 @@ func get_active_slot() -> int:
 ## owning autoload). The provider must implement to_dict() -> Dictionary,
 ## from_dict(Dictionary), and validate() -> bool.
 func register_provider(provider: Object) -> void:
-    assert(provider.has_method("to_dict"), "register_provider: %s missing to_dict()" % provider)
-    assert(provider.has_method("from_dict"), "register_provider: %s missing from_dict()" % provider)
-    assert(provider.has_method("validate"), "register_provider: %s missing validate()" % provider)
+    if not provider.has_method("to_dict"):
+        ToastManager.show_dev_error("register_provider: %s missing to_dict()" % provider)
+        return
+
+    if not provider.has_method("from_dict"):
+        ToastManager.show_dev_error("register_provider: %s missing from_dict()" % provider)
+        return
+
+    if not provider.has_method("validate"):
+        ToastManager.show_dev_error("register_provider: %s missing validate()" % provider)
+        return
+
     _providers.append(provider)
 
 
@@ -179,7 +188,10 @@ func boot_load() -> void:
 ## defaults, then loads [param slot]'s save data and sets the last-active pointer.
 ## Used by Load Game in the slot picker.
 func switch_to_slot(slot: int) -> void:
-    assert(slot >= 1 and slot <= SLOT_COUNT, "switch_to_slot: invalid slot %d" % slot)
+    if slot < 1 or slot > SLOT_COUNT:
+        ToastManager.show_dev_error("switch_to_slot: invalid slot %d" % slot)
+        return
+
     flush()
     reset_providers()
     _active_slot = slot
@@ -191,7 +203,10 @@ func switch_to_slot(slot: int) -> void:
 ## resets all providers to defaults, saves a fresh state, and sets the last-active
 ## pointer. Used by New Game in the slot picker.
 func init_slot(slot: int) -> void:
-    assert(slot >= 1 and slot <= SLOT_COUNT, "init_slot: invalid slot %d" % slot)
+    if slot < 1 or slot > SLOT_COUNT:
+        ToastManager.show_dev_error("init_slot: invalid slot %d" % slot)
+        return
+
     wipe_slot(slot)
     reset_providers()
     _active_slot = slot
@@ -242,7 +257,10 @@ func run_validation() -> bool:
 ## Writes a new counter-based save file to the active slot, updates the manifest
 ## with a summary block, writes the last-active pointer, and cleans up old files.
 func save() -> void:
-    assert(_active_slot > 0, "save() called with no active slot")
+    if _active_slot <= 0:
+        ToastManager.show_dev_error("save() called with no active slot")
+        return
+
     _dirty = false
     _elapsed = 0.0
     _ensure_slot_dir(_active_slot)
@@ -260,7 +278,7 @@ func save() -> void:
     var path := _slot_counter_path(_active_slot, new_counter)
     var file := FileAccess.open(path, FileAccess.WRITE)
     if file == null:
-        push_error("SaveManager: failed to open %s for writing (error %d)" % [path, FileAccess.get_open_error()])
+        ToastManager.show_error("SaveManager: failed to open %s for writing (error %d)" % [path, FileAccess.get_open_error()])
         return
     file.store_string(JSON.stringify(data))
     file.close()
@@ -275,7 +293,10 @@ func save() -> void:
 
 ## Loads from the newest valid counter-based save file in the active slot.
 func _load_active_slot() -> void:
-    assert(_active_slot > 0, "_load_active_slot() called with no active slot")
+    if _active_slot <= 0:
+        ToastManager.show_dev_error("_load_active_slot() called with no active slot")
+        return
+
     var candidates := _build_candidate_list_for_slot(_active_slot)
     if candidates.is_empty():
         return
@@ -384,7 +405,7 @@ func _write_manifest(slot: int, counter: int, summary: Dictionary = { }) -> void
     var path := _slot_manifest_path(slot)
     var file := FileAccess.open(path, FileAccess.WRITE)
     if file == null:
-        push_error("SaveManager: failed to write manifest for slot %d (error %d)" % [slot, FileAccess.get_open_error()])
+        ToastManager.show_error("SaveManager: failed to write manifest for slot %d (error %d)" % [slot, FileAccess.get_open_error()])
         return
     var data: Dictionary = {
         "current_backup": counter,
@@ -421,7 +442,7 @@ func _write_last_active(slot: int) -> void:
     _ensure_slot_base_dir()
     var file := FileAccess.open(_last_active_path(), FileAccess.WRITE)
     if file == null:
-        push_error("SaveManager: failed to write last_active (error %d)" % FileAccess.get_open_error())
+        ToastManager.show_error("SaveManager: failed to write last_active (error %d)" % FileAccess.get_open_error())
         return
     file.store_string(JSON.stringify({ "last_active": slot }))
     file.close()

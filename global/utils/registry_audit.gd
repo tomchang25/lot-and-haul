@@ -21,7 +21,7 @@ static func check_scene_registry(scene_registry: SceneRegistry) -> bool:
             continue
         var value: Variant = scene_registry.get(prop["name"])
         if value == null:
-            push_error("RegistryAudit: SceneRegistry.%s is null" % prop["name"])
+            ToastManager.show_dev_error("RegistryAudit: SceneRegistry.%s is null" % prop["name"])
             ok = false
 
     return ok

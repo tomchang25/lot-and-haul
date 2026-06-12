@@ -89,7 +89,11 @@ class _CircleProgress extends Control:
 
 
 func _ready() -> void:
-    assert(RunManager.lot != null, "AuctionScene: RunManager.lot is null — set_lot() must be called before entering auction.")
+    if RunManager.lot == null:
+        ToastManager.show_error("Auction scene failed to load. Returning to hub.")
+        SceneRouter.go_to_hub.call_deferred()
+        return
+
     _pass_button.pressed.connect(_on_pass_pressed)
     _bid_button.pressed.connect(_on_bid_pressed)
 

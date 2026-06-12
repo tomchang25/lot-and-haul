@@ -21,18 +21,23 @@ func can_afford(amount: int) -> bool:
 
 ## Deducts [param amount] from cash. Refuses if cash would go negative.
 ## Returns true when the spend happened, false when rejected.
-## Asserts non-negative input — negative amounts are a caller bug.
+## Guards against negative input — negative amounts are a caller bug.
 func spend(amount: int) -> bool:
-    assert(amount >= 0, "spend() expects a non-negative amount")
+    if amount < 0:
+        ToastManager.show_dev_error("spend() expects a non-negative amount, got %d" % amount)
+        return false
     if _cash < amount:
         return false
     _cash -= amount
     return true
 
 
-## Adds [param amount] to cash. Asserts non-negative input.
+## Adds [param amount] to cash. Guards against negative input.
 func earn(amount: int) -> void:
-    assert(amount >= 0, "earn() expects a non-negative amount")
+    if amount < 0:
+        ToastManager.show_dev_error("earn() expects a non-negative amount, got %d" % amount)
+        return
+
     _cash += amount
 
 

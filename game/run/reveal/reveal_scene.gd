@@ -32,7 +32,11 @@ var _tooltip: ItemRowTooltip = null
 
 
 func _ready() -> void:
-    assert(RunManager.lot != null, "RevealScene: RunManager.lot is null — set_lot() must be called before entering reveal.")
+    if RunManager.lot == null:
+        ToastManager.show_error("Reveal scene failed to load. Returning to hub.")
+        SceneRouter.go_to_hub.call_deferred()
+        return
+
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 

@@ -30,13 +30,21 @@ from pathlib import Path
 
 # ── Scope ──────────────────────────────────────────────────────────────────────
 #
-# The scene architecture standard applies to block scene scripts, testbed
-# scenes, and reusable UI component scripts. It explicitly does NOT apply to
+# Two scopes, by check family:
+#
+# Scene-architecture / naming checks apply to block scene scripts, testbed
+# scenes, and reusable UI component scripts. They explicitly do NOT apply to
 # autoloads / global managers, resource definitions under data/, or common
 # framework scripts. We approximate that scope by directory.
+#
+# The error-guard check (bare push_error ban) applies to ALL GDScript in the
+# project — guards live mostly in managers and runtime types, so limiting it
+# to scene dirs would make it a dead letter.
 
 SCANNED_DIRS = ("game", "stage")
+ERROR_GUARD_DIRS = ("game", "stage", "common", "global", "data")
 EXCLUDED_PARTS = (".godot", "data", "global", "addons")
+ERROR_GUARD_EXCLUDED_PARTS = (".godot", "addons")
 
 # ── node-src markers ─────────────────────────────────────────────────────────
 #
@@ -46,11 +54,11 @@ EXCLUDED_PARTS = (".godot", "data", "global", "addons")
 
 VALID_NODE_SRC_TAGS = frozenset(
     {
-        "instance",    # packed scene instance not auto-detected as instantiate()
-        "ephemeral",   # tooltip, empty-state label, separator in a dynamic list
-        "drawn",       # custom-drawn control (inner class with _draw())
-        "debug",       # debug-only display behind OS.is_debug_build()
-        "timer",       # Timer node (must be created in code, never in .tscn)
+        "instance",  # packed scene instance not auto-detected as instantiate()
+        "ephemeral",  # tooltip, empty-state label, separator in a dynamic list
+        "drawn",  # custom-drawn control (inner class with _draw())
+        "debug",  # debug-only display behind OS.is_debug_build()
+        "timer",  # Timer node (must be created in code, never in .tscn)
     }
 )
 
@@ -198,14 +206,17 @@ def check_tscn_connections(path: str, text: str) -> list[Violation]:
 # `_\s*:` requires `_` followed immediately by optional space then `:`, which
 # distinguishes the wildcard from identifiers like `_name` (never `_name:`).
 _WILDCARD_ARM_RE = re.compile(r"^(\s+)(?:.*,\s*)?_\s*:\s*(.*?)\s*$")
-_SAFE_WILDCARD_RE = re.compile(r"^(?:push_error\b|push_warning\b|pass\b|#|$)")
+_SAFE_WILDCARD_RE = re.compile(
+    r"^(?:ToastManager\.show_dev_error\b|push_warning\b|pass\b|#|$)"
+)
 
 
 def check_match_wildcard(path: str, text: str) -> list[Violation]:
-    """_: arms must contain only push_error / push_warning, or be empty.
-    Effect code belongs in explicitly-named arms so that adding a new value
-    later surfaces unhandled branches rather than silently falling through.
-    (naming_conventions.md §11)"""
+    """_: arms must contain only ToastManager.show_dev_error / push_warning,
+    or be empty. Effect code belongs in explicitly-named arms so that adding a
+    new value later surfaces unhandled branches rather than silently falling
+    through. (naming_conventions.md §11; bare push_error is banned by the
+    error-guard standard, so the unexpected-value guard is show_dev_error.)"""
     violations: list[Violation] = []
     lines = text.splitlines()
     for i, line in enumerate(lines, start=1):
@@ -219,12 +230,13 @@ def check_match_wildcard(path: str, text: str) -> list[Violation]:
         if inline and not _SAFE_WILDCARD_RE.match(inline):
             violations.append(
                 Violation(
-                    path, i,
+                    path,
+                    i,
                     "match-wildcard",
                     "naming §11",
                     "_: arm contains effect code. Expected values belong in "
-                    "explicit named arms; _: is reserved for push_error / "
-                    "push_warning.",
+                    "explicit named arms; _: is reserved for "
+                    "ToastManager.show_dev_error / push_warning.",
                 )
             )
             continue
@@ -241,7 +253,8 @@ def check_match_wildcard(path: str, text: str) -> list[Violation]:
             if not _SAFE_WILDCARD_RE.match(stripped):
                 violations.append(
                     Violation(
-                        path, i,
+                        path,
+                        i,
                         "match-wildcard",
                         "naming §11",
                         "_: arm contains effect code. Expected values belong in "
@@ -254,27 +267,96 @@ def check_match_wildcard(path: str, text: str) -> list[Violation]:
     return violations
 
 
+# ── Tier 1: bare push_error ban (error_guard_standard.md §3a) ─────────────────
+#
+# All error logging goes through ToastManager: show_error() for runtime guards
+# (logs internally), show_dev_error() for programmer errors. A bare push_error
+# at a call site is a violation, with two exceptions:
+#
+#   - toast_manager.gd itself — the single home of the underlying push_error.
+#   - Boot-phase code that runs before the ToastManager autoload exists
+#     (EventBus, SettingsStore, Debug load earlier). Tier-2 style: the author
+#     declares it with a `# push-error: boot` marker trailing the call or on
+#     the comment line directly above, making the claim greppable for review.
+
+PUSH_ERROR_RE = re.compile(r"\bpush_error\s*\(")
+PUSH_ERROR_BOOT_MARKER_RE = re.compile(r"#\s*push-error:\s*boot\b")
+PUSH_ERROR_EXEMPT_FILES = frozenset({"global/autoloads/toast_manager.gd"})
+
+
+def check_bare_push_error(path: str, text: str) -> list[Violation]:
+    """Flag every bare push_error call site. Runtime guards must use
+    ToastManager.show_error() (which logs internally); programmer-error guards
+    must use ToastManager.show_dev_error(). Pre-ToastManager boot code may
+    declare the exception with `# push-error: boot`.
+    (error_guard_standard.md §3a)
+
+    Matches preceded by `#` on the same line are skipped so commented-out code
+    and doc mentions don't trip the rule. (A `#` inside a string literal before
+    the call would also skip — accepted as a rare false-negative.)"""
+    if path in PUSH_ERROR_EXEMPT_FILES:
+        return []
+
+    violations: list[Violation] = []
+    lines = text.splitlines()
+    for i, line in enumerate(lines, start=1):
+        m = PUSH_ERROR_RE.search(line)
+        if not m:
+            continue
+        hash_idx = line.find("#")
+        if hash_idx != -1 and hash_idx < m.start():
+            continue
+        if PUSH_ERROR_BOOT_MARKER_RE.search(line):
+            continue
+        if i >= 2:
+            prev = lines[i - 2]
+            if prev.lstrip().startswith("#") and PUSH_ERROR_BOOT_MARKER_RE.search(prev):
+                continue
+        violations.append(
+            Violation(
+                path,
+                i,
+                "bare-push-error",
+                "error-guard §3a",
+                "bare push_error at call site. Runtime guards: "
+                "ToastManager.show_error() (logs internally). Programmer "
+                "errors: ToastManager.show_dev_error(). Code running before "
+                "the ToastManager autoload loads may declare "
+                "`# push-error: boot`.",
+            )
+        )
+
+    return violations
+
+
 # ── Dispatch ─────────────────────────────────────────────────────────────────
 
-# (suffix, check fn) pairs. Add new checks here as more rules graduate from the
+# Check families by scope. Add new checks here as more rules graduate from the
 # manifest into machine enforcement.
-GD_CHECKS = (check_node_source, check_match_wildcard)
+GD_SCENE_CHECKS = (check_node_source, check_match_wildcard)
+GD_ERROR_GUARD_CHECKS = (check_bare_push_error,)
 TSCN_CHECKS = (check_tscn_connections,)
 
 
 def lint_file(path: Path, repo_root: Path) -> list[Violation]:
-    """Run the checks that apply to a single file, by extension."""
+    """Run the checks that apply to a single file, by extension and scope."""
     rel = _rel(path, repo_root)
     try:
         text = path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError):
         return []
 
+    violations: list[Violation] = []
     if path.suffix == ".gd":
-        return [v for chk in GD_CHECKS for v in chk(rel, text)]
-    if path.suffix == ".tscn":
-        return [v for chk in TSCN_CHECKS for v in chk(rel, text)]
-    return []
+        if _in_scope(path, repo_root):
+            violations.extend(v for chk in GD_SCENE_CHECKS for v in chk(rel, text))
+        if _in_error_guard_scope(path, repo_root):
+            violations.extend(
+                v for chk in GD_ERROR_GUARD_CHECKS for v in chk(rel, text)
+            )
+    elif path.suffix == ".tscn" and _in_scope(path, repo_root):
+        violations.extend(v for chk in TSCN_CHECKS for v in chk(rel, text))
+    return violations
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -288,7 +370,8 @@ def _rel(path: Path, repo_root: Path) -> str:
 
 
 def _in_scope(path: Path, repo_root: Path) -> bool:
-    """True if the file is under a scanned dir and not an excluded subtree."""
+    """True if the file is under a scanned dir and not an excluded subtree.
+    (Scene-architecture / naming check scope.)"""
     rel = _rel(path, repo_root)
     parts = rel.split("/")
     if parts[0] not in SCANNED_DIRS:
@@ -296,15 +379,29 @@ def _in_scope(path: Path, repo_root: Path) -> bool:
     return not any(part in EXCLUDED_PARTS for part in parts)
 
 
+def _in_error_guard_scope(path: Path, repo_root: Path) -> bool:
+    """True if the file is covered by the error-guard checks (all project
+    GDScript dirs)."""
+    rel = _rel(path, repo_root)
+    parts = rel.split("/")
+    if parts[0] not in ERROR_GUARD_DIRS:
+        return False
+    return not any(part in ERROR_GUARD_EXCLUDED_PARTS for part in parts)
+
+
 def _collect_tree(repo_root: Path) -> list[Path]:
     files: list[Path] = []
-    for d in SCANNED_DIRS:
+    for d in dict.fromkeys(SCANNED_DIRS + ERROR_GUARD_DIRS):
         base = repo_root / d
         if not base.is_dir():
             continue
         files.extend(base.rglob("*.gd"))
         files.extend(base.rglob("*.tscn"))
-    return [f for f in files if _in_scope(f, repo_root)]
+    return [
+        f
+        for f in files
+        if _in_scope(f, repo_root) or _in_error_guard_scope(f, repo_root)
+    ]
 
 
 # ── CLI entry point ──────────────────────────────────────────────────────────
@@ -330,7 +427,12 @@ def main() -> None:
 
     if args.files:
         targets = [Path(f) for f in args.files]
-        targets = [f for f in targets if _in_scope(f, repo_root) and f.is_file()]
+        targets = [
+            f
+            for f in targets
+            if (_in_scope(f, repo_root) or _in_error_guard_scope(f, repo_root))
+            and f.is_file()
+        ]
     else:
         targets = _collect_tree(repo_root)
 

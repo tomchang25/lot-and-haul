@@ -6,7 +6,7 @@
 extends Node
 
 ## Full state for the current run. Null between runs.
-## Scenes in the run phase assert RunManager.is_run_active() on entry and then
+## Scenes in the run phase should guard with RunManager.is_run_active() on entry and then
 ## read directly: RunManager.run.won_items, RunManager.run.inspection_ap_cap, etc.
 ## External code must never mutate RunStore fields directly — use RunManager's
 ## mutation methods below.
@@ -40,9 +40,12 @@ func create_run_store(location: LocationData, car: CarData) -> void:
 ## clues on cargo items (the hub-return reveal), then copies economics and cargo
 ## into the returned value object. The caller (MetaManager.resolve_current_run)
 ## must call clear_run_state() after consuming the result.
-## Asserts that a run is active — call only when is_run_active() is true.
+## Guards that a run is active — call only when is_run_active() is true.
 func take_run_result() -> RunResult:
-    assert(run != null, "take_run_result called with no active run")
+    if run == null:
+        ToastManager.show_dev_error("take_run_result called with no active run")
+        return RunResult.new()
+
     for entry: ItemEntry in run.cargo_items:
         entry.auto_reveal_all_surface()
     var result := RunResult.new()

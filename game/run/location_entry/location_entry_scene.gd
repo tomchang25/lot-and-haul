@@ -20,8 +20,16 @@ const INTERIOR_BEAT := 0.5 ## Seconds held on interior after the wipe before adv
 
 
 func _ready() -> void:
-    assert(RunManager.is_run_active(), "LocationEntry: run is null — Location Select must build it before entering.")
-    assert(RunManager.run.location_data != null, "LocationEntry: location_data is null — Location Select must assign a LocationData before entering.")
+    if not RunManager.is_run_active():
+        ToastManager.show_error("Run data is missing. Returning to hub.")
+        SceneRouter.go_to_hub.call_deferred()
+        return
+
+    if RunManager.run.location_data == null:
+        ToastManager.show_error("Location data is missing. Returning to hub.")
+        SceneRouter.go_to_hub.call_deferred()
+        return
+
     _play_arrival.call_deferred()
 
 # ══ Arrival sequence ══════════════════════════════════════════════════════════

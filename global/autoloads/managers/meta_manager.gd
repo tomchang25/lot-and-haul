@@ -131,7 +131,10 @@ func begin_storage_slot() -> void:
 ## advancing current_slot to 3, returning the player to the evening slot.
 ## Call before navigating to location select.
 func begin_auction() -> void:
-    assert(slot.current_slot == 1, "Auction can only begin in slot 1 (Morning)")
+    if slot.current_slot != 1:
+        ToastManager.show_dev_error("Auction can only begin in slot 1 (Morning), got %d" % slot.current_slot)
+        return
+
     slot.set_slot(3)
     SaveManager.save()
 
