@@ -24,7 +24,7 @@ One-press build flow covering the two release blockers from `dev/docs/visions/it
 
 ### Simple Tutorial (No-Story)
 
-The tutorial split out from the story demo — Stage 2's "small onboarding" pulled forward to Stage 1. A data-driven tutorial hint panel (step list: scene + trigger condition + hint text, played in order — no branching, no portraits, no story) guides the player through one full run + hub loop: inspect → bid → cargo (blocked from leaving empty) → storage → knowledge → customer sell → end day. The first run is made deterministic and friendly via the Director injection skeleton below (big car, high stamina, high-value low-depth items); free play afterwards, no multi-run scripting. The 3-run story demo (Uncle, X-Ray, Crown cutscene) moves to Stage 3. Panel is reusable in the full game. See `dev/docs/visions/itchio_review.md`.
+The tutorial split out from the story demo — Stage 2's "small onboarding" pulled forward to Stage 1. A data-driven tutorial hint panel (step list: scene + trigger condition + hint text, played in order — no branching, no portraits, no story) guides the player through one full run + hub loop: inspect → bid → cargo (blocked from leaving empty) → storage → knowledge → customer sell → end day. The first run is made deterministic and friendly via the Director injection skeleton below (big car, high stamina, high-value low-depth items); free play afterwards, no multi-run scripting. The 3-run story demo (Uncle, X-Ray, Crown cutscene) moves to Stage 3. Panel is reusable in the full game. See `dev/docs/visions/itchio_review.md`. The hub + storage explain-only slice is promoted to `dev/docs/plans/tutorial_hint_panel.sketch.md`; this entry keeps the run-phase tutorial and injection scope.
 
 ### Director System — Phase 1 Injection Skeleton
 
@@ -189,6 +189,7 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 Flows currently being built or ready to implement — may hold more than one entry. One-line pointer each — same format as `## Plan`, promoted here when building starts or the plan is ready to build. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress or ready → this section is empty.
 
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
+- [tutorial] Hub guidance + Storage tutorial hint panel (Director step playback, dim-and-highlight overlay, Help replay) — see `dev/docs/plans/tutorial_hint_panel.sketch.md`
 
 
 ---

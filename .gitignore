@@ -13,6 +13,8 @@
 **/*.tmp
 **/*.import
 **/*.db-journal
+**/*.code-workspace
+
 data/tres/
 
 **/__pycache__/
