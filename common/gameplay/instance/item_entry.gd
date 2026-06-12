@@ -314,11 +314,11 @@ func is_price_converged() -> bool:
 # ── Clue reveal mechanics ─────────────────────────────────────────────────────
 
 
-func attempt_clue(clue: ClueData, attribute_bonus: int) -> bool:
+func attempt_clue(clue: ClueData, attribute_bonus: int, rng: RandomNumberGenerator = null) -> bool:
     if clue == null:
         return false
     var success_chance := clampi((21 + attribute_bonus - clue.dc) * 5, 5, 95)
-    var roll := randi() % 100 + 1
+    var roll := (rng.randi() if rng else randi()) % 100 + 1
     var succeeded := roll <= success_chance
     if succeeded and not revealed_clue_ids.has(clue.clue_id):
         revealed_clue_ids.append(clue.clue_id)

@@ -37,6 +37,7 @@ SaveManager="*uid://bi0oymqq1g433"
 KnowledgeManager="*res://global/autoloads/managers/knowledge_manager.gd"
 MetaManager="*res://global/autoloads/managers/meta_manager.gd"
 SceneRouter="*res://global/autoloads/scene_router/scene_router.tscn"
+Director="*res://global/autoloads/director/director.gd"
 GameManager="*uid://bnj3y0a2848to"
 CIPilot="*res://global/autoloads/ci_pilot/ci_pilot.gd"
 

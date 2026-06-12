@@ -86,6 +86,12 @@ func spend_cash(amount: int) -> bool:
     return economy.spend(amount)
 
 
+## Marks a scene tutorial as seen and schedules a deferred save.
+func mark_tutorial_seen(scene_id: String) -> void:
+    progress.mark_tutorial_seen(scene_id)
+    SaveManager.mark_dirty()
+
+
 ## Cross-domain transaction: deducts the upgrade cost from cash and raises
 ## [param attr] one level in KnowledgeStore. Saves on success.
 ## Returns false when cash is insufficient.

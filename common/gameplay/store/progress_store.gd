@@ -1,5 +1,6 @@
 # progress_store.gd
-# Progress runtime store: calendar day and sampled available locations.
+# Progress runtime store: calendar day, sampled available locations, and
+# tutorial-seen flags.
 # Serializable state slice held by MetaManager. Owns the fields, their save
 # payload, and the operations that mutate them.
 #
@@ -9,6 +10,7 @@ extends StoreBase
 
 var _current_day: int = 0
 var _available_locations: Array[LocationData] = []
+var _tutorial_seen: Dictionary = { }
 
 ## Calendar day counter. Starts at 0, incremented by end_day(). Read-only externally.
 var current_day: int:
@@ -20,6 +22,11 @@ var current_day: int:
 var available_locations: Array[LocationData]:
     get:
         return _available_locations.duplicate()
+
+## Tutorial-seen flags, scene_id -> bool. Read-only externally.
+var tutorial_seen: Dictionary:
+    get:
+        return _tutorial_seen.duplicate()
 
 
 ## Increments current_day by one. Does not save.
@@ -37,9 +44,19 @@ func clear_locations() -> void:
     _available_locations.clear()
 
 
+## Marks a scene tutorial as seen. Does not save.
+func mark_tutorial_seen(scene_id: String) -> void:
+    _tutorial_seen[scene_id] = true
+
+
 ## Section id for the progress save payload.
 func section_id() -> String:
     return "progress"
+
+
+## Returns current schema version. Version 2 adds tutorial_seen flags.
+func _store_version() -> int:
+    return 2
 
 
 ## Serializes progress state to a save payload.
@@ -51,13 +68,14 @@ func to_dict() -> Dictionary:
         "_version": _store_version(),
         "current_day": _current_day,
         "available_location_ids": available_location_ids,
+        "tutorial_seen": _tutorial_seen.duplicate(),
     }
 
 
 ## Restores progress state. Unresolved location ids are dropped with a warning.
-func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
+func from_dict(data: Dictionary, ctx: SaveLoadContext) -> void:
     var version: int = int(data.get("_version", 1))
-    data = _apply_migrations(data, version, _ctx)
+    data = _apply_migrations(data, version, ctx)
     _current_day = int(data.get("current_day", _current_day))
     if data.has("available_location_ids") and data["available_location_ids"] is Array:
         _available_locations = []
@@ -71,3 +89,15 @@ func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
                 )
                 continue
             _available_locations.append(loc)
+    _tutorial_seen = data.get("tutorial_seen", { })
+    if not _tutorial_seen is Dictionary:
+        _tutorial_seen = { }
+
+
+## Migrates saved payloads from older schema versions.
+## Version 2: adds default tutorial_seen dict.
+func _apply_migrations(data: Dictionary, from_version: int, _ctx: SaveLoadContext) -> Dictionary:
+    if from_version < 2:
+        if not data.has("tutorial_seen") or not data["tutorial_seen"] is Dictionary:
+            data["tutorial_seen"] = { }
+    return data

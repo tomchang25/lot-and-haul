@@ -1,0 +1,511 @@
+# director.gd
+# Tutorial Director — owns the dim overlay and manages script playback state.
+# Scenes register their named UI anchors in _ready via register_scene().
+# Inserted after SceneRouter, before GameManager in autoload order.
+extends Node
+
+const OVERLAY_LAYER := 120
+const DIM_COLOR := Color(0.0, 0.0, 0.0, 0.55)
+const PANEL_BG := Color(0.15, 0.15, 0.18, 1.0)
+const PANEL_BORDER := Color(0.3, 0.3, 0.35, 1.0)
+const TEXT_COLOR := Color(0.88, 0.88, 0.92, 1.0)
+
+# ── Overlay nodes (code-built) ─────────────────────────────────────────────────
+var _canvas: CanvasLayer
+var _dim_top: ColorRect
+var _dim_bottom: ColorRect
+var _dim_left: ColorRect
+var _dim_right: ColorRect
+var _dim_full: ColorRect
+var _hint_panel: PanelContainer
+var _hint_label: Label
+var _hint_next: Button
+var _hint_close: Button
+var _popup_panel: PanelContainer
+var _popup_label: Label
+var _popup_image: TextureRect
+var _popup_next: Button
+var _popup_close: Button
+var _help_btn: Button
+
+# ── Playback state ─────────────────────────────────────────────────────────────
+var _is_tutorial_active := false
+var _current_script: Array[TutorialStep] = []
+var _current_step_index := 0
+var _current_script_id := ""
+var _current_scene_id := ""
+var _anchors: Dictionary = { }
+var _is_offer_showing := false
+
+
+func _ready() -> void:
+    _build_overlay()
+    SceneRouter.scene_changed.connect(_on_scene_changed)
+    set_process(false)
+    _position_help_btn.call_deferred()
+
+
+## Entry point for scenes. Registers [param anchors] for the current scene
+## identified by [param scene_id]. The Director checks seen-flags and starts
+## or offers the tutorial as appropriate.
+func register_scene(scene_id: String, anchors: Dictionary) -> void:
+    _current_scene_id = scene_id
+    _anchors = anchors.duplicate()
+    _hide_overlay()
+    _help_btn.visible = false
+
+    match scene_id:
+        "hub":
+            _on_hub_registered()
+        "storage":
+            _on_storage_registered()
+
+
+## Starts playback of the tutorial script identified by [param script_id].
+## Safe to call at any time — the script's steps are all explain-only.
+func start_script(script_id: String) -> void:
+    var script: Array[TutorialStep] = _get_script(script_id)
+    if script.is_empty():
+        return
+    _current_script = script
+    _current_script_id = script_id
+    _current_step_index = 0
+    _is_tutorial_active = true
+    _is_offer_showing = false
+    _help_btn.visible = false
+    _show_step()
+
+# ══ Hub / Storage registration callbacks ═══════════════════════════════════════
+
+
+func _on_hub_registered() -> void:
+    if MetaManager.progress.tutorial_seen.has("hub"):
+        return
+    start_script("hub")
+
+
+func _on_storage_registered() -> void:
+    if MetaManager.progress.tutorial_seen.has("storage"):
+        _help_btn.visible = true
+        return
+    _show_offer_prompt()
+
+
+func _show_offer_prompt() -> void:
+    _is_offer_showing = true
+
+    _dim_full.visible = true
+    _dim_full.mouse_filter = Control.MOUSE_FILTER_STOP
+    _dim_full.position = Vector2.ZERO
+    _dim_full.size = _get_screen_size()
+
+    _popup_image.visible = false
+    _popup_label.text = "Welcome to the Workshop!\n\nWould you like a quick tour of the features?"
+    _popup_next.text = "Yes, show me around!"
+    _popup_panel.visible = true
+    _popup_close.text = "Skip"
+    _popup_close.visible = true
+
+    # Disconnect old slot signatures to avoid duplicates, then connect.
+    _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
+    _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
+    _popup_close.pressed.connect(_on_offer_skip_pressed)
+    _popup_next.pressed.connect(_on_offer_start_pressed)
+
+
+func _offer_safe_disconnect(signal_obj: Signal, callable: Callable) -> void:
+    if signal_obj.is_connected(callable):
+        signal_obj.disconnect(callable)
+
+
+func _on_offer_start_pressed() -> void:
+    _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
+    _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
+    _popup_close.text = "×"
+    start_script("storage")
+
+
+func _on_offer_skip_pressed() -> void:
+    _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
+    _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
+    _popup_close.text = "×"
+    _mark_seen("storage")
+    _hide_overlay()
+    _help_btn.visible = true
+
+# ══ Step display ═══════════════════════════════════════════════════════════════
+
+
+func _show_step() -> void:
+    if _current_step_index >= _current_script.size():
+        _end_tutorial()
+        return
+
+    var step: TutorialStep = _current_script[_current_step_index]
+    _hide_step_ui()
+    _help_btn.visible = false
+    set_process(false)
+
+    match step.kind:
+        TutorialStep.Kind.HINT:
+            _show_hint(step)
+        TutorialStep.Kind.POPUP:
+            _show_popup(step)
+
+
+func _show_hint(step: TutorialStep) -> void:
+    var anchor: Control = _anchors.get(step.anchor_id) as Control
+    if not is_instance_valid(anchor):
+        _current_step_index += 1
+        _show_step()
+        return
+
+    var rect: Rect2 = anchor.get_global_rect()
+    _update_dim_hole(rect)
+
+    if step.unlock_anchor:
+        _dim_full.visible = false
+    else:
+        _dim_full.visible = true
+        _dim_full.mouse_filter = Control.MOUSE_FILTER_STOP
+        _dim_full.position = rect.position
+        _dim_full.size = rect.size
+
+    _hint_label.text = step.text
+    _hint_panel.visible = true
+    _position_near_anchor(_hint_panel, rect)
+
+    set_process(true)
+
+
+func _show_popup(step: TutorialStep) -> void:
+    _dim_full.visible = true
+    _dim_full.mouse_filter = Control.MOUSE_FILTER_STOP
+    _dim_full.position = Vector2.ZERO
+    _dim_full.size = _get_screen_size()
+
+    if step.image != null:
+        _popup_image.texture = step.image
+        _popup_image.visible = true
+    else:
+        _popup_image.visible = false
+
+    _popup_label.text = step.text
+    _popup_panel.visible = true
+
+
+func _hide_step_ui() -> void:
+    _hint_panel.visible = false
+    _popup_panel.visible = false
+    _dim_full.visible = false
+    _dim_top.visible = false
+    _dim_bottom.visible = false
+    _dim_left.visible = false
+    _dim_right.visible = false
+
+
+func _hide_overlay() -> void:
+    _hide_step_ui()
+    _is_tutorial_active = false
+    _is_offer_showing = false
+    set_process(false)
+
+# ══ Navigation buttons ═════════════════════════════════════════════════════════
+
+
+func _on_hint_next_pressed() -> void:
+    if not _is_tutorial_active:
+        return
+    _current_step_index += 1
+    _show_step()
+
+
+func _on_hint_close_pressed() -> void:
+    if not _is_tutorial_active:
+        return
+    _mark_seen(_current_script_id)
+    _hide_overlay()
+    if _current_scene_id == "storage":
+        _help_btn.visible = true
+
+
+func _on_popup_next_pressed() -> void:
+    if not _is_tutorial_active:
+        return
+    _current_step_index += 1
+    _show_step()
+
+
+func _on_popup_close_pressed() -> void:
+    if not _is_tutorial_active:
+        return
+    _mark_seen(_current_script_id)
+    _hide_overlay()
+    if _current_scene_id == "storage":
+        _help_btn.visible = true
+
+
+func _on_help_pressed() -> void:
+    start_script("storage")
+
+# ══ Scene change watcher ═══════════════════════════════════════════════════════
+
+
+func _on_scene_changed() -> void:
+    if _is_tutorial_active and _current_step_index < _current_script.size():
+        var step: TutorialStep = _current_script[_current_step_index]
+        if step.advance == TutorialStep.Advance.SCENE_ENTERED:
+            _mark_seen(_current_script_id)
+            _hide_overlay()
+
+# ══ Script management ══════════════════════════════════════════════════════════
+
+
+static func _get_script(script_id: String) -> Array[TutorialStep]:
+    match script_id:
+        "hub":
+            return TutorialScripts.hub_script()
+        "storage":
+            return TutorialScripts.storage_script()
+    return []
+
+
+func _end_tutorial() -> void:
+    _hide_overlay()
+    if _current_scene_id == "storage":
+        _help_btn.visible = true
+    _current_script = []
+    _current_script_id = ""
+
+
+func _mark_seen(script_id: String) -> void:
+    if script_id.is_empty():
+        return
+    MetaManager.mark_tutorial_seen(script_id)
+
+# ══ Dim / hole layout ══════════════════════════════════════════════════════════
+
+
+func _update_dim_hole(hole: Rect2) -> void:
+    var screen: Vector2 = _get_screen_size()
+
+    var hole_top: float = maxf(hole.position.y, 0.0)
+    var hole_bottom: float = hole.position.y + hole.size.y
+    var hole_left: float = maxf(hole.position.x, 0.0)
+    var hole_right: float = hole.position.x + hole.size.x
+
+    _dim_top.position = Vector2(0, 0)
+    _dim_top.size = Vector2(screen.x, hole_top)
+
+    _dim_bottom.position = Vector2(0, hole_bottom)
+    _dim_bottom.size = Vector2(screen.x, maxf(screen.y - hole_bottom, 0))
+
+    _dim_left.position = Vector2(0, hole_top)
+    _dim_left.size = Vector2(hole_left, hole.size.y)
+
+    _dim_right.position = Vector2(hole_right, hole_top)
+    _dim_right.size = Vector2(maxf(screen.x - hole_right, 0), hole.size.y)
+
+    for dim in [_dim_top, _dim_bottom, _dim_left, _dim_right]:
+        dim.visible = true
+        dim.mouse_filter = Control.MOUSE_FILTER_STOP
+
+
+func _position_near_anchor(panel: Control, anchor_rect: Rect2) -> void:
+    var screen: Vector2 = _get_screen_size()
+    var margin: float = 16.0
+    var preferred_width: float = 280.0
+
+    panel.custom_minimum_size.x = preferred_width
+
+    var px: float = anchor_rect.position.x + anchor_rect.size.x + margin
+    var py: float = anchor_rect.position.y
+
+    if px + preferred_width > screen.x:
+        px = anchor_rect.position.x - preferred_width - margin
+        if px < margin:
+            px = anchor_rect.position.x
+            py = anchor_rect.position.y + anchor_rect.size.y + margin
+
+    panel.position = Vector2(
+        clampf(px, margin, screen.x - preferred_width - margin),
+        clampf(py, margin, screen.y - panel.size.y - margin if panel.size.y > 0 else screen.y - 200),
+    )
+
+# ══ Per-frame hole update ══════════════════════════════════════════════════════
+
+
+func _process(_delta: float) -> void:
+    if not _is_tutorial_active:
+        set_process(false)
+        return
+    if _current_step_index >= _current_script.size():
+        set_process(false)
+        return
+
+    var step: TutorialStep = _current_script[_current_step_index]
+    if step.kind != TutorialStep.Kind.HINT:
+        set_process(false)
+        return
+
+    var anchor: Control = _anchors.get(step.anchor_id) as Control
+    if not is_instance_valid(anchor):
+        return
+
+    var rect: Rect2 = anchor.get_global_rect()
+    _update_dim_hole(rect)
+
+    if not step.unlock_anchor:
+        _dim_full.position = rect.position
+        _dim_full.size = rect.size
+
+    _position_near_anchor(_hint_panel, rect)
+
+# ══ Helpers ════════════════════════════════════════════════════════════════════
+
+
+func _get_screen_size() -> Vector2:
+    return get_viewport().get_visible_rect().size
+
+
+func _position_help_btn() -> void:
+    var screen: Vector2 = _get_screen_size()
+    _help_btn.position = Vector2(8, screen.y - 44)
+
+
+func _make_dim_rect(parent: CanvasLayer) -> ColorRect:
+    var cr := ColorRect.new()
+    cr.color = DIM_COLOR
+    cr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    cr.visible = false
+    parent.add_child(cr)
+    return cr
+
+# ══ Overlay construction ═══════════════════════════════════════════════════════
+
+
+func _build_overlay() -> void:
+    _canvas = CanvasLayer.new()
+    _canvas.layer = OVERLAY_LAYER
+    add_child(_canvas)
+
+    _dim_top = _make_dim_rect(_canvas)
+    _dim_bottom = _make_dim_rect(_canvas)
+    _dim_left = _make_dim_rect(_canvas)
+    _dim_right = _make_dim_rect(_canvas)
+
+    _dim_full = ColorRect.new()
+    _dim_full.color = DIM_COLOR
+    _dim_full.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _dim_full.visible = false
+    _canvas.add_child(_dim_full)
+
+    # Hint panel
+    _hint_panel = PanelContainer.new()
+    _hint_panel.visible = false
+    _hint_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+    _canvas.add_child(_hint_panel)
+
+    var hint_margin := MarginContainer.new()
+    hint_margin.add_theme_constant_override("margin_left", 16)
+    hint_margin.add_theme_constant_override("margin_right", 16)
+    hint_margin.add_theme_constant_override("margin_top", 12)
+    hint_margin.add_theme_constant_override("margin_bottom", 12)
+    _hint_panel.add_child(hint_margin)
+
+    var hint_vbox := VBoxContainer.new()
+    hint_vbox.add_theme_constant_override("separation", 12)
+    hint_margin.add_child(hint_vbox)
+
+    _hint_label = Label.new()
+    _hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    _hint_label.add_theme_color_override("font_color", TEXT_COLOR)
+    _hint_label.add_theme_font_size_override("font_size", 13)
+    _hint_label.custom_minimum_size = Vector2(260, 0)
+    hint_vbox.add_child(_hint_label)
+
+    var hint_btn_hbox := HBoxContainer.new()
+    hint_btn_hbox.alignment = BoxContainer.ALIGNMENT_END
+    hint_btn_hbox.add_theme_constant_override("separation", 8)
+    hint_vbox.add_child(hint_btn_hbox)
+
+    _hint_close = Button.new()
+    _hint_close.text = "×"
+    _hint_close.flat = true
+    _hint_close.pressed.connect(_on_hint_close_pressed)
+    hint_btn_hbox.add_child(_hint_close)
+
+    _hint_next = Button.new()
+    _hint_next.text = "Next"
+    _hint_next.pressed.connect(_on_hint_next_pressed)
+    hint_btn_hbox.add_child(_hint_next)
+
+    # Popup panel
+    _popup_panel = PanelContainer.new()
+    _popup_panel.visible = false
+    _popup_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+    _popup_panel.set_anchors_preset(Control.PRESET_CENTER)
+    _popup_panel.custom_minimum_size = Vector2(420, 0)
+    _canvas.add_child(_popup_panel)
+
+    var popup_margin := MarginContainer.new()
+    popup_margin.add_theme_constant_override("margin_left", 24)
+    popup_margin.add_theme_constant_override("margin_right", 24)
+    popup_margin.add_theme_constant_override("margin_top", 20)
+    popup_margin.add_theme_constant_override("margin_bottom", 20)
+    _popup_panel.add_child(popup_margin)
+
+    var popup_vbox := VBoxContainer.new()
+    popup_vbox.add_theme_constant_override("separation", 16)
+    popup_margin.add_child(popup_vbox)
+
+    _popup_image = TextureRect.new()
+    _popup_image.visible = false
+    _popup_image.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+    _popup_image.custom_minimum_size = Vector2(0, 80)
+    popup_vbox.add_child(_popup_image)
+
+    _popup_label = Label.new()
+    _popup_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    _popup_label.add_theme_color_override("font_color", TEXT_COLOR)
+    _popup_label.add_theme_font_size_override("font_size", 14)
+    popup_vbox.add_child(_popup_label)
+
+    var popup_btn_hbox := HBoxContainer.new()
+    popup_btn_hbox.alignment = BoxContainer.ALIGNMENT_END
+    popup_btn_hbox.add_theme_constant_override("separation", 8)
+    popup_vbox.add_child(popup_btn_hbox)
+
+    _popup_close = Button.new()
+    _popup_close.text = "×"
+    _popup_close.flat = true
+    _popup_close.pressed.connect(_on_popup_close_pressed)
+    popup_btn_hbox.add_child(_popup_close)
+
+    _popup_next = Button.new()
+    _popup_next.text = "Next"
+    _popup_next.pressed.connect(_on_popup_next_pressed)
+    popup_btn_hbox.add_child(_popup_next)
+
+    # Help button (bottom-left corner)
+    _help_btn = Button.new()
+    _help_btn.text = "?"
+    _help_btn.visible = false
+    _help_btn.mouse_filter = Control.MOUSE_FILTER_STOP
+    _help_btn.pressed.connect(_on_help_pressed)
+    _help_btn.custom_minimum_size = Vector2(36, 36)
+    _help_btn.position = Vector2(8, 0)
+    _canvas.add_child(_help_btn)
+
+    # Style panels
+    for panel in [_hint_panel, _popup_panel]:
+        var sb := StyleBoxFlat.new()
+        sb.bg_color = PANEL_BG
+        sb.border_color = PANEL_BORDER
+        sb.set_border_width_all(1)
+        sb.set_corner_radius_all(6)
+        sb.content_margin_left = 0
+        sb.content_margin_right = 0
+        sb.content_margin_top = 0
+        sb.content_margin_bottom = 0
+        panel.add_theme_stylebox_override("panel", sb)

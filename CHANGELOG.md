@@ -2,6 +2,16 @@
 
 Append-only record of shipped work.
 
+## Tutorial Hint Panel — Director System
+
+- 2026-06-12 — [tutorial] `Director` autoload added: code-built dim-overlay CanvasLayer (layer 120) with hint/popup step display, four-rect hole cutout, per-frame anchor tracking, and help button; registered in `project.godot` after SceneRouter
+- 2026-06-12 — [tutorial] `TutorialStep` RefCounted resource class with Kind (HINT/POPUP), Advance (NEXT/SCENE_ENTERED), unlock_anchor flag
+- 2026-06-12 — [tutorial] `TutorialScripts` static class with hub script (slot intro → activity popup → Storage button unlock) and storage script (welcome popup → item table → detail rail → repair/restore/research → appraised-vs-verified popup → AP label → leave button)
+- 2026-06-12 — [tutorial] Hub scene integration: `Director.register_scene("hub", ...)` with slot_label and storage_btn anchors; auto-starts on first visit
+- 2026-06-12 — [tutorial] Storage scene integration: `Director.register_scene("storage", ...)` with 7 anchors; first-visit offer prompt (start/skip), Help button replay; all steps explain-only
+- 2026-06-12 — [tutorial] ProgressStore schema v2: `tutorial_seen` dictionary with migration branch; `MetaManager.mark_tutorial_seen()` wired to deferred save
+- 2026-06-12 — [test] `ItemEntry.attempt_clue()` gains optional `rng` parameter; test RNG injection for deterministic clue roll assertions
+
 ## CI Headless Run-Loop Test Suite
 
 - 2026-06-12 — [ci] RNG injection refactor: `ItemEntry`, `LotEntry`, `ItemGenerator` gain optional seedable RNG parameter with null-fallback preserving all production call sites; `RandomUtils` extended
@@ -34,7 +44,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-06-12 — [lint] `lint_standards.py` gains bare-push-error check across all project GDScript dirs (`game`, `stage`, `common`, `global`, `data`); check dispatch restructured into `GD_SCENE_CHECKS` / `GD_ERROR_GUARD_CHECKS` scopes; match-wildcard safe-set updated from `push_error` to `ToastManager.show_dev_error`
 - 2026-06-12 — [standard] `standards_enforcement.md` documents bare push_error ban as active check; `naming_conventions.md` match-wildcard reference updated to `show_dev_error`
 - 2026-06-12 — [docs] CLAUDE.md updated: Notifications section adds `show_error`/`show_dev_error` mentions, Error guards section added with standard pointer
-- 2026-06-12 — [error_guard] 17 files migrated from `assert()` / bare `push_error` to typed guards: `auction_scene.gd`, `inspection_scene.gd`, `location_entry_scene.gd` (2×), `reveal_scene.gd` (runtime — `show_error` + navigate); `state.gd`, `state_machine.gd` (2×), `cargo_shapes.gd`, `economy_store.gd` (2×), `audio_manager.gd`, `knowledge_manager.gd` (3×), `meta_manager.gd`, `run_manager.gd`, `resource_registry.gd`, `super_category_registry.gd`, `resource_dir_loader.gd`, `save_manager.gd` (7× — 5 precondition + 2 runtime I/O), `registry_audit.gd` (programmer error — `show_dev_error` + return/sentinel); `settings_store.gd` (4×) annotated with boot markers
+- 2026-06-12 — [error_guard] 17 files migrated from `assert()` / bare `push_error` to typed guards: `auction_scene.gd`, `inspection_scene.gd`, `location_entry_scene.gd` (2×), `reveal_scene.gd` (runtime — `show_error` + navigate); `state.gd`, `state_machine.gd` (2×), `cargo_shapes.gd`, `economy_store.gd` (2×), `audio_manager.gd`, `knowledge_manager.gd` (3×), `meta_manager.gd`, `run_manager.gd`, `resource_registry.gd`, `super_category_registry.gd`, `resource_dir_loader.gd`, `save_manager.gd` (7× — 5 precondition + 3 runtime I/O), `registry_audit.gd` (programmer error — `show_dev_error` + return/sentinel); `settings_store.gd` (4×) annotated with boot markers
 
 ## Location Selection Cost Preview
 
@@ -49,7 +59,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-06-11 — [save] Boot sequence: `SaveManager.load()` renamed to `SaveManager.boot_load()`; `GameManager` calls `boot_load()` instead of `load()`
 - 2026-06-11 — [start] Start page rewritten: `PlayButton` split into `NewGameButton` + `LoadGameButton`; slot picker overlay with 3-slot buttons showing day/cash summaries; New Game mode shows all slots (occupied → overwrite confirmation), Load Game mode shows only occupied slots; confirmation dialogs for overwrite; back button returns to main menu
 - 2026-06-11 — [start] Scene file (`start_page_scene.tscn`): slot picker panel with `PickerTitle`, 3 `Slot*Button`s, `PickerBackButton`, `SpacerTop`/`SpacerBottom`, `OverwriteDialog` confirmation dialog; `PlayButton` → `NewGameButton` + `LoadGameButton` with `unique_name_in_owner = true`
-- 2026-06-11 — [theme] `main_theme.tres`: StyleBoxFlat sub-resource order reorganized (disabled/focus/hover before normal); UID attributes added to checkbox icon ext_resources; minor color tweaks (disabled bg 0.16/.18, border 0.22/.25); focus border style added
+- 2026-06-11 — [theme] `main_theme.tres`: StyleBoxFlat sub-resource color order reorganized (disabled/focus/hover before normal); UID attributes added to checkbox icon ext_resources; minor color tweaks (disabled bg 0.16/.18, border 0.22/.25); focus border style added
 - 2026-06-11 — [docs] `dev/docs/plans/save_slots.md` and `dev/docs/plans/start_page_new_game.md` shipped and archived
 
 ## Save Diagnostics & Restore Hardening
@@ -265,7 +275,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-05-01 — [hub] Day Pass confirmation dialog routes through `MetaManager.advance_days(1)` to `DaySummaryScene`
 - 2026-05-01 — [hub] Vehicle button replaces Van info popup; routes to `GameManager.go_to_vehicle_hub()`
 - 2026-05-01 — [hub] `_refresh_display()` refreshes header on return from `DaySummaryScene`
-- 2026-05-01 — [hub] Knowledge Hub entry scene routing to Mastery / Attributes / Perks sub-panels
+- 2026-05-01 — [knowledge] Knowledge Hub entry scene routing to Mastery / Attributes / Perks sub-panels
 - 2026-05-01 — [day-summary] `DaySummaryScene` shared by hub day-pass and run-review flows; reads from `GameManager.consume_pending_day_summary()`, falls back to hub if empty
 - 2026-05-01 — [day-summary] `DaySummary` value object with `start_day` / `end_day` / `days_elapsed`, run fields, `cargo_count`, `living_cost`, `completed_actions`, `net_change`, `has_run_data()` gate
 - 2026-05-01 — [day-summary] `DaySummary.cargo_count` + regrouped scene (TripExpensesGroup / DailyGroup / CargoCountLabel); trip expenses, daily living, cargo summary no longer share a column
