@@ -2,6 +2,18 @@
 
 Append-only record of shipped work.
 
+## Scene Testbeds & Agent Harness
+
+- 2026-06-13 — [dev] SaveManager test slot isolation: `use_test_slot()` wipes and redirects to a non-numeric test slot; boot-load and slot-listing skip it so no normal boot ever resumes into test data
+- 2026-06-13 — [dev] `TestbedRegistry` (`stage/testbeds/testbed_registry.gd`) with `static var REGISTRY` and shared `launch()` entry point consumed by both the manual launcher and the agent pilot
+- 2026-06-13 — [dev] Scene fixtures for 3 flows: storage/workshop (reusing `StorageFixtures`), location-entry→run-start (`LocationEntryFixtures`), and nightly selling (`CustomerSellFixtures`)
+- 2026-06-13 — [dev] `TestbedLauncher` scene (debug-gated, one button per registry entry) + start-page debug entry point for manual interactive use
+- 2026-06-13 — [dev] `TestbedPilot` autoload (`global/autoloads/harness/testbed_pilot.gd`) — `--testbed=<id>` CLI flag launches the same wipe-seed-enter sequence headlessly, drives the flow, and captures per-step screenshots
+- 2026-06-13 — [dev] `TestbedChecks` static class (`testbed_checks.gd`) with log-scan (error-level lines w/ benign-noise filter), stall detection (per-step timeout bound), and foreground-panel overlap checks
+- 2026-06-13 — [doc] `dev/agent_rules/godot_screenshot_check.md` updated with testbed pilot reference and headless run command
+- 2026-06-13 — [skill] `dev/skills/gdscript_const_vs_static_var.md` documents the `const` vs `static var` pitfall for manifest/registry arrays under clean headless import
+- 2026-06-13 — [doc] `dev/docs/plans/scene_testbeds_and_agent_harness.sketch.md` shipped and archived
+
 ## Director Split & Testing Taxonomy
 
 - 2026-06-13 — [refactor] Director autoload split into two focused autoloads: Director (presentation: dim overlay, hint/popup panels, step playback, Anchor registration, Help button) and ScriptDirector (orchestration: scene registration callbacks, auto-start/offer/help decisions, injection skeleton, phase lifecycle)
