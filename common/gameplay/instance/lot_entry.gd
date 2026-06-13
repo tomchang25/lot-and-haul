@@ -62,6 +62,10 @@ static func create(data: LotData, rng: RandomNumberGenerator = null) -> LotEntry
             rng,
         )
         if item_entry == null:
+            ToastManager.show_dev_error(
+                "LotEntry.create: ItemGenerator returned null for category '%s' (no eligible anchor?) — slot skipped"
+                % category.category_id,
+            )
             continue
 
         # Roll veiled_chance: each item independently starts pre-unveiled

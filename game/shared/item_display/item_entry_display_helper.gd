@@ -44,6 +44,9 @@ static func display_name(entry: ItemEntry) -> String:
 
     var has_qualifier := (not prefixes.is_empty() or not suffixes.is_empty())
     if not has_qualifier and not body_text.is_empty():
+        ToastManager.show_warning("Unknown item: %s %s %s - %s" % [prefixes, body_text, suffixes, " ".join(pool)])
+        ToastManager.show_info("%s - %s" % [body_text, " ".join(pool)])
+
         return "Unknown " + body_text
 
     return " ".join(parts)

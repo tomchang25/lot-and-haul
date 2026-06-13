@@ -232,6 +232,11 @@ One-line, no reasoning, no backing doc.
 - [refactor] Collapse ItemGenerator/ItemEntry factory split — single `draw()` returns ItemEntry, delete GenerationResult and from_generation — see `dev/docs/plans/collapse_item_generator_factory.sketch.md`
 - [bug] Testbed - LocationAndRun items still always be the unknown item name
 
+- [debug] Add an debug button in Hub to sell all items in storage
+- [debug] Add an debug button in Hub to add random item
+- [debug] Add Debug Overlay that use debug button in hub to toggle?
+  ​
+
 ---
 
 ## Bug
