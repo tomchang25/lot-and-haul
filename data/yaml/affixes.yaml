@@ -457,6 +457,7 @@ affixes:
   - affix_id: bag_rustic
     naming_slot: prefix
     display_name: Rustic
+    scope_mode: categories
     category_scope:
       - handbag
     weight: 3
@@ -467,6 +468,7 @@ affixes:
   - affix_id: bag_luxury
     naming_slot: prefix
     display_name: Luxury
+    scope_mode: categories
     category_scope:
       - handbag
     weight: 2
@@ -478,6 +480,7 @@ affixes:
   - affix_id: watch_vintage
     naming_slot: prefix
     display_name: Vintage
+    scope_mode: categories
     category_scope:
       - wristwatch
     weight: 2
@@ -488,6 +491,7 @@ affixes:
   - affix_id: watch_modern
     naming_slot: prefix
     display_name: Modern
+    scope_mode: categories
     category_scope:
       - wristwatch
     weight: 3
@@ -498,6 +502,7 @@ affixes:
   - affix_id: lamp_antique
     naming_slot: prefix
     display_name: Antique
+    scope_mode: categories
     category_scope:
       - oil_lamp
     weight: 2
@@ -508,6 +513,7 @@ affixes:
   - affix_id: painting_unsigned
     naming_slot: prefix
     display_name: Unsigned
+    scope_mode: categories
     category_scope:
       - painting
     weight: 2
@@ -518,6 +524,7 @@ affixes:
   - affix_id: clock_grand
     naming_slot: prefix
     display_name: Grand
+    scope_mode: categories
     category_scope:
       - clock
     weight: 2
@@ -528,6 +535,7 @@ affixes:
   - affix_id: clock_mantel
     naming_slot: prefix
     display_name: Mantel
+    scope_mode: categories
     category_scope:
       - clock
     weight: 3
@@ -538,6 +546,7 @@ affixes:
   - affix_id: figurine_painted
     naming_slot: prefix
     display_name: Painted
+    scope_mode: categories
     category_scope:
       - porcelain_figurine
     weight: 2
@@ -548,6 +557,7 @@ affixes:
   - affix_id: figurine_pastoral
     naming_slot: prefix
     display_name: Pastoral
+    scope_mode: categories
     category_scope:
       - porcelain_figurine
     weight: 3
@@ -558,6 +568,7 @@ affixes:
   - affix_id: vase_cameo
     naming_slot: prefix
     display_name: Cameo
+    scope_mode: categories
     category_scope:
       - vase
     weight: 2
@@ -568,6 +579,7 @@ affixes:
   - affix_id: vase_bud
     naming_slot: prefix
     display_name: Bud
+    scope_mode: categories
     category_scope:
       - vase
     weight: 3
@@ -578,6 +590,7 @@ affixes:
   - affix_id: poster_fine
     naming_slot: prefix
     display_name: Fine
+    scope_mode: categories
     category_scope:
       - poster
     weight: 2
@@ -588,6 +601,7 @@ affixes:
   - affix_id: poster_preserved
     naming_slot: prefix
     display_name: Preserved
+    scope_mode: categories
     category_scope:
       - poster
     weight: 3
@@ -598,6 +612,7 @@ affixes:
   - affix_id: sculpture_cast
     naming_slot: prefix
     display_name: Cast
+    scope_mode: categories
     category_scope:
       - sculpture
     weight: 2
@@ -608,6 +623,7 @@ affixes:
   - affix_id: sculpture_gallery
     naming_slot: prefix
     display_name: Gallery
+    scope_mode: categories
     category_scope:
       - sculpture
     weight: 3
@@ -618,6 +634,7 @@ affixes:
   - affix_id: pistol_engraved
     naming_slot: prefix
     display_name: Engraved
+    scope_mode: categories
     category_scope:
       - pistol
     weight: 2
@@ -628,6 +645,7 @@ affixes:
   - affix_id: pistol_service
     naming_slot: prefix
     display_name: Service
+    scope_mode: categories
     category_scope:
       - pistol
     weight: 3
@@ -638,6 +656,7 @@ affixes:
   - affix_id: rifle_sporting
     naming_slot: prefix
     display_name: Sporting
+    scope_mode: categories
     category_scope:
       - rifle
     weight: 2
@@ -648,6 +667,7 @@ affixes:
   - affix_id: rifle_service
     naming_slot: prefix
     display_name: Service
+    scope_mode: categories
     category_scope:
       - rifle
     weight: 3
@@ -658,6 +678,7 @@ affixes:
   - affix_id: crossbow_decorated
     naming_slot: prefix
     display_name: Decorated
+    scope_mode: categories
     category_scope:
       - crossbow
     weight: 2
@@ -668,6 +689,7 @@ affixes:
   - affix_id: crossbow_hunter
     naming_slot: prefix
     display_name: Hunter
+    scope_mode: categories
     category_scope:
       - crossbow
     weight: 3

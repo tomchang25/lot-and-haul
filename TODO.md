@@ -51,6 +51,10 @@ DialogManager, a shared overlay autoload, data-driven from the start — linear 
 
 `PerkData` has no type/kind field — all perks are identical resources. Split into `GATE` perks (content access, checked via `required_perk` on resources) and `EFFECT` perks (formula modifiers: keen_eye → inspection bonus, rarity_affinity → price, quick_study → XP gain). Wire effect perks into actual formulas — `perk_effects.gd` is currently a stub.
 
+### Rarity Generation after Affix Refactor
+
+`LotData.rarity_weights` is still authored in lot YAML and shown on lot cards, but `ItemGenerator.draw()` no longer reads it. Rarity now falls out of the generated item's hidden clue count, which is currently determined by selected affix combinations. Decide whether rarity should become an affix/combo authoring outcome or remain a lot-level draw constraint, then align lot UI, data authoring, storage costs, XP, sorting, and color tuning.
+
 ### Image v3 — Lot & Scene Decoration
 
 Lot card decoration with a random icon/badge per lot. Phase-dependent decoration: worker loading truck in cargo, auctioneer gavel in auction, etc. Needs an asset pipeline — blocked on visual direction.

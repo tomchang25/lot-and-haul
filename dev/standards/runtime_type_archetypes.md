@@ -57,7 +57,7 @@ When a runtime type (Store, Entry, Service, or Snapshot) holds or receives a ref
 ```gdscript
 # Correct
 _draw_affixes(category: CategoryData)  # receives a ref, compares refs
-if category in affix.category_scope:
+if affix.scope_mode == "all" or category in affix.category_scope:
 
 # Wrong
 _draw_affixes(category_id: String)     # receives an id, string-matches
@@ -71,6 +71,7 @@ The `_ids` accessor on registries (`get_all_<singular>_ids()`) exists for serial
 ```gdscript
 # Correct
 @export var super_category: SuperCategoryData = null
+@export var scope_mode: String = "categories"
 @export var category_scope: Array[CategoryData] = []
 
 # Wrong

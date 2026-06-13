@@ -27,6 +27,7 @@ affixes:
   - affix_id: snake_case string
     naming_slot: prefix | suffix
     display_name: string
+    scope_mode: all | categories
     category_scope:
       - <category_id>
     weight: <positive int>
@@ -40,7 +41,8 @@ affixes:
 - `affix_id`: unique snake*case ID across all affixes. Prefer `<category_key>*<descriptor>`(e.g.`bag_rustic`, `watch_vintage`).
 - `naming_slot`: `prefix` or `suffix`. Controls display-name composition in Spec B. At most one prefix and one suffix can be drawn per item, so only prefix × suffix cross-product conflicts are validated — two prefixes on the same category never combine.
 - `display_name`: human-readable label for debug and UI (e.g. `Rustic`, `Vintage`).
-- `category_scope`: list of snake_case category ids this affix applies to. Empty list means the affix can appear on any category (generic). Each id must match a category in `category_data.yaml`. Drawn affixes are filtered by this scope.
+- `scope_mode`: `categories` means this affix applies only to `category_scope`; `all` means this affix can appear on any category.
+- `category_scope`: list of snake_case category ids this affix applies to when `scope_mode: categories`. Each id must match a category in `category_data.yaml`. Use an empty list only when `scope_mode: all`.
 - `weight`: relative draw weight. Higher = more frequent. Must be a positive int.
 - `combination_ids`: list of combination ids belonging to this affix. Order sets ext-resolve order but has no functional weight. Every id must be defined in the `affix_combinations:` block.
 
@@ -72,7 +74,7 @@ affix_combinations:
 
 ## Conflict Rules (validator-enforced)
 
-The build-time validator checks every prefix × suffix affix pair that shares a `category_scope` across all combinations in each affix's cross-product. The merged clue set must satisfy:
+The build-time validator checks every prefix × suffix affix pair whose scopes overlap (`scope_mode: all` overlaps everything; `scope_mode: categories` overlaps shared category ids) across all combinations in each affix's cross-product. The merged clue set must satisfy:
 
 1. **No duplicate exclusive_group.** Two hidden clues on the same item must never share an `exclusive_group`.
 2. **At most one `effect_op: override`.** Two override clues on the same item are illegal.
@@ -161,9 +163,9 @@ vase  poster  painting  sculpture  pistol  rifle  crossbow
 - `affix_combinations:` and `affixes:` blocks are present, combinations listed first.
 - Every `affix_id` is unique and snake_case.
 - Every `combination_id` is unique and snake_case.
-- Every affix has `naming_slot` (`prefix` or `suffix`), `display_name`, `category_scope`, `weight`, and at least one `combination_id`.
+- Every affix has `naming_slot` (`prefix` or `suffix`), `display_name`, `scope_mode`, `category_scope`, `weight`, and at least one `combination_id`.
 - Every combination has `affix_id`, `weight`, and references at least one clue across `surface_clue_ids` and `hidden_clue_ids`.
-- Every entry in `category_scope` matches a defined category, or the list is empty for generic affixes.
+- `scope_mode: categories` has at least one valid `category_scope` entry; `scope_mode: all` has an empty `category_scope`.
 - Every `affix_id` referenced in a combination matches a defined affix.
 - Every clue id in `surface_clue_ids` and `hidden_clue_ids` exists in `clues.yaml` with the correct type.
 - Every `weight` is a positive int (both affix-level and combination-level).
@@ -198,6 +200,7 @@ affixes:
   - affix_id: bag_rustic
     naming_slot: prefix
     display_name: Rustic
+    scope_mode: categories
     category_scope:
       - handbag
     weight: 3

@@ -57,12 +57,17 @@ def _check_category_affix_coverage(data: dict) -> list[str]:
         return errors
 
     covered: set[str] = set()
+    has_global_affix = False
     for affix in affixes:
+        if affix.get("scope_mode", "categories") == "all":
+            has_global_affix = True
+            break
         scope = affix.get("category_scope", [])
-        if not scope:
-            continue
         for cat_id in scope:
             covered.add(cat_id)
+
+    if has_global_affix:
+        return errors
 
     for cat in categories:
         cat_id = cat.get("category_id", "")

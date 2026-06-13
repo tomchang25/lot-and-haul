@@ -230,6 +230,7 @@ class AffixSpec:
         w.add_field_str("affix_id", affix_id)
         w.add_field_str("naming_slot", entry.get("naming_slot", ""))
         w.add_field_str("display_name", entry.get("display_name", ""))
+        w.add_field_str("scope_mode", entry.get("scope_mode", "categories"))
 
         # Category scope — written as ext-refs so Godot resolves to CategoryData refs.
         cat_scope_ids: list[str] = entry.get("category_scope", [])
@@ -288,6 +289,7 @@ class AffixSpec:
             "affix_id": affix_id,
             "naming_slot": tres_field(text, "naming_slot") or "",
             "display_name": tres_field(text, "display_name") or "",
+            "scope_mode": tres_field(text, "scope_mode") or "categories",
             "category_scope": parsed_scope,
             "weight": int(tres_field(text, "weight") or 1),
         }
@@ -321,12 +323,23 @@ class AffixSpec:
             else:
                 seen_ids[aid] = i
 
+            scope_mode = entry.get("scope_mode", "categories")
+            if scope_mode not in ("all", "categories"):
+                errors.append(
+                    f"affix '{aid}': scope_mode must be 'all' or 'categories'"
+                )
+
             cat_scope = entry.get("category_scope", [])
             if not isinstance(cat_scope, list):
                 errors.append(f"affix '{aid}': category_scope must be a list")
-            elif not cat_scope:
-                # Empty scope = generic, valid for all categories.
-                pass
+            elif scope_mode == "all" and cat_scope:
+                errors.append(
+                    f"affix '{aid}': category_scope must be empty when scope_mode is 'all'"
+                )
+            elif scope_mode == "categories" and not cat_scope:
+                errors.append(
+                    f"affix '{aid}': category_scope must list at least one category when scope_mode is 'categories'"
+                )
             else:
                 for scope_cat in cat_scope:
                     if scope_cat not in known_cat_ids:
@@ -367,14 +380,18 @@ class AffixSpec:
 
             peer_slot = "suffix" if my_slot == "prefix" else "prefix"
             peer_affixes: list[dict] = []
-            my_scope_set: set[str] = set(cat_scope) if cat_scope else set()
+            my_scope_set: set[str] = set(cat_scope) if scope_mode == "categories" else set()
+            my_is_all = scope_mode == "all"
             for other in entries:
+                other_scope_mode = other.get("scope_mode", "categories")
                 other_scope = other.get("category_scope", [])
-                other_scope_set: set[str] = set(other_scope) if other_scope else set()
-                # Two affixes overlap if either is generic (empty scope) or they share at least one category.
+                other_scope_set: set[str] = (
+                    set(other_scope) if other_scope_mode == "categories" else set()
+                )
+                # Two affixes overlap if either is global or they share at least one category.
                 share_category = (
-                    not cat_scope
-                    or not other_scope
+                    my_is_all
+                    or other_scope_mode == "all"
                     or bool(my_scope_set & other_scope_set)
                 )
                 if share_category and other.get("naming_slot") == peer_slot:

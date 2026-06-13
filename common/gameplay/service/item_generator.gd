@@ -156,7 +156,9 @@ static func _draw_anchor(category: CategoryData, tier_weights: Dictionary, rng: 
 
 
 ## Draws 0–1 prefix and 0–1 suffix affixes for [param category].
-## Each eligible affix (matches category_scope or has empty scope = generic)
+## Each eligible affix matches scope_mode/category_scope:
+## - scope_mode == "all": eligible for every category
+## - scope_mode == "categories": eligible only for category_scope entries
 ## is rolled independently against its weight. An affix is assigned when
 ##   randf() * TOTAL_WEIGHT < weight
 ## which gives each affix a proportional chance independent of other affixes.
@@ -164,7 +166,7 @@ static func _draw_affixes(category: CategoryData, rng: RandomNumberGenerator) ->
     var all_affixes: Array[AffixData] = AffixRegistry.get_all_affixes()
     var candidates: Array[AffixData] = []
     for a: AffixData in all_affixes:
-        if a.category_scope.is_empty() or category in a.category_scope:
+        if _affix_matches_category(a, category):
             candidates.append(a)
 
     if candidates.is_empty():
@@ -209,6 +211,14 @@ static func _draw_affixes(category: CategoryData, rng: RandomNumberGenerator) ->
                 break
 
     return chosen
+
+
+static func _affix_matches_category(affix: AffixData, category: CategoryData) -> bool:
+    if affix.scope_mode == "all":
+        return true
+    if affix.scope_mode == "categories":
+        return category in affix.category_scope
+    return false
 
 
 ## Weight-picks one combination from [param affix]'s combinations array.
