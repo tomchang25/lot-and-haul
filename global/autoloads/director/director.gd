@@ -1,7 +1,8 @@
 # director.gd
-# Tutorial Director — owns the dim overlay and manages script playback state.
-# Scenes register their named UI anchors in _ready via register_scene().
-# Inserted after SceneRouter, before GameManager in autoload order.
+# Tutorial presentation layer — owns the dim overlay, step playback, and Help
+# button. Knows nothing about game state or when tutorials should trigger
+# callers (ScriptDirector, ShotPilot, Help button) drive it via public commands.
+# Inserted after SceneRouter, before ScriptDirector in autoload order.
 extends Node
 
 const OVERLAY_LAYER := 120
@@ -9,6 +10,22 @@ const DIM_COLOR := Color(0.0, 0.0, 0.0, 0.55)
 const PANEL_BG := Color(0.15, 0.15, 0.18, 1.0)
 const PANEL_BORDER := Color(0.3, 0.3, 0.35, 1.0)
 const TEXT_COLOR := Color(0.88, 0.88, 0.92, 1.0)
+
+## Emitted when a scene registers its anchors. ScriptDirector connects to this
+## to decide whether to auto-start a tutorial, show an offer, or show Help.
+signal scene_registered(scene_id: String)
+
+## Emitted when the user accepts the offer prompt. Payload is the script_id that
+## was passed to [method show_offer_prompt].
+signal offer_accepted(script_id: String)
+
+## Emitted when the user skips the offer prompt. Director already marks the
+## script as seen and shows the Help button before emitting.
+signal offer_skipped(script_id: String)
+
+## Emitted when a tutorial script finishes (all steps exhausted or SCENE_ENTERED
+## advance triggered).
+signal script_completed(script_id: String)
 
 # ── Overlay nodes (code-built) ─────────────────────────────────────────────────
 var _canvas: CanvasLayer
@@ -36,6 +53,8 @@ var _current_script_id := ""
 var _current_scene_id := ""
 var _anchors: Dictionary = { }
 var _is_offer_showing := false
+var _offer_script_id := ""
+var _help_script_id := ""
 
 
 func _ready() -> void:
@@ -46,19 +65,16 @@ func _ready() -> void:
 
 
 ## Entry point for scenes. Registers [param anchors] for the current scene
-## identified by [param scene_id]. The Director checks seen-flags and starts
-## or offers the tutorial as appropriate.
+## identified by [param scene_id]. Emits [signal scene_registered] so the
+## orchestration layer can decide what to do.
 func register_scene(scene_id: String, anchors: Dictionary) -> void:
     _current_scene_id = scene_id
     _anchors = anchors.duplicate()
     _hide_overlay()
     _help_btn.visible = false
-
-    match scene_id:
-        "hub":
-            _on_hub_registered()
-        "storage":
-            _on_storage_registered()
+    _help_script_id = ""
+    _offer_script_id = ""
+    scene_registered.emit(scene_id)
 
 
 ## Starts playback of the tutorial script identified by [param script_id].
@@ -75,23 +91,13 @@ func start_script(script_id: String) -> void:
     _help_btn.visible = false
     _show_step()
 
-# ══ Hub / Storage registration callbacks ═══════════════════════════════════════
 
-
-func _on_hub_registered() -> void:
-    if MetaManager.progress.tutorial_seen.has("hub"):
-        return
-    start_script("hub")
-
-
-func _on_storage_registered() -> void:
-    if MetaManager.progress.tutorial_seen.has("storage"):
-        _help_btn.visible = true
-        return
-    _show_offer_prompt()
-
-
-func _show_offer_prompt() -> void:
+## Shows a centered offer prompt with the given text. When the user accepts,
+## [signal offer_accepted] is emitted with [param script_id]; when declined,
+## Director marks the script as seen, shows the Help button, and emits
+## [signal offer_skipped].
+func show_offer_prompt(script_id: String, offer_text: String, accept_text: String) -> void:
+    _offer_script_id = script_id
     _is_offer_showing = true
 
     _dim_full.visible = true
@@ -100,8 +106,8 @@ func _show_offer_prompt() -> void:
     _dim_full.size = _get_screen_size()
 
     _popup_image.visible = false
-    _popup_label.text = "Welcome to the Workshop!\n\nWould you like a quick tour of the features?"
-    _popup_next.text = "Yes, show me around!"
+    _popup_label.text = offer_text
+    _popup_next.text = accept_text
     _popup_panel.visible = true
     _popup_close.text = "Skip"
     _popup_close.visible = true
@@ -113,22 +119,19 @@ func _show_offer_prompt() -> void:
     _popup_next.pressed.connect(_on_offer_start_pressed)
 
 
-func _offer_safe_disconnect(signal_obj: Signal, callable: Callable) -> void:
-    if signal_obj.is_connected(callable):
-        signal_obj.disconnect(callable)
-
-
-func _on_offer_start_pressed() -> void:
-    accept_offer()
-
-
-func _on_offer_skip_pressed() -> void:
-    _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
-    _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
-    _popup_close.text = "×"
-    _mark_seen("storage")
-    _hide_overlay()
+## Makes the Help button visible for the given [param script_id]. Pressing the
+## button replays the tutorial via [method start_script]. The button persists
+## across tutorial completions until a new scene registers.
+func show_help_button(script_id: String) -> void:
+    _help_script_id = script_id
     _help_btn.visible = true
+    _position_help_btn.call_deferred()
+
+
+## Hides the Help button and clears its associated script.
+func hide_help_button() -> void:
+    _help_script_id = ""
+    _help_btn.visible = false
 
 # ══ Step display ═══════════════════════════════════════════════════════════════
 
@@ -207,7 +210,7 @@ func _hide_overlay() -> void:
     _is_offer_showing = false
     set_process(false)
 
-# ══ Public commands (used by UI buttons and ShotPilot harness) ════════════════
+# ══ Public commands (used by UI buttons, ScriptDirector, and ShotPilot) ══════
 
 
 ## Returns the current step index during playback.
@@ -220,11 +223,11 @@ func step_count() -> int:
     return _current_script.size()
 
 
-## Returns the anchor_id for the step at [param step_index], or "" if out of range.
-func step_anchor_id(step_index: int) -> String:
-    if step_index < 0 or step_index >= _current_script.size():
+## Returns the anchor_id for the step at [param idx], or "" if out of range.
+func step_anchor_id(idx: int) -> String:
+    if idx < 0 or idx >= _current_script.size():
         return ""
-    return _current_script[step_index].anchor_id
+    return _current_script[idx].anchor_id
 
 
 ## Returns true when the offer prompt is currently visible.
@@ -242,15 +245,17 @@ func advance_step() -> void:
 
 
 ## Accepts the current offer prompt (simulates clicking "Yes"). Called by both
-## the offer "Yes" button handler and the ShotPilot harness. No-op when no offer
-## is showing.
+## the offer "Yes" button handler and the ShotPilot harness. No-op when no
+## offer is showing. Emits [signal offer_accepted] — the orchestration layer
+## decides what to do next (typically [method start_script]).
 func accept_offer() -> void:
     if not _is_offer_showing:
         return
     _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
     _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
     _popup_close.text = "×"
-    start_script("storage")
+    _is_offer_showing = false
+    offer_accepted.emit(_offer_script_id)
 
 # ══ Navigation buttons ═════════════════════════════════════════════════════════
 
@@ -264,7 +269,7 @@ func _on_hint_close_pressed() -> void:
         return
     _mark_seen(_current_script_id)
     _hide_overlay()
-    if _current_scene_id == "storage":
+    if not _help_script_id.is_empty():
         _help_btn.visible = true
 
 
@@ -277,12 +282,32 @@ func _on_popup_close_pressed() -> void:
         return
     _mark_seen(_current_script_id)
     _hide_overlay()
-    if _current_scene_id == "storage":
+    if not _help_script_id.is_empty():
         _help_btn.visible = true
 
 
+func _on_offer_start_pressed() -> void:
+    accept_offer()
+
+
+func _on_offer_skip_pressed() -> void:
+    _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
+    _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
+    _popup_close.text = "×"
+    var skipped_id := _offer_script_id
+    _mark_seen(skipped_id)
+    _hide_overlay()
+    show_help_button(skipped_id)
+    offer_skipped.emit(skipped_id)
+
+
 func _on_help_pressed() -> void:
-    start_script("storage")
+    start_script(_help_script_id)
+
+
+func _offer_safe_disconnect(signal_obj: Signal, callable: Callable) -> void:
+    if signal_obj.is_connected(callable):
+        signal_obj.disconnect(callable)
 
 # ══ Scene change watcher ═══════════════════════════════════════════════════════
 
@@ -291,8 +316,10 @@ func _on_scene_changed() -> void:
     if _is_tutorial_active and _current_step_index < _current_script.size():
         var step: TutorialStep = _current_script[_current_step_index]
         if step.advance == TutorialStep.Advance.SCENE_ENTERED:
-            _mark_seen(_current_script_id)
+            var completed_id := _current_script_id
+            _mark_seen(completed_id)
             _hide_overlay()
+            script_completed.emit(completed_id)
 
 # ══ Script management ══════════════════════════════════════════════════════════
 
@@ -307,11 +334,13 @@ static func _get_script(script_id: String) -> Array[TutorialStep]:
 
 
 func _end_tutorial() -> void:
+    var completed_id := _current_script_id
     _hide_overlay()
-    if _current_scene_id == "storage":
+    if not _help_script_id.is_empty():
         _help_btn.visible = true
     _current_script = []
     _current_script_id = ""
+    script_completed.emit(completed_id)
 
 
 func _mark_seen(script_id: String) -> void:

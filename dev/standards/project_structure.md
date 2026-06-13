@@ -272,6 +272,22 @@ The main scene for the current build is registered in `project.godot`.
 
 ---
 
+## Testing & Verification
+
+Three verification layers, each with a distinct purpose and placement rule:
+
+| Layer | Location | Runs via | Purpose |
+| --- | --- | --- | --- |
+| Unit tests | `test/unit/` | `--test-unit` (GUT) | Logic, state, numbers, invariants — fast, headless, deterministic |
+| Testbeds | `stage/testbeds/` | Manual scene launch | Visual exercise of one block in isolation — layout, feel, interaction |
+| Harnesses | `global/autoloads/harness/` | `--ci-run`, `--tutorial-shot` | Automated pilots — CI smoke, screenshot capture, end-to-end traversal |
+
+Triage principle: prefer a unit assertion over a screenshot, and a screenshot over a manual testbed. Reach for a screenshot only when the thing being verified is a genuine pixel property (overlay placement, dim-hole alignment, theme, overlap). Reach for a testbed when the thing being verified requires interactive exploration or is hard to automate (feel, timing, edge-case reproduction).
+
+Harnesses are registered as Godot autoloads in `project.godot` because Godot requires it, but they are completely inert without their command-line flag — no files written, no behavior change, no log lines on a normal launch.
+
+---
+
 # Placement Rules
 
 | Content type                                            | Location                             |
@@ -285,7 +301,9 @@ The main scene for the current build is registered in `project.godot`.
 | Block scene roots, UI components, block logic           | `game/[feature]/`                    |
 | UI components and helpers shared across multiple blocks | `game/_shared/`                      |
 | Global autoloads                                        | `global/autoloads/`                  |
+| Unit tests (GUT)                                        | `test/unit/`                         |
 | Testbed scenes                                          | `stage/testbeds/`                    |
+| Automated harnesses (CI, screenshot)                    | `global/autoloads/harness/`          |
 | Run entry scenes                                        | `stage/runs/`                        |
 | Tilesets and terrain assets                             | `stage/tilesets/`                    |
 | Tooling scripts                                         | `dev/tools/`                         |
