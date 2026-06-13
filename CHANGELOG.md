@@ -2,6 +2,14 @@
 
 Append-only record of shipped work.
 
+## Director Split & Testing Taxonomy
+
+- 2026-06-13 — [refactor] Director autoload split into two focused autoloads: Director (presentation: dim overlay, hint/popup panels, step playback, Anchor registration, Help button) and ScriptDirector (orchestration: scene registration callbacks, auto-start/offer/help decisions, injection skeleton, phase lifecycle)
+- 2026-06-13 — [refactor] Scene registration emits `register_scene_callback` signal instead of branching internally; hub and storage scenes unchanged — still call `Director.register_scene()`
+- 2026-06-13 — [refactor] ScriptDirector connects to Director signals and drives tutorial start/offer/help decisions from game state (seen flags), leaving Director presentation-only
+- 2026-06-13 — [dev] Testing taxonomy documented in `project_structure.md`: three verification layers (unit tests in `test/`, testbeds in `stage/testbeds/`, harnesses in `global/autoloads/harness/`) with placement rules and triage principle
+- 2026-06-13 — [doc] `dev/docs/plans/director_split_and_testing_taxonomy.sketch.md` shipped and archived
+
 ## Test Harness Consolidation
 
 - 2026-06-13 — [dev] Relocated `ShotPilot` and `CIPilot` from top-level autoload dirs into `global/autoloads/harness/`; updated `project.godot` autoload paths and `game_manager.gd` comment
