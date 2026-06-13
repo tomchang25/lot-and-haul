@@ -127,6 +127,332 @@ affix_combinations:
     hidden_clue_ids:
       - painting_override_forgery
 
+  # ── Clock: Grand (prefix) ──────────────────────────────────────────
+  - combination_id: comb_clock_grand_01
+    affix_id: clock_grand
+    weight: 3
+    surface_clue_ids:
+      - clock_case_gilded
+      - clock_movement_signed
+      - clock_joinery_dovetail
+    hidden_clue_ids:
+      - clock_leaf_graham
+
+  - combination_id: comb_clock_grand_02
+    affix_id: clock_grand
+    weight: 1
+    surface_clue_ids:
+      - clock_case_chipped
+      - clock_finish_shellac
+      - clock_workshop_label
+    hidden_clue_ids:
+      - clock_override_marriage
+
+  # ── Clock: Mantel (prefix) ────────────────────────────────────────
+  - combination_id: comb_clock_mantel_01
+    affix_id: clock_mantel
+    weight: 2
+    surface_clue_ids:
+      - clock_case_veneered
+      - clock_movement_seven_jewel
+      - clock_workshop_label
+    hidden_clue_ids:
+      - clock_leaf_boulle
+
+  - combination_id: comb_clock_mantel_02
+    affix_id: clock_mantel
+    weight: 1
+    surface_clue_ids:
+      - clock_case_chipped
+      - clock_finish_shellac
+    hidden_clue_ids:
+      - clock_hidden_spring_broken
+
+  # ── Porcelain Figurine: Painted (prefix) ──────────────────────────
+  - combination_id: comb_figurine_painted_01
+    affix_id: figurine_painted
+    weight: 3
+    surface_clue_ids:
+      - figurine_painting_detail
+      - figurine_gilding_intact
+      - figurine_base_marked
+    hidden_clue_ids:
+      - figurine_leaf_meissen
+
+  - combination_id: comb_figurine_painted_02
+    affix_id: figurine_painted
+    weight: 1
+    surface_clue_ids:
+      - figurine_glaze_crazed
+      - figurine_base_unmarked
+      - figurine_restoration_chip
+    hidden_clue_ids:
+      - figurine_override_later_copy
+
+  # ── Porcelain Figurine: Pastoral (prefix) ─────────────────────────
+  - combination_id: comb_figurine_pastoral_01
+    affix_id: figurine_pastoral
+    weight: 2
+    surface_clue_ids:
+      - figurine_form_shepherdess
+      - figurine_glaze_celadon
+      - figurine_base_marked
+    hidden_clue_ids:
+      - figurine_leaf_dresden
+
+  - combination_id: comb_figurine_pastoral_02
+    affix_id: figurine_pastoral
+    weight: 1
+    surface_clue_ids:
+      - figurine_glaze_crazed
+      - figurine_base_unmarked
+    hidden_clue_ids:
+      - figurine_hidden_repair_fill
+
+  # ── Vase: Cameo (prefix) ─────────────────────────────────────────
+  - combination_id: comb_vase_cameo_01
+    affix_id: vase_cameo
+    weight: 3
+    surface_clue_ids:
+      - vase_body_cameo
+      - vase_glass_cased
+      - vase_maker_etched
+    hidden_clue_ids:
+      - vase_leaf_tiffany
+
+  - combination_id: comb_vase_cameo_02
+    affix_id: vase_cameo
+    weight: 1
+    surface_clue_ids:
+      - vase_rim_chipped
+      - vase_glass_bubble
+      - vase_base_ground
+    hidden_clue_ids:
+      - vase_override_repro
+
+  # ── Vase: Bud (prefix) ───────────────────────────────────────────
+  - combination_id: comb_vase_bud_01
+    affix_id: vase_bud
+    weight: 2
+    surface_clue_ids:
+      - vase_form_bud
+      - vase_rim_polished
+      - vase_maker_etched
+    hidden_clue_ids:
+      - vase_leaf_galle
+
+  - combination_id: comb_vase_bud_02
+    affix_id: vase_bud
+    weight: 1
+    surface_clue_ids:
+      - vase_rim_chipped
+      - vase_base_ground
+    hidden_clue_ids:
+      - vase_hidden_internal_fracture
+
+  # ── Poster: Fine (prefix) ────────────────────────────────────────
+  - combination_id: comb_poster_fine_01
+    affix_id: poster_fine
+    weight: 3
+    surface_clue_ids:
+      - poster_print_lithograph
+      - poster_paper_linen
+      - poster_color_vibrant
+    hidden_clue_ids:
+      - poster_leaf_lautrec
+
+  - combination_id: comb_poster_fine_02
+    affix_id: poster_fine
+    weight: 1
+    surface_clue_ids:
+      - poster_print_offset
+      - poster_paper_pulp
+      - poster_color_faded
+    hidden_clue_ids:
+      - poster_override_reprint
+
+  # ── Poster: Preserved (prefix) ───────────────────────────────────
+  - combination_id: comb_poster_preserved_01
+    affix_id: poster_preserved
+    weight: 2
+    surface_clue_ids:
+      - poster_backing_linen
+      - poster_paper_linen
+      - poster_color_vibrant
+    hidden_clue_ids:
+      - poster_leaf_cassandre
+
+  - combination_id: comb_poster_preserved_02
+    affix_id: poster_preserved
+    weight: 1
+    surface_clue_ids:
+      - poster_print_offset
+      - poster_fold_lines
+      - poster_color_faded
+    hidden_clue_ids:
+      - poster_hidden_trimmed_margin
+
+  # ── Sculpture: Cast (prefix) ─────────────────────────────────────
+  - combination_id: comb_sculpture_cast_01
+    affix_id: sculpture_cast
+    weight: 3
+    surface_clue_ids:
+      - sculpture_medium_bronze
+      - sculpture_patina_natural
+      - sculpture_foundry_marked
+    hidden_clue_ids:
+      - sculpture_leaf_rodin
+
+  - combination_id: comb_sculpture_cast_02
+    affix_id: sculpture_cast
+    weight: 1
+    surface_clue_ids:
+      - sculpture_medium_plaster
+      - sculpture_patina_artificial
+      - sculpture_base_blank
+    hidden_clue_ids:
+      - sculpture_override_cast_copy
+
+  # ── Sculpture: Gallery (prefix) ──────────────────────────────────
+  - combination_id: comb_sculpture_gallery_01
+    affix_id: sculpture_gallery
+    weight: 2
+    surface_clue_ids:
+      - sculpture_base_signed
+      - sculpture_edition_numbered
+      - sculpture_wax_original
+    hidden_clue_ids:
+      - sculpture_leaf_degas
+
+  - combination_id: comb_sculpture_gallery_02
+    affix_id: sculpture_gallery
+    weight: 1
+    surface_clue_ids:
+      - sculpture_surface_pitted
+      - sculpture_base_blank
+    hidden_clue_ids:
+      - sculpture_hidden_weld_repair
+
+  # ── Pistol: Engraved (prefix) ────────────────────────────────────
+  - combination_id: comb_pistol_engraved_01
+    affix_id: pistol_engraved
+    weight: 3
+    surface_clue_ids:
+      - pistol_grip_scrolled
+      - pistol_stock_walnut
+      - pistol_lock_signed
+    hidden_clue_ids:
+      - pistol_leaf_boutet
+
+  - combination_id: comb_pistol_engraved_02
+    affix_id: pistol_engraved
+    weight: 1
+    surface_clue_ids:
+      - pistol_barrel_pitted
+      - pistol_grip_cracked
+    hidden_clue_ids:
+      - pistol_override_conversion
+
+  # ── Pistol: Service (prefix) ─────────────────────────────────────
+  - combination_id: comb_pistol_service_01
+    affix_id: pistol_service
+    weight: 2
+    surface_clue_ids:
+      - pistol_proof_stamped
+      - pistol_lock_fitted
+      - pistol_barrel_short
+    hidden_clue_ids:
+      - pistol_leaf_colt
+
+  - combination_id: comb_pistol_service_02
+    affix_id: pistol_service
+    weight: 1
+    surface_clue_ids:
+      - pistol_barrel_pitted
+      - pistol_grip_cracked
+    hidden_clue_ids:
+      - pistol_hidden_cylinder_mismatch
+
+  # ── Rifle: Sporting (prefix) ─────────────────────────────────────
+  - combination_id: comb_rifle_sporting_01
+    affix_id: rifle_sporting
+    weight: 3
+    surface_clue_ids:
+      - rifle_stock_figured
+      - rifle_action_engraved
+      - rifle_maker_signed
+    hidden_clue_ids:
+      - rifle_leaf_purdey
+
+  - combination_id: comb_rifle_sporting_02
+    affix_id: rifle_sporting
+    weight: 1
+    surface_clue_ids:
+      - rifle_barrel_worn
+      - rifle_action_rough
+    hidden_clue_ids:
+      - rifle_override_kit_build
+
+  # ── Rifle: Service (prefix) ──────────────────────────────────────
+  - combination_id: comb_rifle_service_01
+    affix_id: rifle_service
+    weight: 2
+    surface_clue_ids:
+      - rifle_barrel_long
+      - rifle_proof_stamped
+      - rifle_sight_precision
+    hidden_clue_ids:
+      - rifle_leaf_springfield
+
+  - combination_id: comb_rifle_service_02
+    affix_id: rifle_service
+    weight: 1
+    surface_clue_ids:
+      - rifle_barrel_worn
+      - rifle_action_rough
+    hidden_clue_ids:
+      - rifle_hidden_bore_ring
+
+  # ── Crossbow: Decorated (prefix) ─────────────────────────────────
+  - combination_id: comb_crossbow_decorated_01
+    affix_id: crossbow_decorated
+    weight: 3
+    surface_clue_ids:
+      - crossbow_stock_carved
+      - crossbow_inlay_ivory
+      - crossbow_wire_gilded
+    hidden_clue_ids:
+      - crossbow_leaf_balestrier
+
+  - combination_id: comb_crossbow_decorated_02
+    affix_id: crossbow_decorated
+    weight: 1
+    surface_clue_ids:
+      - crossbow_tiller_splintered
+      - crossbow_prod_rusted
+    hidden_clue_ids:
+      - crossbow_override_replica
+
+  # ── Crossbow: Hunter (prefix) ────────────────────────────────────
+  - combination_id: comb_crossbow_hunter_01
+    affix_id: crossbow_hunter
+    weight: 2
+    surface_clue_ids:
+      - crossbow_prod_steel
+      - crossbow_mech_triggered
+      - crossbow_provenance_tagged
+    hidden_clue_ids:
+      - crossbow_leaf_whistler
+
+  - combination_id: comb_crossbow_hunter_02
+    affix_id: crossbow_hunter
+    weight: 1
+    surface_clue_ids:
+      - crossbow_tiller_splintered
+      - crossbow_iron_fittings
+    hidden_clue_ids:
+      - crossbow_hidden_bowstring_dry
+
 affixes:
   - affix_id: bag_rustic
     naming_slot: prefix
@@ -188,3 +514,163 @@ affixes:
     combination_ids:
       - comb_painting_unsigned_01
       - comb_painting_unsigned_02
+
+  - affix_id: clock_grand
+    naming_slot: prefix
+    display_name: Grand
+    category_scope:
+      - clock
+    weight: 2
+    combination_ids:
+      - comb_clock_grand_01
+      - comb_clock_grand_02
+
+  - affix_id: clock_mantel
+    naming_slot: prefix
+    display_name: Mantel
+    category_scope:
+      - clock
+    weight: 3
+    combination_ids:
+      - comb_clock_mantel_01
+      - comb_clock_mantel_02
+
+  - affix_id: figurine_painted
+    naming_slot: prefix
+    display_name: Painted
+    category_scope:
+      - porcelain_figurine
+    weight: 2
+    combination_ids:
+      - comb_figurine_painted_01
+      - comb_figurine_painted_02
+
+  - affix_id: figurine_pastoral
+    naming_slot: prefix
+    display_name: Pastoral
+    category_scope:
+      - porcelain_figurine
+    weight: 3
+    combination_ids:
+      - comb_figurine_pastoral_01
+      - comb_figurine_pastoral_02
+
+  - affix_id: vase_cameo
+    naming_slot: prefix
+    display_name: Cameo
+    category_scope:
+      - vase
+    weight: 2
+    combination_ids:
+      - comb_vase_cameo_01
+      - comb_vase_cameo_02
+
+  - affix_id: vase_bud
+    naming_slot: prefix
+    display_name: Bud
+    category_scope:
+      - vase
+    weight: 3
+    combination_ids:
+      - comb_vase_bud_01
+      - comb_vase_bud_02
+
+  - affix_id: poster_fine
+    naming_slot: prefix
+    display_name: Fine
+    category_scope:
+      - poster
+    weight: 2
+    combination_ids:
+      - comb_poster_fine_01
+      - comb_poster_fine_02
+
+  - affix_id: poster_preserved
+    naming_slot: prefix
+    display_name: Preserved
+    category_scope:
+      - poster
+    weight: 3
+    combination_ids:
+      - comb_poster_preserved_01
+      - comb_poster_preserved_02
+
+  - affix_id: sculpture_cast
+    naming_slot: prefix
+    display_name: Cast
+    category_scope:
+      - sculpture
+    weight: 2
+    combination_ids:
+      - comb_sculpture_cast_01
+      - comb_sculpture_cast_02
+
+  - affix_id: sculpture_gallery
+    naming_slot: prefix
+    display_name: Gallery
+    category_scope:
+      - sculpture
+    weight: 3
+    combination_ids:
+      - comb_sculpture_gallery_01
+      - comb_sculpture_gallery_02
+
+  - affix_id: pistol_engraved
+    naming_slot: prefix
+    display_name: Engraved
+    category_scope:
+      - pistol
+    weight: 2
+    combination_ids:
+      - comb_pistol_engraved_01
+      - comb_pistol_engraved_02
+
+  - affix_id: pistol_service
+    naming_slot: prefix
+    display_name: Service
+    category_scope:
+      - pistol
+    weight: 3
+    combination_ids:
+      - comb_pistol_service_01
+      - comb_pistol_service_02
+
+  - affix_id: rifle_sporting
+    naming_slot: prefix
+    display_name: Sporting
+    category_scope:
+      - rifle
+    weight: 2
+    combination_ids:
+      - comb_rifle_sporting_01
+      - comb_rifle_sporting_02
+
+  - affix_id: rifle_service
+    naming_slot: prefix
+    display_name: Service
+    category_scope:
+      - rifle
+    weight: 3
+    combination_ids:
+      - comb_rifle_service_01
+      - comb_rifle_service_02
+
+  - affix_id: crossbow_decorated
+    naming_slot: prefix
+    display_name: Decorated
+    category_scope:
+      - crossbow
+    weight: 2
+    combination_ids:
+      - comb_crossbow_decorated_01
+      - comb_crossbow_decorated_02
+
+  - affix_id: crossbow_hunter
+    naming_slot: prefix
+    display_name: Hunter
+    category_scope:
+      - crossbow
+    weight: 3
+    combination_ids:
+      - comb_crossbow_hunter_01
+      - comb_crossbow_hunter_02
