@@ -196,8 +196,6 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 
 Flows currently being built or ready to implement — may hold more than one entry. One-line pointer each — same format as `## Plan`, promoted here when building starts or the plan is ready to build. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress or ready → this section is empty.
 
-- [tutorial_shot] Flag-gated ShotPilot autoload: per-step tutorial screenshots for agent visual review — see `dev/docs/plans/tutorial_shot_harness.sketch.md`
-
 ---
 
 ## Plan
@@ -205,7 +203,6 @@ Flows currently being built or ready to implement — may hold more than one ent
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
 - [simple-demo] Stage 1 tutorial split out to the Simple Tutorial draft; Director skeleton + Dialog remain surviving subsystems
-- [tutorial_shot] Flag-gated ShotPilot autoload: per-step tutorial screenshots for agent visual review — see `dev/docs/plans/tutorial_shot_harness.sketch.md`
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 - [dev/auto-auction] Debug-only quick-win buttons: instant player win at opening bid or rolled price (skip NPC bidding loop; rolled path seeds future auto-bid perk) — see `dev/docs/plans/debug_auto_auction.md`
 - [dev/auto-cargo] Debug-only quick-pack buttons: legal one-press auto-pack (seeds future auto-place perk) + stuff-all-and-go ignoring capacity — see `dev/docs/plans/debug_auto_cargo.md`

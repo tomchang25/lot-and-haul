@@ -319,3 +319,10 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-05-01 — [display] `ItemListPanel`: reusable sortable table; runtime-built headers; per-row selection state
 - 2026-05-01 — [display] Column order matches columns array passed at `setup()`
 - 2026-05-01 — [display] `ItemCard`: clue-aware inspection card; veiled items hide derived fields and show `"???"`
+
+## Tutorial Screenshot Harness — ShotPilot
+
+- 2026-06-13 — [tutorial] `ShotPilot` autoload (`global/autoloads/shot_pilot/shot_pilot.gd`): flag-gated (`--tutorial-shot=<id|all>`) capture harness that seeds game state, navigates to the owning scene, accepts the offer prompt, advances through every tutorial step, and saves one PNG per step to a configurable output directory (`--shot-dir=<path>`, default `user://tutorial_shots`); exits 0 on success, 1 on unknown script id
+- 2026-06-13 — [tutorial] Director debug surface: `debug_step_index()`, `debug_step_count()`, `debug_step_anchor_id(i)`, `debug_is_offer_showing()`, `debug_advance_step()`, `debug_accept_offer()` — enables programmatic capture without input simulation
+- 2026-06-13 — [tutorial] Storage state seeding: `ShotPilot._seed_storage_state()` creates 3 `ItemEntry` instances from registry data, marks first as repair-complete (condition = 0.5), registers via `MetaManager.register_storage_items()`, and begins a storage slot with full AP pool; row selection via `ItemListPanel.row_pressed` signal
+- 2026-06-13 — [tutorial] `dev/docs/plans/tutorial_shot_harness.sketch.md` shipped and archived

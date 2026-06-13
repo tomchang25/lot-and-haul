@@ -15,9 +15,10 @@ cp -r dev/tools/bin "$LH/dev/tools/"             # godot binary is gitignored
 cd "$LH"
 pip install pyyaml --break-system-packages -q 2>/dev/null   # once per sandbox session
 python3 dev/tools/yaml_to_tres.py --godot-root "$LH"         # regenerate data/tres/ (gitignored) from tracked YAML
-(cd "$LH/dev/tools" && python3 render_sfx.py --dir "$LH/data/yaml/sfx/" --godot-root "$LH") # regenerate audio_events .tres (gitignored)
 rm -rf .godot                                    # always import fresh — stale caches poison UID resolution
 timeout 40 dev/tools/bin/Godot_v4.6.3-stable_linux.x86_64 --headless --path "$LH" --import
+# sfx runs AFTER import — it needs resolved script UIDs from .godot/uid_cache.bin
+python3 dev/tools/render_sfx.py --dir "$LH/data/yaml/sfx/" --godot-root "$LH"
 timeout 35 dev/tools/bin/Godot_v4.6.3-stable_linux.x86_64 --headless --path "$LH" --quit 2>&1 | grep -E "SCRIPT ERROR|Parse"
 ```
 
