@@ -119,10 +119,7 @@ func _offer_safe_disconnect(signal_obj: Signal, callable: Callable) -> void:
 
 
 func _on_offer_start_pressed() -> void:
-    _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
-    _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
-    _popup_close.text = "×"
-    start_script("storage")
+    accept_offer()
 
 
 func _on_offer_skip_pressed() -> void:
@@ -210,47 +207,48 @@ func _hide_overlay() -> void:
     _is_offer_showing = false
     set_process(false)
 
-# ══ ShotPilot debug surface ════════════════════════════════════════════════════
+# ══ Public commands (used by UI buttons and ShotPilot harness) ════════════════
 
 
 ## Returns the current step index during playback.
-func debug_step_index() -> int:
+func step_index() -> int:
     return _current_step_index
 
 
 ## Returns the total number of steps in the active script.
-func debug_step_count() -> int:
+func step_count() -> int:
     return _current_script.size()
 
 
 ## Returns the anchor_id for the step at [param step_index], or "" if out of range.
-func debug_step_anchor_id(step_index: int) -> String:
+func step_anchor_id(step_index: int) -> String:
     if step_index < 0 or step_index >= _current_script.size():
         return ""
     return _current_script[step_index].anchor_id
 
 
 ## Returns true when the offer prompt is currently visible.
-func debug_is_offer_showing() -> bool:
+func is_offer_showing() -> bool:
     return _is_offer_showing
 
 
-## Advances one step as if the user clicked Next. Used by ShotPilot.
-func debug_advance_step() -> void:
+## Advances one step (as if the user clicked Next). Called by both the Next
+## button handlers and the ShotPilot harness. No-op when no tutorial is active.
+func advance_step() -> void:
     if not _is_tutorial_active:
         return
     _current_step_index += 1
     _show_step()
 
 
-## Accepts the current offer prompt (simulates clicking "Yes"). No-op when no
-## offer is showing.
-func debug_accept_offer() -> void:
+## Accepts the current offer prompt (simulates clicking "Yes"). Called by both
+## the offer "Yes" button handler and the ShotPilot harness. No-op when no offer
+## is showing.
+func accept_offer() -> void:
     if not _is_offer_showing:
         return
     _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
     _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
-    # Mimic _on_offer_start_pressed without needing the button press.
     _popup_close.text = "×"
     start_script("storage")
 
@@ -258,10 +256,7 @@ func debug_accept_offer() -> void:
 
 
 func _on_hint_next_pressed() -> void:
-    if not _is_tutorial_active:
-        return
-    _current_step_index += 1
-    _show_step()
+    advance_step()
 
 
 func _on_hint_close_pressed() -> void:
@@ -274,10 +269,7 @@ func _on_hint_close_pressed() -> void:
 
 
 func _on_popup_next_pressed() -> void:
-    if not _is_tutorial_active:
-        return
-    _current_step_index += 1
-    _show_step()
+    advance_step()
 
 
 func _on_popup_close_pressed() -> void:

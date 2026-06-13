@@ -42,7 +42,7 @@ func _boot_for_tests() -> void:
 
 func _boot_for_ci() -> void:
     # Autoloads initialize normally. Save loading, validation, and scene audit
-    # run as usual. Scene routing is skipped — the CI pilot autoload (ci_pilot.gd)
+    # run as usual. Scene routing is skipped — the CI pilot autoload (harness/ci_pilot.gd)
     # detects the --ci-run flag and manages the full auto-pilot loop, including
     # its own exit.
     SaveManager.boot_load()

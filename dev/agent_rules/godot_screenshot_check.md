@@ -2,6 +2,8 @@
 
 Use this when a task needs **visual** verification (UI placement, tutorial overlay, VFX, theme changes) rather than just parse/script checks. Verified working 2026-06-13: minimal project and the full game (boots to main menu) both render correctly.
 
+> **Triage note**: Prefer a `--test-unit` headless assertion for logic/state checks (price pipeline, clue reveal, AP, condition). Screenshots are reserved for genuine pixel properties (overlay placement, dim-hole alignment, theme, overlap, VFX timing). Reaching for a screenshot when an assertion would do is the expensive wrong tool.
+
 ## Sandbox prerequisites
 
 The following packages are required (install once per session):
@@ -41,44 +43,35 @@ LIBGL_ALWAYS_SOFTWARE=1 timeout 60 xvfb-run -a -s "-screen 0 1280x720x24" \
 
 Keep the Xvfb screen at least as large as the project window size.
 
-3. Capture mechanism — choose one:
-   - **ShotPilot harness** (shipped): pass `--tutorial-shot=<id> --shot-dir="$LH/shots"`.
-   - **CI Pilot** (game logic without UI clicks): pass `--ci-run` to exercise the full game loop. Screenshots show whatever scene is active when the capture fires.
-   - **Temporary autoload** (general case — see template below). Write a capture script into the snapshot, append it to `[autoload]` in the snapshot's `project.godot`, and let it count frames in `_process` to fire captures and `quit()`.
+3.  Capture mechanism — choose one:
+    - **ShotPilot harness** (`global/autoloads/harness/shot_pilot.gd`): pass `--tutorial-shot=<id|all> --shot-dir="$LH/shots"`. Manifest-driven: to add a new capture target, add a row to the `MANIFEST` constant in `shot_pilot.gd` and, if the scene needs non-default state, create a `<scene>_fixtures.gd` next to the scene with a static method. No new autoload needed.
+    - **CI Pilot** (`global/autoloads/harness/ci_pilot.gd`): pass `--ci-run` to exercise the full game loop. Screenshots show whatever scene is active when the capture fires.
+    - **Temporary autoload** (rare — only when the manifest model doesn't fit): write a capture script into the snapshot, append it to `[autoload]` in the snapshot's `project.godot`, and let it count frames in `_process` to fire captures and `quit()`.
 
-   **Save screenshots to an absolute path outside the project tree** (e.g. `/tmp/shots/`) — if the PNG lands inside the snapshot dir, Godot creates `.import` files for it and they pollute subsequent runs.
+    **Save screenshots to an absolute path outside the project tree** (e.g. `/tmp/shots/`) — if the PNG lands inside the snapshot dir, Godot creates `.import` files for it and they pollute subsequent runs.
 
-### Temporary autoload template
+### Adding a new capture target
 
-Create `/tmp/lh.XXXXXX/tmp_capture.gd`:
+The harness is manifest-driven — no hand-written capture autoload per target.
 
-```gdscript
-extends Node
-var _frame := 0
+1. Add a row to the `MANIFEST` constant in `global/autoloads/harness/shot_pilot.gd`:
 
-func _ready():
-    print("CAPTURE: ready")
+   ```gdscript
+   _make_entry("my_scene", "seed_default", true),
+   ```
 
-func _process(_delta):
-    _frame += 1
-    if _frame == 120:
-        snap("frame_120")
-    elif _frame == 300:
-        snap("frame_300")
-        print("CAPTURE: done")
-        get_tree().quit(0)
+   The three fields are: scene id (maps to the SceneRouter key and filename prefix), fixture method name (or `""` if none), and whether an offer prompt should be captured first.
 
-func snap(name: String):
-    DirAccess.make_dir_recursive_absolute("/tmp/shots")
-    var img := get_viewport().get_texture().get_image()
-    img.save_png("/tmp/shots/%s.png" % name)
-```
+2. If the scene needs non-default state, create `game/<phase>/<scene>/<scene>_fixtures.gd` with a static method matching the fixture name:
+   ```gdscript
+   # my_scene_fixtures.gd
+   extends Node
+   static func seed_default() -> void:
+       # Seed stores via manager APIs (mutation-mediation rule)
+       pass
+   ```
 
-Append to `project.godot` `[autoload]` section:
-
-```
-TmpCapture="*res://tmp_capture.gd"
-```
+That's it — no new autoload, no changes to the harness script.
 
 ### Interacting with the UI
 

@@ -2,6 +2,20 @@
 
 Append-only record of shipped work.
 
+## Test Harness Consolidation
+
+- 2026-06-13 — [dev] Relocated `ShotPilot` and `CIPilot` from top-level autoload dirs into `global/autoloads/harness/`; updated `project.godot` autoload paths and `game_manager.gd` comment
+- 2026-06-13 — [dev] Director seam: extracted public `advance_step()` / `accept_offer()` commands; routed `_on_hint_next_pressed`, `_on_popup_next_pressed`, and `_on_offer_start_pressed` through them; removed `debug_*` twin methods (`debug_advance_step`, `debug_accept_offer`); renamed read accessors (`debug_step_index` → `step_index`, etc.)
+- 2026-06-13 — [dev] Generic-pilot PoC: ShotPilot now manifest-driven (`MANIFEST` constant table); `_seed_storage_state` + `_sample_clues` moved to `game/meta/storage/storage_fixtures.gd`; fixture lookup via path convention; `_enter_scene` replaces per-script match dispatch
+- 2026-06-13 — [dev] Updated `godot_screenshot_check.md` with triage note (prefer unit assertion over screenshot) and manifest-plus-fixture flow for new targets
+
+## Tutorial Screenshot Harness — ShotPilot
+
+- 2026-06-13 — [tutorial] `ShotPilot` autoload (`global/autoloads/shot_pilot/shot_pilot.gd`): flag-gated (`--tutorial-shot=<id|all>`) capture harness that seeds game state, navigates to the owning scene, accepts the offer prompt, advances through every tutorial step, and saves one PNG per step to a configurable output directory (`--shot-dir=<path>`, default `user://tutorial_shots`); exits 0 on success, 1 on unknown script id
+- 2026-06-13 — [tutorial] Director debug surface: `debug_step_index()`, `debug_step_count()`, `debug_step_anchor_id(i)`, `debug_is_offer_showing()`, `debug_advance_step()`, `debug_accept_offer()` — enables programmatic capture without input simulation
+- 2026-06-13 — [tutorial] Storage state seeding: `ShotPilot._seed_storage_state()` creates 3 `ItemEntry` instances from registry data, marks first as repair-complete (condition = 0.5), registers via `MetaManager.register_storage_items()`, and begins a storage slot with full AP pool; row selection via `ItemListPanel.row_pressed` signal
+- 2026-06-13 — [tutorial] `dev/docs/plans/tutorial_shot_harness.sketch.md` shipped and archived
+
 ## Tutorial Hint Panel — Director System
 
 - 2026-06-12 — [tutorial] `Director` autoload added: code-built dim-overlay CanvasLayer (layer 120) with hint/popup step display, four-rect hole cutout, per-frame anchor tracking, and help button; registered in `project.godot` after SceneRouter
@@ -319,10 +333,3 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-05-01 — [display] `ItemListPanel`: reusable sortable table; runtime-built headers; per-row selection state
 - 2026-05-01 — [display] Column order matches columns array passed at `setup()`
 - 2026-05-01 — [display] `ItemCard`: clue-aware inspection card; veiled items hide derived fields and show `"???"`
-
-## Tutorial Screenshot Harness — ShotPilot
-
-- 2026-06-13 — [tutorial] `ShotPilot` autoload (`global/autoloads/shot_pilot/shot_pilot.gd`): flag-gated (`--tutorial-shot=<id|all>`) capture harness that seeds game state, navigates to the owning scene, accepts the offer prompt, advances through every tutorial step, and saves one PNG per step to a configurable output directory (`--shot-dir=<path>`, default `user://tutorial_shots`); exits 0 on success, 1 on unknown script id
-- 2026-06-13 — [tutorial] Director debug surface: `debug_step_index()`, `debug_step_count()`, `debug_step_anchor_id(i)`, `debug_is_offer_showing()`, `debug_advance_step()`, `debug_accept_offer()` — enables programmatic capture without input simulation
-- 2026-06-13 — [tutorial] Storage state seeding: `ShotPilot._seed_storage_state()` creates 3 `ItemEntry` instances from registry data, marks first as repair-complete (condition = 0.5), registers via `MetaManager.register_storage_items()`, and begins a storage slot with full AP pool; row selection via `ItemListPanel.row_pressed` signal
-- 2026-06-13 — [tutorial] `dev/docs/plans/tutorial_shot_harness.sketch.md` shipped and archived
