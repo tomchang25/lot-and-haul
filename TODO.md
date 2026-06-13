@@ -167,33 +167,6 @@ Sell owned cars for partial value when upgrading, so trading up has a cost offse
 
 Future pool-generator work: surface clue count scales with the anchor's tier (e.g. tier 1 → 1–2 clues, tier 5 → 3–5) instead of one global range — higher-value items carry deeper information, making inspection investment on them more rational. Blocked on the pool generator shipping with the global range first.
 
-### Anchor-Conditioned Surface Draw
-
-> Largely superseded by `dev/docs/plans/item_affix_generation.sketch.md` — affix-owned combination tables replace the per-pair weight matrix this entry kept failing to settle. Keep only if a non-affix anchor-affinity draw is still wanted for plain items.
-
-Future pool-generator work: bias surface clue draws by the item's anchor (tier/category affinity) instead of pure uniform. A first half-built attempt — affinity tags plus per-tag weight overrides authored on surface clues — was removed by the clue schema cleanup: the anchor side of the relationship was never defined, and per-clue weight dictionaries degenerate into a disguised per-pair weight matrix. Needs a settled model first (e.g. tags declared on anchors, a single weight function over tag overlap, never per-pair matrices). Blocked on the pool generator existing at all; uniform draw is the shipping behavior until then.
-
-### Combination Naming Rules
-
-> Superseded by `dev/docs/plans/item_affix_generation.sketch.md` — naming is now affix-only (the affix carries the name; combinations and clues do not). Validation detail below is retained for that sketch's naming-validator step.
-
-A combination rule defines a set of input clue ids and a replacement naming entry (slot, text, priority). When all inputs are revealed on the same item, the combination replaces individual naming entries during display-name composition — e.g. `{Blown Glass, Moser}` → `"Bohemian Moser"`. Authored per category, separate from clue definitions.
-
-Validation — the validator enforces:
-
-- existence of every referenced clue id,
-- same-domain inputs,
-- priority dominance over the individual naming entries it replaces,
-- full-reveal name match (the composed name equals the authored combination name when all inputs are revealed).
-
-Open questions:
-
-- Pairs only, or arbitrary input sets?
-- A single clue participating in multiple combination rules — allowed, and how resolved?
-- Strict text containment vs. free replacement of the individual entries.
-
-Prerequisite: the affix-naming system validated across the full item set (composed == authored) — already in place.
-
 ### Location Review v2
 
 Richer lot-preview functionality on the location-select screen: browse lot contents before committing AP/travel, see special gating requirements (tier locks, perk gates, mastery minimums), and surface other meta-info (estimated value range, clue count hints, category breakdown). Builds on the existing `LocationIntel` concept in Draft — fold that entry here when merging. Currently the location-select scene shows only name, cost, and tagline; this adds depth to the decision layer without requiring a trip to confirm.
@@ -210,7 +183,7 @@ Flows currently being built or ready to implement — may hold more than one ent
 
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
-- [robustness] Atomic save writes, hard boot-guard on empty registries, migration scaffolds, run-state guards, price/save/migration tests — see `dev/docs/plans/robustness_hardening.sketch.md`
+- [robustness] Atomic save writes, hard boot-guard on empty registries, run-state guards, price/save/migration tests — see `dev/docs/plans/robustness_hardening.sketch.md`
 - [simple-demo] Stage 1 tutorial split out to the Simple Tutorial draft; Director skeleton + Dialog remain surviving subsystems
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 - [dev/auto-auction] Debug-only quick-win buttons: instant player win at opening bid or rolled price (skip NPC bidding loop; rolled path seeds future auto-bid perk) — see `dev/docs/plans/debug_auto_auction.md`
@@ -219,6 +192,7 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 - [unlock_gating] Requirement-gated premium auction tiers + lot kinds, with location tier reference table & audit — see `dev/docs/plans/unlock_gating_location_tiers.md`
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
+- [clue_quality] Affix-aware clue information validator for posterior value narrowing and low-signal clue review — see `dev/docs/plans/clue_information_validator.sketch.md`
 
 - [demo] 3-run story demo, demoted to Stage 3 scope (stale — references legacy Skill/Merchant systems);
 

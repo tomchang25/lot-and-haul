@@ -59,7 +59,6 @@ A LEGENDARY item carries 4 hidden clues; each may be positive or negative.
 anchors:
   - anchor_id: <category_prefix>_anchor_NN # e.g. lamp_anchor_01, clock_anchor_02
     known_text: "..." # the bare category noun shown as the body name; max 3 words
-    naming_priority: 1 # anchor always occupies the body slot at this priority
     category_scope: <category_id> # must match a defined category
     base_value: <number> # > 0; the item's starting visible price (see tier budgets)
     shape_id: <shape_key> # cargo grid footprint; see valid shapes
@@ -68,9 +67,9 @@ anchors:
     tier: <1–5> # value tier; used by pool-draw tier weight curves
 ```
 
-Anchors carry **no** `dc`, `attribute`, `effect_op`, `type`, `domain`, or `naming` block — only `naming_priority`. They are auto-revealed on first inspect, so they have no discovery roll.
+Anchors carry **no** `dc`, `attribute`, `effect_op`, `type`, `domain`, `naming`, or `naming_priority` field. They are auto-revealed on first inspect, so they have no discovery roll. `known_text` is the plain body noun used by affix-only display-name composition.
 
-**Each category must define at least two anchor variants at different tiers** (a cheap variant and a premium variant). Different items in the same category reference different anchors. `known_text` is the plain noun (`Lamp`, `Clock`, `Pistol`) — the qualifiers come from clues.
+**Each category must define at least two anchor variants at different tiers** (a cheap variant and a premium variant). Different items in the same category reference different anchors. `known_text` is the plain noun (`Lamp`, `Clock`, `Pistol`) — qualifiers come from affixes, not clues.
 
 ---
 
@@ -86,13 +85,10 @@ clues:
     dc: <int> # surface 10–18, hidden 20–25
     effect_op: add | mul | override # 'override' is hidden-only
     effect_amount: <number> # non-zero; |amount| <= 100000
-    naming: # optional — enables a naming contribution
-      slot: prefix | body | suffix
-      priority: <int> # >= 0
     exclusive_group: <string> # HIDDEN-ONLY; at most one clue per group per item
 ```
 
-`exclusive_group` is written only on hidden clues; the converter blanks it on surface clues.
+`exclusive_group` is written only on hidden clues; the converter blanks it on surface clues. Clues do **not** carry a `naming` block; item names are composed from affixes plus the anchor body.
 
 ### Surface clues (2–6 per item, count varies by super-category)
 
@@ -102,7 +98,7 @@ clues:
   - **Negative required**: every category pool must include at least one value-reducing surface clue — a negative `add` (`-500`…`-20`) or a `mul < 1.0`.
 - `dc`: 10–18.
 - `known_text`: one word preferred; two or three only when one is unclear.
-- `naming`: optional — use for surface clues that identify maker, material, or style (prefix/suffix).
+- Surface clues may be used by affix combinations as readable tells, but they do not contribute display-name slots directly.
 
 ### Hidden clues (N per item, N = rarity)
 
@@ -114,7 +110,7 @@ clues:
 - `effect_amount` must be **non-zero**.
 - `dc`: 20–25.
 - `exclusive_group`: assign an authenticity group string (e.g. `authenticity_lamp`) to hidden clues that are mutually-exclusive interpretations of the same feature. A genuine-maker (`_leaf_`) clue and its counterfeit (`_override_`) clue for the same category share one group so a single item never carries both. **No item may carry two hidden clues in the same group** — they are alternatives the pool draw chooses between, never combined.
-- `naming`: optional — a revealed identity (`_leaf_`) clue typically takes the body slot at high priority to replace the generic noun; an override may prepend a prefix such as `Reproduction`.
+- Hidden clues may reveal identity, authenticity, or condition truth, but they do not rename the item directly. Affixes carry the player-facing qualifier.
 
 ---
 
@@ -167,7 +163,7 @@ items:
   - item_id: snake_case_unique_id
     category_id: <category_id>
     rarity: 0 | 1 | 2 | 3 | 4 # must equal the number of hidden_ids
-    anchor_id: <category_prefix>_veil_NN # must reference a defined anchor in this category
+    anchor_id: <category_prefix>_anchor_NN # must reference a defined anchor in this category
     surface_ids:
       - <surface_clue_id>
       - <surface_clue_id>
@@ -175,7 +171,7 @@ items:
       - <hidden_clue_id> # one per rarity point
 ```
 
-- **No `item_name`, `base_price`, `auto_verify`, or `clue_ids` fields.** They have been removed. The display name is composed entirely from naming slots (anchor body + clue qualifiers); value derives from the price pipeline.
+- **No `item_name`, `base_price`, `auto_verify`, or `clue_ids` fields.** They have been removed. The display name is composed from affixes plus the anchor body; value derives from the price pipeline.
 - `rarity` must equal `len(hidden_ids)`. The validator enforces this.
 - `anchor_id` is required and must reference a defined anchor whose `category_scope` matches `category_id`.
 - `surface_ids` must all be `type: surface`; `hidden_ids` must all be `type: hidden`.
@@ -184,13 +180,13 @@ items:
 
 ---
 
-## Structural Naming Requirements (validator-enforced)
+## Display Naming
 
-At full reveal, the named clue set must resolve:
+Item names are affix-only:
 
-1. **A body slot** — the anchor always provides it at `naming_priority` (a revealed hidden clue may displace it at higher priority).
-2. **At least one prefix or suffix qualifier** — supplied by a surface or hidden clue with `naming.slot: prefix` or `suffix`. Without one, the item stays "Unknown {body}".
-3. **Non-empty composed name** — no item whose every naming slot is empty.
+1. The anchor `known_text` supplies the body noun.
+2. Affixes supply prefix or suffix qualifiers through `data/yaml/affixes.yaml`.
+3. Clues and combinations never carry display-name slots. Do not author `naming:` blocks on clues; the validator rejects them.
 
 ---
 
@@ -233,9 +229,8 @@ vase  poster  painting  sculpture  pistol  rifle  crossbow
 # and a mutually-exclusive genuine/counterfeit hidden pair sharing one exclusive_group.
 
 anchors:
-  - anchor_id: clock_veil_01
+  - anchor_id: clock_anchor_01
     known_text: Clock
-    naming_priority: 1
     category_scope: clock
     base_value: 60
     shape_id: s1x3
@@ -243,9 +238,8 @@ anchors:
     weight_kg: 3.5
     tier: 1
 
-  - anchor_id: clock_veil_02
+  - anchor_id: clock_anchor_02
     known_text: Clock
-    naming_priority: 1
     category_scope: clock
     base_value: 500
     shape_id: s1x3
@@ -262,9 +256,6 @@ clues:
     dc: 14
     effect_op: add
     effect_amount: 280
-    naming:
-      slot: prefix
-      priority: 2
 
   - clue_id: clock_case_cracked
     known_text: Cracked
@@ -274,9 +265,6 @@ clues:
     dc: 10
     effect_op: add
     effect_amount: -60
-    naming:
-      slot: prefix
-      priority: 2
 
   - clue_id: clock_movement_signed
     known_text: Signed
@@ -286,9 +274,6 @@ clues:
     dc: 16
     effect_op: add
     effect_amount: 400
-    naming:
-      slot: suffix
-      priority: 2
 
   - clue_id: clock_leaf_boulle
     known_text: Boulle
@@ -299,9 +284,6 @@ clues:
     effect_op: mul
     effect_amount: 2.75
     exclusive_group: authenticity_clock
-    naming:
-      slot: body
-      priority: 10
 
   - clue_id: clock_override_reproduction
     known_text: Reproduction
@@ -312,9 +294,6 @@ clues:
     effect_op: override
     effect_amount: 120
     exclusive_group: authenticity_clock
-    naming:
-      slot: prefix
-      priority: 10
 
   - clue_id: clock_movement_swiss
     known_text: Swiss
@@ -333,7 +312,7 @@ items:
   - item_id: clock_mantel_common
     category_id: clock
     rarity: 0
-    anchor_id: clock_veil_01
+    anchor_id: clock_anchor_01
     surface_ids:
       - clock_case_gilded
       - clock_case_cracked
@@ -341,7 +320,7 @@ items:
   - item_id: clock_signed_uncommon
     category_id: clock
     rarity: 1
-    anchor_id: clock_veil_02
+    anchor_id: clock_anchor_02
     surface_ids:
       - clock_case_gilded
       - clock_movement_signed
@@ -351,7 +330,7 @@ items:
   - item_id: clock_repro_uncommon
     category_id: clock
     rarity: 1
-    anchor_id: clock_veil_02
+    anchor_id: clock_anchor_02
     surface_ids:
       - clock_case_gilded
     hidden_ids:
@@ -360,7 +339,7 @@ items:
   - item_id: clock_boulle_rare
     category_id: clock
     rarity: 2
-    anchor_id: clock_veil_02
+    anchor_id: clock_anchor_02
     surface_ids:
       - clock_case_gilded
       - clock_case_cracked
@@ -372,8 +351,8 @@ items:
 
 Notes on the example:
 
-- `clock_mantel_common` is COMMON (rarity 0, 0 hidden) — verified immediately, shows "Gilded Clock".
+- `clock_mantel_common` is COMMON (rarity 0, 0 hidden) — verified immediately. Its display name is the anchor body plus any drawn affixes; clues do not rename it.
 - `clock_leaf_boulle` and `clock_override_reproduction` both sit in `exclusive_group: authenticity_clock`. They are **alternatives** — `clock_signed_uncommon` draws the genuine `_leaf_`, `clock_repro_uncommon` draws the counterfeit `_override_`. **No single item carries both**, which is exactly what the one-per-group rule enforces.
 - `clock_boulle_rare` is RARE (rarity 2). Its two hidden clues are `clock_leaf_boulle` (group `authenticity_clock`) and `clock_movement_swiss` (**no group**) — so they do not collide, and neither is an `override`, so the one-override limit holds.
 - `clock_case_cracked` is the required negative surface clue; `clock_override_reproduction` is the required negative hidden — on `clock_repro_uncommon` it collapses the tier-3 base (500) to 120 (~24%, within the counterfeit budget).
-- `clock_veil_01` (tier 1, base 60) and `clock_veil_02` (tier 3, base 500) are separate anchors; different items reference different variants.
+- `clock_anchor_01` (tier 1, base 60) and `clock_anchor_02` (tier 3, base 500) are separate anchors; different items reference different variants.

@@ -1,155 +1,115 @@
 # Robustness Hardening
 
-Status: Exploring
-
 ## Goal
 
-Close the confirmed durability gaps that can corrupt a player's save, crash the game on a degraded boot, or let an economics regression ship undetected. The codebase already enforces strong guard/serialization discipline; this is a targeted pass over the handful of places where a single bad event (crash mid-write, empty data folder, missing registry id, future field rename) produces silent data loss or a hard crash rather than a surfaced, recoverable failure.
+Close the remaining durability gaps that can corrupt a player's save, continue boot after missing generated data, crash run-phase scenes reached without their required state, or let an economics/persistence regression ship undetected. The codebase already has the store version seam and explicit registry load-order guards; this sketch now tracks only the robustness work that still needs implementation.
 
 ## Requirements
 
-1. A crash or power loss during a save write must never corrupt the newest save file. Writes are atomic: the previous good file survives intact if the new write does not complete. Today the save writer truncates the target file in place, so an interrupted write destroys the most recent backup generation.
-2. Booting with an empty or incomplete resource set (the `data/tres/` folder is gitignored, so a fresh clone loads zero resources) must fail loudly and stop, not continue into a game where every registry lookup returns null. A degraded boot that limps forward turns one root cause into a cascade of unrelated null crashes that are far harder to diagnose.
-3. Every persisted store must carry a migration scaffold (a version stamp plus an `_apply_migrations()` entry point) so that a future field rename or restructure has a version boundary to hang a migration on. Five persisted stores currently serialize state with no scaffold, so the first schema change to any of them silently drops data on existing saves.
-4. Scenes that depend on run state must guard it before dereferencing, and recover to a safe scene on failure. At least one hub-transition scene reads run state in `_ready()` with no null guard, which is an instant crash if the scene is reached with no active run.
-5. No autoload may rely on `assert()` for a load-order or data precondition, because `assert()` is stripped from release exports and the check vanishes. A load-order precondition currently guarded by `assert()` becomes a silent null-deref crash in a shipped build.
-6. The robustness-critical math and persistence paths must have regression tests: the price pipeline (condition multiplier bands, verified/override-base resolution), a full save round-trip against the committed fixture save, and each store migration. These paths are exercised by the smoke test for "does it crash" but nothing asserts the numbers or the migrated shape, so an off-by-band condition multiplier or a migration that drops the wrong entries would pass CI.
+1. A crash or power loss during a save write must never corrupt the newest save file. Writes are atomic: the previous good file survives intact if the new write does not complete.
+2. Booting with an empty or incomplete generated resource set must fail loudly and stop, not continue into a game where registry lookups return null. The `data/tres/` folder is a generated artifact set, so a fresh or mis-packaged build needs one clear failure instead of a cascade of unrelated null crashes.
+3. Run-phase scenes that depend on run or lot state must guard that state before dereferencing it, then recover to a safe scene on failure. A direct navigation, stale route, or bad resume point should produce one visible recovery message, not a hard crash.
+4. The robustness-critical math and persistence paths must have regression tests: the price pipeline, a save round-trip against the committed fixture save, and every store migration that performs a real transform. Smoke tests prove the game does not crash; these tests must prove the important numbers and migrated shapes remain correct.
 
 ## Design
 
 Priority order, highest blast radius first:
 
-| #   | Gap                                              | Worst-case outcome                                                         | Effort           |
-| --- | ------------------------------------------------ | -------------------------------------------------------------------------- | ---------------- |
-| 1   | Non-atomic save write                            | Newest save permanently corrupted by a crash during autosave               | Small            |
-| 2   | Soft boot on empty registries                    | Game boots into a null-cascade; bug reports point everywhere but the cause | Small            |
-| 3   | Missing migration scaffolds (5 stores)           | First future field change silently drops player data                       | Small/mechanical |
-| 4   | Unguarded run-state deref in a hub scene         | Hard crash on an edge-case navigation into the scene                       | Trivial          |
-| 5   | `assert()` load-order guard in an autoload       | Silent crash in release if load order ever desyncs                         | Trivial          |
-| 6   | No regression tests on price / save / migrations | Economics or migration regression ships green                              | Medium           |
+| #   | Gap                                              | Worst-case outcome                                                         | Effort |
+| --- | ------------------------------------------------ | -------------------------------------------------------------------------- | ------ |
+| 1   | Non-atomic save write                            | Newest save permanently corrupted by a crash during autosave               | Small  |
+| 2   | Soft boot on empty registries                    | Game boots into a null-cascade; bug reports point everywhere but the cause | Small  |
+| 3   | Unguarded run-state derefs in run-phase scenes   | Hard crash on an edge-case navigation or resume path                       | Small  |
+| 4   | No regression tests on price / save / migrations | Economics or migration regression ships green                              | Medium |
 
-Items 1–5 are independent and each shippable on its own. Item 6 should land alongside 1 and 3 — the round-trip and migration tests are what prove those changes correct, and they are the lasting guard against re-regression.
+Items 1–3 are independently shippable. Item 4 should land alongside items 1 and 3 where practical, because the save round-trip and migration tests are the durable proof that persistence changes preserve player data.
 
-Boundaries worth stating up front (folded into the requirements above, repeated here for the priority read): item 2 is the robustness half of the existing "Build Automation" draft in `TODO.md` — that draft covers _regenerating_ the tres files; this covers _failing hard when they are still missing_. The two ship together but are separate concerns: one produces data, one refuses to run without it. Item 3 is scaffold-only — it adds no migration logic today, it only guarantees the next person who renames a field has a versioned seam to write into, per the append-only migration rule.
+The empty-registry guard is the robustness half of the existing Build Automation draft in `TODO.md`: that draft covers regenerating generated resources and export presets; this sketch covers refusing to run when those resources are still absent. The two are related but not the same concern.
 
 ## Sketch (non-normative)
 
-Names and coordinates below are recalled from the audit, not re-verified — the codebase wins any disagreement.
+Names and coordinates below are implementation hints only; the codebase wins any disagreement.
 
 ### 1. Atomic save write — `global/autoloads/save_manager.gd`
 
-The current writer opens the final path directly and truncates it:
+The current writer opens final paths directly and truncates them:
 
 ```gdscript
-# today, roughly:
 var file := FileAccess.open(path, FileAccess.WRITE)
 file.store_string(JSON.stringify(payload))
 file.close()
 ```
 
-Write to a sibling temp path, flush, close, then rename over the target — `DirAccess.rename` / `rename_absolute` is atomic on the same volume:
+Write to a sibling temp path, flush/close, then rename over the target. Keep the temp file on the same volume so the rename is atomic:
 
 ```gdscript
-var tmp := path + ".tmp"
-var file := FileAccess.open(tmp, FileAccess.WRITE)
-if file == null:
-    ToastManager.show_error("SaveManager: could not open %s for writing" % tmp)
-    return false
-file.store_string(JSON.stringify(payload))
-file.close()                       # ensure bytes are flushed before the swap
-var err := DirAccess.rename_absolute(tmp, path)
-if err != OK:
-    ToastManager.show_error("SaveManager: atomic rename failed (%d) for %s" % [err, path])
-    return false
+func _write_json_atomic(path: String, payload: Variant, label: String) -> bool:
+    var tmp := path + ".tmp"
+    var file := FileAccess.open(tmp, FileAccess.WRITE)
+    if file == null:
+        ToastManager.show_error("%s: could not open %s for writing" % [label, tmp])
+        return false
+    file.store_string(JSON.stringify(payload))
+    file.close()
+
+    var err := DirAccess.rename_absolute(ProjectSettings.globalize_path(tmp), ProjectSettings.globalize_path(path))
+    if err != OK:
+        ToastManager.show_error("%s: atomic rename failed (%d) for %s" % [label, err, path])
+        return false
+    return true
 ```
 
-Apply the same pattern to every direct `store_string` site in the file (the audit flagged roughly three: the main slot write plus the manifest/counter writes). The existing newest-first corrupt-file fallback on _load_ already complements this and stays as-is.
+Apply the helper to every direct JSON write in the save coordinator: the counter save file, the slot manifest, and the last-active pointer. The existing newest-first corrupt-file fallback on load stays as the read-side complement.
 
-### 2. Hard boot guard on empty registries — `global/autoloads/registries/resource_registry.gd`
+### 2. Hard boot guard on empty registries
 
-Today an empty registry shows a dev-only toast and returns, letting boot continue:
+Today an empty registry can report a development-only error and return, letting boot continue:
 
 ```gdscript
 if size() <= 0:
     ToastManager.show_dev_error("%s registry is empty after load" % name)
-    return        # <- boot limps on with an empty registry
+    return
 ```
 
-A registry being empty after load is unrecoverable, not a dev nicety. Promote it to an always-visible error and halt the boot rather than fan out into null lookups. Options the implementer can pick between: a `get_tree().quit()` after an always-visible `show_error`, or a single boot-validation gate in `GameManager._ready()` that checks the core registries (Clue, Item/Anchor, Category, Location, Car) before `SaveManager.load()` and routes to a dedicated fatal-error scene with a "regenerate data — run the tres pipeline" message. Centralizing it in `GameManager` reads better than each registry calling `quit()`. Either way the contract is: empty core registry ⇒ stop with a player-legible reason, never continue.
+Make empty core registries a boot-fatal condition. Prefer a central boot validation gate after registry autoloads initialize and before save loading/routing: check every generated-data registry needed for normal play, show one always-visible error that names missing or ungenerated data, then stop boot by routing to a fatal state or quitting with a non-zero exit. A per-registry `show_error` + halt is acceptable if it preserves the same contract: empty core registry means one legible failure and no continued gameplay.
 
-### 3. Migration scaffolds for the five bare stores
+Keep command-line test modes in mind. Unit tests may intentionally boot with limited scene flow, while CI and normal boot should fail hard if generated gameplay data is absent.
 
-Stores missing a version/migration seam (recalled): `economy_store.gd`, `garage_store.gd`, `knowledge_store.gd`, `slot_store.gd`, `customers_store.gd`. Each already calls `_apply_migrations()` from `from_dict()` but inherits a no-op base. Add the minimal seam to each, mirroring what `storage_store.gd` / `progress_store.gd` already do:
+### 3. Run-state guards
 
-```gdscript
-func _store_version() -> int:
-    return 1                      # bump to N when a field changes; append a block below
-
-func _apply_migrations(d: Dictionary, from_version: int, ctx: SaveLoadContext) -> Dictionary:
-    # No migrations yet — seam exists so the next field change has a version boundary.
-    # When you rename/restructure a field: bump _store_version, then:
-    #   if from_version < 2:
-    #       d["new_key"] = d.get("old_key", default); d.erase("old_key")
-    return d
-```
-
-This is scaffold-only and changes no load behavior today; it satisfies the append-only migration rule's precondition (a version stamp must exist before the first migration can be written).
-
-### 4. Run-state guard — `game/run/run_review/run_review_scene.gd`
-
-`_ready()` reads `RunManager.run` (≈ line 58, `RunManager.run.cargo_items + RunManager.run.trailer_items`) with no guard. Add the standard runtime guard:
+Add the standard runtime guard before any `_ready()` path dereferences required run or lot state:
 
 ```gdscript
 func _ready() -> void:
     if RunManager.run == null:
-        ToastManager.show_error("Run review failed to load (no active run). Returning to hub.")
+        ToastManager.show_error("Run review failed to load. Returning to hub.")
         SceneRouter.go_to_hub.call_deferred()
         return
-    # ... existing setup ...
+    # existing setup
 ```
 
-Sweep the other run-phase scenes for the same `RunManager.run` / `RunManager.lot` deref-without-guard pattern while here; the audit only confirmed this one but did not exhaustively cover every scene.
+The confirmed missing guard is in the run-review scene. Sweep the run-phase entry scenes while implementing this, because several scenes already have the intended pattern and the remaining work should bring the outliers in line: location entry and cargo guard run state; inspection, auction, and reveal guard lot state; lot browse and run review should match that behavior.
 
-### 5. Replace the `assert()` load-order guard — `global/autoloads/registries/super_category_registry.gd`
+### 4. Regression tests — `test/unit/`
 
-Recalled near line 26:
+Add focused GUT coverage for the paths that can silently regress:
 
-```gdscript
-assert(CategoryRegistry.size() > 0, "SuperCategoryRegistry requires CategoryRegistry to load first")
-```
+- `test_item_price.gd` — condition multiplier bands, verified-vs-appraised divergence, and hidden-clue override-base resolution. Prefer in-memory `ItemEntry` setup over scene boot where possible.
+- `test_save_round_trip.gd` — load the committed fixture save through the real save/store path or equivalent store-level path, assert representative cash/day/item fields, then serialize and restore again to prove the shape is stable.
+- `test_migrations.gd` — exercise every store migration that performs a real transform. Today that means the existing storage/progress branches; future version bumps add cases here in the same change as the migration.
 
-`assert()` is stripped in release. Convert to an explicit guard that survives and surfaces:
-
-```gdscript
-if CategoryRegistry.size() <= 0:
-    ToastManager.show_dev_error("SuperCategoryRegistry: CategoryRegistry empty — load order wrong or tres missing")
-    return
-```
-
-(If item 2's boot gate lands first, an empty CategoryRegistry already halts boot, making this guard a redundant-but-cheap belt-and-suspenders — keep it.)
-
-### 6. Regression tests — `test/unit/`
-
-The suite has one file (`test_run_manager.gd`) and a committed fixture (`test/test_data/save_v2/save_81.json`) that nothing loads. Add:
-
-- `test_item_price.gd` — condition multiplier across all four bands (not just 1.0), verified-vs-appraised divergence, and the hidden-clue override-base path (`_effective_base_value`). These are pure functions on `ItemEntry`, constructible in-memory like the existing tests.
-- `test_save_round_trip.gd` — load `save_81.json` through `SaveManager` (or each store's `from_dict`), assert item count, cash, day, and a couple of known item fields match the fixture; then `to_dict` → `from_dict` again and assert stability.
-- `test_migrations.gd` — feed a hand-built v1-shaped dict to `StorageStore` and `ProgressStore` `_apply_migrations()` and assert the documented transform (legacy `item_id` entries dropped with a `ctx` note; `tutorial_seen` defaulted). As stores gain real migrations under item 3, add a case each.
-
-Migration step order: land 1 + 6's round-trip/migration tests together (tests prove the atomic-write change preserves round-trip and the scaffolds don't alter load), then 2, then 3 (with its migration-test cases), then the trivial 4 and 5 anytime.
+If the atomic-write helper is awkward to test by killing the process, unit-test the helper's success/failure behavior with a test slot or temp user path, then rely on manual verification for the actual interrupted-write scenario.
 
 ## Non-Goals
 
-1. Building the tres-generation / export-preset pipeline itself — that is the existing "Build Automation" draft in `TODO.md`. This sketch only adds the hard _guard_ for when that data is absent.
-2. Writing actual data migrations for the five bare stores — only the empty scaffold. No field is being renamed here.
-3. A broad exhaustive null-guard sweep of every scene. Items 4–5 fix the confirmed crash sites; a full sweep is a separate chore if wanted.
-4. Reworking the load-time corrupt-file fallback, defensive `from_dict` reads, or `SaveLoadContext` surfacing — the audit confirmed these are already correct.
+1. Building the generated-resource or export-preset automation itself. That remains in the Build Automation draft; this sketch only adds the hard guard for when generated data is absent.
+2. Adding empty migration override methods to every store. The active need is regression coverage for migrations that actually transform data, not boilerplate for stores with no migration branch.
+3. Replacing local registry precondition guards for style consistency. The boot-fatal empty-data contract is the robustness requirement here.
+4. Reworking the load-time corrupt-file fallback, defensive `from_dict` reads, or `SaveLoadContext` diagnostics.
 
 ## Acceptance Criteria
 
-1. Killing the process during a save write leaves the previous save file fully intact and loadable; no truncated/partial newest file is ever read as the active save.
-2. Launching with an empty or absent resource data set stops at a single, player-legible fatal message naming the cause (missing/ungenerated data), instead of booting into a state where lookups return null.
-3. Every persisted store reports a version stamp and routes through an `_apply_migrations()` entry point; a reviewer can point to the seam in each of the five previously-bare stores.
-4. Navigating into the run-review scene with no active run shows a recovery message and returns to the hub instead of crashing.
-5. A release-config build retains the registry load-order precondition check (it is not compiled away) and surfaces an error if the precondition is violated.
-6. CI fails if the condition-multiplier bands, the fixture save round-trip, or any store migration produces a result other than the asserted one.
+1. Killing the process during a save write leaves the previous save file fully intact and loadable; no truncated or partial newest file is read as the active save.
+2. Launching with an empty or absent generated resource data set stops at a single player-legible fatal message naming the cause, instead of booting into a state where lookups return null.
+3. Navigating into run-review, lot-browse, or any other guarded run-phase scene without its required run/lot state shows a recovery message and returns to a safe scene instead of crashing.
+4. CI fails if condition-multiplier bands, verified/appraised value resolution, fixture save round-trip, or any real store migration produces a result other than the asserted one.
