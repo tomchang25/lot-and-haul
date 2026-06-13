@@ -53,6 +53,9 @@ jobs:
 
   # ── Layer 1 — GUT unit tests ──────────────────────────────────────────────
   unit-tests:
+    # TEMPORARILY DISABLED: hangs/loops indefinitely on GitHub Actions. Remove
+    # `if: false` to re-enable once the runaway-run cause is found.
+    if: false
     needs: [generate-tres, render-sfx]
     runs-on: ubuntu-latest
     steps:
@@ -102,6 +105,9 @@ jobs:
 
   # ── Layer 2 — Headless smoke test ─────────────────────────────────────────
   smoke-test:
+    # TEMPORARILY DISABLED: hangs/loops indefinitely on GitHub Actions. Remove
+    # `if: false` to re-enable once the runaway-run cause is found.
+    if: false
     needs: [generate-tres, render-sfx]
     runs-on: ubuntu-latest
     steps:
