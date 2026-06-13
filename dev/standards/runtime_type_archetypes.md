@@ -47,3 +47,37 @@ Scene → Manager.wrapper(entry, ...) → entry.mutator() → EventBus.signal
 - The wrapper emits the appropriate EventBus signal on success.
 - Cross-manager communication: direct call when transactional (caller correctness depends on outcome); EventBus signal when notification (caller correctness is independent).
 - System-level writes (lot generation, storage registration, legacy migrations) are legitimate direct writes by the owning systems — the mediation rule governs scenes and UI code, not the Managers and pipelines that own the data.
+
+## Resource Reference Rule
+
+When a runtime type (Store, Entry, Service, or Snapshot) holds or receives a reference to a designer Resource, hold the Resource itself, not its String id. String ids belong at serialization boundaries (`from_dict`, `to_dict`, `migrate`, `validate`, `_read_save_file`); refs belong in game logic.
+
+**Call sites**: pass the Resource directly rather than extracting a string id and passing that.
+
+```gdscript
+# Correct
+_draw_affixes(category: CategoryData)  # receives a ref, compares refs
+if category in affix.category_scope:
+
+# Wrong
+_draw_affixes(category_id: String)     # receives an id, string-matches
+if category_id in affix.category_scope:
+```
+
+The `_ids` accessor on registries (`get_all_<singular>_ids()`) exists for serialization boundaries only — not as the default iteration path. Iterate resources, not ids.
+
+**Designer-resource `@export var` fields** follow the same rule. When a field on a designer-authored Resource script (`data/definitions/*.gd`) references another designer resource, type it as the Resource class directly. Godot resolves references via `ExtResource` entries in `.tres` files.
+
+```gdscript
+# Correct
+@export var super_category: SuperCategoryData = null
+@export var category_scope: Array[CategoryData] = []
+
+# Wrong
+@export var super_category_id: String = ""
+@export var category_scope: Array[String] = []
+```
+
+String ids are still correct for a resource's own identity field (`item_id`, `category_id`, etc.) — those are the keys registries index on and the identifiers serialization boundaries use.
+
+This rule is also cross-referenced in `registries.md` §40.

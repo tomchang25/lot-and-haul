@@ -16,8 +16,9 @@ extends Resource
 # Human-readable label for debug and tooltip display.
 @export var display_name: String = ""
 
-# Category id this affix is valid for (matched at draw time).
-@export var category_scope: String = ""
+# Categories this affix is valid for (matched at draw time).
+# Empty array means the affix can appear on any category.
+@export var category_scope: Array[CategoryData] = []
 
 # Relative weight for affix draw (higher = more frequent).
 @export var weight: int = 1

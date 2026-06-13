@@ -37,7 +37,7 @@ Every registry exposes, for its resource type `T`:
 
 **Iterate resources, not ids.** If the next thing a caller does after `for id in get_all_<singular>_ids()` is `get_<singular>_by_id(id)`, they should have iterated resources. The `_ids` form exists for save/load and similar boundaries, not as the default.
 
-**Pass Resource refs at non-serialization call sites.** Outside of serialization boundaries (`from_dict`, `to_dict`, `migrate`, `validate`, `_read_save_file`), callers should pass the Resource ref directly rather than extracting a string id and passing that. String ids belong at boundaries; refs belong in game logic.
+**Resource-reference discipline**: see `runtime_type_archetypes.md` § Resource Reference Rule. The short version: outside serialization boundaries, pass Resource refs, not String ids. The same rule extends to `@export var` fields on designer resources.
 
 ## Forbidden APIs
 

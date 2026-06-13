@@ -27,7 +27,8 @@ affixes:
   - affix_id: snake_case string
     naming_slot: prefix | suffix
     display_name: string
-    category_scope: <category_id>
+    category_scope:
+      - <category_id>
     weight: <positive int>
     combination_ids:
       - <combination_id>
@@ -39,7 +40,7 @@ affixes:
 - `affix_id`: unique snake*case ID across all affixes. Prefer `<category_key>*<descriptor>`(e.g.`bag_rustic`, `watch_vintage`).
 - `naming_slot`: `prefix` or `suffix`. Controls display-name composition in Spec B. At most one prefix and one suffix can be drawn per item, so only prefix × suffix cross-product conflicts are validated — two prefixes on the same category never combine.
 - `display_name`: human-readable label for debug and UI (e.g. `Rustic`, `Vintage`).
-- `category_scope`: snake_case category id this affix applies to. Must match a category in `category_data.yaml`. Drawn affixes are filtered by this scope.
+- `category_scope`: list of snake_case category ids this affix applies to. Empty list means the affix can appear on any category (generic). Each id must match a category in `category_data.yaml`. Drawn affixes are filtered by this scope.
 - `weight`: relative draw weight. Higher = more frequent. Must be a positive int.
 - `combination_ids`: list of combination ids belonging to this affix. Order sets ext-resolve order but has no functional weight. Every id must be defined in the `affix_combinations:` block.
 
@@ -162,7 +163,7 @@ vase  poster  painting  sculpture  pistol  rifle  crossbow
 - Every `combination_id` is unique and snake_case.
 - Every affix has `naming_slot` (`prefix` or `suffix`), `display_name`, `category_scope`, `weight`, and at least one `combination_id`.
 - Every combination has `affix_id`, `weight`, and references at least one clue across `surface_clue_ids` and `hidden_clue_ids`.
-- Every `category_scope` matches a defined category.
+- Every entry in `category_scope` matches a defined category, or the list is empty for generic affixes.
 - Every `affix_id` referenced in a combination matches a defined affix.
 - Every clue id in `surface_clue_ids` and `hidden_clue_ids` exists in `clues.yaml` with the correct type.
 - Every `weight` is a positive int (both affix-level and combination-level).
@@ -197,7 +198,8 @@ affixes:
   - affix_id: bag_rustic
     naming_slot: prefix
     display_name: Rustic
-    category_scope: handbag
+    category_scope:
+      - handbag
     weight: 3
     combination_ids:
       - comb_bag_rustic_01

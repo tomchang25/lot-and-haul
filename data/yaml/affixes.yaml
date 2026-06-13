@@ -66,7 +66,7 @@ affix_combinations:
     weight: 1
     surface_clue_ids:
       - watch_crown_wind
-      - watch_dial_patina
+      - watch_dial_refinish
     hidden_clue_ids:
       - watch_override_franken
 
@@ -131,7 +131,8 @@ affixes:
   - affix_id: bag_rustic
     naming_slot: prefix
     display_name: Rustic
-    category_scope: handbag
+    category_scope:
+      - handbag
     weight: 3
     combination_ids:
       - comb_bag_rustic_01
@@ -140,7 +141,8 @@ affixes:
   - affix_id: bag_luxury
     naming_slot: prefix
     display_name: Luxury
-    category_scope: handbag
+    category_scope:
+      - handbag
     weight: 2
     combination_ids:
       - comb_bag_luxury_01
@@ -150,7 +152,8 @@ affixes:
   - affix_id: watch_vintage
     naming_slot: prefix
     display_name: Vintage
-    category_scope: wristwatch
+    category_scope:
+      - wristwatch
     weight: 2
     combination_ids:
       - comb_watch_vintage_01
@@ -159,7 +162,8 @@ affixes:
   - affix_id: watch_modern
     naming_slot: prefix
     display_name: Modern
-    category_scope: wristwatch
+    category_scope:
+      - wristwatch
     weight: 3
     combination_ids:
       - comb_watch_modern_01
@@ -168,7 +172,8 @@ affixes:
   - affix_id: lamp_antique
     naming_slot: prefix
     display_name: Antique
-    category_scope: oil_lamp
+    category_scope:
+      - oil_lamp
     weight: 2
     combination_ids:
       - comb_lamp_antique_01
@@ -177,7 +182,8 @@ affixes:
   - affix_id: painting_unsigned
     naming_slot: prefix
     display_name: Unsigned
-    category_scope: painting
+    category_scope:
+      - painting
     weight: 2
     combination_ids:
       - comb_painting_unsigned_01

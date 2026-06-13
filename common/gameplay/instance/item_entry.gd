@@ -563,7 +563,7 @@ static func from_dict(d: Dictionary, ctx: SaveLoadContext) -> ItemEntry:
         if affix_obj != null:
             entry.affixes.append(affix_obj)
         else:
-            ctx.info("affix '%s' not found on load — dropped" % aid)
+            ctx.info("affix '%s' not found on load — dropped" % raw_aid)
     for cid: Variant in d.get("combination_ids", []):
         entry.combination_ids.append(String(cid))
 

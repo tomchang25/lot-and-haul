@@ -143,15 +143,15 @@ static func _draw_anchor(category: CategoryData, tier_weights: Dictionary, rng: 
 
 
 ## Draws 0–1 prefix and 0–1 suffix affixes for [param category].
-## Each eligible affix (matching category_scope) is rolled independently
-## against its weight. An affix is assigned when
+## Each eligible affix (matches category_scope or has empty scope = generic)
+## is rolled independently against its weight. An affix is assigned when
 ##   randf() * TOTAL_WEIGHT < weight
 ## which gives each affix a proportional chance independent of other affixes.
 static func _draw_affixes(category: CategoryData, rng: RandomNumberGenerator) -> Array[AffixData]:
     var all_affixes: Array[AffixData] = AffixRegistry.get_all_affixes()
     var candidates: Array[AffixData] = []
     for a: AffixData in all_affixes:
-        if a.category_scope == category.category_id:
+        if a.category_scope.is_empty() or category in a.category_scope:
             candidates.append(a)
 
     if candidates.is_empty():

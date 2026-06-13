@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 
 from tres_lib.spec import BuildCtx, ParseCtx
@@ -30,6 +31,7 @@ def _check_conflicts(
 
     seen_groups: dict[str, str] = {}
     override_count = 0
+    first_override_id: str | None = None
 
     for cid in surface_ids + hidden_ids:
         c = clue_map.get(cid)
@@ -47,11 +49,12 @@ def _check_conflicts(
                 seen_groups[eg] = cid
         op = c.get("effect_op", "")
         if op == "override":
-            override_count += 1
-            if override_count > 1:
+            if first_override_id is None:
+                first_override_id = cid
+            else:
                 errors.append(
                     f"{label}: two override clues "
-                    f"(first via '{cid}')"
+                    f"(first via '{first_override_id}', also via '{cid}')"
                 )
 
     return errors
@@ -161,9 +164,7 @@ class AffixCombinationSpec:
                 )
 
             # Check clue ids exist
-            all_clue_ids: set[str] = {
-                c["clue_id"] for c in all_data.get("clues", [])
-            }
+            all_clue_ids: set[str] = {c["clue_id"] for c in all_data.get("clues", [])}
             for field_name, ids in [
                 ("surface_clue_ids", entry.get("surface_clue_ids", [])),
                 ("hidden_clue_ids", entry.get("hidden_clue_ids", [])),
@@ -229,7 +230,23 @@ class AffixSpec:
         w.add_field_str("affix_id", affix_id)
         w.add_field_str("naming_slot", entry.get("naming_slot", ""))
         w.add_field_str("display_name", entry.get("display_name", ""))
-        w.add_field_str("category_scope", entry.get("category_scope", ""))
+
+        # Category scope — written as ext-refs so Godot resolves to CategoryData refs.
+        cat_scope_ids: list[str] = entry.get("category_scope", [])
+        cat_tags: list[str] = []
+        for i, cid in enumerate(cat_scope_ids):
+            cat_uid = ctx.uid_cache.get(cid, "")
+            if not cat_uid:
+                continue
+            tag = f"{i + 2}_cat"
+            w.add_ext_resource(
+                tag,
+                "Resource",
+                f"res://data/tres/categories/{cid}.tres",
+                cat_uid,
+            )
+            cat_tags.append(tag)
+        w.add_field_ext_ref_array("category_scope", cat_tags)
         w.add_field_int("weight", int(entry.get("weight", 1)))
 
         # Combination ext-refs
@@ -255,11 +272,23 @@ class AffixSpec:
         affix_id = tres_field(text, "affix_id") or ""
         if uid:
             ctx.uid_to_id[uid] = affix_id
+
+        ext_res = ext_resources(text)
+        cat_scope_raw = tres_field(text, "category_scope") or ""
+        parsed_scope: list[str] = []
+        for m in re.finditer(r'ExtResource\("([^"]+)"\)', cat_scope_raw):
+            tag = m.group(1)
+            res_uid = ext_res.get(tag, {}).get("uid", "")
+            if res_uid:
+                cat_id = ctx.uid_to_id.get(res_uid, "")
+                if cat_id:
+                    parsed_scope.append(cat_id)
+
         return {
             "affix_id": affix_id,
             "naming_slot": tres_field(text, "naming_slot") or "",
             "display_name": tres_field(text, "display_name") or "",
-            "category_scope": tres_field(text, "category_scope") or "",
+            "category_scope": parsed_scope,
             "weight": int(tres_field(text, "weight") or 1),
         }
 
@@ -292,14 +321,19 @@ class AffixSpec:
             else:
                 seen_ids[aid] = i
 
-            cat_scope = entry.get("category_scope", "")
-            if not cat_scope:
-                errors.append(f"affix '{aid}': category_scope is required")
-            elif cat_scope not in known_cat_ids:
-                errors.append(
-                    f"affix '{aid}': category_scope '{cat_scope}' "
-                    f"not in category table"
-                )
+            cat_scope = entry.get("category_scope", [])
+            if not isinstance(cat_scope, list):
+                errors.append(f"affix '{aid}': category_scope must be a list")
+            elif not cat_scope:
+                # Empty scope = generic, valid for all categories.
+                pass
+            else:
+                for scope_cat in cat_scope:
+                    if scope_cat not in known_cat_ids:
+                        errors.append(
+                            f"affix '{aid}': category_scope '{scope_cat}' "
+                            f"not in category table"
+                        )
 
             naming_slot = entry.get("naming_slot", "")
             if naming_slot not in ("prefix", "suffix"):
@@ -309,23 +343,17 @@ class AffixSpec:
 
             rw = entry.get("weight", 1)
             if not isinstance(rw, int) or rw <= 0:
-                errors.append(
-                    f"affix '{aid}': weight must be a positive int"
-                )
+                errors.append(f"affix '{aid}': weight must be a positive int")
 
             # Validate combination ids exist
             comb_ids: list = entry.get("combination_ids", [])
             if not comb_ids:
                 errors.append(f"affix '{aid}': must have at least one combination")
             else:
-                known_comb_ids: set[str] = {
-                    c["combination_id"] for c in comb_entries
-                }
+                known_comb_ids: set[str] = {c["combination_id"] for c in comb_entries}
                 for cid in comb_ids:
                     if cid not in known_comb_ids:
-                        errors.append(
-                            f"affix '{aid}': combination '{cid}' not found"
-                        )
+                        errors.append(f"affix '{aid}': combination '{cid}' not found")
 
             # ── Cross-product conflict validator ──────────────
             # Enumerate every prefix × suffix affix pair that shares a
@@ -339,11 +367,17 @@ class AffixSpec:
 
             peer_slot = "suffix" if my_slot == "prefix" else "prefix"
             peer_affixes: list[dict] = []
+            my_scope_set: set[str] = set(cat_scope) if cat_scope else set()
             for other in entries:
-                if (
-                    other.get("category_scope") == cat_scope
-                    and other.get("naming_slot") == peer_slot
-                ):
+                other_scope = other.get("category_scope", [])
+                other_scope_set: set[str] = set(other_scope) if other_scope else set()
+                # Two affixes overlap if either is generic (empty scope) or they share at least one category.
+                share_category = (
+                    not cat_scope
+                    or not other_scope
+                    or bool(my_scope_set & other_scope_set)
+                )
+                if share_category and other.get("naming_slot") == peer_slot:
                     peer_affixes.append(other)
 
             if not peer_affixes:
@@ -359,19 +393,15 @@ class AffixSpec:
                     continue
                 for comb_a in my_combs:
                     for comb_b in peer_combs:
-                        merged_surface = (
-                            comb_a.get("surface_clue_ids", [])
-                            + comb_b.get("surface_clue_ids", [])
-                        )
-                        merged_hidden = (
-                            comb_a.get("hidden_clue_ids", [])
-                            + comb_b.get("hidden_clue_ids", [])
+                        merged_surface = comb_a.get(
+                            "surface_clue_ids", []
+                        ) + comb_b.get("surface_clue_ids", [])
+                        merged_hidden = comb_a.get("hidden_clue_ids", []) + comb_b.get(
+                            "hidden_clue_ids", []
                         )
                         label_a = comb_a.get("combination_id", "?")
                         label_b = comb_b.get("combination_id", "?")
-                        label = (
-                            f"cross-product {label_a} + {label_b}"
-                        )
+                        label = f"cross-product {label_a} + {label_b}"
                         xp_errors = _check_conflicts(
                             merged_surface,
                             merged_hidden,
