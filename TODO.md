@@ -18,10 +18,6 @@ Actionable line format: `[Scope] one sentence — [ref plans/<x>.md if any]`
 
 Preliminary concepts — bigger than a one-liner, but a single `###` sub-section says enough. Not necessarily actionable yet. One `###` heading per idea (nested under this `## Draft` so the section stays intact). When an idea outgrows its sub-section / becomes actionable / needs a stable link → move it into its own `dev/docs/plans/<x>.md` (`Status: Exploring`) and delete it here. Stale and never grew → just delete it.
 
-### Build Automation (tres Generation + Export Presets)
-
-One-press build flow covering the two release blockers from `dev/docs/visions/itchio_review.md`. (1) `data/tres/` is gitignored — all 250 `.tres` files (30 anchors / 184 clues / 12 categories / 4 cars / 6 lots / 4 super-categories / 5 attributes / 3 perks) exist only on disk, so a fresh clone loads zero resources and the game cannot boot; fix via a bootstrap script that runs the YAML pipeline to regenerate them (or un-gitignore the folder). (2) Export presets are not configured — no build can be produced at all. Fold both into one automated step: generate tres → export Windows + Linux builds.
-
 ### Director v2 — Highlight Target Component + Anchor Fill-to-Screen
 
 The Director's `_position_near_anchor` and `_update_dim_hole` assume anchors are bounded UI regions. When an anchor fills the screen (e.g. a full-viewport PanelContainer used as a layout root), the hole cutout covers everything and `_position_near_anchor` shoves the hint panel off-screen or into a corner.
@@ -212,6 +208,7 @@ One-line, no reasoning, no backing doc.
 - [refactor] ItemYaml - Refactor Yaml strcuture, so I can list all affix and clues situation in each categories
 
 - [bug] Unreveal clues should be unknown as ???
+- [bug] test button not show when toggle debug inside game
 
 ---
 

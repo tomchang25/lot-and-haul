@@ -18,8 +18,13 @@ static func load_by_id(dir_path: String, id_getter: Callable) -> Dictionary:
     dir.list_dir_begin()
     var file_name := dir.get_next()
     while file_name != "":
-        if not dir.current_is_dir() and file_name.ends_with(".tres"):
-            var res := load(dir_path + "/" + file_name) as Resource
+        if not dir.current_is_dir():
+            var resource_file_name := _resource_file_name(file_name)
+            if resource_file_name == "":
+                file_name = dir.get_next()
+                continue
+
+            var res := load(dir_path + "/" + resource_file_name) as Resource
             if res != null:
                 var id: String = id_getter.call(res)
                 if id != "":
@@ -28,3 +33,11 @@ static func load_by_id(dir_path: String, id_getter: Callable) -> Dictionary:
     dir.list_dir_end()
 
     return result
+
+
+static func _resource_file_name(file_name: String) -> String:
+    if file_name.ends_with(".tres"):
+        return file_name
+    if file_name.ends_with(".tres.remap"):
+        return file_name.trim_suffix(".remap")
+    return ""

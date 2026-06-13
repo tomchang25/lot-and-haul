@@ -2,6 +2,12 @@
 
 Append-only record of shipped work.
 
+## Web Export Build Flow
+
+- 2026-06-13 — [export] Web export preset added with `all_resources` packaging and `build/web/index.html` output for local and itch.io browser builds
+- 2026-06-13 — [dev] VS Code task added to serve the Web export from `build/web` at `localhost:8000`
+- 2026-06-13 — [fix] Resource directory loading now accepts exported `.tres.remap` entries so registry autoloads load designer resources from Web `.pck` builds
+
 ## Affix Generation System
 
 - 2026-06-13 — [feat] AffixData/AffixCombinationData designer resources with YAML pipeline, cross-product conflict validator, and AffixRegistry autoload

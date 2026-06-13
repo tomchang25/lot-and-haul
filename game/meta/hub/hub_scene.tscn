@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bhubscene0001"]
 
 [ext_resource type="Script" uid="uid://cpdf8haohlsir" path="res://game/meta/hub/hub_scene.gd" id="1_hubgd"]
-[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="HubScene" type="Control" unique_id=1000000001]
 layout_mode = 3
@@ -78,36 +78,36 @@ theme_override_constants/separation = 12
 alignment = 1
 
 [node name="NextRunButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000009]
-script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Auction  (Morning)"
+script = ExtResource("99_sfx")
 
 [node name="StorageButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000010]
-script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Storage  (work items)"
+script = ExtResource("99_sfx")
 
 [node name="MerchantButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000011]
-script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Open Shop"
+script = ExtResource("99_sfx")
 
 [node name="VehicleButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000012]
-script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Vehicle"
+script = ExtResource("99_sfx")
 
 [node name="KnowledgeButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000013]
-script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Knowledge"
+script = ExtResource("99_sfx")

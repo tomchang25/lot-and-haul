@@ -154,6 +154,24 @@
             "problemMatcher": []
         },
         {
+            "label": "Web Export: serve localhost:8000",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "http.server",
+                "8000",
+                "--directory",
+                "${workspaceFolder}/build/web"
+            ],
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "CI: unit tests",
             "type": "shell",
             "command": "godot_console",
