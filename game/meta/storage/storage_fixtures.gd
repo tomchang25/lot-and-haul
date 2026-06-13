@@ -24,9 +24,12 @@ static func seed_storage_state() -> void:
 
     for i in count:
         var anchor: AnchorData = anchors[i]
-        var surface_clues := _sample_clues(ClueData.ClueType.SURFACE, 2, rng)
-        var hidden_clues := _sample_clues(ClueData.ClueType.HIDDEN, 1, rng)
-        var entry := ItemEntry.from_generation(anchor, surface_clues, hidden_clues, anchor.category_data, [], [], rng)
+        var cat := anchor.category_data
+        if cat == null:
+            continue
+        var entry := ItemGenerator.draw(cat, { }, 2, 4, rng)
+        if entry == null:
+            continue
         entry.unveiled = true
         entry.auto_reveal_all_surface()
         entries.append(entry)
@@ -36,17 +39,3 @@ static func seed_storage_state() -> void:
 
     MetaManager.register_storage_items(entries)
     MetaManager.begin_storage_slot()
-
-
-## Returns up to [param max_count] clues of the given [param clue_type].
-static func _sample_clues(clue_type: ClueData.ClueType, max_count: int, rng: RandomNumberGenerator) -> Array[ClueData]:
-    var pool: Array[ClueData] = []
-    for clue: ClueData in ClueRegistry.get_all_clues():
-        if clue.type == clue_type:
-            pool.append(clue)
-    RandomUtils.shuffle(pool, rng)
-    var n := mini(max_count, pool.size())
-    var result: Array[ClueData] = []
-    for j in n:
-        result.append(pool[j])
-    return result

@@ -229,8 +229,8 @@ One-line, no reasoning, no backing doc.
 - [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
 - [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
 - [style] Standardize docstrings across all `.gd` files — file header + public function GDDoc format.
-- [] rewrite ItemEntry.from_generation
-- [] testbed items are all unkonwn items due to no affixes
+- [refactor] Collapse ItemGenerator/ItemEntry factory split — single `draw()` returns ItemEntry, delete GenerationResult and from_generation — see `dev/docs/plans/collapse_item_generator_factory.sketch.md`
+- [bug] Testbed - LocationAndRun items still always be the unknown item name
 
 ---
 

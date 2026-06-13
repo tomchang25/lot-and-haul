@@ -470,35 +470,6 @@ func unveil() -> bool:
 func apply_damage(ratio: float) -> void:
     condition = maxf(0.0, condition - ratio)
 
-# ══ Factory ═══════════════════════════════════════════════════════════════════
-
-
-## Creates an entry from pool-generated parts.
-## [param rng] — optional seedable RNG for deterministic generation.
-## When null, falls back to global rand*() calls.
-static func from_generation(
-        gen_anchor: AnchorData,
-        gen_surface: Array[ClueData],
-        gen_hidden: Array[ClueData],
-        gen_category: CategoryData,
-        gen_affixes: Array[AffixData] = [],
-        gen_combination_ids: Array[String] = [],
-        rng: RandomNumberGenerator = null,
-) -> ItemEntry:
-    var entry := ItemEntry.new()
-    entry.anchor = gen_anchor
-    entry.surface_clues = gen_surface
-    entry.hidden_clues = gen_hidden
-    entry.category_data = gen_category
-    entry.affixes = gen_affixes
-    entry.combination_ids = gen_combination_ids
-
-    entry.condition = rng.randf() if rng else randf()
-    entry.center_offset = rng.randf_range(-0.5, 0.5) if rng else randf_range(-0.5, 0.5)
-    entry.unveiled = false
-
-    return entry
-
 # ══ Serialization ═════════════════════════════════════════════════════════════
 
 

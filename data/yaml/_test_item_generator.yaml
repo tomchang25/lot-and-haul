@@ -1,0 +1,43 @@
+super_categories:
+  - super_category_id: test_super
+    display_name: Test
+
+categories:
+  - category_id: test_category
+    super_category: test_super
+    display_name: Test Category
+
+anchors:
+  - anchor_id: test_anchor_01
+    known_text: Test Box
+    category_scope: test_category
+    base_value: 100
+    shape_id: s1x1
+    weight_kg: 1.0
+    tier: 1
+
+clues:
+  - clue_id: test_surface_easy
+    known_text: Easy
+    type: surface
+    domain: test_category
+    attribute: appraisal
+    dc: 5
+    effect_op: add
+    effect_amount: 50
+  - clue_id: test_surface_hard
+    known_text: Hard
+    type: surface
+    domain: test_category
+    attribute: appraisal
+    dc: 19
+    effect_op: add
+    effect_amount: 100
+  - clue_id: test_hidden_gem
+    known_text: Hidden Gem
+    type: hidden
+    domain: test_category
+    attribute: investigation
+    dc: 15
+    effect_op: mul
+    effect_amount: 2.0

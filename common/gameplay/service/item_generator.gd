@@ -5,15 +5,6 @@
 class_name ItemGenerator
 extends RefCounted
 
-## Result of one generate call. All arrays are owned by the caller.
-class GenerationResult extends RefCounted:
-    var anchor: AnchorData = null
-    var surface_clues: Array[ClueData] = []
-    var hidden_clues: Array[ClueData] = []
-    var affixes: Array[AffixData] = []
-    var combination_ids: Array[String] = []
-
-
 ## Draws one item from the reversed draw order:
 ##   category → anchor → affixes (0–1 prefix + 0–1 suffix)
 ##   → one weighted combination per affix → that combination's clues.
@@ -23,41 +14,53 @@ class GenerationResult extends RefCounted:
 ##
 ## [param rng] — optional seedable RNG for deterministic generation.
 ## When null, creates a fresh randomized RNG (production path).
-## Returns a GenerationResult (null anchor means the slot should be skipped).
+## Returns a fully-formed ItemEntry (null anchor means the slot should be skipped).
 static func draw(
         category: CategoryData,
         tier_weights: Dictionary,
         surface_min: int,
         surface_max: int,
         rng: RandomNumberGenerator = null,
-) -> GenerationResult:
+) -> ItemEntry:
     var resolved_rng := rng
     if resolved_rng == null:
         resolved_rng = RandomNumberGenerator.new()
         resolved_rng.randomize()
 
-    var result := GenerationResult.new()
-
     # ── 1. Anchor ────────────────────────────────────────────────────────
-    result.anchor = _draw_anchor(category, tier_weights, resolved_rng)
-    if result.anchor == null:
-        return result
+    var anchor := _draw_anchor(category, tier_weights, resolved_rng)
+    if anchor == null:
+        return null
 
     # ── 2. Affixes ────────────────────────────────────────────────────────
-    result.affixes = _draw_affixes(category, resolved_rng)
+    var affixes := _draw_affixes(category, resolved_rng)
+
+    var surface_clues: Array[ClueData] = []
+    var hidden_clues: Array[ClueData] = []
+    var combination_ids: Array[String] = []
 
     # ── 3. Combinations → clues ──────────────────────────────────────────
-    if not result.affixes.is_empty():
-        for affix: AffixData in result.affixes:
+    if not affixes.is_empty():
+        for affix: AffixData in affixes:
             var combination := _pick_combination(affix, resolved_rng)
             if combination == null:
                 continue
-            result.combination_ids.append(combination.combination_id)
-            result.surface_clues.append_array(combination.surface_clues)
-            result.hidden_clues.append_array(combination.hidden_clues)
+            combination_ids.append(combination.combination_id)
+            surface_clues.append_array(combination.surface_clues)
+            hidden_clues.append_array(combination.hidden_clues)
 
         # ── 3b. Draw-time conflict insurance ──────────────────────────
-        result = _resolve_conflicts(result, resolved_rng)
+        var resolved := _resolve_conflicts(
+            affixes,
+            combination_ids,
+            surface_clues,
+            hidden_clues,
+            resolved_rng,
+        )
+        affixes = resolved.affixes
+        combination_ids = resolved.combination_ids
+        surface_clues = resolved.surface_clues
+        hidden_clues = resolved.hidden_clues
     else:
         # ── 4. Plain-item baseline ────────────────────────────────────
         var surface_count := clampi(
@@ -65,10 +68,20 @@ static func draw(
             1,
             8,
         )
-        result.surface_clues = _draw_surface_clues(category, surface_count, resolved_rng)
-        # No hidden clues for plain items.
+        surface_clues = _draw_surface_clues(category, surface_count, resolved_rng)
 
-    return result
+    # ── 5. Assemble ItemEntry ─────────────────────────────────────────
+    var entry := ItemEntry.new()
+    entry.anchor = anchor
+    entry.surface_clues = surface_clues
+    entry.hidden_clues = hidden_clues
+    entry.category_data = category
+    entry.affixes = affixes
+    entry.combination_ids = combination_ids
+    entry.condition = resolved_rng.randf()
+    entry.center_offset = resolved_rng.randf_range(-0.5, 0.5)
+    entry.unveiled = false
+    return entry
 
 
 ## Picks an anchor for [param category] using [param tier_weights].
@@ -222,36 +235,51 @@ static func _pick_combination(affix: AffixData, rng: RandomNumberGenerator) -> A
 ##
 ## This should never fire on shipped data (the build-time validator catches
 ## all cross-product conflicts). It exists for un-revalidated/drifted data.
-static func _resolve_conflicts(result: GenerationResult, rng: RandomNumberGenerator) -> GenerationResult:
-    var surface_clues: Array[ClueData] = result.surface_clues
-    var hidden_clues: Array[ClueData] = result.hidden_clues
-
+##
+## Returns a Dictionary with keys: affixes, combination_ids, surface_clues, hidden_clues.
+static func _resolve_conflicts(
+        affixes: Array[AffixData],
+        combination_ids: Array[String],
+        surface_clues: Array[ClueData],
+        hidden_clues: Array[ClueData],
+        rng: RandomNumberGenerator,
+) -> Dictionary:
     var conflict = _find_first_conflict(surface_clues, hidden_clues)
     if conflict == null:
-        return result
+        return {
+            affixes = affixes,
+            combination_ids = combination_ids,
+            surface_clues = surface_clues,
+            hidden_clues = hidden_clues,
+        }
 
     ToastManager.show_error(
         "ItemGenerator: draw-time conflict at affix %s: %s"
-        % [result.combination_ids, conflict],
+        % [combination_ids, conflict],
     )
+
+    var affixes_out: Array[AffixData] = affixes.duplicate()
+    var combination_ids_out: Array[String] = combination_ids.duplicate()
+    var surface_clues_out: Array[ClueData] = surface_clues.duplicate()
+    var hidden_clues_out: Array[ClueData] = hidden_clues.duplicate()
 
     # Attempt 1: re-pick a combination for each affix in order.
     var max_retries := 5
     for attempt in range(max_retries):
-        for affix_idx in range(result.affixes.size()):
-            var affix: AffixData = result.affixes[affix_idx]
+        for affix_idx in range(affixes_out.size()):
+            var affix: AffixData = affixes_out[affix_idx]
             var new_comb := _pick_combination(affix, rng)
             if new_comb == null:
                 continue
-            if new_comb.combination_id == result.combination_ids[affix_idx]:
+            if new_comb.combination_id == combination_ids_out[affix_idx]:
                 continue
 
             # Build merged set with this replacement
             var try_surface: Array[ClueData] = []
             var try_hidden: Array[ClueData] = []
-            for j in range(result.affixes.size()):
-                var combo_affix: AffixData = result.affixes[j]
-                var comb_id: String = result.combination_ids[j] if j != affix_idx else new_comb.combination_id
+            for j in range(affixes_out.size()):
+                var combo_affix: AffixData = affixes_out[j]
+                var comb_id: String = combination_ids_out[j] if j != affix_idx else new_comb.combination_id
                 var comb := _find_combination(combo_affix, comb_id)
                 if comb == null:
                     continue
@@ -263,19 +291,24 @@ static func _resolve_conflicts(result: GenerationResult, rng: RandomNumberGenera
                     try_hidden.append_array(comb.hidden_clues)
 
             if _find_first_conflict(try_surface, try_hidden) == null:
-                result.combination_ids[affix_idx] = new_comb.combination_id
-                result.surface_clues = try_surface
-                result.hidden_clues = try_hidden
-                return result
+                combination_ids_out[affix_idx] = new_comb.combination_id
+                surface_clues_out = try_surface
+                hidden_clues_out = try_hidden
+                return {
+                    affixes = affixes_out,
+                    combination_ids = combination_ids_out,
+                    surface_clues = surface_clues_out,
+                    hidden_clues = hidden_clues_out,
+                }
 
     # Attempt 2: drop one affix entirely.
-    if result.affixes.size() > 1:
+    if affixes_out.size() > 1:
         # Pick the affix that keeps the item closest to the intended clue count.
         var scores: Array[int] = []
-        for affix_idx in range(result.affixes.size()):
+        for affix_idx in range(affixes_out.size()):
             var comb := _find_combination(
-                result.affixes[affix_idx],
-                result.combination_ids[affix_idx],
+                affixes_out[affix_idx],
+                combination_ids_out[affix_idx],
             )
             scores.append(
                 (comb.surface_clues.size() + comb.hidden_clues.size()) if comb != null else 0,
@@ -287,26 +320,32 @@ static func _resolve_conflicts(result: GenerationResult, rng: RandomNumberGenera
                 best_score = scores[idx]
                 best_idx = idx
         var kept_comb := _find_combination(
-            result.affixes[best_idx],
-            result.combination_ids[best_idx],
+            affixes_out[best_idx],
+            combination_ids_out[best_idx],
         )
         if kept_comb != null:
-            result.surface_clues = kept_comb.surface_clues.duplicate()
-            result.hidden_clues = kept_comb.hidden_clues.duplicate()
+            surface_clues_out = kept_comb.surface_clues.duplicate()
+            hidden_clues_out = kept_comb.hidden_clues.duplicate()
         else:
-            result.surface_clues = []
-            result.hidden_clues = []
-        result.affixes = [result.affixes[best_idx]]
-        result.combination_ids = [result.combination_ids[best_idx]]
-        return result
+            surface_clues_out = []
+            hidden_clues_out = []
+        affixes_out = [affixes_out[best_idx]]
+        combination_ids_out = [combination_ids_out[best_idx]]
+        return {
+            affixes = affixes_out,
+            combination_ids = combination_ids_out,
+            surface_clues = surface_clues_out,
+            hidden_clues = hidden_clues_out,
+        }
 
     # Last resort: return plain-item baseline (empty clues).
     ToastManager.show_dev_error("ItemGenerator: could not resolve affix conflict — falling back to plain item")
-    result.affixes = []
-    result.combination_ids = []
-    result.surface_clues = []
-    result.hidden_clues = []
-    return result
+    return {
+        affixes = [],
+        combination_ids = [],
+        surface_clues = [],
+        hidden_clues = [],
+    }
 
 
 ## Returns the first conflict description string, or null if no conflict.
