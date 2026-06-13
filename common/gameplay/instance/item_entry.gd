@@ -23,6 +23,15 @@ var surface_clues: Array[ClueData] = []
 var hidden_clues: Array[ClueData] = []
 var category_data: CategoryData = null
 
+## Affixes assigned to this item at generation time. The affix set is the
+## primary index for item naming (Spec B) and the knowledge dictionary (Spec C).
+## Sourced from the affix draw; empty for plain items.
+var affixes: Array[AffixData] = []
+
+## The combination_id drawn for each affix, in the same order as [member affixes].
+## Empty for plain items or when no affix was drawn.
+var combination_ids: Array[String] = []
+
 ## True once the player has unveiled this item (revealed which anchor variant it is).
 ## Veiled items show only their cargo shape and weight; all identity data is masked.
 ## This is the sole authority for veil state — use is_veiled() to read it.
@@ -118,17 +127,16 @@ func fit_tags() -> Array[String]:
     return tags
 
 
-## Clues and the anchor that contribute to display_name composition.
-## The anchor is included when unveiled; surface/hidden clues when in revealed_clue_ids.
+## Anchor and affixes that contribute to display_name composition.
+## The anchor is included when unveiled; affixes when unveiled.
 func get_naming_clue_pool() -> Array:
-    # Returns a mixed array of AnchorData and ClueData entries that participate in naming.
     var result: Array = []
     var eff_anchor := _get_anchor()
     if unveiled and eff_anchor != null:
         result.append(eff_anchor)
-    for clue: ClueData in all_clues:
-        if clue.clue_id in revealed_clue_ids:
-            result.append(clue)
+    if unveiled:
+        for affix: AffixData in affixes:
+            result.append(affix)
     return result
 
 
@@ -462,31 +470,6 @@ func unveil() -> bool:
 func apply_damage(ratio: float) -> void:
     condition = maxf(0.0, condition - ratio)
 
-# ══ Factory ═══════════════════════════════════════════════════════════════════
-
-
-## Creates an entry from pool-generated parts.
-## [param rng] — optional seedable RNG for deterministic generation.
-## When null, falls back to global rand*() calls.
-static func from_generation(
-        gen_anchor: AnchorData,
-        gen_surface: Array[ClueData],
-        gen_hidden: Array[ClueData],
-        gen_category: CategoryData,
-        rng: RandomNumberGenerator = null,
-) -> ItemEntry:
-    var entry := ItemEntry.new()
-    entry.anchor = gen_anchor
-    entry.surface_clues = gen_surface
-    entry.hidden_clues = gen_hidden
-    entry.category_data = gen_category
-
-    entry.condition = rng.randf() if rng else randf()
-    entry.center_offset = rng.randf_range(-0.5, 0.5) if rng else randf_range(-0.5, 0.5)
-    entry.unveiled = false
-
-    return entry
-
 # ══ Serialization ═════════════════════════════════════════════════════════════
 
 
@@ -502,11 +485,17 @@ func to_dict() -> Dictionary:
         "surface_ids": [],
         "hidden_ids": [],
         "category_id": _get_category_data().category_id if _get_category_data() != null else "",
+        "affix_ids": [],
+        "combination_ids": [],
     }
     for c: ClueData in _get_surface_clues():
         d["surface_ids"].append(c.clue_id)
     for c: ClueData in _get_hidden_clues():
         d["hidden_ids"].append(c.clue_id)
+    for a: AffixData in affixes:
+        d["affix_ids"].append(a.affix_id)
+    for cid: String in combination_ids:
+        d["combination_ids"].append(cid)
     return d
 
 
@@ -538,6 +527,16 @@ static func from_dict(d: Dictionary, ctx: SaveLoadContext) -> ItemEntry:
     var cat_id: String = d.get("category_id", "")
     if not cat_id.is_empty():
         entry.category_data = CategoryRegistry.get_category_by_id(cat_id)
+
+    # Affix state (post-generation affix references; empty for pre-affix saves).
+    for raw_aid: Variant in d.get("affix_ids", []):
+        var affix_obj := AffixRegistry.get_affix_by_id(String(raw_aid))
+        if affix_obj != null:
+            entry.affixes.append(affix_obj)
+        else:
+            ctx.info("affix '%s' not found on load — dropped" % raw_aid)
+    for cid: Variant in d.get("combination_ids", []):
+        entry.combination_ids.append(String(cid))
 
     # Common fields
     entry.unveiled = bool(d.get("unveiled", false))

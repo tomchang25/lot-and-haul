@@ -11,10 +11,6 @@ extends Resource
 # Display text; always the default body naming slot when unveiled.
 @export var known_text: String = ""
 
-# Compared against hidden body-naming clues for displacement.
-# Same-priority ties resolve anchor → surface list order → hidden list order.
-@export var naming_priority: int = 1
-
 # The category this anchor variant belongs to (pool scope for the future generator).
 @export var category_data: CategoryData = null
 

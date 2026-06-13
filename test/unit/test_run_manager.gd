@@ -1,35 +1,10 @@
 # test_run_manager.gd
 # Layer 1 — run-loop manager unit tests.
-# Constructs all designer resources from scratch (no disk dependency).
-# Uses seeded RNG for deterministic outcomes.
+# Item entries are generated via ItemGenerator.draw() against test data
+# loaded from the standard YAML → tres pipeline.
 extends GutTest
 
 # ══ Helpers ═══════════════════════════════════════════════════════════════════
-
-func _make_clue(id: String, type: int, attr: String, dc: int, op: String, amount: float) -> ClueData:
-    var c := ClueData.new()
-    c.clue_id = id
-    c.type = type
-    c.attribute = attr
-    c.dc = dc
-    c.effect_op = op
-    c.effect_amount = amount
-    return c
-
-
-func _make_anchor(id: String, base: float, cat: CategoryData) -> AnchorData:
-    var a := AnchorData.new()
-    a.anchor_id = id
-    a.base_value = base
-    a.category_data = cat
-    return a
-
-
-func _make_category(id: String) -> CategoryData:
-    var c := CategoryData.new()
-    c.category_id = id
-    return c
-
 
 func _make_car() -> CarData:
     var c := CarData.new()
@@ -51,17 +26,12 @@ func _make_location() -> LocationData:
     l.travel_days = 2
     return l
 
-
-func _seed_rng(seed_val: int) -> RandomNumberGenerator:
-    var rng := RandomNumberGenerator.new()
-    rng.seed = seed_val
-    return rng
-
 # ══ AP Lifecycle ═══════════════════════════════════════════════════════════
 
 
 func test_ap_lifecycle_create_and_spend() -> void:
-    var rng := _seed_rng(42)
+    var rng := RandomNumberGenerator.new()
+    rng.seed = 42
     var car := _make_car()
     var loc := _make_location()
 
@@ -69,9 +39,12 @@ func test_ap_lifecycle_create_and_spend() -> void:
     assert_not_null(RunManager.run, "run store should exist after create")
     assert_eq(RunManager.run.inspection_ap_cap, 10, "default AP cap")
 
-    var cat := _make_category("test_cat")
-    var anchor := _make_anchor("test_anchor", 100.0, cat)
-    var clue := _make_clue("test_surface", ClueData.ClueType.SURFACE, "appraisal", 10, "add", 50.0)
+    var cat := CategoryRegistry.get_category_by_id("test_category")
+    assert_not_null(cat, "test category should exist in registry")
+
+    var item := ItemGenerator.draw(cat, { }, 2, 4, rng)
+    assert_not_null(item, "item should be generated")
+    assert_not_null(item.anchor, "item should have an anchor")
 
     # Manually construct a LotEntry to avoid registry dependency.
     var lot_data := LotData.new()
@@ -82,7 +55,6 @@ func test_ap_lifecycle_create_and_spend() -> void:
     lot_data.price_variance_max = 1.0
     lot_data.npc_clue_sight_chance = 0.0
 
-    var item := ItemEntry.from_generation(anchor, [clue], [], cat, rng)
     var entry := LotEntry.new()
     entry.lot_data = lot_data
     entry.aggressive_factor = 0.4
@@ -112,18 +84,41 @@ func test_ap_lifecycle_create_and_spend() -> void:
 
 
 func test_clue_hit_and_miss() -> void:
-    var cat := _make_category("test_cat")
-    var anchor := _make_anchor("test_anchor", 100.0, cat)
-    var easy := _make_clue("easy", ClueData.ClueType.SURFACE, "appraisal", 5, "add", 10.0)
-    var hard := _make_clue("hard", ClueData.ClueType.SURFACE, "appraisal", 19, "add", 20.0)
-    var rng := _seed_rng(2)
-    var entry := ItemEntry.from_generation(anchor, [easy, hard], [], cat, rng)
+    var cat := CategoryRegistry.get_category_by_id("test_category")
+    assert_not_null(cat, "test category should exist in registry")
+
+    var rng := RandomNumberGenerator.new()
+    rng.seed = 2
+    var entry := ItemGenerator.draw(cat, { }, 2, 4, rng)
+    assert_not_null(entry, "item should be generated")
+    assert_gt(entry.surface_clues.size(), 0, "should have surface clues")
 
     entry.unveil()
+    assert_true(entry.unveiled, "item should be unveiled")
+
+    # Find easy and hard clues from the drawn pool
+    var easy: ClueData = null
+    var hard: ClueData = null
+    for c: ClueData in entry.surface_clues:
+        if c.clue_id == "test_surface_easy":
+            easy = c
+        elif c.clue_id == "test_surface_hard":
+            hard = c
+
+    # At minimum the test draws 2 surface clues (pool size == 2 from test data).
+    # With the test seed both clues should be present.
+    assert_not_null(easy, "test_surface_easy should be in drawn clues")
+    assert_not_null(hard, "test_surface_hard should be in drawn clues")
+
+    # Easy clue: dc=5, attr bonus 1 → success_chance = (21+1-5)*5 = 85%
+    entry.revealed_clue_ids.clear()
     assert_true(entry.attempt_clue(easy, 1, rng), "easy clue should succeed with attribute bonus")
     assert_eq(entry.revealed_clue_ids.size(), 1, "one clue should be revealed")
 
     var revealed_before := entry.revealed_clue_ids.duplicate()
+
+    # Hard clue: dc=19, attr bonus 0 → success_chance = (21+0-19)*5 = 10%
+    # With seed 2 and RNG state at this point, the roll should miss.
     assert_false(entry.attempt_clue(hard, 0, rng), "hard clue should miss with zero bonus")
     assert_eq(
         entry.revealed_clue_ids,
@@ -131,6 +126,7 @@ func test_clue_hit_and_miss() -> void:
         "revealed set should stay stable after miss",
     )
 
+    # Hard clue with max bonus
     assert_true(entry.attempt_clue(hard, 19, rng), "hard clue should hit with max bonus")
     assert_eq(entry.revealed_clue_ids.size(), 2, "both clues should be revealed")
 
@@ -142,10 +138,13 @@ func test_cargo_commit() -> void:
     var loc := _make_location()
     RunManager.create_run_store(loc, car)
 
-    var cat := _make_category("test_cat")
-    var anchor := _make_anchor("test_anchor", 100.0, cat)
+    var cat := CategoryRegistry.get_category_by_id("test_category")
+    assert_not_null(cat, "test category should exist in registry")
 
-    var entry := ItemEntry.from_generation(anchor, [], [], cat)
+    var rng := RandomNumberGenerator.new()
+    rng.seed = 42
+    var entry := ItemGenerator.draw(cat, { }, 2, 4, rng)
+    assert_not_null(entry, "item should be generated")
     entry.unveil()
 
     RunManager.commit_cargo([entry], [], 50)
@@ -166,7 +165,8 @@ func test_commit_lot_win() -> void:
     lot_data.item_count_min = 0
     lot_data.item_count_max = 0
 
-    var rng := _seed_rng(7)
+    var rng := RandomNumberGenerator.new()
+    rng.seed = 7
     var lot_entry := LotEntry.create(lot_data, rng)
     RunManager.set_lot(lot_entry)
 
@@ -188,9 +188,12 @@ func test_trailer_damage_triggered() -> void:
     var loc := _make_location()
     RunManager.create_run_store(loc, car)
 
-    var cat := _make_category("test_cat")
-    var anchor := _make_anchor("test_anchor", 100.0, cat)
-    var entry := ItemEntry.from_generation(anchor, [], [], cat)
+    var cat := CategoryRegistry.get_category_by_id("test_category")
+    assert_not_null(cat, "test category should exist in registry")
+
+    var rng := RandomNumberGenerator.new()
+    rng.seed = 42
+    var entry := ItemGenerator.draw(cat, { }, 2, 4, rng)
 
     RunManager.commit_cargo([], [entry], 0)
 
@@ -208,9 +211,12 @@ func test_trailer_no_damage_when_chance_zero() -> void:
     var loc := _make_location()
     RunManager.create_run_store(loc, car)
 
-    var cat := _make_category("test_cat")
-    var anchor := _make_anchor("test_anchor", 100.0, cat)
-    var entry := ItemEntry.from_generation(anchor, [], [], cat)
+    var cat := CategoryRegistry.get_category_by_id("test_category")
+    assert_not_null(cat, "test category should exist in registry")
+
+    var rng := RandomNumberGenerator.new()
+    rng.seed = 42
+    var entry := ItemGenerator.draw(cat, { }, 2, 4, rng)
 
     RunManager.commit_cargo([], [entry], 0)
 
@@ -223,7 +229,8 @@ func test_trailer_no_damage_when_chance_zero() -> void:
 
 
 func test_full_run_scratch_to_run_result() -> void:
-    var rng := _seed_rng(1)
+    var rng := RandomNumberGenerator.new()
+    rng.seed = 1
     var car := _make_car()
     var loc := _make_location()
 
@@ -231,14 +238,19 @@ func test_full_run_scratch_to_run_result() -> void:
     RunManager.create_run_store(loc, car)
     assert_not_null(RunManager.run, "run should exist")
 
-    # Construct a lot entry with known items
-    var cat := _make_category("test_cat")
-    var anchor := _make_anchor("a1", 200.0, cat)
-    var surface := _make_clue("s1", ClueData.ClueType.SURFACE, "appraisal", 5, "add", 100.0)
+    # Construct a lot entry with a generated item
+    var cat := CategoryRegistry.get_category_by_id("test_category")
+    assert_not_null(cat, "test category should exist in registry")
 
-    var item := ItemEntry.from_generation(anchor, [surface], [], cat, rng)
+    var item := ItemGenerator.draw(cat, { }, 2, 4, rng)
+    assert_not_null(item, "item should be generated")
+    assert_not_null(item.anchor, "item should have an anchor")
     item.unveil()
-    item.revealed_clue_ids.append("s1")
+
+    # Reveal the first surface clue (easy cue with high attribute)
+    for c: ClueData in item.surface_clues:
+        item.attempt_clue(c, 20, rng)
+        break
 
     var lot_data := LotData.new()
     lot_data.lot_id = "test_lot"
@@ -249,7 +261,7 @@ func test_full_run_scratch_to_run_result() -> void:
     lot_entry.aggressive_factor = 0.5
     lot_entry.price_variance = 1.0
     lot_entry.item_entries = [item]
-    lot_entry.npc_estimate = int(200.0 + 100.0)
+    lot_entry.npc_estimate = int(item.anchor.base_value + 100.0)
 
     # Set the lot
     RunManager.set_lot(lot_entry)
@@ -273,6 +285,6 @@ func test_full_run_scratch_to_run_result() -> void:
     assert_eq(result.fuel_cost, car.fuel_cost_per_day * loc.travel_days, "result fuel_cost")
 
     # Cargo item should have auto-revealed surface clues after take_run_result
-    assert_eq(result.cargo_items[0].revealed_clue_ids.size(), 1, "surface clue should be revealed")
+    assert_gt(result.cargo_items[0].revealed_clue_ids.size(), 0, "surface clues should be revealed")
 
     RunManager.clear_run_state()

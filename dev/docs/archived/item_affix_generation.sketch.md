@@ -74,8 +74,8 @@ New `data/definitions/affix_data.gd` (`AffixData extends Resource`), authored in
 affix_id: String              # "suspicious"
 naming_slot: String           # "prefix" | "suffix"  (anchor stays the body)
 display_name: String          # "Suspicious"
-category_scope: Array[String] # category_ids this affix can attach to ("" = generic)
-rarity_weight: int            # how often this affix appears at all (sparse by default)
+category_scope: Array[String] # category_ids this affix can attach to ([] = generic)
+weight: int                  # how often this affix appears at all (sparse by default)
 combinations: Array[AffixCombination]
 
 # AffixCombination (inner resource or sub-dict)
@@ -106,7 +106,7 @@ func draw(category, tier_weights, rarity_weights, ..., rng):
 
 **Capacity vs. draw policy are separate concerns.** The data model and naming composer must support an *arbitrary* number of prefixes and suffixes on one item (e.g. 3 suffixes + 2 prefixes) — `result.affixes` is an unbounded list and the name composer concatenates however many it's handed. The *generation* policy is the throttle: for now `_draw_affixes` draws **at most 0–1 prefix and 0–1 suffix** (so an item has zero, one, or at most two affixes), kept sparse. Widening the draw to multi-affix items later is a policy change in `_draw_affixes` alone — the schema, composer, and dictionary need no change.
 
-**Hidden clues and rarity become downstream of the combination.** Today hidden clues are drawn independently by a rarity roll (`_pick_rarity` over a `rarity_weights` table, then `_draw_hidden_clues(count)`), and `ItemEntry.rarity` is defined as the hidden-clue count. Under the affix model, hidden clues arrive *only* from drawn combinations, so that whole rarity-roll path is **retired** for generation: a plain (no-affix) item carries no hidden clues and is therefore always the lowest rarity, while an affixed item's rarity falls out of how many hidden clues its combination(s) carry. The `rarity` mechanism itself (count → tier) is unchanged; only its *source* moves. Affix appearance frequency is governed by each affix's own `rarity_weight` and is global for now — lot-level biasing of affix frequency (the old role of `LotData.rarity_weights`) is out of scope for the playtest cut.
+**Hidden clues and rarity become downstream of the combination.** Today hidden clues are drawn independently by a rarity roll (`_pick_rarity` over a `rarity_weights` table, then `_draw_hidden_clues(count)`), and `ItemEntry.rarity` is defined as the hidden-clue count. Under the affix model, hidden clues arrive *only* from drawn combinations, so that whole rarity-roll path is **retired** for generation: a plain (no-affix) item carries no hidden clues and is therefore always the lowest rarity, while an affixed item's rarity falls out of how many hidden clues its combination(s) carry. The `rarity` mechanism itself (count → tier) is unchanged; only its *source* moves. Affix appearance frequency is governed by each affix's own `weight` and is global for now — lot-level biasing of affix frequency (the old role of `LotData.rarity_weights`) is out of scope for the playtest cut.
 
 **Conflict handling at draw time is insurance, not the guarantee.** There is no affix-level `exclusive_group` — conflicts are owned entirely by the clue layer (see Design). The validator is exhaustive, so a green build can never *draw* a conflicting pair. The draw-time check is belt-and-suspenders against shipping without re-running the validator or against data drift: after merging the two affixes' clues, if any clue-level `exclusive_group` is doubled (or two overrides collide), **re-pick one affix's combination or drop an affix** — never strip an individual clue, which would corrupt that combination's meaning (its dictionary slot, its surface/hidden balance).
 

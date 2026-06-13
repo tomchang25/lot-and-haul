@@ -54,24 +54,20 @@ static func create(data: LotData, rng: RandomNumberGenerator = null) -> LotEntry
         if category == null:
             continue
 
-        var result := ItemGenerator.draw(
+        var item_entry := ItemGenerator.draw(
             category,
             data.tier_weights,
-            data.rarity_weights,
             Economy.SURFACE_CLUE_MIN,
             Economy.SURFACE_CLUE_MAX,
             rng,
         )
-        if result.anchor == null:
+        if item_entry == null:
+            ToastManager.show_dev_error(
+                "LotEntry.create: ItemGenerator returned null for category '%s' (no eligible anchor?) — slot skipped"
+                % category.category_id,
+            )
             continue
 
-        var item_entry := ItemEntry.from_generation(
-            result.anchor,
-            result.surface_clues,
-            result.hidden_clues,
-            category,
-            rng,
-        )
         # Roll veiled_chance: each item independently starts pre-unveiled
         # when randf() > veiled_chance. Set unveiled directly —
         # no XP granted for system-level pre-unveils.

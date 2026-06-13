@@ -113,6 +113,10 @@ class TresWriter:
         refs = ", ".join(f'SubResource("{s}")' for s in sub_ids)
         self._resource_fields.append(f"{key} = [{refs}]")
 
+    def add_field_str_array(self, key: str, values: list[str]) -> None:
+        items = ", ".join(f'"{v}"' for v in values)
+        self._resource_fields.append(f"{key} = Array[String]([{items}])")
+
     def add_field_dict(self, key: str, d: dict) -> None:
         self._resource_fields.append(f"{key} = {format_dict(d)}")
 

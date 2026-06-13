@@ -16,13 +16,6 @@ enum ClueType { SURFACE, HIDDEN }
 # Text shown when this clue has been revealed.
 @export var known_text: String = ""
 
-# Optional naming slot for display name composition.
-# "" = no naming participation, "prefix" = prepended, "body" = core, "suffix" = appended.
-@export var naming_slot: String = ""
-
-# Higher priority wins for the same slot. Ties resolved by surface/hidden list order.
-@export var naming_priority: int = 0
-
 # Controls which reveal mechanic applies to this clue.
 @export var type: ClueType = ClueType.SURFACE
 

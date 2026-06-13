@@ -51,6 +51,10 @@ DialogManager, a shared overlay autoload, data-driven from the start — linear 
 
 `PerkData` has no type/kind field — all perks are identical resources. Split into `GATE` perks (content access, checked via `required_perk` on resources) and `EFFECT` perks (formula modifiers: keen_eye → inspection bonus, rarity_affinity → price, quick_study → XP gain). Wire effect perks into actual formulas — `perk_effects.gd` is currently a stub.
 
+### Rarity Generation after Affix Refactor
+
+`LotData.rarity_weights` is still authored in lot YAML and shown on lot cards, but `ItemGenerator.draw()` no longer reads it. Rarity now falls out of the generated item's hidden clue count, which is currently determined by selected affix combinations. Decide whether rarity should become an affix/combo authoring outcome or remain a lot-level draw constraint, then align lot UI, data authoring, storage costs, XP, sorting, and color tuning.
+
 ### Image v3 — Lot & Scene Decoration
 
 Lot card decoration with a random icon/badge per lot. Phase-dependent decoration: worker loading truck in cargo, auctioneer gavel in auction, etc. Needs an asset pipeline — blocked on visual direction.
@@ -207,8 +211,6 @@ Flows currently being built or ready to implement — may hold more than one ent
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
 - [robustness] Atomic save writes, hard boot-guard on empty registries, migration scaffolds, run-state guards, price/save/migration tests — see `dev/docs/plans/robustness_hardening.sketch.md`
-- [affix_items] Affix generation core (name→clues reversal, generator + resources + validator); playtest-build blocker — see `dev/docs/plans/item_affix_generation_core.spec.md` (design: `item_affix_generation.sketch.md`)
-- [affix_items] Affix-only naming (full removal of per-clue/anchor naming), depends on the core spec — see `dev/docs/plans/item_affix_naming.spec.md`
 - [simple-demo] Stage 1 tutorial split out to the Simple Tutorial draft; Director skeleton + Dialog remain surviving subsystems
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 - [dev/auto-auction] Debug-only quick-win buttons: instant player win at opening bid or rolled price (skip NPC bidding loop; rolled path seeds future auto-bid perk) — see `dev/docs/plans/debug_auto_auction.md`
@@ -226,10 +228,16 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 One-line, no reasoning, no backing doc.
 
-- [data] Display name of clues need more diversity of priority, and might need a baseline of priority(from op value?)
 - [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
 - [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
 - [style] Standardize docstrings across all `.gd` files — file header + public function GDDoc format.
+- [debug] Add an debug button in Hub to sell all items in storage
+- [debug] Add an debug button in Hub to add random item
+- [debug] Add Debug Overlay that use debug button in hub to toggle?
+  ​
+- [refactor] ItemYaml - Refactor Yaml strcuture, so I can list all affix and clues situation in each categories
+
+- [bug] Unreveal clues should be unknown as ???
 
 ---
 
