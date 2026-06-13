@@ -18,57 +18,33 @@ const PRICE_UNKNOWN_COLOR := Color(0.6, 0.6, 0.6)
 
 static func display_name(entry: ItemEntry) -> String:
     var pool := entry.get_naming_clue_pool()
-    var best_prefix_text: String = ""
-    var best_prefix_prio: int = -1
-    var best_body_text: String = ""
-    var best_body_prio: int = -1
-    var best_suffix_text: String = ""
-    var best_suffix_prio: int = -1
+    var prefixes: Array[String] = []
+    var body_text: String = ""
+    var suffixes: Array[String] = []
 
     for pool_entry in pool:
-        var slot: String
-        var priority: int
-        var text: String
         if pool_entry is AnchorData:
-            slot = "body"
-            priority = (pool_entry as AnchorData).naming_priority
-            text = (pool_entry as AnchorData).known_text
-        elif pool_entry is ClueData:
-            slot = (pool_entry as ClueData).naming_slot
-            priority = (pool_entry as ClueData).naming_priority
-            text = (pool_entry as ClueData).known_text
-        else:
-            continue
-        if slot.is_empty():
-            continue
-        match slot:
-            "prefix":
-                if priority > best_prefix_prio:
-                    best_prefix_prio = priority
-                    best_prefix_text = text
-            "body":
-                if priority > best_body_prio:
-                    best_body_prio = priority
-                    best_body_text = text
-            "suffix":
-                if priority > best_suffix_prio:
-                    best_suffix_prio = priority
-                    best_suffix_text = text
+            body_text = (pool_entry as AnchorData).known_text
+        elif pool_entry is AffixData:
+            var affix := pool_entry as AffixData
+            match affix.naming_slot:
+                "prefix":
+                    prefixes.append(affix.display_name)
+                "suffix":
+                    suffixes.append(affix.display_name)
 
     var parts: Array[String] = []
-    if not best_prefix_text.is_empty():
-        parts.append(best_prefix_text)
-    if not best_body_text.is_empty():
-        parts.append(best_body_text)
-    if not best_suffix_text.is_empty():
-        parts.append(best_suffix_text)
+    parts.append_array(prefixes)
+    if not body_text.is_empty():
+        parts.append(body_text)
+    parts.append_array(suffixes)
 
     if parts.is_empty():
         return "Unknown Item"
 
-    var has_qualifier := (not best_prefix_text.is_empty() or not best_suffix_text.is_empty())
-    if not has_qualifier and not best_body_text.is_empty():
-        return "Unknown " + best_body_text
+    var has_qualifier := (not prefixes.is_empty() or not suffixes.is_empty())
+    if not has_qualifier and not body_text.is_empty():
+        return "Unknown " + body_text
 
     return " ".join(parts)
 

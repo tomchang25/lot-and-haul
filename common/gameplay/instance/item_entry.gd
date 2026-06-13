@@ -127,17 +127,16 @@ func fit_tags() -> Array[String]:
     return tags
 
 
-## Clues and the anchor that contribute to display_name composition.
-## The anchor is included when unveiled; surface/hidden clues when in revealed_clue_ids.
+## Anchor and affixes that contribute to display_name composition.
+## The anchor is included when unveiled; affixes when unveiled.
 func get_naming_clue_pool() -> Array:
-    # Returns a mixed array of AnchorData and ClueData entries that participate in naming.
     var result: Array = []
     var eff_anchor := _get_anchor()
     if unveiled and eff_anchor != null:
         result.append(eff_anchor)
-    for clue: ClueData in all_clues:
-        if clue.clue_id in revealed_clue_ids:
-            result.append(clue)
+    if unveiled:
+        for affix: AffixData in affixes:
+            result.append(affix)
     return result
 
 

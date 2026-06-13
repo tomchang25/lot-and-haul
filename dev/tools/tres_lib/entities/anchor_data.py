@@ -72,7 +72,6 @@ class AnchorSpec:
         w.add_field('script = ExtResource("1_anchordef")')
         w.add_field_str("anchor_id", anchor_id)
         w.add_field_str("known_text", entry.get("known_text", ""))
-        w.add_field_int("naming_priority", int(entry.get("naming_priority", 1)))
         w.add_field_ext_ref("category_data", cat_tag)
         w.add_field_float("base_value", float(entry.get("base_value", 0.0)))
         w.add_field_str("shape_id", entry.get("shape_id", "s1x1"))
@@ -97,7 +96,6 @@ class AnchorSpec:
         return {
             "anchor_id": anchor_id,
             "known_text": tres_field(text, "known_text") or "",
-            "naming_priority": int(tres_field(text, "naming_priority") or 1),
             "category_scope": category_scope,
             "base_value": float(tres_field(text, "base_value") or 0.0),
             "shape_id": tres_field(text, "shape_id") or "s1x1",

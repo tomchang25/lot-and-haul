@@ -56,12 +56,6 @@ class ClueSpec:
         w.add_field_str("effect_op", entry.get("effect_op", "add"))
         w.add_field_float("effect_amount", float(entry.get("effect_amount", 0.0)))
 
-        naming = entry.get("naming") or {}
-        slot = naming.get("slot", "")
-        priority = int(naming.get("priority", 0))
-        w.add_field_str("naming_slot", slot)
-        w.add_field_int("naming_priority", priority)
-
         # Hidden-only draw-control field
         w.add_field_str(
             "exclusive_group",
@@ -86,8 +80,6 @@ class ClueSpec:
             "dc": int(tres_field(text, "dc") or 10),
             "effect_op": tres_field(text, "effect_op") or "add",
             "effect_amount": float(tres_field(text, "effect_amount") or 0.0),
-            "naming_slot": tres_field(text, "naming_slot") or "",
-            "naming_priority": int(tres_field(text, "naming_priority") or 0),
             "exclusive_group": tres_field(text, "exclusive_group") or "",
         }
 
@@ -160,16 +152,9 @@ class ClueSpec:
             # Validate naming block.
             naming = clue.get("naming")
             if naming is not None:
-                nslot = naming.get("slot", "")
-                if nslot not in ("prefix", "body", "suffix"):
-                    errors.append(
-                        f"clue '{cid}': naming.slot must be 'prefix', 'body', or 'suffix', got '{nslot}'"
-                    )
-                nprio = naming.get("priority")
-                if nprio is not None and (not isinstance(nprio, int) or nprio < 0):
-                    errors.append(
-                        f"clue '{cid}': naming.priority must be a non-negative integer"
-                    )
+                errors.append(
+                    f"clue '{cid}': naming block is no longer supported — use affix naming instead"
+                )
 
         return errors
 

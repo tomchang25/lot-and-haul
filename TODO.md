@@ -226,10 +226,11 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 One-line, no reasoning, no backing doc.
 
-- [data] Display name of clues need more diversity of priority, and might need a baseline of priority(from op value?)
 - [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
 - [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
 - [style] Standardize docstrings across all `.gd` files — file header + public function GDDoc format.
+- [] rewrite ItemEntry.from_generation
+- [] testbed items are all unkonwn items due to no affixes
 
 ---
 
