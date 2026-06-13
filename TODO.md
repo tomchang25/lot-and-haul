@@ -235,24 +235,6 @@ One-line, no reasoning, no backing doc.
 - [debug] Add an debug button in Hub to add random item
 - [debug] Add Debug Overlay that use debug button in hub to toggle?
   ​
-- [bug] Testbed - LocationAndRun items still always be the unknown item name - Due to some categories don't have affixs
-  Categories with affix data: handbag, wristwatch, oil_lamp, painting (4 of 12)
-
-  Categories WITHOUT any affix data (8):
-
-  Category Super-category
-  clock decorative
-  porcelain_figurine decorative
-  vase decorative
-  poster decorative
-  sculpture fine_art
-  pistol weapon
-  rifle weapon
-  crossbow weapon
-  There are no generic affixes (those with an empty category_scope), so these 8 categories will never receive an affix at item-generation time. That means items in those categories will always lack the prefix modifier — no variation from affixes, no surface clues from affix combinations, and no hidden clues from affix combinations.
-
-  This is likely expected for a playtest build (only a subset of categories got affix authoring), but worth flagging if you want parity before wider testing. The YAML pipeline in dev/tools/tres_lib/entities/affix.py is where new affixes would be added.
-
 - [refactor] ItemYaml - Refactor Yaml strcuture, so I can list all affix and clues situation in each categories
 
 - [bug] Unreveal clues should be unknown as ???
