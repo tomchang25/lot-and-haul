@@ -43,23 +43,15 @@
 
 ### 技術阻擋（必須修才能上）
 
-1. **Export Presets 未設定** — 沒有 build 可上傳，這是第零步
-2. ~~**`assert()` 在 release build 會變靜默 crash**~~ — ✅ 已解決（commit `03bf457`）。引入三類錯誤防護系統（runtime guard / programmer error / precondition），所有 18 個 `assert()` 全數移除，改為 `if` + `push_error` + 依照類別使用 `ToastManager.show_error()` 或 `show_dev_error()`。涵蓋 11 個遊戲檔案與多個 autoload。
-3. ~~**New Game vs Continue 路徑相同**~~ — ✅ 已解決。三槽存檔系統 (slot 0–2)，`NewGameButton` 呼叫 `SaveManager.init_slot()` 清空並重置，`LoadGameButton` 呼叫 `switch_to_slot()` 載入。Boot path 透過 `last_active` pointer 決定。合入 PR #115
-4. ~~**音效未接線**~~ — ✅ 已解決（PR #116）。建立確定性合成管線（YAML → WAV + UiAudioEvent.tres）、17+ 種遊戲動作音效事件、SfxButton 元件取代 ClickBinder、所有場景關鍵互動已接線：競標確認、按鈕點擊、物品揭示、格子上架、庫存操作、設定切換等。76 檔案變更，+2400/−26 行。
-5. ~~**data/tres 被 gitignore**~~ — ✅ 已解決。新增 `bootstrap.sh` 一鍵腳本，clone 後執行即可透過 YAML→TRES 管線生成全部 250 個資源並渲染 12 個音效事件，無需手動執行各管線。`data/tres/` 維持 gitignored。
+All Clear
 
 ### 不擋的（Stage 1 可接受）
 
 - ❌ 無自訂字型 → 預設字型夠用
 - ❌ 無物品圖示 → 文字顯示即可
-- ❌ ~~分類空的~~ → ✅ 已補滿 12 分類（4 super-categories），每分類有對應的 anchors 與 clues
-- ❌ ~~只有 35 件物品~~ → ✅ 已重寫為 runtime pool generation 模型（`ItemGenerator`），從 30 anchors + 184 clues + 22 affixes / 45 combinations 組合生成，不再依賴 authored items
 - ❌ 無負面/覆蓋線索 → ✅ schema 與首批內容已落地：affix combinations 會帶出 hidden leaf / override / negative-style outcomes；Stage 1 足夠，但 Stage 2 仍需補覆蓋率與平衡
 - ❌ 無 loading screen → 場景小幾乎瞬移
 - ❌ 車輛共用 placeholder → 功能完整，看得出來是 placeholder
-- ❌ ~~開始畫面樸素~~ → ✅ 已有 game title + 三槽存檔選擇 overlay
-- ❌ ~~無自動化測試~~ → ✅ GUT plugin + CI pipeline（GitHub Actions）、RunManager 單元測試（277 lines）、CIPilot headless 煙霧測試、以及 storage / run_start / selling 三條 scene testbed harness 已就位
 
 ### Stage 1 完成度：**84%**
 
@@ -67,12 +59,13 @@
 
 ### Target Checklist
 
-- [ ] Export Presets 設定（Windows + Linux）
+- [ ] itch.io page 建立（screenshots + 操作說明）
+- [ ] Storage Tutorial v2 + Run Tutorial
+- [x] Export Presets 設定（Windows + Linux）
 - [x] 所有 `assert()` 換成 release-safe error handling — commit `03bf457`
 - [x] ~~New Game 路徑修正~~ — ✅ Done (save slot refactor, PR #115)
 - [x] 關鍵音效 wire（競標確認、物品揭示、按鈕點擊）— PR #116
 - [x] data/tres 提交 or bootstrap script — `bootstrap.sh`
-- [ ] itch.io page 建立（screenshots + 操作說明）
 - [~] Director 注入骨架（固定第一 run 配置 + 空 cargo 阻擋） — `Director`/`ScriptDirector` split 已完成，presentation + scene-trigger 框架就位；注入與 cargo hook 殘留
 - [x] 教學提示面板 overlay — `Director` dim-overlay + hint/popup + Help replay 系統
 - [x] 教學 step 內容配置與測試 — hub 3 steps + storage 9 steps with ProgressStore v2

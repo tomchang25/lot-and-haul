@@ -48,13 +48,13 @@ All sampled lot cards are visible, but only the current card exposes Enter and P
 
 Current inspection is an AP grid. The active lot's item shapes are placed on an 8×8 hidden grid using category shapes. The AP budget is a two-tier pool — a per-lot cap plus a visit-wide reserve that refills the cap (deficit only) at each lot boundary — owned by the run record. See `day_slot_economy.md` for the full pool model. Car stamina exists on the run record but the current inspection UI does not spend it.
 
-Identity is clue-based, not layer-based. Clicking a veiled object spends the unveil AP cost and calls `ItemEntry.unveil()`, which reveals the item's **anchor** clue (its base-value identity) and grants reveal knowledge. There is no layer ladder.
+Identity is clue-based, not layer-based. Clicking a veiled object spends the unveil AP cost and unveils the item's anchor identity and affix-qualified name, then grants reveal knowledge. There is no layer ladder.
 
 Clicking an already-unveiled item that still has discoverable clues spends the clue-chain AP cost and runs a chain of discovery rolls over its unrevealed surface (and high-DC hidden) clues. Each roll's success chance scales with the relevant attribute bonus versus the clue's DC; the chain reveals clues until the first failed roll. Revealed surface clues raise `inspection_level` (the revealed-surface ratio), which tightens the estimated price range.
 
 The list review overlay can be opened manually or appears automatically when AP reaches zero. It shows found items, condition/estimate columns, the lot total estimate, and the auction opening bid. Back to inspection is enabled only while AP remains. Passing returns to lot browse; entering auction routes to the auction scene.
 
-Price estimates are hidden for veiled items. Revealed, unverified items show an estimated range derived from the revealed clue stack (`anchor_flat + Σ surface_add` then `× Π surface_mul`, widened by a spread that shrinks to zero at full inspection) and keep a "+" uncertainty suffix at the lot level while any item is still veiled. Verification (hidden clues) and true value remain hub/storage concepts, not run-phase information.
+Price estimates are hidden for veiled items. Revealed, unverified items show an estimated range derived from the revealed clue stack (`anchor_flat + Σ surface_add` then `× Π surface_mul`, widened by a spread that shrinks to zero at full inspection) and keep a "+" uncertainty suffix at the lot level while any item is still veiled. Verification and true value remain primarily hub/storage concepts, even though the inspection clue chain can reveal hidden clues if it reaches them.
 
 ### Auction
 
@@ -68,7 +68,7 @@ The rolled price is hidden from normal play UI. The current debug overlay expose
 
 Reveal uses only the latest lot result. If the last auction was lost or passed, the screen shows an Auction Lost state and continues back to lot browse.
 
-For won lots, the screen lists the latest won items. Pressing Reveal unveils any still-veiled items (reveals their anchor clue). It does not auto-reveal surface clues, run discovery rolls, or resolve true item identity — surface clues auto-reveal only on hub return, and hidden clues only via Storage Authenticate. Continue returns to lot browse for the next sampled lot.
+For won lots, the screen lists the latest won items. Pressing Reveal unveils any still-veiled items. It does not auto-reveal surface clues, run discovery rolls, or resolve hidden truth — surface clues auto-reveal on hub return, while hidden clues are normally resolved by Storage Research unless already discovered during inspection. Continue returns to lot browse for the next sampled lot.
 
 ### Cargo
 
