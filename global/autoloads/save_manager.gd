@@ -22,6 +22,10 @@ const SLOT_COUNT := 3
 const _SLOT_BASE_DIR := "user://save_slots"
 const _MANIFEST_VERSION := 2
 
+## Path for the disposable testbed slot. Non-numeric so it is never picked up
+## by boot_load() or the numbered-slot listing. Wiped at every testbed launch.
+const TEST_SLOT_DIR := "user://save_slots/slot_test"
+
 ## Deferred-save throttle interval in seconds. The first mark_dirty() starts
 ## the clock; a flush fires once _elapsed >= THROTTLE_SEC. Tunable.
 const THROTTLE_SEC: float = 5.0
@@ -38,8 +42,14 @@ var _dirty: bool = false
 ## Seconds since _dirty was first set on the current cycle.
 var _elapsed: float = 0.0
 
-## Currently active save slot (1-3). 0 means no slot is loaded (fresh start).
+## Currently active save slot (1-3). 0 means no slot is loaded (fresh start)
+## OR the test slot is active (disambiguated by _active_slot_dir being non-empty).
 var _active_slot: int = 0
+
+## When non-empty, overrides the active slot directory for all save/load operations.
+## Set by use_test_slot(). Normal numbered-slot helpers (boot_load, get_slot_summaries,
+## has_any_save) never touch this path because they only iterate slots 1..SLOT_COUNT.
+var _active_slot_dir: String = ""
 
 
 func _ready() -> void:
@@ -194,6 +204,7 @@ func switch_to_slot(slot: int) -> void:
 
     flush()
     reset_providers()
+    _active_slot_dir = "" # exit test slot mode if active
     _active_slot = slot
     _load_active_slot()
     _write_last_active(slot)
@@ -207,6 +218,7 @@ func init_slot(slot: int) -> void:
         ToastManager.show_dev_error("init_slot: invalid slot %d" % slot)
         return
 
+    _active_slot_dir = "" # exit test slot mode if active
     wipe_slot(slot)
     reset_providers()
     _active_slot = slot
@@ -237,6 +249,38 @@ func wipe_all() -> void:
         DirAccess.remove_absolute(ProjectSettings.globalize_path(last_active_path))
 
 
+## Activates the disposable test slot: wipes its directory, redirects all
+## subsequent save/load operations to TEST_SLOT_DIR, and resets all providers
+## to their default state so fixtures can seed on top of a clean baseline.
+## The test slot is never written to the last-active pointer, so a normal boot
+## or crash cannot land in test data.
+## Debug-only — call only from testbed entry points.
+func use_test_slot() -> void:
+    _wipe_dir(TEST_SLOT_DIR)
+    DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(TEST_SLOT_DIR))
+    _active_slot = 0
+    _active_slot_dir = TEST_SLOT_DIR
+    reset_providers()
+
+
+## Deletes every file (non-recursively) inside [param dir_path].
+## Safe to call when the directory does not exist.
+func _wipe_dir(dir_path: String) -> void:
+    var abs_path := ProjectSettings.globalize_path(dir_path)
+    if not DirAccess.dir_exists_absolute(abs_path):
+        return
+    var d := DirAccess.open(dir_path)
+    if d == null:
+        return
+    d.list_dir_begin()
+    var fname := d.get_next()
+    while fname != "":
+        if not d.current_is_dir():
+            DirAccess.remove_absolute(abs_path.path_join(fname))
+        fname = d.get_next()
+    d.list_dir_end()
+
+
 ## Catches OS quit and flushes deferred state.
 func _notification(what: int) -> void:
     if what == NOTIFICATION_WM_CLOSE_REQUEST:
@@ -256,15 +300,19 @@ func run_validation() -> bool:
 
 ## Writes a new counter-based save file to the active slot, updates the manifest
 ## with a summary block, writes the last-active pointer, and cleans up old files.
+## When the test slot is active (_active_slot_dir non-empty), writes to that dir
+## and skips the last-active pointer so normal boot never lands in test data.
 func save() -> void:
-    if _active_slot <= 0:
+    var is_test_slot := not _active_slot_dir.is_empty()
+    if _active_slot <= 0 and not is_test_slot:
         ToastManager.show_dev_error("save() called with no active slot")
         return
 
     _dirty = false
     _elapsed = 0.0
-    _ensure_slot_dir(_active_slot)
-    var new_counter := _next_counter_for_slot(_active_slot)
+    var dir := _active_slot_dir if is_test_slot else _slot_dir(_active_slot)
+    DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dir))
+    var new_counter := _next_counter_in_dir(dir)
 
     var sections_out: Dictionary = { }
     for provider: Object in _providers:
@@ -275,7 +323,7 @@ func save() -> void:
         "sections": sections_out,
     }
 
-    var path := _slot_counter_path(_active_slot, new_counter)
+    var path := dir.path_join("save_%d.json" % new_counter)
     var file := FileAccess.open(path, FileAccess.WRITE)
     if file == null:
         ToastManager.show_error("SaveManager: failed to open %s for writing (error %d)" % [path, FileAccess.get_open_error()])
@@ -284,20 +332,23 @@ func save() -> void:
     file.close()
 
     var summary := _build_summary(sections_out)
-    _write_manifest(_active_slot, new_counter, summary)
-    _write_last_active(_active_slot)
-    _cleanup_old_saves_in_slot(_active_slot)
+    _write_manifest_to_dir(dir, new_counter, summary)
+    if not is_test_slot:
+        _write_last_active(_active_slot)
+    _cleanup_old_saves_in_dir(dir)
 
 # ══ Load ══════════════════════════════════════════════════════════════════════
 
 
 ## Loads from the newest valid counter-based save file in the active slot.
 func _load_active_slot() -> void:
-    if _active_slot <= 0:
+    var is_test_slot := not _active_slot_dir.is_empty()
+    if _active_slot <= 0 and not is_test_slot:
         ToastManager.show_dev_error("_load_active_slot() called with no active slot")
         return
 
-    var candidates := _build_candidate_list_for_slot(_active_slot)
+    var dir := _active_slot_dir if is_test_slot else _slot_dir(_active_slot)
+    var candidates := _build_candidate_list_in_dir(dir)
     if candidates.is_empty():
         return
 
@@ -307,7 +358,7 @@ func _load_active_slot() -> void:
     var sections_data: Dictionary = { }
 
     for counter: int in candidates:
-        var path := _slot_counter_path(_active_slot, counter)
+        var path := dir.path_join("save_%d.json" % counter)
         var result := _try_load_file(path)
         if result == null:
             failed_files.append(path)
@@ -331,7 +382,7 @@ func _load_active_slot() -> void:
 
     if loaded_counter != highest_counter:
         var skipped := range(loaded_counter + 1, highest_counter + 1).map(
-            func(c: int) -> String: return _slot_counter_path(_active_slot, c)
+            func(c: int) -> String: return dir.path_join("save_%d.json" % c)
         )
         ToastManager.show_warning(
             "Loaded save_%d.json (newest file was corrupt). Skipped: %s" % [
@@ -341,7 +392,7 @@ func _load_active_slot() -> void:
         )
 
     var summary := _build_summary(sections_data)
-    _write_manifest(_active_slot, loaded_counter, summary)
+    _write_manifest_to_dir(dir, loaded_counter, summary)
 
 # ══ Private helpers ═══════════════════════════════════════════════════════════
 
@@ -402,10 +453,16 @@ func _read_manifest_counter(slot: int) -> int:
 
 ## Writes the manifest for [param slot] with [param counter] and [param summary].
 func _write_manifest(slot: int, counter: int, summary: Dictionary = { }) -> void:
-    var path := _slot_manifest_path(slot)
+    _write_manifest_to_dir(_slot_dir(slot), counter, summary)
+
+
+## Writes the manifest to an arbitrary [param dir] (used for both numbered slots
+## and the test slot path).
+func _write_manifest_to_dir(dir: String, counter: int, summary: Dictionary = { }) -> void:
+    var path := dir.path_join("manifest.json")
     var file := FileAccess.open(path, FileAccess.WRITE)
     if file == null:
-        ToastManager.show_error("SaveManager: failed to write manifest for slot %d (error %d)" % [slot, FileAccess.get_open_error()])
+        ToastManager.show_error("SaveManager: failed to write manifest at %s (error %d)" % [path, FileAccess.get_open_error()])
         return
     var data: Dictionary = {
         "current_backup": counter,
@@ -495,8 +552,14 @@ func _next_counter_for_slot(slot: int) -> int:
 
 ## Builds the ordered candidate list for slot loading (newest-first) in a slot.
 func _build_candidate_list_for_slot(slot: int) -> Array[int]:
-    var manifest_counter := _read_manifest_counter(slot)
-    var scanned := _scan_save_counters_in_slot(slot)
+    return _build_candidate_list_in_dir(_slot_dir(slot))
+
+
+## Builds the ordered candidate list for loading from an arbitrary [param dir].
+## Manifest pointer is tried first; remaining counters appended in descending order.
+func _build_candidate_list_in_dir(dir: String) -> Array[int]:
+    var manifest_counter := _read_manifest_counter_in_dir(dir)
+    var scanned := _scan_save_counters_in_dir(dir)
     if scanned.is_empty():
         return [] as Array[int]
     var ordered: Array[int] = []
@@ -506,6 +569,47 @@ func _build_candidate_list_for_slot(slot: int) -> Array[int]:
         if c not in ordered:
             ordered.append(c)
     return ordered
+
+
+## Reads the current_backup counter from the manifest in [param dir]. Returns -1 on failure.
+func _read_manifest_counter_in_dir(dir: String) -> int:
+    var path := dir.path_join("manifest.json")
+    if not FileAccess.file_exists(path):
+        return -1
+    var file := FileAccess.open(path, FileAccess.READ)
+    if file == null:
+        return -1
+    var text := file.get_as_text()
+    file.close()
+    var parsed: Variant = JSON.parse_string(text)
+    if parsed == null or not parsed is Dictionary:
+        return -1
+    var counter: Variant = parsed.get("current_backup", -1)
+    if counter is int and counter >= 1:
+        return counter
+    return -1
+
+
+## Determines the next counter for a new save in [param dir].
+func _next_counter_in_dir(dir: String) -> int:
+    var counter := _read_manifest_counter_in_dir(dir)
+    if counter > 0:
+        return counter + 1
+    var existing := _scan_save_counters_in_dir(dir)
+    if existing.is_empty():
+        return 1
+    return existing[0] + 1
+
+
+## Deletes the oldest save files in [param dir] when total count exceeds MAX_SAVES.
+func _cleanup_old_saves_in_dir(dir: String) -> void:
+    var counters := _scan_save_counters_in_dir(dir)
+    var abs_path := ProjectSettings.globalize_path(dir)
+    while counters.size() > MAX_SAVES:
+        var oldest: int = counters.pop_back()
+        var err := DirAccess.remove_absolute(abs_path.path_join("save_%d.json" % oldest))
+        if err != OK:
+            push_warning("SaveManager: could not delete %s/save_%d.json (error %d)" % [dir, oldest, err])
 
 
 ## Tries to parse and structurally validate [param path].
@@ -527,11 +631,4 @@ func _try_load_file(path: String) -> Variant:
 
 ## Deletes the oldest save files in a slot when total count exceeds MAX_SAVES.
 func _cleanup_old_saves_in_slot(slot: int) -> void:
-    var counters := _scan_save_counters_in_slot(slot)
-    while counters.size() > MAX_SAVES:
-        var oldest: int = counters.pop_back()
-        var err := DirAccess.remove_absolute(
-            ProjectSettings.globalize_path(_slot_counter_path(slot, oldest)),
-        )
-        if err != OK:
-            push_warning("SaveManager: could not delete slot %d save_%d (error %d)" % [slot, oldest, err])
+    _cleanup_old_saves_in_dir(_slot_dir(slot))

@@ -42,6 +42,7 @@ ScriptDirector="*res://global/autoloads/director/script_director.gd"
 GameManager="*uid://bnj3y0a2848to"
 CIPilot="*res://global/autoloads/harness/ci_pilot.gd"
 ShotPilot="*res://global/autoloads/harness/shot_pilot.gd"
+TestbedPilot="*res://global/autoloads/harness/testbed_pilot.gd"
 
 [debug]
 

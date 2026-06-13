@@ -235,6 +235,16 @@ func is_offer_showing() -> bool:
     return _is_offer_showing
 
 
+## Returns the hint panel node, or null if not yet built.
+func get_hint_panel() -> PanelContainer:
+    return _hint_panel
+
+
+## Returns the anchor Control registered under [param id], or null.
+func get_anchor(id: String) -> Control:
+    return _anchors.get(id) as Control if _anchors.has(id) else null
+
+
 ## Advances one step (as if the user clicked Next). Called by both the Next
 ## button handlers and the ShotPilot harness. No-op when no tutorial is active.
 func advance_step() -> void:

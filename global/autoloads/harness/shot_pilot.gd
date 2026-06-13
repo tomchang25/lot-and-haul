@@ -7,6 +7,7 @@ extends Node
 
 const DEFAULT_SHOT_DIR: String = "user://tutorial_shots"
 
+
 ## Manifest entry shape.
 ## scene:   scene id passed to SceneRouter (and used as capture filename prefix).
 ## fixture: name of a static fixture method in game/<scene>/<scene>_fixtures.gd,
@@ -15,15 +16,13 @@ const DEFAULT_SHOT_DIR: String = "user://tutorial_shots"
 static func _make_entry(scene: String, fixture: String, offer: bool) -> Dictionary:
     return { "scene": scene, "fixture": fixture, "offer": offer }
 
-
 ## The manifest — add a row here for each capturable scene. When a scene needs
 ## non-default state, create a <scene>_fixtures.gd next to the scene with a
 ## static seed_<variant>() method and reference it here. No new autoload needed.
-const MANIFEST: Array[Dictionary] = [
+static var manifest: Array[Dictionary] = [
     _make_entry("hub", "", false),
     _make_entry("storage", "seed_storage_state", true),
 ]
-
 
 var _shot_dir: String = ""
 var _requested_ids: Array[String] = []
@@ -54,7 +53,7 @@ func _parse_flags(args: PackedStringArray) -> bool:
         _shot_dir = DEFAULT_SHOT_DIR
 
     if shot_flag == "all":
-        _requested_ids = MANIFEST.map(func(e): return e.scene)
+        _requested_ids = manifest.map(func(e): return e.scene)
     else:
         _requested_ids = [shot_flag]
 
@@ -80,7 +79,7 @@ func _run() -> void:
 func _capture_script(script_id: String) -> void:
     var entry: Dictionary
     var found := false
-    for e in MANIFEST:
+    for e in manifest:
         if e.scene == script_id:
             entry = e
             found = true

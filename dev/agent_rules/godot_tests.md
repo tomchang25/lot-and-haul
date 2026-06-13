@@ -9,7 +9,7 @@ Canonical invocations live in `.github/workflows/ci.yml` and `.vscode/tasks.json
 
 ## Sandbox procedure
 
-Never run either layer against the mounted working tree (`sandbox_environment.md`). Build a `/tmp` snapshot exactly as in `godot_headless_check.md` (mktemp dir, `git checkout-index`, copy `dev/tools/bin`, regenerate `data/tres/`, `rm -rf .godot`, `--import`), then:
+Never run either layer against the mounted working tree (`sandbox_environment.md`). Build a `/tmp` snapshot as in `godot_headless_check.md`: mktemp dir, `git checkout-index`, copy `dev/tools/bin`, regenerate `data/tres/`, render SFX, `rm -rf .godot`, `--import`. The `--import` step is required for Layer 2 (smoke test loads scenes that depend on imported WAV resources); Layer 1 (unit tests) may work without it but still benefits from a clean import. Then:
 
 ```bash
 # extra step for unit tests: test fixtures are gitignored, so checkout-index omits them

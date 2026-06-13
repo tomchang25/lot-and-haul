@@ -160,10 +160,11 @@ func test_commit_lot_win() -> void:
     var loc := _make_location()
     RunManager.create_run_store(loc, car)
 
-    var cat := _make_category("test_cat")
     var lot_data := LotData.new()
     lot_data.lot_id = "test_lot"
     lot_data.npc_clue_sight_chance = 0.0
+    lot_data.item_count_min = 0
+    lot_data.item_count_max = 0
 
     var rng := _seed_rng(7)
     var lot_entry := LotEntry.create(lot_data, rng)

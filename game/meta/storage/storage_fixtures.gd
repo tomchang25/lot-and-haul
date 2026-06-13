@@ -1,8 +1,10 @@
 # storage_fixtures.gd
-# Per-scene fixture methods for the screenshot harness. Each function seeds the
-# stores with deterministic state needed for visual captures of the storage scene.
-# Kept next to the scene it fixtures, not inside the harness.
+# Per-scene fixture methods for the screenshot harness and testbed launcher.
+# Each function seeds stores with deterministic state needed for visual captures
+# and testbed runs of the storage scene. Kept next to the scene it fixtures.
 extends RefCounted
+
+class_name StorageFixtures
 
 ## Seeds MetaManager.storage with 3 deterministic items so the storage scene's
 ## detail rail, repair/restore/research buttons, and tutorial anchors all
@@ -42,7 +44,7 @@ static func _sample_clues(clue_type: ClueData.ClueType, max_count: int, rng: Ran
     for clue: ClueData in ClueRegistry.get_all_clues():
         if clue.type == clue_type:
             pool.append(clue)
-    pool.sort_custom(func(_a, _b): return rng.randf() < 0.5)
+    RandomUtils.shuffle(pool, rng)
     var n := mini(max_count, pool.size())
     var result: Array[ClueData] = []
     for j in n:
