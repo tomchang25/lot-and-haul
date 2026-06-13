@@ -2,6 +2,22 @@
 
 Append-only record of shipped work.
 
+## Affix Generation System
+
+- 2026-06-13 — [feat] AffixData/AffixCombinationData designer resources with YAML pipeline, cross-product conflict validator, and AffixRegistry autoload
+- 2026-06-13 — [feat] Reversed ItemGenerator.draw(): affix → combination → clues; \_draw_affixes/\_pick_combination added; rarity-draw path retired for affixed items
+- 2026-06-13 — [feat] category_scope converted to resource-ref array; generic (empty-scope) affix support
+- 2026-06-13 — [feat] ItemEntry gains affixes/combination_ids with save/load round-trip and backward-compat defaults
+- 2026-06-13 — [feat] Affix-only naming: display_name() composes from affix display_names + anchor body; naming_slot/naming_priority removed from ClueData/AnchorData and pipeline
+- 2026-06-13 — [data] 5–8 playtest affixes authored in data/yaml/affixes.yaml with 2–3 combinations each
+
+## ItemGenerator Factory Collapse
+
+- 2026-06-13 — [refactor] ItemGenerator.draw() returns ItemEntry directly; GenerationResult and ItemEntry.from_generation() deleted
+- 2026-06-13 — [test] Test data authored as YAML (\_test_item_generator.yaml); in-memory stub helpers removed
+- 2026-06-13 — [refactor] storage_fixtures.gd migrated to ItemGenerator.draw() with seeded RNG
+- 2026-06-13 — [doc] dev/standards/test_data.md created for test-data-as-YAML workflow
+
 ## Scene Testbeds & Agent Harness
 
 - 2026-06-13 — [dev] SaveManager test slot isolation: `use_test_slot()` wipes and redirects to a non-numeric test slot; boot-load and slot-listing skip it so no normal boot ever resumes into test data

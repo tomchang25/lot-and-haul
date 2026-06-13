@@ -207,8 +207,6 @@ Flows currently being built or ready to implement — may hold more than one ent
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
 - [robustness] Atomic save writes, hard boot-guard on empty registries, migration scaffolds, run-state guards, price/save/migration tests — see `dev/docs/plans/robustness_hardening.sketch.md`
-- [affix_items] Affix generation core (name→clues reversal, generator + resources + validator); playtest-build blocker — see `dev/docs/plans/item_affix_generation_core.spec.md` (design: `item_affix_generation.sketch.md`)
-- [affix_items] Affix-only naming (full removal of per-clue/anchor naming), depends on the core spec — see `dev/docs/plans/item_affix_naming.spec.md`
 - [simple-demo] Stage 1 tutorial split out to the Simple Tutorial draft; Director skeleton + Dialog remain surviving subsystems
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 - [dev/auto-auction] Debug-only quick-win buttons: instant player win at opening bid or rolled price (skip NPC bidding loop; rolled path seeds future auto-bid perk) — see `dev/docs/plans/debug_auto_auction.md`
@@ -229,13 +227,31 @@ One-line, no reasoning, no backing doc.
 - [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
 - [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
 - [style] Standardize docstrings across all `.gd` files — file header + public function GDDoc format.
-- [refactor] Collapse ItemGenerator/ItemEntry factory split — single `draw()` returns ItemEntry, delete GenerationResult and from_generation — see `dev/docs/plans/collapse_item_generator_factory.sketch.md`
-- [bug] Testbed - LocationAndRun items still always be the unknown item name
-
 - [debug] Add an debug button in Hub to sell all items in storage
 - [debug] Add an debug button in Hub to add random item
 - [debug] Add Debug Overlay that use debug button in hub to toggle?
   ​
+- [bug] Testbed - LocationAndRun items still always be the unknown item name - Due to some categories don't have affixs
+  Categories with affix data: handbag, wristwatch, oil_lamp, painting (4 of 12)
+
+  Categories WITHOUT any affix data (8):
+
+  Category Super-category
+  clock decorative
+  porcelain_figurine decorative
+  vase decorative
+  poster decorative
+  sculpture fine_art
+  pistol weapon
+  rifle weapon
+  crossbow weapon
+  There are no generic affixes (those with an empty category_scope), so these 8 categories will never receive an affix at item-generation time. That means items in those categories will always lack the prefix modifier — no variation from affixes, no surface clues from affix combinations, and no hidden clues from affix combinations.
+
+  This is likely expected for a playtest build (only a subset of categories got affix authoring), but worth flagging if you want parity before wider testing. The YAML pipeline in dev/tools/tres_lib/entities/affix.py is where new affixes would be added.
+
+- [refactor] ItemYaml - Refactor Yaml strcuture, so I can list all affix and clues situation in each categories
+
+- [bug] Unreveal clues should be unknown as ???
 
 ---
 
