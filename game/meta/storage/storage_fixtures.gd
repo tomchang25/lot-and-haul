@@ -26,7 +26,7 @@ static func seed_storage_state() -> void:
         var anchor: AnchorData = anchors[i]
         var surface_clues := _sample_clues(ClueData.ClueType.SURFACE, 2, rng)
         var hidden_clues := _sample_clues(ClueData.ClueType.HIDDEN, 1, rng)
-        var entry := ItemEntry.from_generation(anchor, surface_clues, hidden_clues, anchor.category_data, rng)
+        var entry := ItemEntry.from_generation(anchor, surface_clues, hidden_clues, anchor.category_data, [], [], rng)
         entry.unveiled = true
         entry.auto_reveal_all_surface()
         entries.append(entry)

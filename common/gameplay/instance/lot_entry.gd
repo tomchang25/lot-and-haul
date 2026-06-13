@@ -57,7 +57,6 @@ static func create(data: LotData, rng: RandomNumberGenerator = null) -> LotEntry
         var result := ItemGenerator.draw(
             category,
             data.tier_weights,
-            data.rarity_weights,
             Economy.SURFACE_CLUE_MIN,
             Economy.SURFACE_CLUE_MAX,
             rng,
@@ -70,6 +69,8 @@ static func create(data: LotData, rng: RandomNumberGenerator = null) -> LotEntry
             result.surface_clues,
             result.hidden_clues,
             category,
+            result.affixes,
+            result.combination_ids,
             rng,
         )
         # Roll veiled_chance: each item independently starts pre-unveiled

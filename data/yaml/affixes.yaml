@@ -1,0 +1,184 @@
+# Playtest affixes and affix combinations.
+# Combinations are separate entries keyed to their parent affix via affix_id.
+# Clue ids reference entries in data/yaml/clues.yaml and must pass the
+# cross-product conflict validator at build time.
+
+affix_combinations:
+  # ── Handbag: Rustic (prefix) ──────────────────────────────────────────
+  - combination_id: comb_bag_rustic_01
+    affix_id: bag_rustic
+    weight: 3
+    surface_clue_ids:
+      - bag_exterior_faded
+      - bag_hardware_tarnished
+    hidden_clue_ids:
+      - bag_leaf_coach
+
+  - combination_id: comb_bag_rustic_02
+    affix_id: bag_rustic
+    weight: 1
+    surface_clue_ids:
+      - bag_exterior_synthetic
+      - bag_hardware_tarnished
+    hidden_clue_ids:
+      - bag_override_replica
+
+  # ── Handbag: Luxury (prefix) ─────────────────────────────────────────
+  - combination_id: comb_bag_luxury_01
+    affix_id: bag_luxury
+    weight: 2
+    surface_clue_ids:
+      - bag_exterior_leather
+      - bag_hardware_brass
+    hidden_clue_ids:
+      - bag_leaf_hermes
+
+  - combination_id: comb_bag_luxury_02
+    affix_id: bag_luxury
+    weight: 2
+    surface_clue_ids:
+      - bag_exterior_crocodile
+      - bag_hardware_palladium
+    hidden_clue_ids:
+      - bag_leaf_vuitton
+
+  - combination_id: comb_bag_luxury_03
+    affix_id: bag_luxury
+    weight: 1
+    surface_clue_ids:
+      - bag_exterior_leather
+      - bag_hardware_palladium
+    hidden_clue_ids:
+      - bag_override_replica
+
+  # ── Wristwatch: Vintage (prefix) ──────────────────────────────────────
+  - combination_id: comb_watch_vintage_01
+    affix_id: watch_vintage
+    weight: 2
+    surface_clue_ids:
+      - watch_crown_wind
+      - watch_dial_patina
+    hidden_clue_ids:
+      - watch_leaf_longines
+
+  - combination_id: comb_watch_vintage_02
+    affix_id: watch_vintage
+    weight: 1
+    surface_clue_ids:
+      - watch_crown_wind
+      - watch_dial_patina
+    hidden_clue_ids:
+      - watch_override_franken
+
+  # ── Wristwatch: Modern (prefix) ──────────────────────────────────────
+  - combination_id: comb_watch_modern_01
+    affix_id: watch_modern
+    weight: 3
+    surface_clue_ids:
+      - watch_movement_chronograph
+      - watch_movement_jewelled
+    hidden_clue_ids:
+      - watch_leaf_seiko
+
+  - combination_id: comb_watch_modern_02
+    affix_id: watch_modern
+    weight: 1
+    surface_clue_ids:
+      - watch_movement_quartz
+      - watch_movement_jewelled
+    hidden_clue_ids:
+      - watch_leaf_timex
+
+  # ── Oil Lamp: Antique (prefix) ────────────────────────────────────────
+  - combination_id: comb_lamp_antique_01
+    affix_id: lamp_antique
+    weight: 2
+    surface_clue_ids:
+      - lamp_glass_blown
+      - lamp_collar_silver
+    hidden_clue_ids:
+      - lamp_leaf_moser
+
+  - combination_id: comb_lamp_antique_02
+    affix_id: lamp_antique
+    weight: 1
+    surface_clue_ids:
+      - lamp_glass_mold_seam
+      - lamp_collar_pewter
+    hidden_clue_ids:
+      - lamp_override_modern_copy
+
+  # ── Painting: Unsigned (prefix) ──────────────────────────────────────
+  - combination_id: comb_painting_unsigned_01
+    affix_id: painting_unsigned
+    weight: 2
+    surface_clue_ids:
+      - painting_medium_oil
+      - painting_brushwork_loose
+    hidden_clue_ids:
+      - painting_leaf_sargent
+
+  - combination_id: comb_painting_unsigned_02
+    affix_id: painting_unsigned
+    weight: 1
+    surface_clue_ids:
+      - painting_canvas_slack
+      - painting_brushwork_tight
+    hidden_clue_ids:
+      - painting_override_forgery
+
+affixes:
+  - affix_id: bag_rustic
+    naming_slot: prefix
+    display_name: Rustic
+    category_scope: handbag
+    weight: 3
+    combination_ids:
+      - comb_bag_rustic_01
+      - comb_bag_rustic_02
+
+  - affix_id: bag_luxury
+    naming_slot: prefix
+    display_name: Luxury
+    category_scope: handbag
+    weight: 2
+    combination_ids:
+      - comb_bag_luxury_01
+      - comb_bag_luxury_02
+      - comb_bag_luxury_03
+
+  - affix_id: watch_vintage
+    naming_slot: prefix
+    display_name: Vintage
+    category_scope: wristwatch
+    weight: 2
+    combination_ids:
+      - comb_watch_vintage_01
+      - comb_watch_vintage_02
+
+  - affix_id: watch_modern
+    naming_slot: prefix
+    display_name: Modern
+    category_scope: wristwatch
+    weight: 3
+    combination_ids:
+      - comb_watch_modern_01
+      - comb_watch_modern_02
+
+  - affix_id: lamp_antique
+    naming_slot: prefix
+    display_name: Antique
+    category_scope: oil_lamp
+    weight: 2
+    combination_ids:
+      - comb_lamp_antique_01
+      - comb_lamp_antique_02
+
+  - affix_id: painting_unsigned
+    naming_slot: prefix
+    display_name: Unsigned
+    category_scope: painting
+    weight: 2
+    combination_ids:
+      - comb_painting_unsigned_01
+      - comb_painting_unsigned_02

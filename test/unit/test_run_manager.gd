@@ -82,7 +82,7 @@ func test_ap_lifecycle_create_and_spend() -> void:
     lot_data.price_variance_max = 1.0
     lot_data.npc_clue_sight_chance = 0.0
 
-    var item := ItemEntry.from_generation(anchor, [clue], [], cat, rng)
+    var item := ItemEntry.from_generation(anchor, [clue], [], cat, [], [], rng)
     var entry := LotEntry.new()
     entry.lot_data = lot_data
     entry.aggressive_factor = 0.4
@@ -117,7 +117,7 @@ func test_clue_hit_and_miss() -> void:
     var easy := _make_clue("easy", ClueData.ClueType.SURFACE, "appraisal", 5, "add", 10.0)
     var hard := _make_clue("hard", ClueData.ClueType.SURFACE, "appraisal", 19, "add", 20.0)
     var rng := _seed_rng(2)
-    var entry := ItemEntry.from_generation(anchor, [easy, hard], [], cat, rng)
+    var entry := ItemEntry.from_generation(anchor, [easy, hard], [], cat, [], [], rng)
 
     entry.unveil()
     assert_true(entry.attempt_clue(easy, 1, rng), "easy clue should succeed with attribute bonus")
@@ -236,7 +236,7 @@ func test_full_run_scratch_to_run_result() -> void:
     var anchor := _make_anchor("a1", 200.0, cat)
     var surface := _make_clue("s1", ClueData.ClueType.SURFACE, "appraisal", 5, "add", 100.0)
 
-    var item := ItemEntry.from_generation(anchor, [surface], [], cat, rng)
+    var item := ItemEntry.from_generation(anchor, [surface], [], cat, [], [], rng)
     item.unveil()
     item.revealed_clue_ids.append("s1")
 
