@@ -65,13 +65,14 @@ The harness is manifest-driven — no hand-written capture autoload per target.
 2. If the scene needs non-default state, create `game/<phase>/<scene>/<scene>_fixtures.gd` with a static method matching the fixture name:
    ```gdscript
    # my_scene_fixtures.gd
-   extends Node
+   extends RefCounted
+   class_name MySceneFixtures
    static func seed_default() -> void:
-       # Seed stores via manager APIs (mutation-mediation rule)
+       # Seed stores via manager APIs (mutation-mediation rule), deterministically.
        pass
    ```
 
-That's it — no new autoload, no changes to the harness script.
+That's it — no new autoload, no changes to the harness script. The full fixtures convention (RefCounted, manager-API seeding, determinism, guards) lives in `dev/standards/project_structure.md` → "Fixtures convention"; the same fixtures feed the testbed doors.
 
 ### Interacting with the UI
 
@@ -99,6 +100,22 @@ if dialog and dialog.visible:
 ```
 
 4. View the result: `cp` the PNGs to a workspace folder (e.g. `/workspace/tmp/`), then Read them. Identical file sizes across frames usually means a static screen, not a capture bug — verify with `identify -verbose` to check channel statistics.
+
+## Testbed pilot — driving a seeded flow
+
+The testbed pilot (`global/autoloads/harness/testbed_pilot.gd`) reuses the same xvfb + software-GL setup but, instead of capturing a static scene, it **drives a full seeded flow** and emits mechanical checks alongside the screenshots. Use it to exercise storage/workshop, location→run-start, or nightly selling end to end. Valid ids and what each seeds live in `stage/testbeds/testbed_registry.gd`.
+
+```bash
+# $LH is the snapshot path from step 1 — paste the literal path.
+cd "$LH"
+LIBGL_ALWAYS_SOFTWARE=1 timeout 90 xvfb-run -a -s "-screen 0 1280x720x24" \
+  dev/tools/bin/Godot_v4.6.3-stable_linux.x86_64 --path "$LH" --rendering-driver opengl3 --display-driver x11 \
+  --testbed=storage --testbed-shot-dir=/tmp/shots
+```
+
+Outputs to the shot dir: a per-step PNG series (`<id>_step_NN.png`) and `<id>_report.json` with three arrays — `errors` (error-level log lines, benign engine noise filtered), `stalls` (steps that failed to advance within the bound), and `overlaps` (a foreground hint panel covering the anchor it points at). The process exits `0` when all three are empty, `1` otherwise — so a CI/agent check is just the exit code; read the JSON to see what failed, then the PNGs to confirm visually.
+
+The registry is a `static var`, not a `const`. If you edit it, keep it that way or a clean headless import will fail before the pilot runs — see `dev/skills/gdscript_const_vs_static_var.md`.
 
 ## Caveats
 
