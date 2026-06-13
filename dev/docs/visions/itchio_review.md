@@ -2,7 +2,7 @@
 
 > **Level 1 (vision).** 全中文（特例）。專案預設語言為英文，但此評估讀者是中文母語的專案作者，為確保溝通精確度與效率，破例使用中文。內容為整個專案在三種不同發佈階段的完成度診斷，供作者判斷各階段的前置準備與資源投入方向。
 >
-> **Last reviewed: 2026-06-12** — updated for audio-audit ship (PR #116, 76 files, +2400/−26 lines: synth pipeline YAML→WAV, SfxButton component, 17+ game-action events wired across all scenes), assert removal (commit `03bf457`, 26 files, three-category error guard system replacing all `assert()` calls), and bootstrap fix (`bootstrap.sh` one-command resource generation; `data/tres` remains gitignored).
+> **Last reviewed: 2026-06-12** — updated for Director + tutorial hint panel ship (commit `8601815`, 15 files, +721/−13 lines: Director autoload with code-built dim-overlay, four-rect hole cutout, hint/popup step display; hub + storage tutorial scripts with ProgressStore v2 persistence), CI headless run-loop suite (commit `1a35ced`, GUT plugin + CIPilot autoload + GitHub Actions workflow + 277-line unit test), packing-grid colour helper centralization (commit `26e0b37`), and 6 additional SFX events (commit `6c4851d`: rotate, grid lift/put-down, setting toggle, storage repair/restore/research).
 
 ---
 
@@ -34,10 +34,10 @@
 
 #### 需要新增的系統
 
-| 系統                | 說明                                                                                                                                                                                                       |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Director 骨架**   | 新 autoload，只做注入：run 前把固定 lot 內容、車輛、stamina 寫入 RunStore，外加空 cargo 阻擋 hook。不做多 run 狀態機、強制代標、perk 贈送 —— 那些是 Stage 3 故事 demo 的範圍。不修改 production scene |
-| **教學提示面板**    | data-driven step 清單（場景 + 觸發條件 + 提示文字），順序播放。無分支、無立繪、無故事。正式版可直接沿用；完整 DialogManager 等故事 demo 需要時再長出來                                                  |
+| 系統                | 狀態     | 說明                                                                                                                                                                                                       |
+| ------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Director 骨架**   | ⬜ 部分 | Director autoload 已實作（教學引擎 + overlay 系統），但 run 前注入（固定 lot/車輛/stamina）與 cargo 阻擋 hook 尚未實作 —— 移至 Stage 1 殘留項目。完整多 run 狀態機/強制代標/perk 贈送留在 Stage 3 故事 demo |
+| **教學提示面板**    | ✅ 完成 | Director autoload 已包含：hint（四邊形挖洞 dim + 錨點旁面板）與 popup（全屏 dim + 居中面板）兩種 step 類型，NEXT 與 SCENE_ENTERED 兩種推進模式。hub（3 steps）與 storage（9 steps）教學腳本已實作。正式版可直接沿用。完整 DialogManager 等 Stage 3 故事 demo 需要時再長出來 |
 
 （原規劃的 Dialog System 與 Demo Cutscene 移至 Stage 3 故事 demo。）
 
@@ -59,10 +59,11 @@
 - ❌ 無 loading screen → 場景小幾乎瞬移
 - ❌ 車輛共用 placeholder → 功能完整，看得出來是 placeholder
 - ❌ ~~開始畫面樸素~~ → ✅ 已有 game title + 三槽存檔選擇 overlay
+- ❌ ~~無自動化測試~~ → ✅ GUT plugin + CI pipeline（GitHub Actions）、RunManager 單元測試（277 lines）、CIPilot headless 煙霧測試已就位
 
-### Stage 1 完成度：**75%**
+### Stage 1 完成度：**82%**
 
-（70% 基礎完成度 × 扣除新系統權重 + 音效 blocker 清除 + data/tres blocker 清除。教學拆分後，新建範圍從三個系統（Director/Dialog/Cutscene）縮成 Director 骨架 + 教學提示面板，權重扣除變小，比上次評估 +5%。音效 wire 完成後再 +5%。clone bootstrap 障礙清除後再 +5%。）
+（前一版 75%。教學提示面板 overlay + hub/storage step 兩個 checklist 項目完成 → +5%。包裝格 grid 色彩集中化、追加 6 組音效事件、CI 測試管線就緒 → +2%。主要殘留：Export Presets 未設定（第零步阻塞）、Director 注入骨架（固定第一 run 配置 + 空 cargo 阻擋）未實作、itch.io page 未建。）
 
 ### Target Checklist
 
@@ -72,9 +73,10 @@
 - [x] 關鍵音效 wire（競標確認、物品揭示、按鈕點擊）— PR #116
 - [x] data/tres 提交 or bootstrap script — `bootstrap.sh`
 - [ ] itch.io page 建立（screenshots + 操作說明）
-- [ ] Director 注入骨架（固定第一 run 配置 + 空 cargo 阻擋）
-- [ ] 教學提示面板 overlay
-- [ ] 教學 step 內容配置與測試
+- [~] Director 注入骨架（固定第一 run 配置 + 空 cargo 阻擋） — 框架（autoload + overlay）已實作，注入與 cargo hook 殘留
+- [x] 教學提示面板 overlay — commit `8601815`（Director dim-overlay + hint/popup 系統）
+- [x] 教學 step 內容配置與測試 — hub 3 steps + storage 9 steps with ProgressStore v2
+- [x] 自動化測試基礎設施 — GUT + CIPilot + GitHub Actions CI（commit `1a35ced`）
 
 ---
 
@@ -131,7 +133,7 @@
 
 ### Stage 3 完成度：**10%**
 
-Steam 是另一個層級的戰場。Steam API、音樂、效能優化、crash reporter 都是從零開始。Stage 1 只交付 Director 骨架與教學提示面板，Dialog System、Demo Cutscene 與完整 3-run 故事 demo 都落在此階段，加上 platform polish。
+Steam 是另一個層級的戰場。Steam API、音樂、效能優化、crash reporter 都是從零開始。Stage 1 交付了 Director 基礎教學引擎（autoload + overlay + hub/storage tutorial），但 Dialog System、Demo Cutscene、完整 3-run 故事 demo（含 Director 完整 hook 多 run 狀態機）都落在此階段，加上 platform polish。
 
 ---
 
@@ -156,4 +158,6 @@ Stage 3 (Steam Demo)
 Steam EA Release（未來）
 ```
 
-注意 Stage 1 → 2 不一定要完全 serial：一旦 Stage 1 的 build 出去、feedback 開始回流，內容擴充就可以並行進行。Director 骨架與教學提示面板應設計為正式版可復用，避免 demo-only code 被拋棄；完整 Dialog System 等 Stage 3 故事 demo 需要時再從提示面板長出來。
+注意 Stage 1 → 2 不一定要完全 serial：一旦 Stage 1 的 build 出去、feedback 開始回流，內容擴充就可以並行進行。Director 骨架（教學引擎 + overlay）與教學提示面板已設計為正式版可復用（Director 本身即 production autoload，hub/storage tutorial 直接整合於場景），避免 demo-only code 被拋棄；完整 Dialog System 等 Stage 3 故事 demo 需要時再從提示面板長出來。
+
+Stage 1 殘留項目目前聚集在：Export Presets（第零步 build 阻擋）、Director 注入骨架（固定第一 run RunStore 注入 + cargo 阻擋 hook）、以及 run-phase tutorial steps（inspect → bid → cargo 引導）。若注入骨架被視為可選（教學面板仍能在沒有固定配置的情況下引導玩家），則唯一真正的硬阻擋僅剩 Export Presets —— 設定完成即可出 build。

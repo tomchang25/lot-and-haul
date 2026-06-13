@@ -165,9 +165,13 @@ Future pool-generator work: surface clue count scales with the anchor's tier (e.
 
 ### Anchor-Conditioned Surface Draw
 
+> Largely superseded by `dev/docs/plans/item_affix_generation.sketch.md` — affix-owned combination tables replace the per-pair weight matrix this entry kept failing to settle. Keep only if a non-affix anchor-affinity draw is still wanted for plain items.
+
 Future pool-generator work: bias surface clue draws by the item's anchor (tier/category affinity) instead of pure uniform. A first half-built attempt — affinity tags plus per-tag weight overrides authored on surface clues — was removed by the clue schema cleanup: the anchor side of the relationship was never defined, and per-clue weight dictionaries degenerate into a disguised per-pair weight matrix. Needs a settled model first (e.g. tags declared on anchors, a single weight function over tag overlap, never per-pair matrices). Blocked on the pool generator existing at all; uniform draw is the shipping behavior until then.
 
 ### Combination Naming Rules
+
+> Superseded by `dev/docs/plans/item_affix_generation.sketch.md` — naming is now affix-only (the affix carries the name; combinations and clues do not). Validation detail below is retained for that sketch's naming-validator step.
 
 A combination rule defines a set of input clue ids and a replacement naming entry (slot, text, priority). When all inputs are revealed on the same item, the combination replaces individual naming entries during display-name composition — e.g. `{Blown Glass, Moser}` → `"Bohemian Moser"`. Authored per category, separate from clue definitions.
 
@@ -202,6 +206,9 @@ Flows currently being built or ready to implement — may hold more than one ent
 
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
+- [robustness] Atomic save writes, hard boot-guard on empty registries, migration scaffolds, run-state guards, price/save/migration tests — see `dev/docs/plans/robustness_hardening.sketch.md`
+- [affix_items] Affix generation core (name→clues reversal, generator + resources + validator); playtest-build blocker — see `dev/docs/plans/item_affix_generation_core.spec.md` (design: `item_affix_generation.sketch.md`)
+- [affix_items] Affix-only naming (full removal of per-clue/anchor naming), depends on the core spec — see `dev/docs/plans/item_affix_naming.spec.md`
 - [simple-demo] Stage 1 tutorial split out to the Simple Tutorial draft; Director skeleton + Dialog remain surviving subsystems
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 - [dev/auto-auction] Debug-only quick-win buttons: instant player win at opening bid or rolled price (skip NPC bidding loop; rolled path seeds future auto-bid perk) — see `dev/docs/plans/debug_auto_auction.md`
