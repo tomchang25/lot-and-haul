@@ -6,6 +6,7 @@
 **/shader_cache
 **/script_templates
 **/*_back
+**/tmp
 **/test/test_data
 
 **/dev/tools/bin

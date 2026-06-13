@@ -79,6 +79,19 @@ func _ready() -> void:
     _populate_rows()
     _refresh_detail()
 
+    Director.register_scene(
+        "storage",
+        {
+            "item_table": _item_list_panel,
+            "detail_rail": _detail_section,
+            "repair_btn": _repair_btn,
+            "restore_btn": _restore_btn,
+            "research_btn": _research_btn,
+            "ap_label": _ap_label,
+            "leave_btn": _back_btn,
+        },
+    )
+
 # ══ Signal handlers ═══════════════════════════════════════════════════════════
 
 

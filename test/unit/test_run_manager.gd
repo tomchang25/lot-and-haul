@@ -116,22 +116,22 @@ func test_clue_hit_and_miss() -> void:
     var anchor := _make_anchor("test_anchor", 100.0, cat)
     var easy := _make_clue("easy", ClueData.ClueType.SURFACE, "appraisal", 5, "add", 10.0)
     var hard := _make_clue("hard", ClueData.ClueType.SURFACE, "appraisal", 19, "add", 20.0)
-
-    var entry := ItemEntry.from_generation(anchor, [easy, hard], [], cat)
+    var rng := _seed_rng(2)
+    var entry := ItemEntry.from_generation(anchor, [easy, hard], [], cat, rng)
 
     entry.unveil()
-    assert_true(entry.attempt_clue(easy, 1), "easy clue should succeed with attribute bonus")
+    assert_true(entry.attempt_clue(easy, 1, rng), "easy clue should succeed with attribute bonus")
     assert_eq(entry.revealed_clue_ids.size(), 1, "one clue should be revealed")
 
     var revealed_before := entry.revealed_clue_ids.duplicate()
-    assert_false(entry.attempt_clue(hard, 0), "hard clue should miss with zero bonus")
+    assert_false(entry.attempt_clue(hard, 0, rng), "hard clue should miss with zero bonus")
     assert_eq(
         entry.revealed_clue_ids,
         revealed_before,
         "revealed set should stay stable after miss",
     )
 
-    assert_true(entry.attempt_clue(hard, 19), "hard clue should hit with max bonus")
+    assert_true(entry.attempt_clue(hard, 19, rng), "hard clue should hit with max bonus")
     assert_eq(entry.revealed_clue_ids.size(), 2, "both clues should be revealed")
 
 # ══ Cargo Commit ═══════════════════════════════════════════════════════════
@@ -160,10 +160,11 @@ func test_commit_lot_win() -> void:
     var loc := _make_location()
     RunManager.create_run_store(loc, car)
 
-    var cat := _make_category("test_cat")
     var lot_data := LotData.new()
     lot_data.lot_id = "test_lot"
     lot_data.npc_clue_sight_chance = 0.0
+    lot_data.item_count_min = 0
+    lot_data.item_count_max = 0
 
     var rng := _seed_rng(7)
     var lot_entry := LotEntry.create(lot_data, rng)

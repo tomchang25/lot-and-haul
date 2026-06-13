@@ -28,7 +28,12 @@ Use these sections, in this order. `## Summary` and `## Changes` are REQUIRED; t
 
 ### `## Changes` (required)
 
-Bullet list of logical changes, one `-` bullet per change, same imperative style as commit bodies (e.g. `- Add demand tags to CustomerEntry`). Group by area if the list exceeds ~8 bullets.
+The logical changes the PR makes. Format is free — use whatever reads clearest for this PR: a bullet list (one logical change per `-` bullet), prose, or grouped sub-headings for a larger PR. Bullets, when used, follow the same imperative style as commit bodies (e.g. `- Add demand tags to CustomerEntry`). Summarize logical changes, not commits — the two need not map 1:1.
+
+For a PR large enough to warrant grouping, pick whichever grouping fits the PR; default to **by area** when in doubt:
+
+- **By area / module** (default) — group bullets under the module or scene they touch (`**CustomerEntry**`, `**customer_sell scene**`, …). Matches how a reviewer reads the diff, so it's the safe choice for most PRs.
+- **By feature / theme** — group under each self-contained sub-feature or theme (`### Demand-tag matching`, `### Incidental fixes`, …). Use only when one PR genuinely carries several independent strands; if the strands are fully independent, prefer splitting into separate PRs instead.
 
 ### `## Testing` (when code changed)
 

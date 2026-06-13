@@ -42,6 +42,14 @@ func _ready() -> void:
 
     _refresh_display()
 
+    Director.register_scene(
+        "hub",
+        {
+            "slot_label": _slot_label,
+            "storage_btn": _storage_btn,
+        },
+    )
+
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
 

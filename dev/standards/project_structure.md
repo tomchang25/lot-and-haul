@@ -85,7 +85,7 @@ Organize `.tres` files by **content type**, not by which block reads them.
 
 ### What does not belong in data/
 
-Code-generated runtime objects are not designer content and do not belong in `data/`. Runtime *types* — the live instances, stores, snapshots, and services the game mutates during play — live in `common/gameplay/`, organized by archetype; see `CLAUDE.md` for the taxonomy and folder layout. Only block-local throwaway state with no archetype stays in its owning `game/[feature]/` folder.
+Code-generated runtime objects are not designer content and do not belong in `data/`. Runtime _types_ — the live instances, stores, snapshots, and services the game mutates during play — live in `common/gameplay/`, organized by archetype; see `CLAUDE.md` for the taxonomy and folder layout. Only block-local throwaway state with no archetype stays in its owning `game/[feature]/` folder.
 
 ---
 
@@ -272,23 +272,69 @@ The main scene for the current build is registered in `project.godot`.
 
 ---
 
+## Testing & Verification
+
+Three verification layers, each with a distinct purpose and placement rule:
+
+| Layer      | Location                                        | Runs via                                        | Purpose                                                                                             |
+| ---------- | ----------------------------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Unit tests | `test/unit/`                                    | `--test-unit` (GUT)                             | Logic, state, numbers, invariants — fast, headless, deterministic                                   |
+| Testbeds   | `stage/testbeds/` + `global/autoloads/harness/` | Manual launcher, or `--testbed=<id>` pilot      | Drop into one seeded flow at full fidelity — by hand for feel, or agent-driven for capture + checks |
+| Harnesses  | `global/autoloads/harness/`                     | `--ci-run`, `--tutorial-shot`, `--testbed=<id>` | Automated pilots — CI smoke, screenshot capture, testbed driving                                    |
+
+Triage principle: prefer a unit assertion over a screenshot, and a screenshot over a manual testbed. Reach for a screenshot only when the thing being verified is a genuine pixel property (overlay placement, dim-hole alignment, theme, overlap). Reach for a testbed when the thing being verified requires interactive exploration or is hard to automate (feel, timing, edge-case reproduction).
+
+Harnesses are registered as Godot autoloads in `project.godot` because Godot requires it, but they are completely inert without their command-line flag — no files written, no behavior change, no log lines on a normal launch.
+
+### Testbeds — two doors over one registry
+
+A testbed is one **seeded flow** that runs at full fidelity (real controls, real navigation, real transitions). All testbeds are enumerated once in `stage/testbeds/testbed_registry.gd`; two front doors consume that registry:
+
+- **Manual launcher** (`stage/testbeds/testbed_launcher.tscn`, debug-gated) — one button per registry entry; click wipes the test slot, seeds, and enters the flow in a real window. For feel, layout, and interactive exploration.
+- **Agent pilot** (`global/autoloads/harness/testbed_pilot.gd`) — `--testbed=<id>` runs the same wipe-seed-enter sequence headlessly, drives the flow, captures a per-step screenshot series, and writes a report with three mechanical checks (error-level log lines, stalls, and foreground-panel overlaps via `testbed_checks.gd`). For automated capture and regression-style observation. See `dev/agent_rules/godot_screenshot_check.md` for the headless run command.
+
+Both doors call the shared `TestbedRegistry.launch()`, which routes saves to a dedicated **test slot** (`SaveManager.use_test_slot()`) wiped on every launch — no testbed action ever touches a numbered save slot, and a normal boot never resumes into test data.
+
+#### Adding a testbed
+
+1. Add one `_entry(...)` row to `registry` in `stage/testbeds/testbed_registry.gd`: an `id`, a button `label`, a `fixture` Callable, a SceneRouter `enter` Callable, and an optional `tutorial` script id. Keep it a `static var`, never `const` — see `dev/skills/gdscript_const_vs_static_var.md`.
+2. If the flow needs non-default state, add one fixture (next item). If an existing fixture already seeds what you need, reuse it — `selling` reuses `StorageFixtures`.
+
+No new launch path, autoload, or wiring — both doors pick the entry up automatically.
+
+### Fixtures convention (`*_fixtures.gd`)
+
+A fixture seeds the disposable state a flow needs, then hands off to the normal navigation path. The same fixtures feed both the screenshot harness (`shot_pilot.gd`) and the testbed doors.
+
+- One file per scene, named `<scene>_fixtures.gd`, kept **next to the scene** it seeds (e.g. `game/meta/storage/storage_fixtures.gd`).
+- `extends RefCounted` with `class_name <Scene>Fixtures`; expose `static func seed_<variant>() -> void` methods taking no arguments.
+- Seed **through manager APIs** (`MetaManager`, `RunManager`, registries), never by mutating an Entry/Store directly — the mutation-mediation rule applies (see `runtime_type_archetypes.md`).
+- Be **deterministic**: seed any RNG (`rng.seed = 42`) and prefer first-of-registry over hard-coded ids, so captures and checks are reproducible.
+- Guard missing prerequisites with `ToastManager.show_error(...)` and return early rather than crashing the harness.
+- Seed enough surrounding state that real exits work (leaving storage returns to a populated hub; finishing a run resolves into the real summary) — the point is to exercise the real flow, not isolate one scene.
+
+---
+
 # Placement Rules
 
-| Content type                                            | Location                             |
-| ------------------------------------------------------- | ------------------------------------ |
-| Reusable framework or engine utilities                  | `common/`                            |
-| Designer-authored Resource class definitions (`.gd`)    | `data/definitions/`                  |
-| Designer-authored asset files (`.tres`)                 | `data/<type>/`                       |
-| YAML source files for data pipeline                     | `data/yaml/`                         |
-| Runtime types (Entry/Instance, Store, Snapshot, Service) | `common/gameplay/` (see `CLAUDE.md`) |
-| Block-local throwaway runtime state (no archetype)      | `game/[feature]/`                    |
-| Block scene roots, UI components, block logic           | `game/[feature]/`                    |
-| UI components and helpers shared across multiple blocks | `game/_shared/`                      |
-| Global autoloads                                        | `global/autoloads/`                  |
-| Testbed scenes                                          | `stage/testbeds/`                    |
-| Run entry scenes                                        | `stage/runs/`                        |
-| Tilesets and terrain assets                             | `stage/tilesets/`                    |
-| Tooling scripts                                         | `dev/tools/`                         |
-| Localization files                                      | `localization/`                      |
+| Content type                                             | Location                              |
+| -------------------------------------------------------- | ------------------------------------- |
+| Reusable framework or engine utilities                   | `common/`                             |
+| Designer-authored Resource class definitions (`.gd`)     | `data/definitions/`                   |
+| Designer-authored asset files (`.tres`)                  | `data/<type>/`                        |
+| YAML source files for data pipeline                      | `data/yaml/`                          |
+| Runtime types (Entry/Instance, Store, Snapshot, Service) | `common/gameplay/` (see `CLAUDE.md`)  |
+| Block-local throwaway runtime state (no archetype)       | `game/[feature]/`                     |
+| Block scene roots, UI components, block logic            | `game/[feature]/`                     |
+| UI components and helpers shared across multiple blocks  | `game/_shared/`                       |
+| Global autoloads                                         | `global/autoloads/`                   |
+| Unit tests (GUT)                                         | `test/unit/`                          |
+| Scene fixtures (`*_fixtures.gd`)                         | `game/[feature]/` (next to the scene) |
+| Testbed registry + manual launcher                       | `stage/testbeds/`                     |
+| Automated harnesses (CI, screenshot, testbed pilot)      | `global/autoloads/harness/`           |
+| Run entry scenes                                         | `stage/runs/`                         |
+| Tilesets and terrain assets                              | `stage/tilesets/`                     |
+| Tooling scripts                                          | `dev/tools/`                          |
+| Localization files                                       | `localization/`                       |
 
 Avoid placing gameplay scripts directly in the project root unless they are truly project-level files.

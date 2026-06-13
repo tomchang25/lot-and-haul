@@ -49,6 +49,12 @@ func _ready() -> void:
     for i: int in 3:
         _slot_btns[i].pressed.connect(_on_slot_pressed.bind(i + 1))
 
+    if Debug.enabled:
+        var testbed_btn := Button.new()
+        testbed_btn.text = "Testbeds"
+        testbed_btn.pressed.connect(_on_testbeds_pressed)
+        _buttons_vbox.add_child(testbed_btn) # node-src: debug
+
     _refresh()
 
 
@@ -84,6 +90,15 @@ func _on_settings_pressed() -> void:
 
 func _on_quit_pressed() -> void:
     get_tree().quit()
+
+
+## Opens the testbed launcher. Debug-only — button only exists when Debug.enabled.
+func _on_testbeds_pressed() -> void:
+    var launcher := load("res://stage/testbeds/testbed_launcher.tscn") as PackedScene
+    if launcher == null:
+        ToastManager.show_error("StartPage: testbed_launcher.tscn not found")
+        return
+    get_tree().change_scene_to_packed(launcher)
 
 # ══ Signal handlers — Slot picker ═════════════════════════════════════════════
 

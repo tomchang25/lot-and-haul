@@ -2,6 +2,50 @@
 
 Append-only record of shipped work.
 
+## Scene Testbeds & Agent Harness
+
+- 2026-06-13 — [dev] SaveManager test slot isolation: `use_test_slot()` wipes and redirects to a non-numeric test slot; boot-load and slot-listing skip it so no normal boot ever resumes into test data
+- 2026-06-13 — [dev] `TestbedRegistry` (`stage/testbeds/testbed_registry.gd`) with `static var REGISTRY` and shared `launch()` entry point consumed by both the manual launcher and the agent pilot
+- 2026-06-13 — [dev] Scene fixtures for 3 flows: storage/workshop (reusing `StorageFixtures`), location-entry→run-start (`LocationEntryFixtures`), and nightly selling (`CustomerSellFixtures`)
+- 2026-06-13 — [dev] `TestbedLauncher` scene (debug-gated, one button per registry entry) + start-page debug entry point for manual interactive use
+- 2026-06-13 — [dev] `TestbedPilot` autoload (`global/autoloads/harness/testbed_pilot.gd`) — `--testbed=<id>` CLI flag launches the same wipe-seed-enter sequence headlessly, drives the flow, and captures per-step screenshots
+- 2026-06-13 — [dev] `TestbedChecks` static class (`testbed_checks.gd`) with log-scan (error-level lines w/ benign-noise filter), stall detection (per-step timeout bound), and foreground-panel overlap checks
+- 2026-06-13 — [doc] `dev/agent_rules/godot_screenshot_check.md` updated with testbed pilot reference and headless run command
+- 2026-06-13 — [skill] `dev/skills/gdscript_const_vs_static_var.md` documents the `const` vs `static var` pitfall for manifest/registry arrays under clean headless import
+- 2026-06-13 — [doc] `dev/docs/plans/scene_testbeds_and_agent_harness.sketch.md` shipped and archived
+
+## Director Split & Testing Taxonomy
+
+- 2026-06-13 — [refactor] Director autoload split into two focused autoloads: Director (presentation: dim overlay, hint/popup panels, step playback, Anchor registration, Help button) and ScriptDirector (orchestration: scene registration callbacks, auto-start/offer/help decisions, injection skeleton, phase lifecycle)
+- 2026-06-13 — [refactor] Scene registration emits `register_scene_callback` signal instead of branching internally; hub and storage scenes unchanged — still call `Director.register_scene()`
+- 2026-06-13 — [refactor] ScriptDirector connects to Director signals and drives tutorial start/offer/help decisions from game state (seen flags), leaving Director presentation-only
+- 2026-06-13 — [dev] Testing taxonomy documented in `project_structure.md`: three verification layers (unit tests in `test/`, testbeds in `stage/testbeds/`, harnesses in `global/autoloads/harness/`) with placement rules and triage principle
+- 2026-06-13 — [doc] `dev/docs/plans/director_split_and_testing_taxonomy.sketch.md` shipped and archived
+
+## Test Harness Consolidation
+
+- 2026-06-13 — [dev] Relocated `ShotPilot` and `CIPilot` from top-level autoload dirs into `global/autoloads/harness/`; updated `project.godot` autoload paths and `game_manager.gd` comment
+- 2026-06-13 — [dev] Director seam: extracted public `advance_step()` / `accept_offer()` commands; routed `_on_hint_next_pressed`, `_on_popup_next_pressed`, and `_on_offer_start_pressed` through them; removed `debug_*` twin methods (`debug_advance_step`, `debug_accept_offer`); renamed read accessors (`debug_step_index` → `step_index`, etc.)
+- 2026-06-13 — [dev] Generic-pilot PoC: ShotPilot now manifest-driven (`MANIFEST` constant table); `_seed_storage_state` + `_sample_clues` moved to `game/meta/storage/storage_fixtures.gd`; fixture lookup via path convention; `_enter_scene` replaces per-script match dispatch
+- 2026-06-13 — [dev] Updated `godot_screenshot_check.md` with triage note (prefer unit assertion over screenshot) and manifest-plus-fixture flow for new targets
+
+## Tutorial Screenshot Harness — ShotPilot
+
+- 2026-06-13 — [tutorial] `ShotPilot` autoload (`global/autoloads/shot_pilot/shot_pilot.gd`): flag-gated (`--tutorial-shot=<id|all>`) capture harness that seeds game state, navigates to the owning scene, accepts the offer prompt, advances through every tutorial step, and saves one PNG per step to a configurable output directory (`--shot-dir=<path>`, default `user://tutorial_shots`); exits 0 on success, 1 on unknown script id
+- 2026-06-13 — [tutorial] Director debug surface: `debug_step_index()`, `debug_step_count()`, `debug_step_anchor_id(i)`, `debug_is_offer_showing()`, `debug_advance_step()`, `debug_accept_offer()` — enables programmatic capture without input simulation
+- 2026-06-13 — [tutorial] Storage state seeding: `ShotPilot._seed_storage_state()` creates 3 `ItemEntry` instances from registry data, marks first as repair-complete (condition = 0.5), registers via `MetaManager.register_storage_items()`, and begins a storage slot with full AP pool; row selection via `ItemListPanel.row_pressed` signal
+- 2026-06-13 — [tutorial] `dev/docs/plans/tutorial_shot_harness.sketch.md` shipped and archived
+
+## Tutorial Hint Panel — Director System
+
+- 2026-06-12 — [tutorial] `Director` autoload added: code-built dim-overlay CanvasLayer (layer 120) with hint/popup step display, four-rect hole cutout, per-frame anchor tracking, and help button; registered in `project.godot` after SceneRouter
+- 2026-06-12 — [tutorial] `TutorialStep` RefCounted resource class with Kind (HINT/POPUP), Advance (NEXT/SCENE_ENTERED), unlock_anchor flag
+- 2026-06-12 — [tutorial] `TutorialScripts` static class with hub script (slot intro → activity popup → Storage button unlock) and storage script (welcome popup → item table → detail rail → repair/restore/research → appraised-vs-verified popup → AP label → leave button)
+- 2026-06-12 — [tutorial] Hub scene integration: `Director.register_scene("hub", ...)` with slot_label and storage_btn anchors; auto-starts on first visit
+- 2026-06-12 — [tutorial] Storage scene integration: `Director.register_scene("storage", ...)` with 7 anchors; first-visit offer prompt (start/skip), Help button replay; all steps explain-only
+- 2026-06-12 — [tutorial] ProgressStore schema v2: `tutorial_seen` dictionary with migration branch; `MetaManager.mark_tutorial_seen()` wired to deferred save
+- 2026-06-12 — [test] `ItemEntry.attempt_clue()` gains optional `rng` parameter; test RNG injection for deterministic clue roll assertions
+
 ## CI Headless Run-Loop Test Suite
 
 - 2026-06-12 — [ci] RNG injection refactor: `ItemEntry`, `LotEntry`, `ItemGenerator` gain optional seedable RNG parameter with null-fallback preserving all production call sites; `RandomUtils` extended
@@ -34,7 +78,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-06-12 — [lint] `lint_standards.py` gains bare-push-error check across all project GDScript dirs (`game`, `stage`, `common`, `global`, `data`); check dispatch restructured into `GD_SCENE_CHECKS` / `GD_ERROR_GUARD_CHECKS` scopes; match-wildcard safe-set updated from `push_error` to `ToastManager.show_dev_error`
 - 2026-06-12 — [standard] `standards_enforcement.md` documents bare push_error ban as active check; `naming_conventions.md` match-wildcard reference updated to `show_dev_error`
 - 2026-06-12 — [docs] CLAUDE.md updated: Notifications section adds `show_error`/`show_dev_error` mentions, Error guards section added with standard pointer
-- 2026-06-12 — [error_guard] 17 files migrated from `assert()` / bare `push_error` to typed guards: `auction_scene.gd`, `inspection_scene.gd`, `location_entry_scene.gd` (2×), `reveal_scene.gd` (runtime — `show_error` + navigate); `state.gd`, `state_machine.gd` (2×), `cargo_shapes.gd`, `economy_store.gd` (2×), `audio_manager.gd`, `knowledge_manager.gd` (3×), `meta_manager.gd`, `run_manager.gd`, `resource_registry.gd`, `super_category_registry.gd`, `resource_dir_loader.gd`, `save_manager.gd` (7× — 5 precondition + 2 runtime I/O), `registry_audit.gd` (programmer error — `show_dev_error` + return/sentinel); `settings_store.gd` (4×) annotated with boot markers
+- 2026-06-12 — [error_guard] 17 files migrated from `assert()` / bare `push_error` to typed guards: `auction_scene.gd`, `inspection_scene.gd`, `location_entry_scene.gd` (2×), `reveal_scene.gd` (runtime — `show_error` + navigate); `state.gd`, `state_machine.gd` (2×), `cargo_shapes.gd`, `economy_store.gd` (2×), `audio_manager.gd`, `knowledge_manager.gd` (3×), `meta_manager.gd`, `run_manager.gd`, `resource_registry.gd`, `super_category_registry.gd`, `resource_dir_loader.gd`, `save_manager.gd` (7× — 5 precondition + 3 runtime I/O), `registry_audit.gd` (programmer error — `show_dev_error` + return/sentinel); `settings_store.gd` (4×) annotated with boot markers
 
 ## Location Selection Cost Preview
 
@@ -49,7 +93,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-06-11 — [save] Boot sequence: `SaveManager.load()` renamed to `SaveManager.boot_load()`; `GameManager` calls `boot_load()` instead of `load()`
 - 2026-06-11 — [start] Start page rewritten: `PlayButton` split into `NewGameButton` + `LoadGameButton`; slot picker overlay with 3-slot buttons showing day/cash summaries; New Game mode shows all slots (occupied → overwrite confirmation), Load Game mode shows only occupied slots; confirmation dialogs for overwrite; back button returns to main menu
 - 2026-06-11 — [start] Scene file (`start_page_scene.tscn`): slot picker panel with `PickerTitle`, 3 `Slot*Button`s, `PickerBackButton`, `SpacerTop`/`SpacerBottom`, `OverwriteDialog` confirmation dialog; `PlayButton` → `NewGameButton` + `LoadGameButton` with `unique_name_in_owner = true`
-- 2026-06-11 — [theme] `main_theme.tres`: StyleBoxFlat sub-resource order reorganized (disabled/focus/hover before normal); UID attributes added to checkbox icon ext_resources; minor color tweaks (disabled bg 0.16/.18, border 0.22/.25); focus border style added
+- 2026-06-11 — [theme] `main_theme.tres`: StyleBoxFlat sub-resource color order reorganized (disabled/focus/hover before normal); UID attributes added to checkbox icon ext_resources; minor color tweaks (disabled bg 0.16/.18, border 0.22/.25); focus border style added
 - 2026-06-11 — [docs] `dev/docs/plans/save_slots.md` and `dev/docs/plans/start_page_new_game.md` shipped and archived
 
 ## Save Diagnostics & Restore Hardening
@@ -265,7 +309,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-05-01 — [hub] Day Pass confirmation dialog routes through `MetaManager.advance_days(1)` to `DaySummaryScene`
 - 2026-05-01 — [hub] Vehicle button replaces Van info popup; routes to `GameManager.go_to_vehicle_hub()`
 - 2026-05-01 — [hub] `_refresh_display()` refreshes header on return from `DaySummaryScene`
-- 2026-05-01 — [hub] Knowledge Hub entry scene routing to Mastery / Attributes / Perks sub-panels
+- 2026-05-01 — [knowledge] Knowledge Hub entry scene routing to Mastery / Attributes / Perks sub-panels
 - 2026-05-01 — [day-summary] `DaySummaryScene` shared by hub day-pass and run-review flows; reads from `GameManager.consume_pending_day_summary()`, falls back to hub if empty
 - 2026-05-01 — [day-summary] `DaySummary` value object with `start_day` / `end_day` / `days_elapsed`, run fields, `cargo_count`, `living_cost`, `completed_actions`, `net_change`, `has_run_data()` gate
 - 2026-05-01 — [day-summary] `DaySummary.cargo_count` + regrouped scene (TripExpensesGroup / DailyGroup / CargoCountLabel); trip expenses, daily living, cargo summary no longer share a column

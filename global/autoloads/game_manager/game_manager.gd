@@ -17,6 +17,10 @@ func _ready() -> void:
         _boot_for_ci()
         return
 
+    if _has_testbed_flag(args):
+        _boot_for_testbed()
+        return
+
     _boot_normal()
 
 
@@ -42,10 +46,25 @@ func _boot_for_tests() -> void:
 
 func _boot_for_ci() -> void:
     # Autoloads initialize normally. Save loading, validation, and scene audit
-    # run as usual. Scene routing is skipped — the CI pilot autoload (ci_pilot.gd)
+    # run as usual. Scene routing is skipped — the CI pilot autoload (harness/ci_pilot.gd)
     # detects the --ci-run flag and manages the full auto-pilot loop, including
     # its own exit.
     SaveManager.boot_load()
     var validation_ok: bool = SaveManager.run_validation()
     var scene_ok: bool = RegistryAudit.check_scene_registry(SceneRouter.scenes)
     var _audit_ok: bool = validation_ok and scene_ok
+
+
+func _boot_for_testbed() -> void:
+    # Save loading is skipped — TestbedPilot calls SaveManager.use_test_slot()
+    # which wipes and resets providers before seeding. Only the scene registry
+    # audit runs so wiring bugs are surfaced early.
+    var _scene_ok: bool = RegistryAudit.check_scene_registry(SceneRouter.scenes)
+
+
+## Returns true when any argument begins with --testbed=.
+func _has_testbed_flag(args: PackedStringArray) -> bool:
+    for arg: String in args:
+        if arg.begins_with("--testbed="):
+            return true
+    return false
