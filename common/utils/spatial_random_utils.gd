@@ -44,9 +44,4 @@ static func random_point_in_annulus(center: Vector2, min_radius: float, max_radi
 
 
 static func _resolve_rng(rng: RandomNumberGenerator = null) -> RandomNumberGenerator:
-    if rng != null:
-        return rng
-
-    var fallback_rng := RandomNumberGenerator.new()
-    fallback_rng.randomize()
-    return fallback_rng
+    return RandomUtils.resolve_rng(rng)

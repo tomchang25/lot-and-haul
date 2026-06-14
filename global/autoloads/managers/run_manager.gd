@@ -109,8 +109,8 @@ func apply_trailer_damage() -> int:
 
     var cracked := 0
     for entry: ItemEntry in run.trailer_items:
-        if randf() < car.trailer_damage_chance:
-            var ratio := randf_range(car.trailer_damage_ratio_min, car.trailer_damage_ratio_max)
+        if RandomUtils.randf() < car.trailer_damage_chance:
+            var ratio := RandomUtils.randf_range(car.trailer_damage_ratio_min, car.trailer_damage_ratio_max)
             entry.apply_damage(ratio)
             cracked += 1
     return cracked

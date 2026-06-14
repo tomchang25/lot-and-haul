@@ -132,7 +132,7 @@ func _on_npc_tick() -> void:
     else:
         step_multiplier = 1.0
 
-    if randf() < 0.1:
+    if RandomUtils.randf() < 0.1:
         step_multiplier *= 4.0
 
     var step := max(roundi(_current_display_price * STEP_RATIO * step_multiplier), MIN_STEP)
@@ -264,9 +264,9 @@ func _start_npc_timer() -> void:
         min_time = 0.5
         max_time = 1.5
 
-    var interval := randf_range(min_time, max_time)
+    var interval := RandomUtils.randf_range(min_time, max_time)
 
-    if _shorten_next_npc_tick or randf() < 0.25:
+    if _shorten_next_npc_tick or RandomUtils.randf() < 0.25:
         interval *= 0.5
         _shorten_next_npc_tick = false
 
@@ -283,7 +283,7 @@ func _start_circle(from_fill: float) -> void:
     _circle_node.set_fill(from_fill)
 
     # Re-roll closing interval each cycle.
-    var closing_interval := randf_range(3.0, 5.0)
+    var closing_interval := RandomUtils.randf_range(3.0, 5.0)
     var remaining := 1.0 - from_fill
     var duration := closing_interval * remaining
 
@@ -350,9 +350,9 @@ func _show_player_bid_in_stack(price: int) -> void:
 
 
 func _show_npc_popup(price: int) -> void:
-    var new_index := randi() % NPC_NAMES.size()
+    var new_index := RandomUtils.randi() % NPC_NAMES.size()
     while new_index == _last_npc_index:
-        new_index = randi() % NPC_NAMES.size()
+        new_index = RandomUtils.randi() % NPC_NAMES.size()
 
     _last_npc_index = new_index
     var npc_name: String = NPC_NAMES[new_index]

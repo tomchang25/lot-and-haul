@@ -13,7 +13,7 @@ extends RefCounted
 ## surface clues from the generic pool and zero hidden clues.
 ##
 ## [param rng] — optional seedable RNG for deterministic generation.
-## When null, creates a fresh randomized RNG (production path).
+## When null, falls back to RandomUtils' shared production RNG.
 ## Returns a fully-formed ItemEntry (null anchor means the slot should be skipped).
 static func draw(
         category: CategoryData,
@@ -22,10 +22,7 @@ static func draw(
         surface_max: int,
         rng: RandomNumberGenerator = null,
 ) -> ItemEntry:
-    var resolved_rng := rng
-    if resolved_rng == null:
-        resolved_rng = RandomNumberGenerator.new()
-        resolved_rng.randomize()
+    var resolved_rng := RandomUtils.resolve_rng(rng)
 
     # ── 1. Anchor ────────────────────────────────────────────────────────
     var anchor := _draw_anchor(category, tier_weights, resolved_rng)

@@ -85,13 +85,13 @@ static func dice_pool_size(depth: int, verified_count: int) -> int:
     return base + verified_count * VERIFIED_BONUS_DICE
 
 
-## Rolls [param pool_size] d6 using the injected RNG.
-## Pure + RNG-injectable so aggressive-sell rolls are unit-testable and
-## deterministic under a seeded RNG (the scene passes a randomized RNG).
-static func roll_dice(pool_size: int, rng: RandomNumberGenerator) -> Array[int]:
+## Rolls [param pool_size] d6 using [param rng], or RandomUtils' shared RNG when omitted.
+## RNG-injectable so aggressive-sell rolls are unit-testable under a seeded RNG.
+static func roll_dice(pool_size: int, rng: RandomNumberGenerator = null) -> Array[int]:
+    var resolved_rng := RandomUtils.resolve_rng(rng)
     var rolls: Array[int] = []
     for i in range(maxi(0, pool_size)):
-        rolls.append(rng.randi_range(1, 6))
+        rolls.append(resolved_rng.randi_range(1, 6))
     return rolls
 
 

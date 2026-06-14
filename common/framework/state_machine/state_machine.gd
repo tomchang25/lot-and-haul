@@ -58,7 +58,7 @@ func _ready() -> void:
 
     # Spread tick phases so multiple machines don't all fire on the same frame.
     if tick_stagger:
-        var offset := randf_range(0.0, tick_interval)
+        var offset := RandomUtils.randf_range(0.0, tick_interval)
         _process_accumulator = offset
         _physics_accumulator = offset
 

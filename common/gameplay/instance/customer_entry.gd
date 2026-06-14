@@ -12,7 +12,7 @@ var display_name: String = ""
 var grid_columns: int = 2
 var grid_rows: int = 2
 
-## Clue ids (tags) the customer is looking to buy. A clue's id IS its tag;
+## Clue ids (tags) the customer is looking to buy. A clue's id IS its tag
 ## an item fits when its revealed clue ids intersect these.
 var demand_tags: Array[String] = []
 
@@ -50,7 +50,6 @@ const GRID_PRESETS: Array[Vector2i] = [
     Vector2i(5, 4),
 ]
 
-
 ## Default demand-tag count range per customer.
 const DEFAULT_TAG_MIN: int = 2
 const DEFAULT_TAG_MAX: int = 4
@@ -64,25 +63,26 @@ const DEFAULT_NIGHT_MAX: int = 5
 
 ## Generates a single customer.
 ##
-## [param rng] — seedable RNG for deterministic generation.
 ## [param owned_clue_ids] — clue tags revealed on the player's current storage.
 ##   Each demand tag has a 50% chance of being drawn from this pool
 ##   (guaranteed-matchable) and 50% from the full vocabulary — a per-tag bias,
 ##   so roughly half of a customer's tags match current storage.
 ## [param all_clue_ids] — full tag vocabulary to draw random demand from.
 ##   Defaults to the surface+hidden clue ids in ClueRegistry when empty.
+## [param rng] — optional seedable RNG for deterministic generation.
 static func generate(
-        rng: RandomNumberGenerator,
         owned_clue_ids: Array[String] = [],
         all_clue_ids: Array[String] = [],
         tag_min: int = DEFAULT_TAG_MIN,
         tag_max: int = DEFAULT_TAG_MAX,
+        rng: RandomNumberGenerator = null,
 ) -> CustomerEntry:
+    var resolved_rng := RandomUtils.resolve_rng(rng)
     var c := CustomerEntry.new()
-    c.customer_id = "cust_%s" % RandomUtils.random_id(rng)
-    c.display_name = RandomUtils.random_name(rng)
+    c.customer_id = "cust_%s" % RandomUtils.random_id(resolved_rng)
+    c.display_name = RandomUtils.random_name(resolved_rng)
 
-    var preset: Vector2i = GRID_PRESETS[rng.randi_range(0, GRID_PRESETS.size() - 1)]
+    var preset: Vector2i = GRID_PRESETS[resolved_rng.randi_range(0, GRID_PRESETS.size() - 1)]
     c.grid_columns = preset.x
     c.grid_rows = preset.y
 
@@ -90,10 +90,13 @@ static func generate(
         all_clue_ids = _tag_vocabulary()
 
     c.demand_tags = _pick_biased_demand(
-        rng, owned_clue_ids, all_clue_ids, tag_min, tag_max,
+        resolved_rng,
+        owned_clue_ids,
+        all_clue_ids,
+        tag_min,
+        tag_max,
     )
     return c
-
 
 # ══ Nightly generation ═══════════════════════════════════════════════════════
 
@@ -106,14 +109,16 @@ static func generate(
 ## [param count] — number of customers. When negative, a random
 ##   DEFAULT_NIGHT_MIN..DEFAULT_NIGHT_MAX count is rolled. The time-slot economy
 ##   feature passes a slot-derived count here.
+## [param rng] — optional seedable RNG for deterministic generation.
 static func generate_for_night(
-        rng: RandomNumberGenerator,
         storage_items: Array = [],
         count: int = -1,
         all_clue_ids: Array[String] = [],
+        rng: RandomNumberGenerator = null,
 ) -> Array[CustomerEntry]:
+    var resolved_rng := RandomUtils.resolve_rng(rng)
     if count < 0:
-        count = rng.randi_range(DEFAULT_NIGHT_MIN, DEFAULT_NIGHT_MAX)
+        count = resolved_rng.randi_range(DEFAULT_NIGHT_MIN, DEFAULT_NIGHT_MAX)
 
     if all_clue_ids.is_empty():
         all_clue_ids = _tag_vocabulary()
@@ -127,7 +132,7 @@ static func generate_for_night(
     var result: Array[CustomerEntry] = []
     result.resize(count)
     for i in range(count):
-        result[i] = generate(rng, owned_pool, all_clue_ids)
+        result[i] = generate(owned_pool, all_clue_ids, DEFAULT_TAG_MIN, DEFAULT_TAG_MAX, resolved_rng)
     return result
 
 

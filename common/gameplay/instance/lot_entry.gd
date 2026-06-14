@@ -33,21 +33,30 @@ var npc_estimate: int = 0
 # and generating one ItemEntry per roll in lot_data.item_count_min/max
 # using the pool-based ItemGenerator.
 # [param rng] — optional seedable RNG for deterministic generation.
-# When null, falls back to global rand*() calls.
+# When null, falls back to RandomUtils' shared production RNG.
 # Apply external modifiers (player buffs, NPC presence) to the returned entry
 # before passing it to RunManager.create_run_store().
 static func create(data: LotData, rng: RandomNumberGenerator = null) -> LotEntry:
     var entry := LotEntry.new()
     entry.lot_data = data
 
-    entry.aggressive_factor = rng.randf_range(
+    entry.aggressive_factor = RandomUtils.randf_range(
         data.aggressive_factor_min,
         data.aggressive_factor_max,
-    ) if rng else randf_range(data.aggressive_factor_min, data.aggressive_factor_max)
+        rng,
+    )
 
-    entry.price_variance = rng.randf_range(data.price_variance_min, data.price_variance_max) if rng else randf_range(data.price_variance_min, data.price_variance_max)
+    entry.price_variance = RandomUtils.randf_range(
+        data.price_variance_min,
+        data.price_variance_max,
+        rng,
+    )
 
-    var item_count := rng.randi_range(data.item_count_min, data.item_count_max) if rng else randi_range(data.item_count_min, data.item_count_max)
+    var item_count := RandomUtils.randi_range(
+        data.item_count_min,
+        data.item_count_max,
+        rng,
+    )
 
     for i in range(item_count):
         var category := _draw_category(data, rng)
@@ -71,7 +80,7 @@ static func create(data: LotData, rng: RandomNumberGenerator = null) -> LotEntry
         # Roll veiled_chance: each item independently starts pre-unveiled
         # when randf() > veiled_chance. Set unveiled directly —
         # no XP granted for system-level pre-unveils.
-        if data.veiled_chance < 1.0 and (rng.randf() if rng else randf()) > data.veiled_chance:
+        if data.veiled_chance < 1.0 and RandomUtils.randf(rng) > data.veiled_chance:
             item_entry.unveiled = true
         entry.item_entries.append(item_entry)
 
@@ -106,7 +115,7 @@ static func _draw_category(data: LotData, rng: RandomNumberGenerator = null) -> 
             var member_cats: Array[CategoryData] = SuperCategoryRegistry.get_categories_for_super(sc_ref)
             if member_cats.is_empty():
                 continue
-            category_id = member_cats[rng.randi() % member_cats.size() if rng else randi() % member_cats.size()].category_id
+            category_id = member_cats[RandomUtils.randi(rng) % member_cats.size()].category_id
         else:
             var cat_keys: Array = data.category_weights.keys()
             var cat_values: Array[int] = []

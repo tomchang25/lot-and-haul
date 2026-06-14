@@ -26,12 +26,17 @@ const _COLOR_ERROR := Color(0.95, 0.35, 0.3, 1.0) # error_red
 const _BG_COLOR := Color(0.15, 0.15, 0.18, 1.0) # panel surface
 const _BORDER_COLOR := Color(0.3, 0.3, 0.35, 1.0) # 1px border
 
+const _CHANNEL_WARNING := "warning"
+const _CHANNEL_INFO := "info"
+const _CHANNEL_ERROR := "error"
+const _CHANNEL_DEV_ERROR := "dev_error"
+
 var _canvas: CanvasLayer
 var _stack: VBoxContainer
 
-## Session-unique set of dev-error messages that have already been toasted.
+## Session-unique set of messages that have already been toasted by channel.
 ## Prevents toast spam from per-frame/loop guards. Cleared on restart.
-var _dev_error_toasted: Dictionary = { }
+var _toasted_messages: Dictionary = { }
 
 
 func _ready() -> void:
@@ -56,7 +61,7 @@ func _ready() -> void:
 ## Shows a warning toast. Always visible regardless of Debug.enabled.
 ## Use for corruption-fallback alerts.
 func show_warning(message: String) -> void:
-    _push_toast(message, _COLOR_WARNING, _WARN_DURATION)
+    _push_toast(message, _COLOR_WARNING, _WARN_DURATION, _CHANNEL_WARNING)
 
 
 ## Shows an info toast. Only visible when Debug.enabled is true.
@@ -64,7 +69,7 @@ func show_warning(message: String) -> void:
 func show_info(message: String) -> void:
     if not Debug.enabled:
         return
-    _push_toast(message, _COLOR_INFO, _INFO_DURATION)
+    _push_toast(message, _COLOR_INFO, _INFO_DURATION, _CHANNEL_INFO)
 
 
 ## Shows an error toast. Always visible regardless of Debug.enabled.
@@ -76,7 +81,7 @@ func show_info(message: String) -> void:
 ## operation) — the log's reported location points here, not at the guard.
 func show_error(message: String) -> void:
     push_error(message)
-    _push_toast(message, _COLOR_ERROR, _ERROR_DURATION)
+    _push_toast(message, _COLOR_ERROR, _ERROR_DURATION, _CHANNEL_ERROR)
 
 
 ## One-call programmer-error guard: always writes [param message] to the error
@@ -98,13 +103,15 @@ func show_dev_error(message: String) -> void:
     push_error("[DEV] " + message)
     if not Debug.enabled:
         return
-    if _dev_error_toasted.has(message):
+    _push_toast(message, _COLOR_ERROR, _ERROR_DURATION, _CHANNEL_DEV_ERROR)
+
+
+func _push_toast(message: String, color: Color, duration: float, channel: String) -> void:
+    var toast_key := "%s:%s" % [channel, message]
+    if _toasted_messages.has(toast_key):
         return
-    _dev_error_toasted[message] = true
-    _push_toast(message, _COLOR_ERROR, _ERROR_DURATION)
+    _toasted_messages[toast_key] = true
 
-
-func _push_toast(message: String, color: Color, duration: float) -> void:
     var panel := PanelContainer.new()
 
     var stylebox := StyleBoxFlat.new()

@@ -29,7 +29,7 @@ func pick_stream() -> AudioStream:
         _last_index = 0
         return streams[0]
 
-    var index := randi() % streams.size()
+    var index := RandomUtils.randi() % streams.size()
 
     if avoid_repeat and index == _last_index:
         index = (index + 1) % streams.size()
@@ -42,6 +42,6 @@ func resolve_pitch() -> float:
     if use_random_pitch:
         var min_pitch: float = min(pitch_random_min, pitch_random_max)
         var max_pitch: float = max(pitch_random_min, pitch_random_max)
-        return randf_range(min_pitch, max_pitch)
+        return RandomUtils.randf_range(min_pitch, max_pitch)
 
     return pitch_scale

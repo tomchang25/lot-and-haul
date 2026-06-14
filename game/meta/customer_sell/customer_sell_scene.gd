@@ -296,9 +296,7 @@ func _on_aggressive_pressed() -> void:
         dice_row.remove_child(child)
         child.queue_free()
 
-    var rng := RandomNumberGenerator.new()
-    rng.randomize() # RandomNumberGenerator.new() has a fixed seed in Godot 4.
-    var rolls := SellMath.roll_dice(pool, rng)
+    var rolls := SellMath.roll_dice(pool)
     for i in range(pool):
         var val := rolls[i]
         _dice_rolls.append(val)

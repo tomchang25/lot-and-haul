@@ -159,7 +159,7 @@ func _place_items() -> void:
 func _place_entry(entry: ItemEntry) -> void:
     var shape_cells := _get_shape_cells(entry)
     var origins := _candidate_origins()
-    origins.shuffle()
+    RandomUtils.shuffle(origins)
 
     for origin: Vector2i in origins:
         if _can_place_shape(shape_cells, origin):

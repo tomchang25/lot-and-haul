@@ -116,7 +116,7 @@ func register_storage_items(entries: Array[ItemEntry]) -> void:
 
 func roll_available_locations() -> void:
     var all: Array[LocationData] = LocationRegistry.get_all_locations()
-    all.shuffle()
+    RandomUtils.shuffle(all)
     var sampled: Array[LocationData] = []
     sampled.assign(all.slice(0, mini(Economy.LOCATION_SAMPLE_SIZE, all.size())))
     progress.set_locations(sampled)
@@ -204,27 +204,27 @@ func end_day() -> DaySummary:
 ## Generates the nightly customer set scaled by [param selling_slots].
 ## 1 → 2–3 customers, 2 → 4–6, 3 → 7–10. 0 → no customers.
 func _generate_nightly_customers(selling_slots: int) -> void:
-    var rng := RandomNumberGenerator.new()
-    rng.randomize()
-    var count := _selling_slots_to_count(rng, selling_slots)
+    var count := _selling_slots_to_count(selling_slots)
     customers.set_customers(
         CustomerEntry.generate_for_night(
-            rng,
             storage.storage_items,
             count,
         ),
     )
 
 
-func _selling_slots_to_count(rng: RandomNumberGenerator, selling_slots: int) -> int:
+func _selling_slots_to_count(selling_slots: int, rng: RandomNumberGenerator = null) -> int:
     match selling_slots:
+        0:
+            return 0
         1:
-            return rng.randi_range(2, 3)
+            return RandomUtils.randi_range(2, 3, rng)
         2:
-            return rng.randi_range(4, 6)
+            return RandomUtils.randi_range(4, 6, rng)
         3:
-            return rng.randi_range(7, 10)
+            return RandomUtils.randi_range(7, 10, rng)
         _:
+            ToastManager.show_dev_error("Unexpected selling_slots value: %d" % selling_slots)
             return 0
 
 

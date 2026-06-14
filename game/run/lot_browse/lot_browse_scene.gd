@@ -111,6 +111,6 @@ func _on_cargo_pressed() -> void:
 
 func _sample_lots(location_data: LocationData) -> Array[LotData]:
     var pool: Array[LotData] = location_data.lot_pool.duplicate()
-    pool.shuffle()
+    RandomUtils.shuffle(pool)
     var count := mini(location_data.lot_number, pool.size())
     return pool.slice(0, count)

@@ -44,7 +44,7 @@ static func display_name(entry: ItemEntry) -> String:
 
     var has_qualifier := (not prefixes.is_empty() or not suffixes.is_empty())
     if not has_qualifier and not body_text.is_empty():
-        ToastManager.show_dev_error(
+        ToastManager.show_info(
             "ItemEntryDisplayHelper.display_name: unveiled item has no affix; falling back to Unknown %s"
             % body_text,
         )

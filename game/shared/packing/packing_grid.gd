@@ -299,7 +299,7 @@ func get_placed_items() -> Array:
 ## Returns a Dictionary mapping each item → Color.
 static func assign_golden_ratio_colors(items: Array) -> Dictionary:
     var golden_ratio := 0.618033988749895
-    var hue := randf()
+    var hue := RandomUtils.randf()
     var colors: Dictionary = { }
     for item in items:
         hue = fmod(hue + golden_ratio, 1.0)

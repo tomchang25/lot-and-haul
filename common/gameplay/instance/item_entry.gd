@@ -249,7 +249,7 @@ func roll_npc_estimate(sight_chance: float, rng: RandomNumberGenerator = null) -
     var add_sum := 0.0
     var mul_product := 1.0
     for clue: ClueData in _get_surface_clues():
-        if (rng.randf() if rng else randf()) < sight_chance:
+        if RandomUtils.randf(rng) < sight_chance:
             match clue.effect_op:
                 "add":
                     add_sum += clue.effect_amount
@@ -326,7 +326,7 @@ func attempt_clue(clue: ClueData, attribute_bonus: int, rng: RandomNumberGenerat
     if clue == null:
         return false
     var success_chance := clampi((21 + attribute_bonus - clue.dc) * 5, 5, 95)
-    var roll := (rng.randi() if rng else randi()) % 100 + 1
+    var roll := RandomUtils.randi(rng) % 100 + 1
     var succeeded := roll <= success_chance
     if succeeded and not revealed_clue_ids.has(clue.clue_id):
         revealed_clue_ids.append(clue.clue_id)
