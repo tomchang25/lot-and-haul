@@ -2,7 +2,11 @@
 
 Append-only record of shipped work.
 
-## Robustness Hardening
+## v0.1.0
+
+First public alpha, released on itch.io as a free playtest. The core storage-lot loop is fully playable: location selection → inspection → auction bidding → cargo packing → storage research → customer selling → upgrades. Built in Godot 4.6. This is an intentionally early build — placeholder/AI-assisted visuals, provisional balance, incomplete onboarding, limited content density. The defining mechanic is **information asymmetry**: appraised value is your best guess from surface clues; verified value is the truth revealed through storage authentication. The gap between the two drives every auction bid and every sell-or-keep decision.
+
+### Robustness Hardening
 
 - 2026-06-14 — [ci] `dev/ci/error_filters.json` added as canonical error-filter source of truth; `test_error_filters_consistency.gd` asserts GDScript constants match the JSON
 - 2026-06-14 — [ci] CI pilot scene wiring verification enters scenes for 2 frames to exercise `_ready()` paths; mid-flow invariants added for cash, storage, lot-active, and step-finality checks
@@ -14,13 +18,13 @@ Append-only record of shipped work.
 - 2026-06-14 — [test] Regression test cleanup fixed enum-typed clue fixtures, baseline item condition, YAML-backed run clue draw bounds, and migration test formatting after the Phase 2 robustness test-data pass
 - 2026-06-14 — [dev] Godot headless/test guidance now warns that `/tmp` must be container-native Linux storage; a new cross-OS mount hazard card documents the Docker bind-mount failure mode
 
-## Web Export Build Flow
+### Web Export Build Flow
 
 - 2026-06-13 — [export] Web export preset added with `all_resources` packaging and `build/web/index.html` output for local and itch.io browser builds
 - 2026-06-13 — [dev] VS Code task added to serve the Web export from `build/web` at `localhost:8000`
 - 2026-06-13 — [fix] Resource directory loading now accepts exported `.tres.remap` entries so registry autoloads load designer resources from Web `.pck` builds
 
-## Affix Generation System
+### Affix Generation System
 
 - 2026-06-13 — [feat] AffixData/AffixCombinationData designer resources with YAML pipeline, cross-product conflict validator, and AffixRegistry autoload
 - 2026-06-13 — [feat] Reversed ItemGenerator.draw(): affix → combination → clues; \_draw_affixes/\_pick_combination added; rarity-draw path retired for affixed items
@@ -29,14 +33,14 @@ Append-only record of shipped work.
 - 2026-06-13 — [feat] Affix-only naming: display_name() composes from affix display_names + anchor body; naming_slot/naming_priority removed from ClueData/AnchorData and pipeline
 - 2026-06-13 — [data] 5–8 playtest affixes authored in data/yaml/affixes.yaml with 2–3 combinations each
 
-## ItemGenerator Factory Collapse
+### ItemGenerator Factory Collapse
 
 - 2026-06-13 — [refactor] ItemGenerator.draw() returns ItemEntry directly; GenerationResult and ItemEntry.from_generation() deleted
 - 2026-06-13 — [test] Test data authored as YAML (\_test_item_generator.yaml); in-memory stub helpers removed
 - 2026-06-13 — [refactor] storage_fixtures.gd migrated to ItemGenerator.draw() with seeded RNG
 - 2026-06-13 — [doc] dev/standards/test_data.md created for test-data-as-YAML workflow
 
-## Scene Testbeds & Agent Harness
+### Scene Testbeds & Agent Harness
 
 - 2026-06-13 — [dev] SaveManager test slot isolation: `use_test_slot()` wipes and redirects to a non-numeric test slot; boot-load and slot-listing skip it so no normal boot ever resumes into test data
 - 2026-06-13 — [dev] `TestbedRegistry` (`stage/testbeds/testbed_registry.gd`) with `static var REGISTRY` and shared `launch()` entry point consumed by both the manual launcher and the agent pilot
@@ -48,7 +52,7 @@ Append-only record of shipped work.
 - 2026-06-13 — [skill] `dev/skills/gdscript_const_vs_static_var.md` documents the `const` vs `static var` pitfall for manifest/registry arrays under clean headless import
 - 2026-06-13 — [doc] `dev/docs/plans/scene_testbeds_and_agent_harness.sketch.md` shipped and archived
 
-## Director Split & Testing Taxonomy
+### Director Split & Testing Taxonomy
 
 - 2026-06-13 — [refactor] Director autoload split into two focused autoloads: Director (presentation: dim overlay, hint/popup panels, step playback, Anchor registration, Help button) and ScriptDirector (orchestration: scene registration callbacks, auto-start/offer/help decisions, injection skeleton, phase lifecycle)
 - 2026-06-13 — [refactor] Scene registration emits `register_scene_callback` signal instead of branching internally; hub and storage scenes unchanged — still call `Director.register_scene()`
@@ -56,21 +60,21 @@ Append-only record of shipped work.
 - 2026-06-13 — [dev] Testing taxonomy documented in `project_structure.md`: three verification layers (unit tests in `test/`, testbeds in `stage/testbeds/`, harnesses in `global/autoloads/harness/`) with placement rules and triage principle
 - 2026-06-13 — [doc] `dev/docs/plans/director_split_and_testing_taxonomy.sketch.md` shipped and archived
 
-## Test Harness Consolidation
+### Test Harness Consolidation
 
 - 2026-06-13 — [dev] Relocated `ShotPilot` and `CIPilot` from top-level autoload dirs into `global/autoloads/harness/`; updated `project.godot` autoload paths and `game_manager.gd` comment
 - 2026-06-13 — [dev] Director seam: extracted public `advance_step()` / `accept_offer()` commands; routed `_on_hint_next_pressed`, `_on_popup_next_pressed`, and `_on_offer_start_pressed` through them; removed `debug_*` twin methods (`debug_advance_step`, `debug_accept_offer`); renamed read accessors (`debug_step_index` → `step_index`, etc.)
 - 2026-06-13 — [dev] Generic-pilot PoC: ShotPilot now manifest-driven (`MANIFEST` constant table); `_seed_storage_state` + `_sample_clues` moved to `game/meta/storage/storage_fixtures.gd`; fixture lookup via path convention; `_enter_scene` replaces per-script match dispatch
 - 2026-06-13 — [dev] Updated `godot_screenshot_check.md` with triage note (prefer unit assertion over screenshot) and manifest-plus-fixture flow for new targets
 
-## Tutorial Screenshot Harness — ShotPilot
+### Tutorial Screenshot Harness — ShotPilot
 
 - 2026-06-13 — [tutorial] `ShotPilot` autoload (`global/autoloads/shot_pilot/shot_pilot.gd`): flag-gated (`--tutorial-shot=<id|all>`) capture harness that seeds game state, navigates to the owning scene, accepts the offer prompt, advances through every tutorial step, and saves one PNG per step to a configurable output directory (`--shot-dir=<path>`, default `user://tutorial_shots`); exits 0 on success, 1 on unknown script id
 - 2026-06-13 — [tutorial] Director debug surface: `debug_step_index()`, `debug_step_count()`, `debug_step_anchor_id(i)`, `debug_is_offer_showing()`, `debug_advance_step()`, `debug_accept_offer()` — enables programmatic capture without input simulation
 - 2026-06-13 — [tutorial] Storage state seeding: `ShotPilot._seed_storage_state()` creates 3 `ItemEntry` instances from registry data, marks first as repair-complete (condition = 0.5), registers via `MetaManager.register_storage_items()`, and begins a storage slot with full AP pool; row selection via `ItemListPanel.row_pressed` signal
 - 2026-06-13 — [tutorial] `dev/docs/plans/tutorial_shot_harness.sketch.md` shipped and archived
 
-## Tutorial Hint Panel — Director System
+### Tutorial Hint Panel — Director System
 
 - 2026-06-12 — [tutorial] `Director` autoload added: code-built dim-overlay CanvasLayer (layer 120) with hint/popup step display, four-rect hole cutout, per-frame anchor tracking, and help button; registered in `project.godot` after SceneRouter
 - 2026-06-12 — [tutorial] `TutorialStep` RefCounted resource class with Kind (HINT/POPUP), Advance (NEXT/SCENE_ENTERED), unlock_anchor flag
@@ -80,7 +84,7 @@ Append-only record of shipped work.
 - 2026-06-12 — [tutorial] ProgressStore schema v2: `tutorial_seen` dictionary with migration branch; `MetaManager.mark_tutorial_seen()` wired to deferred save
 - 2026-06-12 — [test] `ItemEntry.attempt_clue()` gains optional `rng` parameter; test RNG injection for deterministic clue roll assertions
 
-## CI Headless Run-Loop Test Suite
+### CI Headless Run-Loop Test Suite
 
 - 2026-06-12 — [ci] RNG injection refactor: `ItemEntry`, `LotEntry`, `ItemGenerator` gain optional seedable RNG parameter with null-fallback preserving all production call sites; `RandomUtils` extended
 - 2026-06-12 — [ci] GUT plugin installed + Layer 1 manager unit tests: AP lifecycle, clue hit/miss, cargo commit, trailer damage, full scratch-to-hub traversal; test-flag boot gate skips save loading and scene routing
@@ -94,7 +98,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
-## Placeholder SFX Pipeline
+### Placeholder SFX Pipeline
 
 - 2026-06-12 — [sfx] Deterministic synth pipeline (`render_sfx.py` + `sfx_synth.py`): YAML → WAV + `UiAudioEvent` `.tres` rendering with seed-based determinism, QC pass (peak-normalize, fade-out, length cap), variant support, and idempotent re-run
 - 2026-06-12 — [sfx] Standard interaction sound set authored (12 YAML files under `data/yaml/sfx/`): click, bid_confirm, auction_won, auction_lost, reveal_good, reveal_bad, sale_completed, cash_credited, blocked_error, confirm, cancel_dismiss, button_hover
@@ -104,7 +108,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-06-12 — [sfx] `scene_changed` signal added to `SceneRouter` for scene-transition hooks
 - 2026-06-12 — [sfx] UI bus default lowered to −8 dB for quieter overall HUD loudness
 
-## Error Guard System
+### Error Guard System
 
 - 2026-06-12 — [toast] `ToastManager.show_error()` always-visible red error channel added (8 s duration) for runtime error fallback alerts
 - 2026-06-12 — [toast] `ToastManager.show_dev_error()` one-call programmer-error guard added: always logs `push_error("[DEV] " + msg)`, shows red toast only when `Debug.enabled`, session fire-once dedupe
@@ -114,11 +118,11 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-06-12 — [docs] CLAUDE.md updated: Notifications section adds `show_error`/`show_dev_error` mentions, Error guards section added with standard pointer
 - 2026-06-12 — [error_guard] 17 files migrated from `assert()` / bare `push_error` to typed guards: `auction_scene.gd`, `inspection_scene.gd`, `location_entry_scene.gd` (2×), `reveal_scene.gd` (runtime — `show_error` + navigate); `state.gd`, `state_machine.gd` (2×), `cargo_shapes.gd`, `economy_store.gd` (2×), `audio_manager.gd`, `knowledge_manager.gd` (3×), `meta_manager.gd`, `run_manager.gd`, `resource_registry.gd`, `super_category_registry.gd`, `resource_dir_loader.gd`, `save_manager.gd` (7× — 5 precondition + 3 runtime I/O), `registry_audit.gd` (programmer error — `show_dev_error` + return/sentinel); `settings_store.gd` (4×) annotated with boot markers
 
-## Location Selection Cost Preview
+### Location Selection Cost Preview
 
 - 2026-06-11 — [location] Fuel cost line item (`fuel_cost_per_day × travel_days`) surfaced in `LocationCard` scene between lot count and estimated total
 
-## Save Slots & Start Page New Game
+### Save Slots & Start Page New Game
 
 - 2026-06-11 — [save] Three independent save slots (`user://save_slots/slot_N/`): each slot has its own counter-based backup rotation and manifest; top-level `last_active` pointer; `boot_load()` loads last-active slot with newest-slot fallback; `switch_to_slot()` for Load Game, `init_slot()` for New Game; `get_slot_summaries()` returns per-slot day/cash/last-played from manifest (with pre-summary fallback parsing)
 - 2026-06-11 — [save] Legacy single-save migration: existing `user://saves/` data auto-migrated into slot 1 and last-active pointer set to slot 1; old `save_N.json` counter filenames unchanged per-slot
@@ -130,7 +134,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-06-11 — [theme] `main_theme.tres`: StyleBoxFlat sub-resource color order reorganized (disabled/focus/hover before normal); UID attributes added to checkbox icon ext_resources; minor color tweaks (disabled bg 0.16/.18, border 0.22/.25); focus border style added
 - 2026-06-11 — [docs] `dev/docs/plans/save_slots.md` and `dev/docs/plans/start_page_new_game.md` shipped and archived
 
-## Save Diagnostics & Restore Hardening
+### Save Diagnostics & Restore Hardening
 
 - 2026-06-11 — [save] `SaveLoadContext` (RefCounted) push model replaces per-store pull accumulators: `ctx.warn()` for player-facing data-loss toasts, `ctx.info()` for debug-only detail + console parity
 - 2026-06-11 — [save] `StoreBase.from_dict()` / `_apply_migrations()` require `SaveLoadContext`; `_migration_log` / `_restore_warnings` fields and their getters removed across all stores and managers
@@ -139,7 +143,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-06-11 — [save] Sniffing migrations (`anchor_revealed`/`inspected` → `unveiled`, `verified` → `hidden_ids` union) moved from `ItemEntry.from_dict()` into `StorageStore._apply_migrations()` v<2 branch
 - 2026-06-11 — [save] `SaveManager.load()` constructs one `SaveLoadContext`, threads through provider dispatch, drains warnings/infos to `ToastManager`; `has_method` probing for old collector getters removed
 
-## Pool Generation
+### Pool Generation
 
 - 2026-06-11 — [gen] `ItemGenerator` static class with full draw sequence: category → anchor (tier-weighted, nearest-tier fallback) → surface clues (uniform, no replacement, global min/max range) → rarity → hidden clues (domain scope, exclusive-group, at-most-one-override constraints)
 - 2026-06-11 — [gen] `LotEntry.create()` uses `ItemGenerator.draw()` — authored item references replaced with pool-based generation at lot-draw time
@@ -149,7 +153,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-06-11 — [tool] `dev/tools/balance_preview.py` added — Python simulation of item value distributions per lot config (10k draws, percentiles, content-health flags)
 - 2026-06-11 — [economy] `Economy.SURFACE_CLUE_MIN` / `Economy.SURFACE_CLUE_MAX` (defaults 2,4) with 1–8 hard clamp
 
-## Clue Schema Cleanup
+### Clue Schema Cleanup
 
 - 2026-06-10 — [schema] `AnchorData` resource added (`data/definitions/anchor_data.gd`): anchors extracted out of the clue system into their own designer resource — `anchor_id`, `known_text`, `naming_priority`, `category_data`, `base_value`, and physical identity (`shape_id`, `sprite`, `weight_kg`, `tier`); anchors carry no discovery attribute/DC, effect op, or exclusive group
 - 2026-06-10 — [schema] `ClueData` reduced to surface/hidden: `ClueType.ANCHOR` removed, anchor-only physical fields removed, half-wired `affinity_tags`/`tag_weights` draw metadata removed, `effect_op` domain is now `add | mul | override` (`override` = hidden-only base replacement, renamed from the overloaded "flat")
@@ -162,7 +166,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
-## Clue Content Standard
+### Clue Content Standard
 
 - 2026-06-11 — [docs] Baseline review of post-cleanup YAML set: validator green, `_veil_NN` rename confirmed consistent, no `flat`-op or anchor-as-clue remnants; 5 empty categories + missing negative/override content + `yaml_stats.py` post-cleanup defect documented for the regen plan
 - 2026-06-11 — [docs] Decision: drop `item_name` annotation field from items YAML (pipeline-ignored; display name composes from naming slots)
@@ -175,7 +179,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
-## Clue Content Regen
+### Clue Content Regen
 
 - 2026-06-11 — [tool] `yaml_to_tres.py` `--force` flag added: deletes all existing `.tres` files in output directories before writing, ensuring no stale files linger from prior generations
 - 2026-06-11 — [tool] `tres_to_yaml.py` deprecated: round-trip guarantee (AC4) waived; YAML is the sole authoring surface, `.tres` files are build artifacts
@@ -185,7 +189,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
-## ItemEntry Layer Split & Manager-Mediated Mutations
+### ItemEntry Layer Split & Manager-Mediated Mutations
 
 - 2026-06-11 — [item_entry_refactor] Presentation logic stripped from `ItemEntry` into new `ItemEntryDisplayHelper` (`game/shared/item_display/`): all formatted text, color decisions, display-name composition, sort-key dispatch, and veiled-masking constants; `ItemEntry` now has zero dependencies on `KnowledgeManager` or any UI type
 - 2026-06-11 — [item_entry_refactor] Three `KnowledgeManager.add_category_points()` calls removed from `ItemEntry` (`unveil()`, `attempt_clue()`, `advance_research()`); reveal-type XP flows via `EventBus.item_unveiled` / `EventBus.item_revealed` signals emitted by the owning Manager wrapper; `KnowledgeManager` subscribes and awards `REVEAL` XP
@@ -198,7 +202,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
-## Location Entry Backgrounds
+### Location Entry Backgrounds
 
 - 2026-06-09 — [location_entry] `LocationData` gains `bg_exterior: Texture2D`, `bg_interior: Texture2D`, and `transition_type: String` exports; defaults to `"sliding_door"` when unset
 - 2026-06-09 — [location_entry] `location_entry_scene.gd` rewritten: shows exterior bg on arrival, plays the configured transition wipe (`SlidingDoorTransition` or `FadeTransition`), swaps to interior bg while covered, holds an interior beat, then advances to lot browse; falls back to plain tween fade when textures are null
@@ -209,7 +213,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
-## Deferred Save Throttle
+### Deferred Save Throttle
 
 - 2026-06-09 — [save] `SaveManager` gains two-tier save strategy: `mark_dirty()` sets a dirty flag and starts a throttle clock; `flush()` writes only when dirty; `_process()` auto-flushes at most once per 2 s (`THROTTLE_SEC`); `save()` clears dirty state on entry so a transaction save suppresses any pending deferred flush; `_notification(NOTIFICATION_WM_CLOSE_REQUEST)` flushes on quit
 - 2026-06-09 — [save] `SceneRouter` extracts `_navigate(scene)` helper — calls `SaveManager.flush()` before every `change_scene_to_packed`; all `go_to_*` methods route through it
@@ -218,7 +222,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
-## Save System Upgrade
+### Save System Upgrade
 
 - 2026-06-09 — [save_system] `ToastManager` autoload added (`global/autoloads/toast_manager.gd`): code-built CanvasLayer overlay (layer 128) with `show_warning()` (always visible) and `show_info()` (Debug.enabled only); toasts fade in, hold, then fade out via Tween; registered in `project.godot` after `Debug`
 - 2026-06-09 — [save_system] `StoreBase` gains `_migration_log: Array[String]` and `get_migration_log()` (returns-and-clears); `MetaManager` and `KnowledgeManager` implement `get_migration_log()` aggregating from their owned stores; stores that override `_apply_migrations()` append human-readable entries per schema bump
@@ -228,7 +232,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
-## Unified Debug System
+### Unified Debug System
 
 - 2026-06-09 — [debug] `Debug` autoload added (`global/autoloads/debug.gd`): unified gate combining `OS.is_debug_build()` (build-time) and `SettingsStore.debug_mode` (user preference); exposes `enabled` property, `toggled` signal, and `set_debug_mode()` mutator
 - 2026-06-09 — [debug] `SettingsStore.debug_mode` wired with setter + `debug_mode_changed` signal so any write (via `Debug.set_debug_mode()` or direct assignment) is runtime-correct
@@ -240,7 +244,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
-## Centralized Theme
+### Centralized Theme
 
 - 2026-06-09 — [theme] `main_theme.tres` populated with centralized design tokens: color palette (primary/hover/pressed/disabled text), default font size 16, Button StyleBoxes (5 states), PanelContainer panel, TooltipPanel, HSeparator/VSeparator, container separation defaults (HBox/VBox=8, Grid=6×6)
 - 2026-06-09 — [theme] Custom CheckBox icons added (`global/theme/icons/`): bright-border checked/unchecked/disabled PNGs visible on dark backgrounds; CheckBox theme entries with transparent StyleBoxEmpty background
@@ -251,7 +255,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
-## Start Page & Settings Overlay
+### Start Page & Settings Overlay
 
 - 2026-06-09 — [start_settings] `SettingsStore` autoload added (`global/autoloads/settings_store.gd`): persists master/sfx/music volume, fullscreen, debug_mode to `user://settings.json`; applies audio bus volumes and display mode on boot; toggles settings overlay on `ui_settings` input (Escape)
 - 2026-06-09 — [start_settings] `SettingsOverlay` component added (`game/shared/settings_overlay/`): modal CanvasLayer (layer=100, PROCESS_MODE_ALWAYS) with Audio (Master/SFX/Music sliders), Display (fullscreen), and Gameplay (debug mode) sections; pauses tree on open, unpauses on close via `closed` signal
@@ -262,7 +266,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 
 ---
 
-## Save & Managers Refactor
+### Save & Managers Refactor
 
 - 2026-06-06 — [refactor] SaveManager stripped to a thin persistence coordinator (81 lines, no gameplay state); gameplay state distributed to 10 Store archetypes under `common/gameplay/store/` — 8 persisting (EconomyStore, GarageStore, StorageStore, SlotStore, ProgressStore, CustomersStore, KnowledgeStore) and 2 session-scoped (RunStore, LotStore) — all extending `StoreBase` with `section_id/to_dict/from_dict/_store_version/_apply_migrations`; Managers (MetaManager, KnowledgeManager) register as providers and coordinate cross-domain transactions; RunManager owns RunStore + LotStore factories and run-phase mutations
 - 2026-06-06 — [refactor] Meta↔Knowledge dependency cycle broken via EventBus signals (`sale_resolved`, `item_repaired`, `item_restored`, `run_resolved`); MetaManager emits post-commit, KnowledgeManager subscribes for XP accrual; `upgrade_attribute` transaction moved to MetaManager
@@ -272,18 +276,18 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-06-06 — [refactor] `autoload/` → `autoloads/` folder rename; runtime types organized into archetype subfolders (`instance/`, `store/`, `snapshot/`, `service/`); `Customer` → `CustomerEntry`; `location_select` / `location_entry` → `*_scene` suffix
 - 2026-06-06 — [docs] Systems docs L2 audit; `data_architecture.md` vision added; naming conventions updated for singular archetype folders; `DaySummary` reclassified as Snapshot
 
-## Customer Sell UX Polish
+### Customer Sell UX Polish
 
 - 2026-06-01 — [customer-sell] Fixed grid rotation pivot drift: `_grab_index` pins the grabbed cell under the cursor across Q/E rotations; list picks anchor to shape centroid
 - 2026-06-01 — [customer-sell] Bidirectional list↔grid hover sync via `set_external_hover_item()`; hover state re-emitted after place/cancel to clear stale highlights
 - 2026-06-01 — [customer-sell] Back to Hub button moved to bottom FooterRow; CustomerTabsRow wrapped in ScrollContainer to handle overflow with many customers
 - 2026-06-01 — [customer-sell] `CURSOR_DRAG` feedback while holding an item; `queue_redraw()` in `_apply_state_style` for immediate row colour updates
 
-## Live Budget Label
+### Live Budget Label
 
 - 2026-05-31 — [auction] Budget label pinned to top-right corner showing remaining cash minus committed run costs; refreshes live after every player bid
 
-## Time-Slot Day Structure & Storage AP Economy
+### Time-Slot Day Structure & Storage AP Economy
 
 - 2026-05-30 — [day-structure] 3-slot day (Morning/Afternoon/Evening); hub slot tray replaces Day Pass; Auction consumes slots 1+2, returns player for Evening
 - 2026-05-30 — [day-structure] Storage AP economy: per-slot pool of 10 AP, refreshed each Storage slot; Repair (2 AP), Restore (2 AP), Research (4 AP) execute immediately
@@ -295,48 +299,48 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-05-30 — [day-structure] Save migration: `research_slots` array retired; partial `research_days_spent` seeded into `ItemEntry.research_progress`; `current_slot`, `storage_ap`, `selling_slots_today` added to schema
 - 2026-05-30 — [day-structure] `ResearchSlot` lifecycle stripped (enums, dicts, slot management); math helpers (`apply_repair`, `apply_restore`, caps) kept
 
-## Day Summary Rework
+### Day Summary Rework
 
 - 2026-05-29 — [day-summary] `DaySummary` carries customer sales total/detail; `advance_days()` captures `customer_sales_today` before the nightly ledger clears; net change includes sales revenue; summary scene renders a customer-sales section; post-run routes through the day-summary scene (`f873cc7`).
 
-## Value Policy Cleanup
+### Value Policy Cleanup
 
 - 2026-05-29 — [pricing] `item_price` simplified to `(appraised|verified) × condition_multiplier`; `MarketManager`, `PriceConfig`, `ItemViewContext` removed; condition kept as an independent ×0.25–×4.0 system (`41a5945`).
 
-## Unified Customer Selling
+### Unified Customer Selling
 
 - 2026-05-29 — [customer-sell] `Customer` runtime type with match-biased nightly generation, `SellMath` conservative/aggressive helpers, customer-sell scene with car-grid packing + dice UI, `customer_sales_today` ledger (`236f636`).
 - 2026-05-29 — [cleanup] Legacy merchant negotiation, special orders, and deprecated selling helpers removed; `ItemEntry` price logic deduplicated, research moved to `ResearchSlot` (`9b4dfe9`, #108).
 
-## YAML Content Regeneration
+### YAML Content Regeneration
 
 - 2026-05-28 — [content] All 128 clues rewritten to 1-word `known_text` with naming entries assigned; validator enforces body+qualifier; names reconciled (`19c6caf`).
 
-## Dynamic Naming Rules
+### Dynamic Naming Rules
 
 - 2026-05-28 — [naming] Priority-based `display_name` composition from naming clues, 3-word `known_text` ceiling, full-reveal validation (`3c4c423`).
 
-## Inspection Refinement
+### Inspection Refinement
 
 - 2026-05-28 — [inspection] `DisplayState` (veiled/unveiled/verified), clue chain reveal, lot unveil probability; `verified` as a computed property (`e59d58e`).
 
-## Clue Independence + Attribute System
+### Clue Independence + Attribute System
 
 - 2026-05-27 — [items] Identity layers and the skill system replaced by clue-based add-then-mul pricing, 5 SPECIAL attributes, and dice-roll inspection; `ItemData.base_price` deprecated (`1ff40d0`, #107).
 
-## Cargo Scene Refactor
+### Cargo Scene Refactor
 
 - 2026-05-25 — [cargo] Two-column layout with scrollable item list (`CargoItemRow`), value/weight/condition/shape legibility, inline trailer slots, run summary panel; 10×4 temp grid removed (`0113112`).
 
-## Storage Authenticate
+### Storage Authenticate
 
 - 2026-05-14 — [storage] Hub final-layer resolution and Storage Authenticate: verified flag, rarity-based duration, slot action (`4190a4b`).
 
-## Foundations
+### Foundations
 
 - 2026-05-04 — [items] Pre-redesign foundations: item/entry data model, veil/identity-layer inspection, AP-grid inspection, runtime veil cleanup. The veil and identity-layer models were later superseded by the clue system above.
 
-## Hub & Home
+### Hub & Home
 
 - 2026-05-01 — [hub] Hub scene with Next Run / Storage / Sell / Vehicle / Knowledge / Day Pass navigation buttons
 - 2026-05-01 — [hub] Header displaying Mastery Rank, Balance, and Storage item count
@@ -352,7 +356,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-05-01 — [storage] Hub Storage button badge shows `"Storage (N done)"` when research slots complete; refreshed on `_refresh_display()`
 - 2026-05-01 — [hub] Sell button routes to customer-sell scene; replaces old Merchant button
 
-## Knowledge
+### Knowledge
 
 - 2026-05-01 — [knowledge] `SaveManager.category_points` / `attribute_levels` / `unlocked_perks` persistence
 - 2026-05-01 — [knowledge] Four-layer mastery model: `get_category_rank()`, `get_super_category_rank()`, `get_mastery_rank()`
@@ -363,7 +367,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-05-01 — [knowledge] `KnowledgeManager.validate()` registered with `RegistryCoordinator`; boot-time audit of registries + unlocked perk ids
 - 2026-05-01 — [knowledge] Skill system fully removed; SPECIAL-style attributes replace it
 
-## Vehicle
+### Vehicle
 
 - 2026-05-01 — [vehicle] `CarData` resource: `car_id`, `display_name`, `grid_columns`, `grid_rows`, `max_weight`, `stamina_cap`, `fuel_cost_per_day`, `extra_slot_count`
 - 2026-05-01 — [vehicle] `CarData` consumed by `RunRecord` (stamina, fuel, trailer slots) and cargo scene (grid, weight, trailer slots)
@@ -379,7 +383,7 @@ This file is the single source of truth for the entry format. Each entry: `- YYY
 - 2026-05-01 — [vehicle] `CarCard` component: `setup()`/`_apply()` pattern; Buy button with affordability gating
 - 2026-05-01 — [vehicle] Hub: `VanButton` → `VehicleButton`; `VanPopup` removed; wired to `GameManager.go_to_vehicle_hub()`
 
-## Item Display
+### Item Display
 
 - 2026-05-01 — [display] `ItemViewContext` removed; components take `ItemEntry` directly; no stage enum, no per-stage branching, no merchant/order side-channels
 - 2026-05-01 — [display] `ItemRow` / `ItemListPanel` read every field through `ItemEntry` getters
