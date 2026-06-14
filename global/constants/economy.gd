@@ -61,6 +61,7 @@ static func rarity_for_clue_count(count: int) -> Economy.Rarity:
     return Economy.Rarity.COMMON
 
 
+const STARTING_CASH: int = 1000
 const DAILY_BASE_COST: int = 100
 const ONSITE_SELL_PRICE: int = 50
 const LOCATION_SAMPLE_SIZE: int = 3

@@ -2,6 +2,11 @@
 
 Append-only record of shipped work.
 
+## Robustness Hardening
+
+- 2026-06-14 — [test] Regression test cleanup fixed enum-typed clue fixtures, baseline item condition, YAML-backed run clue draw bounds, and migration test formatting after the Phase 2 robustness test-data pass
+- 2026-06-14 — [dev] Godot headless/test guidance now warns that `/tmp` must be container-native Linux storage; a new cross-OS mount hazard card documents the Docker bind-mount failure mode
+
 ## Web Export Build Flow
 
 - 2026-06-13 — [export] Web export preset added with `all_resources` packaging and `build/web/index.html` output for local and itch.io browser builds

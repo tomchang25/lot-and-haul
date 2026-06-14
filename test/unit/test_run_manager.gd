@@ -78,7 +78,7 @@ func test_clue_hit_and_miss() -> void:
 
     var rng := RandomNumberGenerator.new()
     rng.seed = 2
-    var entry := ItemGenerator.draw(cat, { }, 2, 4, rng)
+    var entry := ItemGenerator.draw(cat, { }, 3, 4, rng)
     assert_not_null(entry, "item should be generated")
     assert_gt(entry.surface_clues.size(), 0, "should have surface clues")
 

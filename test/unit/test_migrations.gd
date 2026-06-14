@@ -8,22 +8,24 @@ extends GutTest
 # ══ StorageStore migration (v1 → v2) — dict-level transform tests ═══════
 # These tests construct a StorageStore, feed v1-format data through from_dict,
 # and check the migration outcome. Entries that survive migration must still
-# resolve through ItemEntry.from_dict (which requires anchor/clue registries);
+# resolve through ItemEntry.from_dict (which requires anchor/clue registries)
 # tests for the sniffing/erasure behaviors therefore only pass when the
 # YAML→tres pipeline has been run. The item_id-dropped test is registry-free.
-
 
 ## ctx.infos should mention the dropped entry when an item_id-only (no anchor_id)
 ## entry is fed through migration.
 func test_storage_v1_item_id_dropped_emits_info() -> void:
     var ctx := SaveLoadContext.new()
     var store := StorageStore.new()
-    store.from_dict({
-        "_version": 1,
-        "storage_items": [
-            { "item_id": "ghost_item", "anchor_revealed": true, "inspected": false },
-        ],
-    }, ctx)
+    store.from_dict(
+        {
+            "_version": 1,
+            "storage_items": [
+                { "item_id": "ghost_item", "anchor_revealed": true, "inspected": false },
+            ],
+        },
+        ctx,
+    )
     var found := false
     for msg: String in ctx.infos:
         if msg.contains("dropped"):
@@ -35,15 +37,17 @@ func test_storage_v1_item_id_dropped_emits_info() -> void:
 func test_storage_v1_migration_survives_all_items_dropped() -> void:
     var ctx := SaveLoadContext.new()
     var store := StorageStore.new()
-    store.from_dict({
-        "_version": 1,
-        "storage_items": [
-            { "item_id": "a" },
-            { "item_id": "b" },
-        ],
-    }, ctx)
+    store.from_dict(
+        {
+            "_version": 1,
+            "storage_items": [
+                { "item_id": "a" },
+                { "item_id": "b" },
+            ],
+        },
+        ctx,
+    )
     assert_eq(store.storage_items.size(), 0, "dropped entries should result in zero storage items")
-
 
 # ══ ProgressStore migration (v1 → v2) ════════════════════════════════════
 # These tests are registry-independent because the migration only adds a
