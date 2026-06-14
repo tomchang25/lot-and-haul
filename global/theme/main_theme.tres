@@ -1,9 +1,9 @@
 [gd_resource type="Theme" format=3 uid="uid://m8fg7e20e3g"]
 
-[ext_resource type="Texture2D" uid="uid://cp3xu5xln2b8i" path="res://global/theme/icons/checkbox_checked.png" id="cb_checked"]
-[ext_resource type="Texture2D" uid="uid://chf06p43bm6o6" path="res://global/theme/icons/checkbox_checked_disabled.png" id="cb_checked_dis"]
-[ext_resource type="Texture2D" uid="uid://d0f45tudibmqe" path="res://global/theme/icons/checkbox_unchecked.png" id="cb_unchecked"]
-[ext_resource type="Texture2D" uid="uid://dewbwfiipwo25" path="res://global/theme/icons/checkbox_unchecked_disabled.png" id="cb_unchecked_dis"]
+[ext_resource type="Texture2D" uid="uid://lwjql7ijankj" path="res://global/theme/icons/checkbox_checked.png" id="cb_checked"]
+[ext_resource type="Texture2D" uid="uid://bfllr21svmq0k" path="res://global/theme/icons/checkbox_checked_disabled.png" id="cb_checked_dis"]
+[ext_resource type="Texture2D" uid="uid://dnwe3h5xq87rp" path="res://global/theme/icons/checkbox_unchecked.png" id="cb_unchecked"]
+[ext_resource type="Texture2D" uid="uid://b43au5bscst6t" path="res://global/theme/icons/checkbox_unchecked_disabled.png" id="cb_unchecked_dis"]
 
 [sub_resource type="StyleBoxFlat" id="btn_disabled"]
 content_margin_left = 12.0

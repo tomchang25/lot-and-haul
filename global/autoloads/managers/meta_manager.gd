@@ -34,6 +34,7 @@ func reset() -> void:
     economy = EconomyStore.new()
     economy.earn(Economy.STARTING_CASH)
     garage = GarageStore.new()
+    _assign_starter_car()
     storage = StorageStore.new()
     slot = SlotStore.new()
     progress = ProgressStore.new()
@@ -343,6 +344,18 @@ func set_active_car(car: CarData) -> void:
         return
     garage.set_active(car)
     SaveManager.mark_dirty()
+
+
+## Assigns the default starter car ("van_basic") to a fresh garage.
+## Called during reset() for new games. This mirrors the doc comment in
+## car_data.yaml that describes van_basic as the default active car.
+func _assign_starter_car() -> void:
+    var starter: CarData = CarRegistry.get_car_by_id(&"van_basic")
+    if starter == null:
+        ToastManager.show_dev_error("MetaManager: starter car 'van_basic' not found in CarRegistry")
+        return
+    garage.add_car(starter)
+    garage.set_active(starter)
 
 # ══ Run resolution ════════════════════════════════════════════════════════════
 
