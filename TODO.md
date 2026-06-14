@@ -18,6 +18,30 @@ Actionable line format: `[Scope] one sentence — [ref plans/<x>.md if any]`
 
 Preliminary concepts — bigger than a one-liner, but a single `###` sub-section says enough. Not necessarily actionable yet. One `###` heading per idea (nested under this `## Draft` so the section stays intact). When an idea outgrows its sub-section / becomes actionable / needs a stable link → move it into its own `dev/docs/plans/<x>.md` (`Status: Exploring`) and delete it here. Stale and never grew → just delete it.
 
+### Debug Storage Cleanup and Liquidation
+
+Storage needs a debug-only way to reset or liquidate all owned items so test loops do not require manually selling or deleting every entry after each run. The debug action should stay strictly behind the debug gate because formal selling is intentionally routed through the nightly customer system; a player-facing quick sell would weaken the customer, car-fill, and conservative/aggressive sell decisions.
+
+Preferred shape: add two separate debug actions rather than one ambiguous button. `Clear Storage` removes all stored items and pays nothing, which is best for state cleanup and repeatable testing. `Debug Liquidate Storage` sells all stored items for a deterministic debug payout, which is useful for economy setup but should be visually marked as a shortcut and never share copy with a normal sell feature.
+
+The action should be stateless and immediate. It should not persist a debug mode, should not create customer-sale history, should not award normal sell progression unless explicitly needed for a later test harness, and should report how many items were removed or liquidated so the developer can confirm the button acted on the intended storage contents.
+
+### Inspection and Research Progress Feedback
+
+Inspection and hub research need stronger moment-to-moment feedback because the player currently spends AP or research effort without an obvious sense of cause, progress, and result. The core loop depends on feeling that information was earned, so the screen should make each spend visible as an action resolving into a clue, a value shift, a verified state change, or meaningful progress toward one of those outcomes.
+
+Feedback should be scene-contextual instead of only toast-based. The item card or selected item panel should flash on action, progress meters should move visibly, newly revealed clue rows should animate or highlight, and value/condition/verified labels should call out changed fields long enough to be noticed. Toasts remain useful for exceptional or global messages, but the primary feedback belongs next to the item and clue data it changes.
+
+The design should separate three feedback layers: action feedback confirms the input was accepted; resolution feedback explains what the check or research step did; outcome feedback marks what changed in the item model. Examples: an inspection spend can show the attribute/check context, reveal or fail to reveal a specific surface clue slot, and then pulse the item estimate if the clue affects value. A research completion can fill the item-level research bar, reveal hidden clue rows together, mark the item verified, and show whether verified value moved up or down.
+
+### Cargo Scene Item Summary Rework
+
+The cargo scene summary should stop acting like a placeholder item dump and become the player's quick read on what they are taking home. At this point in the run the player needs to understand cargo composition, risk, and opportunity before confirming, not just see another flat item list.
+
+The summary should answer four scan questions: how many items are loaded, what the current appraised value looks like, how much cargo capacity or weight is consumed, and which items are risky because they are unverified, low-condition, bulky, or low-value for their footprint. Grouping is more useful than a long raw list; likely groupings are category, verification status, value tier, or placement status.
+
+Preferred layout: top summary cards for item count, appraised total, used capacity, and unverified count; a middle grouped item summary that highlights high-value, risky, and bulky entries; and a bottom action area that stays focused on confirming or adjusting cargo. The feature should preserve manual packing decisions and avoid introducing automated cargo behavior unless a separate auto-pack plan is in scope.
+
 ### Director v2 — Highlight Target Component + Anchor Fill-to-Screen
 
 The Director's `_position_near_anchor` and `_update_dim_hole` assume anchors are bounded UI regions. When an anchor fills the screen (e.g. a full-viewport PanelContainer used as a layout root), the hole cutout covers everything and `_position_near_anchor` shoves the hint panel off-screen or into a corner.
@@ -62,6 +86,14 @@ Replace per-scene `_back_btn` / `_continue_btn` / `_reset_btn` manual wiring wit
 ### Category Mastery ↔ Clue Integration
 
 Mastery (category → super-category → rank) is retained as a progression signal (earned via `KnowledgeManager.add_category_points` on `REVEAL` / `SELL`) but currently has no mechanical effect on clue discovery. Idea: at certain ranks, inspection shows "N unrevealed surface clues remaining"; at higher ranks, the easiest surface clue may auto-reveal (no roll, no AP). Mastery does **not** affect DC or success rate — that is the attribute system. Thresholds TBD.
+
+### Research Reveal Redesign
+
+Storage Research should change from one-hidden-clue-at-a-time progress to item-level hidden research progress. Hidden clue DCs contribute to a total research requirement, the player's total relevant attribute value contributes to progress per spend, and reaching the total unlocks all hidden clues on that item at once.
+
+Inspection remains unchanged. Run-phase clue attempts still use the existing clue-chain roll flow; this draft only covers hub-phase Research.
+
+Display implication: until the item-level research total completes, hidden clues remain unknown and UI surfaces render them as ??? only. Once complete, all hidden clues reveal together and the item becomes verified if no hidden clue remains unrevealed.
 
 ### Attribute Upgrades — Cost Scaling & Max Level
 
@@ -185,6 +217,7 @@ Nothing currently in progress.
 
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
+- [item_display] Shared ItemCard, spoiler-safe ClueChunk, item browser, and card popup UI migration — see `dev/docs/plans/item_card_clue_chunk.sketch.md`
 - [affix_dictionary] Player-facing affix dictionary that tracks affix combination discovery, hidden-risk learning, and gated probability reads — see `dev/docs/plans/affix_dictionary.sketch.md`
 
 - [dev/auto-auction] Debug-only quick-win buttons: instant player win at opening bid or rolled price (skip NPC bidding loop; rolled path seeds future auto-bid perk) — see `dev/docs/plans/debug_auto_auction.md`
@@ -196,6 +229,8 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
 
 - [run_persistence] Mid-run save/resume: phase-stable resume scenes, atomic auction, escrowed run economics — see `dev/docs/plans/run_phase_persistence.md`
+
+- [run_review] Scrollable run summary layout with fixed action buttons so long result data cannot push navigation off-screen — see `dev/docs/plans/run_review_scrollable_summary.sketch.md`
 
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
 
@@ -211,13 +246,11 @@ One-line, no reasoning, no backing doc.
 - [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
 - [style] Standardize docstrings across all `.gd` files — file header + public function GDDoc format.
 - [ci] Diagnose GitHub Actions infinite loop in Godot GUT/smoke jobs and re-enable the disabled CI layers.
-- [debug] Add an debug button in Hub to sell all items in storage
 - [debug] Add an debug button in Hub to add random item
 - [debug] Add Debug Overlay that use debug button in hub to toggle?
   ​
 - [refactor] ItemYaml - Refactor Yaml strcuture, so I can list all affix and clues situation in each categories
 
-- [bug] Unreveal clues should be unknown as ???
 - [bug] test button not show when toggle debug inside game
 
 ---
