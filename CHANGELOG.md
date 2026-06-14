@@ -2,6 +2,12 @@
 
 Append-only record of shipped work.
 
+## v0.1.1
+
+- 2026-06-14 — [fix] New game reset now assigns the "van_basic" starter car to the garage; `_assign_starter_car()` called during `MetaManager.reset()`
+- 2026-06-14 — [theme] Checkbox icon resource UIDs updated in `main_theme.tres`
+- 2026-06-14 — [config] Default window size reduced from 1920×1080 to 1280×720 in `project.godot`
+
 ## v0.1.0
 
 First public alpha, released on itch.io as a free playtest. The core storage-lot loop is fully playable: location selection → inspection → auction bidding → cargo packing → storage research → customer selling → upgrades. Built in Godot 4.6. This is an intentionally early build — placeholder/AI-assisted visuals, provisional balance, incomplete onboarding, limited content density. The defining mechanic is **information asymmetry**: appraised value is your best guess from surface clues; verified value is the truth revealed through storage authentication. The gap between the two drives every auction bid and every sell-or-keep decision.
