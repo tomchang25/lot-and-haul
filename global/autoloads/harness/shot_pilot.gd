@@ -19,6 +19,8 @@ static func _make_entry(scene: String, fixture: String, offer: bool) -> Dictiona
 ## The manifest — add a row here for each capturable scene. When a scene needs
 ## non-default state, create a <scene>_fixtures.gd next to the scene with a
 ## static seed_<variant>() method and reference it here. No new autoload needed.
+## Use static var (not const) because entries are built by function calls — const
+## triggers "not a constant expression" in headless import.
 static var manifest: Array[Dictionary] = [
     _make_entry("hub", "", false),
     _make_entry("storage", "seed_storage_state", true),

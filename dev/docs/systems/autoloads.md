@@ -17,12 +17,12 @@ Both phases are opt-in (a provider that skips `validate()` is skipped). Because 
 
 ## SaveManager
 
-Thin persistence coordinator (`global/autoloads/save_manager.gd`). Writes counter-based save files (`user://saves/save_N.json`); a manifest tracks the latest counter as a fast-path for load; up to 10 files are retained. One-time legacy migration runs on first boot if the old single-file save exists. It holds **no gameplay state** — state lives on the systems that own and mutate it.
+Thin persistence coordinator (`global/autoloads/save_manager.gd`). Writes counter-based save files per player slot (`user://save_slots/slot_N/save_C.json`); a manifest tracks slot summary metadata and the active counter, and up to 10 files are retained per slot. The counter-rotation rationale lives in `dev/docs/archived/save_slots.md`. It holds **no gameplay state** — state lives on the systems that own and mutate it.
 
 Systems register as section providers in their own `_ready()`. Two-tier save strategy:
 
 - **Transaction Save** — `SaveManager.save()` called exactly once per irreversible cross-domain commit point (`resolve_run`, `end_day`, `resolve_customer_sale`, `begin_auction`, `begin_open_shop`, `buy_car`, `upgrade_attribute`). Writes to disk immediately and clears the dirty flag.
-- **Deferred Save** — `SaveManager.mark_dirty()` called by recoverable micro-actions (`repair_item`, `restore_item`, `research_item`, `set_active_car`, `unlock_perk`, `begin_storage_slot`, `register_storage_items`). Sets a dirty flag; `_process` flushes at most once per `THROTTLE_SEC` (2 s). `SceneRouter._navigate()` flushes before every scene transition; `_notification(NOTIFICATION_WM_CLOSE_REQUEST)` flushes on quit.
+- **Deferred Save** — `SaveManager.mark_dirty()` called by recoverable micro-actions (`repair_item`, `restore_item`, `research_item`, `set_active_car`, `unlock_perk`, `begin_storage_slot`, `register_storage_items`). Sets a dirty flag; `_process` flushes at most once per `THROTTLE_SEC` (5 s). `SceneRouter._navigate()` flushes before every scene transition; `_notification(NOTIFICATION_WM_CLOSE_REQUEST)` flushes on quit.
 
 No helper method inside a transaction calls `save()` independently.
 
@@ -49,3 +49,9 @@ Hub (slot tray: Morning / Afternoon / Evening)
 ```
 
 Scene-transition wiring lives in `GameManager`; hub-specific slot/AP flow is in `day_slot_economy.md`.
+
+---
+
+## Tutorial Orchestration
+
+Tutorial presentation and tutorial triggering are split across two autoloads: `Director` owns overlay presentation, scene anchor registration, step playback, and Help/offer UI; `ScriptDirector` listens to Director signals and decides when a tutorial should start based on game progress. The split rationale lives in `dev/docs/archived/director_split_and_testing_taxonomy.sketch.md`.

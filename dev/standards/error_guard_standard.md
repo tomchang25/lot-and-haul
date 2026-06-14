@@ -126,7 +126,7 @@ This keeps load-time diagnostics batched and ordered instead of toasting mid-loa
 | `show_info(msg)`      | Debug only | Near-white          | —                              | Migration details, internal diagnostics                                  |
 | `show_dev_error(msg)` | Debug only | Red (same as error) | `push_error` (`[DEV] ` prefix) | Programmer-error guards (one-call: log + gated toast + fire-once dedupe) |
 
-Programmer-error guards use `show_dev_error` — never gate a raw `show_error` call manually. Use `show_error` directly only for runtime guards (always visible, player-facing).
+Rule of thumb: use `show_dev_error` for programmer invariants and violated internal preconditions; use `show_error` for runtime failures the player can hit and recover from, such as a scene reached without required state. Programmer-error guards use `show_dev_error` — never gate a raw `show_error` call manually. Use `show_error` directly only for runtime guards (always visible, player-facing).
 
 Never use `show_info` for error guards — it is reserved for migration/load diagnostics, and inside the save/load path it is reached via `ctx.info()`, never called directly.
 

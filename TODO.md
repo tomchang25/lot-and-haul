@@ -173,6 +173,8 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 
 Flows currently being built or ready to implement — may hold more than one entry. One-line pointer each — same format as `## Plan`, promoted here when building starts or the plan is ready to build. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress or ready → this section is empty.
 
+- [robustness] Save flush warnings, fatal boot errors, run-state guards, test-data cleanup, and Director/harness hardening — see `dev/docs/plans/robustness_hardening.sketch.md`
+
 ---
 
 ## Plan
@@ -180,13 +182,10 @@ Flows currently being built or ready to implement — may hold more than one ent
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
 - [clue_quality] Affix-aware clue information validator for posterior value narrowing and low-signal clue review — see `dev/docs/plans/clue_information_validator.sketch.md`
-- [robustness] Atomic save writes, hard boot-guard on empty registries, run-state guards, price/save/migration tests — see `dev/docs/plans/robustness_hardening.sketch.md`
 - [affix_dictionary] Player-facing affix dictionary that tracks affix combination discovery, hidden-risk learning, and gated probability reads — see `dev/docs/plans/affix_dictionary.sketch.md`
 
 - [dev/auto-auction] Debug-only quick-win buttons: instant player win at opening bid or rolled price (skip NPC bidding loop; rolled path seeds future auto-bid perk) — see `dev/docs/plans/debug_auto_auction.md`
 - [dev/auto-cargo] Debug-only quick-pack buttons: legal one-press auto-pack (seeds future auto-place perk) + stuff-all-and-go ignoring capacity — see `dev/docs/plans/debug_auto_cargo.md`
-
-- [simple-demo] Stage 1 tutorial split out to the Simple Tutorial draft; Director skeleton + Dialog remain surviving subsystems
 
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 
@@ -196,8 +195,6 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 - [run_persistence] Mid-run save/resume: phase-stable resume scenes, atomic auction, escrowed run economics — see `dev/docs/plans/run_phase_persistence.md`
 
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
-
-- [demo] 3-run story demo, demoted to Stage 3 scope (stale — references legacy Skill/Merchant systems);
 
 - [balance_preview_v2] Balance preview HTML report — rich HTML output with per-clue information tables, category breakdowns, and value distribution charts
 
@@ -210,6 +207,7 @@ One-line, no reasoning, no backing doc.
 - [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
 - [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
 - [style] Standardize docstrings across all `.gd` files — file header + public function GDDoc format.
+- [ci] Diagnose GitHub Actions infinite loop in Godot GUT/smoke jobs and re-enable the disabled CI layers.
 - [debug] Add an debug button in Hub to sell all items in storage
 - [debug] Add an debug button in Hub to add random item
 - [debug] Add Debug Overlay that use debug button in hub to toggle?
