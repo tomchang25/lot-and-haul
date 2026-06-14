@@ -13,7 +13,7 @@ const SELL_GRID_PUT_DOWN: UiAudioEvent = preload("res://data/tres/audio_events/s
 
 const CELL_SIZE := 56
 
-const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
+const ItemRowTooltipScene: PackedScene = preload("res://game/shared/item_display/item_row_tooltip.tscn")
 const CargoItemRowScene: PackedScene = preload("res://game/run/cargo/cargo_item_row.tscn")
 const ExtraSlotCellScene: PackedScene = preload("res://game/run/cargo/extra_slot_cell/extra_slot_cell.tscn")
 

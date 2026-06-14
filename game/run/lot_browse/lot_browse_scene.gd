@@ -29,6 +29,11 @@ var _lot_cards: Array[LotCard] = []
 
 
 func _ready() -> void:
+    if RunManager.run == null:
+        ToastManager.show_error("Lot browse failed to load. Returning to hub.")
+        SceneRouter.go_to_hub.call_deferred()
+        return
+
     _skip_button.pressed.connect(_on_skip_pressed)
     _cargo_button.pressed.connect(_on_cargo_pressed)
     _skip_confirm_popup.confirmed.connect(_on_skip_confirmed)

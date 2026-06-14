@@ -8,7 +8,7 @@ extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
+const ItemRowTooltipScene: PackedScene = preload("res://game/shared/item_display/item_row_tooltip.tscn")
 const STORAGE_RESEARCH: UiAudioEvent = preload("res://data/tres/audio_events/storage_research.tres")
 const STORAGE_REPAIR_RESTORE: UiAudioEvent = preload("res://data/tres/audio_events/storage_repair_restore.tres")
 const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")

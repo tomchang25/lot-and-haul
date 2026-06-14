@@ -89,9 +89,12 @@ func _process(delta: float) -> void:
 
 
 ## Flushes pending deferred state to disk if dirty. Idempotent when clean.
-func flush() -> void:
+## Returns true when the flush completed or was already clean; false when
+## the underlying save failed.
+func flush() -> bool:
     if _dirty:
-        save()
+        return save()
+    return true
 
 
 ## Marks the save state as dirty and starts the throttle clock.
@@ -302,11 +305,12 @@ func run_validation() -> bool:
 ## with a summary block, writes the last-active pointer, and cleans up old files.
 ## When the test slot is active (_active_slot_dir non-empty), writes to that dir
 ## and skips the last-active pointer so normal boot never lands in test data.
-func save() -> void:
+## Returns true when the save completed successfully; false on failure.
+func save() -> bool:
     var is_test_slot := not _active_slot_dir.is_empty()
     if _active_slot <= 0 and not is_test_slot:
         ToastManager.show_dev_error("save() called with no active slot")
-        return
+        return false
 
     _dirty = false
     _elapsed = 0.0
@@ -327,7 +331,7 @@ func save() -> void:
     var file := FileAccess.open(path, FileAccess.WRITE)
     if file == null:
         ToastManager.show_error("SaveManager: failed to open %s for writing (error %d)" % [path, FileAccess.get_open_error()])
-        return
+        return false
     file.store_string(JSON.stringify(data))
     file.close()
 
@@ -336,6 +340,7 @@ func save() -> void:
     if not is_test_slot:
         _write_last_active(_active_slot)
     _cleanup_old_saves_in_dir(dir)
+    return true
 
 # ══ Load ══════════════════════════════════════════════════════════════════════
 

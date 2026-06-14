@@ -56,6 +56,11 @@ var _is_offer_showing := false
 var _offer_script_id := ""
 var _help_script_id := ""
 
+## Cached anchor global rect used to skip redundant per-frame layout recalculations.
+## Reset at each step transition and whenever the anchor rect reported by Godot
+## changes during _process.
+var _last_anchor_rect: Rect2 = Rect2()
+
 
 func _ready() -> void:
     _build_overlay()
@@ -82,6 +87,9 @@ func register_scene(scene_id: String, anchors: Dictionary) -> void:
 func start_script(script_id: String) -> void:
     var script: Array[TutorialStep] = _get_script(script_id)
     if script.is_empty():
+        ToastManager.show_dev_error("Director.start_script: unknown script '%s'" % script_id)
+        _hide_overlay()
+        _clear_playback_state()
         return
     _current_script = script
     _current_script_id = script_id
@@ -89,6 +97,7 @@ func start_script(script_id: String) -> void:
     _is_tutorial_active = true
     _is_offer_showing = false
     _help_btn.visible = false
+    _last_anchor_rect = Rect2()
     _show_step()
 
 
@@ -209,6 +218,7 @@ func _hide_overlay() -> void:
     _is_tutorial_active = false
     _is_offer_showing = false
     set_process(false)
+    _clear_playback_state()
 
 # ══ Public commands (used by UI buttons, ScriptDirector, and ShotPilot) ══════
 
@@ -264,8 +274,15 @@ func accept_offer() -> void:
     _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
     _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
     _popup_close.text = "×"
+    var script_id := _offer_script_id
     _is_offer_showing = false
-    offer_accepted.emit(_offer_script_id)
+    if _get_script(script_id).is_empty():
+        ToastManager.show_dev_error("Director.accept_offer: script '%s' no longer resolves" % script_id)
+        _hide_overlay()
+        _clear_playback_state()
+        _help_btn.visible = false
+        return
+    offer_accepted.emit(script_id)
 
 # ══ Navigation buttons ═════════════════════════════════════════════════════════
 
@@ -322,6 +339,13 @@ func _offer_safe_disconnect(signal_obj: Signal, callable: Callable) -> void:
 # ══ Scene change watcher ═══════════════════════════════════════════════════════
 
 
+func _clear_playback_state() -> void:
+    _current_script = []
+    _current_step_index = 0
+    _current_script_id = ""
+    _last_anchor_rect = Rect2()
+
+
 func _on_scene_changed() -> void:
     if _is_tutorial_active and _current_step_index < _current_script.size():
         var step: TutorialStep = _current_script[_current_step_index]
@@ -346,10 +370,9 @@ static func _get_script(script_id: String) -> Array[TutorialStep]:
 func _end_tutorial() -> void:
     var completed_id := _current_script_id
     _hide_overlay()
+    _clear_playback_state()
     if not _help_script_id.is_empty():
         _help_btn.visible = true
-    _current_script = []
-    _current_script_id = ""
     script_completed.emit(completed_id)
 
 
@@ -393,6 +416,16 @@ func _position_near_anchor(panel: Control, anchor_rect: Rect2) -> void:
 
     panel.custom_minimum_size.x = preferred_width
 
+    # Full-screen anchor fallback: when the anchor covers most of the viewport,
+    # position the hint panel as a centered popup with margin offset rather than
+    # relative to the anchor's edges (which would shove it off-screen).
+    if anchor_rect.size.x >= screen.x * 0.9 and anchor_rect.size.y >= screen.y * 0.9:
+        panel.position = Vector2(
+            clampi(int((screen.x - preferred_width) / 2), 0, int(screen.x - preferred_width)),
+            clampi(int(screen.y * 0.3), 0, int(screen.y - panel.size.y - margin if panel.size.y > 0 else screen.y - 200)),
+        )
+        return
+
     var px: float = anchor_rect.position.x + anchor_rect.size.x + margin
     var py: float = anchor_rect.position.y
 
@@ -428,6 +461,13 @@ func _process(_delta: float) -> void:
         return
 
     var rect: Rect2 = anchor.get_global_rect()
+    # Skip redundant layout when the anchor rect has not changed since the last
+    # per-frame update. The rect is also reset at each step transition via
+    # _last_anchor_rect = Rect2() inside start_script.
+    if rect == _last_anchor_rect:
+        return
+    _last_anchor_rect = rect
+
     _update_dim_hole(rect)
 
     if not step.unlock_anchor:

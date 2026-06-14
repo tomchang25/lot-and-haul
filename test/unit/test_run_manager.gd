@@ -1,29 +1,19 @@
 # test_run_manager.gd
 # Layer 1 — run-loop manager unit tests.
-# Item entries are generated via ItemGenerator.draw() against test data
-# loaded from the standard YAML → tres pipeline.
+# All test resources loaded from committed YAML test data via normal registries.
 extends GutTest
 
 # ══ Helpers ═══════════════════════════════════════════════════════════════════
 
-func _make_car() -> CarData:
-    var c := CarData.new()
-    c.car_id = "test_car"
-    c.grid_columns = 4
-    c.grid_rows = 3
-    c.max_weight = 500.0
-    c.stamina_cap = 30
-    c.fuel_cost_per_day = 10
-    c.trailer_damage_chance = 0.0
+func _car() -> CarData:
+    var c := CarRegistry.get_car_by_id("test_car")
+    assert_not_null(c, "test_car should exist in CarRegistry (run YAML→tres pipeline)")
     return c
 
 
-func _make_location() -> LocationData:
-    var l := LocationData.new()
-    l.location_id = "test_loc"
-    l.display_name = "Test Location"
-    l.entry_fee = 50
-    l.travel_days = 2
+func _location() -> LocationData:
+    var l := LocationRegistry.get_location_by_id("test_location")
+    assert_not_null(l, "test_location should exist in LocationRegistry (run YAML→tres pipeline)")
     return l
 
 # ══ AP Lifecycle ═══════════════════════════════════════════════════════════
@@ -32,8 +22,8 @@ func _make_location() -> LocationData:
 func test_ap_lifecycle_create_and_spend() -> void:
     var rng := RandomNumberGenerator.new()
     rng.seed = 42
-    var car := _make_car()
-    var loc := _make_location()
+    var car := _car()
+    var loc := _location()
 
     RunManager.create_run_store(loc, car)
     assert_not_null(RunManager.run, "run store should exist after create")
@@ -46,7 +36,6 @@ func test_ap_lifecycle_create_and_spend() -> void:
     assert_not_null(item, "item should be generated")
     assert_not_null(item.anchor, "item should have an anchor")
 
-    # Manually construct a LotEntry to avoid registry dependency.
     var lot_data := LotData.new()
     lot_data.lot_id = "test_lot"
     lot_data.aggressive_factor_min = 0.4
@@ -96,7 +85,6 @@ func test_clue_hit_and_miss() -> void:
     entry.unveil()
     assert_true(entry.unveiled, "item should be unveiled")
 
-    # Find easy and hard clues from the drawn pool
     var easy: ClueData = null
     var hard: ClueData = null
     for c: ClueData in entry.surface_clues:
@@ -105,20 +93,15 @@ func test_clue_hit_and_miss() -> void:
         elif c.clue_id == "test_surface_hard":
             hard = c
 
-    # At minimum the test draws 2 surface clues (pool size == 2 from test data).
-    # With the test seed both clues should be present.
     assert_not_null(easy, "test_surface_easy should be in drawn clues")
     assert_not_null(hard, "test_surface_hard should be in drawn clues")
 
-    # Easy clue: dc=5, attr bonus 1 → success_chance = (21+1-5)*5 = 85%
     entry.revealed_clue_ids.clear()
     assert_true(entry.attempt_clue(easy, 1, rng), "easy clue should succeed with attribute bonus")
     assert_eq(entry.revealed_clue_ids.size(), 1, "one clue should be revealed")
 
     var revealed_before := entry.revealed_clue_ids.duplicate()
 
-    # Hard clue: dc=19, attr bonus 0 → success_chance = (21+0-19)*5 = 10%
-    # With seed 2 and RNG state at this point, the roll should miss.
     assert_false(entry.attempt_clue(hard, 0, rng), "hard clue should miss with zero bonus")
     assert_eq(
         entry.revealed_clue_ids,
@@ -126,7 +109,6 @@ func test_clue_hit_and_miss() -> void:
         "revealed set should stay stable after miss",
     )
 
-    # Hard clue with max bonus
     assert_true(entry.attempt_clue(hard, 19, rng), "hard clue should hit with max bonus")
     assert_eq(entry.revealed_clue_ids.size(), 2, "both clues should be revealed")
 
@@ -134,8 +116,8 @@ func test_clue_hit_and_miss() -> void:
 
 
 func test_cargo_commit() -> void:
-    var car := _make_car()
-    var loc := _make_location()
+    var car := _car()
+    var loc := _location()
     RunManager.create_run_store(loc, car)
 
     var cat := CategoryRegistry.get_category_by_id("test_category")
@@ -155,8 +137,8 @@ func test_cargo_commit() -> void:
 
 
 func test_commit_lot_win() -> void:
-    var car := _make_car()
-    var loc := _make_location()
+    var car := _car()
+    var loc := _location()
     RunManager.create_run_store(loc, car)
 
     var lot_data := LotData.new()
@@ -180,12 +162,12 @@ func test_commit_lot_win() -> void:
 
 
 func test_trailer_damage_triggered() -> void:
-    var car := _make_car()
+    var car := _car().duplicate()
     car.trailer_damage_chance = 1.0
     car.trailer_damage_ratio_min = 0.1
     car.trailer_damage_ratio_max = 0.3
 
-    var loc := _make_location()
+    var loc := _location()
     RunManager.create_run_store(loc, car)
 
     var cat := CategoryRegistry.get_category_by_id("test_category")
@@ -205,10 +187,10 @@ func test_trailer_damage_triggered() -> void:
 
 
 func test_trailer_no_damage_when_chance_zero() -> void:
-    var car := _make_car()
+    var car := _car().duplicate()
     car.trailer_damage_chance = 0.0
 
-    var loc := _make_location()
+    var loc := _location()
     RunManager.create_run_store(loc, car)
 
     var cat := CategoryRegistry.get_category_by_id("test_category")
@@ -231,14 +213,12 @@ func test_trailer_no_damage_when_chance_zero() -> void:
 func test_full_run_scratch_to_run_result() -> void:
     var rng := RandomNumberGenerator.new()
     rng.seed = 1
-    var car := _make_car()
-    var loc := _make_location()
+    var car := _car()
+    var loc := _location()
 
-    # Create the run
     RunManager.create_run_store(loc, car)
     assert_not_null(RunManager.run, "run should exist")
 
-    # Construct a lot entry with a generated item
     var cat := CategoryRegistry.get_category_by_id("test_category")
     assert_not_null(cat, "test category should exist in registry")
 
@@ -247,7 +227,6 @@ func test_full_run_scratch_to_run_result() -> void:
     assert_not_null(item.anchor, "item should have an anchor")
     item.unveil()
 
-    # Reveal the first surface clue (easy cue with high attribute)
     for c: ClueData in item.surface_clues:
         item.attempt_clue(c, 20, rng)
         break
@@ -263,20 +242,16 @@ func test_full_run_scratch_to_run_result() -> void:
     lot_entry.item_entries = [item]
     lot_entry.npc_estimate = int(item.anchor.base_value + 100.0)
 
-    # Set the lot
     RunManager.set_lot(lot_entry)
     assert_not_null(RunManager.lot, "lot store should exist")
 
-    # Win the auction
     RunManager.commit_lot_win([item], 250)
     assert_eq(RunManager.run.paid_price, 250, "should have paid 250")
 
-    # Fill cargo
     RunManager.commit_cargo([item], [], 30)
     assert_eq(RunManager.run.cargo_items.size(), 1, "cargo should contain item")
     assert_eq(RunManager.run.onsite_proceeds, 30, "onsite proceeds should be 30")
 
-    # Build run result
     var result: RunResult = RunManager.take_run_result()
     assert_eq(result.cargo_items.size(), 1, "result cargo should have 1 item")
     assert_eq(result.onsite_proceeds, 30, "result onsite_proceeds")
@@ -284,7 +259,6 @@ func test_full_run_scratch_to_run_result() -> void:
     assert_eq(result.entry_fee, loc.entry_fee, "result entry_fee")
     assert_eq(result.fuel_cost, car.fuel_cost_per_day * loc.travel_days, "result fuel_cost")
 
-    # Cargo item should have auto-revealed surface clues after take_run_result
     assert_gt(result.cargo_items[0].revealed_clue_ids.size(), 0, "surface clues should be revealed")
 
     RunManager.clear_run_state()

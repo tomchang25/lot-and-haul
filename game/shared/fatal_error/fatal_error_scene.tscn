@@ -1,0 +1,76 @@
+[gd_scene format=3 uid="uid://cxdpyn4805dtj"]
+
+[ext_resource type="Script" uid="uid://db1vcnvcxqbjb" path="res://game/shared/fatal_error/fatal_error_scene.gd" id="1_script"]
+
+[node name="FatalErrorScene" type="Control" unique_id=720133721]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="." unique_id=2131579840]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.08, 0.08, 0.1, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="." unique_id=295581678]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="SpacerTop" type="Control" parent="RootVBox" unique_id=716264372]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TitleLabel" type="Label" parent="RootVBox" unique_id=1468648273]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Fatal Boot Error"
+horizontal_alignment = 1
+
+[node name="ErrorList" type="RichTextLabel" parent="RootVBox" unique_id=1106122367]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(600, 200)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+theme_override_constants/line_separation = 4
+theme_override_font_sizes/normal_font_size = 14
+bbcode_enabled = true
+autowrap_mode = 2
+
+[node name="ButtonsHBox" type="HBoxContainer" parent="RootVBox" unique_id=1547931940]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 16
+
+[node name="QuitButton" type="Button" parent="RootVBox/ButtonsHBox" unique_id=1574890164]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Quit"
+
+[node name="CopyButton" type="Button" parent="RootVBox/ButtonsHBox" unique_id=1274697247]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Copy Errors"
+
+[node name="SpacerBottom" type="Control" parent="RootVBox" unique_id=702391882]
+layout_mode = 2
+size_flags_vertical = 3

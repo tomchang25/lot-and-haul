@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" path="res://game/meta/knowledge/knowledge_hub.tscn" id="13_khub"]
 [ext_resource type="PackedScene" path="res://game/meta/knowledge/mastery_panel/mastery_panel.tscn" id="14_mastery"]
 [ext_resource type="PackedScene" path="res://game/meta/knowledge/perk_panel/perk_panel.tscn" id="15_perk"]
+[ext_resource type="PackedScene" path="res://game/shared/fatal_error/fatal_error_scene.tscn" id="15_fatal"]
 [ext_resource type="PackedScene" uid="uid://blocsel000001" path="res://game/meta/location_select/location_select_scene.tscn" id="16_locselect"]
 [ext_resource type="PackedScene" path="res://game/meta/vehicle/vehicle_hub.tscn" id="16_vehhub"]
 [ext_resource type="PackedScene" path="res://game/meta/vehicle/car_select/car_select_scene.tscn" id="17_csel"]
@@ -25,6 +26,7 @@
 
 [sub_resource type="Resource" id="Resource_scenes"]
 script = ExtResource("5_ea43q")
+fatal_error = ExtResource("15_fatal")
 location_select = ExtResource("16_locselect")
 location_entry = ExtResource("6_locentry")
 lot_browse = ExtResource("7_locbrw")

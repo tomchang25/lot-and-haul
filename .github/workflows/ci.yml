@@ -53,8 +53,10 @@ jobs:
 
   # ── Layer 1 — GUT unit tests ──────────────────────────────────────────────
   unit-tests:
-    # TEMPORARILY DISABLED: hangs/loops indefinitely on GitHub Actions. Remove
-    # `if: false` to re-enable once the runaway-run cause is found.
+    # GitHub CI currently loops/hangs indefinitely for an unknown reason when
+    # running the Godot GUT and smoke layers. These jobs are intentionally
+    # disabled until the runner hang is diagnosed; local/sandbox invocations
+    # remain the verification path. Remove `if: false` to re-enable.
     if: false
     needs: [generate-tres, render-sfx]
     runs-on: ubuntu-latest
@@ -105,8 +107,10 @@ jobs:
 
   # ── Layer 2 — Headless smoke test ─────────────────────────────────────────
   smoke-test:
-    # TEMPORARILY DISABLED: hangs/loops indefinitely on GitHub Actions. Remove
-    # `if: false` to re-enable once the runaway-run cause is found.
+    # GitHub CI currently loops/hangs indefinitely for an unknown reason when
+    # running the Godot GUT and smoke layers. These jobs are intentionally
+    # disabled until the runner hang is diagnosed; local/sandbox invocations
+    # remain the verification path. Remove `if: false` to re-enable.
     if: false
     needs: [generate-tres, render-sfx]
     runs-on: ubuntu-latest

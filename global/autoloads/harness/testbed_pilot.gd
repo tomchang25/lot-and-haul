@@ -13,25 +13,27 @@
 # Completely inert without the --testbed= flag, even in release exports.
 extends Node
 
-## Seconds to wait for a tutorial step to advance before flagging a stall.
-const STALL_TIMEOUT_SEC: float = 5.0
+## Default seconds to wait for a tutorial step to advance before flagging a stall.
+const DEFAULT_STALL_TIMEOUT_SEC: float = 5.0
 
 ## Default screenshot output directory.
 const DEFAULT_SHOT_DIR: String = "user://testbed_shots"
 
 var _id: String = ""
 var _shot_dir: String = ""
+var _stall_timeout: float = DEFAULT_STALL_TIMEOUT_SEC
 
 
 func _ready() -> void:
     var args := OS.get_cmdline_args()
     if not _parse_flags(args):
         return
-    print("TestbedPilot: id=%s shot_dir=%s" % [_id, _shot_dir])
+    print("TestbedPilot: id=%s shot_dir=%s stall_timeout=%.1f" % [_id, _shot_dir, _stall_timeout])
     call_deferred("_run")
 
 
-## Parses --testbed=<id> and --testbed-shot-dir=<path>.
+## Parses --testbed=<id>, --testbed-shot-dir=<path>, and
+## --testbed-stall-timeout=<seconds>.
 ## Returns false when --testbed= is absent (harness stays inert).
 func _parse_flags(args: PackedStringArray) -> bool:
     for arg: String in args:
@@ -39,6 +41,11 @@ func _parse_flags(args: PackedStringArray) -> bool:
             _id = arg.trim_prefix("--testbed=")
         elif arg.begins_with("--testbed-shot-dir="):
             _shot_dir = arg.trim_prefix("--testbed-shot-dir=")
+        elif arg.begins_with("--testbed-stall-timeout="):
+            var val := arg.trim_prefix("--testbed-stall-timeout=")
+            var parsed := val.to_float()
+            if parsed > 0.0:
+                _stall_timeout = parsed
     if _id.is_empty():
         return false
     if _shot_dir.is_empty():
@@ -98,7 +105,7 @@ func _advance_with_timeout() -> bool:
     var before := Director.step_index()
     Director.advance_step()
     var elapsed := 0.0
-    while elapsed < STALL_TIMEOUT_SEC:
+    while elapsed < _stall_timeout:
         await get_tree().process_frame
         elapsed += get_process_delta_time()
         if Director.step_index() != before:

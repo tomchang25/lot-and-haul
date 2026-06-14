@@ -12,7 +12,7 @@ signal tooltip_dismissed
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-const ItemRowScene: PackedScene = preload("uid://brx8agwvlpi3f")
+const ItemRowScene: PackedScene = preload("res://game/shared/item_display/item_row.tscn")
 const ColumnHeaderButtonScene := preload("res://game/shared/item_display/item_list_panel/column_header_button/column_header_button.tscn")
 
 # ── State ─────────────────────────────────────────────────────────────────────

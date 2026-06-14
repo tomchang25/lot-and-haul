@@ -1,6 +1,7 @@
 class_name SceneRegistry
 extends Resource
 
+@export var fatal_error: PackedScene
 @export var location_select: PackedScene
 @export var location_entry: PackedScene
 @export var lot_browse: PackedScene

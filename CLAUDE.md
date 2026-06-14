@@ -6,11 +6,24 @@ A Godot 4.6 single-player game about buying storage lots at auction, inspecting 
 
 Agent-specific instructions live in `dev/agent_rules/`. Read them before starting work. Key rules: `sandbox_environment.md` (shell vs. file tools), `lint_before_finish.md` (run linter on changed files), `git_operations.md` (git is read-only — never stage/commit, only suggest commit messages), `godot_headless_check.md` (never run Godot against the mount — use the /tmp snapshot procedure), `godot_tests.md` (how to run the GUT unit suite and CI smoke test), `save_migrations.md` (never delete migration code).
 
+## Dev File Placement
+
+Before creating or moving files under `dev/`, classify by the primary thing the file governs, not by who reads it:
+
+- `dev/agent_rules/`: agent behavior and execution constraints. Use for sandbox, git permissions, lint/test requirements, headless checks, approval rules, and required agent habits.
+- `dev/workflows/`: development process artifacts. Use for plan/spec/sketch/ship/stage-review formats, lifecycle steps, and how work moves from idea to implementation.
+- `dev/standards/`: project output standards. Use for code architecture, naming, scene structure, registries, themes, error guards, data conventions, and other rules that define what correct repo artifacts look like.
+- `dev/skills/`: concrete AI/Godot/GDScript recipes and hazard cards. Use for specific pitfalls, compiler/import failures, API traps, repeatable fixes, and commit/PR formatting references.
+- `dev/docs/`: actual design, architecture, planning, and tracking documents. Use for feature plans, system docs, vision docs, archived plans, and product/design content.
+- `dev/tools/`: executable tooling and tool-owned prompts. Use for scripts, validators, generators, hooks, and prompt packs used by those tools.
+
+Full placement rules and tie-breakers live in `dev/README.md`.
+
 **Model-tier gate (Fable)**: if you are running as a Fable-class model, you may freely read individual files. If a task requires reading 10 or more files in a single operation (e.g. codebase-wide search sweeps, bulk lint passes, large diff reviews), stop and confirm with me first before proceeding.
 
 **No hard-wrapped prose**: Do not hard-wrap prose lines — let the client handle line wrapping. This is a global rule that applies to all writing, not just commits.
 
-When asked to build a plan, implementation spec, or sketch, follow the matching standard in `dev/agent_rules/` (`plan_standard.md`, `implementation_spec_standard.md`, `sketch_standard.md`), the plan lifecycle in `dev/docs/README.md`, and `dev/standards/` for any relevant domain standard. Plans and sketches go in `dev/docs/plans/` with a one-line pointer in `TODO.md`. The spec author explores the codebase directly against the plan — there is no separate scout stage. Small features with conversation-settled design take the sketch route (one document, non-normative code allowed, no spec).
+When asked to build a plan, implementation spec, or sketch, follow the matching workflow in `dev/workflows/` (`plan_standard.md`, `implementation_spec_standard.md`, `sketch_standard.md`), the plan lifecycle in `dev/docs/README.md`, and `dev/standards/` for any relevant domain standard. Plans and sketches go in `dev/docs/plans/` with a one-line pointer in `TODO.md`. The spec author explores the codebase directly against the plan — there is no separate scout stage. Small features with conversation-settled design take the sketch route (one document, non-normative code allowed, no spec).
 
 Resolve unknowns by asking me directly during the planning conversation — never emit an `## Open Questions` section or leave unresolved decisions parked in a plan or spec. Stop and ask the moment a decision is unclear; hand over a plan or spec only once every such question has been answered and folded into the relevant Requirement, Design, or Relational Context line.
 
@@ -18,7 +31,7 @@ Resolve unknowns by asking me directly during the planning conversation — neve
 
 **Answer my questions before implementing**: when my message contains a question — even alongside a work request — answer the question in conversation first, before doing the work. If the answer could change what gets built, wait for my confirmation instead of proceeding on assumptions. Never bury the answer in a wrap-up after the implementation is already done.
 
-**Workflow commands** (`/pr`, `/ship`, `/stage-review`): defined in `.claude/commands/`. `pr` generates a PR title/description for the current branch, `ship` closes out completed work — staged changes or a feature branch covering one or more plans (CHANGELOG + TODO + archive plans, suggest commit message), `stage-review` checks staged changes against the plan spec and standards lint. If asked to do one of these tasks without the slash command, follow the matching command file.
+**Workflow commands** (`/pr`, `/ship`, `/stage-review`, `/godot-headless`): defined in `.claude/commands/`. `pr` generates a PR title/description for the current branch, `ship` closes out completed work — staged changes or a feature branch covering one or more plans (CHANGELOG + TODO + archive plans, suggest commit message), `stage-review` checks staged changes against the plan spec and standards lint, and `godot-headless` runs the safe `/tmp` snapshot headless check without mutating git or trusting the sandbox mount. If asked to do one of these tasks without the slash command, follow the matching command file.
 
 ## Core Loop
 
@@ -67,9 +80,11 @@ data/         Designer resources: definitions, yaml sources, generated .tres
 dev/          Development tooling and documentation
   agent_rules/ Agent-specific instructions (sandbox, lint, etc.)
   docs/       Architecture docs, tracked in this repo (vision/, systems/, plans/, archived/)
+  README.md   Classification rules for dev/ folders
   skills/     AI coding references (commit format, GDScript patterns)
   standards/  Coding conventions, naming, registries, scene architecture
   tools/      YAML↔TRES pipeline (Python scripts + prompts)
+  workflows/  Development process formats (plan, spec, sketch)
 game/         Game feature scenes and logic
   meta/       Hub-phase: customer_sell, day_summary, hub, knowledge,
   |           location_select, storage, vehicle

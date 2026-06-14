@@ -1,0 +1,205 @@
+{
+	"schema_version": 2,
+	"sections": {
+		"customers": {
+			"_version": 1,
+			"customer_sales_today": [],
+			"nightly_customers": [
+				{
+					"customer_id": "cust_pwalfg3x",
+					"demand_tags": [
+						"pistol_maker_documented",
+						"rifle_proof_stamped",
+						"figurine_base_unmarked"
+					],
+					"display_name": "Eve Weaver",
+					"grid_columns": 5,
+					"grid_rows": 4
+				},
+				{
+					"customer_id": "cust_51e8mqkj",
+					"demand_tags": ["rifle_barrel_worn", "poster_print_offset"],
+					"display_name": "Grace Mueller",
+					"grid_columns": 4,
+					"grid_rows": 4
+				},
+				{
+					"customer_id": "cust_lgmtyrxf",
+					"demand_tags": ["painting_leaf_monet", "bag_monogram_canvas"],
+					"display_name": "Quinn Park",
+					"grid_columns": 3,
+					"grid_rows": 3
+				}
+			]
+		},
+		"economy": { "_version": 1, "cash": 258350 },
+		"garage": {
+			"_version": 1,
+			"active_car_id": "semi_rig",
+			"owned_car_ids": ["van_basic", "box_truck", "cargo_hauler", "semi_rig"]
+		},
+		"knowledge": {
+			"_version": 1,
+			"attribute_levels": {
+				"appraisal": 4,
+				"investigation": 3,
+				"perception": 4
+			},
+			"category_points": {
+				"clock": 385.0,
+				"crossbow": 263.0,
+				"handbag": 778.0,
+				"oil_lamp": 1156.0,
+				"pistol": 1175.0,
+				"rifle": 244.0,
+				"vase": 379.0,
+				"wristwatch": 217.0
+			},
+			"unlocked_perks": []
+		},
+		"progress": {
+			"_version": 1,
+			"available_location_ids": ["suburban_storage", "midtown_warehouse"],
+			"current_day": 283
+		},
+		"slot": {
+			"_version": 1,
+			"current_slot": 3,
+			"pending_run": {},
+			"selling_slots_today": 0,
+			"storage_ap": 0
+		},
+		"storage": {
+			"_version": 1,
+			"next_entry_id": 276,
+			"storage_items": [
+				{
+					"center_offset": 0.0798378836542991,
+					"condition": 0.493913322687149,
+					"id": 267,
+					"item_id": "wristwatch_timex_auto",
+					"research_progress": {},
+					"revealed_clue_ids": [
+						"watch_case_lugs",
+						"watch_crown_wind",
+						"watch_dial_patina"
+					],
+					"unveiled": true,
+					"verified": false
+				},
+				{
+					"center_offset": -0.182244691757109,
+					"condition": 0.72509491443634,
+					"id": 268,
+					"item_id": "pistol_boutet_mismatch",
+					"research_progress": {},
+					"revealed_clue_ids": [
+						"pistol_barrel_short",
+						"pistol_lock_signed",
+						"pistol_grip_scrolled",
+						"pistol_inlay_gold",
+						"pistol_maker_documented",
+						"pistol_stock_walnut"
+					],
+					"unveiled": true,
+					"verified": false
+				},
+				{
+					"center_offset": 0.103727738689891,
+					"condition": 0.72540020942688,
+					"id": 269,
+					"item_id": "handbag_basic_tote",
+					"research_progress": {},
+					"revealed_clue_ids": [
+						"bag_exterior_synthetic",
+						"bag_lining_synthetic",
+						"bag_stitching_frayed"
+					],
+					"unveiled": true,
+					"verified": true
+				},
+				{
+					"center_offset": 0.0194347628485089,
+					"condition": 0.275839000940323,
+					"id": 270,
+					"item_id": "handbag_basic_tote",
+					"research_progress": {},
+					"revealed_clue_ids": [
+						"bag_exterior_synthetic",
+						"bag_lining_synthetic",
+						"bag_stitching_frayed"
+					],
+					"unveiled": true,
+					"verified": true
+				},
+				{
+					"center_offset": -0.197053543277759,
+					"condition": 0.193295553326607,
+					"id": 271,
+					"item_id": "rifle_springfield_issue",
+					"research_progress": {},
+					"revealed_clue_ids": [
+						"rifle_barrel_long",
+						"rifle_proof_stamped",
+						"rifle_stock_figured",
+						"rifle_buttplate_brass"
+					],
+					"unveiled": true,
+					"verified": false
+				},
+				{
+					"center_offset": -0.296823839502522,
+					"condition": 0.458691477775574,
+					"id": 272,
+					"item_id": "rifle_rough_shooter",
+					"research_progress": {},
+					"revealed_clue_ids": ["rifle_barrel_worn", "rifle_action_rough"],
+					"unveiled": true,
+					"verified": true
+				},
+				{
+					"center_offset": -0.346940589554515,
+					"condition": 0.0103960726410151,
+					"id": 273,
+					"item_id": "rifle_rough_shooter",
+					"research_progress": {},
+					"revealed_clue_ids": ["rifle_barrel_worn", "rifle_action_rough"],
+					"unveiled": true,
+					"verified": true
+				},
+				{
+					"center_offset": -0.493607671152473,
+					"condition": 0.690221726894379,
+					"id": 274,
+					"item_id": "pistol_nock_signed",
+					"research_progress": {},
+					"revealed_clue_ids": [
+						"pistol_barrel_short",
+						"pistol_proof_stamped",
+						"pistol_lock_signed",
+						"pistol_maker_documented",
+						"pistol_stock_walnut"
+					],
+					"unveiled": true,
+					"verified": false
+				},
+				{
+					"center_offset": -0.192178867602305,
+					"condition": 0.185943990945816,
+					"id": 275,
+					"item_id": "crossbow_replica_wall",
+					"research_progress": {},
+					"revealed_clue_ids": [
+						"crossbow_tiller_wood",
+						"crossbow_prod_rusted",
+						"crossbow_stock_carved",
+						"crossbow_wire_gilded",
+						"crossbow_iron_fittings"
+					],
+					"unveiled": true,
+					"verified": false
+				}
+			]
+		}
+	}
+}

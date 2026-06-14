@@ -1,4 +1,6 @@
-# Godot Headless Check — Safe Procedure
+# Godot Headless Check — Authoritative Safe Procedure
+
+This file is the canonical procedure for the `/godot-headless` slash command and any agent-run Godot headless check. Command wrappers should link here instead of duplicating the steps.
 
 Running `Godot --headless` directly against the mounted working tree is **forbidden**: the mount serves tail-truncated views of recently-modified files (see `sandbox_environment.md`), so Godot reports bogus parse errors that don't exist in the real files. Verified example: a truncated `anchor_data.gd` ending at `@export var tier: i` produced `Parse Error: Could not find type "i"`.
 
@@ -14,13 +16,12 @@ git checkout-index -a --prefix="$LH/"            # clean snapshot of STAGED cont
 cp -r dev/tools/bin "$LH/dev/tools/"             # godot binary is gitignored
 cd "$LH"
 pip install pyyaml --break-system-packages -q 2>/dev/null   # once per sandbox session
-python3 dev/tools/yaml_to_tres.py --godot-root "$LH"         # regenerate data/tres/ (gitignored) from tracked YAML
+python3 dev/tools/yaml_to_tres.py --godot-root "."         # regenerate data/tres/ (gitignored) from tracked YAML
 # SFX rendering reads script UIDs from .gd.uid sidecar files (tracked by git),
 # NOT from .godot/uid_cache.bin — so it runs BEFORE --import.
-python3 dev/tools/render_sfx.py --dir "$LH/data/yaml/sfx/" --godot-root "$LH"
-rm -rf .godot                                    # always import fresh — stale caches poison UID resolution
-timeout 90 dev/tools/bin/Godot_v4.6.3-stable_linux.x86_64 --headless --path "$LH" --import
-timeout 35 dev/tools/bin/Godot_v4.6.3-stable_linux.x86_64 --headless --path "$LH" --quit 2>&1 | grep -E "SCRIPT ERROR|Parse"
+python3 dev/tools/render_sfx.py --dir "./data/yaml/sfx/" --godot-root "."
+timeout 30 dev/tools/bin/Godot_v4.6.3-stable_linux.x86_64 --headless --path "." --import
+timeout 30 dev/tools/bin/Godot_v4.6.3-stable_linux.x86_64 --headless --path "." --quit 2>&1 | grep -E "SCRIPT ERROR|Parse"
 ```
 
 Multiple agents/sessions share `/tmp`, and files created by another session's user are not removable (`Permission denied`). That is why a fixed path like `/tmp/lh` is forbidden: `mktemp -d` guarantees a private dir. Don't bother cleaning up other sessions' leftovers — just ignore them.

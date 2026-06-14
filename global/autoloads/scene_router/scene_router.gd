@@ -102,11 +102,46 @@ func go_to_customer_sell() -> void:
 func go_to_start_page() -> void:
     _navigate(scenes.start_page)
 
+# ── Fatal-error hand-off ──────────────────────────────────────────────────────
+
+var _pending_fatal_title: String = ""
+var _pending_fatal_errors: Array[String] = []
+
+
+## Routes to a fatal boot error screen that displays [param title] and
+## [param errors], then quits. Used when generated data registries are empty
+## or critical autoloads fail to initialize.
+func go_to_fatal_error(title: String, errors: Array[String]) -> void:
+    _pending_fatal_title = title
+    _pending_fatal_errors = errors
+    if scenes.fatal_error == null:
+        push_error("SceneRegistry.fatal_error is null — falling back to push_error")
+        for e: String in errors:
+            push_error("[FATAL] " + e)
+        get_tree().quit()
+        return
+    # Deferred so the scene tree is ready for a scene transition during
+    # autoload _ready().
+    _navigate.call_deferred(scenes.fatal_error)
+
+
+## Consume and return the pending fatal error payload (called once by fatal_error_scene).
+func consume_pending_fatal() -> Dictionary:
+    var data := {
+        "title": _pending_fatal_title,
+        "errors": _pending_fatal_errors,
+    }
+    _pending_fatal_title = ""
+    _pending_fatal_errors = []
+    return data
+
 
 ## Flushes any pending deferred save state, then performs the scene transition.
 ## All go_to_* methods route through here so deferred mutations are never lost
-## across scene boundaries.
+## across scene boundaries. A save flush failure is warned but does not block
+## navigation — the player can continue, but recent progress may be lost.
 func _navigate(scene: PackedScene) -> void:
-    SaveManager.flush()
+    if not SaveManager.flush():
+        ToastManager.show_warning("Save failed before scene transition. Continuing, but recent progress may not be saved.")
     get_tree().change_scene_to_packed(scene)
     scene_changed.emit()

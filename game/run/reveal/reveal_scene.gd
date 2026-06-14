@@ -12,7 +12,7 @@ const REVEAL_GOOD: UiAudioEvent = preload("res://data/tres/audio_events/reveal_g
 const AUCTION_LOST: UiAudioEvent = preload("res://data/tres/audio_events/auction_lost.tres")
 const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres")
 
-const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
+const ItemRowTooltipScene: PackedScene = preload("res://game/shared/item_display/item_row_tooltip.tscn")
 
 const REVEAL_COLUMNS: Array = [
     ItemRow.Column.NAME,

@@ -130,9 +130,11 @@ Name: `<scope>_<short_description>.md`. Contains goal (1–2 sentences), context
 
 ## Relationship to other dev/ folders
 
-- `dev/agent_rules/` — agent-specific instructions, including the plan → spec document standards (`plan_standard.md`, `implementation_spec_standard.md`)
-- `dev/standards/` — coding conventions, naming rules, project structure (runtime type archetype taxonomy is now in `CLAUDE.md`)
-- `dev/skills/` — AI coding tool references (commit format, GDScript patterns)
-- `dev/tools/` — build scripts (yaml/tres pipeline)
+- `dev/README.md` — placement rules for every folder under `dev/`.
+- `dev/agent_rules/` — agent behavior and execution constraints, such as sandbox, git, lint, tests, and headless procedures.
+- `dev/workflows/` — development process artifact formats, such as plan, implementation spec, sketch, ship, and stage-review flows.
+- `dev/standards/` — project output standards, such as code architecture, naming, project structure, registries, scenes, themes, and error guards.
+- `dev/skills/` — concrete AI/Godot/GDScript recipes and hazard cards, including commit and PR formatting references.
+- `dev/tools/` — executable tooling, generators, validators, hooks, and tool-owned prompts.
 
 These are separate concerns and live outside `docs/`.

@@ -25,6 +25,11 @@ func _ready() -> void:
 
 
 func _boot_normal() -> void:
+    var boot_errors := RegistryAudit.collect_boot_errors()
+    if not boot_errors.is_empty():
+        SceneRouter.go_to_fatal_error("Generated data failed to load", boot_errors)
+        return
+
     SaveManager.boot_load()
     var validation_ok: bool = SaveManager.run_validation()
     var scene_ok: bool = RegistryAudit.check_scene_registry(SceneRouter.scenes)
@@ -49,6 +54,13 @@ func _boot_for_ci() -> void:
     # run as usual. Scene routing is skipped — the CI pilot autoload (harness/ci_pilot.gd)
     # detects the --ci-run flag and manages the full auto-pilot loop, including
     # its own exit.
+    var boot_errors := RegistryAudit.collect_boot_errors()
+    if not boot_errors.is_empty():
+        for e: String in boot_errors:
+            push_error("[FATAL] " + e)
+        get_tree().quit(1)
+        return
+
     SaveManager.boot_load()
     var validation_ok: bool = SaveManager.run_validation()
     var scene_ok: bool = RegistryAudit.check_scene_registry(SceneRouter.scenes)

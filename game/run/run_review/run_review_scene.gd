@@ -11,7 +11,7 @@ extends Control
 const CASH_CREDITED: UiAudioEvent = preload("res://data/tres/audio_events/cash_credited.tres")
 const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres")
 
-const ItemRowTooltipScene: PackedScene = preload("uid://3kvnpn7pek5i")
+const ItemRowTooltipScene: PackedScene = preload("res://game/shared/item_display/item_row_tooltip.tscn")
 
 const REVIEW_COLUMNS: Array = [
     ItemRow.Column.NAME,
@@ -40,6 +40,11 @@ var _tooltip: ItemRowTooltip = null
 
 
 func _ready() -> void:
+    if RunManager.run == null:
+        ToastManager.show_error("Run review failed to load. Returning to hub.")
+        SceneRouter.go_to_hub.call_deferred()
+        return
+
     _tooltip = ItemRowTooltipScene.instantiate()
     add_child(_tooltip)
 

@@ -111,14 +111,50 @@ func _do_autopilot() -> bool:
         ],
     )
 
-    # ── 13. Verify scene wiring ──────────────────────────────────────────
+    # ── 13. Mid-flow invariant checks ────────────────────────────────────
+    if not _check_invariants():
+        return false
+
+    # ── 14. Verify scene wiring ──────────────────────────────────────────
     _verify_key_scenes()
 
     return true
 
 
-## Instantiate a representative set of scenes to catch wiring bugs
-## (null child-node references, bad exports, missing signal handlers).
+## Reports mid-flow invariant failures with enough context to diagnose regression.
+## Returns false when any invariant fails.
+func _check_invariants() -> bool:
+    var ok := true
+
+    if not RunManager.is_run_active():
+        ToastManager.show_warning("CI invariant: run should be active after create")
+        ok = false
+
+    if MetaManager.economy.cash < 0:
+        ToastManager.show_warning("CI invariant: cash should be non-negative, got %d" % MetaManager.economy.cash)
+        ok = false
+
+    if MetaManager.economy.cash > 500000:
+        ToastManager.show_warning("CI invariant: cash seems excessive at %d" % MetaManager.economy.cash)
+        ok = false
+
+    var day: int = MetaManager.progress.current_day
+    if day <= 0:
+        ToastManager.show_warning("CI invariant: current_day should be positive, got %d" % day)
+        ok = false
+
+    if day > 365:
+        ToastManager.show_warning("CI invariant: current_day seems excessive at %d" % day)
+        ok = false
+
+    return ok
+
+
+## Instantiate a representative set of scenes into the tree to catch wiring
+## bugs (null child-node references, bad exports, missing signal handlers).
+## Adding to the tree exercises _ready() paths (fires on add_child when the
+## parent is already in the tree), node-path lookups, and signal connections.
+## Each instance is freed deferred so the test does not block on cleanup.
 func _verify_key_scenes() -> void:
     var registry: SceneRegistry = SceneRouter.scenes
     if registry == null:
@@ -137,6 +173,9 @@ func _verify_key_scenes() -> void:
         if scene == null:
             ToastManager.show_error("CI Pilot: scene '%s' is null" % key)
             continue
+        var root := Node.new()
+        get_tree().root.add_child(root)
         var instance := scene.instantiate()
-        if instance != null:
-            instance.queue_free()
+        root.add_child(instance)
+        instance.queue_free()
+        root.queue_free()

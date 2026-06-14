@@ -1,27 +1,30 @@
 # **/assets
+# **/*.import
+# **/.godot
 
-**/.godot
-**/.commitsage
-
-**/shader_cache
-**/script_templates
 **/*_back
+**/*venv
+
+**/*.import
+**/.godot
+
 **/tmp
 **/build
-**/*venv
-**/test/test_data
 
 **/dev/tools/bin
 
 **/*.tmp
-**/*.import
-**/*.db-journal
-**/*.code-workspace
 
 data/tres/
 
-**/__pycache__/
 
 # Generated SFX assets (never hand-edit)
 assets/audio/placeholder/*.wav
 data/tres/audio_events/*.tres
+
+**/__pycache__/
+**/shader_cache
+**/script_templates
+**/*.db-journal
+**/*.code-workspace
+**/.commitsage
