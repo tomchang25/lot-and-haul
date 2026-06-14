@@ -7,9 +7,12 @@ extends RefCounted
 
 class_name TestbedChecks
 
+## Canonical error and benign patterns, kept in sync with dev/ci/error_filters.json.
+## Test test/unit/test_error_filters_consistency.gd asserts the two stay in sync.
 ## Benign noise patterns from headless Godot that should not be flagged as errors.
 ## Mirrors the grep -v filter in .github/workflows/ci.yml smoke-test job.
 const BENIGN_PATTERNS: Array[String] = [
+    "[DEBUG-PASS]",
     "AudioServer",
     "DisplayServer",
     "PulseAudio",
@@ -26,6 +29,28 @@ const ERROR_PATTERNS: Array[String] = [
     "push_error",
     "FATAL",
 ]
+
+
+## Loads error filters from dev/ci/error_filters.json and returns them as a
+## Dictionary with "error_patterns" and "benign_patterns" arrays. Returns null
+## when the file is missing or unparseable. Consumers that want one source of
+## truth can call this instead of referencing the const arrays directly.
+static func load_error_filters_from_json() -> Dictionary:
+    var path := "res://dev/ci/error_filters.json"
+    if not FileAccess.file_exists(path):
+        push_warning("TestbedChecks: error_filters.json not found at %s" % path)
+        return {}
+    var file := FileAccess.open(path, FileAccess.READ)
+    if file == null:
+        push_warning("TestbedChecks: could not open %s" % path)
+        return {}
+    var raw := file.get_as_text()
+    file.close()
+    var parsed := JSON.parse_string(raw)
+    if parsed == null or typeof(parsed) != TYPE_DICTIONARY:
+        push_warning("TestbedChecks: error_filters.json is not a valid JSON object")
+        return {}
+    return parsed as Dictionary
 
 
 ## Scans [param log_path] for error-level lines, excluding benign engine noise.

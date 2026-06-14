@@ -159,7 +159,9 @@ jobs:
           set +o pipefail
           # Any SCRIPT ERROR, ERROR:, push_error, or FATAL is a hard fail.
           # Only unavoidable headless-mode engine noise is filtered.
+          # "[DEBUG-PASS]" markers indicate intentional programmer-error guard tests.
           if grep -n -E "(SCRIPT ERROR|ERROR:|push_error|FATAL)" /tmp/ci-output.log \
+            | grep -v -F "[DEBUG-PASS]" \
             | grep -v -E "(AudioServer|DisplayServer)" \
             | grep -v -E "(PulseAudio|ALSA|D3D12|WASAPI|CoreAudio)" \
             | grep .; then

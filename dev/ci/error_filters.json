@@ -1,0 +1,19 @@
+{
+  "error_patterns": [
+    "SCRIPT ERROR",
+    "ERROR:",
+    "push_error",
+    "FATAL"
+  ],
+  "benign_patterns": [
+    "[DEBUG-PASS]",
+    "AudioServer",
+    "DisplayServer",
+    "PulseAudio",
+    "ALSA",
+    "D3D12",
+    "WASAPI",
+    "CoreAudio"
+  ],
+  "_comment": "Canonical source of truth for headless Godot error filtering. testbed_checks.gd constants and CI grep filters should match these arrays."
+}

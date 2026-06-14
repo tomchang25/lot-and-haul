@@ -4,6 +4,13 @@ Append-only record of shipped work.
 
 ## Robustness Hardening
 
+- 2026-06-14 — [ci] `dev/ci/error_filters.json` added as canonical error-filter source of truth; `test_error_filters_consistency.gd` asserts GDScript constants match the JSON
+- 2026-06-14 — [ci] CI pilot scene wiring verification enters scenes for 2 frames to exercise `_ready()` paths; mid-flow invariants added for cash, storage, lot-active, and step-finality checks
+- 2026-06-14 — [test] Director unit coverage: accessor lifecycle, missing anchor auto-skip, offer acceptance signal, unknown-script fallback, tutorial-seen tracking
+- 2026-06-14 — [harness] TestbedPilot stall detection retries once before declaring a stall, reducing false positives from single slow frames
+- 2026-06-14 — [ci] CI grep filter updated with `[DEBUG-PASS]` marker to exempt intentional programmer-error guard tests from error detection
+- 2026-06-14 — [tutorial] `_end_tutorial()` marks the completed script as seen via `MetaManager` before clearing playback state
+- 2026-06-14 — [fix] Unused-parameter warning cleanups: `_origin`, `_action_type`, `_rotation` renames across cargo, inspection, and packing_grid scenes
 - 2026-06-14 — [test] Regression test cleanup fixed enum-typed clue fixtures, baseline item condition, YAML-backed run clue draw bounds, and migration test formatting after the Phase 2 robustness test-data pass
 - 2026-06-14 — [dev] Godot headless/test guidance now warns that `/tmp` must be container-native Linux storage; a new cross-OS mount hazard card documents the Docker bind-mount failure mode
 
