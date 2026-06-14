@@ -64,7 +64,7 @@ data/              Designer resources
   yaml/            Human-authored YAML source data
   tres/            Generated .tres files (do not hand-edit)
 dev/               Development tooling and documentation
-  docs/            Architecture docs (vision/, systems/, plans/)
+  docs/            Architecture docs (vision/, systems/, plans/, pages/)
   standards/       Coding conventions, naming, scene architecture
   tools/           YAML↔TRES pipeline, linting, stats
 game/              Game feature scenes and logic

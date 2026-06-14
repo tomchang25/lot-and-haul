@@ -79,7 +79,7 @@ data/         Designer resources: definitions, yaml sources, generated .tres
     lots/ perks/ super_categories/
 dev/          Development tooling and documentation
   agent_rules/ Agent-specific instructions (sandbox, lint, etc.)
-  docs/       Architecture docs, tracked in this repo (vision/, systems/, plans/, archived/)
+  docs/       Architecture docs, tracked in this repo (vision/, systems/, plans/, archived/, pages/)
   README.md   Classification rules for dev/ folders
   skills/     AI coding references (commit format, GDScript patterns)
   standards/  Coding conventions, naming, registries, scene architecture
