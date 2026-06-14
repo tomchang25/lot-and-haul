@@ -11,7 +11,7 @@ Agent-specific instructions live in `dev/agent_rules/`. Read them before startin
 Before creating or moving files under `dev/`, classify by the primary thing the file governs, not by who reads it:
 
 - `dev/agent_rules/`: agent behavior and execution constraints. Use for sandbox, git permissions, lint/test requirements, headless checks, approval rules, and required agent habits.
-- `dev/workflows/`: development process artifacts. Use for plan/spec/sketch/ship/stage-review formats, lifecycle steps, and how work moves from idea to implementation.
+- `dev/workflows/`: development process artifacts. Use for plan/spec/sketch/closeout/stage-review formats, lifecycle steps, and how work moves from idea to implementation. Slash-command workflow files live in `dev/workflows/commands/`.
 - `dev/standards/`: project output standards. Use for code architecture, naming, scene structure, registries, themes, error guards, data conventions, and other rules that define what correct repo artifacts look like.
 - `dev/skills/`: concrete AI/Godot/GDScript recipes and hazard cards. Use for specific pitfalls, compiler/import failures, API traps, repeatable fixes, and commit/PR formatting references.
 - `dev/docs/`: actual design, architecture, planning, and tracking documents. Use for feature plans, system docs, vision docs, archived plans, and product/design content.
@@ -31,7 +31,7 @@ Resolve unknowns by asking me directly during the planning conversation — neve
 
 **Answer my questions before implementing**: when my message contains a question — even alongside a work request — answer the question in conversation first, before doing the work. If the answer could change what gets built, wait for my confirmation instead of proceeding on assumptions. Never bury the answer in a wrap-up after the implementation is already done.
 
-**Workflow commands** (`/pr`, `/ship`, `/stage-review`, `/godot-headless`): defined in `.claude/commands/`. `pr` generates a PR title/description for the current branch, `ship` closes out completed work — staged changes or a feature branch covering one or more plans (CHANGELOG + TODO + archive plans, suggest commit message), `stage-review` checks staged changes against the plan spec and standards lint, and `godot-headless` runs the safe `/tmp` snapshot headless check without mutating git or trusting the sandbox mount. If asked to do one of these tasks without the slash command, follow the matching command file.
+**Workflow commands** (`/pr`, `/commit-msg`, `/closeout`, `/stage-review`, `/godot-headless`): defined in `dev/workflows/commands/`. `pr` generates a PR title/description for the current branch, `commit-msg` suggests a conventional commit message for currently staged changes without staging, committing, pushing, or opening a PR, `closeout` closes out completed work — staged changes or a feature branch covering one or more plans (CHANGELOG + TODO + archive plans, optional commit-message suggestion only when explicitly asked), `stage-review` checks staged changes against the plan spec and standards lint, and `godot-headless` runs the safe `/tmp` snapshot headless check without mutating git or trusting the sandbox mount. If asked to do one of these tasks without the slash command, follow the matching command file.
 
 ## Core Loop
 
