@@ -13,7 +13,7 @@ func _make_anchor(base_value: int = 100) -> AnchorData:
 func _make_surface(clue_id: String, op: String, amount: float, dc: int = 5) -> ClueData:
     var c := ClueData.new()
     c.clue_id = clue_id
-    c.type = "surface"
+    c.type = ClueData.ClueType.SURFACE
     c.dc = dc
     c.effect_op = op
     c.effect_amount = amount
@@ -23,7 +23,7 @@ func _make_surface(clue_id: String, op: String, amount: float, dc: int = 5) -> C
 func _make_hidden(clue_id: String, op: String, amount: float, dc: int = 10) -> ClueData:
     var c := ClueData.new()
     c.clue_id = clue_id
-    c.type = "hidden"
+    c.type = ClueData.ClueType.HIDDEN
     c.dc = dc
     c.effect_op = op
     c.effect_amount = amount
@@ -36,7 +36,7 @@ func _make_item(anchor: AnchorData, surface: Array[ClueData] = [], hidden: Array
     item.surface_clues = surface
     item.hidden_clues = hidden
     item.unveiled = true
-    item.condition = 1.0
+    item.condition = 0.5
     return item
 
 # ── Condition multiplier bands ─────────────────────────────────────────────

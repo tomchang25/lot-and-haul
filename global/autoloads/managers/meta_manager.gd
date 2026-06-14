@@ -32,6 +32,7 @@ func _ready() -> void:
 ## SaveManager.reset_providers() during the new-game flow.
 func reset() -> void:
     economy = EconomyStore.new()
+    economy.earn(Economy.STARTING_CASH)
     garage = GarageStore.new()
     storage = StorageStore.new()
     slot = SlotStore.new()
