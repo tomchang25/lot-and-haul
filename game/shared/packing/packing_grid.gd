@@ -216,9 +216,9 @@ func lift(item) -> void:
 ## Sets the held item without erasing any placement (used for list/extra lifts).
 ## A list pick has no grabbed grid cell, so the anchor is set to the shape's
 ## centroid cell, keeping the item centred under the cursor across rotations.
-func set_held_item(item, rotation: int) -> void:
+func set_held_item(item, p_rotation: int) -> void:
     active_item = item
-    active_rotation = rotation
+    active_rotation = p_rotation
     phase = Phase.ITEM_HELD
     # No grabbed cell from a list pick — anchor on the cell nearest the shape's
     # centroid so the item pivots in place under the cursor instead of unfolding

@@ -282,7 +282,7 @@ func _do_clue_chain(entry: ItemEntry) -> void:
     _complete_action(entry, ActionType.INSPECT_CLUE)
 
 
-func _complete_action(completed_entry: ItemEntry, action_type: int) -> void:
+func _complete_action(completed_entry: ItemEntry, _action_type: int) -> void:
     _clear_active_action()
 
     _refresh_grid_cells()

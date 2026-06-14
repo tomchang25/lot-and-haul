@@ -124,7 +124,7 @@ func _input(event: InputEvent) -> void:
 # ══ PackingGrid callbacks ═══════════════════════════════════════════════════════
 
 
-func _packing_weight_validator(item, origin: Vector2i) -> bool:
+func _packing_weight_validator(item, _origin: Vector2i) -> bool:
     return not _would_exceed_weight(item)
 
 # ══ PackingGrid signal handlers ════════════════════════════════════════════════

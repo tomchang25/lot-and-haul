@@ -369,6 +369,7 @@ static func _get_script(script_id: String) -> Array[TutorialStep]:
 
 func _end_tutorial() -> void:
     var completed_id := _current_script_id
+    _mark_seen(completed_id)
     _hide_overlay()
     _clear_playback_state()
     if not _help_script_id.is_empty():

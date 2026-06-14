@@ -99,19 +99,30 @@ func _run() -> void:
 
 
 ## Advances the current tutorial step and waits for Director.step_index() to
-## increment (or the scene to change) within STALL_TIMEOUT_SEC.
+## increment (or the scene to change) within STALL_TIMEOUT_SEC. One retry is
+## attempted before declaring a stall so a slow single frame does not become
+## a false positive.
 ## Returns true when the step advanced, false on timeout (stall).
 func _advance_with_timeout() -> bool:
     var before := Director.step_index()
     Director.advance_step()
+    if await _poll_step_change(before):
+        return true
+    # One retry before declaring a stall.
+    if await _poll_step_change(before):
+        return true
+    return false
+
+
+## Polls step_index changes for up to STALL_TIMEOUT_SEC. Returns true when the
+## step advances or the scene changes.
+func _poll_step_change(before: int) -> bool:
     var elapsed := 0.0
     while elapsed < _stall_timeout:
         await get_tree().process_frame
         elapsed += get_process_delta_time()
         if Director.step_index() != before:
             return true
-        # Also accept scene-change as a successful advance.
-        # (SceneRouter.scene_changed would fire; step_index resets.)
         if Director.step_index() == 0 and before > 0:
             return true
     return false
