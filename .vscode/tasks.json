@@ -204,6 +204,52 @@
                 "panel": "dedicated"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "Balance Preview (all lots)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/dev/tools/balance_preview.py",
+                "--yaml-dir",
+                "${workspaceFolder}/data/yaml",
+                "--seed",
+                "42"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Balance Preview (single lot)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/dev/tools/balance_preview.py",
+                "--yaml-dir",
+                "${workspaceFolder}/data/yaml",
+                "--seed",
+                "42",
+                "--lot-id",
+                "${input:lotId}"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "lotId",
+            "description": "Lot ID to preview (e.g. beginner_mixed_a)",
+            "default": "beginner_mixed_a",
+            "type": "promptString"
         }
     ]
 }

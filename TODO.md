@@ -199,6 +199,8 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 - [demo] 3-run story demo, demoted to Stage 3 scope (stale — references legacy Skill/Merchant systems);
 
+- [balance_preview_v2] Balance preview HTML report — rich HTML output with per-clue information tables, category breakdowns, and value distribution charts
+
 ---
 
 ## Chore
