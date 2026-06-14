@@ -171,9 +171,13 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 
 ## Active
 
-Flows currently being built or ready to implement — may hold more than one entry. One-line pointer each — same format as `## Plan`, promoted here when building starts or the plan is ready to build. Phase detail and progress live in the linked `dev/docs/plans/` file; ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched. All phases shipped → archive the plan file + delete this line. Nothing in progress or ready → this section is empty.
+> Do not delete this reminder text
+> Flows currently being built or ready to implement — may hold more than one entry. One-line pointer each — same format as `## Plan`, promoted here when building starts or the plan is ready to build.
+> Phase detail and progress live in the linked `dev/docs/plans/` file;
+> Ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched.
+> All phases shipped → archive the plan file + delete this line. Nothing currently in progress.
 
-- [robustness] Save flush warnings, fatal boot errors, run-state guards, and Director/harness hardening — see `dev/docs/plans/robustness_hardening.sketch.md`
+Nothing currently in progress.
 
 ---
 
@@ -221,3 +225,7 @@ One-line, no reasoning, no backing doc.
 ## Bug
 
 One-line defect to fix.
+
+```
+
+```
