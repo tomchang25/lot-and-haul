@@ -4,6 +4,20 @@ This file is the canonical procedure for the `/godot-headless` slash command and
 
 Running `Godot --headless` directly against the mounted working tree is **forbidden**: the mount serves tail-truncated views of recently-modified files (see `sandbox_environment.md`), so Godot reports bogus parse errors that don't exist in the real files. Verified example: a truncated `anchor_data.gd` ending at `@export var tier: i` produced `Parse Error: Could not find type "i"`.
 
+## Cross-OS mount warning
+
+The safe snapshot procedure only works when `/tmp` is a container-native Linux filesystem. Do not point Godot editor/import/headless at any project directory or temporary snapshot path backed by a Windows bind mount.
+
+Bad Docker Compose example:
+
+```yaml
+volumes:
+  - 'E:/GodotProjects/lot-and-haul:/workspace'
+  - 'E:/tmp:/tmp'
+```
+
+The second mount defeats the procedure: `/tmp/lh.*` becomes another Windows/Docker Desktop mount, so Godot import can see stale or truncated files and emit bogus `.import`, UID, or resource-cache failures. Verified 2026-06-14: commenting out `- 'E:/tmp:/tmp'` made the same Godot import flow normal again.
+
 ## Procedure (verified working)
 
 Materialize a clean snapshot from the git index into a sandbox-local directory and run there. Index/object-DB reads bypass the mount's unreliable working-tree reads.

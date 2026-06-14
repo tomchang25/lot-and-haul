@@ -10,6 +10,7 @@ The sandboxed Linux shell can return **phantom file corruption** for files in th
 - The `.git/` directory desyncs too: a phantom `index.lock` returned EEXIST to git while not existing on the Windows side, with `ls`/`stat`/`rm` mutually inconsistent. This is why git mutations are forbidden — see `git_operations.md`.
 - Right after the **user** runs git on the Windows side, even `.git/index` reads through the mount can be garbled (`fatal: unknown index entry format 0x…`). Object-DB reads (`git show HEAD:<file>`) stay reliable; index-based commands (`git show :<file>`, `checkout-index`, `status`) may fail transiently — report and retry later instead of attempting repairs.
 - Consequence for testing: **never run the Godot headless binary against the mounted working tree** — it reads the truncated views and reports bogus parse errors (e.g. `Could not find type "i"`). See `godot_headless_check.md` for the safe procedure.
+- Cross-OS `/tmp` bind mounts break the safe snapshot too (verified 2026-06-14): mounting `E:/tmp` to container `/tmp` made `/tmp/lh.*` live on the Windows/Docker Desktop mount instead of a native Linux filesystem, and Godot import produced bogus `.import`/UID/cache failures. Commenting out `- 'E:/tmp:/tmp'` made the same import flow normal again.
 
 ## Rules
 
@@ -18,3 +19,4 @@ The sandboxed Linux shell can return **phantom file corruption** for files in th
 - `git` against the object DB (`git show HEAD:<file>`, `git log`, `git show :<file>`, `git cat-file`) is reliable; working-tree file-content reads through the shell mount are not — including the working-tree side of `git diff`.
 - To check whether the mount is serving a truncated view of a file: compare `wc -c <file>` against `git cat-file -s :<file>`. Mount smaller than index ⇒ truncated view (the index is LF-normalized, so the working tree should never be smaller).
 - Any error found by a shell-side tool (linter, Godot, python) must be cross-checked against the Windows side (Read/Grep file tools) before being reported as real.
+- Do not bind-mount a host Windows directory onto container `/tmp` for Godot checks. The `/tmp` used by `godot_headless_check.md` must be container-native Linux storage, or the snapshot procedure is no longer safe.
