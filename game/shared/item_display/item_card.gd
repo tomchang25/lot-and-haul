@@ -1,38 +1,42 @@
 # item_card.gd
-# Item card widget for the inspection grid. Takes an ItemEntry directly.
-# Veiled items hide super-category / category / rarity / condition / weight /
-# grid and show "???" for price; once unveiled those fields appear.
-# Supports field-change flash tweens via refresh(changed), a border flash
-# (flash_border) when the lot-level action bar targets the card, selection
-# overlay (set_selected), and an intuition shimmer + persistent corner mark
-# (play_intuition_shimmer) for special discovery feedback.
+# Reusable item card. Shows sprite placeholder, display name, price, condition,
+# cargo stats (always visible — they are observable even for veiled items),
+# and a ClueChunk for spoiler-safe clue display.
+# Supports veiled/known/verified states, selection overlay, field-change flash
+# tweens via refresh(), and intuition shimmer feedback.
 class_name ItemCard
 extends PanelContainer
 
 signal clicked(card: ItemCard)
 
+const ClueChunkScene: PackedScene = preload("res://game/shared/item_display/clue_chunk/clue_chunk.tscn")
+
 var _entry: ItemEntry = null
 var _is_selected: bool = false
 var _has_intuition_mark: bool = false
 
+@onready var _sprite_rect: ColorRect = $VBox/SpriteRect
 @onready var _name_label: Label = $VBox/NameLabel
-@onready var _super_category_label: Label = $VBox/SuperCategoryLabel
-@onready var _category_label: Label = $VBox/CategoryLabel
-@onready var _potential_label: Label = $VBox/PotentialLabel
+@onready var _price_label: Label = $VBox/PriceLabel
 @onready var _condition_label: Label = $VBox/ConditionLabel
 @onready var _condition_mult_label: Label = $VBox/ConditionMultLabel
-@onready var _price_label: Label = $VBox/PriceLabel
 @onready var _weight_label: Label = $VBox/WeightLabel
 @onready var _grid_label: Label = $VBox/GridLabel
+@onready var _cargo_sep: HSeparator = $VBox/CargoSep
+@onready var _clue_chunk: ClueChunk = $VBox/ClueChunk
+@onready var _auth_tag_label: Label = $VBox/AuthTagLabel
 
 
 func _ready() -> void:
     _apply()
 
 
-func setup(entry) -> void:
-    _entry = entry
+func get_entry() -> ItemEntry:
+    return _entry
 
+
+func setup(entry: ItemEntry) -> void:
+    _entry = entry
     if is_node_ready():
         _apply()
 
@@ -40,8 +44,6 @@ func setup(entry) -> void:
 func refresh(changed: StringName = &"") -> void:
     _apply()
     match changed:
-        &"potential":
-            _animate_pop(_potential_label)
         &"condition":
             _animate_pop(_condition_label)
         &"unveil":
@@ -53,73 +55,39 @@ func _apply() -> void:
         return
 
     _name_label.text = ItemEntryDisplayHelper.display_name(_entry)
+    _name_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.display_name_color(_entry))
 
-    if _entry.is_veiled():
-        _apply_unknown()
-    else:
-        _apply_known()
+    _auth_tag_label.visible = _entry.verified
 
-
-func _apply_unknown() -> void:
-    # Uninspected rows must not depend on legacy layer-0 veil data.
-    _super_category_label.hide()
-    _category_label.hide()
-    _potential_label.hide()
-    _condition_label.hide()
-    _condition_mult_label.hide()
-    _weight_label.hide()
-    _grid_label.hide()
-
-    _price_label.text = ItemEntryDisplayHelper.UNKNOWN_TEXT
-    _price_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(_entry))
-    _price_label.show()
-
-
-func _apply_known() -> void:
-    var super_category := _entry.super_category_text()
-    if super_category != "":
-        _super_category_label.text = super_category
-        _super_category_label.show()
-    else:
-        _super_category_label.hide()
-
-    var category := _entry.category_text()
-    if category != "":
-        _category_label.text = category
-        _category_label.show()
-    else:
-        _category_label.hide()
-
-    _potential_label.text = ItemEntryDisplayHelper.rarity_text(_entry)
-    _potential_label.show()
-
-    _condition_label.text = ItemEntryDisplayHelper.condition_text(_entry)
-    _condition_label.modulate = ItemEntryDisplayHelper.condition_display_color(_entry)
-    _condition_label.show()
-
-    var condition_secondary := ItemEntryDisplayHelper.condition_secondary_text(_entry)
-    if condition_secondary != "":
-        _condition_mult_label.text = condition_secondary
-        _condition_mult_label.show()
-    else:
-        _condition_mult_label.hide()
-
+    # Price — always shown, masked when unknown
     _price_label.text = ItemEntryDisplayHelper.estimated_value_text(_entry)
     _price_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(_entry))
-    _price_label.show()
 
-    var weight := ItemEntryDisplayHelper.weight_text(_entry)
-    var grid := ItemEntryDisplayHelper.grid_text(_entry)
-    if weight != ItemEntryDisplayHelper.UNKNOWN_TEXT:
-        _weight_label.text = weight
-        _weight_label.show()
+    # Condition — known after unveil
+    var cond_text := ItemEntryDisplayHelper.condition_text(_entry)
+    var cond_secondary := ItemEntryDisplayHelper.condition_secondary_text(_entry)
+    if cond_text != ItemEntryDisplayHelper.UNKNOWN_TEXT:
+        _condition_label.text = cond_text
+        _condition_label.modulate = ItemEntryDisplayHelper.condition_display_color(_entry)
+        _condition_label.show()
+        if cond_secondary != "":
+            _condition_mult_label.text = cond_secondary
+            _condition_mult_label.show()
+        else:
+            _condition_mult_label.hide()
     else:
-        _weight_label.hide()
-    if grid != ItemEntryDisplayHelper.UNKNOWN_TEXT:
-        _grid_label.text = grid
-        _grid_label.show()
-    else:
-        _grid_label.hide()
+        _condition_label.hide()
+        _condition_mult_label.hide()
+
+    # Cargo stats — always visible (observable even for veiled items)
+    _weight_label.text = "W: %s" % ItemEntryDisplayHelper.weight_text(_entry)
+    _grid_label.text = "G: %s" % ItemEntryDisplayHelper.grid_text(_entry)
+    _weight_label.show()
+    _grid_label.show()
+
+    # ClueChunk
+    _clue_chunk.setup(_entry)
+    _cargo_sep.visible = _clue_chunk.get_child_count() > 0
 
 
 func _animate_pop(target: Label) -> void:

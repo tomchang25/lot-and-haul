@@ -2,7 +2,9 @@
 
 [ext_resource type="Script" uid="uid://bbr8kx3k0jv3c" path="res://game/run/inspection/inspection_scene.gd" id="1_idapx"]
 [ext_resource type="PackedScene" uid="uid://bstamhudtscn1" path="res://game/run/inspection/stamina_hud/stamina_hud.tscn" id="2_j573n"]
+[ext_resource type="PackedScene" uid="uid://itembrowser001" path="res://game/shared/item_display/item_browser_panel/item_browser_panel.tscn" id="3_browser"]
 [ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+
 [node name="InspectionScene" type="Control" unique_id=2043279360]
 layout_mode = 3
 anchors_preset = 15
@@ -66,7 +68,7 @@ size_flags_horizontal = 3
 [node name="StaminaHUD" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=1666666860 instance=ExtResource("2_j573n")]
 layout_mode = 2
 
-[node name="GridMargin" type="MarginContainer" parent="RootHBox/LeftVBox" unique_id=100000008]
+[node name="BrowserMargin" type="MarginContainer" parent="RootHBox/LeftVBox" unique_id=100000008]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -75,18 +77,11 @@ theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 0
 
-[node name="ScrollContainer" type="ScrollContainer" parent="RootHBox/LeftVBox/GridMargin" unique_id=100000009]
+[node name="ItemBrowser" parent="RootHBox/LeftVBox/BrowserMargin" unique_id=100000009 instance=ExtResource("3_browser")]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="ItemsGrid" type="GridContainer" parent="RootHBox/LeftVBox/GridMargin/ScrollContainer" unique_id=1410177201]
-layout_mode = 2
-size_flags_horizontal = 6
-theme_override_constants/h_separation = 6
-theme_override_constants/v_separation = 6
-columns = 4
 
 [node name="FooterHBox" type="HBoxContainer" parent="RootHBox/LeftVBox" unique_id=100000010]
 custom_minimum_size = Vector2(0, 48)

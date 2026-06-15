@@ -1,14 +1,13 @@
 # storage_scene.gd
 # Storage — Displays stored items and lets the player spend AP on Repair,
 # Restore, and Research actions immediately. No slot-assignment UI.
-# V2 layout: dense table (left) + detail rail (right) with AP bar + action buttons.
+# V2 layout: shared ItemBrowserPanel (Card/Table modes) + detail rail (right).
 # Reads:  MetaManager.storage.storage_items, MetaManager.slot.storage_ap
 # Writes: MetaManager.repair_item, MetaManager.restore_item, MetaManager.research_item
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-const ItemRowTooltipScene: PackedScene = preload("res://game/shared/item_display/item_row_tooltip.tscn")
 const STORAGE_RESEARCH: UiAudioEvent = preload("res://data/tres/audio_events/storage_research.tres")
 const STORAGE_REPAIR_RESTORE: UiAudioEvent = preload("res://data/tres/audio_events/storage_repair_restore.tres")
 const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
@@ -22,13 +21,12 @@ const STORAGE_COLUMNS: Array = [
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _tooltip: ItemRowTooltip = null
 var _selected_entry: ItemEntry = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
-# Left — table
-@onready var _item_list_panel: ItemListPanel = %ItemListPanel
+# Left — browser
+@onready var _item_browser: ItemBrowserPanel = %ItemBrowser
 @onready var _empty_label: Label = %EmptyLabel
 
 # Left — footer
@@ -62,27 +60,22 @@ var _selected_entry: ItemEntry = null
 
 
 func _ready() -> void:
-    _tooltip = ItemRowTooltipScene.instantiate()
-    add_child(_tooltip)
-
     _back_btn.pressed.connect(_on_back_pressed)
     _back_btn.press_event = CANCEL
     _repair_btn.pressed.connect(_on_repair_pressed)
     _research_btn.pressed.connect(_on_research_pressed)
     _restore_btn.pressed.connect(_on_restore_pressed)
 
-    _item_list_panel.row_pressed.connect(_on_row_pressed)
-    _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
-    _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
+    _item_browser.entry_pressed.connect(_on_entry_pressed)
 
     _refresh_ap_label()
-    _populate_rows()
+    _populate_browser()
     _refresh_detail()
 
     Director.register_scene(
         "storage",
         {
-            "item_table": _item_list_panel,
+            "item_browser": _item_browser,
             "detail_rail": _detail_section,
             "repair_btn": _repair_btn,
             "restore_btn": _restore_btn,
@@ -96,19 +89,12 @@ func _ready() -> void:
 
 
 func _on_back_pressed() -> void:
-    # Slot already committed on entry — leaving returns to hub for the next slot.
     SceneRouter.go_to_hub()
 
 
-func _on_row_pressed(entry: ItemEntry) -> void:
-    _select_entry(entry)
-
-
-func _on_row_tooltip_requested(
-        entry: ItemEntry,
-        anchor: Rect2,
-) -> void:
-    _tooltip.show_for(entry, anchor)
+func _on_entry_pressed(entry: ItemEntry) -> void:
+    _selected_entry = entry
+    _refresh_detail()
 
 
 func _on_repair_pressed() -> void:
@@ -116,7 +102,7 @@ func _on_repair_pressed() -> void:
         return
     if MetaManager.repair_item(_selected_entry):
         AudioManager.play_event(STORAGE_REPAIR_RESTORE)
-        _refresh_row(_selected_entry)
+        _item_browser.refresh_entry(_selected_entry)
         _refresh_ap_label()
         _refresh_detail()
 
@@ -126,7 +112,7 @@ func _on_research_pressed() -> void:
         return
     if MetaManager.research_item(_selected_entry):
         AudioManager.play_event(STORAGE_RESEARCH)
-        _refresh_row(_selected_entry)
+        _item_browser.refresh_entry(_selected_entry)
         _refresh_ap_label()
         _refresh_detail()
 
@@ -136,7 +122,7 @@ func _on_restore_pressed() -> void:
         return
     if MetaManager.restore_item(_selected_entry):
         AudioManager.play_event(STORAGE_REPAIR_RESTORE)
-        _refresh_row(_selected_entry)
+        _item_browser.refresh_entry(_selected_entry)
         _refresh_ap_label()
         _refresh_detail()
 
@@ -154,50 +140,27 @@ func _refresh_ap_label() -> void:
     else:
         _ap_label.add_theme_color_override("font_color", Color(0.4, 0.85, 1.0))
 
-# ══ Rows ══════════════════════════════════════════════════════════════════════
+# ══ Browser ═══════════════════════════════════════════════════════════════════
 
 
-func _populate_rows() -> void:
-    if MetaManager.storage.storage_items.is_empty():
+func _populate_browser() -> void:
+    var items: Array = MetaManager.storage.storage_items
+    if items.is_empty():
         _empty_label.visible = true
-        _item_list_panel.visible = false
+        _item_browser.visible = false
         _footer_status_label.text = "0 items"
         return
 
     _empty_label.visible = false
-    _item_list_panel.visible = true
+    _item_browser.visible = true
 
-    _item_list_panel.setup(STORAGE_COLUMNS)
-    _item_list_panel.populate(MetaManager.storage.storage_items)
+    _item_browser.setup(STORAGE_COLUMNS)
+    _item_browser.populate(items)
 
-    for entry: ItemEntry in MetaManager.storage.storage_items:
-        var row: ItemRow = _item_list_panel.get_row(entry)
-        if row != null:
-            row.set_selection_state(ItemRow.SelectionState.AVAILABLE)
-
-    var count: int = MetaManager.storage.storage_items.size()
+    var count: int = items.size()
     _footer_status_label.text = "%d item%s" % [count, "" if count == 1 else "s"]
 
-
-func _refresh_row(entry: ItemEntry) -> void:
-    _item_list_panel.refresh_row(entry)
-
 # ══ Detail panel ══════════════════════════════════════════════════════════════
-
-
-func _select_entry(entry: ItemEntry) -> void:
-    if _selected_entry != null:
-        var prev_row: ItemRow = _item_list_panel.get_row(_selected_entry)
-        if prev_row != null:
-            prev_row.set_selection_state(ItemRow.SelectionState.AVAILABLE)
-
-    _selected_entry = entry
-
-    var new_row: ItemRow = _item_list_panel.get_row(entry)
-    if new_row != null:
-        new_row.set_selection_state(ItemRow.SelectionState.SELECTED)
-
-    _refresh_detail()
 
 
 func _refresh_detail() -> void:
@@ -317,7 +280,6 @@ func _configure_action_buttons(entry: ItemEntry) -> void:
         _repair_btn.visible = false
         _restore_btn.visible = true
     else:
-        # Condition maxed — show Restore disabled as status indicator.
         _repair_btn.visible = false
         _restore_btn.visible = true
 

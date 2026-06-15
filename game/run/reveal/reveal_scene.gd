@@ -12,7 +12,7 @@ const REVEAL_GOOD: UiAudioEvent = preload("res://data/tres/audio_events/reveal_g
 const AUCTION_LOST: UiAudioEvent = preload("res://data/tres/audio_events/auction_lost.tres")
 const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres")
 
-const ItemRowTooltipScene: PackedScene = preload("res://game/shared/item_display/item_row_tooltip.tscn")
+const ItemCardPopupScene: PackedScene = preload("res://game/shared/item_display/item_card_popup.tscn")
 
 const REVEAL_COLUMNS: Array = [
     ItemRow.Column.NAME,
@@ -23,7 +23,7 @@ const REVEAL_COLUMNS: Array = [
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _won_items: Array[ItemEntry] = []
-var _tooltip: ItemRowTooltip = null
+var _tooltip: ItemCardPopup = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -41,7 +41,7 @@ func _ready() -> void:
         SceneRouter.go_to_hub.call_deferred()
         return
 
-    _tooltip = ItemRowTooltipScene.instantiate()
+    _tooltip = ItemCardPopupScene.instantiate()
     add_child(_tooltip)
 
     _reveal_btn.pressed.connect(_on_reveal_pressed)
@@ -86,7 +86,8 @@ func _on_row_tooltip_requested(
         entry,
         anchor: Rect2,
 ) -> void:
-    _tooltip.show_for(entry, anchor)
+    if entry is ItemEntry:
+        _tooltip.show_for(entry as ItemEntry, anchor)
 
 # ══ Reveal sequence ════════════════════════════════════════════════════════════
 

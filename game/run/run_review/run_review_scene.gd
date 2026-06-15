@@ -11,7 +11,7 @@ extends Control
 const CASH_CREDITED: UiAudioEvent = preload("res://data/tres/audio_events/cash_credited.tres")
 const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres")
 
-const ItemRowTooltipScene: PackedScene = preload("res://game/shared/item_display/item_row_tooltip.tscn")
+const ItemCardPopupScene: PackedScene = preload("res://game/shared/item_display/item_card_popup.tscn")
 
 const REVIEW_COLUMNS: Array = [
     ItemRow.Column.NAME,
@@ -23,7 +23,7 @@ const REVIEW_COLUMNS: Array = [
 
 var _cargo_items: Array[ItemEntry] = []
 var _review_entries: Array = []
-var _tooltip: ItemRowTooltip = null
+var _tooltip: ItemCardPopup = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -45,7 +45,7 @@ func _ready() -> void:
         SceneRouter.go_to_hub.call_deferred()
         return
 
-    _tooltip = ItemRowTooltipScene.instantiate()
+    _tooltip = ItemCardPopupScene.instantiate()
     add_child(_tooltip)
 
     _continue_btn.pressed.connect(_on_continue_pressed)
@@ -78,7 +78,8 @@ func _on_row_tooltip_requested(
         entry,
         anchor: Rect2,
 ) -> void:
-    _tooltip.show_for(entry, anchor)
+    if entry is ItemEntry:
+        _tooltip.show_for(entry as ItemEntry, anchor)
 
 # ══ Run resolution ════════════════════════════════════════════════════════════
 
