@@ -1,9 +1,11 @@
 # run_review_scene.gd
 # Block 06 — Run Review
-# Reads:  RunManager.run.cargo_items, RunManager.run.trailer_items, RunManager.run.car_data,
-#         RunManager.run.paid_price, RunManager.run.entry_fee, RunManager.run.fuel_cost,
+# Reads:  RunManager.run.location_data, RunManager.run.cargo_items,
+#         RunManager.run.trailer_items, RunManager.run.paid_price,
+#         RunManager.run.entry_fee, RunManager.run.fuel_cost,
 #         RunManager.run.onsite_proceeds
-# Writes: MetaManager.economy.cash, MetaManager.storage.storage_items (via MetaManager.resolve_current_run())
+# Writes: MetaManager.economy.cash, MetaManager.storage.storage_items
+#         (via MetaManager.resolve_current_run())
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -17,21 +19,18 @@ const REVIEW_COLUMNS: Array = [
     ItemRow.Column.ESTIMATED_VALUE,
 ]
 
-# ── State ─────────────────────────────────────────────────────────────────────
-
-var _cargo_items: Array[ItemEntry] = []
-var _review_entries: Array = []
-
 # ── Node references ───────────────────────────────────────────────────────────
 
-@onready var _item_list_panel: ItemListPanel = $RootVBox/ListCenter/OuterVBox/ItemListPanel
-@onready var _cost_cash_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/CostCashLabel
-@onready var _finance_onsite_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/OnsiteLabel
-@onready var _overall_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/OverallLabel
-@onready var _estimate_price_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/EstimatePriceLabel
-@onready var _estimate_profit_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/EstimateProfitLabel
-@onready var _trailer_damage_label: Label = $RootVBox/ListCenter/OuterVBox/TrailerDamageLabel
-@onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
+@onready var _location_label: Label = %LocationLabel
+@onready var _cargo_panel: CargoManifestPanel = %CargoPanel
+@onready var _entry_fee_label: Label = %EntryFeeLabel
+@onready var _fuel_cost_label: Label = %FuelCostLabel
+@onready var _auction_paid_label: Label = %AuctionPaidLabel
+@onready var _onsite_label: Label = %OnsiteLabel
+@onready var _cash_flow_label: Label = %CashFlowLabel
+@onready var _cargo_value_label: Label = %CargoValueLabel
+@onready var _est_profit_label: Label = %EstProfitLabel
+@onready var _continue_btn: Button = %ContinueButton
 @onready var _tooltip: ItemCardPopup = %TooltipPopup
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
@@ -46,21 +45,18 @@ func _ready() -> void:
     _continue_btn.pressed.connect(_on_continue_pressed)
     _continue_btn.press_event = CONFIRM
 
-    _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
-    _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_popup)
+    _cargo_panel.tooltip_requested.connect(_on_row_tooltip_requested)
+    _cargo_panel.tooltip_dismissed.connect(_tooltip.hide_popup)
+
+    var loc := RunManager.run.location_data
+    _location_label.text = loc.display_name if loc != null else ""
 
     var cracked: int = RunManager.apply_trailer_damage()
-    if cracked > 0:
-        _trailer_damage_label.text = "%d trailer item(s) cracked during transport" % cracked
-        _trailer_damage_label.add_theme_color_override(&"font_color", Color(1.0, 0.8, 0.3))
-        _trailer_damage_label.visible = true
-
-    _cargo_items = RunManager.run.cargo_items + RunManager.run.trailer_items
-    _review_entries = []
-    _review_entries.append_array(_cargo_items)
+    _cargo_panel.set_damage_count(cracked)
 
     _populate_rows()
     _populate_finance()
+    _cargo_panel.set_expanded(false)
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
@@ -80,9 +76,6 @@ func _on_row_tooltip_requested(
 
 
 func _resolve_run_and_navigate() -> void:
-    # resolve_run stashes run economics as pending and sets current_slot = 3
-    # (player returns for the evening slot). The day summary fires later when
-    # the player chooses Open Shop or exhausts all slots from the hub.
     MetaManager.resolve_current_run()
     AudioManager.play_event(CASH_CREDITED)
     SceneRouter.go_to_hub()
@@ -91,34 +84,49 @@ func _resolve_run_and_navigate() -> void:
 
 
 func _populate_rows() -> void:
-    _item_list_panel.setup(REVIEW_COLUMNS)
-    _item_list_panel.populate(_review_entries)
+    var items: Array = RunManager.run.cargo_items + RunManager.run.trailer_items
+    _cargo_panel.setup(REVIEW_COLUMNS, items)
+
+# ══ Finance ledger ════════════════════════════════════════════════════════════
 
 
 func _populate_finance() -> void:
-    var cost_cash: int = RunManager.run.paid_price + RunManager.run.entry_fee + RunManager.run.fuel_cost
-    var onsite: int = RunManager.run.onsite_proceeds
-    var overall: int = onsite - cost_cash
+    var run := RunManager.run
+    var entry_fee: int = run.entry_fee
+    var fuel: int = run.fuel_cost
+    var auction: int = run.paid_price
+    var onsite: int = run.onsite_proceeds
+    var cash_flow: int = onsite - entry_fee - fuel - auction
 
-    _cost_cash_label.text = "Cost Cash:   -$%d" % cost_cash
-    _finance_onsite_label.text = "Sold On-site:   +$%d" % onsite
+    _entry_fee_label.text = "Entry Fee:     -$%d" % entry_fee
 
-    if overall >= 0:
-        _overall_label.text = "Cash Flow:   +$%d" % overall
-        _overall_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.PRICE_COLOR)
+    var travel_days := run.location_data.travel_days if run.location_data != null else 0
+    if travel_days > 0:
+        var day_label: String = "s" if travel_days != 1 else ""
+        _fuel_cost_label.text = "Fuel (\u00d7%d day%s): -$%d" % [travel_days, day_label, fuel]
     else:
-        _overall_label.text = "Cash Flow:   -$%d" % (-overall)
-        _overall_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
+        _fuel_cost_label.text = "Fuel:          -$%d" % fuel
 
+    _auction_paid_label.text = "Purchases:     -$%d" % auction
+    _onsite_label.text = "On-site:       +$%d" % onsite
+
+    if cash_flow >= 0:
+        _cash_flow_label.text = "Cash Flow:     +$%d" % cash_flow
+        _cash_flow_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.PRICE_COLOR)
+    else:
+        _cash_flow_label.text = "Cash Flow:     -$%d" % (-cash_flow)
+        _cash_flow_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
+
+    var cargo_items: Array[ItemEntry] = run.cargo_items + run.trailer_items
     var estimate_price: int = 0
-    for entry: ItemEntry in _cargo_items:
+    for entry: ItemEntry in cargo_items:
         estimate_price += (entry.estimated_value_min + entry.estimated_value_max) / 2
-    _estimate_price_label.text = "Est. Cargo Value:   $%d" % estimate_price
+    _cargo_value_label.text = "Cargo Value:   $%d" % estimate_price
 
-    var estimate_profit: int = overall + estimate_price
+    var estimate_profit: int = cash_flow + estimate_price
     if estimate_profit >= 0:
-        _estimate_profit_label.text = "Est. Profit:   +$%d" % estimate_profit
-        _estimate_profit_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
+        _est_profit_label.text = "Est. Profit:   +$%d" % estimate_profit
+        _est_profit_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
     else:
-        _estimate_profit_label.text = "Est. Profit:   -$%d" % (-estimate_profit)
-        _estimate_profit_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
+        _est_profit_label.text = "Est. Profit:   -$%d" % (-estimate_profit)
+        _est_profit_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))

@@ -3,9 +3,10 @@
 [ext_resource type="Script" uid="uid://vpkwojtrrnv6" path="res://game/run/run_review/run_review_scene.gd" id="1_appraisal"]
 [ext_resource type="PackedScene" uid="uid://cilp5a1xr3e8m" path="res://game/shared/item_display/item_list_panel/item_list_panel.tscn" id="2_ilp"]
 [ext_resource type="PackedScene" uid="uid://tnbmlptuuk3i" path="res://game/shared/item_display/item_card_popup.tscn" id="3_popup"]
+[ext_resource type="PackedScene" path="res://game/run/run_review/cargo_manifest_panel/cargo_manifest_panel.tscn" id="4_cmp"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
-[node name="RunReviewScene" type="Control" unique_id=708244230]
+[node name="RunReviewScene" type="Control" unique_id=1396820394]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,7 +15,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_appraisal")
 
-[node name="Background" type="ColorRect" parent="." unique_id=172726597]
+[node name="Background" type="ColorRect" parent="." unique_id=1597540294]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -23,94 +24,142 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.1, 0.1, 0.12, 1)
 
-[node name="RootVBox" type="VBoxContainer" parent="." unique_id=2101566182]
+[node name="RootVBox" type="VBoxContainer" parent="." unique_id=1295203782]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TitleLabel" type="Label" parent="RootVBox" unique_id=935298121]
-custom_minimum_size = Vector2(0, 64)
+[node name="HeaderPanel" type="PanelContainer" parent="RootVBox" unique_id=1555802068]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+
+[node name="HeaderMargin" type="MarginContainer" parent="RootVBox/HeaderPanel" unique_id=1806197696]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 12
+
+[node name="HeaderVBox" type="VBoxContainer" parent="RootVBox/HeaderPanel/HeaderMargin" unique_id=296380016]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="RootVBox/HeaderPanel/HeaderMargin/HeaderVBox" unique_id=2084473342]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Review"
+text = "Run Settlement"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ListCenter" type="CenterContainer" parent="RootVBox" unique_id=2131226200]
+[node name="LocationLabel" type="Label" parent="RootVBox/HeaderPanel/HeaderMargin/HeaderVBox" unique_id=720753266]
+unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 3
-
-[node name="OuterVBox" type="VBoxContainer" parent="RootVBox/ListCenter" unique_id=777929070]
-custom_minimum_size = Vector2(960, 0)
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="ItemListPanel" parent="RootVBox/ListCenter/OuterVBox" unique_id=1708990476 instance=ExtResource("2_ilp")]
-layout_mode = 2
-
-[node name="TrailerDamageLabel" type="Label" parent="RootVBox/ListCenter/OuterVBox" unique_id=1538760621]
-visible = false
-layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
 theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 
-[node name="FinanceCenter" type="CenterContainer" parent="RootVBox" unique_id=382708820]
+[node name="ScrollContainer" type="ScrollContainer" parent="RootVBox" unique_id=340131022]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ContentVBox" type="VBoxContainer" parent="RootVBox/ScrollContainer" unique_id=727970552]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="SettlementCenter" type="CenterContainer" parent="RootVBox/ScrollContainer/ContentVBox" unique_id=2106234425]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SettlementCard" type="PanelContainer" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter" unique_id=1504617207]
+custom_minimum_size = Vector2(540, 0)
 layout_mode = 2
 
-[node name="FinancePanel" type="PanelContainer" parent="RootVBox/FinanceCenter" unique_id=485990491]
-custom_minimum_size = Vector2(480, 0)
+[node name="SettlementMargin" type="MarginContainer" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard" unique_id=219123728]
 layout_mode = 2
-
-[node name="FinanceMargin" type="MarginContainer" parent="RootVBox/FinanceCenter/FinancePanel" unique_id=1137814635]
-layout_mode = 2
-theme_override_constants/margin_left = 16
+theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 16
+theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 16
 
-[node name="FinanceVBox" type="VBoxContainer" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin" unique_id=1518120712]
+[node name="SettlementVBox" type="VBoxContainer" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin" unique_id=1047582817]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="CostCashLabel" type="Label" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox" unique_id=1384112774]
+[node name="SectionSettlementLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=650974380]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Settlement"
+
+[node name="SettlementSpacer" type="Control" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=1243632810]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+
+[node name="EntryFeeLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=613674848]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="OnsiteLabel" type="Label" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox" unique_id=2144975975]
+[node name="FuelCostLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=2050719516]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="OverallLabel" type="Label" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox" unique_id=1030818343]
+[node name="AuctionPaidLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=557118633]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="FinanceSeparator" type="HSeparator" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox" unique_id=871545512]
+[node name="CostSeparator" type="HSeparator" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=193774293]
 layout_mode = 2
 
-[node name="EstimatePriceLabel" type="Label" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox" unique_id=1308838193]
+[node name="OnsiteLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=1708104452]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="EstimateProfitLabel" type="Label" parent="RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox" unique_id=1003812996]
+[node name="CashFlowLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=441641945]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="FinanceSeparator" type="HSeparator" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=637095573]
+layout_mode = 2
+
+[node name="CargoValueLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=1484801736]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="EstProfitLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=1514337849]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 
-[node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=84919131]
+[node name="CargoCenter" type="CenterContainer" parent="RootVBox/ScrollContainer/ContentVBox" unique_id=2013180395]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CargoPanel" parent="RootVBox/ScrollContainer/ContentVBox/CargoCenter" instance=ExtResource("4_cmp")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=1618972445]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 theme_override_constants/separation = 24
 alignment = 1
 
-[node name="ContinueButton" type="Button" parent="RootVBox/Footer" unique_id=1969516138]
+[node name="ContinueButton" type="Button" parent="RootVBox/Footer" unique_id=82057792]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Continue"
 script = ExtResource("99_sfx")
 
-[node name="TooltipPopup" parent="." unique_id=1000000102 instance=ExtResource("3_popup")]
+[node name="TooltipPopup" parent="." unique_id=1081176488 instance=ExtResource("3_popup")]
 unique_name_in_owner = true
 layout_mode = 0
