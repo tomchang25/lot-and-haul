@@ -3,8 +3,7 @@
 This document defines where scene nodes come from in `.tscn`-backed scenes and
 components.
 
-Plain-language rule: do not dynamically build persistent `.tscn` objects in
-GDScript unless there is a concrete runtime reason.
+Plain-language rule: do not dynamically build or instantiate persistent `.tscn` objects in GDScript unless there is a concrete runtime reason.
 
 Applies to:
 
@@ -23,14 +22,14 @@ Does **not** apply to:
 
 # 1. Core Rule
 
-All persistent nodes in a `.tscn`-backed scene or component **must be defined in
-the `.tscn` file**.
+All persistent nodes in a `.tscn`-backed scene or component **must be defined in the `.tscn` file**.
+
+This includes fixed child components and popups. If the parent scene always owns one instance for the full scene lifetime, pre-place that instance in the parent `.tscn` and reference it with `@onready`; do not `preload()`, `instantiate()`, and `add_child()` it from `_ready()`.
 
 Reference them from the script using `@onready` variables under the standard
 `Node references` variable group.
 
-Persistent means the node exists for the full lifetime of the scene or component,
-even if it starts hidden, disabled, empty, or filled with placeholder content.
+Persistent means the node exists for the full lifetime of the scene or component, even if it starts hidden, disabled, empty, or filled with placeholder content.
 
 Do **not** use `_build_ui()` to construct persistent structural nodes in code.
 
@@ -63,10 +62,11 @@ script.
 
 # 3. Prohibited Patterns
 
-Do not create these in GDScript with `.new()` plus `add_child()`:
+Do not create these in GDScript with `.new()` or `.instantiate()` plus `add_child()`:
 
 - A known root layout, panel, toolbar, form, footer, modal shell, or rail
 - A button, label, container, or separator that is always part of the scene
+- A fixed child component, popup, dialog, or `Window` owned by the parent scene
 - A fixed set of rows or cells whose count is known at edit time
 - Static styling nodes that are only configured once in `_ready()`
 
@@ -80,7 +80,7 @@ The following may be created at runtime in code:
 
 | Case                    | Example                                                     | Reason                                                                                               |
 | ----------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Packed scene instances  | `ItemRowScene.instantiate()`                                | Count unknown at edit time                                                                           |
+| Runtime-variable packed scene instances | `ItemRowScene.instantiate()` for data-driven rows or cards | Count, type, or identity unknown at edit time                                                         |
 | Ephemeral display nodes | Tooltips, empty-state labels, `HSeparator` in dynamic lists | Created and destroyed during the scene's lifetime                                                    |
 | Custom-drawn controls   | Inner class with `_draw()` override                         | Requires `_draw()` override; cannot be defined in `.tscn`                                            |
 | Debug-only display      | `_debug_label` behind `Debug.enabled` guard                 | Never shipped; polluting `.tscn` with invisible nodes is misleading. See `debug_standard.md`.        |
@@ -88,8 +88,9 @@ The following may be created at runtime in code:
 
 The key question: **does this node exist for the full lifetime of the scene?**
 
-If yes, define it in `.tscn`. If no, creating it in code is acceptable when it
-matches one of the permitted cases above.
+If yes, define it in `.tscn`. If no, creating it in code is acceptable when it matches one of the permitted cases above.
+
+Packed scenes are not automatically a runtime-creation exception. A one-off component or popup whose presence is fixed by the parent scene is a pre-place-only node, even when implemented as its own `.tscn`.
 
 ---
 
@@ -139,8 +140,9 @@ Tags map 1:1 to the permitted-exceptions table above:
 | `debug`     | Debug-only display behind `Debug.enabled`                             |
 | `timer`     | `Timer` node, always created in code                                  |
 
-`add_child(SomeScene.instantiate())` and any local variable assigned from
-`.instantiate()` need **no** marker; they are recognised automatically.
+`add_child(SomeScene.instantiate())` and any local variable assigned from `.instantiate()` need **no** marker; they are recognised automatically.
+
+This marker exemption is only a linter convenience. It does not permit fixed persistent components to be instantiated in code; those must still be pre-placed in the parent `.tscn`.
 
 An unmarked, non-instantiate `add_child` is a lint failure. The marker does not
 prove the node is genuinely ephemeral; it forces the author to declare intent so
