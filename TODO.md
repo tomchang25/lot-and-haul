@@ -209,8 +209,7 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 > Ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched.
 > All phases shipped → archive the plan file + delete this line. Nothing currently in progress.
 
-- [inspection] Detail/action-focused inspection rail with a pre-auction summary popup for Card/Table lot review, total estimate, and opening bid — see `dev/docs/plans/inspection_detail_summary_popup.sketch.md`
-- [item_card] Unify item presentation around reusable item card, spoiler-safe clue chunk, and shared item browser — see `dev/docs/plans/item_card_clue_chunk.sketch.md`
+Nothing currently in progress.
 
 ---
 

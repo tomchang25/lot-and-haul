@@ -8,6 +8,16 @@ Append-only record of shipped work.
 
 - 2026-06-15 — [standards] `scene_node_source_standard.md` added as the canonical source for persistent `.tscn` nodes, permitted runtime node creation, and `node-src` markers; scene architecture docs now point to it
 
+### Inspection Detail & Summary Popup
+
+- 2026-06-15 — [inspection] Inspection restructured into select-then-act model: card click selects without spending AP; unveil/inspect actions moved to right-side detail rail with explicit action buttons; aggregate found/veiled/estimate lists removed from right rail
+- 2026-06-15 — [inspection] Pre-auction summary popup added with ItemBrowserPanel (Card/Table modes), total value estimate, and opening bid display; forward button opens modal instead of routing directly to auction
+
+### Item Card Refinements
+
+- 2026-06-15 — [ui] Persistent tooltip popups moved into .tscn (ItemCardPopup); node-reference style fixed across cargo, reveal, and run_review scenes
+- 2026-06-15 — [ui] ClueChunk/ItemBrowserPanel child reuse patterns fixed; cross-mode selection behavior corrected
+
 ## v0.1.1
 
 - 2026-06-14 — [fix] New game reset now assigns the "van_basic" starter car to the garage; `_assign_starter_car()` called during `MetaManager.reset()`
