@@ -24,7 +24,8 @@ var _hovered: bool = false
 var _holding: bool = false
 var _ext_highlighted: bool = false
 
-# Styles built fresh on each state change — perf is negligible for ≤20 rows.
+# Component state styles are defined in main_theme.tres (CargoItemRow/styles/*).
+# GDScript selects the named style at runtime.
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -103,36 +104,15 @@ func _apply() -> void:
 
 
 func _apply_state_style() -> void:
-    var style := StyleBoxFlat.new()
+    var style: StyleBox
     if _hovered or _ext_highlighted:
-        style.bg_color = Color(0.30, 0.27, 0.12, 1.0)
-        style.border_width_left = 2
-        style.border_width_right = 2
-        style.border_width_top = 2
-        style.border_width_bottom = 2
-        style.border_color = Color(0.70, 0.65, 0.25, 1.0)
+        style = get_theme_stylebox(&"hovered", &"CargoItemRow")
     elif _holding:
-        # Cyan matches the grid's held-ghost border — clearly "this is moving".
-        style.bg_color = Color(0.08, 0.22, 0.28, 1.0)
-        style.border_width_left = 2
-        style.border_width_right = 2
-        style.border_width_top = 2
-        style.border_width_bottom = 2
-        style.border_color = Color(0.35, 0.78, 0.90, 1.0)
+        style = get_theme_stylebox(&"holding", &"CargoItemRow")
     elif _loaded:
-        style.bg_color = Color(0.10, 0.28, 0.12, 1.0)
-        style.border_width_left = 1
-        style.border_width_right = 1
-        style.border_width_top = 1
-        style.border_width_bottom = 1
-        style.border_color = Color(0.25, 0.60, 0.30, 1.0)
+        style = get_theme_stylebox(&"loaded", &"CargoItemRow")
     else:
-        style.bg_color = Color(0.14, 0.14, 0.16, 1.0)
-        style.border_width_left = 1
-        style.border_width_right = 1
-        style.border_width_top = 1
-        style.border_width_bottom = 1
-        style.border_color = Color(0.35, 0.35, 0.38, 1.0)
+        style = get_theme_stylebox(&"default", &"CargoItemRow")
     add_theme_stylebox_override(&"panel", style)
     queue_redraw()
     mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND

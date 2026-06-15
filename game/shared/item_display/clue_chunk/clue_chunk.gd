@@ -47,7 +47,9 @@ func _apply() -> void:
 
     # Remove surplus children left over from a previous larger layout
     while get_child_count() > idx:
-        get_child(get_child_count() - 1).queue_free()
+        var child := get_child(get_child_count() - 1)
+        remove_child(child)
+        child.queue_free()
 
 
 func _ensure_child(index: int, type: Variant) -> Node:
@@ -55,6 +57,7 @@ func _ensure_child(index: int, type: Variant) -> Node:
         var existing := get_child(index)
         if is_instance_of(existing, type):
             return existing
+        remove_child(existing)
         existing.queue_free()
 
     var child = type.new()
@@ -66,6 +69,7 @@ func _ensure_child(index: int, type: Variant) -> Node:
 
 func _clear_children() -> void:
     for child in get_children():
+        remove_child(child)
         child.queue_free()
 
 

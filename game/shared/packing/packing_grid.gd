@@ -78,11 +78,15 @@ var _hover_item = null # placed item under cursor in IDLE phase
 var _ext_hover_item = null # placed item highlighted from an outside source (e.g. list row)
 var _lift_offset: Vector2i = Vector2i(0, 0) # offset from item origin to clicked cell
 var _grab_index: int = -1 # index into the item's base shape cells that is pinned under the cursor
+var _item_normal_style: Dictionary = { } # item → StyleBoxFlat (base color)
+var _item_hover_style: Dictionary = { } # item → StyleBoxFlat (lightened for hover)
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
 func _unhandled_input(event: InputEvent) -> void:
+    if not is_inside_tree():
+        return
     if phase != Phase.ITEM_HELD or active_item == null:
         return
     if event is InputEventKey and event.pressed and not event.echo:
@@ -121,6 +125,8 @@ func setup(cols: int, rows: int) -> void:
     _ext_hover_item = null
     _lift_offset = Vector2i(0, 0)
     _grab_index = -1
+    _item_normal_style.clear()
+    _item_hover_style.clear()
 
     _grid_cols = cols
     _grid_rows = rows
@@ -353,33 +359,28 @@ func refresh_visuals() -> void:
 
     for pos: Vector2i in _cell_nodes:
         var cell: Panel = _cell_nodes[pos]
-        var style: StyleBoxFlat
+        var style: StyleBox
 
         if pos in preview_cells:
-            if preview_valid:
-                style = make_stylebox(PREVIEW_VALID_BG, PREVIEW_VALID_BORDER)
-            else:
-                style = make_stylebox(PREVIEW_INVALID_BG, PREVIEW_INVALID_BORDER)
+            style = get_theme_stylebox(
+                &"grid_preview_valid" if preview_valid else &"grid_preview_invalid",
+                &"PackingGrid",
+            )
         elif placement.has(pos):
             var entry = placement[pos]
             var base_color := resolve_color(entry)
             var base_border := resolve_border_color(entry)
             if phase == Phase.ITEM_HELD and active_item == entry:
-                # Ghost of the held item — dimmed with a cyan border to signal "moving".
                 style = make_stylebox(
                     base_color.lightened(0.10),
                     Color(0.35, 0.78, 0.90, 1.0),
                 )
             elif pos in hover_item_cells:
-                # Hovered item in IDLE — noticeably brighter than the held ghost.
-                style = make_stylebox(
-                    base_color.lightened(0.42),
-                    base_border.lightened(0.35),
-                )
+                style = _get_hover_style(entry, base_color, base_border)
             else:
-                style = make_stylebox(base_color, base_border)
+                style = _get_normal_style(entry, base_color, base_border)
         else:
-            style = make_stylebox(DEFAULT_BG, DEFAULT_BORDER)
+            style = get_theme_stylebox(&"grid_cell", &"PackingGrid")
 
         cell.add_theme_stylebox_override("panel", style)
         cell.queue_redraw()
@@ -442,14 +443,7 @@ func _make_cell(pos: Vector2i) -> Panel:
     cell.custom_minimum_size = Vector2(CELL_SIZE, CELL_SIZE)
     cell.set_meta("cell_pos", pos)
 
-    var style := StyleBoxFlat.new()
-    style.bg_color = DEFAULT_BG
-    style.border_width_left = 1
-    style.border_width_right = 1
-    style.border_width_top = 1
-    style.border_width_bottom = 1
-    style.border_color = DEFAULT_BORDER
-    cell.add_theme_stylebox_override("panel", style)
+    cell.add_theme_stylebox_override("panel", get_theme_stylebox(&"grid_cell", &"PackingGrid"))
 
     cell.mouse_entered.connect(_on_cell_mouse_entered.bind(pos))
     cell.mouse_exited.connect(_on_cell_mouse_exited.bind(pos))
@@ -470,7 +464,7 @@ func resolve_border_color(item) -> Color:
     return Color(0.40, 0.55, 0.75, 1.0)
 
 
-static func make_stylebox(bg: Color, border: Color) -> StyleBoxFlat:
+static func _build_stylebox(bg: Color, border: Color) -> StyleBoxFlat:
     var s := StyleBoxFlat.new()
     s.bg_color = bg
     s.border_width_left = 1
@@ -479,6 +473,25 @@ static func make_stylebox(bg: Color, border: Color) -> StyleBoxFlat:
     s.border_width_bottom = 1
     s.border_color = border
     return s
+
+
+static func make_stylebox(bg: Color, border: Color) -> StyleBoxFlat:
+    return _build_stylebox(bg, border)
+
+
+func _get_normal_style(item, base_color: Color, base_border: Color) -> StyleBoxFlat:
+    if not _item_normal_style.has(item):
+        _item_normal_style[item] = _build_stylebox(base_color, base_border)
+    return _item_normal_style[item]
+
+
+func _get_hover_style(item, base_color: Color, base_border: Color) -> StyleBoxFlat:
+    if not _item_hover_style.has(item):
+        _item_hover_style[item] = _build_stylebox(
+            base_color.lightened(0.42),
+            base_border.lightened(0.35),
+        )
+    return _item_hover_style[item]
 
 
 func _on_cell_mouse_entered(pos: Vector2i) -> void:

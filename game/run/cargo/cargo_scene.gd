@@ -29,6 +29,8 @@ var _hover_extra_index: int = -1
 # ── Extra Slot Grid State ──────────────────────────────────────────────────────
 
 var _extra_slot_cells: Dictionary = { }
+var _extra_slot_item_styles: Dictionary = { } # entry → StyleBoxFlat
+var _extra_slot_hover_styles: Dictionary = { } # entry → StyleBoxFlat (hovered)
 
 # ── Item List State ────────────────────────────────────────────────────────────
 
@@ -42,6 +44,7 @@ var _weight_used: float = 0.0
 # ── Tooltip Support ────────────────────────────────────────────────────────────
 
 var _hovered_item: ItemEntry = null
+var _last_highlighted_entry: ItemEntry = null
 
 # ── Node references ────────────────────────────────────────────────────────────
 
@@ -75,10 +78,7 @@ func _ready() -> void:
 
     _run_summary.add_theme_stylebox_override(
         &"panel",
-        PackingGrid.make_stylebox(
-            Color(0.15, 0.15, 0.18, 1.0),
-            Color(0.40, 0.40, 0.45, 1.0),
-        ),
+        get_theme_stylebox(&"panel", &"RunSummary"),
     )
 
     _reset_btn.pressed.connect(_on_reset_pressed)
@@ -128,9 +128,11 @@ func _packing_weight_validator(item, _origin: Vector2i) -> bool:
 
 func _on_packing_grid_item_clicked(item) -> void:
     _hide_tooltip()
+    if _last_highlighted_entry != null:
+        if _item_rows.has(_last_highlighted_entry):
+            _item_rows[_last_highlighted_entry].set_external_highlight(false)
+        _last_highlighted_entry = null
     var entry: ItemEntry = item as ItemEntry
-    if _item_rows.has(entry):
-        _item_rows[entry].set_external_highlight(false)
     AudioManager.play_event(SELL_GRID_LIFT)
     _lift_from_cargo(entry)
 
@@ -160,14 +162,19 @@ func _on_packing_grid_hover_started(pos: Vector2i) -> void:
     if _cargo_grid.phase != PackingGrid.Phase.ITEM_HELD and _cargo_grid.placement.has(pos):
         var entry: ItemEntry = _cargo_grid.placement[pos] as ItemEntry
         if _item_rows.has(entry):
+            if _last_highlighted_entry != null and _last_highlighted_entry != entry:
+                _item_rows[_last_highlighted_entry].set_external_highlight(false)
+            _last_highlighted_entry = entry
             _item_rows[entry].set_external_highlight(true)
             _show_tooltip_for_item(entry, _item_rows[entry].get_global_rect())
 
 
 func _on_packing_grid_hover_ended() -> void:
     _hide_tooltip()
-    for entry: ItemEntry in _item_rows:
-        _item_rows[entry].set_external_highlight(false)
+    if _last_highlighted_entry != null:
+        if _item_rows.has(_last_highlighted_entry):
+            _item_rows[_last_highlighted_entry].set_external_highlight(false)
+        _last_highlighted_entry = null
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
@@ -175,6 +182,8 @@ func _on_packing_grid_hover_ended() -> void:
 func _on_reset_pressed() -> void:
     _cargo_grid.reset()
     _extra_slot_items.fill(null)
+    _extra_slot_item_styles.clear()
+    _extra_slot_hover_styles.clear()
 
     _active_origin = ""
     _active_origin_extra_index = -1
@@ -238,6 +247,9 @@ func _on_extra_slot_hovered(slot_index: int) -> void:
     if _cargo_grid.phase != PackingGrid.Phase.ITEM_HELD and _extra_slot_items[slot_index] != null:
         var entry: ItemEntry = _extra_slot_items[slot_index]
         if _item_rows.has(entry):
+            if _last_highlighted_entry != null and _last_highlighted_entry != entry:
+                _item_rows[_last_highlighted_entry].set_external_highlight(false)
+            _last_highlighted_entry = entry
             _item_rows[entry].set_external_highlight(true)
             _show_tooltip_for_item(entry, _item_rows[entry].get_global_rect())
         else:
@@ -247,9 +259,10 @@ func _on_extra_slot_hovered(slot_index: int) -> void:
 func _on_extra_slot_unhovered(slot_index: int) -> void:
     if _hover_extra_index == slot_index:
         _hover_extra_index = -1
-    if slot_index < _extra_slot_items.size() and _extra_slot_items[slot_index] != null \
-    and _item_rows.has(_extra_slot_items[slot_index]):
-        _item_rows[_extra_slot_items[slot_index]].set_external_highlight(false)
+    if _last_highlighted_entry != null:
+        if _item_rows.has(_last_highlighted_entry):
+            _item_rows[_last_highlighted_entry].set_external_highlight(false)
+        _last_highlighted_entry = null
     _refresh_extra_slot_visuals()
     _hide_tooltip()
 
@@ -261,6 +274,10 @@ func _on_extra_slot_cancel(_slot_index: int) -> void:
 
 func _on_item_row_pressed(entry: ItemEntry) -> void:
     _hide_tooltip()
+    if _last_highlighted_entry != null:
+        if _item_rows.has(_last_highlighted_entry):
+            _item_rows[_last_highlighted_entry].set_external_highlight(false)
+        _last_highlighted_entry = null
     if _item_rows.has(entry):
         _item_rows[entry].set_external_highlight(false)
     if _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
@@ -465,9 +482,9 @@ func _update_summary(pending_slots: int, pending_weight: float, weight_exceeded:
     if pending_weight > 0.0:
         _summary_weight.text = "%.1f + %.1f / %.1f kg" % [_weight_used, pending_weight, max_weight]
         if weight_exceeded:
-            _summary_weight.add_theme_color_override(&"font_color", Color(0.9, 0.3, 0.3, 1.0))
+            _summary_weight.add_theme_color_override(&"font_color", ThemeColors.LOSS_RED)
         else:
-            _summary_weight.add_theme_color_override(&"font_color", Color(0.35, 0.75, 0.40, 1.0))
+            _summary_weight.add_theme_color_override(&"font_color", ThemeColors.PROFIT_GREEN)
     else:
         _summary_weight.text = "%.1f / %.1f kg" % [_weight_used, max_weight]
         _summary_weight.remove_theme_color_override(&"font_color")
@@ -500,25 +517,13 @@ func _refresh_extra_slot_visuals() -> void:
         var entry: ItemEntry = _extra_slot_items[i] if i < _extra_slot_items.size() else null
         if entry != null:
             if i == _hover_extra_index and _cargo_grid.phase != PackingGrid.Phase.ITEM_HELD:
-                style = PackingGrid.make_stylebox(
-                    _cargo_grid.resolve_color(entry).lightened(0.2),
-                    _cargo_grid.resolve_border_color(entry).lightened(0.15),
-                )
+                style = _get_extra_hover_style(entry)
             else:
-                style = PackingGrid.make_stylebox(
-                    _cargo_grid.resolve_color(entry),
-                    _cargo_grid.resolve_border_color(entry),
-                )
+                style = _get_extra_normal_style(entry)
         elif i == _hover_extra_index and _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
-            style = PackingGrid.make_stylebox(
-                Color(0.20, 0.45, 0.22, 1.0),
-                Color(0.35, 0.75, 0.40, 1.0),
-            )
+            style = get_theme_stylebox(&"drop_target", &"ExtraSlotCell")
         else:
-            style = PackingGrid.make_stylebox(
-                Color(0.18, 0.18, 0.20, 1.0),
-                Color(0.35, 0.35, 0.38, 1.0),
-            )
+            style = get_theme_stylebox(&"default", &"ExtraSlotCell")
         var icon_text := ""
         if entry != null:
             var words = ItemEntryDisplayHelper.display_name(entry).split(" ", false)
@@ -526,6 +531,24 @@ func _refresh_extra_slot_visuals() -> void:
             icon_text = icon_text.to_upper()
 
         cell.set_visuals(style, icon_text)
+
+
+func _get_extra_normal_style(entry: ItemEntry) -> StyleBoxFlat:
+    if not _extra_slot_item_styles.has(entry):
+        _extra_slot_item_styles[entry] = PackingGrid.make_stylebox(
+            _cargo_grid.resolve_color(entry),
+            _cargo_grid.resolve_border_color(entry),
+        )
+    return _extra_slot_item_styles[entry]
+
+
+func _get_extra_hover_style(entry: ItemEntry) -> StyleBoxFlat:
+    if not _extra_slot_hover_styles.has(entry):
+        _extra_slot_hover_styles[entry] = PackingGrid.make_stylebox(
+            _cargo_grid.resolve_color(entry).lightened(0.2),
+            _cargo_grid.resolve_border_color(entry).lightened(0.15),
+        )
+    return _extra_slot_hover_styles[entry]
 
 
 func _refresh_item_list_visuals() -> void:

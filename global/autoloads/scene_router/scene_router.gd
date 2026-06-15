@@ -143,5 +143,5 @@ func consume_pending_fatal() -> Dictionary:
 func _navigate(scene: PackedScene) -> void:
     if not SaveManager.flush():
         ToastManager.show_warning("Save failed before scene transition. Continuing, but recent progress may not be saved.")
-    get_tree().change_scene_to_packed(scene)
-    scene_changed.emit()
+    get_tree().change_scene_to_packed.call_deferred(scene)
+    scene_changed.emit.call_deferred()

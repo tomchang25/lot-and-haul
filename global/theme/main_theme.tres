@@ -81,10 +81,66 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
+[sub_resource type="StyleBoxFlat" id="cargo_item_row_default"]
+bg_color = Color(0.14, 0.14, 0.16, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.35, 0.38, 1)
+
+[sub_resource type="StyleBoxFlat" id="cargo_item_row_holding"]
+bg_color = Color(0.08, 0.22, 0.28, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.78, 0.9, 1)
+
+[sub_resource type="StyleBoxFlat" id="cargo_item_row_hovered"]
+bg_color = Color(0.3, 0.27, 0.12, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7, 0.65, 0.25, 1)
+
+[sub_resource type="StyleBoxFlat" id="cargo_item_row_loaded"]
+bg_color = Color(0.1, 0.28, 0.12, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.6, 0.3, 1)
+
 [sub_resource type="StyleBoxEmpty" id="checkbox_bg"]
+
+[sub_resource type="StyleBoxFlat" id="grid_cell_bg"]
+bg_color = Color(0.18, 0.18, 0.2, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.35, 0.38, 1)
+
+[sub_resource type="StyleBoxFlat" id="grid_preview_valid"]
+bg_color = Color(0.2, 0.45, 0.22, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.75, 0.4, 1)
 
 [sub_resource type="StyleBoxLine" id="separator_line"]
 color = Color(0.25, 0.25, 0.3, 1)
+
+[sub_resource type="StyleBoxFlat" id="grid_preview_invalid"]
+bg_color = Color(0.45, 0.18, 0.18, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.75, 0.3, 0.3, 1)
 
 [sub_resource type="StyleBoxFlat" id="panel_bg"]
 content_margin_left = 12.0
@@ -101,6 +157,14 @@ corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="run_summary_panel"]
+bg_color = Color(0.15, 0.15, 0.18, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.4, 0.45, 1)
 
 [sub_resource type="StyleBoxFlat" id="tooltip_panel"]
 content_margin_left = 8.0
@@ -132,6 +196,10 @@ Button/styles/focus = SubResource("btn_focus")
 Button/styles/hover = SubResource("btn_hover")
 Button/styles/normal = SubResource("btn_normal")
 Button/styles/pressed = SubResource("btn_pressed")
+CargoItemRow/styles/default = SubResource("cargo_item_row_default")
+CargoItemRow/styles/holding = SubResource("cargo_item_row_holding")
+CargoItemRow/styles/hovered = SubResource("cargo_item_row_hovered")
+CargoItemRow/styles/loaded = SubResource("cargo_item_row_loaded")
 CheckBox/colors/font_color = Color(0.88, 0.88, 0.92, 1)
 CheckBox/colors/font_disabled_color = Color(0.45, 0.48, 0.53, 1)
 CheckBox/colors/font_focus_color = Color(0.88, 0.88, 0.92, 1)
@@ -148,6 +216,8 @@ CheckBox/styles/focus = SubResource("btn_focus")
 CheckBox/styles/hover = SubResource("checkbox_bg")
 CheckBox/styles/normal = SubResource("checkbox_bg")
 CheckBox/styles/pressed = SubResource("checkbox_bg")
+ExtraSlotCell/styles/default = SubResource("grid_cell_bg")
+ExtraSlotCell/styles/drop_target = SubResource("grid_preview_valid")
 GridContainer/constants/h_separation = 6
 GridContainer/constants/v_separation = 6
 HBoxContainer/constants/separation = 8
@@ -155,9 +225,13 @@ HSeparator/constants/separation = 8
 HSeparator/styles/separator = SubResource("separator_line")
 Label/colors/font_color = Color(0.88, 0.88, 0.92, 1)
 Label/font_sizes/font_size = 16
+PackingGrid/styles/grid_cell = SubResource("grid_cell_bg")
+PackingGrid/styles/grid_preview_invalid = SubResource("grid_preview_invalid")
+PackingGrid/styles/grid_preview_valid = SubResource("grid_preview_valid")
 PanelContainer/styles/panel = SubResource("panel_bg")
 RichTextLabel/colors/default_color = Color(0.88, 0.88, 0.92, 1)
 RichTextLabel/font_sizes/normal_font_size = 16
+RunSummary/styles/panel = SubResource("run_summary_panel")
 TooltipLabel/colors/font_color = Color(0.8, 0.8, 0.85, 1)
 TooltipLabel/font_sizes/font_size = 14
 TooltipPanel/styles/panel = SubResource("tooltip_panel")
