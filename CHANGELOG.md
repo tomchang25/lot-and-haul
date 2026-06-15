@@ -2,6 +2,8 @@
 
 Append-only record of shipped work.
 
+## v0.1.2 - Draft
+
 ## v0.1.1
 
 - 2026-06-14 — [fix] New game reset now assigns the "van_basic" starter car to the garage; `_assign_starter_car()` called during `MetaManager.reset()`
