@@ -76,6 +76,7 @@ func _ready() -> void:
     _confirm_popup.confirmed.connect(_on_auction_confirmed)
 
     _item_browser.entry_pressed.connect(_on_browser_entry_pressed)
+    _item_browser.set_mode_toggle_visible(false)
 
     _populate_browser()
     _refresh_hud()

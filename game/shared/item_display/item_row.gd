@@ -59,6 +59,7 @@ const COLUMN_MIN_WIDTH: Dictionary = {
 var _entry: ItemEntry = null
 var _columns: Array = []
 var _selection_state: SelectionState = SelectionState.NONE
+var _last_applied_columns: Array = []
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -193,6 +194,10 @@ func _refresh() -> void:
 func _apply_column_order() -> void:
     if _columns.is_empty() or not is_node_ready():
         return
+
+    if _columns == _last_applied_columns:
+        return
+    _last_applied_columns = _columns.duplicate()
 
     var column_to_label: Dictionary = {
         Column.NAME: _name_cell,

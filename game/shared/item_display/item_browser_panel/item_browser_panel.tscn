@@ -17,13 +17,13 @@ theme_override_constants/separation = 6
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
+button_pressed = true
 text = "Cards"
 
 [node name="TableToggle" type="Button" parent="ModeToggleHBox" unique_id=100000003]
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
-button_pressed = true
 text = "Table"
 
 [node name="CardPanel" type="PanelContainer" parent="." unique_id=100000008]

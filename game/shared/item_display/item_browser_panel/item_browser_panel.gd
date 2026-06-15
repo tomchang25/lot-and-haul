@@ -17,9 +17,10 @@ const ItemCardScene: PackedScene = preload("res://game/shared/item_display/item_
 
 # ── State ──────────────────────────────────────────────────────────────────────
 
-var _mode: DisplayMode = DisplayMode.TABLE
+var _mode: DisplayMode = DisplayMode.CARD
 var _entries: Array = []
 var _selected_entry: ItemEntry = null
+var _prev_selected_entry: ItemEntry = null
 var _card_rows: Dictionary = { } # ItemEntry -> ItemCard
 var _columns: Array = []
 
@@ -34,6 +35,7 @@ var _pending_ascending: bool = true
 @onready var _card_panel: PanelContainer = %CardPanel
 @onready var _card_grid: GridContainer = %CardGrid
 @onready var _table_panel: ItemListPanel = %TablePanel
+@onready var _mode_toggle_hbox: HBoxContainer = $ModeToggleHBox
 @onready var _empty_label: Label = %EmptyLabel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
@@ -55,6 +57,10 @@ func _ready() -> void:
         _apply()
 
     _refresh_mode()
+
+
+func set_mode_toggle_visible(shown: bool) -> void:
+    _mode_toggle_hbox.visible = shown
 
 # ══ Display mode API ══════════════════════════════════════════════════════════
 
@@ -137,19 +143,29 @@ func _refresh_empty() -> void:
 
 
 func _rebuild_card_grid() -> void:
-    for child in _card_grid.get_children():
-        child.queue_free()
-    _card_rows.clear()
+    # Remove cards for entries no longer in the list
+    for entry in _card_rows.keys():
+        if not entry in _entries:
+            _card_rows[entry].queue_free()
+            _card_rows.erase(entry)
 
+    # Reuse existing cards, create new ones, and maintain correct order
+    var index := 0
     for entry: ItemEntry in _entries:
-        var card: ItemCard = ItemCardScene.instantiate()
-        card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        var card: ItemCard
+        if _card_rows.has(entry):
+            card = _card_rows[entry] as ItemCard
+        else:
+            card = ItemCardScene.instantiate()
+            card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+            card.clicked.connect(_on_card_clicked)
+            card.mouse_entered.connect(_on_card_mouse_entered.bind(card, entry))
+            card.mouse_exited.connect(_on_card_mouse_exited)
+            _card_grid.add_child(card)
+            _card_rows[entry] = card
         card.setup(entry)
-        card.clicked.connect(_on_card_clicked)
-        card.mouse_entered.connect(_on_card_mouse_entered.bind(card, entry))
-        card.mouse_exited.connect(_on_card_mouse_exited)
-        _card_grid.add_child(card)
-        _card_rows[entry] = card
+        _card_grid.move_child(card, index)
+        index += 1
 
 
 func _refresh_mode() -> void:
@@ -163,6 +179,7 @@ func _refresh_mode() -> void:
 
 
 func _deselect_current() -> void:
+    _prev_selected_entry = _selected_entry
     if _selected_entry != null and _card_rows.has(_selected_entry):
         _card_rows[_selected_entry].set_selected(false)
     _selected_entry = null
@@ -174,13 +191,15 @@ func _apply_card_selection() -> void:
 
 
 func _apply_table_selection() -> void:
-    for entry: ItemEntry in _entries:
-        var row := _table_panel.get_row(entry)
+    if _prev_selected_entry != null:
+        var prev_row := _table_panel.get_row(_prev_selected_entry)
+        if prev_row != null:
+            prev_row.set_selection_state(ItemRow.SelectionState.NONE)
+
+    if _selected_entry != null:
+        var row := _table_panel.get_row(_selected_entry)
         if row != null:
-            if entry == _selected_entry:
-                row.set_selection_state(ItemRow.SelectionState.SELECTED)
-            else:
-                row.set_selection_state(ItemRow.SelectionState.NONE)
+            row.set_selection_state(ItemRow.SelectionState.SELECTED)
 
 # ══ Mode switch handlers ═════════════════════════════════════════════════════
 
@@ -220,6 +239,7 @@ func _on_table_row_pressed(entry) -> void:
         _deselect_current()
         _selected_entry = entry
         _apply_card_selection()
+        _apply_table_selection()
         entry_pressed.emit(entry)
 
 

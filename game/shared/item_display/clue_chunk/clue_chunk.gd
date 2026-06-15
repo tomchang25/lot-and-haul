@@ -36,100 +36,116 @@ func refresh() -> void:
 
 
 func _apply() -> void:
+    if _entry == null:
+        _clear_children()
+        return
+
+    var idx := 0
+    idx = _build_anchor(idx)
+    idx = _build_surface(idx)
+    idx = _build_hidden(idx)
+
+    # Remove surplus children left over from a previous larger layout
+    while get_child_count() > idx:
+        get_child(get_child_count() - 1).queue_free()
+
+
+func _ensure_child(index: int, type: Variant) -> Node:
+    if index < get_child_count():
+        var existing := get_child(index)
+        if is_instance_of(existing, type):
+            return existing
+        existing.queue_free()
+
+    var child = type.new()
+    # node-src: ephemeral — rebuilt per _apply()
+    add_child(child)
+    move_child(child, index)
+    return child
+
+
+func _clear_children() -> void:
     for child in get_children():
         child.queue_free()
 
-    if _entry == null:
-        return
 
-    _build_anchor()
-    _build_surface()
-    _build_hidden()
+func _build_anchor(idx: int) -> int:
+    if _entry.anchor == null or not _entry.unveiled:
+        return idx
 
+    _ensure_child(idx, HSeparator)
+    idx += 1
 
-func _make_separator() -> HSeparator:
-    var sep := HSeparator.new()
-    return sep
-
-
-func _make_header(text: String) -> Label:
-    var lbl := Label.new()
-    lbl.text = text
-    lbl.add_theme_font_size_override(&"font_size", 10)
-    lbl.add_theme_color_override(&"font_color", HEADER_COLOR)
-    return lbl
-
-
-func _make_clue_row(icon: String, text: String, color: Color) -> Label:
-    var lbl := Label.new()
-    lbl.text = "%s  %s" % [icon, text]
-    lbl.add_theme_font_size_override(&"font_size", 11)
-    lbl.add_theme_color_override(&"font_color", color)
-    lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-    return lbl
-
-
-func _build_anchor() -> void:
-    if _entry == null:
-        return
-    if _entry.anchor == null:
-        return
-    if not _entry.unveiled:
-        return
-
-    # node-src: ephemeral — rebuilt per _apply()
-    add_child(_make_separator())
-
-    var header := _make_header("IDENTITY")
-    # node-src: ephemeral — rebuilt per _apply()
-    add_child(header)
+    var header := _ensure_child(idx, Label) as Label
+    header.text = "IDENTITY"
+    header.add_theme_font_size_override(&"font_size", 10)
+    header.add_theme_color_override(&"font_color", HEADER_COLOR)
+    idx += 1
 
     var anchor := _entry.anchor
     var text: String = anchor.known_text if _entry.unveiled else UNKNOWN_TEXT
     var color := KNOWN_COLOR if _entry.unveiled else UNKNOWN_COLOR
-    # node-src: ephemeral — rebuilt per _apply()
-    add_child(_make_clue_row("■", text, color))
+    var row := _ensure_child(idx, Label) as Label
+    row.text = "■  %s" % text
+    row.add_theme_font_size_override(&"font_size", 11)
+    row.add_theme_color_override(&"font_color", color)
+    row.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    idx += 1
+
+    return idx
 
 
-func _build_surface() -> void:
-    if _entry == null:
-        return
+func _build_surface(idx: int) -> int:
     var clues: Array[ClueData] = _entry.surface_clues
     if clues.is_empty():
-        return
+        return idx
 
-    # node-src: ephemeral — rebuilt per _apply()
-    add_child(_make_separator())
+    _ensure_child(idx, HSeparator)
+    idx += 1
 
-    var header := _make_header("SURFACE")
-    # node-src: ephemeral — rebuilt per _apply()
-    add_child(header)
+    var header := _ensure_child(idx, Label) as Label
+    header.text = "SURFACE"
+    header.add_theme_font_size_override(&"font_size", 10)
+    header.add_theme_color_override(&"font_color", HEADER_COLOR)
+    idx += 1
 
     for clue: ClueData in clues:
         var revealed := _entry.revealed_clue_ids.has(clue.clue_id)
         var text: String = clue.known_text if revealed else UNKNOWN_TEXT
         var color := KNOWN_COLOR if revealed else UNKNOWN_COLOR
-        # node-src: ephemeral — rebuilt per _apply()
-        add_child(_make_clue_row(SURFACE_ICON, text, color))
+        var row := _ensure_child(idx, Label) as Label
+        row.text = "%s  %s" % [SURFACE_ICON, text]
+        row.add_theme_font_size_override(&"font_size", 11)
+        row.add_theme_color_override(&"font_color", color)
+        row.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        idx += 1
+
+    return idx
 
 
-func _build_hidden() -> void:
-    if _entry == null:
-        return
+func _build_hidden(idx: int) -> int:
     var clues: Array[ClueData] = _entry.hidden_clues
     if clues.is_empty():
-        return
+        return idx
 
-    # node-src: ephemeral — rebuilt per _apply()
-    add_child(_make_separator())
+    _ensure_child(idx, HSeparator)
+    idx += 1
 
-    var header := _make_header("HIDDEN")
-    # node-src: ephemeral — rebuilt per _apply()
-    add_child(header)
+    var header := _ensure_child(idx, Label) as Label
+    header.text = "HIDDEN"
+    header.add_theme_font_size_override(&"font_size", 10)
+    header.add_theme_color_override(&"font_color", HEADER_COLOR)
+    idx += 1
 
     for clue: ClueData in clues:
         var revealed := _entry.revealed_clue_ids.has(clue.clue_id)
         var text: String = clue.known_text if revealed else UNKNOWN_TEXT
         var color := VERIFIED_COLOR if revealed else UNKNOWN_COLOR
-        # node-src: ephemeral — rebuilt per _apply()
-        add_child(_make_clue_row(HIDDEN_ICON, text, color))
+        var row := _ensure_child(idx, Label) as Label
+        row.text = "%s  %s" % [HIDDEN_ICON, text]
+        row.add_theme_font_size_override(&"font_size", 11)
+        row.add_theme_color_override(&"font_color", color)
+        row.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        idx += 1
+
+    return idx
