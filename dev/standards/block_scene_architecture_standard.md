@@ -380,32 +380,12 @@ The exact dash count matters less than visual consistency — copy from an exist
 
 # 11. Node Source Rule
 
-All persistent nodes in a block scene **must be defined in the `.tscn` file**.
-Reference them at the top of the script using `@onready` under `# ── Node references ──`.
+Node-source rules are defined in `dev/standards/scene_node_source_standard.md`.
 
-Exceptions: debug-only display nodes (e.g. `_debug_label` behind `Debug.enabled`) and `Timer` nodes — these must always be created in code, never placed in `.tscn`. See the permitted exceptions table below.
-
-## Node reference style
-
-**Preferred** — `%UniqueName` for new scenes and any scene being actively edited:
-
-```gdscript
-# ── Node references ───────────────────────────────────────────────────────────
-
-@onready var _confirm_button: Button = %ConfirmButton
-@onready var _row_container: VBoxContainer = %RowContainer
-```
-
-Each referenced node must have `unique_name_in_owner = true` set in the `.tscn` as a **property line**, not a header attribute:
-
-```
-[node name="ConfirmButton" type="Button" parent="..." unique_id=...]
-unique_name_in_owner = true
-```
-
-**Legacy** — `$RootVBox/...` full paths are allowed in existing scenes that have not been touched. Do not mix both styles within a single script.
-
-**Do not use `_build_ui()`** to construct persistent structural nodes in code.
+For this standard's scope, all persistent nodes in block scenes, testbeds, and
+reusable UI components must be defined in `.tscn` and referenced from GDScript
+with `@onready`. Runtime-created nodes are allowed only for the permitted cases
+documented in the scene node source standard.
 
 ---
 
@@ -550,74 +530,3 @@ Reason: between the moment the component enters the tree and the moment `_apply(
 
 This applies to `Label.text`, `TextureRect.texture` (leave null), `Button.text` on
 dynamic buttons, and any other field `_apply()` will overwrite.
-
----
-
-## Permitted exceptions
-
-The following may still be created at runtime in code:
-
-| Case                    | Example                                                     | Reason                                                                                               |
-| ----------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Packed scene instances  | `ItemRowScene.instantiate()`                                | Count unknown at edit time                                                                           |
-| Ephemeral display nodes | Tooltips, empty-state labels, `HSeparator` in dynamic lists | Created and destroyed during the scene's lifetime                                                    |
-| Custom-drawn controls   | Inner class with `_draw()` override                         | Requires `_draw()` override — cannot be defined in `.tscn`                                           |
-| Debug-only display      | `_debug_label` behind `Debug.enabled` guard                 | Never shipped — polluting `.tscn` with invisible nodes is misleading. See `debug_standard.md`.       |
-| Timer nodes             | `Timer.new()` for timed logic                               | Godot scene timers fire during tool mode, causing phantom ticks in the editor; always create in code |
-
-The key question: **does this node exist for the full lifetime of the scene?**
-If yes → define it in `.tscn`. If no → creating it in code is acceptable.
-
----
-
-## `node-src` markers (enforcement)
-
-Whether an `add_child(...)` is a violation depends on whether the node is
-persistent — a judgment a linter can't make from the call site alone. To make the
-rule machine-checkable, every runtime `add_child` of a node that is **not** a
-`.instantiate()`'d packed scene must carry a marker declaring which permitted
-exception applies. Put the marker on the comment line **directly above** the call
-(the linter also accepts a trailing marker, but above-the-call is preferred — it
-keeps the call clean and gives the note room):
-
-```gdscript
-# node-src: timer
-add_child(_npc_timer)
-
-# node-src: ephemeral — separator in rebuilt list
-_lot_summary.add_child(HSeparator.new())
-
-# node-src: drawn
-price_area.add_child(_circle_node)
-
-# node-src: debug
-add_child(_debug_label)
-
-# node-src: instance — packed scene not auto-detected
-my_container.add_child(thing)
-```
-
-An optional note may follow the tag after `—`; the linter ignores everything
-after the tag. **Keep the note to a short phrase** (the exception category, e.g.
-`empty-state label`, `per-grid cell, dynamic W×H`). If a marker needs a
-full-sentence justification to feel honest, treat that as a signal the node should
-be **extracted into a `.tscn` component** rather than annotated — a long excuse is
-the smell, not the fix.
-
-Tags map 1:1 to the permitted-exceptions table above:
-
-| Tag         | Case                                                                  |
-| ----------- | --------------------------------------------------------------------- |
-| `instance`  | packed scene instance not auto-detected from a local `.instantiate()` |
-| `ephemeral` | tooltip, empty-state label, separator in a dynamic list               |
-| `drawn`     | custom-drawn control (inner class with `_draw()`)                     |
-| `debug`     | debug-only display behind `Debug.enabled`                             |
-| `timer`     | `Timer` node (always created in code)                                 |
-
-`add_child(SomeScene.instantiate())` — and any local variable assigned from
-`.instantiate()` — needs **no** marker; it is recognised automatically.
-
-An unmarked, non-instantiate `add_child` is a lint failure (`lint_standards.py`,
-§11). The marker doesn't prove the node is genuinely ephemeral — it forces the
-author to declare intent so a reviewer can see and judge the claim. See
-`dev/standards/standards_enforcement.md`.

@@ -80,7 +80,7 @@ if Debug.enabled:
 
 # 4. Node Source Rule
 
-Debug-only nodes must always be created in code, never placed in `.tscn`. They carry the `# node-src: debug` marker for the linter. See `block_scene_architecture_standard.md` § Node Source Rule for full details.
+Debug-only nodes must always be created in code, never placed in `.tscn`. They carry the `# node-src: debug` marker for the linter. See `scene_node_source_standard.md` §5 for full marker details.
 
 ---
 

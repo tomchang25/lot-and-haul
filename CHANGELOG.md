@@ -6,6 +6,8 @@ Append-only record of shipped work.
 
 - 2026-06-15 — [ui] Shared ClueChunk component (spoiler-safe clue block) + reshaped ItemCard + ItemBrowserPanel (Card/Table modes) + ItemCardPopup; Storage and Inspection use the shared browser; legacy ItemRowTooltip replaced with ItemCardPopup across cargo, reveal, and run_review scenes
 
+- 2026-06-15 — [standards] `scene_node_source_standard.md` added as the canonical source for persistent `.tscn` nodes, permitted runtime node creation, and `node-src` markers; scene architecture docs now point to it
+
 ## v0.1.1
 
 - 2026-06-14 — [fix] New game reset now assigns the "van_basic" starter car to the garage; `_assign_starter_car()` called during `MetaManager.reset()`

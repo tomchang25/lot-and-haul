@@ -487,7 +487,7 @@ game/shared/   (Cross-phase — 5 blocks)
 
 Every block scene follows a documented pattern (`dev/standards/block_scene_architecture_standard.md`):
 
-- **Node-source rule**: every node in the `.tscn` tree must have a corresponding `@onready var` or procedural definition in the `.gd` source
+- **Node-source rule** (`dev/standards/scene_node_source_standard.md`): persistent nodes live in `.tscn`; runtime-created nodes require a permitted exception and `node-src` marker
 - **No `[connection]` in `.tscn`**: all signal connections are made in GDScript
 - **`setup()`/`_apply()` pattern**: `setup(data)` stores configuration, `_apply()` reads it and configures the tree
 - **`%UniqueName`** preferred over `$path` node references
@@ -538,24 +538,26 @@ Saves are JSON files. The manifest tracks latest counter as a load fast-path. Co
 
 ### 12.1 Coding Standards
 
-Nine standards documents under `dev/standards/`:
+Eleven standards documents under `dev/standards/`:
 
 | Standard | Covers |
 |----------|--------|
 | `naming_conventions.md` | 11 rules: snake_case files, PascalCase classes/constants/enums, snake_case variables/signals, UPPER_SNAKE_CASE constants, singularity rules for folders |
-| `block_scene_architecture_standard.md` | File headers, node-source rule, no `[connection]` in tscn, `setup()`/`_apply()` pattern |
+| `scene_node_source_standard.md` | Persistent nodes in `.tscn`, permitted runtime node creation, `node-src` markers |
+| `block_scene_architecture_standard.md` | File headers, no `[connection]` in tscn, packed-scene instantiation order, `setup()`/`_apply()` pattern |
 | `error_guard_standard.md` | Three-category guard system replacing `assert()`: runtime guard, programmer error, precondition guard |
 | `registries.md` | Required API, forbidden wrappers, iterate-resources-not-ids, inverse lookup patterns |
 | `runtime_type_archetypes.md` | Four archetypes, mutation-mediation rule, subfolder-as-truth convention |
 | `debug_standard.md` | Two-layer gate, Debug autoload API, coding patterns, node-source rules for debug nodes |
 | `theme_standard.md` | Centralized theme, semantic palette, typography scale, override rules |
 | `project_structure.md` | 7 top-level folders, placement rules |
+| `test_data.md` | Test data lives in YAML and goes through the production YAML to tres pipeline |
 | `standards_enforcement.md` | How rules are enforced, linter scope, bare push_error ban |
 
 ### 12.2 Enforcement
 
 `dev/tools/lint_standards.py` enforces:
-- Node-source markers (every `.tscn` node must have a `@onready var` in `.gd`)
+- Node-source markers (runtime-created nodes must declare a permitted exception)
 - No `[connection]` entries in `.tscn` files
 - No bare `push_error()` calls (must use `ToastManager.show_dev_error()`)
 - Match-statement wildcard rule
