@@ -8,7 +8,7 @@ prose and onto a check instead.
 ## The model
 
 - **One source of truth.** The rule itself lives in its standard doc
-  (`block_scene_architecture_standard.md`, etc.). This file and the linter only
+  (`scene_node_source_standard.md`, etc.). This file and the linter only
   _point back at_ it — they never restate or redefine a rule.
 - **One check module.** All machine-checkable rules are decided by
   `dev/tools/lint_standards.py`. No second copy of the logic anywhere.
@@ -37,7 +37,7 @@ when it's actually been violated enough to be worth automating.
 
 Only what `lint_standards.py` enforces today:
 
-- **Node-source rule** (`block_scene_architecture_standard.md` §11). A machine
+- **Node-source rule** (`scene_node_source_standard.md` §5). A machine
   can't tell whether a node is persistent, so the convention makes intent
   syntactic: every runtime `add_child` that is _not_ a `.instantiate()`'d packed
   scene must carry a `# node-src: <tag>` marker (on the line directly above the
@@ -59,7 +59,7 @@ Only what `lint_standards.py` enforces today:
   A _wrong_ claim (e.g. `# node-src: ephemeral` on a clearly persistent node) is
   now greppable — that's exactly what a reviewer checks by eye.
 
-- **No signal connections in `.tscn`** (scene standard, Signal connections).
+- **No signal connections in `.tscn`** (`block_scene_architecture_standard.md`, Signal connections).
   Any `[connection]` block in a scene file fails; connect signals in `_ready()`
   so the full wiring surface is visible in code.
 

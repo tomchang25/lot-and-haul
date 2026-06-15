@@ -4,6 +4,8 @@ Append-only record of shipped work.
 
 ## v0.1.2 - Draft
 
+- 2026-06-15 — [standards] `scene_node_source_standard.md` added as the canonical source for persistent `.tscn` nodes, permitted runtime node creation, and `node-src` markers; scene architecture docs now point to it
+
 ## v0.1.1
 
 - 2026-06-14 — [fix] New game reset now assigns the "van_basic" starter car to the garage; `_assign_starter_car()` called during `MetaManager.reset()`

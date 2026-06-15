@@ -53,11 +53,15 @@
 
 - [專案結構 project_structure](../standards/project_structure.md)
 - [命名慣例 naming_conventions](../standards/naming_conventions.md)
+- [Runtime type archetypes](../standards/runtime_type_archetypes.md)
 - [Registry 標準 registries](../standards/registries.md)
+- [Scene node source 標準 scene_node_source_standard](../standards/scene_node_source_standard.md)
 - [Block 場景架構 block_scene_architecture_standard](../standards/block_scene_architecture_standard.md)
+- [Error guard 標準 error_guard_standard](../standards/error_guard_standard.md)
 - [標準強制執行 standards_enforcement](../standards/standards_enforcement.md)
 - [Debug 標準 debug_standard](../standards/debug_standard.md)
 - [Theme 標準 theme_standard](../standards/theme_standard.md)
+- [Test data 標準 test_data](../standards/test_data.md)
 
 ## 🛠 Skills（AI 編碼參考，`dev/skills/`）
 

@@ -48,16 +48,16 @@ ERROR_GUARD_EXCLUDED_PARTS = (".godot", "addons")
 
 # ── node-src markers ─────────────────────────────────────────────────────────
 #
-# The permitted-exceptions vocabulary from block_scene_architecture_standard.md
-# §11. A runtime add_child of a node NOT produced by .instantiate() must declare
-# which exception applies via a trailing `# node-src: <tag>` comment.
+# The permitted-exceptions vocabulary from scene_node_source_standard.md §5. A
+# runtime add_child of a node NOT produced by .instantiate() must declare
+# which exception applies via a `# node-src: <tag>` marker.
 
 VALID_NODE_SRC_TAGS = frozenset(
     {
         "instance",  # packed scene instance not auto-detected as instantiate()
         "ephemeral",  # tooltip, empty-state label, separator in a dynamic list
         "drawn",  # custom-drawn control (inner class with _draw())
-        "debug",  # debug-only display behind OS.is_debug_build()
+        "debug",  # debug-only display behind Debug.enabled
         "timer",  # Timer node (must be created in code, never in .tscn)
     }
 )
@@ -91,7 +91,7 @@ class Violation:
         )
 
 
-# ── Tier 2: Node Source Rule (block_scene_architecture_standard.md §11) ──────
+# ── Tier 2: Node Source Rule (scene_node_source_standard.md §5) ───────────────
 
 
 def check_node_source(path: str, text: str) -> list[Violation]:
@@ -146,7 +146,7 @@ def check_node_source(path: str, text: str) -> list[Violation]:
                         path,
                         i,
                         "node-source",
-                        "scene §11",
+                        "scene-node-source §5",
                         f"unknown node-src tag '{tag}'. "
                         f"Use one of: {', '.join(sorted(VALID_NODE_SRC_TAGS))}.",
                     )
@@ -161,7 +161,7 @@ def check_node_source(path: str, text: str) -> list[Violation]:
                 path,
                 i,
                 "node-source",
-                "scene §11",
+                "scene-node-source §5",
                 f"add_child({arg}) has no node-src marker. Persistent nodes "
                 f"belong in the .tscn (@onready). If this is a permitted "
                 f"exception, add a marker on the line directly above the call "
