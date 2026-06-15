@@ -19,6 +19,11 @@ Append-only record of shipped work.
 - 2026-06-15 — [ui] Persistent tooltip popups moved into .tscn (ItemCardPopup); node-reference style fixed across cargo, reveal, and run_review scenes
 - 2026-06-15 — [ui] ClueChunk/ItemBrowserPanel child reuse patterns fixed; cross-mode selection behavior corrected
 
+### Run Settlement & Cargo Panel
+
+- 2026-06-15 — [run-review] `CargoManifestPanel` added: collapsible cargo list with expand/collapse toggle, damage-count display, and tooltip relay for ItemCardPopup
+- 2026-06-15 — [run-review] Settlement view redesigned: itemized finance ledger (Entry Fee, Fuel w/ travel-day multiplier, Auction Purchases, On-site) replaces aggregated "Cost Cash"; location subtitle added; layout restructured with scroll container, header panel, and settlement card
+
 ## v0.1.1
 
 - 2026-06-14 — [fix] New game reset now assigns the "van_basic" starter car to the garage; `_assign_starter_car()` called during `MetaManager.reset()`

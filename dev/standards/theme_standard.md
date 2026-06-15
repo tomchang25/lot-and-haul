@@ -44,9 +44,17 @@ The project uses a single centralized theme at `global/theme/main_theme.tres`, s
 - `TooltipPanel` — near-black (`0.1, 0.1, 0.12`), 3px radius
 - `HSeparator/VSeparator` — 1px line matching border color
 
+## Component state StyleBoxes
+
+When a `Control` has a fixed set of visual states that belong to one reusable component (`default`, `hovered`, `selected`, `available`, `blocked`, `loaded`, `holding`), define those `StyleBox` resources in `global/theme/main_theme.tres` under a component-specific theme type. The theme type should match the component class name when one exists, e.g. `CargoItemRow/styles/default`, `CargoItemRow/styles/hovered`, `CargoItemRow/styles/holding`, `CargoItemRow/styles/loaded`.
+
+GDScript may still choose which themed style applies because the selected state is runtime data. The script should fetch the named style from the theme, e.g. `get_theme_stylebox(&"loaded", &"CargoItemRow")`, then apply it with `add_theme_stylebox_override(&"panel", style)` or remove the override when returning to an inherited base style. Do not create `StyleBoxFlat.new()` in GDScript for fixed component states.
+
+GDScript-built `StyleBox` resources are only acceptable when style values are genuinely computed at runtime, such as grid cells colored by a valid drop target, debug overlays, or one-off ephemeral controls that cannot be represented by a finite named state set.
+
 ## Semantic color palette (for GDScript usage)
 
-These colors appear repeatedly in code for gameplay state. They belong in GDScript constants, not in the theme resource, because they represent runtime state — not static UI style.
+These colors appear repeatedly in code for gameplay state. Use them for dynamic color choices that are not whole themed control states, such as price deltas, condition labels, warning text, and placeholder text. Fixed component state `StyleBox` resources belong in the theme instead, with GDScript only selecting the named state style.
 
 | Name           | Value                        | Usage                            |
 | -------------- | ---------------------------- | -------------------------------- |
@@ -63,13 +71,13 @@ These colors appear repeatedly in code for gameplay state. They belong in GDScri
 
 1. **Theme-level styling only for static appearance.** Font sizes, default colors, panel backgrounds, button states, container spacing — anything that defines the resting visual identity goes in `main_theme.tres`.
 
-2. **GDScript `add_theme_*_override()` only for dynamic state.** Runtime state changes (cell turns green on valid drop, row highlights on hover, price changes color based on profit/loss) are the only legitimate use of code-level overrides. If a style is applied once in `_ready()` and never changes, it should move to the theme or the `.tscn` file.
+2. **GDScript `add_theme_*_override()` only for dynamic state selection or computed style values.** Runtime state changes may select a named style from the theme (row highlights on hover, selected cargo row, loaded cargo row) or apply a genuinely computed style (cell turns green on valid drop, price changes color based on profit/loss). If a style is applied once in `_ready()` and never changes, it should move to the theme or the `.tscn` file.
 
 3. **Prefer theme inheritance over per-node overrides.** Before adding `theme_override_*` to a node in a `.tscn` file, check whether the theme default already provides the value you want. If the value is close but not exact, consider whether the difference matters or whether the scene should just use the theme default.
 
 4. **Type variations for component-level variants (future).** When a control needs a named variant (e.g. "HeaderLabel" = Label with font_size 28), define a type variation in the theme rather than overriding every instance. This is not yet implemented — for now, per-node overrides are acceptable until we build out variations.
 
-5. **Never hardcode Color() literals for static UI.** If you need a new static color, add it to the semantic palette table above and use the named constant. If it's truly a one-off, add a `theme_override_colors/` in the `.tscn` file — not an inline `Color()` in GDScript.
+5. **Never hardcode `Color()` literals for static UI in GDScript.** Theme resources may define the actual color values for theme-owned styles. If GDScript needs a repeated dynamic semantic color, add it to the semantic palette table above and use the named constant. If it is truly a one-off static node color, add a `theme_override_colors/` in the `.tscn` file, not an inline `Color()` in GDScript.
 
 ## Migration approach
 
