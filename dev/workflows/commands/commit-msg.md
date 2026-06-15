@@ -35,6 +35,8 @@ type(scope): concise summary
 4. Keep the body to 2-3 bullets unless the staged diff is truly tiny, in which case a subject line alone is fine.
 5. Follow `dev/skills/conventional_commits.md` and the CLAUDE.md commit conventions:
    - Do not hard-wrap prose.
-   - Do not include TODO/CHANGELOG/archive operations in the body unless those files are the actual primary product of the change.
-   - Describe what changed in the codebase, not what command was run.
+   - Keep the message plain, concise, and outcome-focused.
+   - Avoid hype language, speculative performance claims, and low-level implementation mechanics unless needed to identify the fix.
+   - Do not include TODO/CHANGELOG/archive/closeout operations in the body unless those files are the actual primary product of the change.
+   - Describe what changed in the codebase or durable project rules, not what command was run.
 6. If the staged changes represent multiple unrelated commits, say so and suggest a split, then provide the best single-message fallback only if the user still wants one.

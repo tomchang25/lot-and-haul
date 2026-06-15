@@ -121,6 +121,12 @@ These rules extend the base specification for this project.
 - When listing multiple changes in the body, **MUST** use `-` bullet points, one per logical change.
 - Each bullet **SHOULD** be a concise imperative phrase (e.g. `Add --force flag to yaml_to_tres.py`).
 
+### Tone and content
+
+- Commit messages **SHOULD** be plain, concise, and outcome-focused.
+- Commit messages **SHOULD NOT** use hype language, speculative performance claims, or low-level implementation mechanics unless those details are needed to identify the fix.
+- Prefer describing the user-visible behavior, system behavior, or durable project rule that changed over listing the steps taken to make the change.
+
 ### Subject/body separation
 
 - The subject line and body **MUST** be separated by exactly one blank line, per spec §6.
@@ -130,8 +136,10 @@ These rules extend the base specification for this project.
 
 - **MUST NOT** include administrative housekeeping in commit messages. Examples:
   - Archiving a plan after shipping it (the plan is done — the commit is the evidence)
-  - Updating `TODO.md` or `CHANGELOG.md` as a listed bullet (these are side-effects, not the change itself)
-- The commit message describes *what changed in the codebase*, not what paperwork moved.
+  - Updating `TODO.md` or `CHANGELOG.md` as a listed bullet (these are side effects, not the change itself)
+  - Running closeout workflow steps, moving completed plans, or cleaning tracking files
+- The commit message describes _what changed in the codebase_, not what paperwork moved.
+- If the staged changes are themselves dev-process standards or workflow files, describe the durable rule/workflow change rather than the act of updating docs.
 
 ---
 
@@ -170,7 +178,7 @@ Conventional Commits encourages more of certain types of commits such as fixes. 
 ### How does this relate to SemVer?
 
 | Commit type       | SemVer release |
-|-------------------|----------------|
+| ----------------- | -------------- |
 | `fix`             | `PATCH`        |
 | `feat`            | `MINOR`        |
 | `BREAKING CHANGE` | `MAJOR`        |
@@ -191,7 +199,7 @@ No! If you use a squash-based workflow on Git, lead maintainers can clean up the
 
 ### How does Conventional Commits handle revert commits?
 
-Conventional Commits does not make an explicit effort to define revert behavior. Instead, it leaves it to tooling authors to use the flexibility of *types* and *footers* to develop their own logic for handling reverts.
+Conventional Commits does not make an explicit effort to define revert behavior. Instead, it leaves it to tooling authors to use the flexibility of _types_ and _footers_ to develop their own logic for handling reverts.
 
 One recommendation is to use the `revert` type with a footer referencing the commit SHAs being reverted:
 
@@ -203,4 +211,4 @@ Refs: 676104e, a215868
 
 ---
 
-*Licensed under [Creative Commons - CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)*
+_Licensed under [Creative Commons - CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)_

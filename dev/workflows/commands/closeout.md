@@ -14,10 +14,12 @@ Run `git status` and `git branch --show-current`:
 
 1. Identify the plan/spec file(s) in the completed scope (under `dev/docs/plans/`). Staged mode normally has exactly one; branch mode may have several — process each plan through steps 2–5. If none is found, ask which plan file(s) to use.
 2. Read each plan file to understand the completed scope and phases.
-3. Append a CHANGELOG entry per plan under `CHANGELOG.md` following the existing format:
-   - Group under a `## <Title>` heading matching the plan title.
+3. Append a CHANGELOG entry per plan under `CHANGELOG.md`, following the rules in the file header:
+   - Add entries under the current `## <version>` heading.
+   - Group related entries under a `### <Title>` section matching the plan title.
    - Each bullet: `- YYYY-MM-DD — [scope] one-line summary`. Use today's date. No commit ref.
    - Cover each major change block (one bullet per logical unit).
+   - If the completed scope is dev-process-only maintenance, skip the CHANGELOG step. This includes closeout workflow changes, CHANGELOG/TODO edits, plan archival, and tracking cleanup.
 4. Remove each plan's one-line pointer from `TODO.md` `## Active` (or `## Plan` if it was queued). If `## Active` becomes empty, replace the section content with "Nothing currently in progress."
 5. Move each plan file and its sibling spec/scout files from `dev/docs/plans/` to `dev/docs/archived/`.
 6. Run `git status` to show the final state.

@@ -33,7 +33,7 @@ Documentation (this folder) describes **how the project works**. _Tracking_ — 
 
 - **TODO** = the WHAT-NOW and the single forward surface — every open item and brewing idea, so nothing gets forgotten in a second list. `## Active` holds in-flight and ready-to-implement flows (more than one entry is fine), `## Plan` holds queued flows backed by a file, `## Draft` holds concepts. Entries are one line; the moment something needs sequencing, a dependency reason, or phases, it earns a `dev/docs/plans/` file and `TODO.md` keeps only a one-line pointer.
 - **plans/** = the WHY and the _order_. A multi-step flow's phases, dependencies, and acceptance criteria live in its own file. **Forward-only**: ship a phase → cut it out; ship the flow → archive the file.
-- **CHANGELOG** = the permanent record. The only place finished work persists.
+- **CHANGELOG** = the permanent record. The only place finished work persists. Entry format and style rules live in the `CHANGELOG.md` header.
 
 ## The maturity scale (one item, one home)
 

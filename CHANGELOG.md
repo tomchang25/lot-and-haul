@@ -2,10 +2,19 @@
 
 Append-only record of shipped work.
 
+Rules:
+
+- Add shipped work only; do not keep forward-looking items or Done lists here.
+- Each entry uses `- YYYY-MM-DD — [scope] one-line summary`.
+- `##` headings are version headings only. Entries must live under `###` section headings; only version notes may sit directly under a `##` heading.
+- `###` headings group related entries. Section titles are plain names, not "Phase"/"Stage" labels.
+- Keep entries concise and outcome-focused. Avoid hype, speculative performance claims, and implementation mechanics unless needed to identify the fix.
+- When a phase ships, append the entry here and cut the shipped work from its plan/TODO source.
+- Do not add entries for dev-process-only maintenance, including closeout workflow changes, CHANGELOG/TODO edits, plan archival, or tracking cleanup.
+
 ## v0.1.2 - Draft
 
-- 2026-06-15 — [standards] `scene_node_source_standard.md` added as the canonical source for persistent `.tscn` nodes, permitted runtime node creation, and `node-src` markers; scene architecture docs now point to it
-- 2026-06-15 — [ui] Shared ClueChunk component (spoiler-safe clue block) + reshaped ItemCard + ItemBrowserPanel (Card/Table modes) + ItemCardPopup; Storage and Inspection use the shared browser; legacy ItemRowTooltip replaced with ItemCardPopup across cargo, reveal, and run_review scenes
+### Standards
 
 - 2026-06-15 — [standards] `scene_node_source_standard.md` added as the canonical source for persistent `.tscn` nodes, permitted runtime node creation, and `node-src` markers; scene architecture docs now point to it
 
@@ -16,6 +25,7 @@ Append-only record of shipped work.
 
 ### Item Card Refinements
 
+- 2026-06-15 — [ui] Shared ClueChunk component (spoiler-safe clue block) + reshaped ItemCard + ItemBrowserPanel (Card/Table modes) + ItemCardPopup; Storage and Inspection use the shared browser; legacy ItemRowTooltip replaced with ItemCardPopup across cargo, reveal, and run_review scenes
 - 2026-06-15 — [ui] Persistent tooltip popups moved into .tscn (ItemCardPopup); node-reference style fixed across cargo, reveal, and run_review scenes
 - 2026-06-15 — [ui] ClueChunk/ItemBrowserPanel child reuse patterns fixed; cross-mode selection behavior corrected
 
@@ -24,7 +34,16 @@ Append-only record of shipped work.
 - 2026-06-15 — [run-review] `CargoManifestPanel` added: collapsible cargo list with expand/collapse toggle, damage-count display, and tooltip relay for ItemCardPopup
 - 2026-06-15 — [run-review] Settlement view redesigned: itemized finance ledger (Entry Fee, Fuel w/ travel-day multiplier, Auction Purchases, On-site) replaces aggregated "Cost Cash"; location subtitle added; layout restructured with scroll container, header panel, and settlement card
 
+### Cargo UI Stability & Theme Cleanup
+
+- 2026-06-15 — [fix] Scene transitions are deferred and PackingGrid input is guarded so events do not target scenes after removal
+- 2026-06-15 — [fix] ClueChunk detaches surplus children before `queue_free()`, preventing freezes when clue row counts shrink
+- 2026-06-15 — [perf] Cargo packing hover UI reuses StyleBoxFlat resources and clears only the previous highlighted row
+- 2026-06-15 — [theme] Cargo packing styles moved into `main_theme.tres`; `ThemeColors` added for shared semantic colours
+
 ## v0.1.1
+
+### Maintenance
 
 - 2026-06-14 — [fix] New game reset now assigns the "van_basic" starter car to the garage; `_assign_starter_car()` called during `MetaManager.reset()`
 - 2026-06-14 — [theme] Checkbox icon resource UIDs updated in `main_theme.tres`
@@ -118,11 +137,7 @@ First public alpha, released on itch.io as a free playtest. The core storage-lot
 - 2026-06-12 — [ci] GUT plugin installed + Layer 1 manager unit tests: AP lifecycle, clue hit/miss, cargo commit, trailer damage, full scratch-to-hub traversal; test-flag boot gate skips save loading and scene routing
 - 2026-06-12 — [ci] CI pilot autoload (`CIPilot`) auto-pilots one full run headless with force-win hook; Layer 2 smoke test via log grep with known-benign allowlist
 - 2026-06-12 — [ci] GitHub Actions workflow (`ci.yml`): parallel unit test + smoke test jobs, Godot binary caching, YAML pipeline prereq, 5-minute timeout
-- 2026-06-12 — [docs] `dev/docs/plans/ci_run_loop_tests.md` shipped and archived This is the project's permanent "done" history.
-
-**Why this file exists:** it is the single home for "what got built." Because it is append-only — you only ever add entries, never reconcile them against current code — it cannot go stale. This is what lets every other tracking surface stay forward-only: `systems/` describes the system as it _is_ (present tense, no Done lists) and `TODO.md` holds only open work (`## Active` in-flight flows, `Plan`/`Chore`/`Bug`, and `## Draft` concepts), with multi-step flows detailed in `dev/docs/plans/` files. When a phase ships, append one entry here, then cut that phase from its plan file; when a whole flow ships, also delete its `TODO.md` line.
-
-This file is the single source of truth for the entry format. Each entry: `- YYYY-MM-DD — [scope] one-line summary (commit/PR ref)`. Group related entries under a `## <Title>` heading — title only, no "Phase"/"Stage" wording.
+- 2026-06-12 — [docs] `dev/docs/plans/ci_run_loop_tests.md` shipped and archived
 
 ---
 
