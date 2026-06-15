@@ -16,32 +16,19 @@ const BLOCKED_ERROR: UiAudioEvent = preload("res://data/tres/audio_events/blocke
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _active_entry: ItemEntry = null
-var _active_action_type: int = -1
-var _active_action_cost: int = 0
+var _selected_entry: ItemEntry = null
 var _inspection_finished: bool = false
-
-enum ActionType { UNVEIL, INSPECT_CLUE }
 
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _item_browser: ItemBrowserPanel = %ItemBrowser
 @onready var _footer: HBoxContainer = %FooterHBox
 @onready var _pass_button: Button = %PassButton
-@onready var _start_auction_button: Button = %StartAuctionButton
+@onready var _review_button: Button = %ReviewButton
 @onready var _stamina_hud: StaminaHUD = %StaminaHUD
-@onready var _confirm_popup: ConfirmationDialog = $ConfirmPopup
 
-# Sidebar — found list
-@onready var _found_vbox: VBoxContainer = %FoundVBox
-@onready var _empty_found_label: Label = %EmptyFoundLabel
-
-# Sidebar — veiled list
-@onready var _veiled_vbox: VBoxContainer = %VeiledVBox
-@onready var _empty_veiled_label: Label = %EmptyVeiledLabel
-
-# Sidebar — total estimate
-@onready var _total_est_label: Label = %TotalEstValueLabel
+# Sidebar — empty selection state
+@onready var _empty_selection_label: Label = %EmptySelectionLabel
 
 # Sidebar — active item detail
 @onready var _sidebar_hsep: HSeparator = %SidebarHSep
@@ -59,6 +46,14 @@ enum ActionType { UNVEIL, INSPECT_CLUE }
 @onready var _clues_vbox: VBoxContainer = %CluesVBox
 @onready var _clue_rows: VBoxContainer = %ClueRows
 
+# Sidebar — action buttons
+@onready var _action_unveil_button: Button = %UnveilButton
+@onready var _action_inspect_button: Button = %InspectCluesButton
+@onready var _action_complete_label: Label = %ActionCompleteLabel
+
+# Summary popup
+@onready var _summary_popup: InspectionSummaryPopup = %SummaryPopup
+
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
@@ -70,20 +65,21 @@ func _ready() -> void:
 
     _footer.show()
     _pass_button.show()
-    _start_auction_button.show()
+    _review_button.show()
     _pass_button.pressed.connect(_on_pass_pressed)
-    _start_auction_button.pressed.connect(_on_auction_pressed)
-    _confirm_popup.confirmed.connect(_on_auction_confirmed)
+    _review_button.pressed.connect(_on_review_pressed)
 
     _item_browser.entry_pressed.connect(_on_browser_entry_pressed)
     _item_browser.set_mode_toggle_visible(false)
 
+    _action_unveil_button.pressed.connect(_on_unveil_pressed)
+    _action_inspect_button.pressed.connect(_on_inspect_clues_pressed)
+
+    _summary_popup.start_auction_requested.connect(_on_summary_start_auction_requested)
+
     _populate_browser()
     _refresh_hud()
-    _refresh_sidebar_lists()
-    _refresh_total_estimate()
     _clear_detail_section()
-    _clear_clue_result()
 
 
 func _process(_delta: float) -> void:
@@ -98,49 +94,47 @@ func _populate_browser() -> void:
     _item_browser.populate(items)
     _item_browser.set_mode(ItemBrowserPanel.DisplayMode.CARD)
 
-# ══ Card interaction ════════════════════════════════════════════════════════
+# ══ Card interaction — select only, no AP spend ═══════════════════════════════
 
 
 func _on_browser_entry_pressed(entry: ItemEntry) -> void:
-    if _inspection_finished:
+    _selected_entry = entry
+    _refresh_detail()
+
+
+func _on_unveil_pressed() -> void:
+    if _selected_entry == null or _inspection_finished:
+        return
+    if not _selected_entry.is_veiled():
+        return
+    if UNVEIL_COST > RunManager.lot.actions_remaining:
         AudioManager.play_event(BLOCKED_ERROR)
         return
+    _do_unveil(_selected_entry)
 
-    if _active_entry != null:
-        return
 
-    if entry.is_veiled():
-        if UNVEIL_COST > RunManager.lot.actions_remaining:
-            AudioManager.play_event(BLOCKED_ERROR)
-            return
-        _do_unveil(entry)
+func _on_inspect_clues_pressed() -> void:
+    if _selected_entry == null or _inspection_finished:
         return
-
-    if entry.has_inspection_clues():
-        if CLUE_CHAIN_COST > RunManager.lot.actions_remaining:
-            AudioManager.play_event(BLOCKED_ERROR)
-            return
-        _do_clue_chain(entry)
+    if _selected_entry.is_veiled():
         return
+    if not _selected_entry.has_inspection_clues():
+        return
+    if CLUE_CHAIN_COST > RunManager.lot.actions_remaining:
+        AudioManager.play_event(BLOCKED_ERROR)
+        return
+    _do_clue_chain(_selected_entry)
 
 
 func _do_unveil(entry: ItemEntry) -> void:
-    _active_entry = entry
-    _active_action_type = ActionType.UNVEIL
-    _active_action_cost = UNVEIL_COST
-
     RunManager.spend_ap(UNVEIL_COST)
     _reveal_item(entry)
     AudioManager.play_event(REVEAL_GOOD)
 
-    _complete_action(entry, ActionType.UNVEIL)
+    _complete_action()
 
 
 func _do_clue_chain(entry: ItemEntry) -> void:
-    _active_entry = entry
-    _active_action_type = ActionType.INSPECT_CLUE
-    _active_action_cost = CLUE_CHAIN_COST
-
     RunManager.spend_ap(CLUE_CHAIN_COST)
 
     _clear_clue_result()
@@ -163,26 +157,16 @@ func _do_clue_chain(entry: ItemEntry) -> void:
         _clue_result_label.text = "\n".join(clue_texts)
     _clue_result_section.show()
 
-    _complete_action(entry, ActionType.INSPECT_CLUE)
+    _complete_action()
 
 
-func _complete_action(completed_entry: ItemEntry, _action_type: int) -> void:
-    _clear_active_action()
-
+func _complete_action() -> void:
     _item_browser.refresh()
     _refresh_hud()
-    _refresh_sidebar_lists()
-    _refresh_total_estimate()
-    _update_detail_section(completed_entry)
+    _refresh_detail()
 
     if RunManager.lot.actions_remaining <= 0:
         _finish_inspection()
-
-
-func _clear_active_action() -> void:
-    _active_entry = null
-    _active_action_type = -1
-    _active_action_cost = 0
 
 
 func _clear_clue_result() -> void:
@@ -201,81 +185,45 @@ func _refresh_hud() -> void:
     var cap: int = RunManager.run.inspection_ap_cap
     _stamina_hud.update_ap(ap, cap)
 
-# ══ Sidebar — item lists ════════════════════════════════════════════════════
-
-
-func _refresh_sidebar_lists() -> void:
-    _refresh_found_list()
-    _refresh_veiled_list()
-
-
-func _refresh_found_list() -> void:
-    for child in _found_vbox.get_children():
-        child.free()
-
-    var items := RunManager.lot.lot_items
-    var found_count := 0
-    for entry: ItemEntry in items:
-        if entry.is_veiled():
-            continue
-        found_count += 1
-
-        var price_text := ItemEntryDisplayHelper.estimated_value_text(entry)
-        var has_price := price_text != ItemEntryDisplayHelper.UNKNOWN_TEXT
-
-        var row: ValueRow = ValueRowScene.instantiate()
-        row.setup(
-            ItemEntryDisplayHelper.display_name(entry),
-            price_text if has_price else "",
-            ItemEntryDisplayHelper.price_display_color(entry) if has_price else Color.WHITE,
-            13,
-        )
-        _found_vbox.add_child(row)
-
-    _empty_found_label.visible = found_count == 0
-
-
-func _refresh_veiled_list() -> void:
-    for child in _veiled_vbox.get_children():
-        child.free()
-
-    var items := RunManager.lot.lot_items
-    var veiled_count := 0
-    for entry: ItemEntry in items:
-        if not entry.is_veiled():
-            continue
-        veiled_count += 1
-
-        var row: ValueRow = ValueRowScene.instantiate()
-        row.setup(
-            ItemEntryDisplayHelper.display_name(entry),
-            "%d AP" % UNVEIL_COST,
-            Color(0.55, 0.58, 0.63, 1),
-            13,
-        )
-        _veiled_vbox.add_child(row)
-
-    _empty_veiled_label.visible = veiled_count == 0
-
-# ══ Sidebar — total estimate ════════════════════════════════════════════════
-
-
-func _refresh_total_estimate() -> void:
-    var lot: LotEntry = RunManager.lot.lot_entry
-    if lot == null:
-        _total_est_label.text = "—"
-        return
-    var estimate := lot.get_player_estimate()
-    var lo: int = estimate[0]
-    var hi: int = estimate[1]
-    if lo == 0 and hi == 0:
-        _total_est_label.text = "—"
-    elif hi <= lo:
-        _total_est_label.text = "$%d" % lo
-    else:
-        _total_est_label.text = "$%d – $%d" % [lo, hi]
-
 # ══ Sidebar — active item detail ════════════════════════════════════════════
+
+
+func _refresh_detail() -> void:
+    if _selected_entry == null or _inspection_finished:
+        _clear_detail_section()
+        _empty_selection_label.show()
+        return
+
+    _empty_selection_label.hide()
+    _update_detail_section(_selected_entry)
+    _refresh_action_section(_selected_entry)
+
+
+func _refresh_action_section(entry: ItemEntry) -> void:
+    var ap: int = RunManager.lot.actions_remaining
+
+    if entry.is_veiled():
+        _action_unveil_button.show()
+        _action_inspect_button.hide()
+        _action_complete_label.hide()
+        _action_unveil_button.disabled = ap < UNVEIL_COST
+        if ap < UNVEIL_COST:
+            _action_unveil_button.tooltip_text = "Not enough AP"
+        else:
+            _action_unveil_button.tooltip_text = "Unveil this item (%d AP)" % UNVEIL_COST
+    elif entry.has_inspection_clues():
+        _action_unveil_button.hide()
+        _action_inspect_button.show()
+        _action_complete_label.hide()
+        _action_inspect_button.disabled = ap < CLUE_CHAIN_COST
+        if ap < CLUE_CHAIN_COST:
+            _action_inspect_button.tooltip_text = "Not enough AP"
+        else:
+            _action_inspect_button.tooltip_text = "Inspect remaining clues (%d AP)" % CLUE_CHAIN_COST
+    else:
+        _action_unveil_button.hide()
+        _action_inspect_button.hide()
+        _action_complete_label.show()
 
 
 func _update_detail_section(entry: ItemEntry) -> void:
@@ -356,6 +304,10 @@ func _refresh_clues_section(entry: ItemEntry) -> void:
 func _clear_detail_section() -> void:
     _sidebar_hsep.hide()
     _detail_section.hide()
+    _action_unveil_button.hide()
+    _action_inspect_button.hide()
+    _action_complete_label.hide()
+    _selected_entry = null
 
 # ══ Summary / exit ══════════════════════════════════════════════════════════
 
@@ -365,24 +317,21 @@ func _finish_inspection() -> void:
         return
 
     _inspection_finished = true
-    _clear_active_action()
 
     _clear_detail_section()
     _clear_clue_result()
     _item_browser.refresh()
     _refresh_hud()
-    _refresh_sidebar_lists()
-    _refresh_total_estimate()
 
 
 func _on_pass_pressed() -> void:
     SceneRouter.go_to_lot_browse()
 
 
-func _on_auction_pressed() -> void:
-    _clear_active_action()
-    _confirm_popup.popup_centered()
+func _on_review_pressed() -> void:
+    _summary_popup.setup(RunManager.lot.lot_entry)
+    _summary_popup.popup_centered()
 
 
-func _on_auction_confirmed() -> void:
+func _on_summary_start_auction_requested() -> void:
     SceneRouter.go_to_auction()

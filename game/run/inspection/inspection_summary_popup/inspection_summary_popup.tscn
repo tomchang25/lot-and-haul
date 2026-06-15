@@ -1,0 +1,244 @@
+[gd_scene format=3 uid="uid://cddj8ljbhn4sb"]
+
+[ext_resource type="Script" uid="uid://dvcdwra7gwpr3" path="res://game/run/inspection/inspection_summary_popup/inspection_summary_popup.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://bi01jgyv1md6o" path="res://game/shared/item_display/item_browser_panel/item_browser_panel.tscn" id="2_browser"]
+
+[sub_resource type="StyleBoxFlat" id="popup_panel"]
+bg_color = Color(0.14, 0.13, 0.16, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.28, 0.28, 0.33, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_size = 16
+shadow_offset = Vector2(0, 4)
+shadow_color = Color(0, 0, 0, 0.45)
+
+[sub_resource type="StyleBoxFlat" id="stat_card"]
+bg_color = Color(0.11, 0.105, 0.13, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.2, 0.24, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxEmpty" id="close_btn_normal"]
+[sub_resource type="StyleBoxFlat" id="close_btn_hover"]
+bg_color = Color(0.75, 0.25, 0.25, 0.85)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="close_btn_pressed"]
+bg_color = Color(0.55, 0.15, 0.15, 0.9)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="accent_btn_normal"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.13, 0.32, 0.19, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.5, 0.32, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="accent_btn_hover"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.18, 0.4, 0.25, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.6, 0.42, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="accent_btn_pressed"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.08, 0.24, 0.14, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.55, 0.38, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="InspectionSummaryPopup" type="Window" unique_id=1044505717]
+borderless = true
+transparent = true
+unresizable = true
+size = Vector2i(820, 620)
+wrap_controls = true
+exclusive = true
+script = ExtResource("1_script")
+
+[node name="PopupPanel" type="PanelContainer" parent="." unique_id=3751260]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("popup_panel")
+
+[node name="PopupMargin" type="MarginContainer" parent="PopupPanel" unique_id=3751261]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="PopupPanel/PopupMargin" unique_id=934692]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="HeaderRow" type="HBoxContainer" parent="PopupPanel/PopupMargin/VBox" unique_id=2048606961]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TitleLabel" type="Label" parent="PopupPanel/PopupMargin/VBox/HeaderRow" unique_id=1950461531]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.92, 0.95, 1)
+theme_override_font_sizes/font_size = 20
+text = "LOT REVIEW"
+
+[node name="HeaderSpacer" type="Control" parent="PopupPanel/PopupMargin/VBox/HeaderRow" unique_id=213199609]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CloseButton" type="Button" parent="PopupPanel/PopupMargin/VBox/HeaderRow" unique_id=1763492784]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+theme_override_colors/font_hover_color = Color(1, 0.85, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("close_btn_normal")
+theme_override_styles/hover = SubResource("close_btn_hover")
+theme_override_styles/pressed = SubResource("close_btn_pressed")
+theme_override_styles/focus = SubResource("close_btn_normal")
+text = "✕"
+
+[node name="HeaderSep" type="HSeparator" parent="PopupPanel/PopupMargin/VBox" unique_id=2150379284]
+layout_mode = 2
+
+[node name="SummaryStatsRow" type="HBoxContainer" parent="PopupPanel/PopupMargin/VBox" unique_id=1609225081]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="EstimateCard" type="PanelContainer" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow" unique_id=2288124736]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("stat_card")
+
+[node name="EstimateContent" type="VBoxContainer" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/EstimateCard" unique_id=145641771]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="EstimateTitle" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/EstimateCard/EstimateContent" unique_id=1374061872]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 10
+text = "TOTAL ESTIMATE"
+
+[node name="TotalEstimateLabel" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/EstimateCard/EstimateContent" unique_id=1128001547]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="BidCard" type="PanelContainer" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow" unique_id=2803801494]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("stat_card")
+
+[node name="BidContent" type="VBoxContainer" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/BidCard" unique_id=3740439565]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="BidTitle" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/BidCard/BidContent" unique_id=3876167237]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 10
+text = "OPENING BID"
+
+[node name="OpeningBidLabel" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/BidCard/BidContent" unique_id=1165743760]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="StatsSep" type="HSeparator" parent="PopupPanel/PopupMargin/VBox" unique_id=2975118076]
+layout_mode = 2
+
+[node name="ItemBrowser" parent="PopupPanel/PopupMargin/VBox" unique_id=1745743082 instance=ExtResource("2_browser")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="FooterSep" type="HSeparator" parent="PopupPanel/PopupMargin/VBox" unique_id=2333896609]
+layout_mode = 2
+
+[node name="FooterActions" type="HBoxContainer" parent="PopupPanel/PopupMargin/VBox" unique_id=1598914269]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FooterSpacer" type="Control" parent="PopupPanel/PopupMargin/VBox/FooterActions" unique_id=2142700731]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BackButton" type="Button" parent="PopupPanel/PopupMargin/VBox/FooterActions" unique_id=236353152]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+text = "Back"
+
+[node name="StartAuctionButton" type="Button" parent="PopupPanel/PopupMargin/VBox/FooterActions" unique_id=1395598753]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 1, 0.7, 1)
+theme_override_colors/font_hover_color = Color(0.85, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0.5, 0.85, 0.5, 1)
+theme_override_colors/font_disabled_color = Color(0.35, 0.5, 0.35, 1)
+theme_override_styles/normal = SubResource("accent_btn_normal")
+theme_override_styles/hover = SubResource("accent_btn_hover")
+theme_override_styles/pressed = SubResource("accent_btn_pressed")
+text = "Start Auction"
