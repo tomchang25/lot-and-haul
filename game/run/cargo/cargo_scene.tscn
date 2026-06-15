@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://bed421fg56sjp"]
 
 [ext_resource type="Script" uid="uid://bmkpu1bykwvjt" path="res://game/run/cargo/cargo_scene.gd" id="1_cargov2"]
-[ext_resource type="Script" path="res://game/shared/packing/packing_grid.gd" id="2_packing_grid"]
-[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+[ext_resource type="Script" uid="uid://doaqxqk7u1no0" path="res://game/shared/packing/packing_grid.gd" id="2_packing_grid"]
+[ext_resource type="PackedScene" uid="uid://tnbmlptuuk3i" path="res://game/shared/item_display/item_card_popup.tscn" id="3_popup"]
+[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="CargoSceneV2" type="Control" unique_id=1664710573]
 layout_mode = 3
@@ -84,11 +85,11 @@ text = "Car cargo"
 horizontal_alignment = 1
 
 [node name="CargoGrid" type="GridContainer" parent="MainHBox/VehiclePanel/CargoSection" unique_id=178417464]
-script = ExtResource("2_packing_grid")
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/h_separation = 3
 theme_override_constants/v_separation = 3
+script = ExtResource("2_packing_grid")
 
 [node name="TrailerSection" type="HBoxContainer" parent="MainHBox/VehiclePanel" unique_id=100000020]
 layout_mode = 2
@@ -174,7 +175,6 @@ theme_override_font_sizes/font_size = 14
 text = " - "
 
 [node name="ResetButton" type="Button" parent="." unique_id=1359420237]
-script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 1
 anchors_preset = 2
@@ -187,9 +187,9 @@ offset_bottom = -16.0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 15
 text = "Reset"
+script = ExtResource("99_sfx")
 
 [node name="ContinueButton" type="Button" parent="." unique_id=362281920]
-script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(160, 40)
 layout_mode = 1
 anchors_preset = 3
@@ -205,7 +205,12 @@ grow_horizontal = 0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 15
 text = "Continue"
+script = ExtResource("99_sfx")
 
 [node name="ConfirmPopup" type="ConfirmationDialog" parent="." unique_id=500000002]
 title = "Continue?"
 ok_button_text = "Confirm"
+
+[node name="TooltipPopup" parent="." unique_id=1000000100 instance=ExtResource("3_popup")]
+unique_name_in_owner = true
+layout_mode = 0

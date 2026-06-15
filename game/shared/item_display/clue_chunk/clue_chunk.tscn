@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://cluechunk001"]
+
+[ext_resource type="Script" uid="uid://cluechunkscript" path="res://game/shared/item_display/clue_chunk/clue_chunk.gd" id="1_cluechunk"]
+
+[node name="ClueChunk" type="VBoxContainer"]
+script = ExtResource("1_cluechunk")
+theme_override_constants/separation = 2

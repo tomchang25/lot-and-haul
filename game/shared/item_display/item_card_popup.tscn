@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://tnbmlptuuk3i"]
+
+[ext_resource type="Script" uid="uid://dbymlw2v6at7" path="res://game/shared/item_display/item_card_popup.gd" id="1_popup"]
+[ext_resource type="PackedScene" uid="uid://bw23cjkf40y5r" path="res://game/shared/item_display/item_card.tscn" id="2_card"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x6k72"]
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+bg_color = Color(0.1, 0.1, 0.1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="ItemCardPopup" type="PanelContainer" unique_id=1000000001]
+visible = false
+z_index = 10
+custom_minimum_size = Vector2(200, 0)
+offset_right = 200.0
+offset_bottom = 62.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_x6k72")
+script = ExtResource("1_popup")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=1000000002]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ItemCard" parent="VBox" unique_id=1000000003 instance=ExtResource("2_card")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3

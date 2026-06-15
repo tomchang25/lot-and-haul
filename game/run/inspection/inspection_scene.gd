@@ -1,12 +1,9 @@
 # inspection_scene.gd
-# Block 02 — AP-limited Inspection phase; player searches unknown grid shapes before Auction.
+# Block 02 — AP-limited Inspection phase; player inspects lot items through
+# direct card interaction instead of spatial grid search.
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
-
-const GRID_COLS := 8
-const GRID_ROWS := 8
-const CELL_SIZE := Vector2(64.0, 64.0)
 
 const UNVEIL_COST := 1
 const CLUE_CHAIN_COST := 2
@@ -17,56 +14,21 @@ const REVEAL_GOOD: UiAudioEvent = preload("res://data/tres/audio_events/reveal_g
 const REVEAL_BAD: UiAudioEvent = preload("res://data/tres/audio_events/reveal_bad.tres")
 const BLOCKED_ERROR: UiAudioEvent = preload("res://data/tres/audio_events/blocked_error.tres")
 
-const ACTIVE_BORDER_COLOR := Color(1.0, 0.88, 0.25, 1.0)
-const ACTIVE_BORDER_WIDTH := 3
-
-const SHAPE_COLORS: Array[Color] = [
-    Color(0.20, 0.28, 0.40, 1.0),
-    Color(0.30, 0.22, 0.38, 1.0),
-    Color(0.22, 0.34, 0.27, 1.0),
-    Color(0.40, 0.27, 0.18, 1.0),
-    Color(0.34, 0.22, 0.24, 1.0),
-    Color(0.20, 0.34, 0.36, 1.0),
-    Color(0.36, 0.33, 0.20, 1.0),
-    Color(0.27, 0.27, 0.40, 1.0),
-]
-
-enum ActionType { UNVEIL, INSPECT_CLUE }
-
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _cell_buttons: Dictionary = { }
-var _cell_entry: Dictionary = { }
-var _entry_cells: Dictionary = { }
-var _entry_origin: Dictionary = { }
-var _entry_color_by_entry: Dictionary = { }
-
-var _active_entry: ItemEntry = null
-var _active_action_type: int = -1
-var _active_action_cost: int = 0
+var _selected_entry: ItemEntry = null
 var _inspection_finished: bool = false
-
-var _hover_entry: ItemEntry = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
-@onready var _items_grid: GridContainer = $RootHBox/LeftVBox/GridMargin/ScrollContainer/ItemsGrid
-@onready var _footer: HBoxContainer = $RootHBox/LeftVBox/FooterHBox
-@onready var _pass_button: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/PassButton
-@onready var _start_auction_button: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/StartAuctionButton
-@onready var _stamina_hud: StaminaHUD = $RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner/StaminaHUD
-@onready var _confirm_popup: ConfirmationDialog = $ConfirmPopup
+@onready var _item_browser: ItemBrowserPanel = %ItemBrowser
+@onready var _footer: HBoxContainer = %FooterHBox
+@onready var _pass_button: Button = %PassButton
+@onready var _review_button: Button = %ReviewButton
+@onready var _stamina_hud: StaminaHUD = %StaminaHUD
 
-# Sidebar — found list
-@onready var _found_vbox: VBoxContainer = %FoundVBox
-@onready var _empty_found_label: Label = %EmptyFoundLabel
-
-# Sidebar — veiled list
-@onready var _veiled_vbox: VBoxContainer = %VeiledVBox
-@onready var _empty_veiled_label: Label = %EmptyVeiledLabel
-
-# Sidebar — total estimate
-@onready var _total_est_label: Label = %TotalEstValueLabel
+# Sidebar — empty selection state
+@onready var _empty_selection_label: Label = %EmptySelectionLabel
 
 # Sidebar — active item detail
 @onready var _sidebar_hsep: HSeparator = %SidebarHSep
@@ -76,13 +38,21 @@ var _hover_entry: ItemEntry = null
 @onready var _detail_cond_value_label: Label = %CondValueLabel
 @onready var _detail_value_label: Label = %ValueValueLabel
 
-# Sidebar — clue results (dedicated, separate from value)
+# Sidebar — clue results
 @onready var _clue_result_section: VBoxContainer = %ClueResultSection
 @onready var _clue_result_label: RichTextLabel = %ClueResultLabel
 
-# Sidebar — revealed clue breakdown (static; rows rebuilt into _clue_rows)
+# Sidebar — revealed clue breakdown
 @onready var _clues_vbox: VBoxContainer = %CluesVBox
 @onready var _clue_rows: VBoxContainer = %ClueRows
+
+# Sidebar — action buttons
+@onready var _action_unveil_button: Button = %UnveilButton
+@onready var _action_inspect_button: Button = %InspectCluesButton
+@onready var _action_complete_label: Label = %ActionCompleteLabel
+
+# Summary popup
+@onready var _summary_popup: InspectionSummaryPopup = %SummaryPopup
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -95,168 +65,76 @@ func _ready() -> void:
 
     _footer.show()
     _pass_button.show()
-    _start_auction_button.show()
+    _review_button.show()
     _pass_button.pressed.connect(_on_pass_pressed)
-    _start_auction_button.pressed.connect(_on_auction_pressed)
-    _confirm_popup.confirmed.connect(_on_auction_confirmed)
+    _review_button.pressed.connect(_on_review_pressed)
 
-    _build_grid_controls()
-    _place_items()
-    _refresh_grid_cells()
+    _item_browser.entry_pressed.connect(_on_browser_entry_pressed)
+    _item_browser.set_mode_toggle_visible(false)
+
+    _action_unveil_button.pressed.connect(_on_unveil_pressed)
+    _action_inspect_button.pressed.connect(_on_inspect_clues_pressed)
+
+    _summary_popup.start_auction_requested.connect(_on_summary_start_auction_requested)
+
+    _populate_browser()
     _refresh_hud()
-    _refresh_found_list()
-    _refresh_veiled_list()
-    _refresh_total_estimate()
     _clear_detail_section()
-    _clear_clue_result()
 
 
 func _process(_delta: float) -> void:
     pass
 
-# ══ Grid setup ════════════════════════════════════════════════════════════════
+# ══ Browser setup ════════════════════════════════════════════════════════════
 
 
-func _build_grid_controls() -> void:
-    for child in _items_grid.get_children():
-        child.queue_free()
+func _populate_browser() -> void:
+    var items := RunManager.lot.lot_items
+    _item_browser.setup([]) # No columns needed for card mode
+    _item_browser.populate(items)
+    _item_browser.set_mode(ItemBrowserPanel.DisplayMode.CARD)
 
-    _items_grid.columns = GRID_COLS
-    _items_grid.add_theme_constant_override(&"h_separation", 6)
-    _items_grid.add_theme_constant_override(&"v_separation", 6)
-
-    _cell_buttons.clear()
-    for row in GRID_ROWS:
-        for col in GRID_COLS:
-            var coord := Vector2i(col, row)
-            var button := SfxButton.new()
-            button.custom_minimum_size = CELL_SIZE
-            button.focus_mode = Control.FOCUS_NONE
-            button.text = ""
-            button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-            button.add_theme_font_size_override(&"font_size", 12)
-            button.clip_text = true
-            button.pressed.connect(_on_grid_cell_pressed.bind(coord))
-            button.gui_input.connect(_on_cell_gui_input.bind(coord))
-            button.mouse_entered.connect(_on_grid_cell_mouse_entered.bind(coord))
-
-            # node-src: ephemeral — per-grid cell, dynamic W×H
-            _items_grid.add_child(button)
-
-            _cell_buttons[coord] = button
+# ══ Card interaction — select only, no AP spend ═══════════════════════════════
 
 
-func _place_items() -> void:
-    _cell_entry.clear()
-    _entry_cells.clear()
-    _entry_origin.clear()
-    _entry_color_by_entry.clear()
-
-    for entry: ItemEntry in RunManager.lot.lot_items:
-        _place_entry(entry)
+func _on_browser_entry_pressed(entry: ItemEntry) -> void:
+    _selected_entry = entry
+    _refresh_detail()
 
 
-func _place_entry(entry: ItemEntry) -> void:
-    var shape_cells := _get_shape_cells(entry)
-    var origins := _candidate_origins()
-    RandomUtils.shuffle(origins)
-
-    for origin: Vector2i in origins:
-        if _can_place_shape(shape_cells, origin):
-            _commit_shape_placement(entry, shape_cells, origin)
-            return
-
-    push_warning("Inspection grid could not place item: %s" % ItemEntryDisplayHelper.display_name(entry))
-
-
-func _candidate_origins() -> Array[Vector2i]:
-    var origins: Array[Vector2i] = []
-    for row in GRID_ROWS:
-        for col in GRID_COLS:
-            origins.append(Vector2i(col, row))
-    return origins
-
-
-func _get_shape_cells(entry: ItemEntry) -> Array[Vector2i]:
-    var fallback: Array[Vector2i] = [Vector2i.ZERO]
-    var cells := entry.get_cells()
-    if cells.is_empty():
-        return fallback
-    return cells
-
-
-func _can_place_shape(shape_cells: Array[Vector2i], origin: Vector2i) -> bool:
-    for local_cell: Vector2i in shape_cells:
-        var world := origin + local_cell
-        if world.x < 0 or world.x >= GRID_COLS or world.y < 0 or world.y >= GRID_ROWS:
-            return false
-        if _cell_entry.has(world):
-            return false
-    return true
-
-
-func _commit_shape_placement(
-        entry: ItemEntry,
-        shape_cells: Array[Vector2i],
-        origin: Vector2i,
-) -> void:
-    var occupied_cells: Array[Vector2i] = []
-    for local_cell: Vector2i in shape_cells:
-        var world := origin + local_cell
-        occupied_cells.append(world)
-        _cell_entry[world] = entry
-
-    _entry_cells[entry] = occupied_cells
-    _entry_origin[entry] = origin
-    _entry_color_by_entry[entry] = SHAPE_COLORS[_entry_color_by_entry.size() % SHAPE_COLORS.size()]
-
-# ══ Search interaction ════════════════════════════════════════════════════════
-
-
-func _on_grid_cell_pressed(coord: Vector2i) -> void:
-    if _inspection_finished:
+func _on_unveil_pressed() -> void:
+    if _selected_entry == null or _inspection_finished:
+        return
+    if not _selected_entry.is_veiled():
+        return
+    if UNVEIL_COST > RunManager.lot.actions_remaining:
         AudioManager.play_event(BLOCKED_ERROR)
         return
+    _do_unveil(_selected_entry)
 
-    if _active_entry != null:
-        return
 
-    var entry := _cell_entry.get(coord) as ItemEntry
-    if entry == null:
+func _on_inspect_clues_pressed() -> void:
+    if _selected_entry == null or _inspection_finished:
         return
-
-    if entry.is_veiled():
-        if UNVEIL_COST > RunManager.lot.actions_remaining:
-            AudioManager.play_event(BLOCKED_ERROR)
-            return
-        _do_unveil(entry)
+    if _selected_entry.is_veiled():
         return
-
-    if entry.has_inspection_clues():
-        if CLUE_CHAIN_COST > RunManager.lot.actions_remaining:
-            AudioManager.play_event(BLOCKED_ERROR)
-            return
-        _do_clue_chain(entry)
+    if not _selected_entry.has_inspection_clues():
         return
+    if CLUE_CHAIN_COST > RunManager.lot.actions_remaining:
+        AudioManager.play_event(BLOCKED_ERROR)
+        return
+    _do_clue_chain(_selected_entry)
 
 
 func _do_unveil(entry: ItemEntry) -> void:
-    _active_entry = entry
-    _active_action_type = ActionType.UNVEIL
-    _active_action_cost = UNVEIL_COST
-
     RunManager.spend_ap(UNVEIL_COST)
     _reveal_item(entry)
     AudioManager.play_event(REVEAL_GOOD)
 
-    _complete_action(entry, ActionType.UNVEIL)
+    _complete_action()
 
 
 func _do_clue_chain(entry: ItemEntry) -> void:
-    _active_entry = entry
-    _active_action_type = ActionType.INSPECT_CLUE
-    _active_action_cost = CLUE_CHAIN_COST
-
     RunManager.spend_ap(CLUE_CHAIN_COST)
 
     _clear_clue_result()
@@ -279,50 +157,16 @@ func _do_clue_chain(entry: ItemEntry) -> void:
         _clue_result_label.text = "\n".join(clue_texts)
     _clue_result_section.show()
 
-    _complete_action(entry, ActionType.INSPECT_CLUE)
+    _complete_action()
 
 
-func _complete_action(completed_entry: ItemEntry, _action_type: int) -> void:
-    _clear_active_action()
-
-    _refresh_grid_cells()
+func _complete_action() -> void:
+    _item_browser.refresh()
     _refresh_hud()
-    _refresh_found_list()
-    _refresh_veiled_list()
-    _refresh_total_estimate()
-
-    # Always refresh detail when the active item is hovered — _update_detail_section
-    # only touches name/condition/value labels and does not clear the clue result area.
-    if _hover_entry == completed_entry:
-        _update_detail_section(completed_entry)
+    _refresh_detail()
 
     if RunManager.lot.actions_remaining <= 0:
         _finish_inspection()
-
-
-func _on_cell_gui_input(event: InputEvent, coord: Vector2i) -> void:
-    var mouse_event := event as InputEventMouseButton
-    if mouse_event == null or not mouse_event.pressed:
-        return
-    if mouse_event.button_index != MOUSE_BUTTON_RIGHT:
-        return
-    if _active_entry == null:
-        return
-    if (_cell_entry.get(coord) as ItemEntry) != _active_entry:
-        return
-    _cancel_active_action()
-
-
-func _cancel_active_action() -> void:
-    _clear_active_action()
-    _refresh_grid_cells()
-    _refresh_hud()
-
-
-func _clear_active_action() -> void:
-    _active_entry = null
-    _active_action_type = -1
-    _active_action_cost = 0
 
 
 func _clear_clue_result() -> void:
@@ -331,212 +175,55 @@ func _clear_clue_result() -> void:
 
 
 func _reveal_item(item: ItemEntry) -> void:
-    # unveil() reveals the anchor. RunManager.unveil_item() emits item_unveiled
-    # on success; KnowledgeManager subscribes and awards REVEAL XP.
     RunManager.unveil_item(item)
 
-# ══ Display refresh ═══════════════════════════════════════════════════════════
-
-
-func _refresh_grid_cells() -> void:
-    for coord in _cell_buttons:
-        var button := _cell_buttons[coord] as Button
-        var entry := _cell_entry.get(coord) as ItemEntry
-        _refresh_grid_cell(button, coord, entry)
-
-
-func _refresh_grid_cell(button: Button, coord: Vector2i, entry: ItemEntry) -> void:
-    button.disabled = _active_entry != null and entry != _active_entry
-
-    if entry == null:
-        button.text = ""
-        button.mouse_default_cursor_shape = Control.CURSOR_ARROW
-        _apply_cell_style(button, Color(0.18, 0.19, 0.18, 0.55))
-        return
-
-    button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-    var is_origin: bool = coord == _entry_origin.get(entry, Vector2i(-1, -1))
-    var base_color := _entry_grid_color(entry)
-
-    var hover_borders := _hover_edge_borders(coord) if entry == _hover_entry else { }
-
-    if entry == _active_entry:
-        var action_color := Color(1.0, 0.55, 0.26, 1.0) if _active_action_type == ActionType.INSPECT_CLUE else Color(1.0, 0.82, 0.35, 1.0)
-        _apply_cell_style(button, base_color.lerp(action_color, 0.45), hover_borders)
-        button.text = _active_origin_text() if is_origin else ""
-    elif entry == _hover_entry:
-        _apply_cell_style(button, base_color if entry.is_veiled() else base_color.lightened(0.16 if not entry.has_inspection_clues() else 0.28), hover_borders)
-        button.text = _origin_ap_text(entry) if is_origin else ""
-    elif not entry.is_veiled():
-        var is_final_item: bool = not entry.has_inspection_clues()
-        _apply_cell_style(button, base_color.lightened(0.16 if is_final_item else 0.28))
-        button.text = _origin_ap_text(entry) if is_origin else ""
-    else:
-        _apply_cell_style(button, base_color)
-        button.text = _origin_ap_text(entry) if is_origin else ""
-
-
-func _entry_grid_color(entry: ItemEntry) -> Color:
-    return _entry_color_by_entry.get(entry, Color(0.08, 0.08, 0.10, 1.0))
-
-
-func _success_chance_for_next_clue(entry: ItemEntry) -> int:
-    var clues := entry.get_inspection_clues()
-    if clues.is_empty():
-        return 0
-    var target := clues[0]
-    var bonus := maxi(KnowledgeManager.get_attribute_value(target.attribute) - 1, 0)
-    return clampi((21 + bonus - target.dc) * 5, 5, 95)
-
-
-func _origin_ap_text(entry: ItemEntry) -> String:
-    if entry.is_veiled():
-        return "%d AP" % UNVEIL_COST
-
-    if entry.has_inspection_clues():
-        var pct := _success_chance_for_next_clue(entry)
-        return "%d AP\n%d%%" % [CLUE_CHAIN_COST, pct]
-    return "✓"
-
-
-func _active_origin_text() -> String:
-    return "%d AP" % _active_action_cost
-
-
-func _apply_cell_style(button: Button, color: Color, edge_borders: Dictionary = { }) -> void:
-    button.modulate = Color.WHITE
-    button.add_theme_color_override(&"font_color", Color.WHITE)
-    button.add_theme_color_override(&"font_hover_color", Color.WHITE)
-    button.add_theme_color_override(&"font_pressed_color", Color.WHITE)
-    button.add_theme_color_override(&"font_disabled_color", Color(0.74, 0.74, 0.74, 1.0))
-    button.add_theme_stylebox_override(&"normal", _cell_style(color, edge_borders))
-    button.add_theme_stylebox_override(&"hover", _cell_style(color.lightened(0.08), edge_borders))
-    button.add_theme_stylebox_override(&"pressed", _cell_style(color.darkened(0.08), edge_borders))
-    button.add_theme_stylebox_override(&"disabled", _cell_style(color.darkened(0.25), edge_borders))
-
-
-func _cell_style(color: Color, edge_borders: Dictionary = { }) -> StyleBoxFlat:
-    var style := StyleBoxFlat.new()
-    style.bg_color = color
-    style.corner_radius_top_left = 6
-    style.corner_radius_top_right = 6
-    style.corner_radius_bottom_left = 6
-    style.corner_radius_bottom_right = 6
-    if edge_borders.is_empty():
-        style.border_width_top = 1
-        style.border_width_right = 1
-        style.border_width_bottom = 1
-        style.border_width_left = 1
-        style.border_color = color.lightened(0.16)
-    else:
-        style.border_width_top = edge_borders.get(&"top", 0)
-        style.border_width_right = edge_borders.get(&"right", 0)
-        style.border_width_bottom = edge_borders.get(&"bottom", 0)
-        style.border_width_left = edge_borders.get(&"left", 0)
-        style.border_color = ACTIVE_BORDER_COLOR
-    return style
-
-
-func _hover_edge_borders(coord: Vector2i) -> Dictionary:
-    var borders := { }
-    var deltas := {
-        &"top": Vector2i(0, -1),
-        &"right": Vector2i(1, 0),
-        &"bottom": Vector2i(0, 1),
-        &"left": Vector2i(-1, 0),
-    }
-    for side: StringName in deltas:
-        var neighbor: Vector2i = coord + deltas[side]
-        var neighbor_entry := _cell_entry.get(neighbor) as ItemEntry
-        if neighbor_entry != _hover_entry:
-            borders[side] = ACTIVE_BORDER_WIDTH
-    return borders
+# ══ Display refresh ═════════════════════════════════════════════════════════
 
 
 func _refresh_hud() -> void:
     var ap: int = RunManager.lot.actions_remaining
-    # Use the two-tier cap as the HUD maximum — reflects the per-lot ceiling,
-    # not the legacy per-lot action_quota.
     var cap: int = RunManager.run.inspection_ap_cap
     _stamina_hud.update_ap(ap, cap)
 
-# ══ Sidebar — item list ═══════════════════════════════════════════════════════
+# ══ Sidebar — active item detail ════════════════════════════════════════════
 
 
-func _refresh_found_list() -> void:
-    for child in _found_vbox.get_children():
-        child.free()
-
-    var found_count := 0
-    for entry: ItemEntry in _entry_cells.keys():
-        if entry.is_veiled():
-            continue
-        found_count += 1
-
-        var price_text := ItemEntryDisplayHelper.estimated_value_text(entry)
-        var has_price := price_text != ItemEntryDisplayHelper.UNKNOWN_TEXT
-
-        var row: ValueRow = ValueRowScene.instantiate()
-        row.setup(
-            ItemEntryDisplayHelper.display_name(entry),
-            price_text if has_price else "",
-            ItemEntryDisplayHelper.price_display_color(entry) if has_price else Color.WHITE,
-            13,
-        )
-        _found_vbox.add_child(row)
-
-    _empty_found_label.visible = found_count == 0
-
-
-func _refresh_veiled_list() -> void:
-    for child in _veiled_vbox.get_children():
-        child.free()
-
-    var veiled_count := 0
-    for entry: ItemEntry in _entry_cells.keys():
-        if not entry.is_veiled():
-            continue
-        veiled_count += 1
-
-        var row: ValueRow = ValueRowScene.instantiate()
-        row.setup(
-            ItemEntryDisplayHelper.display_name(entry),
-            "%d AP" % UNVEIL_COST,
-            Color(0.55, 0.58, 0.63, 1),
-            13,
-        )
-        _veiled_vbox.add_child(row)
-
-    _empty_veiled_label.visible = veiled_count == 0
-
-# ══ Sidebar — total estimate ══════════════════════════════════════════════════
-
-
-func _refresh_total_estimate() -> void:
-    var lot: LotEntry = RunManager.lot.lot_entry
-    if lot == null:
-        _total_est_label.text = "—"
+func _refresh_detail() -> void:
+    if _selected_entry == null or _inspection_finished:
+        _clear_detail_section()
+        _empty_selection_label.show()
         return
-    var estimate := lot.get_player_estimate()
-    var lo: int = estimate[0]
-    var hi: int = estimate[1]
-    if lo == 0 and hi == 0:
-        _total_est_label.text = "—"
-    elif hi <= lo:
-        _total_est_label.text = "$%d" % lo
+
+    _empty_selection_label.hide()
+    _update_detail_section(_selected_entry)
+    _refresh_action_section(_selected_entry)
+
+
+func _refresh_action_section(entry: ItemEntry) -> void:
+    var ap: int = RunManager.lot.actions_remaining
+
+    if entry.is_veiled():
+        _action_unveil_button.show()
+        _action_inspect_button.hide()
+        _action_complete_label.hide()
+        _action_unveil_button.disabled = ap < UNVEIL_COST
+        if ap < UNVEIL_COST:
+            _action_unveil_button.tooltip_text = "Not enough AP"
+        else:
+            _action_unveil_button.tooltip_text = "Unveil this item (%d AP)" % UNVEIL_COST
+    elif entry.has_inspection_clues():
+        _action_unveil_button.hide()
+        _action_inspect_button.show()
+        _action_complete_label.hide()
+        _action_inspect_button.disabled = ap < CLUE_CHAIN_COST
+        if ap < CLUE_CHAIN_COST:
+            _action_inspect_button.tooltip_text = "Not enough AP"
+        else:
+            _action_inspect_button.tooltip_text = "Inspect remaining clues (%d AP)" % CLUE_CHAIN_COST
     else:
-        _total_est_label.text = "$%d – $%d" % [lo, hi]
-
-# ══ Sidebar — active item detail ══════════════════════════════════════════════
-
-
-func _on_grid_cell_mouse_entered(coord: Vector2i) -> void:
-    var entry := _cell_entry.get(coord) as ItemEntry
-    if entry == null or entry == _hover_entry:
-        return
-    _hover_entry = entry
-    _update_detail_section(entry)
-    _refresh_grid_cells()
+        _action_unveil_button.hide()
+        _action_inspect_button.hide()
+        _action_complete_label.show()
 
 
 func _update_detail_section(entry: ItemEntry) -> void:
@@ -571,21 +258,16 @@ func _update_detail_section(entry: ItemEntry) -> void:
     _detail_section.show()
 
 
-## Rebuilds the revealed-clue breakdown rows for the given entry.
-## Shows anchor (if revealed) then each revealed surface clue with op + amount.
-## The CLUES header and separator are static (.tscn); only the rows rebuild.
 func _refresh_clues_section(entry: ItemEntry) -> void:
     for child in _clue_rows.get_children():
         child.queue_free()
 
     var rows: Array[Dictionary] = []
 
-    # Anchor row
     if entry.unveiled and entry.anchor != null:
         var a: AnchorData = entry.anchor
         rows.append({ "text": a.known_text, "op": "base", "amount": float(a.base_value), "anchor": true })
 
-    # Surface clue rows — only revealed
     for clue: ClueData in entry.surface_clues:
         if clue.type != ClueData.ClueType.SURFACE:
             continue
@@ -622,8 +304,12 @@ func _refresh_clues_section(entry: ItemEntry) -> void:
 func _clear_detail_section() -> void:
     _sidebar_hsep.hide()
     _detail_section.hide()
+    _action_unveil_button.hide()
+    _action_inspect_button.hide()
+    _action_complete_label.hide()
+    _selected_entry = null
 
-# ══ Summary / exit ════════════════════════════════════════════════════════════
+# ══ Summary / exit ══════════════════════════════════════════════════════════
 
 
 func _finish_inspection() -> void:
@@ -631,25 +317,21 @@ func _finish_inspection() -> void:
         return
 
     _inspection_finished = true
-    _clear_active_action()
 
     _clear_detail_section()
     _clear_clue_result()
-    _refresh_grid_cells()
+    _item_browser.refresh()
     _refresh_hud()
-    _refresh_found_list()
-    _refresh_veiled_list()
-    _refresh_total_estimate()
 
 
 func _on_pass_pressed() -> void:
     SceneRouter.go_to_lot_browse()
 
 
-func _on_auction_pressed() -> void:
-    _cancel_active_action()
-    _confirm_popup.popup_centered()
+func _on_review_pressed() -> void:
+    _summary_popup.setup(RunManager.lot.lot_entry)
+    _summary_popup.popup_centered()
 
 
-func _on_auction_confirmed() -> void:
+func _on_summary_start_auction_requested() -> void:
     SceneRouter.go_to_auction()

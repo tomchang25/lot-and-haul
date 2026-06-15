@@ -13,7 +13,6 @@ const SELL_GRID_PUT_DOWN: UiAudioEvent = preload("res://data/tres/audio_events/s
 
 const CELL_SIZE := 56
 
-const ItemRowTooltipScene: PackedScene = preload("res://game/shared/item_display/item_row_tooltip.tscn")
 const CargoItemRowScene: PackedScene = preload("res://game/run/cargo/cargo_item_row.tscn")
 const ExtraSlotCellScene: PackedScene = preload("res://game/run/cargo/extra_slot_cell/extra_slot_cell.tscn")
 
@@ -42,7 +41,6 @@ var _slots_used: int = 0
 var _weight_used: float = 0.0
 # ── Tooltip Support ────────────────────────────────────────────────────────────
 
-var _tooltip: ItemRowTooltip = null
 var _hovered_item: ItemEntry = null
 
 # ── Node references ────────────────────────────────────────────────────────────
@@ -64,6 +62,7 @@ var _hovered_item: ItemEntry = null
 @onready var _summary_trailer_line: HBoxContainer = $MainHBox/VehiclePanel/RunSummary/SummaryVBox/TrailerLine
 @onready var _summary_trailer_value: Label = $MainHBox/VehiclePanel/RunSummary/SummaryVBox/TrailerLine/TrailerRiskValue
 @onready var _run_summary: PanelContainer = $MainHBox/VehiclePanel/RunSummary
+@onready var _tooltip: ItemCardPopup = %TooltipPopup
 
 # ══ Lifecycle ══════════════════════════════════════════════════════════════════
 
@@ -73,9 +72,6 @@ func _ready() -> void:
         ToastManager.show_error("Cargo scene failed to load. Returning to hub.")
         SceneRouter.go_to_hub.call_deferred()
         return
-
-    _tooltip = ItemRowTooltipScene.instantiate()
-    add_child(_tooltip)
 
     _run_summary.add_theme_stylebox_override(
         &"panel",
@@ -561,9 +557,10 @@ func _show_tooltip_for_item(entry: ItemEntry, anchor: Rect2) -> void:
     if _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
         return
     _hovered_item = entry
-    _tooltip.show_for(entry, anchor)
+    if entry is ItemEntry:
+        _tooltip.show_for(entry as ItemEntry, anchor)
 
 
 func _hide_tooltip() -> void:
     _hovered_item = null
-    _tooltip.hide_tooltip()
+    _tooltip.hide_popup()

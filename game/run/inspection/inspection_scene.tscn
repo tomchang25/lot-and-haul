@@ -2,7 +2,10 @@
 
 [ext_resource type="Script" uid="uid://bbr8kx3k0jv3c" path="res://game/run/inspection/inspection_scene.gd" id="1_idapx"]
 [ext_resource type="PackedScene" uid="uid://bstamhudtscn1" path="res://game/run/inspection/stamina_hud/stamina_hud.tscn" id="2_j573n"]
-[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+[ext_resource type="PackedScene" uid="uid://bi01jgyv1md6o" path="res://game/shared/item_display/item_browser_panel/item_browser_panel.tscn" id="3_browser"]
+[ext_resource type="PackedScene" uid="uid://cddj8ljbhn4sb" path="res://game/run/inspection/inspection_summary_popup/inspection_summary_popup.tscn" id="4_summary"]
+[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+
 [node name="InspectionScene" type="Control" unique_id=2043279360]
 layout_mode = 3
 anchors_preset = 15
@@ -64,9 +67,10 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="StaminaHUD" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=1666666860 instance=ExtResource("2_j573n")]
+unique_name_in_owner = true
 layout_mode = 2
 
-[node name="GridMargin" type="MarginContainer" parent="RootHBox/LeftVBox" unique_id=100000008]
+[node name="BrowserMargin" type="MarginContainer" parent="RootHBox/LeftVBox" unique_id=100000008]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -75,20 +79,12 @@ theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 0
 
-[node name="ScrollContainer" type="ScrollContainer" parent="RootHBox/LeftVBox/GridMargin" unique_id=100000009]
+[node name="ItemBrowser" parent="RootHBox/LeftVBox/BrowserMargin" unique_id=100000009 instance=ExtResource("3_browser")]
+unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="ItemsGrid" type="GridContainer" parent="RootHBox/LeftVBox/GridMargin/ScrollContainer" unique_id=1410177201]
-layout_mode = 2
-size_flags_horizontal = 6
-theme_override_constants/h_separation = 6
-theme_override_constants/v_separation = 6
-columns = 4
 
 [node name="FooterHBox" type="HBoxContainer" parent="RootHBox/LeftVBox" unique_id=100000010]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_constants/separation = 8
@@ -109,16 +105,18 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="PassButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=1473063044]
-script = ExtResource("99_sfx")
+unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Pass"
-
-[node name="StartAuctionButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=1061694818]
 script = ExtResource("99_sfx")
+
+[node name="ReviewButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=1061694818]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
-text = "Start Auction"
+text = "Review Lot"
+script = ExtResource("99_sfx")
 
 [node name="SidebarSep" type="VSeparator" parent="RootHBox" unique_id=100000020]
 layout_mode = 2
@@ -140,69 +138,15 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="ItemListSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000030]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="ListHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ItemListSection" unique_id=100000031]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 11
-text = "Found · Items"
-
-[node name="FoundVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ItemListSection" unique_id=100000033]
+[node name="EmptySelectionLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000030]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 6
-
-[node name="EmptyFoundLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ItemListSection" unique_id=100000034]
-unique_name_in_owner = true
-layout_mode = 2
+size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
 theme_override_font_sizes/font_size = 12
-text = "No items revealed yet."
+text = "Select an item to inspect."
 horizontal_alignment = 1
-
-[node name="VeiledListSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000060]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="VeiledHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/VeiledListSection" unique_id=100000061]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 11
-text = "Veiled · Items"
-
-[node name="VeiledVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/VeiledListSection" unique_id=100000063]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 6
-
-[node name="EmptyVeiledLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/VeiledListSection" unique_id=100000064]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
-theme_override_font_sizes/font_size = 12
-text = "All items revealed."
-horizontal_alignment = 1
-
-[node name="TotalEstSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000070]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="TotalEstHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TotalEstSection" unique_id=100000071]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 11
-text = "Est. Total"
-
-[node name="TotalEstValueLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TotalEstSection" unique_id=100000072]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "—"
+vertical_alignment = 1
 
 [node name="ClueResultSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000080]
 unique_name_in_owner = true
@@ -210,16 +154,15 @@ visible = false
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="ClueResultHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ClueResultSection"]
+[node name="ClueResultHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ClueResultSection" unique_id=192364118]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 11
 text = "Clue Results"
 
-[node name="ClueResultLabel" type="RichTextLabel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ClueResultSection"]
+[node name="ClueResultLabel" type="RichTextLabel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ClueResultSection" unique_id=1564928163]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
 bbcode_enabled = true
 fit_content = true
 
@@ -237,7 +180,7 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 11
-text = "Active"
+text = "Selected Item"
 
 [node name="HoverNameLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000043]
 unique_name_in_owner = true
@@ -327,8 +270,41 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="ConfirmPopup" type="ConfirmationDialog" parent="." unique_id=46946476]
-title = "Enter Auction?"
-dialog_text = "Proceed to auction with your current findings?"
-ok_button_text = "Enter Auction"
-cancel_button_text = "Cancel"
+[node name="ActionSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000100]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ActionSep" type="HSeparator" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ActionSection" unique_id=100000101]
+layout_mode = 2
+
+[node name="ActionHeader" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ActionSection" unique_id=100000102]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.58, 0.63, 1)
+theme_override_font_sizes/font_size = 10
+text = "ACTIONS"
+
+[node name="UnveilButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ActionSection" unique_id=100000103]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Unveil (1 AP)"
+
+[node name="InspectCluesButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ActionSection" unique_id=100000104]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Inspect Clues (2 AP)"
+
+[node name="ActionCompleteLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ActionSection" unique_id=100000105]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
+theme_override_font_sizes/font_size = 12
+text = "No further inspection available"
+
+[node name="SummaryPopup" parent="." instance=ExtResource("4_summary")]
+visible = false
+unique_name_in_owner = true

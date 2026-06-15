@@ -217,7 +217,6 @@ Nothing currently in progress.
 
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
-- [item_display] Shared ItemCard, spoiler-safe ClueChunk, item browser, and card popup UI migration — see `dev/docs/plans/item_card_clue_chunk.sketch.md`
 - [affix_dictionary] Player-facing affix dictionary that tracks affix combination discovery, hidden-risk learning, and gated probability reads — see `dev/docs/plans/affix_dictionary.sketch.md`
 
 - [dev/auto-auction] Debug-only quick-win buttons: instant player win at opening bid or rolled price (skip NPC bidding loop; rolled path seeds future auto-bid perk) — see `dev/docs/plans/debug_auto_auction.md`

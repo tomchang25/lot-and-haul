@@ -2,7 +2,8 @@
 
 [ext_resource type="Script" uid="uid://b62533yf8nr3" path="res://game/run/reveal/reveal_scene.gd" id="1_bbq33"]
 [ext_resource type="PackedScene" uid="uid://cilp5a1xr3e8m" path="res://game/shared/item_display/item_list_panel/item_list_panel.tscn" id="2_ilp"]
-[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+[ext_resource type="PackedScene" uid="uid://tnbmlptuuk3i" path="res://game/shared/item_display/item_card_popup.tscn" id="3_popup"]
+[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="RevealScene" type="Control" unique_id=708244230]
 layout_mode = 3
@@ -46,7 +47,7 @@ custom_minimum_size = Vector2(760, 0)
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="ItemListPanel" parent="RootVBox/ListCenter/OuterVBox" instance=ExtResource("2_ilp")]
+[node name="ItemListPanel" parent="RootVBox/ListCenter/OuterVBox" unique_id=1524569227 instance=ExtResource("2_ilp")]
 layout_mode = 2
 
 [node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=84919131]
@@ -56,16 +57,20 @@ theme_override_constants/separation = 24
 alignment = 1
 
 [node name="RevealButton" type="Button" parent="RootVBox/Footer" unique_id=1005702364]
-script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Reveal Next"
+script = ExtResource("99_sfx")
 
 [node name="ContinueButton" type="Button" parent="RootVBox/Footer" unique_id=1969516138]
-script = ExtResource("99_sfx")
 visible = false
 custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Continue"
+script = ExtResource("99_sfx")
+
+[node name="TooltipPopup" parent="." unique_id=1000000101 instance=ExtResource("3_popup")]
+unique_name_in_owner = true
+layout_mode = 0
