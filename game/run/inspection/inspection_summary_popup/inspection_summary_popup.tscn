@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cddj8ljbhn4sb"]
 
-[ext_resource type="Script" uid="uid://dvcdwra7gwpr3" path="res://game/run/inspection/inspection_summary_popup/inspection_summary_popup.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://ca3uatlxvq7gm" path="res://game/run/inspection/inspection_summary_popup/inspection_summary_popup.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://bi01jgyv1md6o" path="res://game/shared/item_display/item_browser_panel/item_browser_panel.tscn" id="2_browser"]
 
 [sub_resource type="StyleBoxFlat" id="popup_panel"]
@@ -14,27 +14,19 @@ corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.45)
 shadow_size = 16
 shadow_offset = Vector2(0, 4)
-shadow_color = Color(0, 0, 0, 0.45)
 
-[sub_resource type="StyleBoxFlat" id="stat_card"]
-bg_color = Color(0.11, 0.105, 0.13, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.2, 0.2, 0.24, 1)
+[sub_resource type="StyleBoxEmpty" id="close_btn_normal"]
+
+[sub_resource type="StyleBoxFlat" id="close_btn_pressed"]
+bg_color = Color(0.55, 0.15, 0.15, 0.9)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
-content_margin_left = 12.0
-content_margin_top = 8.0
-content_margin_right = 12.0
-content_margin_bottom = 8.0
 
-[sub_resource type="StyleBoxEmpty" id="close_btn_normal"]
 [sub_resource type="StyleBoxFlat" id="close_btn_hover"]
 bg_color = Color(0.75, 0.25, 0.25, 0.85)
 corner_radius_top_left = 4
@@ -42,8 +34,17 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="StyleBoxFlat" id="close_btn_pressed"]
-bg_color = Color(0.55, 0.15, 0.15, 0.9)
+[sub_resource type="StyleBoxFlat" id="stat_card"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+bg_color = Color(0.11, 0.105, 0.13, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.2, 0.24, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -65,22 +66,6 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="StyleBoxFlat" id="accent_btn_hover"]
-content_margin_left = 12.0
-content_margin_top = 6.0
-content_margin_right = 12.0
-content_margin_bottom = 6.0
-bg_color = Color(0.18, 0.4, 0.25, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.35, 0.6, 0.42, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
 [sub_resource type="StyleBoxFlat" id="accent_btn_pressed"]
 content_margin_left = 12.0
 content_margin_top = 6.0
@@ -97,17 +82,34 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
+[sub_resource type="StyleBoxFlat" id="accent_btn_hover"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.18, 0.4, 0.25, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.6, 0.42, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
 [node name="InspectionSummaryPopup" type="Window" unique_id=1044505717]
-borderless = true
-transparent = true
-unresizable = true
-size = Vector2i(820, 620)
+transparent_bg = true
+oversampling_override = 1.0
+size = Vector2i(820, 711)
 wrap_controls = true
 exclusive = true
+unresizable = true
+borderless = true
+transparent = true
 script = ExtResource("1_script")
 
 [node name="PopupPanel" type="PanelContainer" parent="." unique_id=3751260]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -147,16 +149,16 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
-theme_override_colors/font_hover_color = Color(1, 0.85, 0.85, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.7, 0.7, 1)
+theme_override_colors/font_hover_color = Color(1, 0.85, 0.85, 1)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("close_btn_normal")
-theme_override_styles/hover = SubResource("close_btn_hover")
 theme_override_styles/pressed = SubResource("close_btn_pressed")
+theme_override_styles/hover = SubResource("close_btn_hover")
 theme_override_styles/focus = SubResource("close_btn_normal")
 text = "✕"
 
-[node name="HeaderSep" type="HSeparator" parent="PopupPanel/PopupMargin/VBox" unique_id=2150379284]
+[node name="HeaderSep" type="HSeparator" parent="PopupPanel/PopupMargin/VBox" unique_id=-2144588012]
 layout_mode = 2
 
 [node name="SummaryStatsRow" type="HBoxContainer" parent="PopupPanel/PopupMargin/VBox" unique_id=1609225081]
@@ -164,7 +166,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 16
 
-[node name="EstimateCard" type="PanelContainer" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow" unique_id=2288124736]
+[node name="EstimateCard" type="PanelContainer" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow" unique_id=-2006842560]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("stat_card")
@@ -184,16 +186,16 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 
-[node name="BidCard" type="PanelContainer" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow" unique_id=2803801494]
+[node name="BidCard" type="PanelContainer" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow" unique_id=-1491165802]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("stat_card")
 
-[node name="BidContent" type="VBoxContainer" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/BidCard" unique_id=3740439565]
+[node name="BidContent" type="VBoxContainer" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/BidCard" unique_id=-554527731]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="BidTitle" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/BidCard/BidContent" unique_id=3876167237]
+[node name="BidTitle" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/BidCard/BidContent" unique_id=-418800059]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 10
@@ -204,16 +206,14 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 
-[node name="StatsSep" type="HSeparator" parent="PopupPanel/PopupMargin/VBox" unique_id=2975118076]
+[node name="StatsSep" type="HSeparator" parent="PopupPanel/PopupMargin/VBox" unique_id=-1319849220]
 layout_mode = 2
 
 [node name="ItemBrowser" parent="PopupPanel/PopupMargin/VBox" unique_id=1745743082 instance=ExtResource("2_browser")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
 
-[node name="FooterSep" type="HSeparator" parent="PopupPanel/PopupMargin/VBox" unique_id=2333896609]
+[node name="FooterSep" type="HSeparator" parent="PopupPanel/PopupMargin/VBox" unique_id=-1961070687]
 layout_mode = 2
 
 [node name="FooterActions" type="HBoxContainer" parent="PopupPanel/PopupMargin/VBox" unique_id=1598914269]
@@ -235,10 +235,10 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 1, 0.7, 1)
-theme_override_colors/font_hover_color = Color(0.85, 1, 0.85, 1)
 theme_override_colors/font_pressed_color = Color(0.5, 0.85, 0.5, 1)
+theme_override_colors/font_hover_color = Color(0.85, 1, 0.85, 1)
 theme_override_colors/font_disabled_color = Color(0.35, 0.5, 0.35, 1)
 theme_override_styles/normal = SubResource("accent_btn_normal")
-theme_override_styles/hover = SubResource("accent_btn_hover")
 theme_override_styles/pressed = SubResource("accent_btn_pressed")
+theme_override_styles/hover = SubResource("accent_btn_hover")
 text = "Start Auction"

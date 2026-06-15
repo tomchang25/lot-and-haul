@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cluechunk001"]
 
-[ext_resource type="Script" uid="uid://cluechunkscript" path="res://game/shared/item_display/clue_chunk/clue_chunk.gd" id="1_cluechunk"]
+[ext_resource type="Script" uid="uid://dtoj6ga2bkgn5" path="res://game/shared/item_display/clue_chunk/clue_chunk.gd" id="1_cluechunk"]
 
-[node name="ClueChunk" type="VBoxContainer"]
-script = ExtResource("1_cluechunk")
+[node name="ClueChunk" type="VBoxContainer" unique_id=1920559197]
 theme_override_constants/separation = 2
+script = ExtResource("1_cluechunk")
