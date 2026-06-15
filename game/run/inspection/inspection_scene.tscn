@@ -66,6 +66,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="StaminaHUD" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=1666666860 instance=ExtResource("2_j573n")]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="BrowserMargin" type="MarginContainer" parent="RootHBox/LeftVBox" unique_id=100000008]
@@ -84,6 +85,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="FooterHBox" type="HBoxContainer" parent="RootHBox/LeftVBox" unique_id=100000010]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_constants/separation = 8
@@ -104,12 +106,14 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="PassButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=1473063044]
+unique_name_in_owner = true
 script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Pass"
 
 [node name="StartAuctionButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=1061694818]
+unique_name_in_owner = true
 script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2

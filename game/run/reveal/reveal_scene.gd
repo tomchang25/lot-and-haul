@@ -12,8 +12,6 @@ const REVEAL_GOOD: UiAudioEvent = preload("res://data/tres/audio_events/reveal_g
 const AUCTION_LOST: UiAudioEvent = preload("res://data/tres/audio_events/auction_lost.tres")
 const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres")
 
-const ItemCardPopupScene: PackedScene = preload("res://game/shared/item_display/item_card_popup.tscn")
-
 const REVEAL_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
@@ -23,7 +21,6 @@ const REVEAL_COLUMNS: Array = [
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _won_items: Array[ItemEntry] = []
-var _tooltip: ItemCardPopup = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -31,6 +28,7 @@ var _tooltip: ItemCardPopup = null
 @onready var _title_label: Label = $RootVBox/TitleLabel
 @onready var _reveal_btn: Button = $RootVBox/Footer/RevealButton
 @onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
+@onready var _tooltip: ItemCardPopup = %TooltipPopup
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -41,16 +39,13 @@ func _ready() -> void:
         SceneRouter.go_to_hub.call_deferred()
         return
 
-    _tooltip = ItemCardPopupScene.instantiate()
-    add_child(_tooltip)
-
     _reveal_btn.pressed.connect(_on_reveal_pressed)
     _reveal_btn.press_event = null
     _continue_btn.pressed.connect(_on_continue_pressed)
     _continue_btn.press_event = CONFIRM
 
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
-    _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
+    _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_popup)
 
     _won_items = RunManager.lot.won_items
     _continue_btn.hide()

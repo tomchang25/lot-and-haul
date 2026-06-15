@@ -26,10 +26,10 @@ enum ActionType { UNVEIL, INSPECT_CLUE }
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _item_browser: ItemBrowserPanel = %ItemBrowser
-@onready var _footer: HBoxContainer = $RootHBox/LeftVBox/FooterHBox
-@onready var _pass_button: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/PassButton
-@onready var _start_auction_button: Button = $RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner/StartAuctionButton
-@onready var _stamina_hud: StaminaHUD = $RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner/StaminaHUD
+@onready var _footer: HBoxContainer = %FooterHBox
+@onready var _pass_button: Button = %PassButton
+@onready var _start_auction_button: Button = %StartAuctionButton
+@onready var _stamina_hud: StaminaHUD = %StaminaHUD
 @onready var _confirm_popup: ConfirmationDialog = $ConfirmPopup
 
 # Sidebar — found list
@@ -93,7 +93,7 @@ func _process(_delta: float) -> void:
 
 func _populate_browser() -> void:
     var items := RunManager.lot.lot_items
-    _item_browser.setup([])  # No columns needed for card mode
+    _item_browser.setup([]) # No columns needed for card mode
     _item_browser.populate(items)
     _item_browser.set_mode(ItemBrowserPanel.DisplayMode.CARD)
 

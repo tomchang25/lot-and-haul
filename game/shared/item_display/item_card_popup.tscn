@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://tnbmlptuuk3i"]
 
-[ext_resource type="Script" uid="uid://itemcardpopupscript" path="res://game/shared/item_display/item_card_popup.gd" id="1_popup"]
+[ext_resource type="Script" uid="uid://dbymlw2v6at7" path="res://game/shared/item_display/item_card_popup.gd" id="1_popup"]
 [ext_resource type="PackedScene" uid="uid://bw23cjkf40y5r" path="res://game/shared/item_display/item_card.tscn" id="2_card"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x6k72"]
@@ -29,5 +29,6 @@ layout_mode = 2
 theme_override_constants/separation = 4
 
 [node name="ItemCard" parent="VBox" unique_id=1000000003 instance=ExtResource("2_card")]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3

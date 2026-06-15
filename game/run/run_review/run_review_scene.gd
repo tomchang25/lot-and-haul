@@ -11,8 +11,6 @@ extends Control
 const CASH_CREDITED: UiAudioEvent = preload("res://data/tres/audio_events/cash_credited.tres")
 const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres")
 
-const ItemCardPopupScene: PackedScene = preload("res://game/shared/item_display/item_card_popup.tscn")
-
 const REVIEW_COLUMNS: Array = [
     ItemRow.Column.NAME,
     ItemRow.Column.CONDITION,
@@ -23,7 +21,6 @@ const REVIEW_COLUMNS: Array = [
 
 var _cargo_items: Array[ItemEntry] = []
 var _review_entries: Array = []
-var _tooltip: ItemCardPopup = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -35,6 +32,7 @@ var _tooltip: ItemCardPopup = null
 @onready var _estimate_profit_label: Label = $RootVBox/FinanceCenter/FinancePanel/FinanceMargin/FinanceVBox/EstimateProfitLabel
 @onready var _trailer_damage_label: Label = $RootVBox/ListCenter/OuterVBox/TrailerDamageLabel
 @onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
+@onready var _tooltip: ItemCardPopup = %TooltipPopup
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -45,14 +43,11 @@ func _ready() -> void:
         SceneRouter.go_to_hub.call_deferred()
         return
 
-    _tooltip = ItemCardPopupScene.instantiate()
-    add_child(_tooltip)
-
     _continue_btn.pressed.connect(_on_continue_pressed)
     _continue_btn.press_event = CONFIRM
 
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
-    _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_tooltip)
+    _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_popup)
 
     var cracked: int = RunManager.apply_trailer_damage()
     if cracked > 0:

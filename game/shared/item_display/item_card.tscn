@@ -26,8 +26,8 @@ autowrap_mode = 2
 
 [node name="AuthTagLabel" type="Label" parent="VBox" unique_id=1000000032]
 visible = false
-layout_mode = 2
 modulate = Color(0.6, 0.9, 0.4, 1)
+layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "● AUTHENTICATED"
 horizontal_alignment = 1

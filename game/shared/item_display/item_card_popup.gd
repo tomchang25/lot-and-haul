@@ -1,13 +1,13 @@
 # item_card_popup.gd
 # Floating popup that displays an ItemCard for hover previews.
-# Add one instance to the scene root; call show_for() / hide_popup()
+# Place one instance in the scene's .tscn; call show_for() / hide_popup()
 # from the parent scene.
 class_name ItemCardPopup
 extends PanelContainer
 
 const ItemCardScene: PackedScene = preload("res://game/shared/item_display/item_card.tscn")
 
-@onready var _card: ItemCard = $VBox/ItemCard
+@onready var _card: ItemCard = %ItemCard
 
 
 func show_for(entry: ItemEntry, anchor: Rect2) -> void:
