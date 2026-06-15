@@ -78,13 +78,13 @@ Move those nodes into `.tscn` and reference them with `@onready` instead.
 
 The following may be created at runtime in code:
 
-| Case                    | Example                                                     | Reason                                                                                               |
-| ----------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Runtime-variable packed scene instances | `ItemRowScene.instantiate()` for data-driven rows or cards | Count, type, or identity unknown at edit time                                                         |
-| Ephemeral display nodes | Tooltips, empty-state labels, `HSeparator` in dynamic lists | Created and destroyed during the scene's lifetime                                                    |
-| Custom-drawn controls   | Inner class with `_draw()` override                         | Requires `_draw()` override; cannot be defined in `.tscn`                                            |
-| Debug-only display      | `_debug_label` behind `Debug.enabled` guard                 | Never shipped; polluting `.tscn` with invisible nodes is misleading. See `debug_standard.md`.        |
-| Timer nodes             | `Timer.new()` for timed logic                               | Godot scene timers fire during tool mode, causing phantom ticks in the editor; always create in code |
+| Case                                    | Example                                                     | Reason                                                                                               |
+| --------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Runtime-variable packed scene instances | `ItemRowScene.instantiate()` for data-driven rows or cards  | Count, type, or identity unknown at edit time                                                        |
+| Ephemeral display nodes                 | Tooltips, empty-state labels, `HSeparator` in dynamic lists | Created and destroyed during the scene's lifetime                                                    |
+| Custom-drawn controls                   | Inner class with `_draw()` override                         | Requires `_draw()` override; cannot be defined in `.tscn`                                            |
+| Debug-only display                      | `_debug_label` behind `Debug.enabled` guard                 | Never shipped; polluting `.tscn` with invisible nodes is misleading. See `debug_standard.md`.        |
+| Timer nodes                             | `Timer.new()` for timed logic                               | Godot scene timers fire during tool mode, causing phantom ticks in the editor; always create in code |
 
 The key question: **does this node exist for the full lifetime of the scene?**
 

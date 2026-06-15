@@ -1,6 +1,6 @@
 # Godot Headless Check — Authoritative Safe Procedure
 
-This file is the canonical procedure for the `/godot-headless` slash command and any agent-run Godot headless check. Command wrappers should link here instead of duplicating the steps.
+This file is the canonical safe snapshot and plain headless check procedure for the `/godot-test` slash command and any agent-run Godot headless check. Command wrappers should link here instead of duplicating the steps. Unit and smoke test layers live in `godot_tests.md`.
 
 Running `Godot --headless` directly against the mounted working tree is **forbidden**: the mount serves tail-truncated views of recently-modified files (see `sandbox_environment.md`), so Godot reports bogus parse errors that don't exist in the real files. Verified example: a truncated `anchor_data.gd` ending at `@export var tier: i` produced `Parse Error: Could not find type "i"`.
 
@@ -34,9 +34,11 @@ python3 dev/tools/render_sfx.py --dir "./data/yaml/sfx/" --godot-root "."
 python3 dev/tools/yaml_to_tres.py --godot-root "."         # regenerate data/tres/ (gitignored) from tracked YAML
 # SFX rendering reads script UIDs from .gd.uid sidecar files (tracked by git),
 # NOT from .godot/uid_cache.bin — so it runs BEFORE --import.
-timeout 90 dev/tools/bin/Godot_v4.6.3-stable_linux.x86_64 --headless --path "." --import      # regenerate .import, ignore errors here
-timeout 90 dev/tools/bin/Godot_v4.6.3-stable_linux.x86_64 --headless --path "." --quit 2>&1 | grep -E "SCRIPT ERROR|Parse"
+timeout 90 dev/tools/bin/Godot_v4.6.3-stable_linux.x86_64 --headless --path "." --import      # import/setup phase: regenerate .godot/.import; ignore errors and non-zero exit here
+timeout 90 dev/tools/bin/Godot_v4.6.3-stable_linux.x86_64 --headless --path "." --quit 2>&1 | grep -E "SCRIPT ERROR|Parse|ERROR:|push_error|FATAL"
 ```
+
+The `--import` invocation is setup only and is not the pass/fail result. The real plain-headless check is the second invocation: any unexpected error-level line there is a failure after applying the caveats below and cross-checking against the real repo files.
 
 Multiple agents/sessions share `/tmp`, and files created by another session's user are not removable (`Permission denied`). That is why a fixed path like `/tmp/lh` is forbidden: `mktemp -d` guarantees a private dir. Don't bother cleaning up other sessions' leftovers — just ignore them.
 
