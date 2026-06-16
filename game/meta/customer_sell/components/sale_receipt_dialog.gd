@@ -27,7 +27,7 @@ func show_receipt(items: Array, price: int, strategy: String) -> void:
     _pending_price = price
     _pending_strategy = strategy
     dialog_text = _build_text(items, price, strategy)
-    popup()
+    popup_centered()
 
 # ══ Internal ══════════════════════════════════════════════════════════════════
 

@@ -42,6 +42,12 @@ Rules:
 - 2026-06-16 — [slot] Deep Storage hub action grants 25 AP (2.5×) and advances to Evening, preserving the shop; morning-only button labeled "extended workshop" alongside normal "short workshop" Storage
 - 2026-06-16 — [slot] SlotStore tracks storage_ap_max so storage scene displays dynamic AP budget (25/25) instead of hardcoded STORAGE_AP_MAX
 
+### Selling HUD Sales Desk
+
+- 2026-06-16 — [customer_sell] Customer info (name, demands, car total, verified) merged into CustomerCarPanel; CustomerProfilePanel deleted
+- 2026-06-16 — [customer_sell] SellSidebar restructured into PanelContainer > Margin > VBox (300px, matching Storage rail style); SelectedItemPanel expanded into persistent detail rail with condition/value panels and price convergence
+- 2026-06-16 — [customer_sell] ItemCardPopup removed from sell scene; hover uses preview/selected state that restores the last selection on hover end instead of always clearing
+
 ## v0.1.2
 
 ### Customer Generation

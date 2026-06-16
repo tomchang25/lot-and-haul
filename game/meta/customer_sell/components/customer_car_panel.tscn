@@ -1,36 +1,60 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://my11d2txip3k"]
 
-[ext_resource type="Script" path="res://game/meta/customer_sell/components/customer_car_panel.gd" id="1_ccp"]
-[ext_resource type="Script" path="res://game/shared/packing/packing_grid.gd" id="2_pg"]
-[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="3_sfx"]
+[ext_resource type="Script" uid="uid://b4lonjofevc7l" path="res://game/meta/customer_sell/components/customer_car_panel.gd" id="1_ccp"]
+[ext_resource type="Script" uid="uid://doaqxqk7u1no0" path="res://game/shared/packing/packing_grid.gd" id="2_pg"]
+[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="3_sfx"]
 
-[node name="CustomerCarPanel" type="PanelContainer"]
+[node name="CustomerCarPanel" type="PanelContainer" unique_id=630524090]
 custom_minimum_size = Vector2(420, 380)
 script = ExtResource("1_ccp")
 
-[node name="VBox" type="VBoxContainer" parent="."]
+[node name="VBox" type="VBoxContainer" parent="." unique_id=874977156]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 6
 
-[node name="HeaderRow" type="HBoxContainer" parent="VBox"]
+[node name="CustomerHeaderRow" type="HBoxContainer" parent="VBox" unique_id=673283089]
 layout_mode = 2
 
-[node name="CarTitleLabel" type="Label" parent="VBox/HeaderRow"]
+[node name="CustomerNameLabel" type="Label" parent="VBox/CustomerHeaderRow" unique_id=987457849]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 16
-text = "Customer's Car"
+theme_override_font_sizes/font_size = 20
+text = "Customer Name"
 
-[node name="CapacityLabel" type="Label" parent="VBox/HeaderRow"]
+[node name="CapacityLabel" type="Label" parent="VBox/CustomerHeaderRow" unique_id=1168133706]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Capacity: ?×?"
+text = "Capacity: ???"
 
-[node name="PackingGrid" type="GridContainer" parent="VBox"]
+[node name="DemandTagsLabel" type="Label" parent="VBox" unique_id=1685664173]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Wants: -"
+autowrap_mode = 2
+max_lines_visible = 3
+
+[node name="CarSummaryRow" type="HBoxContainer" parent="VBox" unique_id=1058049413]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CarTotalLabel" type="Label" parent="VBox/CarSummaryRow" unique_id=1234983308]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Car total: $0"
+
+[node name="VerifiedCountLabel" type="Label" parent="VBox/CarSummaryRow" unique_id=2001962363]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Verified: 0 / 0"
+
+[node name="PackingGrid" type="GridContainer" parent="VBox" unique_id=659388510]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(400, 300)
 layout_mode = 2
@@ -38,7 +62,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("2_pg")
 
-[node name="ClearButton" type="Button" parent="VBox"]
+[node name="ClearButton" type="Button" parent="VBox" unique_id=304537502]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2

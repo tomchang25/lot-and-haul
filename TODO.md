@@ -233,7 +233,7 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 > Ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched.
 > All phases shipped → archive the plan file + delete this line.
 
-- [customer_sell] Sales Desk information architecture and selected-item layout — see `dev/docs/plans/selling_hud_sales_desk.sketch.md`
+- [customer_sell] SellingItemRowScene Need change to Small Card instead list row
 - [customer_sell] Conservative/aggressive strategy interaction and VFX polish — see `dev/docs/plans/customer_sell_strategy_vfx.sketch.md`
 
 ---

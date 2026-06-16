@@ -21,6 +21,8 @@ var _selected_index: int = -1
 var _pending_sale_price: int = 0
 var _pending_strategy: String = ""
 var _hovered_entry: ItemEntry = null
+var _selected_entry: ItemEntry = null
+var _preview_entry: ItemEntry = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -31,11 +33,9 @@ var _hovered_entry: ItemEntry = null
 @onready var _customer_queue: CustomerQueuePanel = %CustomerQueuePanel
 @onready var _item_list: SellingItemListPanel = %SellingItemListPanel
 @onready var _car_panel: CustomerCarPanel = %CustomerCarPanel
-@onready var _profile_panel: CustomerProfilePanel = %CustomerProfilePanel
 @onready var _selected_item_panel: SelectedItemPanel = %SelectedItemPanel
 @onready var _deal_panel: DealPanel = %DealPanel
 @onready var _receipt: SaleReceiptDialog = %SaleReceiptDialog
-@onready var _tooltip: ItemCardPopup = %TooltipPopup
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -84,7 +84,7 @@ func _on_customer_selected(index: int) -> void:
 func _on_item_pick_requested(entry: ItemEntry) -> void:
     if entry == null:
         return
-    _selected_item_panel.set_item(entry)
+    _show_item_detail(entry, false)
     var grid := _car_panel.get_grid()
     if grid.phase == PackingGrid.Phase.ITEM_HELD:
         grid.cancel_placement()
@@ -98,20 +98,18 @@ func _on_item_pick_requested(entry: ItemEntry) -> void:
     _item_list.update_row_states(grid)
 
 
-func _on_item_row_hovered(entry: ItemEntry, anchor: Rect2) -> void:
+func _on_item_row_hovered(entry: ItemEntry, _anchor: Rect2) -> void:
     if entry == null:
         return
     var grid := _car_panel.get_grid()
     grid.set_external_hover_item(entry)
-    _selected_item_panel.set_item(entry)
-    _tooltip.show_for(entry, anchor)
+    _show_item_detail(entry, true)
 
 
 func _on_item_row_hover_ended() -> void:
     var grid := _car_panel.get_grid()
     grid.set_external_hover_item(null)
-    _selected_item_panel.clear_display()
-    _tooltip.hide_popup()
+    _clear_preview_detail()
 
 
 func _on_grid_hover_started(cell_pos: Vector2i) -> void:
@@ -125,22 +123,20 @@ func _on_grid_hover_started(cell_pos: Vector2i) -> void:
     _hovered_entry = new_entry
     _item_list.set_external_highlight(_hovered_entry, true)
     if _hovered_entry != null:
-        _selected_item_panel.set_item(_hovered_entry)
-        _tooltip.show_for(_hovered_entry, _car_panel.get_global_rect())
+        _show_item_detail(_hovered_entry, true)
 
 
 func _on_grid_hover_ended() -> void:
     _item_list.set_external_highlight(_hovered_entry, false)
     _hovered_entry = null
-    _selected_item_panel.clear_display()
-    _tooltip.hide_popup()
+    _clear_preview_detail()
 
 
 func _on_grid_item_clicked(item) -> void:
     var entry := item as ItemEntry
     if entry == null:
         return
-    _selected_item_panel.set_item(entry)
+    _show_item_detail(entry, false)
     var grid := _car_panel.get_grid()
     grid.lift(entry)
     AudioManager.play_event(SELL_GRID_LIFT)
@@ -173,7 +169,6 @@ func _on_conservative_requested(price: int) -> void:
         return
     _pending_sale_price = price
     _pending_strategy = "conservative"
-    _tooltip.hide_popup()
     _receipt.show_receipt(placed, price, "conservative")
 
 
@@ -195,7 +190,6 @@ func _on_pitch_confirmed(price: int) -> void:
     var placed := _car_panel.get_grid().get_placed_items()
     _pending_sale_price = price
     _pending_strategy = "aggressive"
-    _tooltip.hide_popup()
     _receipt.show_receipt(placed, price, "aggressive")
 
 
@@ -218,6 +212,8 @@ func _on_receipt_confirmed(price: int, strategy: String) -> void:
     _customers.remove_at(_selected_index)
     _pending_sale_price = 0
     _pending_strategy = ""
+    _selected_entry = null
+    _preview_entry = null
 
     if _customers.is_empty():
         _show_empty_state("All customers served! End of night.")
@@ -253,7 +249,8 @@ func _select_customer(index: int) -> void:
     _selected_index = index
     _pending_sale_price = 0
     _pending_strategy = ""
-    _tooltip.hide_popup()
+    _selected_entry = null
+    _preview_entry = null
     _hovered_entry = null
     _deal_panel.reset()
     _selected_item_panel.clear_display()
@@ -268,7 +265,6 @@ func _select_customer(index: int) -> void:
     grid.setup(customer.grid_columns, customer.grid_rows)
 
     _car_panel.setup(customer)
-    _profile_panel.setup(customer)
     _item_list.rebuild(
         customer,
         MetaManager.storage.storage_items,
@@ -296,6 +292,24 @@ func _show_empty_state(message: String) -> void:
     _main_area.hide()
     _customer_queue.hide()
 
+# ══ Item detail preview/selection ═════════════════════════════════════════════
+
+
+func _show_item_detail(entry: ItemEntry, preview: bool) -> void:
+    if preview:
+        _preview_entry = entry
+    else:
+        _selected_entry = entry
+    _selected_item_panel.set_item(entry)
+
+
+func _clear_preview_detail() -> void:
+    _preview_entry = null
+    if _selected_entry != null:
+        _selected_item_panel.set_item(_selected_entry)
+    else:
+        _selected_item_panel.clear_display()
+
 # ══ Car display ═══════════════════════════════════════════════════════════════
 
 
@@ -303,7 +317,7 @@ func _refresh_car_display() -> void:
     if _selected_index < 0:
         return
     var placed := _car_panel.get_grid().get_placed_items()
-    _profile_panel.set_car_info(placed)
+    _car_panel.set_car_info(placed)
     _item_list.update_row_states(_car_panel.get_grid())
     _deal_panel.set_placed_items(placed)
 

@@ -1,6 +1,7 @@
 # customer_car_panel.gd
-# Wraps the shared PackingGrid in a selling-specific shell — car title, capacity, clear action.
-# Reads:  PackingGrid, CustomerEntry
+# Wraps the shared PackingGrid in a selling-specific shell — customer info, car title, capacity,
+# car summary stats, clear action.
+# Reads:  CustomerEntry, ClueRegistry, SellMath
 # Writes: nothing
 class_name CustomerCarPanel
 extends PanelContainer
@@ -22,8 +23,11 @@ var _customer: CustomerEntry = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
-@onready var _car_title_label: Label = %CarTitleLabel
+@onready var _customer_name_label: Label = %CustomerNameLabel
 @onready var _capacity_label: Label = %CapacityLabel
+@onready var _demand_tags_label: Label = %DemandTagsLabel
+@onready var _car_total_label: Label = %CarTotalLabel
+@onready var _verified_count_label: Label = %VerifiedCountLabel
 @onready var _grid: PackingGrid = %PackingGrid
 @onready var _clear_button: SfxButton = %ClearButton
 
@@ -62,14 +66,41 @@ func refresh() -> void:
     if is_node_ready():
         _apply()
 
+
+func set_car_info(placed_items: Array) -> void:
+    if not is_node_ready():
+        return
+    var total := 0
+    var verified_count := 0
+    for item in placed_items:
+        var entry := item as ItemEntry
+        if entry == null:
+            continue
+        total += entry.item_price
+        if SellMath.is_item_verified(entry):
+            verified_count += 1
+    _car_total_label.text = "Car total: $%d" % total
+    _verified_count_label.text = "Verified: %d / %d" % [verified_count, placed_items.size()]
+
 # ══ Internal ══════════════════════════════════════════════════════════════════
 
 
 func _apply() -> void:
     if _customer == null:
         return
-    _car_title_label.text = "%s's Car" % _customer.display_name
+    _customer_name_label.text = _customer.display_name
     _capacity_label.text = "Capacity: %d\u00d7%d" % [_customer.grid_columns, _customer.grid_rows]
+    _demand_tags_label.text = "Wants: %s" % _format_demand_tags()
+    _car_total_label.text = "Car total: $0"
+    _verified_count_label.text = "Verified: 0 / 0"
+
+
+func _format_demand_tags() -> String:
+    var tag_names: Array[String] = []
+    for tag: String in _customer.demand_tags:
+        var clue := ClueRegistry.get_clue_by_id(tag)
+        tag_names.append(clue.known_text if clue != null and clue.known_text != "" else tag)
+    return ", ".join(tag_names)
 
 
 func _show_placeholder_grid() -> void:
