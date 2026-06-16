@@ -14,6 +14,10 @@ Rules:
 
 ## v0.1.3 - Draft
 
+### Selling Scene Item Visibility
+
+- 2026-06-16 — [customer_sell] Customer sell rows and loaded car items now surface the shared item-card popup so sale decisions can inspect value, condition, verification, and clue state before confirmation
+
 ### Debug Auction Quick-Win Buttons
 
 - 2026-06-16 — [debug] Auction scene gains two debug-only buttons: "Win at Opening Bid" and "Win at Rolled Price", both skipping the NPC bidding loop and resolving through a shared `_win_now(price)` guard against double-resolution
