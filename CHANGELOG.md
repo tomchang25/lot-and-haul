@@ -12,7 +12,9 @@ Rules:
 - When a phase ships, append the entry here and cut the shipped work from its plan/TODO source.
 - Do not add entries for dev-process-only maintenance, including closeout workflow changes, CHANGELOG/TODO edits, plan archival, or tracking cleanup.
 
-## v0.1.2 - Draft
+## v0.1.3 - Draft
+
+## v0.1.2
 
 ### Customer Generation
 
