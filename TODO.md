@@ -75,6 +75,14 @@ DialogManager, a shared overlay autoload, data-driven from the start — linear 
 
 `LotData.rarity_weights` is still authored in lot YAML and shown on lot cards, but `ItemGenerator.draw()` no longer reads it. Rarity now falls out of the generated item's hidden clue count, which is currently determined by selected affix combinations. Decide whether rarity should become an affix/combo authoring outcome or remain a lot-level draw constraint, then align lot UI, data authoring, storage costs, XP, sorting, and color tuning.
 
+### Generic Affix Vocabulary and Clue Notes
+
+Affix content should compress player learning instead of increasing entropy. Prefer a small reusable vocabulary of roughly 10-20 generic affix patterns that appear across categories, so players can learn familiar lookup and prediction actions instead of ignoring affix/clue combinations as bespoke noise.
+
+Category still provides the concrete clue implementations, but the generic affix defines the player-facing prediction frame. `Suspicious` should consistently point toward authenticity, provenance, or source-risk questions; `Restored` toward repair and alteration; `Signed` toward maker or attribution; `Damaged` toward condition risk; `Rare` toward upside that needs hidden confirmation. The point is not semantic flavor reuse, but a stable decision vocabulary that makes unrevealed and hidden clue inference manageable.
+
+This should pair with the future clue notes system. Seeing an affix plus some revealed clues should let the player check notes, narrow possible unrevealed or hidden branches, and eventually benefit from mastery or reputation buffs that improve how much of that pattern can be read before full verification.
+
 ### Image v3 — Lot & Scene Decoration
 
 Lot card decoration with a random icon/badge per lot. Phase-dependent decoration: worker loading truck in cargo, auctioneer gavel in auction, etc. Needs an asset pipeline — blocked on visual direction.
@@ -159,6 +167,22 @@ Daily interest on cash reserves, game-over condition when debt threshold is cros
 
 Weighted tag pools (calendar/event/progression-driven), regular customers with fixed profiles, quality tiers (budget vs. collector), selling-related perks. Builds on the current nightly customer system.
 
+### Shop Preparation Layer
+
+Daytime shop actions should prepare tonight's business instead of opening the shop immediately. This keeps the fantasy that the shop is actually pressable at night while preserving a strategic reason to spend earlier slots on selling-related setup.
+
+Possible preparation actions: `Prepare Shop` to improve customer volume or quality, `Set Tonight Tags` to bias demand toward categories or clue families the player wants to move, and `Assign Employee` to decide who handles routine selling work. The evening `Open Shop` action remains the actual manual customer-sell entry point and day closeout.
+
+This layer should sit between the current slot commitment model and later employee automation. It can explain why a player who spent more of the day preparing gets better traffic or matching without requiring the selling scene to be entered before night.
+
+### Half-AFK Shop
+
+Add a low-friction employee-assisted selling path for nights when the player does not want to manually pack every customer car. The player sets tonight tags and assigns an NPC employee, then the employee auto-sells a limited set of matching items at about `x1.0` to `x1.5` price depending on employee attributes.
+
+Manual selling should remain the high-control, high-upside option. Half-AFK selling is a convenience lane: lower interaction cost, lower ceiling than strong manual play, and meaningful dependence on the employee's appraisal or negotiation profile. It should avoid full-storage liquidation and should not blindly sell high-risk unverified items unless the player explicitly allows that behavior.
+
+This likely depends on the shop preparation layer, because tags and assigned employee need to be chosen before the night resolves.
+
 ### Garage Sell
 
 Sell individual items in a garage-style scene modelled on `game/run/auction/`. System placement unclear: merchant surface or standalone selling channel? Deferred until the customer sell flow is stable.
@@ -207,7 +231,11 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 > Flows currently being built or ready to implement — may hold more than one entry. One-line pointer each — same format as `## Plan`, promoted here when building starts or the plan is ready to build.
 > Phase detail and progress live in the linked `dev/docs/plans/` file;
 > Ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched.
-> All phases shipped → archive the plan file + delete this line. Nothing currently in progress.
+> All phases shipped → archive the plan file + delete this line.
+
+- [deep_storage] One-click Deep Storage grants an enlarged storage AP budget while preserving evening shop — see `dev/docs/plans/deep_storage_slot.sketch.md`
+
+- [customer_sell] Selling scene item-info repair and formal layout pass with shared item-card popup support — see `dev/docs/plans/selling_scene_rework.sketch.md`
 
 ---
 
