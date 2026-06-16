@@ -218,9 +218,6 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 - [affix_dictionary] Player-facing affix dictionary that tracks affix combination discovery, hidden-risk learning, and gated probability reads — see `dev/docs/plans/affix_dictionary.sketch.md`
 
-- [dev/auto-auction] Debug-only quick-win buttons: instant player win at opening bid or rolled price (skip NPC bidding loop; rolled path seeds future auto-bid perk) — see `dev/docs/plans/debug_auto_auction.md`
-- [dev/auto-cargo] Debug-only quick-pack buttons: legal one-press auto-pack (seeds future auto-place perk) + stuff-all-and-go ignoring capacity — see `dev/docs/plans/debug_auto_cargo.md`
-
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 
 - [unlock_gating] Requirement-gated premium auction tiers + lot kinds, with location tier reference table & audit — see `dev/docs/plans/unlock_gating_location_tiers.md`

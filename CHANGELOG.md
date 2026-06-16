@@ -14,6 +14,14 @@ Rules:
 
 ## v0.1.3 - Draft
 
+### Debug Auction Quick-Win Buttons
+
+- 2026-06-16 — [debug] Auction scene gains two debug-only buttons: "Win at Opening Bid" and "Win at Rolled Price", both skipping the NPC bidding loop and resolving through a shared `_win_now(price)` guard against double-resolution
+
+### Debug Cargo Quick-Pack Buttons
+
+- 2026-06-16 — [debug] Cargo scene gains two debug-only buttons: "Auto-Pack Items" (first-fit legal grid fill with trailer spill-over) and "Stuff All & Go" (commits all items as main cargo regardless of capacity, jumps to run review)
+
 ## v0.1.2
 
 ### Customer Generation

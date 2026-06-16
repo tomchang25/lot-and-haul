@@ -40,6 +40,7 @@ var _bid_enabled: bool = true
 var _shorten_next_npc_tick: bool = false
 var _last_npc_index: int = -1 # tracks the last NPC to prevent repeats
 var _circle_node: _CircleProgress = null
+var _resolved: bool = false # guards against double-resolution from debug buttons + normal flow
 var _debug_label: Label = null # gated by Debug.enabled; never exposes _rolled_price in release
 
 # ── Timer / tween handles ─────────────────────────────────────────────────────
@@ -304,15 +305,34 @@ func _reset_circle() -> void:
 
 
 func _resolve() -> void:
+    if _last_bidder == "player":
+        _win_now(_current_display_price)
+    else:
+        _bid_button.disabled = true
+        _pass_button.disabled = true
+        SceneRouter.go_to_reveal()
+
+
+## Resolves the auction as a player win at an arbitrary price, stopping all
+## timers and animations, committing the lot win, and navigating to reveal.
+## Safe to call from normal resolution or debug shortcuts — a guard flag
+## prevents double-resolution.
+func _win_now(price: int) -> void:
+    if _resolved:
+        return
+    _resolved = true
+
+    if _npc_timer:
+        _npc_timer.stop()
+    if _circle_tween:
+        _circle_tween.kill()
+
     _bid_button.disabled = true
     _pass_button.disabled = true
+    _bid_enabled = false
 
-    if _last_bidder == "player":
-        # lot_items proxy already returns a duplicate — use it directly as the
-        # canonical won-items snapshot for this lot.
-        RunManager.commit_lot_win(RunManager.lot.lot_items, _current_display_price)
-        AudioManager.play_event(AUCTION_WON)
-
+    RunManager.commit_lot_win(RunManager.lot.lot_items, price)
+    AudioManager.play_event(AUCTION_WON)
     SceneRouter.go_to_reveal()
 
 # ══ Budget refresh ══════════════════════════════════════════════════════════════
@@ -399,6 +419,22 @@ func _init_debug_overlay() -> void:
     # node-src: debug
     add_child(_debug_label)
     Debug.toggled.connect(_on_debug_toggled)
+
+    # ── Quick-win buttons ──────────────────────────────────────────────────
+    var opening_bid := max(lot.get_opening_bid(), MIN_STEP)
+    var button_bar: HBoxContainer = $RootVBox/ButtonBar
+
+    var open_btn := Button.new()
+    open_btn.text = "Win at Opening Bid ($%d)" % opening_bid
+    open_btn.pressed.connect(_win_now.bind(opening_bid))
+    # node-src: debug
+    button_bar.add_child(open_btn)
+
+    var rolled_btn := Button.new()
+    rolled_btn.text = "Win at Rolled Price ($%d)" % _rolled_price
+    rolled_btn.pressed.connect(_win_now.bind(_rolled_price))
+    # node-src: debug
+    button_bar.add_child(rolled_btn)
 
 
 func _on_debug_toggled(is_enabled: bool) -> void:

@@ -109,6 +109,7 @@ func _ready() -> void:
     _build_extra_slots()
     _recalc_totals()
     _refresh_ui()
+    _init_debug_overlay()
 
 
 func _input(event: InputEvent) -> void:
@@ -572,6 +573,111 @@ func _build_summary_text() -> String:
         "Left behind: %d  (sold on-site for $%d)\n\n" % [unplaced_count, proceeds] +
         "Continue to settlement?"
     )
+
+# ══ Debug overlay ══════════════════════════════════════════════════════════════
+# Gated by Debug.enabled (OS.is_debug_build() AND SettingsStore.debug_mode).
+
+
+func _init_debug_overlay() -> void:
+    if not Debug.enabled:
+        return
+
+    # ── Auto-pack button ──────────────────────────────────────────────────
+    var auto_pack_btn := Button.new()
+    auto_pack_btn.text = "Auto-Pack Items"
+    auto_pack_btn.pressed.connect(_debug_auto_pack)
+    auto_pack_btn.anchor_left = 0.0
+    auto_pack_btn.anchor_top = 1.0
+    auto_pack_btn.anchor_right = 0.0
+    auto_pack_btn.anchor_bottom = 1.0
+    auto_pack_btn.offset_left = 152.0
+    auto_pack_btn.offset_top = -56.0
+    auto_pack_btn.offset_bottom = -16.0
+    auto_pack_btn.custom_minimum_size = Vector2(150, 40)
+    # node-src: debug
+    add_child(auto_pack_btn)
+
+    # ── Stuff-all & go button ─────────────────────────────────────────────
+    var stuff_btn := Button.new()
+    stuff_btn.text = "Stuff All & Go"
+    stuff_btn.pressed.connect(_debug_stuff_all)
+    stuff_btn.anchor_left = 0.0
+    stuff_btn.anchor_top = 1.0
+    stuff_btn.anchor_right = 0.0
+    stuff_btn.anchor_bottom = 1.0
+    stuff_btn.offset_left = 310.0
+    stuff_btn.offset_top = -56.0
+    stuff_btn.offset_bottom = -16.0
+    stuff_btn.custom_minimum_size = Vector2(150, 40)
+    # node-src: debug
+    add_child(stuff_btn)
+
+    Debug.toggled.connect(_on_debug_toggled)
+
+
+func _on_debug_toggled(_is_enabled: bool) -> void:
+    # Debug overlay buttons are created only at _ready() when Debug.enabled is
+    # true, so toggling debug off mid-scene hides nothing (the buttons never
+    # exist in release). This stub documents the choice and prevents lint
+    # warnings about an unused connection.
+    pass
+
+
+## One-press legal auto-pack. Places every unplaced item into the grid using
+## first-fit (left-to-right, top-to-bottom), then spills overflow into trailer
+## slots. Items that fit nowhere stay unloaded. No rearrangement — only fills.
+func _debug_auto_pack() -> void:
+    if not Debug.enabled:
+        return
+
+    var cols: int = RunManager.run.car_data.grid_columns
+    var rows: int = RunManager.run.car_data.grid_rows
+
+    for entry: ItemEntry in _won_items:
+        if _is_item_loaded(entry):
+            continue
+
+        var placed := false
+
+        # First-fit: scan grid left-to-right, top-to-bottom.
+        for y in rows:
+            for x in cols:
+                var origin := Vector2i(x, y)
+                if _cargo_grid.can_place(entry, origin):
+                    _cargo_grid.place(entry, origin)
+                    placed = true
+                    _recalc_totals()
+                    break
+            if placed:
+                break
+
+        if placed:
+            continue
+
+        # Spill overflow into the first free trailer slot.
+        for i in _extra_slot_items.size():
+            if _extra_slot_items[i] == null:
+                _extra_slot_items[i] = entry
+                placed = true
+                break
+
+    _recalc_totals()
+    _refresh_ui()
+
+
+## One-press stuff-all: commits every won item as main cargo regardless of
+## grid/weight capacity, with empty trailer and zero on-site proceeds, and
+## jumps straight to run review with no confirm popup.
+func _debug_stuff_all() -> void:
+    if not Debug.enabled:
+        return
+
+    var cargo: Array[ItemEntry] = []
+    for entry: ItemEntry in _won_items:
+        cargo.append(entry)
+
+    RunManager.commit_cargo(cargo, [], 0)
+    SceneRouter.go_to_run_review()
 
 # ══ Tooltip helpers ════════════════════════════════════════════════════════════
 
