@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://cvyujuur8ye7x"]
+
+[ext_resource type="Script" uid="uid://drjk57d2brnak" path="res://game/meta/customer_sell/components/sale_receipt_dialog.gd" id="1_srd"]
+
+[node name="SaleReceiptDialog" type="ConfirmationDialog" unique_id=1687403893]
+oversampling_override = 1.0
+title = "Sale Result"
+position = Vector2i(0, 0)
+size = Vector2i(247, 100)
+visible = true
+ok_button_text = "Confirm Sale"
+dialog_text = "Receipt details will appear here."
+dialog_autowrap = true
+script = ExtResource("1_srd")

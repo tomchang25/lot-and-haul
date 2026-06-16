@@ -14,6 +14,13 @@ Rules:
 
 ## v0.1.3 - Draft
 
+### Selling Scene Component Modularization
+
+- 2026-06-16 — [customer_sell] Selling screen decomposed into 7 focused scene-backed components (SellingItemRow, SellingItemListPanel, SelectedItemPanel, DealPanel, CustomerQueuePanel, CustomerProfilePanel, CustomerCarPanel, SaleReceiptDialog) so redesign and debugging no longer require editing one large scene script
+- 2026-06-16 — [customer_sell] Root selling screen script thinned from 546 lines to ~320 — now a state coordinator that wires component signals rather than painting every UI surface directly
+- 2026-06-16 — [customer_sell] Persistent layout structure (scroll shells, empty states, section titles) moved into component .tscn files; only data-variable rows, tabs, and dice buttons created at runtime
+- 2026-06-16 — [customer_sell] Each component follows setup() + \_apply() pattern with is_node_ready() guard, emits user-intent signals, and exposes public state methods instead of direct node access from the parentit
+
 ### Selling Scene Item Visibility
 
 - 2026-06-16 — [customer_sell] Customer sell rows and loaded car items now surface the shared item-card popup so sale decisions can inspect value, condition, verification, and clue state before confirmation

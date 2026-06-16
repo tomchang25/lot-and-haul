@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/meta/customer_sell/components/selected_item_panel.gd" id="1_sip"]
+
+[node name="SelectedItemPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(220, 150)
+script = ExtResource("1_sip")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Selected Item"
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "No item selected"
+
+[node name="ValueLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Value: -"
+
+[node name="ConditionLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Condition: -"
+
+[node name="RarityLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Rarity: -"
+
+[node name="VerifiedLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Verification: -"

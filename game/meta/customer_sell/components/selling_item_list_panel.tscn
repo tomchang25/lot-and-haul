@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/meta/customer_sell/components/selling_item_list_panel.gd" id="1_silp"]
+
+[node name="SellingItemListPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(260, 360)
+script = ExtResource("1_silp")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ListEmptyLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "No matching items loaded."
+modulate = Color(0.6, 0.6, 0.6, 1)
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ItemListVBox" type="VBoxContainer" parent="VBox/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ListPlaceholderLabel" type="Label" parent="VBox/ScrollContainer/ItemListVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Item rows appear here"

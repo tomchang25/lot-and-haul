@@ -1,0 +1,53 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/meta/customer_sell/components/customer_profile_panel.gd" id="1_cpp"]
+
+[node name="CustomerProfilePanel" type="PanelContainer"]
+custom_minimum_size = Vector2(220, 160)
+script = ExtResource("1_cpp")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Customer"
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Customer Name"
+vertical_alignment = 1
+
+[node name="GridSizeLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Car: ?×?"
+
+[node name="DemandTagsLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Wants: -"
+autowrap_mode = 2
+max_lines_visible = 3
+
+[node name="HSeparator" type="HSeparator" parent="VBox"]
+layout_mode = 2
+
+[node name="CarTotalLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Car total: $0"
+
+[node name="VerifiedCountLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Verified: 0 / 0"

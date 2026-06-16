@@ -1,0 +1,48 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/meta/customer_sell/components/customer_car_panel.gd" id="1_ccp"]
+[ext_resource type="Script" path="res://game/shared/packing/packing_grid.gd" id="2_pg"]
+[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="3_sfx"]
+
+[node name="CustomerCarPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(420, 380)
+script = ExtResource("1_ccp")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="HeaderRow" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+
+[node name="CarTitleLabel" type="Label" parent="VBox/HeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+text = "Customer's Car"
+
+[node name="CapacityLabel" type="Label" parent="VBox/HeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Capacity: ?×?"
+
+[node name="PackingGrid" type="GridContainer" parent="VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 300)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("2_pg")
+
+[node name="ClearButton" type="Button" parent="VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_font_sizes/font_size = 15
+text = "Clear Car"
+script = ExtResource("3_sfx")
