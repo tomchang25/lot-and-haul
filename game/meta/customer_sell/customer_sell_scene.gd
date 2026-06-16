@@ -277,7 +277,6 @@ func _select_customer(index: int) -> void:
     )
     _deal_panel.set_placed_items(grid.get_placed_items())
 
-    _main_area.show()
     _empty_label.hide()
 
 

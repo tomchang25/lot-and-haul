@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="2_sfx"]
 
 [node name="DealPanel" type="PanelContainer"]
-custom_minimum_size = Vector2(220, 260)
+custom_minimum_size = Vector2(220, 150)
 script = ExtResource("1_dp")
 
 [node name="VBox" type="VBoxContainer" parent="."]
@@ -35,6 +35,7 @@ script = ExtResource("2_sfx")
 
 [node name="DiceSection" type="VBoxContainer" parent="VBox"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_override_constants/separation = 4
 

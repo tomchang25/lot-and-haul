@@ -22,6 +22,7 @@ var _fit_count: int = 0
 var _loaded: bool = false
 var _hovered: bool = false
 var _holding: bool = false
+var _selected: bool = false
 var _ext_highlighted: bool = false
 
 # ── Node references ───────────────────────────────────────────────────────────
@@ -74,6 +75,12 @@ func set_holding(val: bool) -> void:
         _apply_state_style()
 
 
+func set_selected(val: bool) -> void:
+    _selected = val
+    if is_node_ready():
+        _apply_state_style()
+
+
 func set_external_highlight(val: bool) -> void:
     _ext_highlighted = val
     if is_node_ready():
@@ -106,6 +113,8 @@ func _apply_state_style() -> void:
         style = get_theme_stylebox(&"hovered", &"SellingItemRow")
     elif _holding:
         style = get_theme_stylebox(&"holding", &"SellingItemRow")
+    elif _selected:
+        style = get_theme_stylebox(&"selected", &"SellingItemRow")
     elif _loaded:
         style = get_theme_stylebox(&"loaded", &"SellingItemRow")
     else:

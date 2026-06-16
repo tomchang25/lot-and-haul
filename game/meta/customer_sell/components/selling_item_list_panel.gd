@@ -17,6 +17,7 @@ const SellingItemRowScene: PackedScene = preload("res://game/meta/customer_sell/
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _item_rows: Dictionary = { } # ItemEntry -> SellingItemRow
+var _selected_entry: ItemEntry = null
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -110,7 +111,21 @@ func _clear_rows() -> void:
 func _on_row_pressed(entry: ItemEntry, _row: SellingItemRow) -> void:
     if entry == null:
         return
+    _set_selected_entry(entry)
+    item_selected.emit(entry)
     item_pick_requested.emit(entry)
+
+
+func _set_selected_entry(entry: ItemEntry) -> void:
+    if _selected_entry == entry:
+        return
+    var prev_row := _item_rows.get(_selected_entry) as SellingItemRow
+    if prev_row != null:
+        prev_row.set_selected(false)
+    _selected_entry = entry
+    var new_row := _item_rows.get(entry) as SellingItemRow
+    if new_row != null:
+        new_row.set_selected(true)
 
 
 func _on_tooltip_requested(entry: ItemEntry, anchor: Rect2) -> void:

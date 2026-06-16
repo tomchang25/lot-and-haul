@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" path="res://game/meta/customer_sell/components/customer_profile_panel.tscn" id="5_cpp"]
 [ext_resource type="PackedScene" path="res://game/meta/customer_sell/components/selected_item_panel.tscn" id="6_sip"]
 [ext_resource type="PackedScene" path="res://game/meta/customer_sell/components/deal_panel.tscn" id="7_dp"]
-[ext_resource type="PackedScene" path="res://game/meta/customer_sell/components/sale_receipt_dialog.tscn" id="8_srd"]
+[ext_resource type="PackedScene" uid="uid://cvyujuur8ye7x" path="res://game/meta/customer_sell/components/sale_receipt_dialog.tscn" id="8_srd"]
 [ext_resource type="PackedScene" uid="uid://dk4vsndd2lfnm" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="9_sbo"]
 [ext_resource type="PackedScene" uid="uid://tnbmlptuuk3i" path="res://game/shared/item_display/item_card_popup.tscn" id="10_popup"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
@@ -60,45 +60,48 @@ theme_override_font_sizes/font_size = 16
 text = "Day 1"
 vertical_alignment = 1
 
-[node name="CustomerQueuePanel" parent="RootVBox" instance=ExtResource("2_cqp")]
+[node name="HeaderRightSpacer" type="Control" parent="RootVBox/HeaderRow" unique_id=42784276]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CustomerQueuePanel" parent="RootVBox" unique_id=507195485 instance=ExtResource("2_cqp")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="MainArea" type="HBoxContainer" parent="RootVBox" unique_id=785758664]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="SellingItemListPanel" parent="RootVBox/MainArea" instance=ExtResource("3_silp")]
+[node name="SellingItemListPanel" parent="RootVBox/MainArea" unique_id=505066450 instance=ExtResource("3_silp")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
-size_flags_horizontal = 2
 size_flags_vertical = 3
 
-[node name="CustomerCarPanel" parent="RootVBox/MainArea" instance=ExtResource("4_ccp")]
+[node name="CustomerCarPanel" parent="RootVBox/MainArea" unique_id=163487352 instance=ExtResource("4_ccp")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="SellSidebar" type="VBoxContainer" parent="RootVBox/MainArea"]
+[node name="SellSidebar" type="VBoxContainer" parent="RootVBox/MainArea" unique_id=1313532282]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="CustomerProfilePanel" parent="RootVBox/MainArea/SellSidebar" instance=ExtResource("5_cpp")]
+[node name="CustomerProfilePanel" parent="RootVBox/MainArea/SellSidebar" unique_id=1992656702 instance=ExtResource("5_cpp")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="SelectedItemPanel" parent="RootVBox/MainArea/SellSidebar" instance=ExtResource("6_sip")]
+[node name="SelectedItemPanel" parent="RootVBox/MainArea/SellSidebar" unique_id=974691496 instance=ExtResource("6_sip")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="DealPanel" parent="RootVBox/MainArea/SellSidebar" instance=ExtResource("7_dp")]
+[node name="DealPanel" parent="RootVBox/MainArea/SellSidebar" unique_id=347134492 instance=ExtResource("7_dp")]
 unique_name_in_owner = true
 layout_mode = 2
 
@@ -112,7 +115,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "\u2190 Back to Hub"
+text = "  Back to Hub"
 script = ExtResource("99_sfx")
 
 [node name="EmptyLabel" type="Label" parent="." unique_id=125428447]
@@ -129,8 +132,9 @@ text = "No customers tonight."
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SaleReceiptDialog" parent="." instance=ExtResource("8_srd")]
+[node name="SaleReceiptDialog" parent="." unique_id=215182387 instance=ExtResource("8_srd")]
 unique_name_in_owner = true
+size = Vector2i(247, 110)
 
 [node name="TooltipPopup" parent="." unique_id=1000000102 instance=ExtResource("10_popup")]
 unique_name_in_owner = true
