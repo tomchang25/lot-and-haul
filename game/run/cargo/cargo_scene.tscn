@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://doaqxqk7u1no0" path="res://game/shared/packing/packing_grid.gd" id="2_packing_grid"]
 [ext_resource type="PackedScene" uid="uid://tnbmlptuuk3i" path="res://game/shared/item_display/item_card_popup.tscn" id="3_popup"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="4_sbo"]
 
 [node name="CargoSceneV2" type="Control" unique_id=1664710573]
 layout_mode = 3
@@ -214,3 +215,5 @@ ok_button_text = "Confirm"
 [node name="TooltipPopup" parent="." unique_id=1000000100 instance=ExtResource("3_popup")]
 unique_name_in_owner = true
 layout_mode = 0
+
+[node name="SettingsButtonOverlay" parent="." instance=ExtResource("4_sbo")]

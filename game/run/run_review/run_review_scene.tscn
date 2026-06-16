@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://tnbmlptuuk3i" path="res://game/shared/item_display/item_card_popup.tscn" id="3_popup"]
 [ext_resource type="PackedScene" path="res://game/run/run_review/cargo_manifest_panel/cargo_manifest_panel.tscn" id="4_cmp"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="5_sbo"]
 
 [node name="RunReviewScene" type="Control" unique_id=1396820394]
 layout_mode = 3
@@ -163,3 +164,5 @@ script = ExtResource("99_sfx")
 [node name="TooltipPopup" parent="." unique_id=1081176488 instance=ExtResource("3_popup")]
 unique_name_in_owner = true
 layout_mode = 0
+
+[node name="SettingsButtonOverlay" parent="." instance=ExtResource("5_sbo")]

@@ -209,7 +209,6 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 > Ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched.
 > All phases shipped → archive the plan file + delete this line. Nothing currently in progress.
 
-
 ---
 
 ## Plan

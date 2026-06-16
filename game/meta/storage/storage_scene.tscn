@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://u48bbtcw2fm4" path="res://game/meta/storage/storage_scene.gd" id="1_uoidr"]
 [ext_resource type="PackedScene" uid="uid://bi01jgyv1md6o" path="res://game/shared/item_display/item_browser_panel/item_browser_panel.tscn" id="2_browser"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="3_sbo"]
 
 [node name="StorageScene" type="Control" unique_id=303272155]
 layout_mode = 3
@@ -370,3 +371,5 @@ theme_override_font_sizes/font_size = 12
 text = "Click an item to view details"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="SettingsButtonOverlay" parent="." instance=ExtResource("3_sbo")]

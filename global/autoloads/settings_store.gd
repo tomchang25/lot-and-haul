@@ -22,6 +22,7 @@ var _overlay_instance: CanvasLayer = null
 
 
 func _ready() -> void:
+    process_mode = Node.PROCESS_MODE_ALWAYS
     load_settings()
     apply_audio()
     apply_display()

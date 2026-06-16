@@ -22,6 +22,10 @@ Rules:
 
 - 2026-06-16 — [debug] Cargo scene gains two debug-only buttons: "Auto-Pack Items" (first-fit legal grid fill with trailer spill-over) and "Stuff All & Go" (commits all items as main cargo regardless of capacity, jumps to run review)
 
+### Settings Button Overlay
+
+- 2026-06-16 — [ui] SettingsButtonOverlay component instanced across all 16 gameplay screens; SettingsStore uses PROCESS_MODE_ALWAYS so Escape closes the overlay while paused
+
 ## v0.1.2
 
 ### Customer Generation

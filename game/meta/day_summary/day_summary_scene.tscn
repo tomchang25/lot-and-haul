@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://herl5nijad6n" path="res://game/meta/day_summary/day_summary_scene.gd" id="1_script"]
 [ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="2_sbo"]
 
 [node name="DaySummaryScene" type="Control" unique_id=903261577]
 layout_mode = 3
@@ -164,3 +165,5 @@ custom_minimum_size = Vector2(160, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Continue"
+
+[node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]

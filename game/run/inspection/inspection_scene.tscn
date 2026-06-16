@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bi01jgyv1md6o" path="res://game/shared/item_display/item_browser_panel/item_browser_panel.tscn" id="3_browser"]
 [ext_resource type="PackedScene" uid="uid://cddj8ljbhn4sb" path="res://game/run/inspection/inspection_summary_popup/inspection_summary_popup.tscn" id="4_summary"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="5_sbo"]
 
 [node name="InspectionScene" type="Control" unique_id=2043279360]
 layout_mode = 3
@@ -308,3 +309,5 @@ text = "No further inspection available"
 [node name="SummaryPopup" parent="." instance=ExtResource("4_summary")]
 visible = false
 unique_name_in_owner = true
+
+[node name="SettingsButtonOverlay" parent="." instance=ExtResource("5_sbo")]

@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://dk4vsndd2lfnm"]
+
+[ext_resource type="Script" uid="uid://w07balgag01e" path="res://game/shared/settings_button_overlay/settings_button_overlay.gd" id="1_sbo"]
+[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+
+[node name="SettingsButtonOverlay" type="CanvasLayer" unique_id=714171414]
+layer = 10
+script = ExtResource("1_sbo")
+
+[node name="SettingsButton" type="Button" parent="." unique_id=80196417]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 44)
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -59.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = 52.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 18
+text = "⚙"
+script = ExtResource("99_sfx")

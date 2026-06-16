@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cuw7v0qpqfq4l" path="res://game/run/auction/auction_scene.gd" id="1_auction"]
 [ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="2_sbo"]
 
 [node name="AuctionScene" type="Control" unique_id=1003257590]
 layout_mode = 3
@@ -98,3 +99,5 @@ script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 text = "Bid"
+
+[node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]

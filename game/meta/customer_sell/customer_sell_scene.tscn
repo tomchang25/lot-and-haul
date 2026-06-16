@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://b61ssm5ecobc4" path="res://game/meta/customer_sell/customer_sell_scene.gd" id="1_css"]
 [ext_resource type="Script" path="res://game/shared/packing/packing_grid.gd" id="2_packing_grid"]
 [ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="3_sbo"]
 
 [node name="CustomerSellScene" type="Control" unique_id=331840253]
 layout_mode = 3
@@ -218,3 +219,5 @@ vertical_alignment = 1
 title = "Sale Result"
 ok_button_text = "Confirm Sale"
 dialog_autowrap = true
+
+[node name="SettingsButtonOverlay" parent="." instance=ExtResource("3_sbo")]

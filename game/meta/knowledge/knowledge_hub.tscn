@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://4x30301vpql" path="res://game/meta/knowledge/knowledge_hub.gd" id="1_script"]
 [ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="2_sbo"]
 
 [node name="KnowledgeHub" type="Control"]
 layout_mode = 3
@@ -79,3 +80,5 @@ custom_minimum_size = Vector2(200, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Back"
+
+[node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]

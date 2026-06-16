@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bwrhentry001"]
 
 [ext_resource type="Script" uid="uid://cbl7v53qh4tu0" path="res://game/run/location_entry/location_entry_scene.gd" id="1_locentry"]
+[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="2_sbo"]
 
 [node name="LocationEntry" type="Control" unique_id=70781841]
 layout_mode = 3
@@ -19,3 +20,5 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 stretch_mode = 6
+
+[node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ba36wua7kesgv" path="res://game/meta/location_select/location_select_scene.gd" id="1_locsel"]
 [ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="2_sbo"]
 
 [node name="LocationSelect" type="Control" unique_id=-294967295]
 layout_mode = 3
@@ -59,3 +60,5 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 16
 text = "Back"
+
+[node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]
