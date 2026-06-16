@@ -92,6 +92,13 @@ theme_override_font_sizes/font_size = 18
 text = "Storage  (work items)"
 script = ExtResource("99_sfx")
 
+[node name="DeepStorageButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000015]
+custom_minimum_size = Vector2(240, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Deep Storage  (extended workshop)"
+script = ExtResource("99_sfx")
+
 [node name="MerchantButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000011]
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2

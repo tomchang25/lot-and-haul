@@ -233,8 +233,6 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 > Ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched.
 > All phases shipped → archive the plan file + delete this line.
 
-- [deep_storage] One-click Deep Storage grants an enlarged storage AP budget while preserving evening shop — see `dev/docs/plans/deep_storage_slot.sketch.md`
-
 - [customer_sell] Selling scene item-info repair and formal layout pass with shared item-card popup support — see `dev/docs/plans/selling_scene_rework.sketch.md`
 
 ---

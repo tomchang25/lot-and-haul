@@ -135,6 +135,17 @@ func begin_storage_slot() -> void:
     SaveManager.mark_dirty()
 
 
+## Begins a Deep Storage slot: advances the slot to Evening (3) and seeds
+## storage_ap with an enlarged pool (STORAGE_AP_MAX * DEEP_STORAGE_AP_MULTIPLIER).
+## Preserves the evening shop. Call before navigating to the storage scene.
+## Deferred save — flushed on the subsequent scene transition.
+func begin_deep_storage_slot() -> void:
+    var ap: int = roundi(Economy.STORAGE_AP_MAX * Economy.DEEP_STORAGE_AP_MULTIPLIER)
+    slot.set_storage_ap(ap)
+    slot.set_slot(3)
+    SaveManager.mark_dirty()
+
+
 ## Begins an Auction slot: consumes morning + afternoon (slots 1 + 2) by
 ## advancing current_slot to 3, returning the player to the evening slot.
 ## Call before navigating to location select.

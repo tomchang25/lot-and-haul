@@ -71,6 +71,9 @@ const LOCATION_SAMPLE_SIZE: int = 3
 ## AP pool granted at the start of each Storage slot (flat; tuning pass pending).
 const STORAGE_AP_MAX: int = 10
 
+## Multiplier for Deep Storage AP budget (applied to STORAGE_AP_MAX).
+const DEEP_STORAGE_AP_MULTIPLIER: float = 2.5
+
 ## AP cost per storage action.
 const REPAIR_AP_COST: int = 2
 const RESTORE_AP_COST: int = 2

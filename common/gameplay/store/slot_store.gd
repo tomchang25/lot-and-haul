@@ -9,6 +9,7 @@ extends StoreBase
 
 var _current_slot: int = 1
 var _storage_ap: int = 0
+var _storage_ap_max: int = 0
 var _selling_slots_today: int = 0
 var _pending_run: Dictionary = { }
 
@@ -23,6 +24,11 @@ var current_slot: int:
 var storage_ap: int:
     get:
         return _storage_ap
+
+## Maximum AP for the current storage slot. Read-only externally.
+var storage_ap_max: int:
+    get:
+        return _storage_ap_max
 
 ## Selling slots committed to Open Shop this day. Read-only externally.
 var selling_slots_today: int:
@@ -41,9 +47,10 @@ func set_slot(slot: int) -> void:
     _current_slot = slot
 
 
-## Sets storage_ap to [param value]. Does not save.
+## Sets storage_ap and storage_ap_max to [param value]. Does not save.
 func set_storage_ap(value: int) -> void:
     _storage_ap = value
+    _storage_ap_max = value
 
 
 ## Sets selling_slots_today to [param value]. Does not save.
@@ -85,6 +92,7 @@ func to_dict() -> Dictionary:
         "_version": _store_version(),
         "current_slot": _current_slot,
         "storage_ap": _storage_ap,
+        "storage_ap_max": _storage_ap_max,
         "selling_slots_today": _selling_slots_today,
         "pending_run": _pending_run,
     }
@@ -96,6 +104,7 @@ func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
     data = _apply_migrations(data, version, _ctx)
     _current_slot = int(data.get("current_slot", _current_slot))
     _storage_ap = int(data.get("storage_ap", _storage_ap))
+    _storage_ap_max = int(data.get("storage_ap_max", _storage_ap_max))
     _selling_slots_today = int(data.get("selling_slots_today", _selling_slots_today))
     _pending_run = { }
     if data.has("pending_run") and data["pending_run"] is Dictionary:

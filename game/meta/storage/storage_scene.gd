@@ -131,7 +131,7 @@ func _on_restore_pressed() -> void:
 
 func _refresh_ap_label() -> void:
     var ap: int = MetaManager.slot.storage_ap
-    var max_ap: int = Economy.STORAGE_AP_MAX
+    var max_ap: int = MetaManager.slot.storage_ap_max
     _ap_label.text = "AP:  %d / %d" % [ap, max_ap]
     if ap == 0:
         _ap_label.add_theme_color_override("font_color", Color(0.6, 0.4, 0.4))

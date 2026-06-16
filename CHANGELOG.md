@@ -26,6 +26,11 @@ Rules:
 
 - 2026-06-16 — [ui] SettingsButtonOverlay component instanced across all 16 gameplay screens; SettingsStore uses PROCESS_MODE_ALWAYS so Escape closes the overlay while paused
 
+### Deep Storage Slot
+
+- 2026-06-16 — [slot] Deep Storage hub action grants 25 AP (2.5×) and advances to Evening, preserving the shop; morning-only button labeled "extended workshop" alongside normal "short workshop" Storage
+- 2026-06-16 — [slot] SlotStore tracks storage_ap_max so storage scene displays dynamic AP budget (25/25) instead of hardcoded STORAGE_AP_MAX
+
 ## v0.1.2
 
 ### Customer Generation

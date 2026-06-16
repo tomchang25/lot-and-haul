@@ -18,9 +18,11 @@ const SLOT_NAMES: Array[String] = ["", "Morning", "Afternoon", "Evening"]
 # Activity buttons — repurposed from the original layout.
 # NextRunButton → Auction (slot 1 only)
 # StorageButton → Storage (any slot)
+# DeepStorageButton → Deep Storage (slot 1 only, grants bonus AP)
 # MerchantButton → Open Shop (any slot)
 @onready var _next_run_btn: Button = $RootVBox/ButtonsVBox/NextRunButton
 @onready var _storage_btn: Button = $RootVBox/ButtonsVBox/StorageButton
+@onready var _deep_storage_btn: Button = $RootVBox/ButtonsVBox/DeepStorageButton
 @onready var _sell_btn: Button = $RootVBox/ButtonsVBox/MerchantButton
 @onready var _vehicle_btn: Button = $RootVBox/ButtonsVBox/VehicleButton
 @onready var _knowledge_btn: Button = $RootVBox/ButtonsVBox/KnowledgeButton
@@ -31,6 +33,7 @@ const SLOT_NAMES: Array[String] = ["", "Morning", "Afternoon", "Evening"]
 func _ready() -> void:
     _next_run_btn.pressed.connect(_on_auction_pressed)
     _storage_btn.pressed.connect(_on_storage_pressed)
+    _deep_storage_btn.pressed.connect(_on_deep_storage_pressed)
     _sell_btn.pressed.connect(_on_open_shop_pressed)
     _vehicle_btn.pressed.connect(_on_vehicle_pressed)
     _knowledge_btn.pressed.connect(_on_knowledge_pressed)
@@ -61,6 +64,11 @@ func _on_auction_pressed() -> void:
 
 func _on_storage_pressed() -> void:
     MetaManager.begin_storage_slot()
+    SceneRouter.go_to_storage()
+
+
+func _on_deep_storage_pressed() -> void:
+    MetaManager.begin_deep_storage_slot()
     SceneRouter.go_to_storage()
 
 
@@ -117,8 +125,17 @@ func _refresh_activity_buttons() -> void:
     _next_run_btn.disabled = (slot != 1)
     _next_run_btn.tooltip_text = "" if slot == 1 else "Auction is only available in the Morning slot"
 
-    # Storage: any slot, no restriction.
-    _storage_btn.text = "Storage  (work items, %d AP)" % Economy.STORAGE_AP_MAX
+    # Deep Storage: morning (slot 1) only; shows enlarged AP budget.
+    var is_morning: bool = (slot == 1)
+    _deep_storage_btn.visible = is_morning
+
+    # Storage: any slot.
+    if is_morning:
+        _storage_btn.text = "Storage  (short workshop, %d AP)" % Economy.STORAGE_AP_MAX
+        var deep_ap: int = roundi(Economy.STORAGE_AP_MAX * Economy.DEEP_STORAGE_AP_MULTIPLIER)
+        _deep_storage_btn.text = "Deep Storage  (extended workshop, %d AP)" % deep_ap
+    else:
+        _storage_btn.text = "Storage  (work items, %d AP)" % Economy.STORAGE_AP_MAX
 
     # Open Shop: label shows how many selling slots the commitment covers.
     var selling_slots: int = 4 - slot
