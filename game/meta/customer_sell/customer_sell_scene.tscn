@@ -48,6 +48,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 28
 text = "Night Market"
+horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="DayLabel" type="Label" parent="RootVBox/HeaderRow" unique_id=1563382684]
@@ -76,7 +77,7 @@ theme_override_constants/separation = 8
 
 [node name="SellingItemListPanel" parent="RootVBox/MainArea" unique_id=505066450 instance=ExtResource("3_silp")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(260, 0)
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 size_flags_vertical = 3
 

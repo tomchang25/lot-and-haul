@@ -52,6 +52,16 @@ static func display_name(entry: ItemEntry) -> String:
 
     return " ".join(parts)
 
+
+static func short_name(entry: ItemEntry) -> String:
+    var words := display_name(entry).split(" ", false)
+    var abbrev := ""
+    for word in words:
+        if not word.is_empty():
+            abbrev += word[0].to_upper()
+    return abbrev
+
+
 # ── Formatted text methods ────────────────────────────────────────────────────
 
 

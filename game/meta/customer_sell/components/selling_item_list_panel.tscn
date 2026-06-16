@@ -1,37 +1,37 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://xb84s3sm48je"]
 
-[ext_resource type="Script" path="res://game/meta/customer_sell/components/selling_item_list_panel.gd" id="1_silp"]
+[ext_resource type="Script" uid="uid://b1o1vhimpcd6h" path="res://game/meta/customer_sell/components/selling_item_list_panel.gd" id="1_silp"]
 
-[node name="SellingItemListPanel" type="PanelContainer"]
-custom_minimum_size = Vector2(260, 360)
+[node name="SellingItemListPanel" type="PanelContainer" unique_id=1774503467]
+custom_minimum_size = Vector2(300, 360)
 script = ExtResource("1_silp")
 
-[node name="VBox" type="VBoxContainer" parent="."]
+[node name="VBox" type="VBoxContainer" parent="." unique_id=242819612]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme_override_constants/separation = 6
 
-[node name="ListEmptyLabel" type="Label" parent="VBox"]
+[node name="ListEmptyLabel" type="Label" parent="VBox" unique_id=1556926469]
 unique_name_in_owner = true
+modulate = Color(0.6, 0.6, 0.6, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "No matching items loaded."
-modulate = Color(0.6, 0.6, 0.6, 1)
-horizontal_alignment = 0
 vertical_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="VBox"]
+[node name="ScrollContainer" type="ScrollContainer" parent="VBox" unique_id=1799165134]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
 
-[node name="ItemListVBox" type="VBoxContainer" parent="VBox/ScrollContainer"]
+[node name="ItemGrid" type="GridContainer" parent="VBox/ScrollContainer" unique_id=1089316830]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
-
-[node name="ListPlaceholderLabel" type="Label" parent="VBox/ScrollContainer/ItemListVBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Item rows appear here"
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 3

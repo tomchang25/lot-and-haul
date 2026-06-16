@@ -89,7 +89,6 @@ func _on_item_pick_requested(entry: ItemEntry) -> void:
     if grid.phase == PackingGrid.Phase.ITEM_HELD:
         grid.cancel_placement()
         _item_list.update_row_states(grid)
-        return
     if grid.is_item_placed(entry):
         grid.lift(entry)
     else:

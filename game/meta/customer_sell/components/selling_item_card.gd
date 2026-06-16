@@ -1,8 +1,8 @@
-# selling_item_row.gd
-# Row component for the sellable item list — shows name, value, fit count, condition, and shape.
+# selling_item_card.gd
+# Card component for the sellable item grid — compact shape showing name, fit, condition, value.
 # Reads:  ItemEntry fields, SellMath utility
 # Writes: nothing
-class_name SellingItemRow
+class_name SellingItemCard
 extends PanelContainer
 
 signal row_pressed(entry: ItemEntry)
@@ -11,9 +11,9 @@ signal tooltip_dismissed
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-const SHAPE_CELL_SIZE := 6
+const SHAPE_CELL_SIZE := 4
 const SHAPE_CELL_GAP := 1
-const SHAPE_PADDING := 2
+const SHAPE_PADDING := 1
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
@@ -28,6 +28,7 @@ var _ext_highlighted: bool = false
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _name_label: Label = %NameLabel
+@onready var _verified_label: Label = %VerifiedLabel
 @onready var _value_label: Label = %ValueLabel
 @onready var _fit_label: Label = %FitLabel
 @onready var _condition_label: Label = %ConditionLabel
@@ -93,13 +94,20 @@ func _apply() -> void:
     if _entry == null:
         return
 
-    _name_label.text = ItemEntryDisplayHelper.display_name(_entry)
+    _name_label.text = ItemEntryDisplayHelper.short_name(_entry)
     _name_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.display_name_color(_entry))
+
+    var verified: bool
+    if _entry.has_method("fit_tags"):
+        verified = SellMath.is_item_verified(_entry)
+    else:
+        verified = _entry.verified
+    _verified_label.visible = verified
 
     _value_label.text = ItemEntryDisplayHelper.estimated_value_text(_entry)
     _value_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(_entry))
 
-    _fit_label.text = "Fit: %d" % _fit_count
+    _fit_label.text = "F:%d" % _fit_count
 
     _condition_label.text = ItemEntryDisplayHelper.condition_text(_entry)
     _condition_label.modulate = ItemEntryDisplayHelper.condition_display_color(_entry)
@@ -142,10 +150,16 @@ func _build_shape_icon() -> void:
             max_y = c.y
 
     var step := SHAPE_CELL_SIZE + SHAPE_CELL_GAP
+    var total_w := (max_x + 1) * step - SHAPE_CELL_GAP + SHAPE_PADDING * 2
+    var total_h := (max_y + 1) * step - SHAPE_CELL_GAP + SHAPE_PADDING * 2
+    var area := _shape_icon.get_rect().size
+    var ox := maxf(0, (area.x - total_w) / 2.0)
+    var oy := maxf(0, (area.y - total_h) / 2.0)
+
     for c: Vector2i in cells:
         var rect := ColorRect.new()
         rect.size = Vector2(SHAPE_CELL_SIZE, SHAPE_CELL_SIZE)
-        rect.position = Vector2(c.x * step + SHAPE_PADDING, c.y * step + SHAPE_PADDING)
+        rect.position = Vector2(c.x * step + SHAPE_PADDING + ox, c.y * step + SHAPE_PADDING + oy)
         rect.color = Color(0.65, 0.65, 0.70, 1.0)
 
         # node-src: ephemeral — per-shape cell, rebuilt per refresh

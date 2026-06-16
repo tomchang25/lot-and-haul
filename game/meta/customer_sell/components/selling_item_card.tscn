@@ -1,0 +1,108 @@
+[gd_scene format=3 uid="uid://b6etydkqsokit"]
+
+[ext_resource type="Script" uid="uid://bty2qr31etrrg" path="res://game/meta/customer_sell/components/selling_item_card.gd" id="1_sic"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xbtl0"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.15, 0.15, 0.18, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.25, 0.3, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="SellingItemCard" type="PanelContainer" unique_id=351955918]
+custom_minimum_size = Vector2(90, 84)
+offset_right = 90.0
+offset_bottom = 84.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_xbtl0")
+script = ExtResource("1_sic")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1090635750]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=850025220]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="TopRow" type="HBoxContainer" parent="Margin/VBox" unique_id=218551179]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="NameLabel" type="Label" parent="Margin/VBox/TopRow" unique_id=46639189]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = "-"
+vertical_alignment = 1
+text_overrun_behavior = 2
+
+[node name="VerifiedLabel" type="Label" parent="Margin/VBox/TopRow" unique_id=1883703541]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(16, 20)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.5, 1)
+theme_override_font_sizes/font_size = 10
+text = "OK"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ShapeIcon" type="Control" parent="Margin/VBox/TopRow" unique_id=1892637915]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 20)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MidRow" type="HBoxContainer" parent="Margin/VBox" unique_id=2136290649]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="FitLabel" type="Label" parent="Margin/VBox/MidRow" unique_id=461864196]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(28, 16)
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "-"
+vertical_alignment = 1
+
+[node name="ConditionLabel" type="Label" parent="Margin/VBox/MidRow" unique_id=966736500]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 10
+text = "-"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="ValueLabel" type="Label" parent="Margin/VBox" unique_id=343657161]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "-"
+horizontal_alignment = 1
+vertical_alignment = 1

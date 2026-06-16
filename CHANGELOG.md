@@ -47,6 +47,7 @@ Rules:
 - 2026-06-16 — [customer_sell] Customer info (name, demands, car total, verified) merged into CustomerCarPanel; CustomerProfilePanel deleted
 - 2026-06-16 — [customer_sell] SellSidebar restructured into PanelContainer > Margin > VBox (300px, matching Storage rail style); SelectedItemPanel expanded into persistent detail rail with condition/value panels and price convergence
 - 2026-06-16 — [customer_sell] ItemCardPopup removed from sell scene; hover uses preview/selected state that restores the last selection on hover end instead of always clearing
+- 2026-06-16 — [customer_sell] SellingItemRow replaced by compact SellingItemCard with centered shape icon, verified badge, short name, and compact fit label
 
 ## v0.1.2
 
