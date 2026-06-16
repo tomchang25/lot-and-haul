@@ -5,6 +5,8 @@ components.
 
 Plain-language rule: do not dynamically build or instantiate persistent `.tscn` objects in GDScript unless there is a concrete runtime reason.
 
+For reusable component root sizing, previewable defaults, default visibility, and fixture/debug data boundaries, see `dev/standards/component_scene_standard.md`.
+
 Applies to:
 
 - Block scene root scripts
