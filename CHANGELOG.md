@@ -18,6 +18,11 @@ Rules:
 
 - 2026-06-15 — [standards] `scene_node_source_standard.md` added as the canonical source for persistent `.tscn` nodes, permitted runtime node creation, and `node-src` markers; scene architecture docs now point to it
 
+### Plain-Item Baseline Removal
+
+- 2026-06-16 — [refactor] Removed legacy plain-item baseline from ItemGenerator: `surface_min`/`surface_max` params, `_draw_surface_clues()` function, `Economy.SURFACE_CLUE_MIN/MAX` constants, and `ClueData.domain` field; all callers updated to new 3-param `draw()` signature
+- 2026-06-16 — [refactor] Added `test_affix`/`test_comb` YAML fixtures so tests exercise the affix→combination→clues pipeline instead of the removed baseline
+
 ### Inspection Detail & Summary Popup
 
 - 2026-06-15 — [inspection] Inspection restructured into select-then-act model: card click selects without spending AP; unveil/inspect actions moved to right-side detail rail with explicit action buttons; aggregate found/veiled/estimate lists removed from right rail

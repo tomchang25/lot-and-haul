@@ -83,11 +83,3 @@ const INSPECTION_AP_CAP: int = 10
 
 ## Default reserve that refills the per-lot cap at lot boundaries.
 const INSPECTION_REFILL_METRIC_DEFAULT: int = 30
-
-# ── Surface clue draw constants ──────────────────────────────────────────────
-
-## Minimum number of surface clues drawn per generated item (inclusive).
-const SURFACE_CLUE_MIN: int = 2
-
-## Maximum number of surface clues drawn per generated item (inclusive).
-const SURFACE_CLUE_MAX: int = 4

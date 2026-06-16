@@ -1,7 +1,7 @@
 # clue_data.gd
 # Designer-authored resource representing one revealable clue.
-# Each clue has a type (surface/hidden), domain (generic or category_id),
-# an attribute+DC for discovery checks, and a price effect.
+# Each clue has a type (surface/hidden), an attribute+DC for discovery checks,
+# and a price effect.
 class_name ClueData
 extends Resource
 
@@ -18,9 +18,6 @@ enum ClueType { SURFACE, HIDDEN }
 
 # Controls which reveal mechanic applies to this clue.
 @export var type: ClueType = ClueType.SURFACE
-
-# generic | <category_id> — controls content scope.
-@export var domain: String = "generic"
 
 # Attribute used for discovery dice rolls (e.g. "appraisal", "perception").
 @export var attribute: String = ""

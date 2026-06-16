@@ -27,7 +27,7 @@ static func seed_storage_state() -> void:
         var cat := anchor.category_data
         if cat == null:
             continue
-        var entry := ItemGenerator.draw(cat, { }, 2, 4, rng)
+        var entry := ItemGenerator.draw(cat, { }, rng)
         if entry == null:
             continue
         entry.unveiled = true

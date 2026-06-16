@@ -58,6 +58,24 @@ clues:
     effect_op: override
     effect_amount: 500
 
+affix_combinations:
+  - combination_id: test_comb
+    affix_id: test_affix
+    weight: 1
+    surface_clue_ids:
+      - test_surface_easy
+      - test_surface_hard
+    hidden_clue_ids: []
+
+affixes:
+  - affix_id: test_affix
+    naming_slot: prefix
+    display_name: Test
+    scope_mode: all
+    weight: 1
+    combination_ids:
+      - test_comb
+
 cars:
   - car_id: test_car
     display_name: Test Car

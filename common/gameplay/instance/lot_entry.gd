@@ -66,8 +66,6 @@ static func create(data: LotData, rng: RandomNumberGenerator = null) -> LotEntry
         var item_entry := ItemGenerator.draw(
             category,
             data.tier_weights,
-            Economy.SURFACE_CLUE_MIN,
-            Economy.SURFACE_CLUE_MAX,
             rng,
         )
         if item_entry == null:

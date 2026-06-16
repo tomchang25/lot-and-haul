@@ -50,7 +50,6 @@ class ClueSpec:
         w.add_field_str("clue_id", clue_id)
         w.add_field_str("known_text", entry.get("known_text", ""))
         w.add_field_int("type", _CLUE_TYPE_TO_INT.get(ctype, 0))
-        w.add_field_str("domain", entry.get("domain", "generic"))
         w.add_field_str("attribute", entry.get("attribute", ""))
         w.add_field_int("dc", int(entry.get("dc", 10)))
         w.add_field_str("effect_op", entry.get("effect_op", "add"))
@@ -75,7 +74,6 @@ class ClueSpec:
             "type": _INT_TO_CLUE_TYPE.get(
                 int(tres_field(text, "type") or 0), "surface"
             ),
-            "domain": tres_field(text, "domain") or "generic",
             "attribute": tres_field(text, "attribute") or "",
             "dc": int(tres_field(text, "dc") or 10),
             "effect_op": tres_field(text, "effect_op") or "add",

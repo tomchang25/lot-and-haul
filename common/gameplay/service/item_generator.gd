@@ -9,17 +9,12 @@ extends RefCounted
 ##   category → anchor → affixes (0–1 prefix + 0–1 suffix)
 ##   → one weighted combination per affix → that combination's clues.
 ##
-## When no affix is drawn, falls back to the plain-item baseline:
-## surface clues from the generic pool and zero hidden clues.
-##
 ## [param rng] — optional seedable RNG for deterministic generation.
 ## When null, falls back to RandomUtils' shared production RNG.
 ## Returns a fully-formed ItemEntry (null anchor means the slot should be skipped).
 static func draw(
         category: CategoryData,
         tier_weights: Dictionary,
-        surface_min: int,
-        surface_max: int,
         rng: RandomNumberGenerator = null,
 ) -> ItemEntry:
     var resolved_rng := RandomUtils.resolve_rng(rng)
@@ -59,13 +54,10 @@ static func draw(
         surface_clues = resolved.surface_clues
         hidden_clues = resolved.hidden_clues
     else:
-        # ── 4. Plain-item baseline ────────────────────────────────────
-        var surface_count := clampi(
-            resolved_rng.randi_range(surface_min, surface_max),
-            1,
-            8,
+        # ── 4. Plain-item baseline (legacy) ──────────────────────────
+        ToastManager.show_dev_error(
+            "ItemGenerator: plain-item baseline (no affixes) is legacy — should not reach here with populated registry",
         )
-        surface_clues = _draw_surface_clues(category, surface_count, resolved_rng)
 
     # ── 5. Assemble ItemEntry ─────────────────────────────────────────
     var entry := ItemEntry.new()
@@ -345,8 +337,8 @@ static func _resolve_conflicts(
             hidden_clues = hidden_clues_out,
         }
 
-    # Last resort: return plain-item baseline (empty clues).
-    ToastManager.show_dev_error("ItemGenerator: could not resolve affix conflict — falling back to plain item")
+    # Last resort: return empty clues.
+    ToastManager.show_dev_error("ItemGenerator: could not resolve affix conflict — falling back to empty item")
     return {
         affixes = [],
         combination_ids = [],
@@ -381,36 +373,3 @@ static func _find_combination(affix: AffixData, combination_id: String) -> Affix
         if c.combination_id == combination_id:
             return c
     return null
-
-
-## Draws [param count] surface clues without replacement from valid pool.
-## Valid: type == SURFACE and domain is "generic" or matches category_id.
-## If pool is smaller than count, takes everything.
-## This is the plain-item baseline — not used on affixed items.
-static func _draw_surface_clues(category: CategoryData, count: int, rng: RandomNumberGenerator) -> Array[ClueData]:
-    var pool: Array[ClueData] = []
-    for c: ClueData in ClueRegistry.get_all_clues():
-        if c.type != ClueData.ClueType.SURFACE:
-            continue
-        if c.domain == "generic" or c.domain == category.category_id:
-            pool.append(c)
-
-    var actual := mini(count, pool.size())
-    if actual == 0:
-        return [] as Array[ClueData]
-    if actual == pool.size():
-        return pool.duplicate()
-
-    var chosen: Array[ClueData] = []
-    var used: Array[int] = []
-    for i in range(actual):
-        var idx := rng.randi() % pool.size()
-        var attempts := 0
-        while idx in used and attempts < 100:
-            idx = rng.randi() % pool.size()
-            attempts += 1
-        if idx in used:
-            continue
-        used.append(idx)
-        chosen.append(pool[idx])
-    return chosen

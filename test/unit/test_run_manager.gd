@@ -32,7 +32,7 @@ func test_ap_lifecycle_create_and_spend() -> void:
     var cat := CategoryRegistry.get_category_by_id("test_category")
     assert_not_null(cat, "test category should exist in registry")
 
-    var item := ItemGenerator.draw(cat, { }, 2, 4, rng)
+    var item := ItemGenerator.draw(cat, { }, rng)
     assert_not_null(item, "item should be generated")
     assert_not_null(item.anchor, "item should have an anchor")
 
@@ -78,7 +78,7 @@ func test_clue_hit_and_miss() -> void:
 
     var rng := RandomNumberGenerator.new()
     rng.seed = 2
-    var entry := ItemGenerator.draw(cat, { }, 3, 4, rng)
+    var entry := ItemGenerator.draw(cat, { }, rng)
     assert_not_null(entry, "item should be generated")
     assert_gt(entry.surface_clues.size(), 0, "should have surface clues")
 
@@ -125,7 +125,7 @@ func test_cargo_commit() -> void:
 
     var rng := RandomNumberGenerator.new()
     rng.seed = 42
-    var entry := ItemGenerator.draw(cat, { }, 2, 4, rng)
+    var entry := ItemGenerator.draw(cat, { }, rng)
     assert_not_null(entry, "item should be generated")
     entry.unveil()
 
@@ -175,7 +175,7 @@ func test_trailer_damage_triggered() -> void:
 
     var rng := RandomNumberGenerator.new()
     rng.seed = 42
-    var entry := ItemGenerator.draw(cat, { }, 2, 4, rng)
+    var entry := ItemGenerator.draw(cat, { }, rng)
 
     RunManager.commit_cargo([], [entry], 0)
 
@@ -198,7 +198,7 @@ func test_trailer_no_damage_when_chance_zero() -> void:
 
     var rng := RandomNumberGenerator.new()
     rng.seed = 42
-    var entry := ItemGenerator.draw(cat, { }, 2, 4, rng)
+    var entry := ItemGenerator.draw(cat, { }, rng)
 
     RunManager.commit_cargo([], [entry], 0)
 
@@ -222,7 +222,7 @@ func test_full_run_scratch_to_run_result() -> void:
     var cat := CategoryRegistry.get_category_by_id("test_category")
     assert_not_null(cat, "test category should exist in registry")
 
-    var item := ItemGenerator.draw(cat, { }, 2, 4, rng)
+    var item := ItemGenerator.draw(cat, { }, rng)
     assert_not_null(item, "item should be generated")
     assert_not_null(item.anchor, "item should have an anchor")
     item.unveil()
