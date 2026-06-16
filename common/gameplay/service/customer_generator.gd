@@ -18,6 +18,10 @@ const DEFAULT_NIGHT_MIN: int = 3
 const DEFAULT_NIGHT_MAX: int = 5
 const DEMAND_TAG_COUNT: int = 2
 
+const MATCH_FLOOR_RATIO: float = 0.5
+const MATCH_FLOOR_MIN: int = 1
+const MATCH_REROLL_ATTEMPTS: int = 10
+
 
 static func generate(rng: RandomNumberGenerator = null) -> CustomerEntry:
     var resolved_rng := RandomUtils.resolve_rng(rng)
@@ -33,16 +37,65 @@ static func generate(rng: RandomNumberGenerator = null) -> CustomerEntry:
     )
 
 
-static func generate_for_night(count: int = -1, rng: RandomNumberGenerator = null) -> Array[CustomerEntry]:
+static func generate_for_night(storage_items: Array = [], count: int = -1, rng: RandomNumberGenerator = null) -> Array[CustomerEntry]:
     var resolved_rng := RandomUtils.resolve_rng(rng)
     if count < 0:
         count = resolved_rng.randi_range(DEFAULT_NIGHT_MIN, DEFAULT_NIGHT_MAX)
 
+    if count <= 0:
+        return [] as Array[CustomerEntry]
+
+    if not _has_any_fit_tags(storage_items):
+        return _generate_unconstrained(count, resolved_rng)
+
+    var target_matches := _match_floor_for_count(count)
+    var result: Array[CustomerEntry] = []
+    var matched_count := 0
+
+    result.resize(count)
+    for index in range(count):
+        var needs_match := matched_count < target_matches
+        var customer := _generate_matchable(storage_items, resolved_rng) if needs_match else generate(resolved_rng)
+        if _customer_matches_storage(customer, storage_items):
+            matched_count += 1
+        result[index] = customer
+
+    if matched_count < target_matches:
+        ToastManager.show_dev_error("CustomerGenerator: match floor missed %d/%d" % [matched_count, target_matches])
+    return result
+
+
+static func _generate_unconstrained(count: int, rng: RandomNumberGenerator) -> Array[CustomerEntry]:
     var result: Array[CustomerEntry] = []
     result.resize(count)
     for index in range(count):
-        result[index] = generate(resolved_rng)
+        result[index] = generate(rng)
     return result
+
+
+static func _match_floor_for_count(count: int) -> int:
+    return clampi(ceili(float(count) * MATCH_FLOOR_RATIO), MATCH_FLOOR_MIN, count)
+
+
+static func _generate_matchable(storage_items: Array, rng: RandomNumberGenerator) -> CustomerEntry:
+    var fallback := generate(rng)
+    for attempt in range(MATCH_REROLL_ATTEMPTS):
+        var customer := generate(rng)
+        if _customer_matches_storage(customer, storage_items):
+            return customer
+        fallback = customer
+    return fallback
+
+
+static func _customer_matches_storage(customer: CustomerEntry, storage_items: Array) -> bool:
+    return not SellMath.matched_items(customer, storage_items).is_empty()
+
+
+static func _has_any_fit_tags(storage_items: Array) -> bool:
+    for entry in storage_items:
+        if entry != null and entry.has_method("fit_tags") and not entry.fit_tags().is_empty():
+            return true
+    return false
 
 
 static func _pick_category(rng: RandomNumberGenerator) -> CategoryData:
