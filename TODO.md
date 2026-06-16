@@ -216,10 +216,6 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
-- [customer_grid] Size customer car grids to fit the largest anchor shape their demand tags can match (via affix graph) — see `dev/docs/plans/customer_grid_affix_graph.sketch.md`
-
-- [customer_sell] Add a night-level customer match floor so open shop usually has actionable buyers without restoring tag-level owned-storage bias — see `dev/docs/plans/customer_sell_match_floor.sketch.md`
-
 - [affix_dictionary] Player-facing affix dictionary that tracks affix combination discovery, hidden-risk learning, and gated probability reads — see `dev/docs/plans/affix_dictionary.sketch.md`
 
 - [dev/auto-auction] Debug-only quick-win buttons: instant player win at opening bid or rolled price (skip NPC bidding loop; rolled path seeds future auto-bid perk) — see `dev/docs/plans/debug_auto_auction.md`

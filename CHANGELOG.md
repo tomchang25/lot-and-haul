@@ -14,6 +14,11 @@ Rules:
 
 ## v0.1.2 - Draft
 
+### Customer Generation
+
+- 2026-06-16 — [customer_grid] Customer generation now samples demand from affix combinations scoped to one selected category and sizes each customer grid to fit that category's largest anchor shape
+- 2026-06-16 — [customer_sell] Nightly customer generation now applies a bounded match floor so open shop usually includes actionable buyers when stored items expose fit tags
+
 ### Standards
 
 - 2026-06-15 — [standards] `scene_node_source_standard.md` added as the canonical source for persistent `.tscn` nodes, permitted runtime node creation, and `node-src` markers; scene architecture docs now point to it
