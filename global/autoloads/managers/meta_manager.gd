@@ -208,10 +208,7 @@ func end_day() -> DaySummary:
 func _generate_nightly_customers(selling_slots: int) -> void:
     var count := _selling_slots_to_count(selling_slots)
     customers.set_customers(
-        CustomerEntry.generate_for_night(
-            storage.storage_items,
-            count,
-        ),
+        CustomerGenerator.generate_for_night(count),
     )
 
 
