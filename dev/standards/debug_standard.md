@@ -80,7 +80,36 @@ if Debug.enabled:
 
 # 4. Node Source Rule
 
-Debug-only nodes must always be created in code, never placed in `.tscn`. They carry the `# node-src: debug` marker for the linter. See `scene_node_source_standard.md` §5 for full marker details.
+By default, debug-only nodes are created in code, never placed in `.tscn`. They carry the `# node-src: debug` marker for the linter. See `scene_node_source_standard.md` §5 for full marker details. Layout-sensitive reusable debug blocks may use the exception below.
+
+## 4a. Debug Block Exception
+
+Reusable, layout-sensitive debug UI blocks may be authored as dedicated `.tscn` + `.gd` pairs when the block exists only to package debug controls and layout. This exception is for panels/containers whose layout should be inspected in the editor; one-off debug labels and buttons should still be created in code.
+
+Debug blocks may be pre-placed in gameplay scene `.tscn` files when all of these are true:
+
+- The node is an instance of a dedicated debug block scene, not ad hoc debug controls placed directly in the gameplay scene.
+- The debug block root is named with a clear debug prefix or suffix, such as `DebugButtonContainer`.
+- The debug block is hidden by default in the `.tscn`.
+- The debug block script gates its own visibility from `Debug.enabled` in `_ready()` and reacts to `Debug.toggled` when needed.
+- Every action handler that mutates game state must guard with `if not Debug.enabled: return` even if the block is hidden.
+- Release exports may contain the hidden node in the scene tree, but must never show it or allow its actions to run because `Debug.enabled` is false.
+
+```gdscript
+func _ready() -> void:
+    visible = Debug.enabled
+    Debug.toggled.connect(_on_debug_toggled)
+
+
+func _on_debug_toggled(is_enabled: bool) -> void:
+    visible = is_enabled
+
+
+func _on_add_random_item_pressed() -> void:
+    if not Debug.enabled:
+        return
+    # mutate debug state here
+```
 
 ---
 

@@ -9,7 +9,7 @@ When a user says a `.tscn` file's "format" is broken, LLMs often over-focus on p
 ## Triage Workflow
 
 1. Read the target `.tscn`, its paired `.gd` script, and one or two nearby similar scene files.
-2. Check structural basics once: `[gd_scene]`, `ext_resource` ids, node parent paths, node names used by `%UniqueName`, and invalid `[connection]` blocks.
+2. Check structural basics once: `[gd_scene]`, `ext_resource` ids, node parent paths, node names used by `%UniqueName`, invalid `[connection]` blocks, and Color literals as described in [Color Literals](#color-literals).
 3. Run the standards linter on the target scene.
 4. If syntax and lint are clean, stop looping on parser-format theories. Reinterpret "format broken" as likely visual/layout formatting.
 5. Make the smallest plausible layout-normalization pass.
@@ -25,9 +25,27 @@ Prefer small, explicit fixes that make a compact UI scene stable:
 - Add relevant `size_flags_horizontal` and `size_flags_vertical` when a child should fill or expand inside a container.
 - Add container `theme_override_constants/separation` and `alignment` when row/column spacing is ambiguous.
 - Normalize placeholder text, usually `"-"` instead of padded variants like `" - "` unless the existing UI pattern requires padding.
-- Prefer full `Color(r, g, b, a)` in hand-authored scene edits.
+- For any color-related scene edit, follow [Color Literals](#color-literals).
 - Avoid non-ASCII UI markers in newly edited `.tscn` text unless the file or project already establishes that marker style.
 - Keep signal wiring in `.gd`; do not add `[connection]` blocks to fix layout.
+
+---
+
+## Color Literals
+
+In hand-authored `.tscn` edits, always write colors with an explicit alpha channel:
+
+```tscn
+Color(r, g, b, a)
+```
+
+Do not write three-channel colors in `.tscn` files:
+
+```tscn
+Color(r, g, b)
+```
+
+When a scene fails to open and Godot points at a line containing a color value, check for missing alpha before chasing unrelated `SubResource`, style override, UID, or parser theories.
 
 ---
 
