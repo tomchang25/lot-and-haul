@@ -1,6 +1,7 @@
 # tutorial_scripts.gd
 # Static step arrays for hub and storage tutorials.
 # Not autoloaded — imported by Director.
+# The single surface for script id resolution and anchor validation.
 class_name TutorialScripts
 
 static func hub_script() -> Array[TutorialStep]:
@@ -94,3 +95,32 @@ your day. You can always come back to the Workshop later.",
             "leave_btn",
         ),
     ]
+
+
+static func resolve_script(script_id: String) -> Array[TutorialStep]:
+    match script_id:
+        "hub":
+            return hub_script()
+        "storage":
+            return storage_script()
+        _:
+            ToastManager.show_dev_error("TutorialScripts: unknown script id '%s'" % script_id)
+            return []
+
+
+static func known_script_ids() -> Array[String]:
+    return ["hub", "storage"]
+
+
+static func validate_anchors(script_id: String, anchors: Dictionary) -> Array[String]:
+    var missing: Array[String] = []
+    var script := resolve_script(script_id)
+    if script.is_empty():
+        return missing
+    for step: TutorialStep in script:
+        if not step.anchor_id.is_empty() and not anchors.has(step.anchor_id):
+            missing.append(step.anchor_id)
+        for fallback_id: String in step.fallback_anchor_ids:
+            if not anchors.has(fallback_id):
+                missing.append(fallback_id)
+    return missing

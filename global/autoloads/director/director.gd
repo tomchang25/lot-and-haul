@@ -93,12 +93,20 @@ func register_scene(scene_id: String, anchors: Dictionary) -> void:
 ## Starts playback of the tutorial script identified by [param script_id].
 ## Safe to call at any time — the script's steps are all explain-only.
 func start_script(script_id: String) -> void:
-    var script: Array[TutorialStep] = _get_script(script_id)
+    var script: Array[TutorialStep] = TutorialScripts.resolve_script(script_id)
     if script.is_empty():
         ToastManager.show_dev_error("Director.start_script: unknown script '%s'" % script_id)
         _hide_overlay()
         _clear_playback_state()
         return
+
+    var missing_anchors := TutorialScripts.validate_anchors(script_id, _anchors)
+    if not missing_anchors.is_empty():
+        ToastManager.show_dev_error(
+            "Director: script '%s' references unregistered anchors: %s"
+            % [script_id, ", ".join(missing_anchors)],
+        )
+
     _current_script = script
     _current_script_id = script_id
     _current_step_index = 0
@@ -338,7 +346,7 @@ func accept_offer() -> void:
     _popup_close.text = "×"
     var script_id := _offer_script_id
     _is_offer_showing = false
-    if _get_script(script_id).is_empty():
+    if TutorialScripts.resolve_script(script_id).is_empty():
         ToastManager.show_dev_error("Director.accept_offer: script '%s' no longer resolves" % script_id)
         _hide_overlay()
         _clear_playback_state()
@@ -418,15 +426,6 @@ func _on_scene_changed() -> void:
             script_completed.emit(completed_id)
 
 # ══ Script management ══════════════════════════════════════════════════════════
-
-
-static func _get_script(script_id: String) -> Array[TutorialStep]:
-    match script_id:
-        "hub":
-            return TutorialScripts.hub_script()
-        "storage":
-            return TutorialScripts.storage_script()
-    return []
 
 
 func _end_tutorial() -> void:

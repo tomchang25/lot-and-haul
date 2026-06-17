@@ -240,7 +240,6 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
 
-- [tutorial_rework_2] Tutorial script registry and anchor validation — see `dev/docs/plans/tutorial_rework_2_script_registry_validation.sketch.md`
 - [tutorial_rework_3] Tutorial target and placement modularization — see `dev/docs/plans/tutorial_rework_3_target_and_placement_modularization.sketch.md`
 
 - [affix_dictionary] Player-facing affix dictionary that tracks affix combination discovery, hidden-risk learning, and gated probability reads — see `dev/docs/plans/affix_dictionary.sketch.md`

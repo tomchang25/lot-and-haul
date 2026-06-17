@@ -172,7 +172,7 @@ func test_unknown_script_accept_offer_resets_state() -> void:
     Director.show_offer_prompt(UNKNOWN_OFFER_ID, "Bad offer?", "Accept")
     # Offer is showing, but the script doesn't exist.
     Director.accept_offer()
-    # accept_offer checks _get_script and falls back with dev error.
+    # accept_offer checks resolve_script and falls back with dev error.
     assert_false(Director.is_offer_showing(), "offer dismissed after unresolving accept")
     assert_eq(Director.step_count(), 0, "state cleared after unresolving offer accept")
     assert_eq(Director.step_index(), 0, "step index reset after unresolving offer accept")
@@ -193,3 +193,34 @@ func test_completing_tutorial_marks_seen() -> void:
         MetaManager.progress.tutorial_seen.has("hub"),
         "hub marked seen after completing all steps",
     )
+
+# ══ Script registry ═══════════════════════════════════════════════════════════
+
+
+func test_known_script_ids_resolve() -> void:
+    for id: String in TutorialScripts.known_script_ids():
+        assert_false(
+            TutorialScripts.resolve_script(id).is_empty(),
+            "script '%s' resolves to steps" % id,
+        )
+
+
+func test_unknown_script_id_returns_empty() -> void:
+    assert_true(
+        TutorialScripts.resolve_script("nonexistent_registry_test").is_empty(),
+        "unknown id returns empty",
+    )
+
+
+func test_validate_anchors_finds_missing() -> void:
+    var missing := TutorialScripts.validate_anchors("hub", { "slot_label": _make_anchor_button() })
+    assert_true("storage_btn" in missing, "storage_btn reported missing")
+
+
+func test_validate_anchors_empty_when_all_present() -> void:
+    var full_anchors := {
+        "slot_label": _make_anchor_button(),
+        "storage_btn": _make_anchor_button(),
+    }
+    var missing := TutorialScripts.validate_anchors("hub", full_anchors)
+    assert_true(missing.is_empty(), "no missing anchors when all present")

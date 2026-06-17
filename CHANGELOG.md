@@ -20,6 +20,10 @@ Rules:
 - 2026-06-17 — [tutorial] Storage tutorial anchors corrected and made resilient to repair/restore button visibility, with workshop onboarding skipped when storage is empty
 - 2026-06-17 — [storage] Storage scene now opens with the first item selected so tutorial details and actions are immediately visible
 
+### Script Registry and Validation
+
+- 2026-06-17 — [tutorial] Moved script resolution from Director into TutorialScripts static registry with anchor validation, push_error for unknown ids, and known_script_ids() for test coverage
+
 ### Settings Main Menu Button
 
 - 2026-06-17 — [ui] Settings overlay now shows a "Return to Main Menu" button when opened in-game, hidden when on the start page; navigates to the title screen and closes the overlay on press
