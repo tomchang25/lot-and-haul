@@ -14,6 +14,18 @@ Rules:
 
 ## v0.1.4 - Draft
 
+### Settings Main Menu Button
+
+- 2026-06-17 — [ui] Settings overlay now shows a "Return to Main Menu" button when opened in-game, hidden when on the start page; navigates to the title screen and closes the overlay on press
+
+### Debug Toggle Reactivity
+
+- 2026-06-17 — [debug] Debug overlay buttons in auction and cargo scenes now appear and disappear reactively when debug mode is toggled mid-scene via the settings overlay, instead of only showing on scene load
+
+### Test Hub Back Button
+
+- 2026-06-17 — [test] Testbed launcher now has a "Back" button that returns to the start page
+
 ## v0.1.3
 
 ### Customer Sell Layout Rework

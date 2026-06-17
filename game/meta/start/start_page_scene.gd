@@ -32,6 +32,7 @@ const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismis
 var _picker_mode: PickerMode = PickerMode.NEW_GAME
 var _summaries: Array = [] # 3 elements, null or dict
 var _pending_slot: int = 0 # slot being confirmed for overwrite
+var _debug_testbed_btn: Button = null # created/destroyed by _on_debug_toggled
 
 # ══ Lifecycle ══════════════════════════════════════════════════════════════════
 
@@ -49,11 +50,9 @@ func _ready() -> void:
     for i: int in 3:
         _slot_btns[i].pressed.connect(_on_slot_pressed.bind(i + 1))
 
+    Debug.toggled.connect(_on_debug_toggled)
     if Debug.enabled:
-        var testbed_btn := Button.new()
-        testbed_btn.text = "Testbeds"
-        testbed_btn.pressed.connect(_on_testbeds_pressed)
-        _buttons_vbox.add_child(testbed_btn) # node-src: debug
+        _add_testbed_button()
 
     _refresh()
 
@@ -99,6 +98,29 @@ func _on_testbeds_pressed() -> void:
         ToastManager.show_error("StartPage: testbed_launcher.tscn not found")
         return
     get_tree().change_scene_to_packed(launcher)
+
+
+func _add_testbed_button() -> void:
+    if _debug_testbed_btn != null:
+        return
+    _debug_testbed_btn = Button.new()
+    _debug_testbed_btn.text = "Testbeds"
+    _debug_testbed_btn.pressed.connect(_on_testbeds_pressed)
+    _buttons_vbox.add_child(_debug_testbed_btn) # node-src: debug
+
+
+func _remove_testbed_button() -> void:
+    if _debug_testbed_btn == null:
+        return
+    _debug_testbed_btn.queue_free()
+    _debug_testbed_btn = null
+
+
+func _on_debug_toggled(is_enabled: bool) -> void:
+    if is_enabled:
+        _add_testbed_button()
+    else:
+        _remove_testbed_button()
 
 # ══ Signal handlers — Slot picker ═════════════════════════════════════════════
 

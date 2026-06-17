@@ -180,3 +180,11 @@ custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Close"
+
+[node name="MainMenuButton" type="Button" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000034]
+script = ExtResource("99_sfx")
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Return to Main Menu"

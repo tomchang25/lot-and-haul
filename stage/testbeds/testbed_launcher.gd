@@ -16,3 +16,13 @@ func _ready() -> void:
         btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         btn.pressed.connect(func() -> void: TestbedRegistry.launch(entry))
         %ButtonColumn.add_child(btn) # node-src: ephemeral
+
+    var back_btn := Button.new()
+    back_btn.text = "Back"
+    back_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    back_btn.pressed.connect(_on_back_pressed)
+    %ButtonColumn.add_child(back_btn) # node-src: debug
+
+
+func _on_back_pressed() -> void:
+    get_tree().change_scene_to_file("res://game/meta/start/start_page_scene.tscn")

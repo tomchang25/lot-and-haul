@@ -46,6 +46,10 @@ var _weight_used: float = 0.0
 var _hovered_item: ItemEntry = null
 var _last_highlighted_entry: ItemEntry = null
 
+# Debug overlay buttons — created by _init_debug_overlay().
+var _debug_auto_pack_btn: Button = null
+var _debug_stuff_btn: Button = null
+
 # ── Node references ────────────────────────────────────────────────────────────
 
 @onready var _item_list_vbox: VBoxContainer = $MainHBox/ItemListPanel/ItemListScroll/ItemListVBox
@@ -109,7 +113,9 @@ func _ready() -> void:
     _build_extra_slots()
     _recalc_totals()
     _refresh_ui()
-    _init_debug_overlay()
+    Debug.toggled.connect(_on_debug_toggled)
+    if Debug.enabled:
+        _init_debug_overlay()
 
 
 func _input(event: InputEvent) -> void:
@@ -583,44 +589,47 @@ func _init_debug_overlay() -> void:
         return
 
     # ── Auto-pack button ──────────────────────────────────────────────────
-    var auto_pack_btn := Button.new()
-    auto_pack_btn.text = "Auto-Pack Items"
-    auto_pack_btn.pressed.connect(_debug_auto_pack)
-    auto_pack_btn.anchor_left = 0.0
-    auto_pack_btn.anchor_top = 1.0
-    auto_pack_btn.anchor_right = 0.0
-    auto_pack_btn.anchor_bottom = 1.0
-    auto_pack_btn.offset_left = 152.0
-    auto_pack_btn.offset_top = -56.0
-    auto_pack_btn.offset_bottom = -16.0
-    auto_pack_btn.custom_minimum_size = Vector2(150, 40)
+    _debug_auto_pack_btn = Button.new()
+    _debug_auto_pack_btn.text = "Auto-Pack Items"
+    _debug_auto_pack_btn.pressed.connect(_debug_auto_pack)
+    _debug_auto_pack_btn.anchor_left = 0.0
+    _debug_auto_pack_btn.anchor_top = 1.0
+    _debug_auto_pack_btn.anchor_right = 0.0
+    _debug_auto_pack_btn.anchor_bottom = 1.0
+    _debug_auto_pack_btn.offset_left = 152.0
+    _debug_auto_pack_btn.offset_top = -56.0
+    _debug_auto_pack_btn.offset_bottom = -16.0
+    _debug_auto_pack_btn.custom_minimum_size = Vector2(150, 40)
     # node-src: debug
-    add_child(auto_pack_btn)
+    add_child(_debug_auto_pack_btn)
 
     # ── Stuff-all & go button ─────────────────────────────────────────────
-    var stuff_btn := Button.new()
-    stuff_btn.text = "Stuff All & Go"
-    stuff_btn.pressed.connect(_debug_stuff_all)
-    stuff_btn.anchor_left = 0.0
-    stuff_btn.anchor_top = 1.0
-    stuff_btn.anchor_right = 0.0
-    stuff_btn.anchor_bottom = 1.0
-    stuff_btn.offset_left = 310.0
-    stuff_btn.offset_top = -56.0
-    stuff_btn.offset_bottom = -16.0
-    stuff_btn.custom_minimum_size = Vector2(150, 40)
+    _debug_stuff_btn = Button.new()
+    _debug_stuff_btn.text = "Stuff All & Go"
+    _debug_stuff_btn.pressed.connect(_debug_stuff_all)
+    _debug_stuff_btn.anchor_left = 0.0
+    _debug_stuff_btn.anchor_top = 1.0
+    _debug_stuff_btn.anchor_right = 0.0
+    _debug_stuff_btn.anchor_bottom = 1.0
+    _debug_stuff_btn.offset_left = 310.0
+    _debug_stuff_btn.offset_top = -56.0
+    _debug_stuff_btn.offset_bottom = -16.0
+    _debug_stuff_btn.custom_minimum_size = Vector2(150, 40)
     # node-src: debug
-    add_child(stuff_btn)
-
-    Debug.toggled.connect(_on_debug_toggled)
+    add_child(_debug_stuff_btn)
 
 
-func _on_debug_toggled(_is_enabled: bool) -> void:
-    # Debug overlay buttons are created only at _ready() when Debug.enabled is
-    # true, so toggling debug off mid-scene hides nothing (the buttons never
-    # exist in release). This stub documents the choice and prevents lint
-    # warnings about an unused connection.
-    pass
+func _on_debug_toggled(is_enabled: bool) -> void:
+    if is_enabled:
+        if _debug_auto_pack_btn == null:
+            _init_debug_overlay()
+        else:
+            _debug_auto_pack_btn.visible = true
+            _debug_stuff_btn.visible = true
+    else:
+        if _debug_auto_pack_btn != null:
+            _debug_auto_pack_btn.visible = false
+            _debug_stuff_btn.visible = false
 
 
 ## One-press legal auto-pack. Places every unplaced item into the grid using

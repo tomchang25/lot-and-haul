@@ -5,6 +5,7 @@ extends CanvasLayer
 signal closed
 
 const SETTING_TOGGLE: UiAudioEvent = preload("res://data/tres/audio_events/setting_toggle.tres")
+const START_PAGE_PATH := "res://game/meta/start/start_page_scene.tscn"
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -17,6 +18,7 @@ const SETTING_TOGGLE: UiAudioEvent = preload("res://data/tres/audio_events/setti
 @onready var _fullscreen_check: CheckBox = %FullscreenCheck
 @onready var _debug_check: CheckBox = %DebugCheck
 @onready var _close_btn: Button = %CloseButton
+@onready var _main_menu_btn: Button = %MainMenuButton
 
 
 # ══ Lifecycle ══════════════════════════════════════════════════════════════════
@@ -30,6 +32,9 @@ func _ready() -> void:
     _fullscreen_check.toggled.connect(_on_fullscreen_toggled)
     _debug_check.toggled.connect(_on_debug_toggled)
     _close_btn.pressed.connect(_on_close_pressed)
+    _main_menu_btn.pressed.connect(_on_main_menu_pressed)
+
+    _main_menu_btn.visible = get_tree().current_scene.scene_file_path != START_PAGE_PATH
 
     _apply()
 
@@ -71,6 +76,11 @@ func _on_debug_toggled(pressed: bool) -> void:
 
 func _on_close_pressed() -> void:
     closed.emit()
+
+
+func _on_main_menu_pressed() -> void:
+    closed.emit()
+    SceneRouter.go_to_start_page()
 
 
 # ══ View ═══════════════════════════════════════════════════════════════════════

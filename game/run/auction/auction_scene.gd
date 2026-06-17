@@ -42,6 +42,8 @@ var _last_npc_index: int = -1 # tracks the last NPC to prevent repeats
 var _circle_node: _CircleProgress = null
 var _resolved: bool = false # guards against double-resolution from debug buttons + normal flow
 var _debug_label: Label = null # gated by Debug.enabled; never exposes _rolled_price in release
+var _debug_open_btn: Button = null
+var _debug_rolled_btn: Button = null
 
 # ── Timer / tween handles ─────────────────────────────────────────────────────
 
@@ -111,6 +113,9 @@ func _ready() -> void:
     price_area.move_child(_circle_node, 0)
 
     _init_auction()
+    Debug.toggled.connect(_on_debug_toggled)
+    if Debug.enabled:
+        _init_debug_overlay()
     _start_npc_timer()
     _start_circle(0.0)
 
@@ -418,25 +423,34 @@ func _init_debug_overlay() -> void:
     ]
     # node-src: debug
     add_child(_debug_label)
-    Debug.toggled.connect(_on_debug_toggled)
 
     # ── Quick-win buttons ──────────────────────────────────────────────────
     var opening_bid := max(lot.get_opening_bid(), MIN_STEP)
     var button_bar: HBoxContainer = $RootVBox/ButtonBar
 
-    var open_btn := Button.new()
-    open_btn.text = "Win at Opening Bid ($%d)" % opening_bid
-    open_btn.pressed.connect(_win_now.bind(opening_bid))
+    _debug_open_btn = Button.new()
+    _debug_open_btn.text = "Win at Opening Bid ($%d)" % opening_bid
+    _debug_open_btn.pressed.connect(_win_now.bind(opening_bid))
     # node-src: debug
-    button_bar.add_child(open_btn)
+    button_bar.add_child(_debug_open_btn)
 
-    var rolled_btn := Button.new()
-    rolled_btn.text = "Win at Rolled Price ($%d)" % _rolled_price
-    rolled_btn.pressed.connect(_win_now.bind(_rolled_price))
+    _debug_rolled_btn = Button.new()
+    _debug_rolled_btn.text = "Win at Rolled Price ($%d)" % _rolled_price
+    _debug_rolled_btn.pressed.connect(_win_now.bind(_rolled_price))
     # node-src: debug
-    button_bar.add_child(rolled_btn)
+    button_bar.add_child(_debug_rolled_btn)
 
 
 func _on_debug_toggled(is_enabled: bool) -> void:
-    if _debug_label != null:
-        _debug_label.visible = is_enabled
+    if is_enabled:
+        if _debug_label == null:
+            _init_debug_overlay()
+        else:
+            _debug_label.visible = true
+            _debug_open_btn.visible = true
+            _debug_rolled_btn.visible = true
+    else:
+        if _debug_label != null:
+            _debug_label.visible = false
+            _debug_open_btn.visible = false
+            _debug_rolled_btn.visible = false
