@@ -53,10 +53,15 @@ var rarity: Economy.Rarity:
     get:
         return Economy.rarity_for_clue_count(hidden_clues.size())
 
-# Computed: true when every hidden clue is in revealed_clue_ids.
+# Computed: true when item is unveiled, all surface clues are revealed,
+# and every hidden clue is in revealed_clue_ids.
 # If item has no hidden clues, verified is true by default.
 var verified: bool:
     get:
+        if not unveiled:
+            return false
+        if not all_surface_revealed():
+            return false
         if _get_hidden_clues().is_empty():
             return true
         for clue: ClueData in _get_hidden_clues():
