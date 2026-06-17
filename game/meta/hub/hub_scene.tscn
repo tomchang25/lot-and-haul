@@ -2,7 +2,8 @@
 
 [ext_resource type="Script" uid="uid://cpdf8haohlsir" path="res://game/meta/hub/hub_scene.gd" id="1_hubgd"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
-[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="2_sbo"]
+[ext_resource type="PackedScene" uid="uid://dk4vsndd2lfnm" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="2_sbo"]
+[ext_resource type="PackedScene" uid="uid://cdxsmh2g5ggb5" path="res://game/shared/debug_button_container/debug_button_container.tscn" id="3_dbc"]
 
 [node name="HubScene" type="Control" unique_id=1000000001]
 layout_mode = 3
@@ -121,3 +122,4 @@ text = "Knowledge"
 script = ExtResource("99_sfx")
 
 [node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]
+[node name="DebugButtonContainer" parent="." instance=ExtResource("3_dbc")]

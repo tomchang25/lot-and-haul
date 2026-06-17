@@ -38,6 +38,11 @@ func register_entries(entries: Array) -> void:
         register_entry(e)
 
 
+## Removes all entries from storage. Does not save.
+func clear_all() -> void:
+    _storage_items.clear()
+
+
 ## Removes each entry in [param entries] from storage. Returns an Array[int] of
 ## the ids that were removed. Does not save.
 func remove_entries(entries: Array) -> Array:

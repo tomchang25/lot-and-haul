@@ -113,6 +113,12 @@ func register_storage_items(entries: Array[ItemEntry]) -> void:
     storage.register_entries(entries)
     SaveManager.mark_dirty()
 
+
+## Debug-only: clears all items from storage. Deferred save.
+func clear_all_storage() -> void:
+    storage.clear_all()
+    SaveManager.mark_dirty()
+
 # ══ Location sampling ═════════════════════════════════════════════════════════
 
 

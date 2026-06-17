@@ -43,6 +43,10 @@ Rules:
 - [storage] State simplified: \_selected_entry removed, empty-label branch dropped
 - [ui] Hover/click audio moved into ItemBrowserPanel for consistent feedbacke
 
+### Debug Storage Buttons
+
+- 2026-06-17 — [debug] Hub scene gains debug-only "Add Random Item" and "Clear All Storage" buttons for storage state control during testing, gated behind `Debug.enabled`
+
 ## v0.1.3
 
 ### Customer Sell Layout Rework
