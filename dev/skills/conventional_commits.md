@@ -118,7 +118,9 @@ These rules extend the base specification for this project.
 
 ### Body format
 
-- When listing multiple changes in the body, **MUST** use `-` bullet points, one per logical change.
+- Prefer a compact body with one general bullet when it accurately covers the shipped change.
+- Split into multiple bullets only when the commit contains clearly separate outcomes that would be misleading if combined.
+- When listing multiple changes in the body, **MUST** use `-` bullet points, one per logical outcome.
 - Each bullet **SHOULD** be a concise imperative phrase (e.g. `Add --force flag to yaml_to_tres.py`).
 
 ### Tone and content
@@ -126,6 +128,7 @@ These rules extend the base specification for this project.
 - Commit messages **SHOULD** be plain, concise, and outcome-focused.
 - Commit messages **SHOULD NOT** use hype language, speculative performance claims, or low-level implementation mechanics unless those details are needed to identify the fix.
 - Prefer describing the user-visible behavior, system behavior, or durable project rule that changed over listing the steps taken to make the change.
+- Do not expand a compact feature into a checklist of implementation details. Summarize the general outcome whenever possible.
 
 ### Subject/body separation
 
