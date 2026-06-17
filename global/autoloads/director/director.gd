@@ -69,6 +69,14 @@ func _ready() -> void:
     _position_help_btn.call_deferred()
 
 
+## Consume ESC/ui_settings while the tutorial cover or offer prompt is visible
+## to prevent SettingsStore from pausing the tree (which would deadlock both
+## overlays since the dim cover blocks the settings panel).
+func _unhandled_input(event: InputEvent) -> void:
+    if (_is_tutorial_active or _is_offer_showing) and event.is_action_pressed("ui_settings"):
+        get_viewport().set_input_as_handled()
+
+
 ## Entry point for scenes. Registers [param anchors] for the current scene
 ## identified by [param scene_id]. Emits [signal scene_registered] so the
 ## orchestration layer can decide what to do.
