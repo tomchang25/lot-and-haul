@@ -57,6 +57,10 @@ Rules:
 
 - 2026-06-17 — [debug] Hub scene gains debug-only "Add Random Item" and "Clear All Storage" buttons for storage state control during testing, gated behind `Debug.enabled`
 
+### Tutorial Target and Placement Modularization
+
+- 2026-06-17 — [tutorial] TutorialTarget node decouples logical highlight regions from layout Control rects with custom rect override, preferred-side placement, and deterministic fallback chain; full-viewport targets use centered popup; Director target resolution handles both TutorialTarget and plain Control anchors; harness overlap check and unit tests updated
+
 ## v0.1.3
 
 ### Customer Sell Layout Rework
