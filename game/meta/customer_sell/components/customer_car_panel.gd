@@ -30,6 +30,7 @@ var _customer: CustomerEntry = null
 @onready var _verified_count_label: Label = %VerifiedCountLabel
 @onready var _grid: PackingGrid = %PackingGrid
 @onready var _clear_button: SfxButton = %ClearButton
+@onready var deal_panel: DealPanel = %DealPanel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 

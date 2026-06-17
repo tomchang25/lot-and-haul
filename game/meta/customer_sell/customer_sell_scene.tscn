@@ -2,10 +2,9 @@
 
 [ext_resource type="Script" uid="uid://b61ssm5ecobc4" path="res://game/meta/customer_sell/customer_sell_scene.gd" id="1_css"]
 [ext_resource type="PackedScene" path="res://game/meta/customer_sell/components/customer_queue_panel.tscn" id="2_cqp"]
-[ext_resource type="PackedScene" path="res://game/meta/customer_sell/components/selling_item_list_panel.tscn" id="3_silp"]
+[ext_resource type="PackedScene" uid="uid://xb84s3sm48je" path="res://game/meta/customer_sell/components/selling_item_list_panel.tscn" id="3_silp"]
 [ext_resource type="PackedScene" uid="uid://my11d2txip3k" path="res://game/meta/customer_sell/components/customer_car_panel.tscn" id="4_ccp"]
 [ext_resource type="PackedScene" path="res://game/meta/customer_sell/components/selected_item_panel.tscn" id="6_sip"]
-[ext_resource type="PackedScene" path="res://game/meta/customer_sell/components/deal_panel.tscn" id="7_dp"]
 [ext_resource type="PackedScene" uid="uid://cvyujuur8ye7x" path="res://game/meta/customer_sell/components/sale_receipt_dialog.tscn" id="8_srd"]
 [ext_resource type="PackedScene" uid="uid://dk4vsndd2lfnm" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="9_sbo"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
@@ -42,15 +41,6 @@ custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TitleLabel" type="Label" parent="RootVBox/HeaderRow" unique_id=1218286169]
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 28
-text = "Night Market"
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="DayLabel" type="Label" parent="RootVBox/HeaderRow" unique_id=1563382684]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
@@ -59,10 +49,23 @@ theme_override_font_sizes/font_size = 16
 text = "Day 1"
 vertical_alignment = 1
 
-[node name="HeaderRightSpacer" type="Control" parent="RootVBox/HeaderRow" unique_id=42784276]
-custom_minimum_size = Vector2(70, 0)
+[node name="BackButton" type="Button" parent="RootVBox/HeaderRow" unique_id=720366815]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 36)
 layout_mode = 2
-mouse_filter = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 14
+text = "  Back to Hub"
+script = ExtResource("99_sfx")
+
+[node name="TitleLabel" type="Label" parent="RootVBox/HeaderRow" unique_id=1218286169]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "Night Market"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="CustomerQueuePanel" parent="RootVBox" unique_id=507195485 instance=ExtResource("2_cqp")]
 unique_name_in_owner = true
@@ -106,26 +109,6 @@ theme_override_constants/separation = 12
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-
-[node name="SidebarHSep" type="HSeparator" parent="RootVBox/MainArea/SellSidebar/SidebarMargin/SidebarVBox" unique_id=1631523605]
-layout_mode = 2
-
-[node name="DealPanel" parent="RootVBox/MainArea/SellSidebar/SidebarMargin/SidebarVBox" unique_id=347134492 instance=ExtResource("7_dp")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="FooterRow" type="HBoxContainer" parent="RootVBox" unique_id=999000001]
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="BackButton" type="Button" parent="RootVBox/FooterRow" unique_id=1597092715]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 44)
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "  Back to Hub"
-script = ExtResource("99_sfx")
 
 [node name="EmptyLabel" type="Label" parent="." unique_id=125428447]
 unique_name_in_owner = true

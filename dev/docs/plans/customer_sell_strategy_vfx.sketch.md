@@ -44,14 +44,14 @@ enum OfferState {
 
 Suggested card states:
 
-| State | Conservative card | Aggressive card |
-| --- | --- | --- |
-| Empty car | Disabled with hint text | Disabled with hint text |
-| Ready | Shows certain quote | Shows dice pool and risk bands |
-| Rolling | Disabled while dice tray animates | Active rolling animation |
-| Selecting dice | Disabled or secondary | Dice tray active, confirm disabled until two dice are selected |
-| Pitch ready | Shows safe comparison | Shows selected sum, multiplier, and final aggressive total |
-| Receipt open | Locked | Locked |
+| State          | Conservative card                 | Aggressive card                                                |
+| -------------- | --------------------------------- | -------------------------------------------------------------- |
+| Empty car      | Disabled with hint text           | Disabled with hint text                                        |
+| Ready          | Shows certain quote               | Shows dice pool and risk bands                                 |
+| Rolling        | Disabled while dice tray animates | Active rolling animation                                       |
+| Selecting dice | Disabled or secondary             | Dice tray active, confirm disabled until two dice are selected |
+| Pitch ready    | Shows safe comparison             | Shows selected sum, multiplier, and final aggressive total     |
+| Receipt open   | Locked                            | Locked                                                         |
 
 Aggressive sequence shape:
 
@@ -77,17 +77,17 @@ Use short tweens, not long cinematic sequences. Good default ranges are 0.08 to 
 
 Suggested UI feedback map:
 
-| Action | Feedback |
-| --- | --- |
-| Item loaded | Row moves to loaded style, grid cells pulse once, car total count-up |
-| Item lifted | Row enters holding style, grid preview uses drag cursor, selected item panel marks held |
-| Invalid placement | Grid preview rejects with red pulse and blocked sound |
-| Conservative selected | Conservative card glow, final quote count-up, receipt opens |
-| Aggressive selected | Dice tray expands, dice roll in, risk bands appear |
-| Die selected | Die raises or glows, selected count updates, multiplier preview refreshes |
-| Extra die rejected | Die bumps or shakes briefly, hint flashes selection limit |
-| Pitch confirmed | Aggressive card locks, receipt opens with pitch result |
-| Sale confirmed | Receipt stamp flash, cash value flash, completion audio |
+| Action                | Feedback                                                                                |
+| --------------------- | --------------------------------------------------------------------------------------- |
+| Item loaded           | Row moves to loaded style, grid cells pulse once, car total count-up                    |
+| Item lifted           | Row enters holding style, grid preview uses drag cursor, selected item panel marks held |
+| Invalid placement     | Grid preview rejects with red pulse and blocked sound                                   |
+| Conservative selected | Conservative card glow, final quote count-up, receipt opens                             |
+| Aggressive selected   | Dice tray expands, dice roll in, risk bands appear                                      |
+| Die selected          | Die raises or glows, selected count updates, multiplier preview refreshes               |
+| Extra die rejected    | Die bumps or shakes briefly, hint flashes selection limit                               |
+| Pitch confirmed       | Aggressive card locks, receipt opens with pitch result                                  |
+| Sale confirmed        | Receipt stamp flash, cash value flash, completion audio                                 |
 
 Multiplier band labels can be derived from the existing price bands at display time:
 

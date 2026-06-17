@@ -34,8 +34,9 @@ var _preview_entry: ItemEntry = null
 @onready var _item_list: SellingItemListPanel = %SellingItemListPanel
 @onready var _car_panel: CustomerCarPanel = %CustomerCarPanel
 @onready var _selected_item_panel: SelectedItemPanel = %SelectedItemPanel
-@onready var _deal_panel: DealPanel = %DealPanel
 @onready var _receipt: SaleReceiptDialog = %SaleReceiptDialog
+
+var _deal_panel: DealPanel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -56,6 +57,7 @@ func _ready() -> void:
     _car_panel.hover_ended.connect(_on_grid_hover_ended)
     _car_panel.car_clear_requested.connect(_on_car_clear_requested)
 
+    _deal_panel = _car_panel.deal_panel
     _deal_panel.conservative_requested.connect(_on_conservative_requested)
     _deal_panel.aggressive_requested.connect(_on_aggressive_requested)
     _deal_panel.pitch_confirmed.connect(_on_pitch_confirmed)

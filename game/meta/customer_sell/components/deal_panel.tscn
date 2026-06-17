@@ -1,106 +1,121 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://do4pnb7wlxhw3"]
 
-[ext_resource type="Script" path="res://game/meta/customer_sell/components/deal_panel.gd" id="1_dp"]
-[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="2_sfx"]
+[ext_resource type="Script" uid="uid://cjtgaect2h24a" path="res://game/meta/customer_sell/components/deal_panel.gd" id="1_dp"]
+[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="2_sfx"]
 
-[node name="DealPanel" type="PanelContainer"]
-custom_minimum_size = Vector2(220, 150)
+[node name="DealPanel" type="PanelContainer" unique_id=1195814800]
+custom_minimum_size = Vector2(360, 210)
 script = ExtResource("1_dp")
 
-[node name="VBox" type="VBoxContainer" parent="."]
+[node name="VBox" type="VBoxContainer" parent="." unique_id=1946661013]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="TitleLabel" type="Label" parent="VBox"]
+[node name="TitleLabel" type="Label" parent="VBox" unique_id=1624744891]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Sell Strategy"
 vertical_alignment = 1
 
-[node name="ConservativeButton" type="Button" parent="VBox"]
+[node name="BodyRow" type="HBoxContainer" parent="VBox" unique_id=2114897575]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ButtonColumn" type="VBoxContainer" parent="VBox/BodyRow" unique_id=971759670]
+custom_minimum_size = Vector2(124, 0)
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ConservativeButton" type="Button" parent="VBox/BodyRow/ButtonColumn" unique_id=563200389]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
-text = "Sell Conservative"
+text = "Conservative"
 script = ExtResource("2_sfx")
 
-[node name="AggressiveButton" type="Button" parent="VBox"]
+[node name="AggressiveButton" type="Button" parent="VBox/BodyRow/ButtonColumn" unique_id=1708635709]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
-text = "Sell Aggressive (Roll Dice)"
+text = "Aggressive"
 script = ExtResource("2_sfx")
 
-[node name="DiceSection" type="VBoxContainer" parent="VBox"]
+[node name="DiceSection" type="VBoxContainer" parent="VBox/BodyRow" unique_id=2136538789]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="DiceTitleLabel" type="Label" parent="VBox/DiceSection"]
+[node name="DiceTitleLabel" type="Label" parent="VBox/BodyRow/DiceSection" unique_id=349120602]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Dice Roll Results"
 
-[node name="DiceHint" type="Label" parent="VBox/DiceSection"]
+[node name="DiceHint" type="Label" parent="VBox/BodyRow/DiceSection" unique_id=569091747]
 unique_name_in_owner = true
 modulate = Color(0.7, 0.7, 0.7, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Select 2 dice to keep"
 
-[node name="DiceRow" type="HBoxContainer" parent="VBox/DiceSection"]
+[node name="DiceRow" type="HFlowContainer" parent="VBox/BodyRow/DiceSection" unique_id=1594438907]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 6
 
-[node name="DicePlaceholderA" type="Button" parent="VBox/DiceSection/DiceRow"]
+[node name="DicePlaceholderA" type="Button" parent="VBox/BodyRow/DiceSection/DiceRow" unique_id=580073116]
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 disabled = true
 text = "?"
 script = ExtResource("2_sfx")
 
-[node name="DicePlaceholderB" type="Button" parent="VBox/DiceSection/DiceRow"]
+[node name="DicePlaceholderB" type="Button" parent="VBox/BodyRow/DiceSection/DiceRow" unique_id=434007196]
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 disabled = true
 text = "?"
 script = ExtResource("2_sfx")
 
-[node name="DicePlaceholderC" type="Button" parent="VBox/DiceSection/DiceRow"]
+[node name="DicePlaceholderC" type="Button" parent="VBox/BodyRow/DiceSection/DiceRow" unique_id=1676937635]
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 disabled = true
 text = "?"
 script = ExtResource("2_sfx")
 
-[node name="DiceSumLabel" type="Label" parent="VBox/DiceSection"]
+[node name="DiceTotalsRow" type="HBoxContainer" parent="VBox/BodyRow/DiceSection" unique_id=2021515765]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DiceSumLabel" type="Label" parent="VBox/BodyRow/DiceSection/DiceTotalsRow" unique_id=183929863]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 16
 text = "Sum: —"
 
-[node name="DiceTotalLabel" type="Label" parent="VBox/DiceSection"]
+[node name="DiceTotalLabel" type="Label" parent="VBox/BodyRow/DiceSection/DiceTotalsRow" unique_id=1941889040]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 16
 text = "Total: —"
 
-[node name="DiceBtnRow" type="HBoxContainer" parent="VBox/DiceSection"]
+[node name="DiceBtnRow" type="HBoxContainer" parent="VBox/BodyRow/DiceSection" unique_id=1560005387]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ConfirmDiceButton" type="Button" parent="VBox/DiceSection/DiceBtnRow"]
+[node name="ConfirmDiceButton" type="Button" parent="VBox/BodyRow/DiceSection/DiceBtnRow" unique_id=248845062]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "Confirm Dice"
 script = ExtResource("2_sfx")
 
-[node name="CancelDiceButton" type="Button" parent="VBox/DiceSection/DiceBtnRow"]
+[node name="CancelDiceButton" type="Button" parent="VBox/BodyRow/DiceSection/DiceBtnRow" unique_id=649169907]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Cancel"

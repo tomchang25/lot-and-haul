@@ -14,6 +14,10 @@ Rules:
 
 ## v0.1.3 - Draft
 
+### Customer Sell Layout Rework
+
+- 2026-06-17 — [customer_sell] Sell scene layout rework: item details claim the full right sidebar, deal panel moves into the car panel bottom row, back navigation promoted to the header, and deal panel restructured with compact side-by-side strategy buttons and wrapped dice controls
+
 ### Selling Scene Component Modularization
 
 - 2026-06-16 — [customer_sell] Selling screen decomposed into 7 focused scene-backed components (SellingItemRow, SellingItemListPanel, SelectedItemPanel, DealPanel, CustomerQueuePanel, CustomerProfilePanel, CustomerCarPanel, SaleReceiptDialog) so redesign and debugging no longer require editing one large scene script
