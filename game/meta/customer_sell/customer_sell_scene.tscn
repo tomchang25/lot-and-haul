@@ -126,6 +126,5 @@ vertical_alignment = 1
 
 [node name="SaleReceiptDialog" parent="." unique_id=215182387 instance=ExtResource("8_srd")]
 unique_name_in_owner = true
-size = Vector2i(247, 110)
 
 [node name="SettingsButtonOverlay" parent="." unique_id=864161326 instance=ExtResource("9_sbo")]

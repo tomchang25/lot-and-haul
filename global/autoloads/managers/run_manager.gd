@@ -192,14 +192,14 @@ func commit_cargo(
 
 # ── Auction AP resolution ──────────────────────────────────────────────────────
 # Single source of truth for a run's starting auction AP. Every modifier source
-# (car, attributes, perks, …) folds in here, so all runs are built identically
+# (car, attributes, perks, ...) folds in here, so all runs are built identically
 # and no call site can bypass or forget one. Add new terms as the game grows —
 # this is the only place auction AP should be computed.
 
 
 ## Resolves the per-lot inspection AP ceiling for a run using [param car].
 @warning_ignore("unused_parameter")
-func _resolve_inspection_ap_cap(car: CarData) -> int:
+func _resolve_inspection_ap_cap(_car: CarData) -> int:
     var cap: int = Economy.INSPECTION_AP_CAP
     # Future modifiers fold in here, e.g.:
     #   cap += car.inspection_ap_bonus
@@ -209,7 +209,7 @@ func _resolve_inspection_ap_cap(car: CarData) -> int:
 
 ## Resolves the inspection AP reserve (lot-boundary refill pool) using [param car].
 @warning_ignore("unused_parameter")
-func _resolve_refill_reserve(car: CarData) -> int:
+func _resolve_refill_reserve(_car: CarData) -> int:
     var reserve: int = Economy.INSPECTION_REFILL_METRIC_DEFAULT
     # Future modifiers fold in here.
     return reserve

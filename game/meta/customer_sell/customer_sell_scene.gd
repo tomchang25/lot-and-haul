@@ -146,14 +146,17 @@ func _on_grid_item_clicked(item) -> void:
 
 func _on_grid_cell_clicked(pos: Vector2i) -> void:
     var grid := _car_panel.get_grid()
-    if grid.active_item == null:
+    var item := grid.active_item as ItemEntry
+    if item == null:
         return
-    if not grid.can_place(grid.active_item, pos):
+    if not grid.can_place(item, pos):
         AudioManager.play_event(BLOCKED_ERROR)
+        _item_list.play_card_reject(item)
         return
-    grid.place(grid.active_item, pos)
+    grid.place(item, pos)
     AudioManager.play_event(SELL_GRID_PUT_DOWN)
     _item_list.update_row_states(grid)
+    _item_list.play_card_pulse(item)
 
 
 func _on_car_clear_requested() -> void:

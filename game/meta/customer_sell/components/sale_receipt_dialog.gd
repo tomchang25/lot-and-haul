@@ -1,40 +1,51 @@
 # sale_receipt_dialog.gd
-# Receipt dialog for the sale flow — shows final receipt copy and emits confirm/cancel.
+# Receipt overlay for the sale flow — shows receipt copy, stamp animation on confirm.
 # Reads:  ItemEntry, ItemEntryDisplayHelper, SellMath
 # Writes: nothing
 class_name SaleReceiptDialog
-extends ConfirmationDialog
+extends Control
 
 signal receipt_confirmed(price: int, strategy: String)
 signal receipt_cancelled
 
-# ── State ─────────────────────────────────────────────────────────────────────
-
 var _pending_price: int = 0
 var _pending_strategy: String = ""
 
-# ══ Lifecycle ═════════════════════════════════════════════════════════════════
+@onready var _background_overlay: ColorRect = %BackgroundOverlay
+@onready var _title_label: Label = %TitleLabel
+@onready var _receipt_text: Label = %ReceiptText
+@onready var _stamp_label: Label = %StampLabel
+@onready var _cancel_btn: SfxButton = %CancelBtn
+@onready var _confirm_btn: SfxButton = %ConfirmBtn
 
 
 func _ready() -> void:
-    confirmed.connect(_on_confirmed)
-    canceled.connect(_on_canceled)
-
-# ══ Common API ════════════════════════════════════════════════════════════════
+    _cancel_btn.pressed.connect(_on_cancel)
+    _confirm_btn.pressed.connect(_on_confirm)
+    _background_overlay.gui_input.connect(_on_overlay_clicked)
 
 
 func show_receipt(items: Array, price: int, strategy: String) -> void:
     _pending_price = price
     _pending_strategy = strategy
-    dialog_text = _build_text(items, price, strategy)
-    popup_centered()
+    _receipt_text.text = _build_text(items, price)
+    _title_label.text = "%s Sale" % strategy.capitalize()
+    _stamp_label.hide()
+    _stamp_label.rotation = 0.0
+    _stamp_label.modulate = Color(1, 1, 1, 1)
+    _confirm_btn.disabled = false
+    _cancel_btn.disabled = false
+    show()
 
-# ══ Internal ══════════════════════════════════════════════════════════════════
+
+func hide_receipt() -> void:
+    _pending_price = 0
+    _pending_strategy = ""
+    hide()
 
 
-func _build_text(items: Array, price: int, strategy: String) -> String:
+func _build_text(items: Array, price: int) -> String:
     var lines: PackedStringArray = []
-    lines.append("Sell Strategy: %s" % strategy.capitalize())
     lines.append("Items: %d" % items.size())
     lines.append("")
     for item in items:
@@ -55,16 +66,35 @@ func _build_text(items: Array, price: int, strategy: String) -> String:
     lines.append("Sell Price: $%d" % price)
     return "\n".join(lines)
 
-# ══ Signal handlers ════════════════════════════════════════════════════════════
+
+func _on_confirm() -> void:
+    if _pending_price <= 0 or _pending_strategy == "":
+        return
+    _confirm_btn.disabled = true
+    _cancel_btn.disabled = true
+
+    _stamp_label.show()
+    var tween := create_tween().set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+    _stamp_label.scale = Vector2(3.0, 3.0)
+    tween.tween_property(_stamp_label, "scale", Vector2(1.0, 1.0), 0.4)
+    tween.parallel().tween_property(_stamp_label, "rotation", deg_to_rad(-4.0), 0.25)
+    tween.tween_interval(0.15)
+    tween.tween_callback(
+        func() -> void:
+            receipt_confirmed.emit(_pending_price, _pending_strategy)
+            _pending_price = 0
+            _pending_strategy = ""
+            hide()
+    )
 
 
-func _on_confirmed() -> void:
-    receipt_confirmed.emit(_pending_price, _pending_strategy)
-    _pending_price = 0
-    _pending_strategy = ""
-
-
-func _on_canceled() -> void:
+func _on_cancel() -> void:
     receipt_cancelled.emit()
     _pending_price = 0
     _pending_strategy = ""
+    hide()
+
+
+func _on_overlay_clicked(event: InputEvent) -> void:
+    if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+        _on_cancel()

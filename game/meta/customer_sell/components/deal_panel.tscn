@@ -54,6 +54,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Dice Roll Results"
 
+[node name="PoolSizeLabel" type="Label" parent="VBox/BodyRow/DiceSection" unique_id=1687404000]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Rolling 4 dice..."
+
 [node name="DiceHint" type="Label" parent="VBox/BodyRow/DiceSection" unique_id=569091747]
 unique_name_in_owner = true
 modulate = Color(0.7, 0.7, 0.7, 1)
@@ -65,58 +72,69 @@ text = "Select 2 dice to keep"
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="DicePlaceholderA" type="Button" parent="VBox/BodyRow/DiceSection/DiceRow" unique_id=580073116]
-custom_minimum_size = Vector2(44, 44)
-layout_mode = 2
-disabled = true
-text = "?"
-script = ExtResource("2_sfx")
-
-[node name="DicePlaceholderB" type="Button" parent="VBox/BodyRow/DiceSection/DiceRow" unique_id=434007196]
-custom_minimum_size = Vector2(44, 44)
-layout_mode = 2
-disabled = true
-text = "?"
-script = ExtResource("2_sfx")
-
-[node name="DicePlaceholderC" type="Button" parent="VBox/BodyRow/DiceSection/DiceRow" unique_id=1676937635]
-custom_minimum_size = Vector2(44, 44)
-layout_mode = 2
-disabled = true
-text = "?"
-script = ExtResource("2_sfx")
-
 [node name="DiceTotalsRow" type="HBoxContainer" parent="VBox/BodyRow/DiceSection" unique_id=2021515765]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 
 [node name="DiceSumLabel" type="Label" parent="VBox/BodyRow/DiceSection/DiceTotalsRow" unique_id=183929863]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 14
 text = "Sum: —"
 
 [node name="DiceTotalLabel" type="Label" parent="VBox/BodyRow/DiceSection/DiceTotalsRow" unique_id=1941889040]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 14
 text = "Total: —"
+horizontal_alignment = 2
+
+[node name="MultiplierBands" type="HBoxContainer" parent="VBox/BodyRow/DiceSection" unique_id=1687404001]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Band2_4" type="Label" parent="VBox/BodyRow/DiceSection/MultiplierBands" unique_id=1687404002]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = "2-4: Bad (x0.7)"
+horizontal_alignment = 1
+
+[node name="Band5_9" type="Label" parent="VBox/BodyRow/DiceSection/MultiplierBands" unique_id=1687404003]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = "5-9: Solid (x1.1)"
+horizontal_alignment = 1
+
+[node name="Band10_12" type="Label" parent="VBox/BodyRow/DiceSection/MultiplierBands" unique_id=1687404004]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+text = "10-12: Big Win (x1.5)"
+horizontal_alignment = 1
 
 [node name="DiceBtnRow" type="HBoxContainer" parent="VBox/BodyRow/DiceSection" unique_id=1560005387]
 layout_mode = 2
 theme_override_constants/separation = 8
+
+[node name="CancelDiceButton" type="Button" parent="VBox/BodyRow/DiceSection/DiceBtnRow" unique_id=649169907]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Cancel"
+script = ExtResource("2_sfx")
 
 [node name="ConfirmDiceButton" type="Button" parent="VBox/BodyRow/DiceSection/DiceBtnRow" unique_id=248845062]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "Confirm Dice"
-script = ExtResource("2_sfx")
-
-[node name="CancelDiceButton" type="Button" parent="VBox/BodyRow/DiceSection/DiceBtnRow" unique_id=649169907]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Cancel"
 script = ExtResource("2_sfx")

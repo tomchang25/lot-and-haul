@@ -91,6 +91,20 @@ func get_row(entry: ItemEntry) -> SellingItemCard:
     return _item_cards.get(entry) as SellingItemCard
 
 
+## Triggers a pulse animation on the card for the given entry.
+func play_card_pulse(entry: ItemEntry) -> void:
+    var card := get_row(entry)
+    if card != null:
+        card.play_loaded_pulse()
+
+
+## Triggers a reject animation on the card for the given entry.
+func play_card_reject(entry: ItemEntry) -> void:
+    var card := get_row(entry)
+    if card != null:
+        card.play_invalid_reject()
+
+
 ## Clears all cards.
 func clear() -> void:
     _clear_cards()

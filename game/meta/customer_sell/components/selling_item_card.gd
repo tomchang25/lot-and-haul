@@ -49,6 +49,22 @@ func _ready() -> void:
 # ══ Common API ════════════════════════════════════════════════════════════════
 
 
+func play_loaded_pulse() -> void:
+    var tween := create_tween().set_trans(Tween.TRANS_QUAD)
+    tween.tween_property(self, "modulate", Color(1.4, 1.3, 0.5, 1.0), 0.08)
+    tween.tween_property(self, "modulate", Color.WHITE, 0.22)
+
+
+func play_invalid_reject() -> void:
+    var original := position
+    var tween := create_tween().set_trans(Tween.TRANS_QUAD)
+    tween.tween_property(self, "modulate", Color(1.0, 0.25, 0.25, 1.0), 0.06)
+    tween.tween_property(self, "position", original + Vector2(4, 0), 0.03)
+    tween.tween_property(self, "position", original - Vector2(4, 0), 0.03)
+    tween.tween_property(self, "position", original, 0.03)
+    tween.tween_property(self, "modulate", Color.WHITE, 0.12)
+
+
 func setup(entry: ItemEntry, fit_count: int) -> void:
     _entry = entry
     _fit_count = fit_count

@@ -18,6 +18,10 @@ Rules:
 
 - 2026-06-17 — [customer_sell] Sell scene layout rework: item details claim the full right sidebar, deal panel moves into the car panel bottom row, back navigation promoted to the header, and deal panel restructured with compact side-by-side strategy buttons and wrapped dice controls
 
+### Customer Sell Strategy VFX
+
+- 2026-06-17 — [customer_sell] Conservative and aggressive sell strategies now have distinct interaction rhythms with button glow, staggered dice roll-in animation, multiplier band display with highlight, price count-up tweens, item card pulse/reject feedback, and a custom receipt overlay with stamp animation — all gated by a DealPanel state machine
+
 ### Selling Scene Component Modularization
 
 - 2026-06-16 — [customer_sell] Selling screen decomposed into 7 focused scene-backed components (SellingItemRow, SellingItemListPanel, SelectedItemPanel, DealPanel, CustomerQueuePanel, CustomerProfilePanel, CustomerCarPanel, SaleReceiptDialog) so redesign and debugging no longer require editing one large scene script

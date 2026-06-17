@@ -80,8 +80,25 @@ func set_car_info(placed_items: Array) -> void:
         total += entry.item_price
         if SellMath.is_item_verified(entry):
             verified_count += 1
-    _car_total_label.text = "Car total: $%d" % total
+    _animate_car_total(total)
     _verified_count_label.text = "Verified: %d / %d" % [verified_count, placed_items.size()]
+
+
+func _animate_car_total(target: int) -> void:
+    var current: int = 0
+    var raw := _car_total_label.text
+    if raw.begins_with("Car total: $"):
+        current = int(raw.trim_prefix("Car total: $"))
+    if current == target:
+        return
+    var tween := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+    tween.tween_method(
+        func(val: float) -> void:
+            _car_total_label.text = "Car total: $%d" % int(val),
+        float(current),
+        float(target),
+        0.3,
+    )
 
 # ══ Internal ══════════════════════════════════════════════════════════════════
 
