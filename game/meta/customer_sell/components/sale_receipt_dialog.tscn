@@ -1,0 +1,92 @@
+[gd_scene format=3 uid="uid://cvyujuur8ye7x"]
+
+[ext_resource type="Script" uid="uid://drjk57d2brnak" path="res://game/meta/customer_sell/components/sale_receipt_dialog.gd" id="1_srd"]
+[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="2_sfx"]
+
+[node name="SaleReceiptDialog" type="Control" unique_id=1687403893]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+visible = false
+script = ExtResource("1_srd")
+
+[node name="BackgroundOverlay" type="ColorRect" parent="." unique_id=1687403900]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5)
+mouse_filter = 1
+
+[node name="ReceiptCenter" type="CenterContainer" parent="." unique_id=1687403901]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ReceiptPanel" type="PanelContainer" parent="ReceiptCenter" unique_id=1687403903]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 240)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="VBox" type="VBoxContainer" parent="ReceiptCenter/ReceiptPanel" unique_id=1687403904]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="ReceiptCenter/ReceiptPanel/VBox" unique_id=1687403905]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Sale Result"
+horizontal_alignment = 1
+
+[node name="ReceiptText" type="Label" parent="ReceiptCenter/ReceiptPanel/VBox" unique_id=1687403906]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 14
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="StampLabel" type="Label" parent="ReceiptCenter/ReceiptPanel/VBox" unique_id=1687403907]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(1, 0.7, 0, 1)
+text = " SOLD! "
+horizontal_alignment = 1
+
+[node name="ButtonRow" type="HBoxContainer" parent="ReceiptCenter/ReceiptPanel/VBox" unique_id=1687403908]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="CancelBtn" type="Button" parent="ReceiptCenter/ReceiptPanel/VBox/ButtonRow" unique_id=1687403909]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Cancel"
+script = ExtResource("2_sfx")
+
+[node name="ConfirmBtn" type="Button" parent="ReceiptCenter/ReceiptPanel/VBox/ButtonRow" unique_id=1687403910]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Confirm Sale"
+script = ExtResource("2_sfx")

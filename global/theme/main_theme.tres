@@ -166,6 +166,14 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.4, 0.4, 0.45, 1)
 
+[sub_resource type="StyleBoxFlat" id="selling_item_row_selected"]
+bg_color = Color(0.15, 0.2, 0.35, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.5, 0.8, 1)
+
 [sub_resource type="StyleBoxFlat" id="tooltip_panel"]
 content_margin_left = 8.0
 content_margin_top = 6.0
@@ -232,6 +240,11 @@ PanelContainer/styles/panel = SubResource("panel_bg")
 RichTextLabel/colors/default_color = Color(0.88, 0.88, 0.92, 1)
 RichTextLabel/font_sizes/normal_font_size = 16
 RunSummary/styles/panel = SubResource("run_summary_panel")
+SellingItemRow/styles/default = SubResource("cargo_item_row_default")
+SellingItemRow/styles/holding = SubResource("cargo_item_row_holding")
+SellingItemRow/styles/hovered = SubResource("cargo_item_row_hovered")
+SellingItemRow/styles/loaded = SubResource("cargo_item_row_loaded")
+SellingItemRow/styles/selected = SubResource("selling_item_row_selected")
 TooltipLabel/colors/font_color = Color(0.8, 0.8, 0.85, 1)
 TooltipLabel/font_sizes/font_size = 14
 TooltipPanel/styles/panel = SubResource("tooltip_panel")

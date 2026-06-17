@@ -20,7 +20,6 @@ const DEMAND_TAG_COUNT: int = 2
 
 const MATCH_FLOOR_RATIO: float = 0.5
 const MATCH_FLOOR_MIN: int = 1
-const MATCH_REROLL_ATTEMPTS: int = 10
 
 
 static func generate(rng: RandomNumberGenerator = null) -> CustomerEntry:
@@ -50,18 +49,11 @@ static func generate_for_night(storage_items: Array = [], count: int = -1, rng: 
 
     var target_matches := _match_floor_for_count(count)
     var result: Array[CustomerEntry] = []
-    var matched_count := 0
+    var targeted := _generate_targeted_matches(storage_items, target_matches, resolved_rng)
+    result.assign(targeted)
+    while result.size() < count:
+        result.append(generate(resolved_rng))
 
-    result.resize(count)
-    for index in range(count):
-        var needs_match := matched_count < target_matches
-        var customer := _generate_matchable(storage_items, resolved_rng) if needs_match else generate(resolved_rng)
-        if _customer_matches_storage(customer, storage_items):
-            matched_count += 1
-        result[index] = customer
-
-    if matched_count < target_matches:
-        ToastManager.show_dev_error("CustomerGenerator: match floor missed %d/%d" % [matched_count, target_matches])
     return result
 
 
@@ -77,14 +69,63 @@ static func _match_floor_for_count(count: int) -> int:
     return clampi(ceili(float(count) * MATCH_FLOOR_RATIO), MATCH_FLOOR_MIN, count)
 
 
-static func _generate_matchable(storage_items: Array, rng: RandomNumberGenerator) -> CustomerEntry:
-    var fallback := generate(rng)
-    for attempt in range(MATCH_REROLL_ATTEMPTS):
-        var customer := generate(rng)
-        if _customer_matches_storage(customer, storage_items):
-            return customer
-        fallback = customer
-    return fallback
+## Builds the guaranteed-match portion of a night from storage tags. If any
+## generated customer fails the same SellMath check used by selling, callers
+## should discard the batch and fall back to unconstrained generation.
+static func _generate_targeted_matches(storage_items: Array, count: int, rng: RandomNumberGenerator) -> Array[CustomerEntry]:
+    var specs := _target_specs_for_storage(storage_items)
+    var result: Array[CustomerEntry] = []
+    if specs.is_empty():
+        return result
+
+    for index in range(count):
+        var spec: Dictionary = specs[index % specs.size()]
+        var customer := _make_targeted_customer(spec["category"], spec["tag"], rng)
+        if not _customer_matches_storage(customer, storage_items):
+            return [] as Array[CustomerEntry]
+        result.append(customer)
+    return result
+
+
+static func _target_specs_for_storage(storage_items: Array) -> Array[Dictionary]:
+    var specs: Array[Dictionary] = []
+    for item in storage_items:
+        if item == null or not item.has_method("fit_tags"):
+            continue
+        var item_tags: Array = item.fit_tags()
+        if item_tags.is_empty():
+            continue
+        var cat: CategoryData = item.category_data if item is ItemEntry else null
+        for raw_tag in item_tags:
+            var tag := String(raw_tag)
+            var tag_cat := cat if cat != null else _find_category_for_clue(tag)
+            if tag_cat != null:
+                specs.append({ "category": tag_cat, "tag": tag })
+    return specs
+
+
+static func _make_targeted_customer(category: CategoryData, tag: String, rng: RandomNumberGenerator) -> CustomerEntry:
+    var required_size := AnchorRegistry.get_largest_anchor_size_for_category(category)
+    var preset := _pick_min_preset(required_size, rng)
+    var tags := _sample_demand_tags(category, rng)
+    if not tags.is_empty() and tag not in tags:
+        tags[0] = tag
+
+    return CustomerEntry.create(
+        "cust_%s" % RandomUtils.random_id(rng),
+        RandomUtils.random_name(rng),
+        preset,
+        tags,
+    )
+
+
+static func _find_category_for_clue(clue_id: String) -> CategoryData:
+    var categories := CategoryRegistry.get_all_categories()
+    for cat in categories:
+        var pool := _clue_pool_for_category(cat)
+        if clue_id in pool:
+            return cat
+    return null
 
 
 static func _customer_matches_storage(customer: CustomerEntry, storage_items: Array) -> bool:

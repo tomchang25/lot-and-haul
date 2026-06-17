@@ -1,8 +1,10 @@
 # customer_sell_scene.gd
-# Phase 9 nightly customer sell scene — tag matching, car packing, sell strategy.
+# Phase 9 nightly customer sell screen — coordinates components for tag matching, car packing, sell strategy.
 # Reads:  MetaManager.customers.nightly_customers, MetaManager.storage.storage_items
 # Writes: MetaManager.resolve_customer_sale()
 extends Control
+
+# ── Constants ─────────────────────────────────────────────────────────────────
 
 const SALE_COMPLETED: UiAudioEvent = preload("res://data/tres/audio_events/sale_completed.tres")
 const CASH_CREDITED: UiAudioEvent = preload("res://data/tres/audio_events/cash_credited.tres")
@@ -12,396 +14,222 @@ const BLOCKED_ERROR: UiAudioEvent = preload("res://data/tres/audio_events/blocke
 const SELL_GRID_LIFT: UiAudioEvent = preload("res://data/tres/audio_events/sell_grid_lift.tres")
 const SELL_GRID_PUT_DOWN: UiAudioEvent = preload("res://data/tres/audio_events/sell_grid_put_down.tres")
 
-const CargoItemRowScene: PackedScene = preload("res://game/run/cargo/cargo_item_row.tscn")
+# ── State ─────────────────────────────────────────────────────────────────────
 
 var _customers: Array[CustomerEntry] = []
-var _selected_idx: int = -1
-var _item_rows: Dictionary = { }
-var _dice_rolls: Array[int] = []
-var _selected_dice_indices: Array[int] = []
+var _selected_index: int = -1
 var _pending_sale_price: int = 0
 var _pending_strategy: String = ""
-
-@onready var _grid: PackingGrid = $RootVBox/MainArea/GridContainer/CustomerGrid
-@onready var _day_label: Label = $RootVBox/HeaderRow/DayLabel
-@onready var _back_btn: Button = $RootVBox/FooterRow/BackButton
-@onready var _customer_tabs_row: HBoxContainer = $RootVBox/CustomerTabsScroll/CustomerTabsRow
-@onready var _main_area: HBoxContainer = $RootVBox/MainArea
-@onready var _item_list_vbox: VBoxContainer = $RootVBox/MainArea/ItemScroll/ItemListVBox
-@onready var _customer_name_label: Label = $RootVBox/MainArea/SellPanel/CustomerNameLabel
-@onready var _grid_size_label: Label = $RootVBox/MainArea/SellPanel/GridSizeLabel
-@onready var _demand_tags_label: Label = $RootVBox/MainArea/SellPanel/DemandTagsLabel
-@onready var _car_total_label: Label = $RootVBox/MainArea/SellPanel/CarTotalLabel
-@onready var _verified_count_label: Label = $RootVBox/MainArea/SellPanel/VerifiedCountLabel
-@onready var _empty_label: Label = $EmptyLabel
-@onready var _sell_result_popup: ConfirmationDialog = $SellResultPopup
-@onready var _car_clear_btn: Button = $RootVBox/MainArea/SellPanel/CarClearButton
-@onready var _conservative_btn: Button = $RootVBox/MainArea/SellPanel/ConservativeButton
-@onready var _aggressive_btn: Button = $RootVBox/MainArea/SellPanel/AggressiveButton
-@onready var _dice_section: VBoxContainer = $RootVBox/MainArea/SellPanel/DiceSection
-@onready var _dice_sum_label: Label = $RootVBox/MainArea/SellPanel/DiceSection/DiceSumLabel
-@onready var _dice_total_label: Label = $RootVBox/MainArea/SellPanel/DiceSection/DiceTotalLabel
-@onready var _confirm_dice_btn: Button = $RootVBox/MainArea/SellPanel/DiceSection/DiceBtnRow/ConfirmDiceButton
-@onready var _cancel_dice_btn: Button = $RootVBox/MainArea/SellPanel/DiceSection/DiceBtnRow/CancelDiceButton
-
-var _dice_buttons: Array[Button] = []
 var _hovered_entry: ItemEntry = null
+var _selected_entry: ItemEntry = null
+var _preview_entry: ItemEntry = null
+
+# ── Node references ───────────────────────────────────────────────────────────
+
+@onready var _day_label: Label = %DayLabel
+@onready var _back_button: SfxButton = %BackButton
+@onready var _empty_label: Label = %EmptyLabel
+@onready var _main_area: HBoxContainer = %MainArea
+@onready var _customer_queue: CustomerQueuePanel = %CustomerQueuePanel
+@onready var _item_list: SellingItemListPanel = %SellingItemListPanel
+@onready var _car_panel: CustomerCarPanel = %CustomerCarPanel
+@onready var _selected_item_panel: SelectedItemPanel = %SelectedItemPanel
+@onready var _receipt: SaleReceiptDialog = %SaleReceiptDialog
+
+var _deal_panel: DealPanel
+
+# ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
 
 func _ready() -> void:
-    _back_btn.pressed.connect(_on_back_pressed)
-    _back_btn.press_event = CANCEL
-    _sell_result_popup.confirmed.connect(_on_sell_confirmed)
-    _sell_result_popup.canceled.connect(_on_sell_cancelled)
-    _car_clear_btn.pressed.connect(_on_clear_car_pressed)
-    _conservative_btn.pressed.connect(_on_conservative_pressed)
-    _aggressive_btn.pressed.connect(_on_aggressive_pressed)
-    _confirm_dice_btn.pressed.connect(_on_confirm_dice_pressed)
-    _cancel_dice_btn.pressed.connect(_on_cancel_dice_pressed)
-    _conservative_btn.text = "Sell Conservative (×%.1f)" % SellMath.CONSERVATIVE_MULTIPLIER
+    _back_button.pressed.connect(_on_back_pressed)
+    _back_button.press_event = CANCEL
 
-    _grid.item_clicked.connect(_on_grid_item_clicked)
-    _grid.cell_clicked.connect(_on_grid_cell_clicked)
-    _grid.placement_changed.connect(_refresh_display)
-    _grid.hover_started.connect(_on_grid_hover_started)
-    _grid.hover_ended.connect(_on_grid_hover_ended)
+    _customer_queue.customer_selected.connect(_on_customer_selected)
+    _item_list.item_pick_requested.connect(_on_item_pick_requested)
+    _item_list.tooltip_requested.connect(_on_item_row_hovered)
+    _item_list.tooltip_dismissed.connect(_on_item_row_hover_ended)
+
+    _car_panel.placement_changed.connect(_on_car_placement_changed)
+    _car_panel.item_clicked.connect(_on_grid_item_clicked)
+    _car_panel.cell_clicked.connect(_on_grid_cell_clicked)
+    _car_panel.hover_started.connect(_on_grid_hover_started)
+    _car_panel.hover_ended.connect(_on_grid_hover_ended)
+    _car_panel.car_clear_requested.connect(_on_car_clear_requested)
+
+    _deal_panel = _car_panel.deal_panel
+    _deal_panel.conservative_requested.connect(_on_conservative_requested)
+    _deal_panel.aggressive_requested.connect(_on_aggressive_requested)
+    _deal_panel.pitch_confirmed.connect(_on_pitch_confirmed)
+
+    _receipt.receipt_confirmed.connect(_on_receipt_confirmed)
+    _receipt.receipt_cancelled.connect(_on_receipt_cancelled)
 
     _customers = MetaManager.customers.nightly_customers.duplicate()
 
     if _customers.is_empty():
-        _empty_label.visible = true
-        _main_area.visible = false
+        _show_empty_state("No customers tonight.")
         return
 
     _day_label.text = "Day %d" % MetaManager.progress.current_day
-    _build_customer_tabs()
+    _customer_queue.setup(_customers)
+    _customer_queue.set_selected(0)
     _select_customer(0)
 
-
-func _build_customer_tabs() -> void:
-    for child: Node in _customer_tabs_row.get_children():
-        _customer_tabs_row.remove_child(child)
-        child.queue_free()
-
-    for i: int in _customers.size():
-        var c: CustomerEntry = _customers[i]
-        var btn := SfxButton.new()
-        btn.custom_minimum_size = Vector2(140, 36)
-        btn.add_theme_font_size_override("font_size", 14)
-        btn.text = c.display_name
-        btn.toggle_mode = true
-        var idx := i
-        btn.pressed.connect(func() -> void: _select_customer(idx))
-
-        # node-src: ephemeral — per-customer tab, dynamic count
-        _customer_tabs_row.add_child(btn)
+# ══ Signal handlers ═══════════════════════════════════════════════════════════
 
 
-func _select_customer(idx: int) -> void:
-    if idx < 0 or idx >= _customers.size():
+func _on_customer_selected(index: int) -> void:
+    _select_customer(index)
+
+
+func _on_item_pick_requested(entry: ItemEntry) -> void:
+    if entry == null:
         return
-
-    _selected_idx = idx
-    _update_tab_states()
-
-    var c: CustomerEntry = _customers[idx]
-    _customer_name_label.text = c.display_name
-    _grid_size_label.text = "Car: %dx%d" % [c.grid_columns, c.grid_rows]
-
-    var tag_names: Array[String] = []
-    for tag: String in c.demand_tags:
-        var clue := ClueRegistry.get_clue_by_id(tag)
-        tag_names.append(clue.known_text if clue != null and clue.known_text != "" else tag)
-    _demand_tags_label.text = "Wants: %s" % ", ".join(tag_names)
-
-    _hovered_entry = null
-    _rebuild_grid(c)
-    _rebuild_item_list(c)
-    _dice_section.visible = false
-    _refresh_display()
-
-
-func _update_tab_states() -> void:
-    var children := _customer_tabs_row.get_children()
-    for i: int in children.size():
-        var btn: Button = children[i]
-        btn.button_pressed = (i == _selected_idx)
-        btn.disabled = (_customers[i] == null)
-
-
-func _rebuild_grid(c: CustomerEntry) -> void:
-    _grid.setup(c.grid_columns, c.grid_rows)
-    _main_area.visible = true
-
-
-func _rebuild_item_list(c: CustomerEntry) -> void:
-    for child: Node in _item_list_vbox.get_children():
-        _item_list_vbox.remove_child(child)
-        child.queue_free()
-    _item_rows.clear()
-
-    var matched: Array = SellMath.matched_items(c, MetaManager.storage.storage_items)
-    if matched.is_empty():
-        var lbl := Label.new()
-        lbl.text = "No matching items in storage."
-        lbl.add_theme_font_size_override("font_size", 14)
-        lbl.modulate = Color(0.6, 0.6, 0.6)
-        # node-src: ephemeral — empty-state label
-        _item_list_vbox.add_child(lbl)
-        return
-
-    _grid.setup_default_callbacks(matched)
-
-    for entry: ItemEntry in matched:
-        var row: CargoItemRow = CargoItemRowScene.instantiate()
-        row.setup(entry)
-        row.row_pressed.connect(_on_item_row_pressed)
-        row.tooltip_requested.connect(_on_item_row_hovered)
-        row.tooltip_dismissed.connect(_on_item_row_hover_ended)
-        _item_list_vbox.add_child(row)
-        _item_rows[entry] = row
-
-
-func _refresh_display() -> void:
-    if _selected_idx < 0:
-        return
-
-    var placed: Array = _grid.get_placed_items()
-    var total := SellMath.car_total(placed, 1.0)
-    var verified_count := 0
-    for entry in placed:
-        if SellMath.is_item_verified(entry):
-            verified_count += 1
-
-    _car_total_label.text = "Car total: $%d" % total
-    _verified_count_label.text = "Verified: %d / %d" % [verified_count, placed.size()]
-
-    _update_item_row_states()
-
-
-func _update_item_row_states() -> void:
-    for entry: ItemEntry in _item_rows:
-        var row: CargoItemRow = _item_rows[entry]
-        var is_loaded := _grid != null and _grid.is_item_placed(entry)
-        row.set_loaded(is_loaded)
-        var is_held: bool = _grid != null and _grid.active_item == entry and _grid.phase == PackingGrid.Phase.ITEM_HELD
-        row.set_holding(is_held)
-
-
-func _on_item_row_pressed(entry: ItemEntry) -> void:
-    if _grid == null:
-        return
-    if _grid.phase == PackingGrid.Phase.ITEM_HELD:
-        _grid.cancel_placement()
-        _update_item_row_states()
-        return
-    if _grid.is_item_placed(entry):
-        _grid.lift(entry)
-        AudioManager.play_event(SELL_GRID_LIFT)
-        _update_item_row_states()
+    _show_item_detail(entry, false)
+    var grid := _car_panel.get_grid()
+    if grid.phase == PackingGrid.Phase.ITEM_HELD:
+        grid.cancel_placement()
+        _item_list.update_row_states(grid)
+    if grid.is_item_placed(entry):
+        grid.lift(entry)
     else:
-        _grid.set_held_item(entry, _grid.item_rotations.get(entry, 0))
-        AudioManager.play_event(SELL_GRID_LIFT)
-        _update_item_row_states()
+        grid.set_held_item(entry, grid.item_rotations.get(entry, 0))
+    AudioManager.play_event(SELL_GRID_LIFT)
+    _item_list.update_row_states(grid)
 
 
-## Hovering a list row lights up that item's cells in the grid (the mirror of
-## _on_grid_hover_started, which lights up the row when the grid is hovered).
 func _on_item_row_hovered(entry: ItemEntry, _anchor: Rect2) -> void:
-    if _grid != null:
-        _grid.set_external_hover_item(entry)
+    if entry == null:
+        return
+    var grid := _car_panel.get_grid()
+    grid.set_external_hover_item(entry)
+    _show_item_detail(entry, true)
 
 
 func _on_item_row_hover_ended() -> void:
-    if _grid != null:
-        _grid.set_external_hover_item(null)
+    var grid := _car_panel.get_grid()
+    grid.set_external_hover_item(null)
+    _clear_preview_detail()
 
 
 func _on_grid_hover_started(cell_pos: Vector2i) -> void:
-    if _grid == null or _grid.phase == PackingGrid.Phase.ITEM_HELD:
+    var grid := _car_panel.get_grid()
+    if grid.phase == PackingGrid.Phase.ITEM_HELD:
         return
-    var new_entry: ItemEntry = _grid.placement.get(cell_pos) as ItemEntry
+    var new_entry: ItemEntry = grid.placement.get(cell_pos) as ItemEntry
     if new_entry == _hovered_entry:
         return
-    if _hovered_entry != null and _item_rows.has(_hovered_entry):
-        _item_rows[_hovered_entry].set_external_highlight(false)
+    _item_list.set_external_highlight(_hovered_entry, false)
     _hovered_entry = new_entry
-    if _hovered_entry != null and _item_rows.has(_hovered_entry):
-        _item_rows[_hovered_entry].set_external_highlight(true)
+    _item_list.set_external_highlight(_hovered_entry, true)
+    if _hovered_entry != null:
+        _show_item_detail(_hovered_entry, true)
 
 
 func _on_grid_hover_ended() -> void:
-    if _hovered_entry != null and _item_rows.has(_hovered_entry):
-        _item_rows[_hovered_entry].set_external_highlight(false)
+    _item_list.set_external_highlight(_hovered_entry, false)
     _hovered_entry = null
+    _clear_preview_detail()
 
 
 func _on_grid_item_clicked(item) -> void:
-    if _grid != null:
-        _grid.lift(item)
-        AudioManager.play_event(SELL_GRID_LIFT)
-        _refresh_display()
+    var entry := item as ItemEntry
+    if entry == null:
+        return
+    _show_item_detail(entry, false)
+    var grid := _car_panel.get_grid()
+    grid.lift(entry)
+    AudioManager.play_event(SELL_GRID_LIFT)
+    _refresh_car_display()
 
 
 func _on_grid_cell_clicked(pos: Vector2i) -> void:
-    if _grid != null and _grid.active_item != null:
-        if _grid.can_place(_grid.active_item, pos):
-            _grid.place(_grid.active_item, pos)
-            AudioManager.play_event(SELL_GRID_PUT_DOWN)
-            _update_item_row_states()
-        else:
-            AudioManager.play_event(BLOCKED_ERROR)
-
-
-func _on_clear_car_pressed() -> void:
-    if _grid != null:
-        _grid.reset()
-        _refresh_display()
-
-
-func _on_conservative_pressed() -> void:
-    var placed: Array = _grid.get_placed_items()
-    if placed.is_empty():
-        AudioManager.play_event(CANCEL)
+    var grid := _car_panel.get_grid()
+    var item := grid.active_item as ItemEntry
+    if item == null:
         return
-    var price := SellMath.conservative_total(placed)
+    if not grid.can_place(item, pos):
+        AudioManager.play_event(BLOCKED_ERROR)
+        _item_list.play_card_reject(item)
+        return
+    grid.place(item, pos)
+    AudioManager.play_event(SELL_GRID_PUT_DOWN)
+    _item_list.update_row_states(grid)
+    _item_list.play_card_pulse(item)
+
+
+func _on_car_clear_requested() -> void:
+    _refresh_car_display()
+
+
+func _on_car_placement_changed() -> void:
+    _refresh_car_display()
+
+
+func _on_conservative_requested(price: int) -> void:
+    var placed := _car_panel.get_grid().get_placed_items()
+    if placed.is_empty():
+        return
     _pending_sale_price = price
     _pending_strategy = "conservative"
-    _sell_result_popup.dialog_text = _build_result_text(placed, price, "conservative")
-    _sell_result_popup.popup_centered()
+    _receipt.show_receipt(placed, price, "conservative")
 
 
-func _on_aggressive_pressed() -> void:
-    var placed: Array = _grid.get_placed_items()
+func _on_aggressive_requested() -> void:
+    var customer := _get_selected_customer()
+    if customer == null:
+        return
+    var grid := _car_panel.get_grid()
+    var placed := grid.get_placed_items()
     if placed.is_empty():
         AudioManager.play_event(CANCEL)
         return
-    if _selected_idx < 0:
-        return
-
-    var c: CustomerEntry = _customers[_selected_idx]
-    var depth := SellMath.best_item_fit_depth(c, placed)
-    var verified_count := 0
-    for entry in placed:
-        if SellMath.is_item_verified(entry):
-            verified_count += 1
-    var pool := SellMath.dice_pool_size(depth, verified_count)
-
-    _dice_rolls.clear()
-    _selected_dice_indices.clear()
-    _dice_buttons.clear()
-
-    var dice_row: HBoxContainer = _dice_section.get_node("DiceRow")
-    for child: Node in dice_row.get_children():
-        dice_row.remove_child(child)
-        child.queue_free()
-
+    var pool := _get_dice_pool_size(customer, placed)
     var rolls := SellMath.roll_dice(pool)
-    for i in range(pool):
-        var val := rolls[i]
-        _dice_rolls.append(val)
-        var btn := SfxButton.new()
-        btn.custom_minimum_size = Vector2(44, 44)
-        btn.text = str(val)
-        btn.toggle_mode = true
-        btn.add_theme_font_size_override("font_size", 16)
-        var idx := i
-        btn.toggled.connect(func(toggled: bool) -> void: _on_dice_toggled(idx, toggled))
-        # node-src: ephemeral — per-die toggle, dynamic count
-        dice_row.add_child(btn)
-        _dice_buttons.append(btn)
-
-    _dice_section.get_node("DiceHint").text = "Select 2 dice to keep"
-    _dice_sum_label.text = "Sum: —"
-    _dice_total_label.text = "Total: —"
-    _confirm_dice_btn.disabled = true
-
-    _dice_section.visible = true
+    _deal_panel.show_dice(rolls, placed)
 
 
-func _on_dice_toggled(idx: int, toggled: bool) -> void:
-    if toggled:
-        if _selected_dice_indices.size() >= 2:
-            _dice_buttons[idx].button_pressed = false
-            return
-        _selected_dice_indices.append(idx)
-    else:
-        _selected_dice_indices.erase(idx)
-
-    if _selected_dice_indices.size() == 2:
-        var sum := _dice_rolls[_selected_dice_indices[0]] + _dice_rolls[_selected_dice_indices[1]]
-        var mult := SellMath.dice_multiplier(sum)
-        var placed: Array = _grid.get_placed_items()
-        var total := SellMath.aggressive_total(placed, sum)
-        _pending_sale_price = total
-
-        _dice_section.get_node("DiceHint").text = ""
-        _dice_sum_label.text = "Sum: %d (×%.1f)" % [sum, mult]
-        _dice_total_label.text = "Total: $%d" % total
-        _confirm_dice_btn.disabled = false
-    else:
-        _dice_sum_label.text = "Sum: —"
-        _dice_total_label.text = "Total: —"
-        _confirm_dice_btn.disabled = true
-
-
-func _on_confirm_dice_pressed() -> void:
-    AudioManager.play_event(CONFIRM)
-    _dice_section.visible = false
+func _on_pitch_confirmed(price: int) -> void:
+    var placed := _car_panel.get_grid().get_placed_items()
+    _pending_sale_price = price
     _pending_strategy = "aggressive"
-    var placed: Array = _grid.get_placed_items()
-    _sell_result_popup.dialog_text = _build_result_text(placed, _pending_sale_price, "aggressive")
-    _sell_result_popup.popup_centered()
+    _receipt.show_receipt(placed, price, "aggressive")
 
 
-func _on_cancel_dice_pressed() -> void:
-    AudioManager.play_event(CANCEL)
-    _dice_section.visible = false
-
-
-func _build_result_text(items: Array, price: int, strategy: String) -> String:
-    var lines: PackedStringArray = []
-    lines.append("Sell Strategy: %s" % strategy.capitalize())
-    lines.append("Items: %d" % items.size())
-    lines.append("")
-    for entry: ItemEntry in items:
-        var contrib := SellMath.item_contribution(entry)
-        var verified_label := " (verified)" if SellMath.is_item_verified(entry) else ""
-        lines.append("• %s — $%d%s" % [ItemEntryDisplayHelper.display_name(entry), contrib, verified_label])
-    lines.append("")
-    lines.append("Sell Price: $%d" % price)
-    return "\n".join(lines)
-
-
-func _on_sell_confirmed() -> void:
-    if _selected_idx < 0:
+func _on_receipt_confirmed(price: int, strategy: String) -> void:
+    var sold_customer := _get_selected_customer()
+    if sold_customer == null:
         return
-    var placed: Array = _grid.get_placed_items()
+    var placed := _car_panel.get_grid().get_placed_items()
     if placed.is_empty():
+        ToastManager.show_dev_error("CustomerSellScene._on_receipt_confirmed: no placed items")
+        return
+    if price <= 0 or strategy == "":
+        ToastManager.show_dev_error("CustomerSellScene._on_receipt_confirmed: sale is missing price or strategy")
         return
 
-    var sold_customer: CustomerEntry = _customers[_selected_idx]
-    # MetaManager owns the transaction: it commits cash/storage, records the
-    # sale for the daily summary, and removes the served customer from the
-    # persisted nightly set. The scene only drops it from its local view.
-    MetaManager.resolve_customer_sale(placed, _pending_sale_price, sold_customer, _pending_strategy)
+    MetaManager.resolve_customer_sale(placed, price, sold_customer, strategy)
     AudioManager.play_event(CONFIRM)
     AudioManager.play_event(SALE_COMPLETED)
     AudioManager.play_event(CASH_CREDITED)
-    _customers.remove_at(_selected_idx)
+    _customers.remove_at(_selected_index)
+    _pending_sale_price = 0
+    _pending_strategy = ""
+    _selected_entry = null
+    _preview_entry = null
 
     if _customers.is_empty():
-        _empty_label.visible = true
-        _main_area.visible = false
-        _customer_tabs_row.hide()
-        _empty_label.text = "All customers served! End of night."
+        _show_empty_state("All customers served! End of night.")
+        _customer_queue.hide()
         return
 
-    _build_customer_tabs()
-    _select_customer(mini(_selected_idx, _customers.size() - 1))
+    var auto_select := mini(_selected_index, _customers.size() - 1)
+    _customer_queue.rebuild(_customers, auto_select)
+    _select_customer(auto_select)
 
 
-func _on_sell_cancelled() -> void:
+func _on_receipt_cancelled() -> void:
     AudioManager.play_event(CANCEL)
     _pending_sale_price = 0
     _pending_strategy = ""
@@ -409,3 +237,106 @@ func _on_sell_cancelled() -> void:
 
 func _on_back_pressed() -> void:
     SceneRouter.go_to_hub()
+
+# ══ Customer selection ════════════════════════════════════════════════════════
+
+
+func _select_customer(index: int) -> void:
+    if index < 0 or index >= _customers.size():
+        ToastManager.show_dev_error("CustomerSellScene._select_customer: invalid index %d" % index)
+        return
+    var customer := _customers[index]
+    if customer == null:
+        ToastManager.show_dev_error("CustomerSellScene._select_customer: customer %d is null" % index)
+        return
+
+    _selected_index = index
+    _pending_sale_price = 0
+    _pending_strategy = ""
+    _selected_entry = null
+    _preview_entry = null
+    _hovered_entry = null
+    _deal_panel.reset()
+    _selected_item_panel.clear_display()
+
+    var grid := _car_panel.get_grid()
+    if customer.grid_columns <= 0 or customer.grid_rows <= 0:
+        ToastManager.show_error("Customer sale scene failed to load a valid car grid. Returning to hub.")
+        SceneRouter.go_to_hub.call_deferred()
+        return
+
+    grid.reset()
+    grid.setup(customer.grid_columns, customer.grid_rows)
+
+    _car_panel.setup(customer)
+    _item_list.rebuild(
+        customer,
+        MetaManager.storage.storage_items,
+        func(matched: Array) -> void:
+            grid.setup_default_callbacks(matched)
+    )
+    _deal_panel.set_placed_items(grid.get_placed_items())
+
+    _empty_label.hide()
+
+
+func _get_selected_customer() -> CustomerEntry:
+    if _selected_index < 0 or _selected_index >= _customers.size():
+        ToastManager.show_dev_error("CustomerSellScene._get_selected_customer: selected index is invalid")
+        return null
+    var customer := _customers[_selected_index]
+    if customer == null:
+        ToastManager.show_dev_error("CustomerSellScene._get_selected_customer: selected customer is null")
+    return customer
+
+
+func _show_empty_state(message: String) -> void:
+    _empty_label.text = message
+    _empty_label.show()
+    _main_area.hide()
+    _customer_queue.hide()
+
+# ══ Item detail preview/selection ═════════════════════════════════════════════
+
+
+func _show_item_detail(entry: ItemEntry, preview: bool) -> void:
+    if preview:
+        _preview_entry = entry
+    else:
+        _selected_entry = entry
+    _selected_item_panel.set_item(entry)
+
+
+func _clear_preview_detail() -> void:
+    _preview_entry = null
+    if _selected_entry != null:
+        _selected_item_panel.set_item(_selected_entry)
+    else:
+        _selected_item_panel.clear_display()
+
+# ══ Car display ═══════════════════════════════════════════════════════════════
+
+
+func _refresh_car_display() -> void:
+    if _selected_index < 0:
+        return
+    var placed := _car_panel.get_grid().get_placed_items()
+    _car_panel.set_car_info(placed)
+    _item_list.update_row_states(_car_panel.get_grid())
+    _deal_panel.set_placed_items(placed)
+
+# ══ Dice helpers ══════════════════════════════════════════════════════════════
+
+
+func _get_dice_pool_size(customer: CustomerEntry, placed: Array) -> int:
+    var depth := SellMath.best_item_fit_depth(customer, placed)
+    var verified_count := _count_verified_items(placed)
+    return SellMath.dice_pool_size(depth, verified_count)
+
+
+func _count_verified_items(items: Array) -> int:
+    var count := 0
+    for item in items:
+        if SellMath.is_item_verified(item):
+            count += 1
+    return count

@@ -1,9 +1,13 @@
 [gd_scene format=3 uid="uid://bxrs864dl2cmg"]
 
 [ext_resource type="Script" uid="uid://b61ssm5ecobc4" path="res://game/meta/customer_sell/customer_sell_scene.gd" id="1_css"]
-[ext_resource type="Script" path="res://game/shared/packing/packing_grid.gd" id="2_packing_grid"]
-[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
-[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="3_sbo"]
+[ext_resource type="PackedScene" path="res://game/meta/customer_sell/components/customer_queue_panel.tscn" id="2_cqp"]
+[ext_resource type="PackedScene" uid="uid://xb84s3sm48je" path="res://game/meta/customer_sell/components/selling_item_list_panel.tscn" id="3_silp"]
+[ext_resource type="PackedScene" uid="uid://my11d2txip3k" path="res://game/meta/customer_sell/components/customer_car_panel.tscn" id="4_ccp"]
+[ext_resource type="PackedScene" path="res://game/meta/customer_sell/components/selected_item_panel.tscn" id="6_sip"]
+[ext_resource type="PackedScene" uid="uid://cvyujuur8ye7x" path="res://game/meta/customer_sell/components/sale_receipt_dialog.tscn" id="8_srd"]
+[ext_resource type="PackedScene" uid="uid://dk4vsndd2lfnm" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="9_sbo"]
+[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="CustomerSellScene" type="Control" unique_id=331840253]
 layout_mode = 3
@@ -37,171 +41,77 @@ custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TitleLabel" type="Label" parent="RootVBox/HeaderRow" unique_id=1218286169]
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 28
-text = "Night Market"
-vertical_alignment = 1
-
 [node name="DayLabel" type="Label" parent="RootVBox/HeaderRow" unique_id=1563382684]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Day 1"
 vertical_alignment = 1
 
-[node name="CustomerTabsScroll" type="ScrollContainer" parent="RootVBox" unique_id=1458900081]
-custom_minimum_size = Vector2(0, 44)
+[node name="BackButton" type="Button" parent="RootVBox/HeaderRow" unique_id=720366815]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 36)
 layout_mode = 2
-horizontal_scroll_mode = 3
-vertical_scroll_mode = 0
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 14
+text = "  Back to Hub"
+script = ExtResource("99_sfx")
 
-[node name="CustomerTabsRow" type="HBoxContainer" parent="RootVBox/CustomerTabsScroll" unique_id=1458900080]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="MainArea" type="HBoxContainer" parent="RootVBox" unique_id=785758664]
-visible = false
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 8
-
-[node name="ItemScroll" type="ScrollContainer" parent="RootVBox/MainArea" unique_id=1975978480]
-custom_minimum_size = Vector2(260, 0)
-layout_mode = 2
-size_flags_horizontal = 2
-
-[node name="ItemListVBox" type="VBoxContainer" parent="RootVBox/MainArea/ItemScroll" unique_id=826718706]
-layout_mode = 2
-size_flags_horizontal = 4
-
-[node name="GridContainer" type="Control" parent="RootVBox/MainArea" unique_id=295981979]
+[node name="TitleLabel" type="Label" parent="RootVBox/HeaderRow" unique_id=1218286169]
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="CustomerGrid" type="GridContainer" parent="RootVBox/MainArea/GridContainer" unique_id=111222333]
-script = ExtResource("2_packing_grid")
-layout_mode = 2
-custom_minimum_size = Vector2(400, 300)
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="SellPanel" type="VBoxContainer" parent="RootVBox/MainArea" unique_id=709091156]
-custom_minimum_size = Vector2(220, 0)
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="CustomerNameLabel" type="Label" parent="RootVBox/MainArea/SellPanel" unique_id=706047828]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
+text = "Night Market"
+horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="GridSizeLabel" type="Label" parent="RootVBox/MainArea/SellPanel" unique_id=779385138]
+[node name="CustomerQueuePanel" parent="RootVBox" unique_id=507195485 instance=ExtResource("2_cqp")]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+size_flags_horizontal = 3
 
-[node name="DemandTagsLabel" type="Label" parent="RootVBox/MainArea/SellPanel" unique_id=1193600170]
+[node name="MainArea" type="HBoxContainer" parent="RootVBox" unique_id=785758664]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-autowrap_mode = 2
-max_lines_visible = 3
-
-[node name="LabelDivider1" type="HSeparator" parent="RootVBox/MainArea/SellPanel" unique_id=918250383]
-layout_mode = 2
-
-[node name="CarTotalLabel" type="Label" parent="RootVBox/MainArea/SellPanel" unique_id=8029017]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-
-[node name="VerifiedCountLabel" type="Label" parent="RootVBox/MainArea/SellPanel" unique_id=1841041322]
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-
-[node name="LabelDivider2" type="HSeparator" parent="RootVBox/MainArea/SellPanel" unique_id=535341362]
-layout_mode = 2
-
-[node name="CarClearButton" type="Button" parent="RootVBox/MainArea/SellPanel" unique_id=111222334]
-script = ExtResource("99_sfx")
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "Clear Car"
-
-[node name="ConservativeButton" type="Button" parent="RootVBox/MainArea/SellPanel" unique_id=111222335]
-script = ExtResource("99_sfx")
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "Sell Conservative"
-
-[node name="AggressiveButton" type="Button" parent="RootVBox/MainArea/SellPanel" unique_id=111222336]
-script = ExtResource("99_sfx")
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "Sell Aggressive (Roll Dice)"
-
-[node name="DiceSection" type="VBoxContainer" parent="RootVBox/MainArea/SellPanel" unique_id=111222337]
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="DiceTitleLabel" type="Label" parent="RootVBox/MainArea/SellPanel/DiceSection" unique_id=111222338]
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Dice Roll Results"
-
-[node name="DiceHint" type="Label" parent="RootVBox/MainArea/SellPanel/DiceSection" unique_id=111222339]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-modulate = Color(0.7, 0.7, 0.7, 1)
-text = "Select 2 dice to keep"
-
-[node name="DiceRow" type="HBoxContainer" parent="RootVBox/MainArea/SellPanel/DiceSection" unique_id=111222340]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="DiceSumLabel" type="Label" parent="RootVBox/MainArea/SellPanel/DiceSection" unique_id=111222341]
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "Sum: —"
-
-[node name="DiceTotalLabel" type="Label" parent="RootVBox/MainArea/SellPanel/DiceSection" unique_id=111222342]
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "Total: —"
-
-[node name="DiceBtnRow" type="HBoxContainer" parent="RootVBox/MainArea/SellPanel/DiceSection" unique_id=111222343]
-layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="ConfirmDiceButton" type="Button" parent="RootVBox/MainArea/SellPanel/DiceSection/DiceBtnRow" unique_id=111222344]
-script = ExtResource("99_sfx")
+[node name="SellingItemListPanel" parent="RootVBox/MainArea" unique_id=505066450 instance=ExtResource("3_silp")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
-disabled = true
-text = "Confirm Dice"
+size_flags_vertical = 3
 
-[node name="CancelDiceButton" type="Button" parent="RootVBox/MainArea/SellPanel/DiceSection/DiceBtnRow" unique_id=111222345]
-script = ExtResource("99_sfx")
+[node name="CustomerCarPanel" parent="RootVBox/MainArea" unique_id=163487352 instance=ExtResource("4_ccp")]
+unique_name_in_owner = true
 layout_mode = 2
-text = "Cancel"
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="FooterRow" type="HBoxContainer" parent="RootVBox" unique_id=999000001]
-custom_minimum_size = Vector2(0, 52)
+[node name="SellSidebar" type="PanelContainer" parent="RootVBox/MainArea" unique_id=1313532282]
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
-theme_override_constants/separation = 8
 
-[node name="BackButton" type="Button" parent="RootVBox/FooterRow" unique_id=1597092715]
-script = ExtResource("99_sfx")
-custom_minimum_size = Vector2(160, 44)
+[node name="SidebarMargin" type="MarginContainer" parent="RootVBox/MainArea/SellSidebar" unique_id=405150614]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "← Back to Hub"
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="SidebarVBox" type="VBoxContainer" parent="RootVBox/MainArea/SellSidebar/SidebarMargin" unique_id=289005101]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SelectedItemPanel" parent="RootVBox/MainArea/SellSidebar/SidebarMargin/SidebarVBox" unique_id=974691496 instance=ExtResource("6_sip")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
 
 [node name="EmptyLabel" type="Label" parent="." unique_id=125428447]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -209,15 +119,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_font_sizes/font_size = 24
 text = "No customers tonight."
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SellResultPopup" type="ConfirmationDialog" parent="." unique_id=475284183]
-title = "Sale Result"
-ok_button_text = "Confirm Sale"
-dialog_autowrap = true
+[node name="SaleReceiptDialog" parent="." unique_id=215182387 instance=ExtResource("8_srd")]
+unique_name_in_owner = true
 
-[node name="SettingsButtonOverlay" parent="." instance=ExtResource("3_sbo")]
+[node name="SettingsButtonOverlay" parent="." unique_id=864161326 instance=ExtResource("9_sbo")]

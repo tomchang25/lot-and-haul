@@ -18,7 +18,8 @@ Run `git status` and `git branch --show-current`:
    - Add entries under the current `## <version>` heading.
    - Group related entries under a `### <Title>` section matching the plan title.
    - Each bullet: `- YYYY-MM-DD — [scope] one-line summary`. Use today's date. No commit ref.
-   - Cover each major change block (one bullet per logical unit).
+   - Prefer one compact, general entry per plan. Only split into multiple bullets when the shipped work contains clearly separate user-visible outcomes that would be misleading if combined.
+   - Keep bullets outcome-focused. Avoid listing implementation mechanics, file-by-file details, or every sub-change when one general entry accurately covers the work.
    - If the completed scope is dev-process-only maintenance, skip the CHANGELOG step. This includes closeout workflow changes, CHANGELOG/TODO edits, plan archival, and tracking cleanup.
 4. Remove each plan's one-line pointer from `TODO.md` `## Active` (or `## Plan` if it was queued). If `## Active` becomes empty, replace the section content with "Nothing currently in progress."
 5. Move each plan file and its sibling spec/scout files from `dev/docs/plans/` to `dev/docs/archived/`.

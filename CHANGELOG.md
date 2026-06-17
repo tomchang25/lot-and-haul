@@ -14,6 +14,25 @@ Rules:
 
 ## v0.1.3 - Draft
 
+### Customer Sell Layout Rework
+
+- 2026-06-17 — [customer_sell] Sell scene layout rework: item details claim the full right sidebar, deal panel moves into the car panel bottom row, back navigation promoted to the header, and deal panel restructured with compact side-by-side strategy buttons and wrapped dice controls
+
+### Customer Sell Strategy VFX
+
+- 2026-06-17 — [customer_sell] Conservative and aggressive sell strategies now have distinct interaction rhythms with button glow, staggered dice roll-in animation, multiplier band display with highlight, price count-up tweens, item card pulse/reject feedback, and a custom receipt overlay with stamp animation — all gated by a DealPanel state machine
+
+### Selling Scene Component Modularization
+
+- 2026-06-16 — [customer_sell] Selling screen decomposed into 7 focused scene-backed components (SellingItemRow, SellingItemListPanel, SelectedItemPanel, DealPanel, CustomerQueuePanel, CustomerProfilePanel, CustomerCarPanel, SaleReceiptDialog) so redesign and debugging no longer require editing one large scene script
+- 2026-06-16 — [customer_sell] Root selling screen script thinned from 546 lines to ~320 — now a state coordinator that wires component signals rather than painting every UI surface directly
+- 2026-06-16 — [customer_sell] Persistent layout structure (scroll shells, empty states, section titles) moved into component .tscn files; only data-variable rows, tabs, and dice buttons created at runtime
+- 2026-06-16 — [customer_sell] Each component follows setup() + \_apply() pattern with is_node_ready() guard, emits user-intent signals, and exposes public state methods instead of direct node access from the parentit
+
+### Selling Scene Item Visibility
+
+- 2026-06-16 — [customer_sell] Customer sell rows and loaded car items now surface the shared item-card popup so sale decisions can inspect value, condition, verification, and clue state before confirmation
+
 ### Debug Auction Quick-Win Buttons
 
 - 2026-06-16 — [debug] Auction scene gains two debug-only buttons: "Win at Opening Bid" and "Win at Rolled Price", both skipping the NPC bidding loop and resolving through a shared `_win_now(price)` guard against double-resolution
@@ -30,6 +49,13 @@ Rules:
 
 - 2026-06-16 — [slot] Deep Storage hub action grants 25 AP (2.5×) and advances to Evening, preserving the shop; morning-only button labeled "extended workshop" alongside normal "short workshop" Storage
 - 2026-06-16 — [slot] SlotStore tracks storage_ap_max so storage scene displays dynamic AP budget (25/25) instead of hardcoded STORAGE_AP_MAX
+
+### Selling HUD Sales Desk
+
+- 2026-06-16 — [customer_sell] Customer info (name, demands, car total, verified) merged into CustomerCarPanel; CustomerProfilePanel deleted
+- 2026-06-16 — [customer_sell] SellSidebar restructured into PanelContainer > Margin > VBox (300px, matching Storage rail style); SelectedItemPanel expanded into persistent detail rail with condition/value panels and price convergence
+- 2026-06-16 — [customer_sell] ItemCardPopup removed from sell scene; hover uses preview/selected state that restores the last selection on hover end instead of always clearing
+- 2026-06-16 — [customer_sell] SellingItemRow replaced by compact SellingItemCard with centered shape icon, verified badge, short name, and compact fit label
 
 ## v0.1.2
 
