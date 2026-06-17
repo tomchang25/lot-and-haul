@@ -14,6 +14,12 @@ Rules:
 
 ## v0.1.4 - Draft
 
+### Tutorial Highlight and Anchor Fixes
+
+- 2026-06-17 — [tutorial] Anchored tutorial hints now keep their targets visible while blocking locked interactions, recover cleanly from missing or hidden anchors, and refresh target geometry between steps
+- 2026-06-17 — [tutorial] Storage tutorial anchors corrected and made resilient to repair/restore button visibility, with workshop onboarding skipped when storage is empty
+- 2026-06-17 — [storage] Storage scene now opens with the first item selected so tutorial details and actions are immediately visible
+
 ### Settings Main Menu Button
 
 - 2026-06-17 — [ui] Settings overlay now shows a "Return to Main Menu" button when opened in-game, hidden when on the start page; navigates to the title screen and closes the overlay on press

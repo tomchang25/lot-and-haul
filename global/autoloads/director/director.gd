@@ -57,8 +57,8 @@ var _offer_script_id := ""
 var _help_script_id := ""
 
 ## Cached anchor global rect used to skip redundant per-frame layout recalculations.
-## Reset at each step transition and whenever the anchor rect reported by Godot
-## changes during _process.
+## Reset at each step transition in _show_step and whenever the anchor rect
+## reported by Godot changes during _process.
 var _last_anchor_rect: Rect2 = Rect2()
 
 
@@ -117,6 +117,7 @@ func show_offer_prompt(script_id: String, offer_text: String, accept_text: Strin
     _offer_script_id = script_id
     _is_offer_showing = true
 
+    _dim_full.color = DIM_COLOR
     _dim_full.visible = true
     _dim_full.mouse_filter = Control.MOUSE_FILTER_STOP
     _dim_full.position = Vector2.ZERO
@@ -153,7 +154,54 @@ func hide_help_button() -> void:
 # ══ Step display ═══════════════════════════════════════════════════════════════
 
 
+func _is_anchor_renderable(anchor: Control) -> bool:
+    if not is_instance_valid(anchor):
+        return false
+    if not anchor.is_visible_in_tree():
+        return false
+    var rect := anchor.get_global_rect()
+    return rect.size.x > 0.0 and rect.size.y > 0.0
+
+
+func _resolve_step_anchor(step: TutorialStep) -> Control:
+    var primary: Control = _anchors.get(step.anchor_id) as Control
+    if _is_anchor_renderable(primary):
+        return primary
+
+    if not step.fallback_when_anchor_unrenderable:
+        return null
+
+    for fallback_id: String in step.fallback_anchor_ids:
+        var fallback: Control = _anchors.get(fallback_id) as Control
+        if _is_anchor_renderable(fallback):
+            return fallback
+
+    return null
+
+
+func _advance_to_renderable_step() -> void:
+    while _current_step_index < _current_script.size():
+        var step: TutorialStep = _current_script[_current_step_index]
+        if step.kind == TutorialStep.Kind.POPUP:
+            return
+        if _resolve_step_anchor(step) != null:
+            return
+        ToastManager.show_dev_error(
+            "Director: Skipping step %d: all anchors non-renderable in scene '%s'"
+            % [_current_step_index, _current_scene_id],
+        )
+        _current_step_index += 1
+
+
 func _show_step() -> void:
+    if _current_step_index >= _current_script.size():
+        _end_tutorial()
+        return
+
+    _last_anchor_rect = Rect2()
+
+    _advance_to_renderable_step()
+
     if _current_step_index >= _current_script.size():
         _end_tutorial()
         return
@@ -171,8 +219,12 @@ func _show_step() -> void:
 
 
 func _show_hint(step: TutorialStep) -> void:
-    var anchor: Control = _anchors.get(step.anchor_id) as Control
-    if not is_instance_valid(anchor):
+    var anchor: Control = _resolve_step_anchor(step)
+    if not _is_anchor_renderable(anchor):
+        ToastManager.show_dev_error(
+            "Director._show_hint: step %d anchor unresolved despite advance guard"
+            % _current_step_index,
+        )
         _current_step_index += 1
         _show_step()
         return
@@ -183,10 +235,11 @@ func _show_hint(step: TutorialStep) -> void:
     if step.unlock_anchor:
         _dim_full.visible = false
     else:
-        _dim_full.visible = true
+        _dim_full.color = Color.TRANSPARENT
         _dim_full.mouse_filter = Control.MOUSE_FILTER_STOP
         _dim_full.position = rect.position
         _dim_full.size = rect.size
+        _dim_full.visible = true
 
     _hint_label.text = step.text
     _hint_panel.visible = true
@@ -196,6 +249,7 @@ func _show_hint(step: TutorialStep) -> void:
 
 
 func _show_popup(step: TutorialStep) -> void:
+    _dim_full.color = DIM_COLOR
     _dim_full.visible = true
     _dim_full.mouse_filter = Control.MOUSE_FILTER_STOP
     _dim_full.position = Vector2.ZERO
@@ -465,14 +519,14 @@ func _process(_delta: float) -> void:
         set_process(false)
         return
 
-    var anchor: Control = _anchors.get(step.anchor_id) as Control
-    if not is_instance_valid(anchor):
+    var anchor: Control = _resolve_step_anchor(step)
+    if not _is_anchor_renderable(anchor):
         return
 
     var rect: Rect2 = anchor.get_global_rect()
     # Skip redundant layout when the anchor rect has not changed since the last
-    # per-frame update. The rect is also reset at each step transition via
-    # _last_anchor_rect = Rect2() inside start_script.
+    # per-frame update. _last_anchor_rect is reset at each step transition in
+    # _show_step, so stale data from a previous step never carries forward.
     if rect == _last_anchor_rect:
         return
     _last_anchor_rect = rect

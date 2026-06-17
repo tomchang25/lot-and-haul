@@ -43,7 +43,7 @@ You can Repair, Restore, and Research items using Action Points (AP).",
             "This table lists every item in storage. Columns show the item name, \
 condition (damage level), estimated value, and rarity. Click any row \
 to inspect it in detail.",
-            "item_table",
+            "item_browser",
         ),
         TutorialStep.new(
             TutorialStep.Kind.HINT,
@@ -54,15 +54,15 @@ is to 100%, the more accurate the estimate.",
         ),
         TutorialStep.new(
             TutorialStep.Kind.HINT,
-            "Repair improves an item's condition up to 50% — essential for items \
-in poor shape. Better condition means higher sale prices.",
+            "Repair improves condition up to 50%, and Restore pushes it from 50% \
+to 100%. Only one button appears based on the current state. \
+Better condition means higher sale prices.",
             "repair_btn",
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Restore takes over after Repair, pushing condition from 50% to 100%. \
-It only appears once Repair is complete on an item.",
-            "restore_btn",
+            TutorialStep.Advance.NEXT,
+            false,
+            null,
+            ["restore_btn"],
+            true,
         ),
         TutorialStep.new(
             TutorialStep.Kind.HINT,

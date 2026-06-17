@@ -43,6 +43,10 @@ func _on_storage_registered() -> void:
     if MetaManager.progress.tutorial_seen.has("storage"):
         Director.show_help_button("storage")
         return
+    if MetaManager.storage.storage_items.is_empty():
+        # Workshop tutorial is meaningless with nothing to work on.
+        return
+
     Director.show_offer_prompt(
         "storage",
         "Welcome to the Workshop!\n\nWould you like a quick tour of the features?",

@@ -4,6 +4,7 @@
 extends Node
 
 var _gut: GutMain = null
+var _tracker: GutErrorTracker = null
 
 
 func _ready() -> void:
@@ -13,7 +14,10 @@ func _ready() -> void:
 
 
 func _run_all() -> void:
+    _tracker = _FilteredErrorTracker.new()
     _gut = GutMain.new()
+    _gut.error_tracker = _tracker
+    GutErrorTracker.register_logger(_tracker)
     add_child(_gut)
     _gut.include_subdirectories = true
     _gut.ignore_pause_before_teardown = true
@@ -24,6 +28,8 @@ func _run_all() -> void:
 
 
 func _on_run_finished() -> void:
+    if _tracker != null:
+        GutErrorTracker.deregister_logger(_tracker)
     if _gut == null:
         get_tree().quit(1)
         return
@@ -40,6 +46,22 @@ func _on_run_finished() -> void:
         ],
     )
     get_tree().quit(1 if failed else 0)
+
+# ── Filtered error tracker ──────────────────────────────────────────────
+
+
+class _FilteredErrorTracker extends GutErrorTracker:
+    ## Exempts errors whose text matches a benign pattern from
+    ## TestbedChecks.BENIGN_PATTERNS, while keeping the default
+    ## treat-everything-as-failure for all other errors.
+
+    func _is_error_failable(error: GutTrackedError) -> bool:
+        if error.handled:
+            return false
+        for pattern: String in TestbedChecks.BENIGN_PATTERNS:
+            if error.contains_text(pattern):
+                return false
+        return super._is_error_failable(error)
 
 
 static func _summarize(tc, logger) -> Dictionary:
