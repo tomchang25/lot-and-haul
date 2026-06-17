@@ -20,7 +20,6 @@ const ItemCardScene: PackedScene = preload("res://game/shared/item_display/item_
 var _mode: DisplayMode = DisplayMode.CARD
 var _entries: Array = []
 var _selected_entry: ItemEntry = null
-var _prev_selected_entry: ItemEntry = null
 var _card_rows: Dictionary = { } # ItemEntry -> ItemCard
 var _columns: Array = []
 
@@ -56,7 +55,7 @@ func _ready() -> void:
     if not _entries.is_empty():
         _apply()
 
-    _refresh_mode()
+    _refresh_visibility()
 
 
 func set_mode_toggle_visible(shown: bool) -> void:
@@ -70,7 +69,7 @@ func set_mode(mode: DisplayMode) -> void:
         return
     _mode = mode
     if is_node_ready():
-        _refresh_mode()
+        _refresh_visibility()
 
 
 func get_mode() -> DisplayMode:
@@ -87,16 +86,24 @@ func toggle_mode() -> void:
 # ══ Item API ══════════════════════════════════════════════════════════════════
 
 
-func setup(columns: Array, default_sort_column = ItemRow.Column.NAME, default_ascending := true) -> void:
+func setup(
+        columns: Array,
+        default_sort_column = ItemRow.Column.NAME,
+        default_ascending := true,
+) -> void:
     _columns = columns
     if is_node_ready():
         _table_panel.setup(columns, default_sort_column, default_ascending)
     else:
         _pending_columns = columns.duplicate()
+        _pending_default_sort = default_sort_column
+        _pending_ascending = default_ascending
 
 
 func populate(entries: Array) -> void:
     _entries = entries.duplicate()
+    if _selected_entry != null and not _selected_entry in _entries:
+        _selected_entry = null
     if is_node_ready():
         _apply()
 
@@ -106,23 +113,22 @@ func get_selected() -> ItemEntry:
 
 
 func set_selected(entry: ItemEntry) -> void:
-    _deselect_current()
-    _selected_entry = entry
-    _apply_card_selection()
-    _apply_table_selection()
+    _select_entry(entry, false)
 
 
 func refresh() -> void:
     _rebuild_card_grid()
     _table_panel.populate(_entries)
-    _apply_card_selection()
-    _apply_table_selection()
+    _apply_selection()
+    _refresh_visibility()
 
 
 func refresh_entry(entry: ItemEntry) -> void:
     if _card_rows.has(entry):
         _card_rows[entry].setup(entry)
     _table_panel.refresh_row(entry)
+    if _selected_entry == entry and _card_rows.has(entry):
+        _card_rows[entry].set_selected(true)
 
 # ══ Internal ══════════════════════════════════════════════════════════════════
 
@@ -130,15 +136,61 @@ func refresh_entry(entry: ItemEntry) -> void:
 func _apply() -> void:
     _rebuild_card_grid()
     _table_panel.populate(_entries)
-    _refresh_empty()
+    _apply_selection()
+    _refresh_visibility()
 
 
-func _refresh_empty() -> void:
+## Routes every selection change through a single path so both display modes
+## stay in sync. Called by set_selected(), card clicks, and table row clicks.
+func _select_entry(entry: ItemEntry, emit_pressed: bool) -> void:
+    if entry == _selected_entry:
+        return
+    _clear_card_selection()
+    _selected_entry = entry
+    _apply_card_selection()
+    _apply_table_selection()
+    if emit_pressed:
+        entry_pressed.emit(entry)
+
+
+func _clear_card_selection() -> void:
+    if _selected_entry != null and _card_rows.has(_selected_entry):
+        _card_rows[_selected_entry].set_selected(false)
+
+
+func _apply_card_selection() -> void:
+    if _selected_entry != null and _card_rows.has(_selected_entry):
+        _card_rows[_selected_entry].set_selected(true)
+
+
+func _apply_table_selection() -> void:
+    for row_entry in _table_panel.get_all_rows().keys():
+        var row := _table_panel.get_row(row_entry)
+        if row != null:
+            row.set_selection_state(ItemRow.SelectionState.AVAILABLE)
+
+    if _selected_entry != null:
+        var row := _table_panel.get_row(_selected_entry)
+        if row != null:
+            row.set_selection_state(ItemRow.SelectionState.SELECTED)
+
+
+func _apply_selection() -> void:
+    _apply_card_selection()
+    _apply_table_selection()
+
+
+func _refresh_visibility() -> void:
     var has_entries := not _entries.is_empty()
-    _card_panel.visible = has_entries and _mode == DisplayMode.CARD
-    _table_panel.visible = has_entries and _mode == DisplayMode.TABLE
+    var in_card := _mode == DisplayMode.CARD
+    var in_table := _mode == DisplayMode.TABLE
+
+    _card_toggle.button_pressed = in_card
+    _table_toggle.button_pressed = in_table
+    _card_panel.visible = has_entries and in_card
+    _table_panel.visible = has_entries and in_table
     _empty_label.visible = not has_entries
-    if _empty_label.visible:
+    if not has_entries:
         _empty_label.text = "No items."
 
 
@@ -167,40 +219,6 @@ func _rebuild_card_grid() -> void:
         _card_grid.move_child(card, index)
         index += 1
 
-
-func _refresh_mode() -> void:
-    _card_toggle.button_pressed = _mode == DisplayMode.CARD
-    _table_toggle.button_pressed = _mode == DisplayMode.TABLE
-    _card_panel.visible = _mode == DisplayMode.CARD and not _entries.is_empty()
-    _table_panel.visible = _mode == DisplayMode.TABLE and not _entries.is_empty()
-    _empty_label.visible = _entries.is_empty()
-    if _empty_label.visible:
-        _empty_label.text = "No items."
-
-
-func _deselect_current() -> void:
-    _prev_selected_entry = _selected_entry
-    if _selected_entry != null and _card_rows.has(_selected_entry):
-        _card_rows[_selected_entry].set_selected(false)
-    _selected_entry = null
-
-
-func _apply_card_selection() -> void:
-    if _selected_entry != null and _card_rows.has(_selected_entry):
-        _card_rows[_selected_entry].set_selected(true)
-
-
-func _apply_table_selection() -> void:
-    if _prev_selected_entry != null:
-        var prev_row := _table_panel.get_row(_prev_selected_entry)
-        if prev_row != null:
-            prev_row.set_selection_state(ItemRow.SelectionState.NONE)
-
-    if _selected_entry != null:
-        var row := _table_panel.get_row(_selected_entry)
-        if row != null:
-            row.set_selection_state(ItemRow.SelectionState.SELECTED)
-
 # ══ Mode switch handlers ═════════════════════════════════════════════════════
 
 
@@ -218,10 +236,7 @@ func _on_card_clicked(card: ItemCard) -> void:
     var entry := card.get_entry()
     if entry == null:
         return
-    _deselect_current()
-    _selected_entry = entry
-    card.set_selected(true)
-    entry_pressed.emit(entry)
+    _select_entry(entry, true)
 
 
 func _on_card_mouse_entered(card: ItemCard, entry: ItemEntry) -> void:
@@ -236,11 +251,7 @@ func _on_card_mouse_exited() -> void:
 
 func _on_table_row_pressed(entry) -> void:
     if entry is ItemEntry:
-        _deselect_current()
-        _selected_entry = entry
-        _apply_card_selection()
-        _apply_table_selection()
-        entry_pressed.emit(entry)
+        _select_entry(entry, true)
 
 
 func _on_table_tooltip_requested(entry, anchor: Rect2) -> void:
