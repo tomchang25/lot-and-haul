@@ -12,7 +12,9 @@ Rules:
 - When a phase ships, append the entry here and cut the shipped work from its plan/TODO source.
 - Do not add entries for dev-process-only maintenance, including closeout workflow changes, CHANGELOG/TODO edits, plan archival, or tracking cleanup.
 
-## v0.1.3 - Draft
+## v0.1.4 - Draft
+
+## v0.1.3
 
 ### Customer Sell Layout Rework
 
@@ -24,10 +26,7 @@ Rules:
 
 ### Selling Scene Component Modularization
 
-- 2026-06-16 — [customer_sell] Selling screen decomposed into 7 focused scene-backed components (SellingItemRow, SellingItemListPanel, SelectedItemPanel, DealPanel, CustomerQueuePanel, CustomerProfilePanel, CustomerCarPanel, SaleReceiptDialog) so redesign and debugging no longer require editing one large scene script
-- 2026-06-16 — [customer_sell] Root selling screen script thinned from 546 lines to ~320 — now a state coordinator that wires component signals rather than painting every UI surface directly
-- 2026-06-16 — [customer_sell] Persistent layout structure (scroll shells, empty states, section titles) moved into component .tscn files; only data-variable rows, tabs, and dice buttons created at runtime
-- 2026-06-16 — [customer_sell] Each component follows setup() + \_apply() pattern with is_node_ready() guard, emits user-intent signals, and exposes public state methods instead of direct node access from the parentit
+- 2026-06-16 — [customer_sell] Selling screen decomposed into focused scene-backed components so the root script now coordinates state and component signals instead of owning every UI surface directly
 
 ### Selling Scene Item Visibility
 
@@ -52,10 +51,7 @@ Rules:
 
 ### Selling HUD Sales Desk
 
-- 2026-06-16 — [customer_sell] Customer info (name, demands, car total, verified) merged into CustomerCarPanel; CustomerProfilePanel deleted
-- 2026-06-16 — [customer_sell] SellSidebar restructured into PanelContainer > Margin > VBox (300px, matching Storage rail style); SelectedItemPanel expanded into persistent detail rail with condition/value panels and price convergence
-- 2026-06-16 — [customer_sell] ItemCardPopup removed from sell scene; hover uses preview/selected state that restores the last selection on hover end instead of always clearing
-- 2026-06-16 — [customer_sell] SellingItemRow replaced by compact SellingItemCard with centered shape icon, verified badge, short name, and compact fit label
+- 2026-06-16 — [customer_sell] Selling HUD rebuilt around a compact sales-desk layout with customer details in the car panel, a persistent item detail rail, restored selection after hover previews, and compact selling item cards
 
 ## v0.1.2
 

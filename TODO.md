@@ -244,12 +244,10 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 
 - [unlock_gating] Requirement-gated premium auction tiers + lot kinds, with location tier reference table & audit — see `dev/docs/plans/unlock_gating_location_tiers.md`
-- [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
 
 - [run_persistence] Mid-run save/resume: phase-stable resume scenes, atomic auction, escrowed run economics — see `dev/docs/plans/run_phase_persistence.md`
 
-- [run_review] Scrollable run summary layout with fixed action buttons so long result data cannot push navigation off-screen — see `dev/docs/plans/run_review_scrollable_summary.sketch.md`
-
+- [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
 
 - [balance_preview_v2] Balance preview HTML report — rich HTML output with per-clue information tables, category breakdowns, affix-aware balance preview mode, and value distribution charts
@@ -260,16 +258,22 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 One-line, no reasoning, no backing doc.
 
-- [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
-- [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
-- [style] Standardize docstrings across all `.gd` files — file header + public function GDDoc format.
-- [ci] Diagnose GitHub Actions infinite loop in Godot GUT/smoke jobs and re-enable the disabled CI layers.
+- [bug] test button not show when toggle debug inside game
+- [bug] Missing back button in test hub
+
 - [debug] Add an debug button in Hub to add random item
+- [debug] Add an debug button in Hub to clear all storage items
 - [debug] Add Debug Overlay that use debug button in hub to toggle?
   ​
+
+- [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
+- [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
+
+- [ci] Diagnose GitHub Actions infinite loop in Godot GUT/smoke jobs and re-enable the disabled CI layers.
+
 - [refactor] ItemYaml - Refactor Yaml strcuture, so I can list all affix and clues situation in each categories
 
-- [bug] test button not show when toggle debug inside game
+- [feat] Localization
 
 ---
 
