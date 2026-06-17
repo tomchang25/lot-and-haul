@@ -11,6 +11,8 @@ extends Control
 const STORAGE_RESEARCH: UiAudioEvent = preload("res://data/tres/audio_events/storage_research.tres")
 const STORAGE_REPAIR_RESTORE: UiAudioEvent = preload("res://data/tres/audio_events/storage_repair_restore.tres")
 const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
+const SELECT: UiAudioEvent = preload("res://data/tres/audio_events/click.tres")
+const HOVER: UiAudioEvent = preload("res://data/tres/audio_events/button_hover.tres")
 
 const STORAGE_COLUMNS: Array = [
     ItemRow.Column.NAME,
@@ -67,6 +69,7 @@ func _ready() -> void:
     _restore_btn.pressed.connect(_on_restore_pressed)
 
     _item_browser.entry_pressed.connect(_on_entry_pressed)
+    _item_browser.entry_hovered.connect(_on_entry_hovered)
 
     _refresh_ap_label()
     _populate_browser()
@@ -93,8 +96,13 @@ func _on_back_pressed() -> void:
 
 
 func _on_entry_pressed(entry: ItemEntry) -> void:
+    AudioManager.play_event(SELECT)
     _selected_entry = entry
     _refresh_detail()
+
+
+func _on_entry_hovered(_entry: ItemEntry, _anchor: Rect2) -> void:
+    AudioManager.play_event(HOVER)
 
 
 func _on_repair_pressed() -> void:

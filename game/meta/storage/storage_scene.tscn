@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://u48bbtcw2fm4" path="res://game/meta/storage/storage_scene.gd" id="1_uoidr"]
 [ext_resource type="PackedScene" uid="uid://bi01jgyv1md6o" path="res://game/shared/item_display/item_browser_panel/item_browser_panel.tscn" id="2_browser"]
+[ext_resource type="PackedScene" uid="uid://dk4vsndd2lfnm" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="3_sbo"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
-[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="3_sbo"]
 
 [node name="StorageScene" type="Control" unique_id=303272155]
 layout_mode = 3
@@ -96,7 +96,9 @@ theme_override_constants/separation = 12
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 8
 
 [node name="FooterInner" type="HBoxContainer" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin" unique_id=1782915038]
 layout_mode = 2
@@ -372,4 +374,4 @@ text = "Click an item to view details"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SettingsButtonOverlay" parent="." instance=ExtResource("3_sbo")]
+[node name="SettingsButtonOverlay" parent="." unique_id=1129740867 instance=ExtResource("3_sbo")]

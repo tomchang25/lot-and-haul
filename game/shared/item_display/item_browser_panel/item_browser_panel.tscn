@@ -2,8 +2,10 @@
 
 [ext_resource type="Script" uid="uid://dhbkhfulkq21p" path="res://game/shared/item_display/item_browser_panel/item_browser_panel.gd" id="1_browser"]
 [ext_resource type="PackedScene" uid="uid://cilp5a1xr3e8m" path="res://game/shared/item_display/item_list_panel/item_list_panel.tscn" id="2_table"]
+[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="3_sfx"]
 
 [node name="ItemBrowserPanel" type="VBoxContainer" unique_id=462387481]
+clip_contents = true
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 6
@@ -19,12 +21,41 @@ layout_mode = 2
 toggle_mode = true
 button_pressed = true
 text = "Cards"
+script = ExtResource("3_sfx")
 
 [node name="TableToggle" type="Button" parent="ModeToggleHBox" unique_id=100000003]
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
 text = "Table"
+script = ExtResource("3_sfx")
+
+[node name="SortHBox" type="HBoxContainer" parent="." unique_id=100000009]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SortLabel" type="Label" parent="SortHBox" unique_id=100000010]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Sort:"
+vertical_alignment = 1
+
+[node name="SortOptionButton" type="OptionButton" parent="SortHBox" unique_id=100000011]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+
+[node name="SortDirButton" type="Button" parent="SortHBox" unique_id=100000012]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(28, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+toggle_mode = true
+text = "▲"
+flat = true
+script = ExtResource("3_sfx")
 
 [node name="CardPanel" type="PanelContainer" parent="." unique_id=100000008]
 unique_name_in_owner = true
@@ -50,6 +81,7 @@ columns = 4
 
 [node name="TablePanel" parent="." unique_id=100000006 instance=ExtResource("2_table")]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 size_flags_vertical = 3
 

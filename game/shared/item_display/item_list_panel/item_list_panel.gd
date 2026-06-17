@@ -9,6 +9,7 @@ extends PanelContainer
 signal row_pressed(entry)
 signal tooltip_requested(entry, anchor: Rect2)
 signal tooltip_dismissed
+signal sort_changed(column: int, ascending: bool)
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -84,6 +85,15 @@ func refresh_row(entry) -> void:
 func rebuild_header() -> void:
     _build_header()
 
+
+func set_sort(column: int, ascending: bool) -> void:
+    if column == _sort_column and ascending == _sort_ascending:
+        return
+    _sort_column = column
+    _sort_ascending = ascending
+    _build_header()
+    apply_sort()
+
 # ══ Sorting ═══════════════════════════════════════════════════════════════════
 
 
@@ -144,6 +154,7 @@ func _on_header_pressed(column: ItemRow.Column) -> void:
 
     _build_header()
     apply_sort()
+    sort_changed.emit(_sort_column, _sort_ascending)
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 

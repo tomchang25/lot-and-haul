@@ -26,6 +26,14 @@ Rules:
 
 - 2026-06-17 — [test] Testbed launcher now has a "Back" button that returns to the start page
 
+### Item Browser Sort Controls
+
+- 2026-06-17 — [ui] Item browser gains sort column dropdown and direction toggle in card mode; card and table sort modes stay in sync via a `sort_changed` signal from `ItemListPanel`
+
+### Storage Scene Audio & Layout
+
+- 2026-06-17 — [storage] Storage scene plays click SFX on item selection and hover SFX on item row hover; footer margin padding adjusted for consistent spacing
+
 ## v0.1.3
 
 ### Customer Sell Layout Rework
