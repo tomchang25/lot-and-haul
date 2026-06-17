@@ -78,15 +78,6 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 1
 
-[node name="EmptyLabel" type="Label" parent="RootHBox/LeftVBox/TableMargin/TableVBox" unique_id=1078190231]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 16
-text = "No items in storage."
-horizontal_alignment = 1
-
 [node name="FooterHBox" type="HBoxContainer" parent="RootHBox/LeftVBox" unique_id=1095072794]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2

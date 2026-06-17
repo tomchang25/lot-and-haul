@@ -34,6 +34,15 @@ Rules:
 
 - 2026-06-17 — [storage] Storage scene plays click SFX on item selection and hover SFX on item row hover; footer margin padding adjusted for consistent spacing
 
+### Inspection pass confirmation, browser columns, green review button
+
+- 2026-06-17
+- [inspection] Pass lot now shows confirmation dialog before navigating away
+- [inspection] Item browser shows table column headers while in card mode
+- [inspection] "Review Lot" button styled with green accent palette
+- [storage] State simplified: \_selected_entry removed, empty-label branch dropped
+- [ui] Hover/click audio moved into ItemBrowserPanel for consistent feedbacke
+
 ## v0.1.3
 
 ### Customer Sell Layout Rework

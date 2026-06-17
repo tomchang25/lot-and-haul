@@ -14,6 +14,14 @@ const REVEAL_GOOD: UiAudioEvent = preload("res://data/tres/audio_events/reveal_g
 const REVEAL_BAD: UiAudioEvent = preload("res://data/tres/audio_events/reveal_bad.tres")
 const BLOCKED_ERROR: UiAudioEvent = preload("res://data/tres/audio_events/blocked_error.tres")
 
+const INSPECTION_COLUMNS: Array = [
+    ItemRow.Column.NAME,
+    ItemRow.Column.CONDITION,
+    ItemRow.Column.ESTIMATED_VALUE,
+    ItemRow.Column.RARITY,
+    ItemRow.Column.INSPECTION,
+]
+
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _selected_entry: ItemEntry = null
@@ -24,6 +32,7 @@ var _inspection_finished: bool = false
 @onready var _item_browser: ItemBrowserPanel = %ItemBrowser
 @onready var _footer: HBoxContainer = %FooterHBox
 @onready var _pass_button: Button = %PassButton
+@onready var _pass_confirm_popup: ConfirmationDialog = %PassConfirmPopup
 @onready var _review_button: Button = %ReviewButton
 @onready var _stamina_hud: StaminaHUD = %StaminaHUD
 
@@ -67,6 +76,7 @@ func _ready() -> void:
     _pass_button.show()
     _review_button.show()
     _pass_button.pressed.connect(_on_pass_pressed)
+    _pass_confirm_popup.confirmed.connect(_on_pass_confirmed)
     _review_button.pressed.connect(_on_review_pressed)
 
     _item_browser.entry_pressed.connect(_on_browser_entry_pressed)
@@ -90,7 +100,7 @@ func _process(_delta: float) -> void:
 
 func _populate_browser() -> void:
     var items := RunManager.lot.lot_items
-    _item_browser.setup([]) # No columns needed for card mode
+    _item_browser.setup(INSPECTION_COLUMNS)
     _item_browser.populate(items)
     _item_browser.set_mode(ItemBrowserPanel.DisplayMode.CARD)
 
@@ -325,6 +335,10 @@ func _finish_inspection() -> void:
 
 
 func _on_pass_pressed() -> void:
+    _pass_confirm_popup.popup_centered()
+
+
+func _on_pass_confirmed() -> void:
     SceneRouter.go_to_lot_browse()
 
 

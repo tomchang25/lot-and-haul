@@ -11,8 +11,6 @@ extends Control
 const STORAGE_RESEARCH: UiAudioEvent = preload("res://data/tres/audio_events/storage_research.tres")
 const STORAGE_REPAIR_RESTORE: UiAudioEvent = preload("res://data/tres/audio_events/storage_repair_restore.tres")
 const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
-const SELECT: UiAudioEvent = preload("res://data/tres/audio_events/click.tres")
-const HOVER: UiAudioEvent = preload("res://data/tres/audio_events/button_hover.tres")
 
 const STORAGE_COLUMNS: Array = [
     ItemRow.Column.NAME,
@@ -23,13 +21,10 @@ const STORAGE_COLUMNS: Array = [
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-var _selected_entry: ItemEntry = null
-
 # ── Node references ───────────────────────────────────────────────────────────
 
 # Left — browser
 @onready var _item_browser: ItemBrowserPanel = %ItemBrowser
-@onready var _empty_label: Label = %EmptyLabel
 
 # Left — footer
 @onready var _footer_status_label: Label = %FooterStatusLabel
@@ -69,7 +64,6 @@ func _ready() -> void:
     _restore_btn.pressed.connect(_on_restore_pressed)
 
     _item_browser.entry_pressed.connect(_on_entry_pressed)
-    _item_browser.entry_hovered.connect(_on_entry_hovered)
 
     _refresh_ap_label()
     _populate_browser()
@@ -95,42 +89,39 @@ func _on_back_pressed() -> void:
     SceneRouter.go_to_hub()
 
 
-func _on_entry_pressed(entry: ItemEntry) -> void:
-    AudioManager.play_event(SELECT)
-    _selected_entry = entry
+func _on_entry_pressed(_entry: ItemEntry) -> void:
     _refresh_detail()
 
 
-func _on_entry_hovered(_entry: ItemEntry, _anchor: Rect2) -> void:
-    AudioManager.play_event(HOVER)
-
-
 func _on_repair_pressed() -> void:
-    if _selected_entry == null:
+    var entry := _item_browser.get_selected()
+    if entry == null:
         return
-    if MetaManager.repair_item(_selected_entry):
+    if MetaManager.repair_item(entry):
         AudioManager.play_event(STORAGE_REPAIR_RESTORE)
-        _item_browser.refresh_entry(_selected_entry)
+        _item_browser.refresh_entry(entry)
         _refresh_ap_label()
         _refresh_detail()
 
 
 func _on_research_pressed() -> void:
-    if _selected_entry == null:
+    var entry := _item_browser.get_selected()
+    if entry == null:
         return
-    if MetaManager.research_item(_selected_entry):
+    if MetaManager.research_item(entry):
         AudioManager.play_event(STORAGE_RESEARCH)
-        _item_browser.refresh_entry(_selected_entry)
+        _item_browser.refresh_entry(entry)
         _refresh_ap_label()
         _refresh_detail()
 
 
 func _on_restore_pressed() -> void:
-    if _selected_entry == null:
+    var entry := _item_browser.get_selected()
+    if entry == null:
         return
-    if MetaManager.restore_item(_selected_entry):
+    if MetaManager.restore_item(entry):
         AudioManager.play_event(STORAGE_REPAIR_RESTORE)
-        _item_browser.refresh_entry(_selected_entry)
+        _item_browser.refresh_entry(entry)
         _refresh_ap_label()
         _refresh_detail()
 
@@ -153,15 +144,6 @@ func _refresh_ap_label() -> void:
 
 func _populate_browser() -> void:
     var items: Array = MetaManager.storage.storage_items
-    if items.is_empty():
-        _empty_label.visible = true
-        _item_browser.visible = false
-        _footer_status_label.text = "0 items"
-        return
-
-    _empty_label.visible = false
-    _item_browser.visible = true
-
     _item_browser.setup(STORAGE_COLUMNS)
     _item_browser.populate(items)
 
@@ -172,7 +154,8 @@ func _populate_browser() -> void:
 
 
 func _refresh_detail() -> void:
-    var has_selection: bool = _selected_entry != null
+    var entry := _item_browser.get_selected()
+    var has_selection: bool = entry != null
     _no_selection_label.visible = not has_selection
 
     _detail_name_label.visible = has_selection
@@ -186,8 +169,6 @@ func _refresh_detail() -> void:
 
     if not has_selection:
         return
-
-    var entry: ItemEntry = _selected_entry
 
     # ── Name and category ─────────────────────────────────────────────────────
     _detail_name_label.text = ItemEntryDisplayHelper.display_name(entry)

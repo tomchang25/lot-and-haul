@@ -258,15 +258,14 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 One-line, no reasoning, no backing doc.
 
-- [inspection-scene] add a confirmation box for Pass, and change the Review Lot button to green to make it more obvious.
-
-- [tutorial] tutorial rework
-- [tutorial] tutorial cover whole gameplay
+- [bug] Somehow item with 1 clue revealed while still 1 surface veiled still get verified
 
 - [debug] Add an debug button in Hub to add random item
 - [debug] Add an debug button in Hub to clear all storage items
 - [debug] Add Debug Overlay that use debug button in hub to toggle?
   ​
+- [tutorial] tutorial rework
+- [tutorial] tutorial cover whole gameplay]
 
 - [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
 - [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`

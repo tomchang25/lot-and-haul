@@ -4,8 +4,56 @@
 [ext_resource type="PackedScene" uid="uid://bstamhudtscn1" path="res://game/run/inspection/stamina_hud/stamina_hud.tscn" id="2_j573n"]
 [ext_resource type="PackedScene" uid="uid://bi01jgyv1md6o" path="res://game/shared/item_display/item_browser_panel/item_browser_panel.tscn" id="3_browser"]
 [ext_resource type="PackedScene" uid="uid://cddj8ljbhn4sb" path="res://game/run/inspection/inspection_summary_popup/inspection_summary_popup.tscn" id="4_summary"]
+[ext_resource type="PackedScene" uid="uid://dk4vsndd2lfnm" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="5_sbo"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
-[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="5_sbo"]
+
+[sub_resource type="StyleBoxFlat" id="accent_btn_normal"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.13, 0.32, 0.19, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.5, 0.32, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="accent_btn_pressed"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.08, 0.24, 0.14, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.55, 0.38, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="accent_btn_hover"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.18, 0.4, 0.25, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.6, 0.42, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [node name="InspectionScene" type="Control" unique_id=2043279360]
 layout_mode = 3
@@ -94,7 +142,9 @@ theme_override_constants/separation = 8
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 8
 
 [node name="FooterInner" type="HBoxContainer" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin" unique_id=100000012]
 layout_mode = 2
@@ -116,6 +166,13 @@ script = ExtResource("99_sfx")
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 1, 0.7, 1)
+theme_override_colors/font_pressed_color = Color(0.5, 0.85, 0.5, 1)
+theme_override_colors/font_hover_color = Color(0.85, 1, 0.85, 1)
+theme_override_colors/font_disabled_color = Color(0.35, 0.5, 0.35, 1)
+theme_override_styles/normal = SubResource("accent_btn_normal")
+theme_override_styles/pressed = SubResource("accent_btn_pressed")
+theme_override_styles/hover = SubResource("accent_btn_hover")
 text = "Review Lot"
 script = ExtResource("99_sfx")
 
@@ -306,8 +363,15 @@ theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
 theme_override_font_sizes/font_size = 12
 text = "No further inspection available"
 
-[node name="SummaryPopup" parent="." instance=ExtResource("4_summary")]
-visible = false
+[node name="SummaryPopup" parent="." unique_id=1462834888 instance=ExtResource("4_summary")]
 unique_name_in_owner = true
+visible = false
 
-[node name="SettingsButtonOverlay" parent="." instance=ExtResource("5_sbo")]
+[node name="PassConfirmPopup" type="ConfirmationDialog" parent="." unique_id=1602018568]
+unique_name_in_owner = true
+title = "Pass Lot"
+initial_position = 2
+size = Vector2i(360, 120)
+dialog_text = "Are you sure you want to pass this lot?"
+
+[node name="SettingsButtonOverlay" parent="." unique_id=1558973680 instance=ExtResource("5_sbo")]

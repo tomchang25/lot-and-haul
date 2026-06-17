@@ -17,7 +17,6 @@ const ItemCardScene: PackedScene = preload("res://game/shared/item_display/item_
 
 const SORT_CLICK: UiAudioEvent = preload("res://data/tres/audio_events/click.tres")
 const SORT_HOVER: UiAudioEvent = preload("res://data/tres/audio_events/button_hover.tres")
-
 # ── State ──────────────────────────────────────────────────────────────────────
 
 var _mode: DisplayMode = DisplayMode.CARD
@@ -187,6 +186,7 @@ func _select_entry(entry: ItemEntry, emit_pressed: bool) -> void:
     _apply_card_selection()
     _apply_table_selection()
     if emit_pressed:
+        AudioManager.play_event(SORT_CLICK)
         entry_pressed.emit(entry)
 
 
@@ -354,6 +354,7 @@ func _on_card_clicked(card: ItemCard) -> void:
 
 
 func _on_card_mouse_entered(card: ItemCard, entry: ItemEntry) -> void:
+    AudioManager.play_event(SORT_HOVER)
     entry_hovered.emit(entry, card.get_global_rect())
 
 
@@ -369,6 +370,7 @@ func _on_table_row_pressed(entry) -> void:
 
 
 func _on_table_tooltip_requested(entry, anchor: Rect2) -> void:
+    AudioManager.play_event(SORT_HOVER)
     entry_hovered.emit(entry, anchor)
 
 
