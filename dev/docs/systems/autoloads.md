@@ -39,13 +39,14 @@ Cross-domain transactions (`resolve_run`, `resolve_customer_sale`, `end_day`, `b
 ## Hub Navigation
 
 ```
-Hub (slot tray: Morning / Afternoon / Evening)
- ├── Auction (slot 1; consumes slots 1+2) → run loop (location_entry → lot_browse → … → run_review)
- ├── Storage (spend storage AP: Repair / Restore / Research)
- ├── Open Shop (slot-scaled nightly customer-sell scene) → ends day
+Hub (slot tray: Day / Night)
+ ├── Activity chooser (cancellable per-slot activity popup)
+ │    ├── Auction (Day only) → run loop (location_entry → lot_browse → … → run_review) → Night
+ │    ├── Storage (spend slot-scaled storage AP: Repair / Restore / Research)
+ │    └── Open Shop (Day/Night-scaled customer-sell scene)
  ├── Vehicle Hub (Garage car select + Car Shop)
  ├── Knowledge Hub (Mastery, Attributes, Perks)
- └── Day end (Open Shop or all slots spent) → DaySummaryScene
+ └── Day end (after Night activity) → DaySummaryScene
 ```
 
 Scene-transition wiring lives in `GameManager`; hub-specific slot/AP flow is in `day_slot_economy.md`.

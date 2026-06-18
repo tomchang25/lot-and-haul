@@ -14,6 +14,10 @@ Rules:
 
 ## v0.1.4 - Draft
 
+### TimeSlot Day/Night Rework
+
+- 2026-06-18 — [timeslot] Hub days now run as Day/Night activity slots with a cancellable chooser, Day-only auctions, slot-scaled Storage AP and selling volume, and save migration from the old three-slot model
+
 ### Customer Sell Resume
 
 - 2026-06-18 — [customer_sell] Force-quit during shop session now resumes the in-flight customer_sell scene with the same customer and grid placements; Back closes the shop and returns to hub

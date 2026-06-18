@@ -28,7 +28,7 @@ hub
                                      └── hub
 ```
 
-A finished run returns the player to the Hub for the Evening slot, stashing its economics as pending; the Day Summary scene (`GameManager.go_to_day_summary`) fires when the day ends from the hub (Open Shop or all slots spent). See `day_slot_economy.md`.
+A finished run returns the player to the Hub for the Night slot, stashing its economics as pending; the Day Summary scene (`GameManager.go_to_day_summary`) fires when a Night activity advances the hub past Night. See `day_slot_economy.md`.
 
 ## Key Flows
 
@@ -82,7 +82,7 @@ Run review applies trailer damage before showing the item list. Trailer damage u
 
 The finance panel shows cash cost, sold-on-site proceeds, immediate cash flow, estimated cargo value, and estimated profit. Cash cost is auction paid total plus entry fee plus fuel cost. Immediate cash flow is on-site proceeds minus that cost.
 
-Continuing resolves the run through `MetaManager.resolve_run()`: cash is mutated by on-site proceeds minus paid price, entry fee, and fuel cost; normal cargo items have all surface clues auto-revealed (`ItemEntry.auto_reveal_all_surface()` — no layer ladder) and enter storage; the run's economics are stashed as pending (folded into the day summary at day-end) and the player returns to the Hub for the Evening slot (the auction consumed the morning + afternoon). Items flagged `auto_verify` also reveal their hidden clues on storage entry. There is no market advancement (`MarketManager` was removed). Living cost and the day summary are applied later by the day-end sequence, not here — see `day_slot_economy.md`. Run state is cleared after settlement.
+Continuing resolves the run through `MetaManager.resolve_run()`: cash is mutated by on-site proceeds minus paid price, entry fee, and fuel cost; normal cargo items have all surface clues auto-revealed (`ItemEntry.auto_reveal_all_surface()` — no layer ladder) and enter storage; the run's economics are stashed as pending (folded into the day summary at day-end) and the player returns to the Hub for the Night slot. Items flagged `auto_verify` also reveal their hidden clues on storage entry. There is no market advancement (`MarketManager` was removed). Living cost and the day summary are applied later by the day-end sequence, not here — see `day_slot_economy.md`. Run state is cleared after settlement.
 
 Current caveat: run review displays cargo plus trailer items and applies trailer damage, but settlement registration currently only stores normal cargo items (see Open Questions).
 
