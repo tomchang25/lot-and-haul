@@ -8,7 +8,7 @@ Rules:
 - Each entry uses `- YYYY-MM-DD — [scope] one-line summary`.
 - `##` headings are version headings only. Entries must live under `###` section headings; only version notes may sit directly under a `##` heading.
 - `###` headings group related entries. Section titles are plain names, not "Phase"/"Stage" labels.
-- Keep entries concise and outcome-focused. Avoid hype, speculative performance claims, and implementation mechanics unless needed to identify the fix.
+- Keep entries concise and outcome-focused per `dev/standards/change_summary_standard.md`.
 - When a phase ships, append the entry here and cut the shipped work from its plan/TODO source.
 - Do not add entries for dev-process-only maintenance, including closeout workflow changes, CHANGELOG/TODO edits, plan archival, or tracking cleanup.
 

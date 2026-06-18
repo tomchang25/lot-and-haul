@@ -6,7 +6,7 @@ This directory holds development-time instructions, standards, workflows, refere
 
 - `agent_rules/`: agent behavior and execution constraints. Use this for sandbox rules, git permissions, lint/test requirements, headless run procedures, approval rules, and habits an agent must follow while working.
 - `workflows/`: development process artifacts. Use this for plan, implementation spec, sketch, closeout, stage-review, slash-command workflow files under `workflows/commands/`, and other rules for how work moves from idea to implementation.
-- `standards/`: project output standards. Use this for rules that define what correct repo artifacts look like: code architecture, naming, scene structure, registries, themes, error guards, data conventions, and project layout.
+- `standards/`: project output standards. Use this for rules that define what correct repo artifacts look like: code architecture, naming, scene structure, registries, themes, error guards, data conventions, change-summary tone, and project layout.
 - `skills/`: concrete recipes and hazard cards for AI, Godot, GDScript, or tooling pitfalls. Use this for specific failure modes, compiler/import traps, API gotchas, repeatable fixes, commit/PR formatting references, and examples that prevent common wrong code.
 - `docs/`: actual design, architecture, planning, and tracking documents. Use this for feature plans, system docs, vision docs, archived plans, and product/design content.
 - `tools/`: executable development tooling and tool-owned prompts. Use this for scripts, validators, generators, hooks, and prompt packs used by those tools.

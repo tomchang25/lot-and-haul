@@ -12,7 +12,7 @@ Before creating or moving files under `dev/`, classify by the primary thing the 
 
 - `dev/agent_rules/`: agent behavior and execution constraints. Use for sandbox, git permissions, lint/test requirements, headless checks, approval rules, and required agent habits.
 - `dev/workflows/`: development process artifacts. Use for plan/spec/sketch/closeout/stage-review formats, lifecycle steps, and how work moves from idea to implementation. Slash-command workflow files live in `dev/workflows/commands/`.
-- `dev/standards/`: project output standards. Use for code architecture, naming, scene structure, registries, themes, error guards, data conventions, and other rules that define what correct repo artifacts look like.
+- `dev/standards/`: project output standards. Use for code architecture, naming, scene structure, registries, themes, error guards, data conventions, change-summary tone, and other rules that define what correct repo artifacts look like.
 - `dev/skills/`: concrete AI/Godot/GDScript recipes and hazard cards. Use for specific pitfalls, compiler/import failures, API traps, repeatable fixes, and commit/PR formatting references.
 - `dev/docs/`: actual design, architecture, planning, and tracking documents. Use for feature plans, system docs, vision docs, archived plans, and product/design content.
 - `dev/tools/`: executable tooling and tool-owned prompts. Use for scripts, validators, generators, hooks, and prompt packs used by those tools.
@@ -33,7 +33,13 @@ Resolve unknowns by asking me directly during the planning conversation — neve
 
 **Answer my questions before implementing**: when my message contains a question — even alongside a work request — answer the question in conversation first, before doing the work. If the answer could change what gets built, wait for my confirmation instead of proceeding on assumptions. Never bury the answer in a wrap-up after the implementation is already done.
 
-**Workflow commands** (`/pr`, `/commit-msg`, `/closeout`, `/stage-review`, `/godot-test`): defined in `dev/workflows/commands/`. `pr` generates a PR title/description for the current branch, `commit-msg` suggests a conventional commit message for currently staged changes without staging, committing, pushing, or opening a PR, `closeout` closes out completed work — staged changes or a feature branch covering one or more plans (CHANGELOG + TODO + archive plans, optional commit-message suggestion only when explicitly asked), `stage-review` checks staged changes against the plan spec and standards lint, and `godot-test` runs the safe `/tmp` snapshot Godot test workflow without mutating git or trusting the sandbox mount. If asked to do one of these tasks without the slash command, follow the matching command file.
+**Workflow commands**: command workflows live in `dev/workflows/commands/`. When asked to do a command task, read the matching file before acting and follow it exactly. Slash form, dash form, `cmd <name>`, and natural-language requests are all valid: `/closeout`, `-closeout`, `cmd closeout`, and "close out this work" all mean the `closeout` command and must read `dev/workflows/commands/closeout.md`.
+
+- `/closeout` -> `dev/workflows/commands/closeout.md`: closes out completed work — staged changes or a feature branch covering one or more plans (CHANGELOG + TODO + archive plans, optional commit-message suggestion only when explicitly asked).
+- `/commit-msg` -> `dev/workflows/commands/commit-msg.md`: suggests a conventional commit message for currently staged changes without staging, committing, pushing, or opening a PR.
+- `/godot-test` -> `dev/workflows/commands/godot-test.md`: runs the safe `/tmp` snapshot Godot test workflow without mutating git or trusting the sandbox mount.
+- `/pr-review` -> `dev/workflows/commands/pr-review.md`: reviews the branch against the base branch, then generates a PR title/description without creating files or opening a PR.
+- `/stage-review` -> `dev/workflows/commands/stage-review.md`: checks staged changes against the plan spec and standards lint.
 
 ## Core Loop
 
@@ -145,6 +151,7 @@ Check TODO.md ## Active Section
 - **Debug** (adding debug-conditional code or UI): read `dev/standards/debug_standard.md` — covers the two-layer gate (`OS.is_debug_build()` + `SettingsStore.debug_mode`), the `Debug` autoload API, and node-source rules for debug nodes.
 - **Error guards** (replacing `assert()`, writing precondition checks): read `dev/standards/error_guard_standard.md` — covers the three guard categories (runtime, programmer error, recovery warning), ToastManager channel selection, fire-once for high-frequency guards, and the pattern for each.
 - **Project structure** (placing new files or folders): read `dev/standards/project_structure.md`.
+- **Change summaries** (commit messages, review notes, PR titles/descriptions, CHANGELOG entries, closeout summaries): read `dev/standards/change_summary_standard.md` — shared outcome-focused wording rules and examples.
 - **Commits**: conventional commits format — read `dev/skills/conventional_commits.md` when writing commit messages. Do not hard-wrap prose lines (bullet points, PR descriptions, commit bodies) at a column boundary — let the client handle line wrapping.
 - **Pull requests**: read `dev/skills/pr_convention.md` when writing PR titles or descriptions — conventional-style title, required Summary/Changes sections, Testing/Breaking-changes when applicable.
 - **Docs and tracking** (writing/archiving docs, updating TODO/CHANGELOG, deciding where a forward item lives): read `dev/docs/README.md` — covers the 3-level model, maturity scale, lifecycle rules, and the "no living Done list" principle.

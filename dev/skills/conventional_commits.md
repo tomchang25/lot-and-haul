@@ -116,19 +116,18 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 These rules extend the base specification for this project.
 
+Read `dev/standards/change_summary_standard.md` for the shared tone and content rules used by commit messages, PR descriptions, reviews, CHANGELOG entries, and closeout summaries.
+
 ### Body format
 
-- Prefer a compact body with one general bullet when it accurately covers the shipped change.
+- Prefer a compact body with one general bullet when it accurately covers the shipped change, following `dev/standards/change_summary_standard.md`.
 - Split into multiple bullets only when the commit contains clearly separate outcomes that would be misleading if combined.
 - When listing multiple changes in the body, **MUST** use `-` bullet points, one per logical outcome.
 - Each bullet **SHOULD** be a concise imperative phrase (e.g. `Add --force flag to yaml_to_tres.py`).
 
 ### Tone and content
 
-- Commit messages **SHOULD** be plain, concise, and outcome-focused.
-- Commit messages **SHOULD NOT** use hype language, speculative performance claims, or low-level implementation mechanics unless those details are needed to identify the fix.
-- Prefer describing the user-visible behavior, system behavior, or durable project rule that changed over listing the steps taken to make the change.
-- Do not expand a compact feature into a checklist of implementation details. Summarize the general outcome whenever possible.
+- Commit messages **SHOULD** follow `dev/standards/change_summary_standard.md`: plain, concise, outcome-focused, and not expanded into implementation checklists.
 
 ### Subject/body separation
 
@@ -137,7 +136,7 @@ These rules extend the base specification for this project.
 
 ### What to exclude
 
-- **MUST NOT** include administrative housekeeping in commit messages. Examples:
+- **MUST NOT** include administrative housekeeping in commit messages unless those files are the primary product of the change. Examples:
   - Archiving a plan after shipping it (the plan is done — the commit is the evidence)
   - Updating `TODO.md` or `CHANGELOG.md` as a listed bullet (these are side effects, not the change itself)
   - Running closeout workflow steps, moving completed plans, or cleaning tracking files

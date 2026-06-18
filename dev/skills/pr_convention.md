@@ -1,6 +1,6 @@
 # Pull Request Convention
 
-A lightweight convention for PR titles and descriptions. Extends `conventional_commits.md` — read that first; this document only covers what differs at the PR level.
+A lightweight convention for PR titles and descriptions. Extends `conventional_commits.md` and `dev/standards/change_summary_standard.md` — read those first; this document only covers what differs at the PR level.
 
 ---
 
@@ -51,7 +51,7 @@ Anything the reviewer should know that isn't a change: known limitations, follow
 
 ## Rules
 
-- The description describes *what changed in the codebase* — the same "no administrative housekeeping" rule as commits applies (no bullets for archiving plans or updating `TODO.md`/`CHANGELOG.md`).
+- The description describes _what changed in the codebase_ — follow `dev/standards/change_summary_standard.md` for tone, content, and administrative-housekeeping exclusions.
 - Do not paste the commit list as the description; `## Changes` summarizes logical changes, which may not map 1:1 to commits.
 - Do not hard-wrap prose at a column boundary — let the client wrap.
 - Reference issues/plans with closing keywords where supported (e.g. `Closes #123`) at the end of the Summary, not as a separate section.

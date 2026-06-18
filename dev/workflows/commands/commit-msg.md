@@ -14,7 +14,7 @@ If there are no staged changes, stop and say there is nothing staged to summariz
 
 ## Steps
 
-1. Read the staged file list and staged diff.
+1. Read `dev/standards/change_summary_standard.md`, then read the staged file list and staged diff.
 2. Infer the most appropriate conventional commit type and optional scope from the staged changes:
    - `feat` for new user-facing behavior or capability.
    - `fix` for bug fixes.
@@ -33,10 +33,8 @@ type(scope): concise summary
 ```
 
 4. Keep the body to 2-3 bullets unless the staged diff is truly tiny, in which case a subject line alone is fine.
-5. Follow `dev/skills/conventional_commits.md` and the CLAUDE.md commit conventions:
+5. Follow `dev/skills/conventional_commits.md`, `dev/standards/change_summary_standard.md`, and the CLAUDE.md commit conventions:
    - Do not hard-wrap prose.
-   - Keep the message plain, concise, and outcome-focused.
-   - Avoid hype language, speculative performance claims, and low-level implementation mechanics unless needed to identify the fix.
    - Do not include TODO/CHANGELOG/archive/closeout operations in the body unless those files are the actual primary product of the change.
    - Describe what changed in the codebase or durable project rules, not what command was run.
 6. If the staged changes represent multiple unrelated commits, say so and suggest a split, then provide the best single-message fallback only if the user still wants one.
