@@ -393,6 +393,7 @@ func _show_hint(step: TutorialStep) -> void:
 
     _hint_label.text = step.text
     _hint_panel.visible = true
+    _hint_next.visible = step.advance == TutorialStep.Advance.NEXT
     _position_near_anchor(_hint_panel, t_rect, preferred)
 
     set_process(true)
@@ -413,6 +414,7 @@ func _show_popup(step: TutorialStep) -> void:
 
     _popup_label.text = step.text
     _popup_panel.visible = true
+    _popup_next.visible = step.advance == TutorialStep.Advance.NEXT
 
 
 func _hide_step_ui() -> void:

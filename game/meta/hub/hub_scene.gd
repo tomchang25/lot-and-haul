@@ -114,11 +114,34 @@ func _end_day_and_navigate() -> void:
 func _show_chooser() -> void:
     var is_day: bool = MetaManager.slot.current_slot == SlotStore.SLOT_DAY
     _auction_btn.visible = is_day
+    _storage_btn.visible = true
+    _sell_btn.visible = true
+    _cancel_btn.visible = true
+
+    # Onboarding gating: disable non-target activity options.
+    # Reset all to enabled first.
+    _auction_btn.disabled = false
+    _storage_btn.disabled = false
+    _sell_btn.disabled = false
+    if MetaManager.is_onboarding_pending():
+        var target := MetaManager.onboarding_target_activity()
+        if target == "auction":
+            _storage_btn.disabled = true
+            _sell_btn.disabled = true
+        elif target == "storage":
+            _auction_btn.disabled = true
+            _sell_btn.disabled = true
+        elif target == "selling":
+            _auction_btn.disabled = true
+            _storage_btn.disabled = true
+
     _chooser.show()
 
     Director.register_anchor("auction_btn", _auction_btn)
     Director.register_anchor("storage_btn", _storage_btn)
     Director.register_anchor("sell_btn", _sell_btn)
+
+    EventBus.tutorial_event.emit(TutorialEvents.CHOOSER_OPENED, { })
 
 
 func _close_chooser() -> void:

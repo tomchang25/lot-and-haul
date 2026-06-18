@@ -101,6 +101,41 @@ func mark_tutorial_seen(scene_id: String) -> void:
     SaveManager.mark_dirty()
 
 
+## Whether onboarding is still pending for this save.
+func is_onboarding_pending() -> bool:
+    return progress.onboarding_pending
+
+
+## Returns the intended activity during onboarding, or empty if onboarding is
+## not active or the player is not in a hub-chooser state.
+func onboarding_target_activity() -> String:
+    if not progress.onboarding_pending:
+        return &""
+    if progress.current_day == 0 and slot.current_slot == SlotStore.SLOT_DAY:
+        return &"auction"
+    if progress.current_day == 0 and slot.current_slot == SlotStore.SLOT_NIGHT:
+        return &"storage"
+    if progress.current_day == 1 and slot.current_slot == SlotStore.SLOT_DAY:
+        return &"selling"
+    return &""
+
+
+## Marks onboarding as completed and saves. Also marks the basic hub and storage
+## tutorials as seen so they do not trigger after onboarding finishes.
+func complete_onboarding() -> void:
+    progress.mark_onboarding_complete()
+    progress.mark_tutorial_seen("hub")
+    progress.mark_tutorial_seen("storage")
+    SaveManager.mark_dirty()
+
+
+## Marks onboarding as skipped and saves. Does not mark hub/storage as seen
+## so the player can still receive individual tutorial offers.
+func skip_onboarding() -> void:
+    progress.mark_onboarding_complete()
+    SaveManager.mark_dirty()
+
+
 ## Cross-domain transaction: deducts the upgrade cost from cash and raises
 ## [param attr] one level in KnowledgeStore. Saves on success.
 ## Returns false when cash is insufficient.

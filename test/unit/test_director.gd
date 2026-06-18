@@ -28,6 +28,7 @@ func before_each() -> void:
 
 
 func after_each() -> void:
+    ScriptDirector.reset_runtime()
     for control: Control in _owned_controls:
         if is_instance_valid(control):
             control.free()
@@ -356,3 +357,77 @@ func test_tutorial_target_fallback_resolves_when_primary_hidden() -> void:
     assert_eq(primary_rect.size, Vector2(0, 0), "hidden primary target returns empty rect")
     var fallback_rect := Director.get_target_rect("fallback_target")
     assert_eq(fallback_rect.size, Vector2(200, 100), "visible fallback target rect ok")
+
+# ══ Onboarding resolver and segment tests ══════════════════════════
+
+
+func test_onboarding_resolver_starts_hub_segment() -> void:
+    # after before_each: day 0, slot DAY, onboarding_pending=true.
+    # Register the real "hub" id so the onboarding resolver matches.
+    Director.register_scene("hub", { "activity_btn": _make_anchor_button(), "auction_btn": _make_anchor_button() })
+    assert_true(ScriptDirector.active, "onboarding segment should start for hub scene")
+    assert_eq(Director.step_count(), 3, "onboarding_hub_intro_choose has 3 steps")
+
+
+func test_onboarding_resolver_skips_when_segment_seen() -> void:
+    MetaManager.progress.mark_tutorial_seen("onboarding_hub_intro_choose")
+    Director.register_scene("hub", { "activity_btn": _make_anchor_button(), "auction_btn": _make_anchor_button() })
+    assert_false(ScriptDirector.active, "onboarding should not start when segment already seen")
+
+
+func test_onboarding_resolver_supports_storage_choose() -> void:
+    MetaManager.slot.set_slot(SlotStore.SLOT_NIGHT)
+    Director.register_scene("hub", { "activity_btn": _make_anchor_button(), "storage_btn": _make_anchor_button() })
+    assert_true(ScriptDirector.active, "onboarding storage_choose should start for night hub")
+    assert_eq(Director.step_count(), 3, "onboarding_storage_choose has 3 steps")
+
+
+func test_onboarding_resolver_does_not_interfere_with_synthetic_scenes() -> void:
+    # Registering a synthetic scene id should not trigger onboarding.
+    Director.register_scene("synthetic_onboarding_test [DEBUG-PASS]", { })
+    assert_false(ScriptDirector.active, "synthetic scene should not start onboarding")
+
+
+func test_onboarding_scripts_resolve() -> void:
+    var ids := [
+        "onboarding_hub_intro_choose",
+        "onboarding_auction_run",
+        "onboarding_storage_choose",
+        "onboarding_storage",
+        "onboarding_day_pass",
+        "onboarding_shop_choose",
+        "onboarding_selling",
+    ]
+    for id: String in ids:
+        var steps := TutorialScripts.resolve_script(id)
+        assert_false(steps.is_empty(), "onboarding script '%s' should resolve" % id)
+
+
+func test_onboarding_close_skips_onboarding() -> void:
+    ScriptDirector.start_script("onboarding_hub_intro_choose")
+    assert_true(ScriptDirector.active, "onboarding script should be active")
+    assert_true(MetaManager.is_onboarding_pending(), "onboarding pending before close")
+    ScriptDirector.stop_script()
+    assert_false(ScriptDirector.active, "script should not be active after close")
+    assert_false(MetaManager.is_onboarding_pending(), "onboarding should be skipped after close")
+
+
+func test_selling_segment_completes_onboarding() -> void:
+    MetaManager.progress.reset_onboarding()
+    assert_true(MetaManager.is_onboarding_pending(), "onboarding pending before test")
+    ScriptDirector.start_script("onboarding_selling")
+    # Steps 0 and 1 are POPUP (NEXT), step 2 is EVENT (SALE_COMPLETED).
+    Director.advance_step() # 0 → 1
+    Director.advance_step() # 1 → 2
+    assert_true(ScriptDirector.active, "script active after advancing to step 2")
+    EventBus.tutorial_event.emit(TutorialEvents.SALE_COMPLETED, { })
+    assert_false(ScriptDirector.active, "script should end after sale event")
+    assert_false(MetaManager.is_onboarding_pending(), "onboarding should be complete after selling segment")
+
+
+func test_auction_resolved_event_constant_exists() -> void:
+    assert_eq(typeof(TutorialEvents.AUCTION_RESOLVED), TYPE_STRING_NAME, "AUCTION_RESOLVED should be a StringName")
+
+
+func test_chooser_opened_event_constant_exists() -> void:
+    assert_eq(typeof(TutorialEvents.CHOOSER_OPENED), TYPE_STRING_NAME, "CHOOSER_OPENED should be a StringName")

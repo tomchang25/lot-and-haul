@@ -322,6 +322,7 @@ func _resolve() -> void:
     else:
         _bid_button.disabled = true
         _pass_button.disabled = true
+        EventBus.tutorial_event.emit(TutorialEvents.AUCTION_RESOLVED, { })
         SceneRouter.go_to_reveal()
 
 
@@ -346,6 +347,7 @@ func _win_now(price: int) -> void:
     RunManager.commit_lot_win(RunManager.lot.lot_items, price)
     AudioManager.play_event(AUCTION_WON)
     EventBus.tutorial_event.emit(TutorialEvents.AUCTION_WON, { })
+    EventBus.tutorial_event.emit(TutorialEvents.AUCTION_RESOLVED, { "won": true })
     SceneRouter.go_to_reveal()
 
 # ══ Budget refresh ══════════════════════════════════════════════════════════════

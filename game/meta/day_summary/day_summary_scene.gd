@@ -48,6 +48,12 @@ func _ready() -> void:
         return
 
     _render(summary)
+    Director.register_scene(
+        "day_summary",
+        {
+            "continue_btn": _continue_btn,
+        },
+    )
 
 # ══ Display ═══════════════════════════════════════════════════════════════════
 

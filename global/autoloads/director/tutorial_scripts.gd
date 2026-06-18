@@ -101,6 +101,236 @@ your day. You can always come back to the Workshop later.",
         ),
     ]
 
+# ══ Onboarding segment scripts ════════════════════════════════════════════════
+
+
+## Day 1 Day hub intro + chooser: teaches the hub UI and steers the player to
+## choose Auction.
+static func onboarding_hub_intro_choose_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.POPUP,
+            "Welcome to Lot & Haul!\n\nThis is your Hub. Each day has two time \
+slots: Day and Night. You can use each slot for one activity. \
+Let's start your first day with an Auction Run.",
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Click the Activity button to open the activity chooser.",
+            "activity_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.CHOOSER_OPENED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Choose Auction to begin your first run.",
+            "auction_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.ACTIVITY_CHOSEN,
+        ),
+    ]
+
+
+## Covers the full auction-run scene chain: location select → lot browse →
+## inspection → auction → cargo → run review.
+static func onboarding_auction_run_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Pick a location to visit. Each location has different lots \
+and travel costs.",
+            "cards_container",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.LOCATION_SELECTED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Browse the available lots and choose one to inspect.",
+            "lot_cards",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.LOT_SELECTED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Inspect items to learn about their condition and value. \
+Spend Action Points (AP) to reveal clue details.",
+            "inspect_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.INSPECTION_PERFORMED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Bid on the lot or pass. The auction is real — win or lose, \
+the run continues.",
+            "bid_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            ["pass_btn"],
+            true,
+            TutorialEvents.AUCTION_RESOLVED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Load items into your cargo to bring them home. Items left \
+behind are sold on-site.",
+            "cargo_grid",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.CARGO_LOADED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Review your run results and continue to the Hub.",
+            "continue_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.RUN_REVIEWED,
+        ),
+    ]
+
+
+## Day 1 Night hub chooser: tells the player to choose Storage.
+static func onboarding_storage_choose_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.POPUP,
+            "Good run! Now let's visit Storage.\n\nYou can manage items, \
+repair them, and research hidden details.",
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Click the Activity button to open the chooser.",
+            "activity_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.CHOOSER_OPENED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Choose Storage to manage your items.",
+            "storage_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.ACTIVITY_CHOSEN,
+        ),
+    ]
+
+
+## Storage workshop tutorial for onboarding. Reuses the existing storage
+## tutorial steps but auto-starts instead of going through the offer prompt.
+static func onboarding_storage_script() -> Array[TutorialStep]:
+    return storage_script()
+
+
+## Day summary pass: brief summary of the day, then advance.
+static func onboarding_day_pass_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.POPUP,
+            "Day 1 is complete! Here's a summary of your earnings and \
+expenses. Today's net profit is shown below.",
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Click Continue to move to Day 2.",
+            "continue_btn",
+            TutorialStep.Advance.NEXT,
+            true,
+        ),
+    ]
+
+
+## Day 2 Day hub chooser: tells the player to choose Selling.
+static func onboarding_shop_choose_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.POPUP,
+            "Welcome to Day 2! Let's try selling to nightly customers.",
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Click the Activity button to open the chooser.",
+            "activity_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.CHOOSER_OPENED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Choose Selling to open your shop.",
+            "sell_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.ACTIVITY_CHOSEN,
+        ),
+    ]
+
+
+## Nightly customer selling: brief intro, then wait for a completed sale.
+static func onboarding_selling_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.POPUP,
+            "Welcome to your shop! Select a customer, pack their car with \
+matching items, and make a deal.",
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.POPUP,
+            "Complete a sale to finish the onboarding and continue \
+playing freely.",
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Serve a customer to complete the sale.",
+            "customer_queue",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.SALE_COMPLETED,
+        ),
+    ]
+
 
 static func resolve_script(script_id: String) -> Array[TutorialStep]:
     match script_id:
@@ -108,13 +338,37 @@ static func resolve_script(script_id: String) -> Array[TutorialStep]:
             return hub_script()
         "storage":
             return storage_script()
+        "onboarding_hub_intro_choose":
+            return onboarding_hub_intro_choose_script()
+        "onboarding_auction_run":
+            return onboarding_auction_run_script()
+        "onboarding_storage_choose":
+            return onboarding_storage_choose_script()
+        "onboarding_storage":
+            return onboarding_storage_script()
+        "onboarding_day_pass":
+            return onboarding_day_pass_script()
+        "onboarding_shop_choose":
+            return onboarding_shop_choose_script()
+        "onboarding_selling":
+            return onboarding_selling_script()
         _:
             ToastManager.show_dev_error("TutorialScripts: unknown script id '%s'" % script_id)
             return []
 
 
 static func known_script_ids() -> Array[String]:
-    return ["hub", "storage"]
+    return [
+        "hub",
+        "storage",
+        "onboarding_hub_intro_choose",
+        "onboarding_auction_run",
+        "onboarding_storage_choose",
+        "onboarding_storage",
+        "onboarding_day_pass",
+        "onboarding_shop_choose",
+        "onboarding_selling",
+    ]
 
 
 ## Returns anchor ids referenced by [param script_id] that are absent from

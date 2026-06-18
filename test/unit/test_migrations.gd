@@ -91,6 +91,54 @@ func test_progress_v2_preserves_tutorial_seen() -> void:
     store.from_dict(v2_data, ctx)
     assert_true(store.tutorial_seen.has("hub"), "tutorial_seen hub should be preserved")
 
+# ══ ProgressStore migration (v2 → v3) — onboarding_pending ═══════════════
+
+
+func test_progress_defaults_onboarding_pending_true() -> void:
+    var store := ProgressStore.new()
+    assert_true(store.onboarding_pending, "new ProgressStore should have onboarding_pending=true")
+
+
+func test_progress_v2_missing_onboarding_pending_added_as_false() -> void:
+    var ctx := SaveLoadContext.new()
+    var store := ProgressStore.new()
+    var v2_data := {
+        "_version": 2,
+        "current_day": 10,
+        "available_location_ids": [],
+        "tutorial_seen": { },
+    }
+    store.from_dict(v2_data, ctx)
+    assert_false(store.onboarding_pending, "onboarding_pending should be false after v2→v3 migration")
+
+
+func test_progress_v3_preserves_onboarding_pending_false() -> void:
+    var ctx := SaveLoadContext.new()
+    var store := ProgressStore.new()
+    var v3_data := {
+        "_version": 3,
+        "current_day": 10,
+        "available_location_ids": [],
+        "tutorial_seen": { },
+        "onboarding_pending": false,
+    }
+    store.from_dict(v3_data, ctx)
+    assert_false(store.onboarding_pending, "onboarding_pending=false should survive round trip")
+
+
+func test_progress_v3_preserves_onboarding_pending_true() -> void:
+    var ctx := SaveLoadContext.new()
+    var store := ProgressStore.new()
+    var v3_data := {
+        "_version": 3,
+        "current_day": 10,
+        "available_location_ids": [],
+        "tutorial_seen": { },
+        "onboarding_pending": true,
+    }
+    store.from_dict(v3_data, ctx)
+    assert_true(store.onboarding_pending, "onboarding_pending=true should survive round trip")
+
 # ══ SlotStore migration (v1 → v2) — three-slot to two-slot remap ═══════
 
 

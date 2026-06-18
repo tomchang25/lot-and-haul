@@ -61,7 +61,11 @@ func start_script(script_id: String) -> void:
 func stop_script() -> void:
     if not _is_active:
         return
-    _mark_seen(_active_script_id)
+    var script_id := _active_script_id
+    _mark_seen(script_id)
+    # Closing an onboarding script skips the entire onboarding.
+    if script_id.begins_with("onboarding_"):
+        MetaManager.skip_onboarding()
     Director.hide_tutorial_overlay()
     _clear_state()
 
@@ -217,6 +221,9 @@ func _skip_non_renderable_next_steps() -> void:
 func _end_tutorial() -> void:
     var completed_id := _active_script_id
     _mark_seen(completed_id)
+    # Completing the selling segment finishes onboarding.
+    if completed_id == "onboarding_selling":
+        MetaManager.complete_onboarding()
     Director.hide_tutorial_overlay()
     _clear_state()
     Director.notify_script_completed(completed_id)
@@ -239,6 +246,9 @@ func _clear_state() -> void:
 
 
 func _decide_tutorial_for_scene(scene_id: String) -> void:
+    if MetaManager.is_onboarding_pending():
+        _decide_onboarding_for_scene(scene_id)
+        return
     match scene_id:
         "hub":
             _on_hub_registered()
@@ -246,6 +256,42 @@ func _decide_tutorial_for_scene(scene_id: String) -> void:
             _on_storage_registered()
         _:
             pass
+
+
+func _decide_onboarding_for_scene(scene_id: String) -> void:
+    var segment_id := _derive_onboarding_segment(scene_id)
+    if segment_id.is_empty():
+        return
+    if MetaManager.progress.tutorial_seen.has(segment_id):
+        return
+    start_script(segment_id)
+
+
+## Derives the onboarding segment id from the current game state and scene.
+## The segment is not persisted — it is recalculated on every scene registration
+## so resume always picks the right segment for the real economy state.
+func _derive_onboarding_segment(scene_id: String) -> String:
+    var day: int = MetaManager.progress.current_day
+    var slot: int = MetaManager.slot.current_slot
+    match scene_id:
+        "hub":
+            if day == 0 and slot == SlotStore.SLOT_DAY:
+                return "onboarding_hub_intro_choose"
+            if day == 0 and slot == SlotStore.SLOT_NIGHT:
+                return "onboarding_storage_choose"
+            if day == 1 and slot == SlotStore.SLOT_DAY:
+                return "onboarding_shop_choose"
+        "storage":
+            return "onboarding_storage"
+        "day_summary":
+            return "onboarding_day_pass"
+        "customer_sell":
+            return "onboarding_selling"
+    # For run scenes during the first auction (day 0 or 1), derive via the
+    # run state rather than per-scene matching.
+    if RunManager.is_run_active() and (day == 0 or day == 1):
+        return "onboarding_auction_run"
+    return ""
 
 
 func _on_hub_registered() -> void:

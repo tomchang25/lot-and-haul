@@ -93,6 +93,17 @@ func _ready() -> void:
             _suppress_placement_update = false
         _apply_saved_placement(MetaManager.shop_session.placement)
 
+    Director.register_scene(
+        "customer_sell",
+        {
+            "customer_queue": _customer_queue,
+            "item_list": _item_list,
+            "car_panel": _car_panel,
+            "deal_panel": _deal_panel,
+            "back_btn": _back_button,
+        },
+    )
+
 # ══ Signal handlers ═══════════════════════════════════════════════════════════
 
 
