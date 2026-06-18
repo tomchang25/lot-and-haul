@@ -1,6 +1,7 @@
 # test_director.gd
 # Director accessor lifecycle, unknown-script fallback, offer acceptance, and
-# tutorial-seen tracking.
+# tutorial-seen tracking. Tests now use synthetic scene ids ("test_hub",
+# "test_storage") to avoid ScriptDirector auto-start from tests.
 extends GutTest
 
 const HUB_SCRIPT_SIZE := 3
@@ -22,7 +23,8 @@ func before_each() -> void:
         "slot_label": _make_anchor_button(),
         "storage_btn": _make_anchor_button(),
     }
-    Director.register_scene("hub", _hub_anchors)
+    # Use a synthetic scene id so ScriptDirector does not auto-start tutorials.
+    Director.register_scene("test_hub [DIRECTOR-TEST]", _hub_anchors)
 
 
 func after_each() -> void:
@@ -59,42 +61,50 @@ func test_accessors_return_active_state_while_playing() -> void:
     Director.start_script("hub")
     assert_eq(Director.step_index(), 0, "step_index starts at 0")
     assert_eq(Director.step_count(), HUB_SCRIPT_SIZE, "step_count matches hub script size")
-    assert_true(Director.step_anchor_id(0) == "slot_label", "first step anchor is slot_label")
+    assert_eq(Director.step_anchor_id(0), "slot_label", "first step anchor is slot_label")
     assert_false(Director.is_offer_showing(), "is_offer_showing is false during hint playback")
 
 
 func test_accessors_reset_after_end() -> void:
     Director.start_script("hub")
-    # Advance through all steps to trigger _end_tutorial via public API.
-    for i in HUB_SCRIPT_SIZE:
-        Director.advance_step()
+    # Advance steps 0 (NEXT) and 1 (NEXT). Step 2 is SCENE_ENTERED and will
+    # not advance from advance_step(). We register "storage" to complete it.
+    Director.advance_step()
+    Director.advance_step()
+    Director.register_scene("storage", { "storage_btn": _make_anchor_button() })
     assert_eq(Director.step_index(), 0, "step_index resets after end")
     assert_eq(Director.step_count(), 0, "step_count is 0 after end")
     assert_false(Director.is_offer_showing(), "is_offer_showing is false after end")
 
 
-func test_accessors_reset_after_scene_registration() -> void:
+func test_accessors_survive_scene_registration() -> void:
     Director.start_script("hub")
-    Director.register_scene("storage", { })
-    assert_eq(Director.step_index(), 0, "step_index resets to 0 after new scene registration")
-    assert_eq(Director.step_count(), 0, "step_count is 0 after new scene registration")
+    # Scene registration no longer clears tutorial state.
+    Director.register_scene("test_storage [DIRECTOR-TEST]", { })
+    assert_eq(Director.step_index(), 0, "step_index preserved after scene registration")
+    assert_eq(Director.step_count(), HUB_SCRIPT_SIZE, "step_count preserved after scene registration")
 
-# ══ Missing anchors auto-skip ══════════════════════════════════════════════
+# ══ Missing anchors — NEXT steps are skipped; SCENE_ENTERED steps wait ════
 
 
-func test_missing_anchor_skips_step_without_crash() -> void:
+func test_missing_anchor_skips_next_step_without_crash() -> void:
     var partial_anchors := {
         "slot_label": _make_anchor_button(),
     }
-    Director.register_scene("hub_partial [DEBUG-PASS]", partial_anchors)
+    Director.register_scene("partial_hub [DEBUG-PASS]", partial_anchors)
     Director.start_script("hub")
-    # Step 0: slot_label (exists) → shown.
-    # Advance to step 1 (POPUP, no anchor), then step 2 (storage_btn MISSING).
+    # Step 0 (slot_label, NEXT): anchor exists → renders.
+    # Advance to step 1 (POPUP, no anchor): renders.
     Director.advance_step()
+    # Step 2 (storage_btn, SCENE_ENTERED): anchor missing but advance is
+    # SCENE_ENTERED, so it waits rather than skipping.
     Director.advance_step()
-    # Step 2's missing storage_btn triggers auto-skip → tutorial ends.
-    assert_eq(Director.step_count(), 0, "tutorial ended after missing anchor auto-skip")
-    assert_eq(Director.step_index(), 0, "step_index reset after missing anchor")
+    assert_eq(Director.step_index(), 2, "step 2 reached but SCENE_ENTERED waits")
+    assert_eq(Director.step_count(), HUB_SCRIPT_SIZE, "tutorial still active")
+
+    # Registering the matching scene completes the step.
+    Director.register_scene("storage", { "storage_btn": _make_anchor_button() })
+    assert_eq(Director.step_count(), 0, "tutorial ended after scene registration")
 
 # ══ Anchor fallback resolution ════════════════════════════════════════════
 
@@ -110,7 +120,7 @@ func test_anchor_fallback_resolves_when_primary_hidden() -> void:
         "leave_btn": _make_anchor_button(),
     }
     anchors["repair_btn"].hide()
-    Director.register_scene("storage", anchors)
+    Director.register_scene("test_storage [DEBUG-PASS]", anchors)
     Director.start_script("storage")
     # Advance through steps 0 (POPUP), 1 (item_browser), 2 (detail_rail).
     Director.advance_step()
@@ -127,9 +137,9 @@ func test_anchor_fallback_disabled_skips_when_primary_hidden() -> void:
         "storage_btn": _make_anchor_button(),
     }
     partial_anchors["slot_label"].hide()
-    Director.register_scene("hub_hidden [DEBUG-PASS]", partial_anchors)
+    Director.register_scene("partial_hub [DEBUG-PASS]", partial_anchors)
     Director.start_script("hub")
-    # Step 0 (slot_label, HINT) hidden with no fallback → skip to step 1 (POPUP).
+    # Step 0 (slot_label, HINT, NEXT) hidden with no fallback → skip to step 1 (POPUP).
     assert_eq(Director.step_index(), 1, "step index 1 after hidden primary with no fallback")
 
 
@@ -145,7 +155,7 @@ func test_anchor_fallback_all_hidden_skips() -> void:
     }
     anchors["repair_btn"].hide()
     anchors["restore_btn"].hide()
-    Director.register_scene("storage [DEBUG-PASS]", anchors)
+    Director.register_scene("test_storage [DEBUG-PASS]", anchors)
     Director.start_script("storage")
     # Advance through steps 0-2.
     Director.advance_step()
@@ -161,10 +171,9 @@ func test_anchor_fallback_all_hidden_skips() -> void:
 
 func test_offer_accept_emits_signal() -> void:
     watch_signals(Director)
-    # Register storage anchors so that accepting the offer (which triggers
-    # start_script("storage") via ScriptDirector) doesn't produce anchor
-    # validation errors that would fail the test.
-    Director.register_scene("storage", _storage_anchors())
+    # Register storage anchors so that accepting the offer does not produce
+    # anchor validation errors.
+    Director.register_scene("test_storage [DIRECTOR-TEST]", _storage_anchors())
     Director.show_offer_prompt("storage", "Test offer?", "Accept")
     assert_true(Director.is_offer_showing(), "offer is showing after show_offer_prompt")
     Director.accept_offer()
@@ -178,7 +187,6 @@ func test_offer_accept_emits_signal() -> void:
 
 func test_unknown_script_id_does_not_stick_offer() -> void:
     Director.start_script(UNKNOWN_SCRIPT_ID)
-    # start_script with unknown script calls _hide_overlay() → _clear_playback_state()
     assert_eq(Director.step_count(), 0, "step_count is 0 after unknown script")
     assert_eq(Director.step_index(), 0, "step_index is 0 after unknown script")
     assert_false(Director.is_offer_showing(), "no offer popup stuck after unknown script")
@@ -202,12 +210,28 @@ func test_completing_tutorial_marks_seen() -> void:
         "hub not seen before tutorial completes",
     )
     Director.start_script("hub")
-    # Advance through all steps to trigger _end_tutorial.
-    for i in HUB_SCRIPT_SIZE:
-        Director.advance_step()
+    # Advance through NEXT steps (0, 1), then register "storage" to complete
+    # the SCENE_ENTERED step (2).
+    Director.advance_step()
+    Director.advance_step()
+    Director.register_scene("storage", { "storage_btn": _make_anchor_button() })
     assert_true(
         MetaManager.progress.tutorial_seen.has("hub"),
         "hub marked seen after completing all steps",
+    )
+
+
+func test_reset_runtime_clears_active_tutorial_without_marking_seen() -> void:
+    Director.start_script("hub")
+    assert_eq(Director.step_count(), HUB_SCRIPT_SIZE, "tutorial active before reset")
+
+    ScriptDirector.reset_runtime()
+
+    assert_eq(Director.step_count(), 0, "tutorial cleared after runtime reset")
+    assert_eq(Director.step_index(), 0, "step index reset after runtime reset")
+    assert_false(
+        MetaManager.progress.tutorial_seen.has("hub"),
+        "runtime reset should not mark tutorial seen",
     )
 
 # ══ Script registry ═══════════════════════════════════════════════════════════
@@ -229,16 +253,12 @@ func test_unknown_script_id_returns_empty() -> void:
 
 
 func test_validate_anchors_finds_missing() -> void:
-    var missing := TutorialScripts.validate_anchors("hub", { "slot_label": _make_anchor_button() })
-    assert_true("storage_btn" in missing, "storage_btn reported missing")
+    var missing := TutorialScripts.validate_anchors("storage", { "item_browser": _make_anchor_button() })
+    assert_true("detail_rail" in missing, "detail_rail reported missing")
 
 
 func test_validate_anchors_empty_when_all_present() -> void:
-    var full_anchors := {
-        "slot_label": _make_anchor_button(),
-        "storage_btn": _make_anchor_button(),
-    }
-    var missing := TutorialScripts.validate_anchors("hub", full_anchors)
+    var missing := TutorialScripts.validate_anchors("storage", _storage_anchors())
     assert_true(missing.is_empty(), "no missing anchors when all present")
 
 
@@ -309,7 +329,7 @@ func test_auto_preferred_side_default() -> void:
 func test_full_viewport_target_uses_centered_fallback() -> void:
     var screen := Director.get_viewport().get_visible_rect().size
     var big_btn := Button.new()
-    big_btn.size = screen * 0.95 # large enough to trigger ≥90% fallback
+    big_btn.size = screen * 0.95
     add_child(big_btn)
     _owned_controls.append(big_btn)
 
@@ -332,9 +352,7 @@ func test_tutorial_target_fallback_resolves_when_primary_hidden() -> void:
             "fallback_target": fallback,
         },
     )
-    # The primary TutorialTarget is hidden; get_target_rect should return empty.
     var primary_rect := Director.get_target_rect("target_btn")
     assert_eq(primary_rect.size, Vector2(0, 0), "hidden primary target returns empty rect")
-    # The fallback TutorialTarget renders normally.
     var fallback_rect := Director.get_target_rect("fallback_target")
     assert_eq(fallback_rect.size, Vector2(200, 100), "visible fallback target rect ok")

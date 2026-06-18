@@ -1,7 +1,7 @@
 # director.gd
-# Tutorial presentation layer — owns the dim overlay, step playback, and Help
-# button. Knows nothing about game state or when tutorials should trigger
-# callers (ScriptDirector, ShotPilot, Help button) drive it via public commands.
+# Tutorial presentation layer — owns the dim overlay, step rendering, offer
+# prompt, Help button, and anchor registry. Knows nothing about step order or
+# wait conditions. The flow layer (ScriptDirector) owns all tutorial state.
 # Inserted after SceneRouter, before ScriptDirector in autoload order.
 extends Node
 
@@ -12,19 +12,23 @@ const PANEL_BORDER := Color(0.3, 0.3, 0.35, 1.0)
 const TEXT_COLOR := Color(0.88, 0.88, 0.92, 1.0)
 
 ## Emitted when a scene registers its anchors. ScriptDirector connects to this
-## to decide whether to auto-start a tutorial, show an offer, or show Help.
+## to decide whether to start a tutorial, show an offer, or show Help.
 signal scene_registered(scene_id: String)
+
+## Emitted when the player clicks Next on a hint or popup step.
+signal advance_requested
+
+## Emitted when the player closes the tutorial with the close (x) button.
+signal tutorial_closed
 
 ## Emitted when the user accepts the offer prompt. Payload is the script_id that
 ## was passed to [method show_offer_prompt].
 signal offer_accepted(script_id: String)
 
-## Emitted when the user skips the offer prompt. Director already marks the
-## script as seen and shows the Help button before emitting.
+## Emitted when the user skips the offer prompt.
 signal offer_skipped(script_id: String)
 
-## Emitted when a tutorial script finishes (all steps exhausted or SCENE_ENTERED
-## advance triggered).
+## Emitted when a tutorial script finishes (all steps exhausted or ended).
 signal script_completed(script_id: String)
 
 # ── Overlay nodes (code-built) ─────────────────────────────────────────────────
@@ -45,20 +49,20 @@ var _popup_next: Button
 var _popup_close: Button
 var _help_btn: Button
 
-# ── Playback state ─────────────────────────────────────────────────────────────
-var _is_tutorial_active := false
-var _current_script: Array[TutorialStep] = []
-var _current_step_index := 0
-var _current_script_id := ""
-var _current_scene_id := ""
+# ── Presentation state ─────────────────────────────────────────────────────────
 var _anchors: Dictionary = { }
 var _is_offer_showing := false
 var _offer_script_id := ""
 var _help_script_id := ""
+var _current_scene_id := ""
+
+## The step currently being rendered — used by _process for per-frame
+## anchor tracking. Set by render_step(), cleared by hide_tutorial_overlay().
+var _rendered_step: TutorialStep = null
 
 ## Cached target geometry used to skip redundant per-frame layout recalculations.
-## Reset at each step transition in _show_step and whenever the rect changes
-## during _process. Stores { rect: Rect2, preferred: int }.
+## Reset at each step transition in render_step and whenever the rect changes
+## during _process.
 var _last_target_info: Dictionary = { }
 
 
@@ -68,72 +72,125 @@ func _ready() -> void:
     set_process(false)
     _position_help_btn.call_deferred()
 
+## The scene id most recently registered.
+var current_scene_id: String:
+    get:
+        return _current_scene_id
+
+
+## Whether the offer prompt is currently visible.
+func is_offer_showing() -> bool:
+    return _is_offer_showing
+
+
+## Whether a tutorial step is currently being rendered.
+func is_tutorial_active() -> bool:
+    return _rendered_step != null
+
+
+## Returns the full anchors dictionary for the current scene.
+func get_anchors() -> Dictionary:
+    return _anchors.duplicate()
+
 
 ## Consume ESC/ui_settings while the tutorial cover or offer prompt is visible
 ## to prevent SettingsStore from pausing the tree (which would deadlock both
 ## overlays since the dim cover blocks the settings panel).
 func _unhandled_input(event: InputEvent) -> void:
-    if (_is_tutorial_active or _is_offer_showing) and event.is_action_pressed("ui_settings"):
+    if (_rendered_step != null or _is_offer_showing) and event.is_action_pressed("ui_settings"):
         get_viewport().set_input_as_handled()
+
+# ══ Anchor management ══════════════════════════════════════════════════════════
 
 
 ## Entry point for scenes. Registers [param anchors] for the current scene
 ## identified by [param scene_id]. Emits [signal scene_registered] so the
-## orchestration layer can decide what to do.
+## flow layer can decide what to do.
 func register_scene(scene_id: String, anchors: Dictionary) -> void:
     _current_scene_id = scene_id
     _anchors = anchors.duplicate()
-    _hide_overlay()
-    _help_btn.visible = false
-    _help_script_id = ""
-    _offer_script_id = ""
     _last_target_info = { }
+    # Do not clear overlay or flow state here — ScriptDirector handles that.
     scene_registered.emit(scene_id)
 
 
 ## Registers a single [param anchor] node under [param id] without resetting the
-## scene's full anchor map or overlay state. Intended for dynamic elements like
-## chooser popup options that appear and disappear during the scene's lifetime.
+## scene's full anchor map. Intended for dynamic elements like chooser popup
+## options that appear and disappear during the scene's lifetime.
 func register_anchor(id: String, anchor: Variant) -> void:
     _anchors[id] = anchor
 
 
-## Removes the anchor registered under [param id]. Does not reset overlay state.
+## Removes the anchor registered under [param id].
 func unregister_anchor(id: String) -> void:
     _anchors.erase(id)
 
+# ══ Public commands — delegate flow to ScriptDirector ═════════════════════════
+
 
 ## Starts playback of the tutorial script identified by [param script_id].
-## Safe to call at any time — the script's steps are all explain-only.
+## Delegates to the flow layer.
 func start_script(script_id: String) -> void:
-    var script: Array[TutorialStep] = TutorialScripts.resolve_script(script_id)
-    if script.is_empty():
-        ToastManager.show_dev_error("Director.start_script: unknown script '%s'" % script_id)
-        _hide_overlay()
-        _clear_playback_state()
-        return
+    ScriptDirector.start_script(script_id)
 
-    var missing_anchors := TutorialScripts.validate_anchors(script_id, _anchors)
-    if not missing_anchors.is_empty():
-        ToastManager.show_dev_error(
-            "Director: script '%s' references unregistered anchors in scene '%s': %s"
-            % [script_id, _current_scene_id, ", ".join(missing_anchors)],
-        )
 
-    _current_script = script
-    _current_script_id = script_id
-    _current_step_index = 0
-    _is_tutorial_active = true
-    _is_offer_showing = false
-    _help_btn.visible = false
-    _last_target_info = { }
-    _show_step()
+## Advances one step (as if the user clicked Next). Delegates to the flow layer
+## by emitting [signal advance_requested].
+func advance_step() -> void:
+    advance_requested.emit()
+
+# ══ Public accessors — delegated to ScriptDirector ════════════════════════════
+
+
+## Returns the current step index during playback.
+func step_index() -> int:
+    return ScriptDirector.step_index()
+
+
+## Returns the total number of steps in the active script.
+func step_count() -> int:
+    return ScriptDirector.step_count()
+
+
+## Returns the anchor_id for the step at [param idx], or "" if out of range.
+func step_anchor_id(idx: int) -> String:
+    return ScriptDirector.step_anchor_id(idx)
+
+
+## Returns the anchor registered under [param id] (Control or TutorialTarget),
+## or null.
+func get_anchor(id: String) -> Variant:
+    return _anchors.get(id) if _anchors.has(id) else null
+
+
+## Returns the resolved global rect for the target registered under [param id].
+## Handles both plain Control references and TutorialTarget nodes. Returns an
+## empty Rect2 when the id is unknown.
+func get_target_rect(id: String) -> Rect2:
+    var raw = _anchors.get(id)
+    if raw == null:
+        return Rect2()
+    if raw is TutorialTarget:
+        if not _is_node_renderable(raw):
+            return Rect2()
+        return raw.get_tutorial_rect()
+    if raw is Control:
+        if not _is_node_renderable(raw):
+            return Rect2()
+        return raw.get_global_rect()
+    return Rect2()
+
+
+## Returns the hint panel node, or null if not yet built.
+func get_hint_panel() -> PanelContainer:
+    return _hint_panel
+
+# ══ Offer prompt ═══════════════════════════════════════════════════════════════
 
 
 ## Shows a centered offer prompt with the given text. When the user accepts,
 ## [signal offer_accepted] is emitted with [param script_id]; when declined,
-## Director marks the script as seen, shows the Help button, and emits
-## [signal offer_skipped].
+## [signal offer_skipped] is emitted.
 func show_offer_prompt(script_id: String, offer_text: String, accept_text: String) -> void:
     _offer_script_id = script_id
     _is_offer_showing = true
@@ -151,16 +208,43 @@ func show_offer_prompt(script_id: String, offer_text: String, accept_text: Strin
     _popup_close.text = "Skip"
     _popup_close.visible = true
 
-    # Disconnect old slot signatures to avoid duplicates, then connect.
     _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
     _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
     _popup_close.pressed.connect(_on_offer_skip_pressed)
     _popup_next.pressed.connect(_on_offer_start_pressed)
 
 
+## Hides the offer prompt without emitting signals.
+func hide_offer_prompt() -> void:
+    _is_offer_showing = false
+    _dim_full.visible = false
+    _popup_panel.visible = false
+    _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
+    _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
+
+
+## Accepts the current offer prompt. Emits [signal offer_accepted] only after
+## confirming the referenced script still resolves. Unknown scripts are silently
+## dismissed with a dev error (preserving the old Director.accept_offer contract).
+func accept_offer() -> void:
+    if not _is_offer_showing:
+        return
+    _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
+    _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
+    _popup_close.text = "x"
+    var script_id := _offer_script_id
+    if TutorialScripts.resolve_script(script_id).is_empty():
+        ToastManager.show_dev_error("Director.accept_offer: script '%s' no longer resolves" % script_id)
+        _hide_offer_state()
+        return
+    _hide_offer_state()
+    offer_accepted.emit(script_id)
+
+# ══ Help button ════════════════════════════════════════════════════════════════
+
+
 ## Makes the Help button visible for the given [param script_id]. Pressing the
-## button replays the tutorial via [method start_script]. The button persists
-## across tutorial completions until a new scene registers.
+## button replays the tutorial via the flow layer.
 func show_help_button(script_id: String) -> void:
     _help_script_id = script_id
     _help_btn.visible = true
@@ -172,25 +256,59 @@ func hide_help_button() -> void:
     _help_script_id = ""
     _help_btn.visible = false
 
-# ══ Step display ═══════════════════════════════════════════════════════════════
+# ══ Step rendering (called by ScriptDirector) ═════════════════════════════════
 
 
-func _is_node_renderable(node: Node) -> bool:
-    if not is_instance_valid(node):
-        return false
-    if not node.is_visible_in_tree():
-        return false
-    return true
+## Renders the given [param step] on the overlay. Called by the flow layer
+## after evaluating advance conditions. The Director owns no flow state:
+## it only renders what it is told.
+func render_step(step: TutorialStep) -> void:
+    _rendered_step = step
+    _hide_step_ui()
+    _help_btn.visible = false
+    _last_target_info = { }
+    set_process(false)
+
+    match step.kind:
+        TutorialStep.Kind.HINT:
+            _show_hint(step)
+        TutorialStep.Kind.POPUP:
+            _show_popup(step)
 
 
-func _is_rect_positive(rect: Rect2) -> bool:
-    return rect.size.x > 0.0 and rect.size.y > 0.0
+## Hides the tutorial overlay but does not clear flow state. Called by the
+## flow layer when a tutorial ends or pauses across scene transitions.
+func hide_tutorial_overlay() -> void:
+    _hide_step_ui()
+    set_process(false)
+    _rendered_step = null
+
+
+## Clears all non-persistent tutorial presentation state. Called when save-slot
+## state is reset or switched so stale overlays, offers, Help buttons, and
+## anchors cannot suppress the next scene's tutorial trigger.
+func reset_tutorial_presentation() -> void:
+    hide_tutorial_overlay()
+    hide_offer_prompt()
+    hide_help_button()
+    _anchors.clear()
+    _current_scene_id = ""
+    _offer_script_id = ""
+    _last_target_info = { }
+
+
+## Called by ScriptDirector after a tutorial completes. Emits the
+## [signal script_completed] signal for backward compatibility.
+func notify_script_completed(script_id: String) -> void:
+    script_completed.emit(script_id)
+
+# ══ Target resolution (shared with ScriptDirector) ════════════════════════════
 
 
 ## Resolves a TutorialStep's target to a { rect, preferred } dictionary.
 ## Accepts both plain Control references and TutorialTarget nodes registered
 ## as anchors. Returns an empty dictionary when nothing resolves.
-func _resolve_target(step: TutorialStep) -> Dictionary:
+func resolve_target(step: TutorialStep) -> Dictionary:
     var raw = _anchors.get(step.anchor_id)
     if raw == null:
         return _try_fallback_targets(step)
@@ -238,54 +356,26 @@ func _try_fallback_targets(step: TutorialStep) -> Dictionary:
     return { }
 
 
-func _advance_to_renderable_step() -> void:
-    while _current_step_index < _current_script.size():
-        var step: TutorialStep = _current_script[_current_step_index]
-        if step.kind == TutorialStep.Kind.POPUP:
-            return
-        if not _resolve_target(step).is_empty():
-            return
-        ToastManager.show_dev_error(
-            "Director: Skipping step %d: all targets non-renderable in scene '%s'"
-            % [_current_step_index, _current_scene_id],
-        )
-        _current_step_index += 1
+func _is_node_renderable(node: Node) -> bool:
+    if not is_instance_valid(node):
+        return false
+    if not node.is_visible_in_tree():
+        return false
+    return true
 
 
-func _show_step() -> void:
-    if _current_step_index >= _current_script.size():
-        _end_tutorial()
-        return
+func _is_rect_positive(rect: Rect2) -> bool:
+    return rect.size.x > 0.0 and rect.size.y > 0.0
 
-    _last_target_info = { }
-
-    _advance_to_renderable_step()
-
-    if _current_step_index >= _current_script.size():
-        _end_tutorial()
-        return
-
-    var step: TutorialStep = _current_script[_current_step_index]
-    _hide_step_ui()
-    _help_btn.visible = false
-    set_process(false)
-
-    match step.kind:
-        TutorialStep.Kind.HINT:
-            _show_hint(step)
-        TutorialStep.Kind.POPUP:
-            _show_popup(step)
+# ══ Step display ═══════════════════════════════════════════════════════════════
 
 
 func _show_hint(step: TutorialStep) -> void:
-    var target := _resolve_target(step)
+    var target := resolve_target(step)
     if target.is_empty():
         ToastManager.show_dev_error(
-            "Director._show_hint: step %d target unresolved despite advance guard"
-            % _current_step_index,
+            "Director._show_hint: step target unresolved — flow layer should have skipped",
         )
-        _current_step_index += 1
-        _show_step()
         return
 
     var t_rect: Rect2 = target.get("rect", Rect2())
@@ -335,123 +425,40 @@ func _hide_step_ui() -> void:
     _dim_right.visible = false
 
 
-func _hide_overlay() -> void:
-    _hide_step_ui()
-    _is_tutorial_active = false
+func _hide_offer_state() -> void:
     _is_offer_showing = false
-    set_process(false)
-    _clear_playback_state()
-
-# ══ Public commands (used by UI buttons, ScriptDirector, and ShotPilot) ══════
-
-
-## Returns the current step index during playback.
-func step_index() -> int:
-    return _current_step_index
-
-
-## Returns the total number of steps in the active script.
-func step_count() -> int:
-    return _current_script.size()
-
-
-## Returns the anchor_id for the step at [param idx], or "" if out of range.
-func step_anchor_id(idx: int) -> String:
-    if idx < 0 or idx >= _current_script.size():
-        return ""
-    return _current_script[idx].anchor_id
-
-
-## Returns true when the offer prompt is currently visible.
-func is_offer_showing() -> bool:
-    return _is_offer_showing
-
-
-## Returns the hint panel node, or null if not yet built.
-func get_hint_panel() -> PanelContainer:
-    return _hint_panel
-
-
-## Returns the anchor registered under [param id] (Control or TutorialTarget),
-## or null. Preserved for backward compatibility with harness code.
-func get_anchor(id: String) -> Variant:
-    return _anchors.get(id) if _anchors.has(id) else null
-
-
-## Returns the resolved global rect for the target registered under [param id].
-## Handles both plain Control references and TutorialTarget nodes. Returns an
-## empty Rect2 when the id is unknown.
-func get_target_rect(id: String) -> Rect2:
-    var raw = _anchors.get(id)
-    if raw == null:
-        return Rect2()
-    if raw is TutorialTarget:
-        if not _is_node_renderable(raw):
-            return Rect2()
-        return raw.get_tutorial_rect()
-    if raw is Control:
-        if not _is_node_renderable(raw):
-            return Rect2()
-        return raw.get_global_rect()
-    return Rect2()
-
-
-## Advances one step (as if the user clicked Next). Called by both the Next
-## button handlers and the ShotPilot harness. No-op when no tutorial is active.
-func advance_step() -> void:
-    if not _is_tutorial_active:
-        return
-    _current_step_index += 1
-    _show_step()
-
-
-## Accepts the current offer prompt (simulates clicking "Yes"). Called by both
-## the offer "Yes" button handler and the ShotPilot harness. No-op when no
-## offer is showing. Emits [signal offer_accepted] — the orchestration layer
-## decides what to do next (typically [method start_script]).
-func accept_offer() -> void:
-    if not _is_offer_showing:
-        return
-    _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
-    _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
-    _popup_close.text = "×"
-    var script_id := _offer_script_id
-    _is_offer_showing = false
-    if TutorialScripts.resolve_script(script_id).is_empty():
-        ToastManager.show_dev_error("Director.accept_offer: script '%s' no longer resolves" % script_id)
-        _hide_overlay()
-        _clear_playback_state()
-        _help_btn.visible = false
-        return
-    offer_accepted.emit(script_id)
+    _dim_full.visible = false
+    _popup_panel.visible = false
 
 # ══ Navigation buttons ═════════════════════════════════════════════════════════
 
 
+# Next — emit advance_requested for the flow layer to handle.
 func _on_hint_next_pressed() -> void:
-    advance_step()
+    advance_requested.emit()
 
 
 func _on_hint_close_pressed() -> void:
-    if not _is_tutorial_active:
+    if _rendered_step == null:
         return
-    _mark_seen(_current_script_id)
-    _hide_overlay()
-    if not _help_script_id.is_empty():
-        _help_btn.visible = true
+    tutorial_closed.emit()
 
 
 func _on_popup_next_pressed() -> void:
-    advance_step()
+    advance_requested.emit()
 
 
 func _on_popup_close_pressed() -> void:
-    if not _is_tutorial_active:
+    if _rendered_step == null:
         return
-    _mark_seen(_current_script_id)
-    _hide_overlay()
+    tutorial_closed.emit()
+
+
+func _on_help_pressed() -> void:
     if not _help_script_id.is_empty():
-        _help_btn.visible = true
+        ScriptDirector.start_script(_help_script_id)
+
+# ══ Offer button handlers ══════════════════════════════════════════════════════
 
 
 func _on_offer_start_pressed() -> void:
@@ -461,16 +468,10 @@ func _on_offer_start_pressed() -> void:
 func _on_offer_skip_pressed() -> void:
     _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
     _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
-    _popup_close.text = "×"
+    _popup_close.text = "x"
     var skipped_id := _offer_script_id
-    _mark_seen(skipped_id)
-    _hide_overlay()
-    show_help_button(skipped_id)
+    _hide_offer_state()
     offer_skipped.emit(skipped_id)
-
-
-func _on_help_pressed() -> void:
-    start_script(_help_script_id)
 
 
 func _offer_safe_disconnect(signal_obj: Signal, callable: Callable) -> void:
@@ -480,39 +481,9 @@ func _offer_safe_disconnect(signal_obj: Signal, callable: Callable) -> void:
 # ══ Scene change watcher ═══════════════════════════════════════════════════════
 
 
-func _clear_playback_state() -> void:
-    _current_script = []
-    _current_step_index = 0
-    _current_script_id = ""
-    _last_target_info = { }
-
-
 func _on_scene_changed() -> void:
-    if _is_tutorial_active and _current_step_index < _current_script.size():
-        var step: TutorialStep = _current_script[_current_step_index]
-        if step.advance == TutorialStep.Advance.SCENE_ENTERED:
-            var completed_id := _current_script_id
-            _mark_seen(completed_id)
-            _hide_overlay()
-            script_completed.emit(completed_id)
-
-# ══ Script management ══════════════════════════════════════════════════════════
-
-
-func _end_tutorial() -> void:
-    var completed_id := _current_script_id
-    _mark_seen(completed_id)
-    _hide_overlay()
-    _clear_playback_state()
-    if not _help_script_id.is_empty():
-        _help_btn.visible = true
-    script_completed.emit(completed_id)
-
-
-func _mark_seen(script_id: String) -> void:
-    if script_id.is_empty():
-        return
-    MetaManager.mark_tutorial_seen(script_id)
+    # Presentation only — inform the flow layer. No state clearing here.
+    pass
 
 # ══ Dim / hole layout ══════════════════════════════════════════════════════════
 
@@ -541,10 +512,40 @@ func _update_dim_hole(hole: Rect2) -> void:
         dim.visible = true
         dim.mouse_filter = Control.MOUSE_FILTER_STOP
 
+# ══ Per-frame hole update ══════════════════════════════════════════════════════
 
-## Tries to place [param panel] on the given [param side] of [param target_rect]
-## within screen bounds. Returns the position if it fits, or null if clipping
-## occurs.
+
+func _process(_delta: float) -> void:
+    if _rendered_step == null:
+        set_process(false)
+        return
+    if _rendered_step.kind != TutorialStep.Kind.HINT:
+        set_process(false)
+        return
+
+    var target := resolve_target(_rendered_step)
+    if target.is_empty():
+        return
+
+    var t_rect: Rect2 = target.get("rect", Rect2())
+    var preferred: int = target.get("preferred", TutorialTarget.PreferredSide.AUTO)
+
+    var cached_rect: Rect2 = _last_target_info.get("rect", Rect2())
+    if t_rect == cached_rect:
+        return
+    _last_target_info = { "rect": t_rect, "preferred": preferred }
+
+    _update_dim_hole(t_rect)
+
+    if not _rendered_step.unlock_anchor:
+        _dim_full.position = t_rect.position
+        _dim_full.size = t_rect.size
+
+    _position_near_anchor(_hint_panel, t_rect, preferred)
+
+# ══ Panel placement ════════════════════════════════════════════════════════════
+
+
 func _try_place_on_side(
         panel: Control,
         target_rect: Rect2,
@@ -577,9 +578,6 @@ func _try_place_on_side(
     return null
 
 
-## Positions [param panel] near [param target_rect], trying [param preferred_side]
-## first when set, then falling through RIGHT → LEFT → BOTTOM → centered.
-## Full-viewport targets (>=90% screen in both axes) are always centered.
 func _position_near_anchor(
         panel: Control,
         target_rect: Rect2,
@@ -590,8 +588,6 @@ func _position_near_anchor(
     panel.custom_minimum_size.x = 280.0
     var pw: float
 
-    # Full-viewport fallback: when the target covers most of the viewport, use
-    # a centered popup-style placement rather than edge-relative positioning.
     if target_rect.size.x >= screen.x * 0.9 and target_rect.size.y >= screen.y * 0.9:
         pw = panel.custom_minimum_size.x
         panel.position = Vector2(
@@ -600,14 +596,12 @@ func _position_near_anchor(
         )
         return
 
-    # Try preferred side first when explicitly set.
     if preferred_side != TutorialTarget.PreferredSide.AUTO:
         var pos := _try_place_on_side(panel, target_rect, preferred_side, screen, margin)
         if pos != null:
             panel.position = pos as Vector2
             return
 
-    # Default fallback order: RIGHT → LEFT → BOTTOM → TOP → centered.
     var fallback_order: Array[int] = [
         TutorialTarget.PreferredSide.RIGHT,
         TutorialTarget.PreferredSide.LEFT,
@@ -620,51 +614,11 @@ func _position_near_anchor(
             panel.position = pos as Vector2
             return
 
-    # Last resort: centered with margin.
     pw = panel.custom_minimum_size.x
     panel.position = Vector2(
         clampf((screen.x - pw) / 2, margin, screen.x - pw - margin),
         clampf(screen.y * 0.3, margin, screen.y - panel.size.y - margin if panel.size.y > 0 else screen.y - 200),
     )
-
-# ══ Per-frame hole update ══════════════════════════════════════════════════════
-
-
-func _process(_delta: float) -> void:
-    if not _is_tutorial_active:
-        set_process(false)
-        return
-    if _current_step_index >= _current_script.size():
-        set_process(false)
-        return
-
-    var step: TutorialStep = _current_script[_current_step_index]
-    if step.kind != TutorialStep.Kind.HINT:
-        set_process(false)
-        return
-
-    var target := _resolve_target(step)
-    if target.is_empty():
-        return
-
-    var t_rect: Rect2 = target.get("rect", Rect2())
-    var preferred: int = target.get("preferred", TutorialTarget.PreferredSide.AUTO)
-
-    # Skip redundant layout when the target rect has not changed since the last
-    # per-frame update. _last_target_info is reset at each step transition in
-    # _show_step, so stale data from a previous step never carries forward.
-    var cached_rect: Rect2 = _last_target_info.get("rect", Rect2())
-    if t_rect == cached_rect:
-        return
-    _last_target_info = { "rect": t_rect, "preferred": preferred }
-
-    _update_dim_hole(t_rect)
-
-    if not step.unlock_anchor:
-        _dim_full.position = t_rect.position
-        _dim_full.size = t_rect.size
-
-    _position_near_anchor(_hint_panel, t_rect, preferred)
 
 # ══ Helpers ════════════════════════════════════════════════════════════════════
 
@@ -705,7 +659,6 @@ func _build_overlay() -> void:
     _dim_full.visible = false
     _canvas.add_child(_dim_full)
 
-    # Hint panel
     _hint_panel = PanelContainer.new()
     _hint_panel.visible = false
     _hint_panel.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -735,7 +688,7 @@ func _build_overlay() -> void:
     hint_vbox.add_child(hint_btn_hbox)
 
     _hint_close = Button.new()
-    _hint_close.text = "×"
+    _hint_close.text = "x"
     _hint_close.flat = true
     _hint_close.pressed.connect(_on_hint_close_pressed)
     hint_btn_hbox.add_child(_hint_close)
@@ -745,7 +698,6 @@ func _build_overlay() -> void:
     _hint_next.pressed.connect(_on_hint_next_pressed)
     hint_btn_hbox.add_child(_hint_next)
 
-    # Popup panel
     _popup_panel = PanelContainer.new()
     _popup_panel.visible = false
     _popup_panel.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -782,7 +734,7 @@ func _build_overlay() -> void:
     popup_vbox.add_child(popup_btn_hbox)
 
     _popup_close = Button.new()
-    _popup_close.text = "×"
+    _popup_close.text = "x"
     _popup_close.flat = true
     _popup_close.pressed.connect(_on_popup_close_pressed)
     popup_btn_hbox.add_child(_popup_close)
@@ -792,7 +744,6 @@ func _build_overlay() -> void:
     _popup_next.pressed.connect(_on_popup_next_pressed)
     popup_btn_hbox.add_child(_popup_next)
 
-    # Help button (bottom-left corner)
     _help_btn = Button.new()
     _help_btn.text = "?"
     _help_btn.visible = false
@@ -802,7 +753,6 @@ func _build_overlay() -> void:
     _help_btn.position = Vector2(8, 0)
     _canvas.add_child(_help_btn)
 
-    # Style panels
     for panel in [_hint_panel, _popup_panel]:
         var sb := StyleBoxFlat.new()
         sb.bg_color = PANEL_BG

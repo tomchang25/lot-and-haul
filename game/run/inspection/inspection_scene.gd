@@ -90,6 +90,16 @@ func _ready() -> void:
     _populate_browser()
     _refresh_hud()
     _clear_detail_section()
+    Director.register_scene(
+        "inspection",
+        {
+            "item_browser": _item_browser,
+            "pass_btn": _pass_button,
+            "review_btn": _review_button,
+            "unveil_btn": _action_unveil_button,
+            "inspect_btn": _action_inspect_button,
+        },
+    )
 
 
 func _process(_delta: float) -> void:
@@ -174,6 +184,7 @@ func _complete_action() -> void:
     _item_browser.refresh()
     _refresh_hud()
     _refresh_detail()
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_PERFORMED, { })
 
     if RunManager.lot.actions_remaining <= 0:
         _finish_inspection()

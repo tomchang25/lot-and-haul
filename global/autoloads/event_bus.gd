@@ -28,6 +28,12 @@ signal item_restored(entry: ItemEntry)
 ## run state cleared. [param result] — the RunResult snapshot that was consumed.
 signal run_resolved(result: RunResult)
 
+# ── Save lifecycle events ────────────────────────────────────────────────────
+
+## Emitted after SaveManager resets persistent providers for a new slot, loaded
+## slot, or test slot. Runtime-only systems use this to discard stale state.
+signal save_runtime_reset
+
 # ── Reveal-type business events ────────────────────────────────────────────────
 # Emitted by the owning Manager after a successful reveal-during-play mutation.
 # KnowledgeManager subscribes to award mastery XP without a direct import.
@@ -39,5 +45,13 @@ signal item_unveiled(entry: ItemEntry)
 ## Emitted after a surface or hidden clue is revealed through play during a
 ## run. [param entry] — the ItemEntry whose clue was revealed.
 signal item_revealed(entry: ItemEntry)
+
+# ── Tutorial events ──────────────────────────────────────────────────────────
+# Generic signal for semantic tutorial milestones. Gameplay emits; flow layer
+# subscribes. No gameplay system references tutorial copy or step order.
+
+## Emitted when a semantic gameplay milestone occurs. [param event_id] matches
+## TutorialEvents constants; [param payload] is reserved for future use.
+signal tutorial_event(event_id: StringName, payload: Dictionary)
 
 @warning_ignore_restore("unused_signal")

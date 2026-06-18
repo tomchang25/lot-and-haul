@@ -70,17 +70,20 @@ func _on_activity_pressed() -> void:
 
 func _on_auction_chosen() -> void:
     _close_chooser()
+    EventBus.tutorial_event.emit(TutorialEvents.ACTIVITY_CHOSEN, { })
     SceneRouter.go_to_location_select()
 
 
 func _on_storage_chosen() -> void:
     _close_chooser()
+    EventBus.tutorial_event.emit(TutorialEvents.ACTIVITY_CHOSEN, { })
     MetaManager.begin_storage_slot()
     SceneRouter.go_to_storage()
 
 
 func _on_sell_chosen() -> void:
     _close_chooser()
+    EventBus.tutorial_event.emit(TutorialEvents.ACTIVITY_CHOSEN, { })
     MetaManager.begin_open_shop()
     SceneRouter.go_to_customer_sell()
 

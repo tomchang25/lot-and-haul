@@ -118,6 +118,14 @@ func _ready() -> void:
         _init_debug_overlay()
     _start_npc_timer()
     _start_circle(0.0)
+    Director.register_scene(
+        "auction",
+        {
+            "bid_btn": _bid_button,
+            "pass_btn": _pass_button,
+            "price_label": _price_label,
+        },
+    )
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
@@ -337,6 +345,7 @@ func _win_now(price: int) -> void:
 
     RunManager.commit_lot_win(RunManager.lot.lot_items, price)
     AudioManager.play_event(AUCTION_WON)
+    EventBus.tutorial_event.emit(TutorialEvents.AUCTION_WON, { })
     SceneRouter.go_to_reveal()
 
 # ══ Budget refresh ══════════════════════════════════════════════════════════════

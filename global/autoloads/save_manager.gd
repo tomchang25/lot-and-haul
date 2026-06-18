@@ -110,6 +110,7 @@ func reset_providers() -> void:
     for provider: Object in _providers:
         if provider.has_method("reset"):
             provider.reset()
+    EventBus.save_runtime_reset.emit()
 
 
 ## Returns true when at least one save slot holds data.

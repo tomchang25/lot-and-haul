@@ -21,6 +21,13 @@ func _ready() -> void:
     _back_button.pressed.connect(_on_back_pressed)
     _back_button.press_event = CANCEL
     _populate_cards()
+    Director.register_scene(
+        "location_select",
+        {
+            "cards_container": _cards_container,
+            "back_btn": _back_button,
+        },
+    )
 
 # ══ Population ════════════════════════════════════════════════════════════════
 
@@ -42,6 +49,7 @@ func _on_card_pressed(card: LocationCard) -> void:
 
     MetaManager.begin_auction()
     RunManager.create_run_store(location, MetaManager.garage.active_car)
+    EventBus.tutorial_event.emit(TutorialEvents.LOCATION_SELECTED, { })
     SceneRouter.go_to_location_entry()
 
 

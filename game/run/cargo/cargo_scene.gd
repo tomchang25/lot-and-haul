@@ -116,6 +116,15 @@ func _ready() -> void:
     Debug.toggled.connect(_on_debug_toggled)
     if Debug.enabled:
         _init_debug_overlay()
+    Director.register_scene(
+        "cargo",
+        {
+            "item_list": _item_list_vbox,
+            "cargo_grid": _cargo_grid,
+            "continue_btn": _continue_btn,
+            "reset_btn": _reset_btn,
+        },
+    )
 
 
 func _input(event: InputEvent) -> void:
@@ -219,6 +228,7 @@ func _on_confirm_popup_confirmed() -> void:
             unplaced_count += 1
 
     RunManager.commit_cargo(cargo, trailer, unplaced_count * Economy.ONSITE_SELL_PRICE)
+    EventBus.tutorial_event.emit(TutorialEvents.CARGO_LOADED, { })
     SceneRouter.go_to_run_review()
 
 

@@ -284,6 +284,7 @@ func resolve_customer_sale(
         customers.remove_customer(customer)
     for entry: ItemEntry in items:
         EventBus.sale_resolved.emit(entry)
+    EventBus.tutorial_event.emit(TutorialEvents.SALE_COMPLETED, { })
     SaveManager.save()
 
 # ══ Storage AP actions ════════════════════════════════════════════════════════

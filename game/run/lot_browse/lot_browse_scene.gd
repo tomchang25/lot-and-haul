@@ -43,6 +43,14 @@ func _ready() -> void:
 
     _build_all_cards()
     _refresh_view()
+    Director.register_scene(
+        "lot_browse",
+        {
+            "lot_cards": _lot_card_container,
+            "cargo_btn": _cargo_button,
+            "skip_btn": _skip_button,
+        },
+    )
 
 # ══ View helpers ══════════════════════════════════════════════════════════════
 
@@ -88,6 +96,7 @@ func _on_enter_pressed() -> void:
     var entry := LotEntry.create(lot_data)
     RunManager.set_lot(entry)
     RunManager.advance_browse_index()
+    EventBus.tutorial_event.emit(TutorialEvents.LOT_SELECTED, { })
     SceneRouter.go_to_inspection()
 
 

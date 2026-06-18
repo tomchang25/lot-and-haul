@@ -23,11 +23,16 @@ or study Knowledge to improve your attributes.",
         ),
         TutorialStep.new(
             TutorialStep.Kind.HINT,
-            "Let's visit the Workshop to see what items you've collected. \
+            "Let's visit the Workshop to see what you've collected. \
 Click the Storage button to continue.",
             "storage_btn",
             TutorialStep.Advance.SCENE_ENTERED,
             true,
+            null,
+            [],
+            false,
+            &"",
+            "storage",
         ),
     ]
 
@@ -112,12 +117,18 @@ static func known_script_ids() -> Array[String]:
     return ["hub", "storage"]
 
 
+## Returns anchor ids referenced by [param script_id] that are absent from
+## [param anchors] and are expected to be renderable in the current scene.
+## Steps whose advance is SCENE_ENTERED or EVENT may target a different scene,
+## so their anchors are not flagged here.
 static func validate_anchors(script_id: String, anchors: Dictionary) -> Array[String]:
     var missing: Array[String] = []
     var script := resolve_script(script_id)
     if script.is_empty():
         return missing
     for step: TutorialStep in script:
+        if step.advance in [TutorialStep.Advance.SCENE_ENTERED, TutorialStep.Advance.EVENT]:
+            continue
         if not step.anchor_id.is_empty() and not anchors.has(step.anchor_id):
             missing.append(step.anchor_id)
         for fallback_id: String in step.fallback_anchor_ids:
