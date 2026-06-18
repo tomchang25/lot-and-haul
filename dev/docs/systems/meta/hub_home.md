@@ -4,19 +4,19 @@ Meta block group in `game/meta/` — hub navigation, the slot tray that allocate
 
 ## Goal
 
-Be the calm between runs: the place where the player converts won cargo into cash, spends cash on progression, and allocates the day's three slots. Success is a hub that frames every major meta system (knowledge, storage, selling, vehicles) without itself becoming a minigame.
+Be the calm between runs: the place where the player converts won cargo into cash, spends cash on progression, and allocates the day's Day/Night activity slots. Success is a hub that frames every major meta system (knowledge, storage, selling, vehicles) without itself becoming a minigame.
 
 ## Hub Navigation Flow
 
-The slot tray presents three slots (Morning / Afternoon / Evening). Each open slot exposes an activity chooser:
+The slot tray presents two slots, Day and Night. The Activity button opens a cancellable chooser for the activities valid in the current slot:
 
-- **Auction** (slot 1 only; greyed otherwise) — consumes slots 1+2, transitions to location select.
-- **Storage** — begins a fresh storage AP slot.
-- **Open Shop** — generates slot-scaled nightly customers and ends the day via the customer-sell scene.
+- **Auction** (Day only) — consumes the Day slot, transitions to location select, and returns to hub for Night after run settlement.
+- **Storage** — begins a fresh storage AP slot, with the larger Day budget or base Night budget.
+- **Open Shop** — generates Day/Night-scaled customers and advances one slot.
 - **Vehicle** — routes to Vehicle Hub (Garage car select + Car Shop).
 - **Knowledge** — routes to Knowledge Hub (Mastery / Attributes / Perks).
 
-When the day ends — Open Shop chosen, or all three slots spent — the hub asks `MetaManager` to close the day and routes the returned `DaySummary` to `DaySummaryScene`. Returning to hub re-runs `_ready()` and refreshes the display.
+When a Night activity advances past Night, the hub asks `MetaManager` to close the day and routes the returned `DaySummary` to `DaySummaryScene`. Returning to hub re-runs `_ready()` and refreshes the display.
 
 All slot transitions go through `MetaManager` (one method per activity); the hub never writes `current_day`, living cost, or customer state itself. Full slot/AP rules are in `../day_slot_economy.md`.
 

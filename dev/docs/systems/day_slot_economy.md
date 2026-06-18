@@ -1,6 +1,6 @@
 # Day-Slot Economy
 
-The structure of a calendar day and the action-point budgets that govern hub and run work. A day is three slots the player allocates to activities; storage work runs on a per-slot AP pool with deterministic research; auction inspection runs on a separate two-tier AP pool; and the nightly customer count scales with how much of the day was committed to selling. `MetaManager` is the single authority for slot progression, living cost, and the day-end sequence; `SaveManager` holds the persisted slot/AP state it mutates.
+The structure of a calendar day and the action-point budgets that govern hub and run work. A day is two ordered activity slots, Day then Night; storage work runs on a per-slot AP pool with deterministic research; auction inspection runs on a separate two-tier AP pool; and customer count scales by the chosen Day/Night selling slot. `MetaManager` is the single authority for slot progression, living cost, and the day-end sequence; `SaveManager` holds the persisted slot/AP state it mutates.
 
 ## Goal
 
@@ -8,19 +8,19 @@ Give the hub moment-to-moment agency and let a single day mix activities. Instea
 
 ## The Slot Day
 
-Each calendar day is three ordered slots — Morning, Afternoon, Evening — tracked by `SaveManager.current_slot` (1–3). The three activities a slot can hold:
+Each calendar day is two ordered slots, Day then Night. The hub exposes one Activity button; pressing it opens a chooser for the activities valid in the current slot. Cancelling the chooser consumes nothing.
 
-- **Auction** — Morning only. Consumes the morning _and_ afternoon slots: choosing it advances `current_slot` to 3, so the player travels, inspects/bids/loads cargo, and returns for the Evening slot. One auction per day.
-- **Storage** — Available in any open slot. Begins a fresh per-slot AP pool (see Storage AP). Multiple Storage slots in a day stack into proportionally more work because each grants its own full pool.
-- **Open Shop** — Triggers the nightly customer sell and ends the day. The number of slots still uncommitted when Open Shop is chosen becomes the _selling-slot commitment_ that scales customer traffic.
+- **Auction** — Day only. Consumes the Day slot, so the player travels, inspects/bids/loads cargo, and returns for the Night slot. One auction per day.
+- **Storage** — Available in Day or Night. Begins a fresh per-slot AP pool (see Storage AP) and advances exactly one slot.
+- **Open Shop** — Available in Day or Night. Generates customer traffic for the chosen slot and advances exactly one slot.
 
-`MetaManager` owns the slot transitions: a method per activity advances `current_slot` and seeds the relevant state. Open Shop pushes `current_slot` past 3 as a sentinel; the hub, seeing `current_slot > 3` on re-entry, runs the day-end sequence. The day also ends naturally once all three slots are spent.
+`MetaManager` owns the slot transitions: a method per activity advances `current_slot` and seeds the relevant state. Every activity advances exactly one step: Day to Night, Night to day-ending. The hub, seeing the day-ending sentinel on re-entry, runs the day-end sequence.
 
-A completed auction returns the player to the Evening slot (`current_slot = 3`) and stashes the run's economics as a _pending run_ on `SaveManager`, persisted so a quit before day-end doesn't drop them. The day-end sequence folds those pending economics, plus the night's customer sales, into the day summary, advances `current_day`, deducts living cost once, and resets slot state for the next day.
+A completed auction returns the player to the Night slot and stashes the run's economics as a _pending run_ on `SaveManager`, persisted so a quit before day-end doesn't drop them. The day-end sequence folds those pending economics, plus customer sales, into the day summary, advances `current_day`, deducts living cost once, and resets slot state for the next day.
 
 ## Storage AP
 
-Storage actions spend from a per-**slot** AP pool, not a per-day one. Beginning a Storage slot refreshes the pool to its maximum (10); leftover AP is discarded when the slot ends and never carries forward. A two-Storage-slot day therefore grants 10 + 10 = 20 AP of total work, and the cost of doing more is the auction or selling slot given up — not a shared daily ceiling.
+Storage actions spend from a per-**slot** AP pool, not a per-day one. Beginning a Day Storage slot refreshes the pool to the enlarged working-day budget (25 with current constants); beginning a Night Storage slot refreshes it to the base budget (10). Leftover AP is discarded when the slot ends and never carries forward, and the cost of doing more storage is the auction or selling slot given up, not a shared daily ceiling.
 
 Three actions, each applied immediately on the button press (no day-tick delay):
 
@@ -62,15 +62,14 @@ Both values are resolved once at run construction through dedicated resolvers on
 
 ## Customer Scaling
 
-Opening shop maps the selling-slot commitment to a nightly customer count, passed to the customer generator:
+Opening shop maps the current Day/Night slot to a customer count, passed to the customer generator:
 
-| Selling slots committed            | Customers |
-| ---------------------------------- | --------- |
-| 1 (Evening only, after an auction) | 2–3       |
-| 2 (Afternoon + Evening)            | 4–6       |
-| 3 (full day)                       | 7–10      |
+| Slot  | Customers |
+| ----- | --------- |
+| Day   | 4–6       |
+| Night | 2–3       |
 
-Opening shop in slot 1 commits the whole day and yields max traffic; opening after an auction commits only the Evening for base traffic. The customer-sell mechanics themselves are unchanged — only the count is derived here (see `customer_sell.md`).
+Opening shop during Day yields the larger traffic window and still leaves Night available afterward. Opening shop during Night yields the smaller traffic window and advances to day-ending. The customer-sell mechanics themselves are unchanged - only the count is derived here (see `customer_sell.md`).
 
 ## Living Cost
 
@@ -78,7 +77,7 @@ Living cost ($100/day) is deducted once per calendar day during the day-end sequ
 
 ## Persistence
 
-`SlotStore` persists the current slot index, storage AP, selling-slot commitment, and the pending-run economics dict. Storage AP is effectively ephemeral — it refreshes at each Storage slot and resets to 0 at day-end. Per-clue research progress persists on each `ItemEntry` and serializes with it. Auction AP (both tiers) is run-scoped: seeded at visit construction, cleared with run state, never persisted across sessions.
+`SlotStore` persists the current slot index, storage AP, the legacy selling-slot field for save compatibility, and the pending-run economics dict. Storage AP is effectively ephemeral - it refreshes at each Storage slot and resets to 0 at day-end. Per-clue research progress persists on each `ItemEntry` and serializes with it. Auction AP (both tiers) is run-scoped: seeded at visit construction, cleared with run state, never persisted across sessions.
 
 ## Invariants
 

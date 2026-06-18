@@ -233,7 +233,10 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 > Ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched.
 > All phases shipped → archive the plan file + delete this line.
 
-- [timeslot] Two-slot Day/Night hub model: per-slot activity chooser, every activity consumes one slot, Day-enlarged Storage/Selling budgets — see `dev/docs/plans/timeslot_day_night_rework.md`
+Nothing currently in progress.
+
+- [tutorial_infra] Tutorial presentation/flow split + event-based advance for interactive onboarding — see `dev/docs/plans/tutorial_infrastructure_rework.md`
+- [onboarding] First-game onboarding: Hub → Auction run → Storage → Selling over two real days, on the new tutorial machinery — see `dev/docs/plans/onboarding_flow.md`
 
 ---
 
@@ -254,18 +257,15 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 - [balance_preview_v2] Balance preview HTML report — rich HTML output with per-clue information tables, category breakdowns, affix-aware balance preview mode, and value distribution charts
 
-- [tutorial_infra] Tutorial presentation/flow split + event-based advance for interactive onboarding — see `dev/docs/plans/tutorial_infrastructure_rework.md`
-- [onboarding] First-game onboarding: Hub → Auction run → Storage → Selling over two real days, on the new tutorial machinery — see `dev/docs/plans/onboarding_flow.md`
-
 ---
 
 ## Chore
 
 One-line, no reasoning, no backing doc.
 
-​
-
 - [tutorial] tutorial cover whole gameplay
+
+​
 
 - [fix] update changelog before 0.2.0
 - [fix] update changelog rule to disallow unicode and force to be "compact"

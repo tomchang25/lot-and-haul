@@ -91,6 +91,18 @@ func register_scene(scene_id: String, anchors: Dictionary) -> void:
     scene_registered.emit(scene_id)
 
 
+## Registers a single [param anchor] node under [param id] without resetting the
+## scene's full anchor map or overlay state. Intended for dynamic elements like
+## chooser popup options that appear and disappear during the scene's lifetime.
+func register_anchor(id: String, anchor: Variant) -> void:
+    _anchors[id] = anchor
+
+
+## Removes the anchor registered under [param id]. Does not reset overlay state.
+func unregister_anchor(id: String) -> void:
+    _anchors.erase(id)
+
+
 ## Starts playback of the tutorial script identified by [param script_id].
 ## Safe to call at any time — the script's steps are all explain-only.
 func start_script(script_id: String) -> void:

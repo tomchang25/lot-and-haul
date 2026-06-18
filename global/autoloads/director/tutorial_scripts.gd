@@ -9,8 +9,8 @@ static func hub_script() -> Array[TutorialStep]:
         TutorialStep.new(
             TutorialStep.Kind.HINT,
             "This shows the current day and your available time slots. \
-You have three slots per day: Morning, Afternoon, and Evening. \
-Each slot can be used for one activity.",
+You have two slots per day: Day and Night. \
+Each slot can be used for one activity. Click the Activity button to choose.",
             "slot_label",
             TutorialStep.Advance.NEXT,
             false,

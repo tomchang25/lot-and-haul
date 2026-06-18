@@ -55,6 +55,11 @@ func record_sale(
     )
 
 
+## Clears the nightly customer list. Does not save.
+func clear_customers() -> void:
+    _nightly_customers.clear()
+
+
 ## Clears the daily sales ledger. Does not save.
 func clear_sales() -> void:
     _customer_sales_today.clear()

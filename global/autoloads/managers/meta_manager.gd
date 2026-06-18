@@ -1,11 +1,12 @@
 # meta_manager.gd
-# Hub-phase transactional authority. Holds six domain stores (EconomyStore,
-# GarageStore, StorageStore, SlotStore, ProgressStore, CustomersStore); each
-# owns its domain's live fields, save payload, and the operations that mutate
-# them. Store references are plain public fields — scenes read state directly
-# via MetaManager.economy.cash, MetaManager.storage.storage_items, etc.
-# Cross-domain transactions (day end, run resolution, customer sale) remain here
-# as single coordinated methods that call store methods and save exactly once.
+# Hub-phase transactional authority. Holds seven domain stores (EconomyStore,
+# GarageStore, StorageStore, SlotStore, ProgressStore, CustomersStore,
+# ShopSessionStore); each owns its domain's live fields, save payload, and the
+# operations that mutate them. Store references are plain public fields — scenes
+# read state directly via MetaManager.economy.cash,
+# MetaManager.storage.storage_items, etc. Cross-domain transactions (day end,
+# run resolution, customer sale, shop close) remain here as single coordinated
+# methods that call store methods and save exactly once.
 extends Node
 
 # ── Domain stores ──────────────────────────────────────────────────────────────
@@ -16,6 +17,7 @@ var storage: StorageStore
 var slot: SlotStore
 var progress: ProgressStore
 var customers: CustomersStore
+var shop_session: ShopSessionStore
 
 
 func _ready() -> void:
@@ -25,6 +27,7 @@ func _ready() -> void:
     slot = SlotStore.new()
     progress = ProgressStore.new()
     customers = CustomersStore.new()
+    shop_session = ShopSessionStore.new()
     SaveManager.register_provider(self)
 
 
@@ -39,6 +42,7 @@ func reset() -> void:
     slot = SlotStore.new()
     progress = ProgressStore.new()
     customers = CustomersStore.new()
+    shop_session = ShopSessionStore.new()
 
 # ══ Save section interface ════════════════════════════════════════════════════
 
@@ -53,6 +57,7 @@ func to_dict() -> Dictionary:
     out[slot.section_id()] = slot.to_dict()
     out[progress.section_id()] = progress.to_dict()
     out[customers.section_id()] = customers.to_dict()
+    out[shop_session.section_id()] = shop_session.to_dict()
     return out
 
 
@@ -65,6 +70,7 @@ func from_dict(data: Dictionary, ctx: SaveLoadContext) -> void:
     slot.from_dict(data.get(slot.section_id(), { }), ctx)
     progress.from_dict(data.get(progress.section_id(), { }), ctx)
     customers.from_dict(data.get(customers.section_id(), { }), ctx)
+    shop_session.from_dict(data.get(shop_session.section_id(), { }), ctx)
 
 
 ## Aggregates validate() across all stores. Returns true when all pass.
@@ -76,6 +82,7 @@ func validate() -> bool:
     ok = slot.validate() and ok
     ok = progress.validate() and ok
     ok = customers.validate() and ok
+    ok = shop_session.validate() and ok
     return ok
 
 # ══ Cross-autoload cash helper ════════════════════════════════════════════════
@@ -132,57 +139,90 @@ func roll_available_locations() -> void:
 # ══ Slot economy — hub actions ════════════════════════════════════════════════
 
 
-## Begins a Storage slot: increments current_slot (consuming it) and refreshes
-## storage_ap to a full pool. Call before navigating to the storage scene.
-## Deferred save — flushed on the subsequent scene transition.
-func begin_storage_slot() -> void:
+## Advances the current slot by exactly one step: Day → Night → day-ending.
+## Does not save — callers commit after their activity-specific setup.
+func _advance_slot() -> void:
     slot.set_slot(slot.current_slot + 1)
-    slot.set_storage_ap(Economy.STORAGE_AP_MAX)
-    SaveManager.mark_dirty()
 
 
-## Begins a Deep Storage slot: advances the slot to Evening (3) and seeds
-## storage_ap with an enlarged pool (STORAGE_AP_MAX * DEEP_STORAGE_AP_MULTIPLIER).
-## Preserves the evening shop. Call before navigating to the storage scene.
-## Deferred save — flushed on the subsequent scene transition.
-func begin_deep_storage_slot() -> void:
-    var ap: int = roundi(Economy.STORAGE_AP_MAX * Economy.DEEP_STORAGE_AP_MULTIPLIER)
-    slot.set_storage_ap(ap)
-    slot.set_slot(3)
-    SaveManager.mark_dirty()
-
-
-## Begins an Auction slot: consumes morning + afternoon (slots 1 + 2) by
-## advancing current_slot to 3, returning the player to the evening slot.
-## Call before navigating to location select.
-func begin_auction() -> void:
-    if slot.current_slot != 1:
-        ToastManager.show_dev_error("Auction can only begin in slot 1 (Morning), got %d" % slot.current_slot)
+## Begins a Storage slot: validates Day or Night, refreshes storage_ap to a
+## full pool (Day grants the enlarged deep-storage AP budget; Night grants
+## base AP), advances one slot, and saves. Call before navigating to the
+## storage scene.
+func begin_storage_slot() -> void:
+    if slot.current_slot != SlotStore.SLOT_DAY and slot.current_slot != SlotStore.SLOT_NIGHT:
+        ToastManager.show_dev_error("Storage can only begin in slot Day or Night, got %d" % slot.current_slot)
         return
 
-    slot.set_slot(3)
+    var is_day: bool = slot.current_slot == SlotStore.SLOT_DAY
+    var ap: int = roundi(Economy.STORAGE_AP_MAX * Economy.DEEP_STORAGE_AP_MULTIPLIER) if is_day else Economy.STORAGE_AP_MAX
+    _advance_slot()
+    slot.set_storage_ap(ap)
+    SaveManager.mark_dirty()
+
+
+## Begins an Auction slot: validates Day, advances one slot to Night, and saves.
+## Call before navigating to location select.
+func begin_auction() -> void:
+    if slot.current_slot != SlotStore.SLOT_DAY:
+        ToastManager.show_dev_error("Auction can only begin in slot Day, got %d" % slot.current_slot)
+        return
+
+    _advance_slot()
     SaveManager.save()
 
 
-## Begins an Open Shop session: generates nightly customers scaled to the slots
-## committed, clears the nightly sales ledger, and marks current_slot > 3 so
-## the hub ends the day on re-entry after customer_sell completes.
-##
-## [param selling_slots] — 1 (evening only), 2 (afternoon + evening), or
-##   3 (full day). Pass 4 - current_slot at the moment Open Shop is chosen.
-func begin_open_shop(selling_slots: int) -> void:
-    slot.set_selling_slots_today(selling_slots)
-    slot.set_slot(4) # hub sees > 3 → triggers end_day
+## Begins an Open Shop session: validates Day or Night, generates nightly
+## customers scaled to the current slot (Day = larger volume, Night =
+## smaller), clears the nightly sales ledger, advances one slot, initialises
+## the shop session for the first customer, and saves.
+func begin_open_shop() -> void:
+    if slot.current_slot != SlotStore.SLOT_DAY and slot.current_slot != SlotStore.SLOT_NIGHT:
+        ToastManager.show_dev_error("Open Shop can only begin in slot Day or Night, got %d" % slot.current_slot)
+        return
+
+    var is_day: bool = slot.current_slot == SlotStore.SLOT_DAY
+    slot.set_selling_slots_today(0)
     customers.clear_sales()
-    _generate_nightly_customers(selling_slots)
+    var count: int
+    if is_day:
+        count = RandomUtils.randi_range(Economy.DAY_SELLING_CUSTOMER_MIN, Economy.DAY_SELLING_CUSTOMER_MAX)
+    else:
+        count = RandomUtils.randi_range(Economy.NIGHT_SELLING_CUSTOMER_MIN, Economy.NIGHT_SELLING_CUSTOMER_MAX)
+    var new_customers: Array[CustomerEntry] = CustomerGenerator.generate_for_night(storage.storage_items, count)
+    customers.set_customers(new_customers)
+    _advance_slot()
+    if not new_customers.is_empty():
+        open_shop_session(new_customers[0])
+    else:
+        shop_session.clear()
     SaveManager.save()
+
+
+## Initialises a shop session for [param customer]: sets the active customer,
+## clears the placement, and sets the boot-routing pointer to "customer_sell".
+## Does not save — caller commits.
+func open_shop_session(customer: CustomerEntry) -> void:
+    shop_session.set_active_customer(customer.customer_id)
+    shop_session.set_placement([])
+    shop_session.set_pending_scene(ShopSessionStore.SCENE_CUSTOMER_SELL)
+
+
+## Records the current [param placement] for [param customer] via the deferred
+## save throttle. Called on every customer switch and every grid change.
+func update_shop_session(customer: CustomerEntry, placement: Array) -> void:
+    shop_session.set_active_customer(
+        customer.customer_id if customer != null else "",
+    )
+    shop_session.set_placement(placement)
+    SaveManager.mark_dirty()
 
 
 ## Closes out the current calendar day: advances current_day, deducts living
 ## cost, captures customer sales, folds pending run economics, resets slot
 ## state, saves, and returns a DaySummary for the day summary scene.
 ##
-## The hub calls this automatically when current_slot > 3.
+## The hub calls this automatically when current_slot > SlotStore.SLOT_NIGHT.
 func end_day() -> DaySummary:
     var summary := DaySummary.new()
     summary.start_day = progress.current_day
@@ -209,7 +249,7 @@ func end_day() -> DaySummary:
         slot.clear_pending_run()
 
     # Reset for next day.
-    slot.set_slot(1)
+    slot.set_slot(SlotStore.SLOT_DAY)
     slot.set_storage_ap(0)
     slot.set_selling_slots_today(0)
     progress.clear_locations()
@@ -217,31 +257,7 @@ func end_day() -> DaySummary:
     SaveManager.save()
     return summary
 
-# ══ Nightly customers ═════════════════════════════════════════════════════════
-
-
-## Generates the nightly customer set scaled by [param selling_slots].
-## 1 → 2–3 customers, 2 → 4–6, 3 → 7–10. 0 → no customers.
-func _generate_nightly_customers(selling_slots: int) -> void:
-    var count := _selling_slots_to_count(selling_slots)
-    customers.set_customers(
-        CustomerGenerator.generate_for_night(storage.storage_items, count),
-    )
-
-
-func _selling_slots_to_count(selling_slots: int, rng: RandomNumberGenerator = null) -> int:
-    match selling_slots:
-        0:
-            return 0
-        1:
-            return RandomUtils.randi_range(2, 3, rng)
-        2:
-            return RandomUtils.randi_range(4, 6, rng)
-        3:
-            return RandomUtils.randi_range(7, 10, rng)
-        _:
-            ToastManager.show_dev_error("Unexpected selling_slots value: %d" % selling_slots)
-            return 0
+# ══ Customer sale ═════════════════════════════════════════════════════════════
 
 
 ## Commits a customer sale: removes items from storage, adds cash, records the
@@ -404,7 +420,7 @@ func resolve_run(result: RunResult) -> void:
     # Persisted so a quit before end_day doesn't drop them.
     slot.stash_pending_run(result) # no inner save
 
-    # Auction consumed morning + afternoon; player returns for the evening slot.
-    slot.set_slot(3) # no inner save
+    # Auction consumed the Day slot; player returns for the Night slot.
+    slot.set_slot(SlotStore.SLOT_NIGHT) # no inner save
 
     SaveManager.save() # single commit

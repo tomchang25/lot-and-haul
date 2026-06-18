@@ -100,4 +100,5 @@ func _apply_migrations(data: Dictionary, from_version: int, _ctx: SaveLoadContex
     if from_version < 2:
         if not data.has("tutorial_seen") or not data["tutorial_seen"] is Dictionary:
             data["tutorial_seen"] = { }
+    data["_version"] = _store_version()
     return data

@@ -14,7 +14,7 @@ A clue's id **is** its demand tag. An item's fit tags are its revealed surface c
 
 ## Nightly Generation
 
-Opening shop triggers `MetaManager` to generate the night's customers. Customer count is derived from the selling-slot commitment (see `day_slot_economy.md`). Each customer's 2–4 demand tags use a **50/50 bias**: drawn from the owned-storage tag pool (guaranteed-matchable) half the time, from the full clue vocabulary otherwise. Empty storage falls back to all-random tags. Grid dimensions are drawn from a preset list. The generated set is persisted, so re-entering the scene the same day shows the same customers.
+Opening shop triggers `MetaManager` to generate the slot's customers. Customer count is derived from the current Day/Night slot (see `day_slot_economy.md`). Each customer's 2–4 demand tags use a **50/50 bias**: drawn from the owned-storage tag pool (guaranteed-matchable) half the time, from the full clue vocabulary otherwise. Empty storage falls back to all-random tags. Grid dimensions are drawn from a preset list. The generated set is persisted, so re-entering the scene the same day shows the same customers.
 
 ---
 

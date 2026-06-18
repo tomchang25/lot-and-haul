@@ -1,20 +1,26 @@
 # slot_store.gd
-# Slot-flow runtime store: current slot, storage AP, committed selling slots,
-# and pending run economics. Serializable state slice held by MetaManager.
+# Slot-flow runtime store: current slot (Day/Night), storage AP, committed
+# selling slots (legacy), and pending run economics. Serializable state slice
+# held by MetaManager.
 # Owns the fields, their save payload, and the phase operations that mutate them.
 #
 # Fields are read-public via getters. Mutation goes through the owning Manager only.
 class_name SlotStore
 extends StoreBase
 
-var _current_slot: int = 1
+## Two-slot Day/Night model constants.
+const SLOT_DAY: int = 1
+const SLOT_NIGHT: int = 2
+## current_slot >= SLOT_DAY_ENDING triggers hub auto-end-day.
+const SLOT_DAY_ENDING: int = 3
+
+var _current_slot: int = SLOT_DAY
 var _storage_ap: int = 0
 var _storage_ap_max: int = 0
 var _selling_slots_today: int = 0
 var _pending_run: Dictionary = { }
 
-## Current slot index within the active day (1 = Morning, 2 = Afternoon,
-## 3 = Evening). > 3 means the day is ending — hub auto-calls end_day on entry.
+## Current slot within the active day (1 = Day, 2 = Night, >= 3 = day-ending).
 ## Read-only externally.
 var current_slot: int:
     get:
@@ -30,7 +36,8 @@ var storage_ap_max: int:
     get:
         return _storage_ap_max
 
-## Selling slots committed to Open Shop this day. Read-only externally.
+## Legacy selling-slots counter preserved for save compatibility.
+## No longer used to determine customer volume. Read-only externally.
 var selling_slots_today: int:
     get:
         return _selling_slots_today
@@ -86,6 +93,12 @@ func section_id() -> String:
     return "slot"
 
 
+## Returns current schema version. Version 2 remaps three-slot values to
+## two-slot Day/Night equivalents.
+func _store_version() -> int:
+    return 2
+
+
 ## Serializes slot state to a save payload.
 func to_dict() -> Dictionary:
     return {
@@ -111,3 +124,23 @@ func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
         for key: Variant in data["pending_run"]:
             if key is String:
                 _pending_run[key] = int(data["pending_run"][key])
+
+
+## Migrates saved payloads from older schema versions.
+## Version 2: remap three-slot values to two-slot:
+##   Morning (1) → Day (1)
+##   Afternoon (2) → Night (2)
+##   Evening (3) → Night (2)
+##   >=4 → day-ending (3)
+func _apply_migrations(data: Dictionary, from_version: int, _ctx: SaveLoadContext) -> Dictionary:
+    if from_version < 2:
+        var old_slot: int = int(data.get("current_slot", SLOT_DAY))
+        match old_slot:
+            1:
+                data["current_slot"] = SLOT_DAY
+            2, 3:
+                data["current_slot"] = SLOT_NIGHT
+            _:
+                data["current_slot"] = SLOT_DAY_ENDING
+    data["_version"] = _store_version()
+    return data

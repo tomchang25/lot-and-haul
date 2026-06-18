@@ -110,19 +110,36 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="EmptyLabel" type="Label" parent="." unique_id=125428447]
+[node name="EmptyState" type="VBoxContainer" parent="." unique_id=125428447]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="EmptyLabel" type="Label" parent="EmptyState" unique_id=125428448]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 24
 text = "No customers tonight."
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="EmptyCloseButton" type="Button" parent="EmptyState" unique_id=125428449]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 44)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 16
+text = "Close Shop"
+script = ExtResource("99_sfx")
 
 [node name="SaleReceiptDialog" parent="." unique_id=215182387 instance=ExtResource("8_srd")]
 unique_name_in_owner = true

@@ -110,9 +110,9 @@ func _do_autopilot() -> bool:
         return false
 
     # ── 12. Advance the hub day ──────────────────────────────────────────
-    # resolve_run (step 11) already set slot to 3 (evening); begin_auction
-    # is only valid at slot 1 (morning) so we skip it here.
-    MetaManager.begin_open_shop(1)
+    # resolve_run (step 11) already set slot to Night; begin_open_shop
+    # advances to day-ending.
+    MetaManager.begin_open_shop()
     MetaManager.end_day()
     MetaManager.begin_auction()
     MetaManager.end_day()
