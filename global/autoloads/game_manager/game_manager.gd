@@ -57,7 +57,7 @@ func _boot_for_ci() -> void:
     var boot_errors := RegistryAudit.collect_boot_errors()
     if not boot_errors.is_empty():
         for e: String in boot_errors:
-            push_error("[FATAL] " + e)
+            push_error("[FATAL] " + e)  # push-error: boot
         get_tree().quit(1)
         return
 
