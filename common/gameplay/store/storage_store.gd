@@ -140,4 +140,5 @@ func _apply_migrations(data: Dictionary, from_version: int, ctx: SaveLoadContext
             migrated.append(d)
         data["storage_items"] = migrated
         ctx.info("StorageStore: migrated to version 2 (item_id → composition)")
+    data["_version"] = _store_version()
     return data

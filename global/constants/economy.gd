@@ -66,6 +66,16 @@ const DAILY_BASE_COST: int = 100
 const ONSITE_SELL_PRICE: int = 50
 const LOCATION_SAMPLE_SIZE: int = 3
 
+# ── Customer selling volume (Day/Night model) ────────────────────────────────
+
+## Customer count range for Day selling.
+const DAY_SELLING_CUSTOMER_MIN: int = 4
+const DAY_SELLING_CUSTOMER_MAX: int = 6
+
+## Customer count range for Night selling.
+const NIGHT_SELLING_CUSTOMER_MIN: int = 2
+const NIGHT_SELLING_CUSTOMER_MAX: int = 3
+
 # ── Storage AP economy ────────────────────────────────────────────────────────
 
 ## AP pool granted at the start of each Storage slot (flat; tuning pass pending).

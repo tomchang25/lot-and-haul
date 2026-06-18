@@ -217,7 +217,6 @@ func _init_auction() -> void:
     _price_label.text = "$%d" % opening_bid
 
     _build_lot_summary()
-    _init_debug_overlay()
     _refresh_budget()
 
 

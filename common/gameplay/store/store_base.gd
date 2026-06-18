@@ -45,10 +45,15 @@ func _store_version() -> int:
 ##       if from_version < 3:
 ##           data["renamed"] = data.get("legacy_name", "")
 ##           data.erase("legacy_name")
+##       data["_version"] = _store_version()
 ##       return data
 ##
 ## Each block transforms data one version forward. The caller (from_dict) handles
-## reading _version from the payload and passing it here. Returns the dict with
-## all fields in the current version's shape, ready for field restoration.
+## reading _version from the payload and passing it here. The final
+## `data["_version"] = _store_version()` stamp is required: without it, a re-run
+## of from_dict on the same dict would re-apply earlier migrations (e.g. a v1
+## payload that maps 4 → 3 would re-map 3 → 2 on the second pass). Returns the
+## dict with all fields in the current version's shape, ready for field
+## restoration.
 func _apply_migrations(data: Dictionary, _from_version: int, _ctx: SaveLoadContext) -> Dictionary:
     return data

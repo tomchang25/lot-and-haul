@@ -90,3 +90,87 @@ func test_progress_v2_preserves_tutorial_seen() -> void:
     }
     store.from_dict(v2_data, ctx)
     assert_true(store.tutorial_seen.has("hub"), "tutorial_seen hub should be preserved")
+
+# ══ SlotStore migration (v1 → v2) — three-slot to two-slot remap ═══════
+
+
+func test_slot_v1_morning_maps_to_day() -> void:
+    var ctx := SaveLoadContext.new()
+    var store := SlotStore.new()
+    store.from_dict(
+        {
+            "_version": 1,
+            "current_slot": 1,
+        },
+        ctx,
+    )
+    assert_eq(store.current_slot, SlotStore.SLOT_DAY, "Morning (1) should map to Day")
+
+
+func test_slot_v1_afternoon_maps_to_night() -> void:
+    var ctx := SaveLoadContext.new()
+    var store := SlotStore.new()
+    store.from_dict(
+        {
+            "_version": 1,
+            "current_slot": 2,
+        },
+        ctx,
+    )
+    assert_eq(store.current_slot, SlotStore.SLOT_NIGHT, "Afternoon (2) should map to Night")
+
+
+func test_slot_v1_evening_maps_to_night() -> void:
+    var ctx := SaveLoadContext.new()
+    var store := SlotStore.new()
+    store.from_dict(
+        {
+            "_version": 1,
+            "current_slot": 3,
+        },
+        ctx,
+    )
+    assert_eq(store.current_slot, SlotStore.SLOT_NIGHT, "Evening (3) should map to Night")
+
+
+func test_slot_v1_past_evening_maps_to_day_ending() -> void:
+    var ctx := SaveLoadContext.new()
+    var store := SlotStore.new()
+    store.from_dict(
+        {
+            "_version": 1,
+            "current_slot": 4,
+        },
+        ctx,
+    )
+    assert_eq(store.current_slot, SlotStore.SLOT_DAY_ENDING, ">3 should map to day-ending")
+
+
+func test_slot_v2_preserves_current_slot() -> void:
+    var ctx := SaveLoadContext.new()
+    var store := SlotStore.new()
+    store.from_dict(
+        {
+            "_version": 2,
+            "current_slot": SlotStore.SLOT_NIGHT,
+        },
+        ctx,
+    )
+    assert_eq(store.current_slot, SlotStore.SLOT_NIGHT, "v2 data should preserve Night slot")
+
+
+func test_slot_v1_migration_is_idempotent() -> void:
+    # A v1 payload with current_slot=4 would map to 3 (day-ending) on the first
+    # pass, and to 2 (Night) on a re-run of the migration. The _version stamp
+    # at the end of _apply_migrations prevents the second pass from re-firing.
+    var ctx := SaveLoadContext.new()
+    var store := SlotStore.new()
+    var data := {
+        "_version": 1,
+        "current_slot": 4,
+    }
+    store.from_dict(data, ctx)
+    assert_eq(store.current_slot, SlotStore.SLOT_DAY_ENDING, "first pass maps 4 to day-ending (3)")
+    # Re-feeding the same dict — the stamped _version should bypass migration.
+    store.from_dict(data, ctx)
+    assert_eq(store.current_slot, SlotStore.SLOT_DAY_ENDING, "re-run must not re-migrate to Night (2)")
