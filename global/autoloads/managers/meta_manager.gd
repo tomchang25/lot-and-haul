@@ -1,11 +1,12 @@
 # meta_manager.gd
-# Hub-phase transactional authority. Holds six domain stores (EconomyStore,
-# GarageStore, StorageStore, SlotStore, ProgressStore, CustomersStore); each
-# owns its domain's live fields, save payload, and the operations that mutate
-# them. Store references are plain public fields — scenes read state directly
-# via MetaManager.economy.cash, MetaManager.storage.storage_items, etc.
-# Cross-domain transactions (day end, run resolution, customer sale) remain here
-# as single coordinated methods that call store methods and save exactly once.
+# Hub-phase transactional authority. Holds seven domain stores (EconomyStore,
+# GarageStore, StorageStore, SlotStore, ProgressStore, CustomersStore,
+# ShopSessionStore); each owns its domain's live fields, save payload, and the
+# operations that mutate them. Store references are plain public fields — scenes
+# read state directly via MetaManager.economy.cash,
+# MetaManager.storage.storage_items, etc. Cross-domain transactions (day end,
+# run resolution, customer sale, shop close) remain here as single coordinated
+# methods that call store methods and save exactly once.
 extends Node
 
 # ── Domain stores ──────────────────────────────────────────────────────────────
@@ -16,6 +17,7 @@ var storage: StorageStore
 var slot: SlotStore
 var progress: ProgressStore
 var customers: CustomersStore
+var shop_session: ShopSessionStore
 
 
 func _ready() -> void:
@@ -25,6 +27,7 @@ func _ready() -> void:
     slot = SlotStore.new()
     progress = ProgressStore.new()
     customers = CustomersStore.new()
+    shop_session = ShopSessionStore.new()
     SaveManager.register_provider(self)
 
 
@@ -39,6 +42,7 @@ func reset() -> void:
     slot = SlotStore.new()
     progress = ProgressStore.new()
     customers = CustomersStore.new()
+    shop_session = ShopSessionStore.new()
 
 # ══ Save section interface ════════════════════════════════════════════════════
 
@@ -53,6 +57,7 @@ func to_dict() -> Dictionary:
     out[slot.section_id()] = slot.to_dict()
     out[progress.section_id()] = progress.to_dict()
     out[customers.section_id()] = customers.to_dict()
+    out[shop_session.section_id()] = shop_session.to_dict()
     return out
 
 
@@ -65,6 +70,7 @@ func from_dict(data: Dictionary, ctx: SaveLoadContext) -> void:
     slot.from_dict(data.get(slot.section_id(), { }), ctx)
     progress.from_dict(data.get(progress.section_id(), { }), ctx)
     customers.from_dict(data.get(customers.section_id(), { }), ctx)
+    shop_session.from_dict(data.get(shop_session.section_id(), { }), ctx)
 
 
 ## Aggregates validate() across all stores. Returns true when all pass.
@@ -76,6 +82,7 @@ func validate() -> bool:
     ok = slot.validate() and ok
     ok = progress.validate() and ok
     ok = customers.validate() and ok
+    ok = shop_session.validate() and ok
     return ok
 
 # ══ Cross-autoload cash helper ════════════════════════════════════════════════
@@ -167,7 +174,8 @@ func begin_auction() -> void:
 
 ## Begins an Open Shop session: validates Day or Night, generates nightly
 ## customers scaled to the current slot (Day = larger volume, Night =
-## smaller), clears the nightly sales ledger, advances one slot, and saves.
+## smaller), clears the nightly sales ledger, advances one slot, initialises
+## the shop session for the first customer, and saves.
 func begin_open_shop() -> void:
     if slot.current_slot != SlotStore.SLOT_DAY and slot.current_slot != SlotStore.SLOT_NIGHT:
         ToastManager.show_dev_error("Open Shop can only begin in slot Day or Night, got %d" % slot.current_slot)
@@ -181,11 +189,33 @@ func begin_open_shop() -> void:
         count = RandomUtils.randi_range(Economy.DAY_SELLING_CUSTOMER_MIN, Economy.DAY_SELLING_CUSTOMER_MAX)
     else:
         count = RandomUtils.randi_range(Economy.NIGHT_SELLING_CUSTOMER_MIN, Economy.NIGHT_SELLING_CUSTOMER_MAX)
-    customers.set_customers(
-        CustomerGenerator.generate_for_night(storage.storage_items, count),
-    )
+    var new_customers: Array[CustomerEntry] = CustomerGenerator.generate_for_night(storage.storage_items, count)
+    customers.set_customers(new_customers)
     _advance_slot()
+    if not new_customers.is_empty():
+        open_shop_session(new_customers[0])
+    else:
+        shop_session.clear()
     SaveManager.save()
+
+
+## Initialises a shop session for [param customer]: sets the active customer,
+## clears the placement, and sets the boot-routing pointer to "customer_sell".
+## Does not save — caller commits.
+func open_shop_session(customer: CustomerEntry) -> void:
+    shop_session.set_active_customer(customer.customer_id)
+    shop_session.set_placement([])
+    shop_session.set_pending_scene(ShopSessionStore.SCENE_CUSTOMER_SELL)
+
+
+## Records the current [param placement] for [param customer] via the deferred
+## save throttle. Called on every customer switch and every grid change.
+func update_shop_session(customer: CustomerEntry, placement: Array) -> void:
+    shop_session.set_active_customer(
+        customer.customer_id if customer != null else "",
+    )
+    shop_session.set_placement(placement)
+    SaveManager.mark_dirty()
 
 
 ## Closes out the current calendar day: advances current_day, deducts living

@@ -265,7 +265,7 @@ One-line, no reasoning, no backing doc.
 
 - [tutorial] tutorial cover whole gameplay
 
-​- [fix] Resume open shop state if exiting game while selling
+​
 
 - [fix] update changelog before 0.2.0
 - [fix] update changelog rule to disallow unicode and force to be "compact"

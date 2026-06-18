@@ -14,6 +14,10 @@ Rules:
 
 ## v0.1.4 - Draft
 
+### Customer Sell Resume
+
+- 2026-06-18 — [customer_sell] Force-quit during shop session now resumes the in-flight customer_sell scene with the same customer and grid placements; Back closes the shop and returns to hub
+
 ### Tutorial Highlight and Anchor Fixes
 
 - 2026-06-17 — [tutorial] Anchored tutorial hints now keep their targets visible while blocking locked interactions, recover cleanly from missing or hidden anchors, and refresh target geometry between steps

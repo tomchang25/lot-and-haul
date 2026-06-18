@@ -23,12 +23,15 @@ var _pending_strategy: String = ""
 var _hovered_entry: ItemEntry = null
 var _selected_entry: ItemEntry = null
 var _preview_entry: ItemEntry = null
+var _suppress_placement_update: bool = false
 
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _day_label: Label = %DayLabel
 @onready var _back_button: SfxButton = %BackButton
+@onready var _empty_state: VBoxContainer = %EmptyState
 @onready var _empty_label: Label = %EmptyLabel
+@onready var _empty_close_button: SfxButton = %EmptyCloseButton
 @onready var _main_area: HBoxContainer = %MainArea
 @onready var _customer_queue: CustomerQueuePanel = %CustomerQueuePanel
 @onready var _item_list: SellingItemListPanel = %SellingItemListPanel
@@ -44,6 +47,8 @@ var _deal_panel: DealPanel
 func _ready() -> void:
     _back_button.pressed.connect(_on_back_pressed)
     _back_button.press_event = CANCEL
+    _empty_close_button.pressed.connect(_on_back_pressed)
+    _empty_close_button.press_event = CANCEL
 
     _customer_queue.customer_selected.connect(_on_customer_selected)
     _item_list.item_pick_requested.connect(_on_item_pick_requested)
@@ -74,13 +79,31 @@ func _ready() -> void:
     _day_label.text = "Day %d" % MetaManager.progress.current_day
     _customer_queue.setup(_customers)
     _customer_queue.set_selected(0)
+    _suppress_placement_update = true
     _select_customer(0)
+    _suppress_placement_update = false
+
+    var saved_id: String = MetaManager.shop_session.active_customer_id
+    if saved_id != "":
+        var idx := _find_customer_index(saved_id)
+        if idx >= 0 and idx != 0:
+            _customer_queue.set_selected(idx)
+            _suppress_placement_update = true
+            _select_customer(idx)
+            _suppress_placement_update = false
+        _apply_saved_placement(MetaManager.shop_session.placement)
 
 # ══ Signal handlers ═══════════════════════════════════════════════════════════
 
 
 func _on_customer_selected(index: int) -> void:
+    _suppress_placement_update = true
     _select_customer(index)
+    _suppress_placement_update = false
+    MetaManager.update_shop_session(
+        _get_selected_customer(),
+        _serialize_placement(),
+    )
 
 
 func _on_item_pick_requested(entry: ItemEntry) -> void:
@@ -165,6 +188,12 @@ func _on_car_clear_requested() -> void:
 
 func _on_car_placement_changed() -> void:
     _refresh_car_display()
+    if _suppress_placement_update:
+        return
+    MetaManager.update_shop_session(
+        _get_selected_customer(),
+        _serialize_placement(),
+    )
 
 
 func _on_conservative_requested(price: int) -> void:
@@ -236,6 +265,9 @@ func _on_receipt_cancelled() -> void:
 
 
 func _on_back_pressed() -> void:
+    MetaManager.shop_session.clear()
+    MetaManager.customers.clear_customers()
+    SaveManager.save()
     SceneRouter.go_to_hub()
 
 # ══ Customer selection ════════════════════════════════════════════════════════
@@ -277,7 +309,7 @@ func _select_customer(index: int) -> void:
     )
     _deal_panel.set_placed_items(grid.get_placed_items())
 
-    _empty_label.hide()
+    _empty_state.hide()
 
 
 func _get_selected_customer() -> CustomerEntry:
@@ -290,9 +322,65 @@ func _get_selected_customer() -> CustomerEntry:
     return customer
 
 
+## Returns the index of the customer with [param customer_id], or -1.
+func _find_customer_index(customer_id: String) -> int:
+    for i: int in _customers.size():
+        if _customers[i] != null and _customers[i].customer_id == customer_id:
+            return i
+    return -1
+
+
+## Serialises the current PackingGrid placement into an Array of
+## {"item_id", "cell", "rotation"} dicts - one entry per unique item with the
+## top-left origin and the stored rotation.
+func _serialize_placement() -> Array:
+    var grid := _car_panel.get_grid()
+    var snapshot: Array = []
+    for item in grid.get_placed_items():
+        var entry := item as ItemEntry
+        if entry == null:
+            continue
+        var origin := grid.get_item_origin(entry)
+        snapshot.append(
+            {
+                "item_id": entry.id,
+                "cell": { "x": origin.x, "y": origin.y },
+                "rotation": int(grid.item_rotations.get(entry, 0)),
+            },
+        )
+    return snapshot
+
+
+## Replays a saved placement Array onto the live PackingGrid. Entries that
+## fail can_place (grid changed, item missing) are silently dropped.
+func _apply_saved_placement(placement: Array) -> void:
+    var grid := _car_panel.get_grid()
+    var by_id: Dictionary = { }
+    for item in MetaManager.storage.storage_items:
+        var entry := item as ItemEntry
+        if entry != null:
+            by_id[entry.id] = entry
+    for p: Dictionary in placement:
+        var entry: ItemEntry = by_id.get(int(p.get("item_id", -1)))
+        if entry == null:
+            continue
+        var cell_dict: Dictionary = p.get("cell", { })
+        var cell := Vector2i(
+            int(cell_dict.get("x", 0)),
+            int(cell_dict.get("y", 0)),
+        )
+        var rot: int = int(p.get("rotation", 0))
+        # place() and can_place() both read active_rotation, so set it before
+        # the can_place check; place() resets it to 0 after the call.
+        grid.active_rotation = rot
+        if grid.can_place(entry, cell):
+            grid.place(entry, cell)
+    _refresh_car_display()
+
+
 func _show_empty_state(message: String) -> void:
     _empty_label.text = message
-    _empty_label.show()
+    _empty_state.show()
     _main_area.hide()
     _customer_queue.hide()
 
