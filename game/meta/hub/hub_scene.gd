@@ -26,6 +26,7 @@ const SLOT_NAMES: Array[String] = ["", "Morning", "Afternoon", "Evening"]
 @onready var _sell_btn: Button = $RootVBox/ButtonsVBox/MerchantButton
 @onready var _vehicle_btn: Button = $RootVBox/ButtonsVBox/VehicleButton
 @onready var _knowledge_btn: Button = $RootVBox/ButtonsVBox/KnowledgeButton
+@onready var _debug_container: DebugButtonContainer = $DebugButtonContainer
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -44,6 +45,7 @@ func _ready() -> void:
         return
 
     _refresh_display()
+    _debug_container.storage_changed.connect(_refresh_display)
 
     Director.register_scene(
         "hub",

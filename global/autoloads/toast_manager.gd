@@ -63,13 +63,18 @@ func _ready() -> void:
 func show_warning(message: String) -> void:
     _push_toast(message, _COLOR_WARNING, _WARN_DURATION, _CHANNEL_WARNING)
 
+    if Debug.enabled:
+        push_warning("WARNING: %s" % message)
+
 
 ## Shows an info toast. Only visible when Debug.enabled is true.
 ## Use for migration detail alerts.
 func show_info(message: String) -> void:
     if not Debug.enabled:
         return
+
     _push_toast(message, _COLOR_INFO, _INFO_DURATION, _CHANNEL_INFO)
+    print("INFO: %s" % message)
 
 
 ## Shows an error toast. Always visible regardless of Debug.enabled.

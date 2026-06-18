@@ -86,7 +86,7 @@ func rebuild_header() -> void:
     _build_header()
 
 
-func set_sort(column: int, ascending: bool) -> void:
+func set_sort(column: ItemRow.Column, ascending: bool) -> void:
     if column == _sort_column and ascending == _sort_ascending:
         return
     _sort_column = column

@@ -56,10 +56,10 @@ var _is_offer_showing := false
 var _offer_script_id := ""
 var _help_script_id := ""
 
-## Cached anchor global rect used to skip redundant per-frame layout recalculations.
-## Reset at each step transition and whenever the anchor rect reported by Godot
-## changes during _process.
-var _last_anchor_rect: Rect2 = Rect2()
+## Cached target geometry used to skip redundant per-frame layout recalculations.
+## Reset at each step transition in _show_step and whenever the rect changes
+## during _process. Stores { rect: Rect2, preferred: int }.
+var _last_target_info: Dictionary = { }
 
 
 func _ready() -> void:
@@ -67,6 +67,14 @@ func _ready() -> void:
     SceneRouter.scene_changed.connect(_on_scene_changed)
     set_process(false)
     _position_help_btn.call_deferred()
+
+
+## Consume ESC/ui_settings while the tutorial cover or offer prompt is visible
+## to prevent SettingsStore from pausing the tree (which would deadlock both
+## overlays since the dim cover blocks the settings panel).
+func _unhandled_input(event: InputEvent) -> void:
+    if (_is_tutorial_active or _is_offer_showing) and event.is_action_pressed("ui_settings"):
+        get_viewport().set_input_as_handled()
 
 
 ## Entry point for scenes. Registers [param anchors] for the current scene
@@ -79,25 +87,34 @@ func register_scene(scene_id: String, anchors: Dictionary) -> void:
     _help_btn.visible = false
     _help_script_id = ""
     _offer_script_id = ""
+    _last_target_info = { }
     scene_registered.emit(scene_id)
 
 
 ## Starts playback of the tutorial script identified by [param script_id].
 ## Safe to call at any time — the script's steps are all explain-only.
 func start_script(script_id: String) -> void:
-    var script: Array[TutorialStep] = _get_script(script_id)
+    var script: Array[TutorialStep] = TutorialScripts.resolve_script(script_id)
     if script.is_empty():
         ToastManager.show_dev_error("Director.start_script: unknown script '%s'" % script_id)
         _hide_overlay()
         _clear_playback_state()
         return
+
+    var missing_anchors := TutorialScripts.validate_anchors(script_id, _anchors)
+    if not missing_anchors.is_empty():
+        ToastManager.show_dev_error(
+            "Director: script '%s' references unregistered anchors in scene '%s': %s"
+            % [script_id, _current_scene_id, ", ".join(missing_anchors)],
+        )
+
     _current_script = script
     _current_script_id = script_id
     _current_step_index = 0
     _is_tutorial_active = true
     _is_offer_showing = false
     _help_btn.visible = false
-    _last_anchor_rect = Rect2()
+    _last_target_info = { }
     _show_step()
 
 
@@ -109,6 +126,7 @@ func show_offer_prompt(script_id: String, offer_text: String, accept_text: Strin
     _offer_script_id = script_id
     _is_offer_showing = true
 
+    _dim_full.color = DIM_COLOR
     _dim_full.visible = true
     _dim_full.mouse_filter = Control.MOUSE_FILTER_STOP
     _dim_full.position = Vector2.ZERO
@@ -145,7 +163,92 @@ func hide_help_button() -> void:
 # ══ Step display ═══════════════════════════════════════════════════════════════
 
 
+func _is_node_renderable(node: Node) -> bool:
+    if not is_instance_valid(node):
+        return false
+    if not node.is_visible_in_tree():
+        return false
+    return true
+
+
+func _is_rect_positive(rect: Rect2) -> bool:
+    return rect.size.x > 0.0 and rect.size.y > 0.0
+
+
+## Resolves a TutorialStep's target to a { rect, preferred } dictionary.
+## Accepts both plain Control references and TutorialTarget nodes registered
+## as anchors. Returns an empty dictionary when nothing resolves.
+func _resolve_target(step: TutorialStep) -> Dictionary:
+    var raw = _anchors.get(step.anchor_id)
+    if raw == null:
+        return _try_fallback_targets(step)
+
+    if raw is TutorialTarget:
+        if not _is_node_renderable(raw):
+            return _try_fallback_targets(step)
+        var rect: Rect2 = raw.get_tutorial_rect()
+        if not _is_rect_positive(rect):
+            return _try_fallback_targets(step)
+        return { "rect": rect, "preferred": raw.preferred_side }
+
+    if raw is Control:
+        if not _is_node_renderable(raw):
+            return _try_fallback_targets(step)
+        var rect: Rect2 = raw.get_global_rect()
+        if not _is_rect_positive(rect):
+            return _try_fallback_targets(step)
+        return { "rect": rect, "preferred": TutorialTarget.PreferredSide.AUTO }
+
+    return _try_fallback_targets(step)
+
+
+func _try_fallback_targets(step: TutorialStep) -> Dictionary:
+    if not step.fallback_when_anchor_unrenderable:
+        return { }
+    for fallback_id: String in step.fallback_anchor_ids:
+        var raw = _anchors.get(fallback_id)
+        if raw == null:
+            continue
+        if raw is TutorialTarget:
+            if not _is_node_renderable(raw):
+                continue
+            var rect: Rect2 = raw.get_tutorial_rect()
+            if not _is_rect_positive(rect):
+                continue
+            return { "rect": rect, "preferred": raw.preferred_side }
+        if raw is Control:
+            if not _is_node_renderable(raw):
+                continue
+            var rect: Rect2 = raw.get_global_rect()
+            if not _is_rect_positive(rect):
+                continue
+            return { "rect": rect, "preferred": TutorialTarget.PreferredSide.AUTO }
+    return { }
+
+
+func _advance_to_renderable_step() -> void:
+    while _current_step_index < _current_script.size():
+        var step: TutorialStep = _current_script[_current_step_index]
+        if step.kind == TutorialStep.Kind.POPUP:
+            return
+        if not _resolve_target(step).is_empty():
+            return
+        ToastManager.show_dev_error(
+            "Director: Skipping step %d: all targets non-renderable in scene '%s'"
+            % [_current_step_index, _current_scene_id],
+        )
+        _current_step_index += 1
+
+
 func _show_step() -> void:
+    if _current_step_index >= _current_script.size():
+        _end_tutorial()
+        return
+
+    _last_target_info = { }
+
+    _advance_to_renderable_step()
+
     if _current_step_index >= _current_script.size():
         _end_tutorial()
         return
@@ -163,31 +266,38 @@ func _show_step() -> void:
 
 
 func _show_hint(step: TutorialStep) -> void:
-    var anchor: Control = _anchors.get(step.anchor_id) as Control
-    if not is_instance_valid(anchor):
+    var target := _resolve_target(step)
+    if target.is_empty():
+        ToastManager.show_dev_error(
+            "Director._show_hint: step %d target unresolved despite advance guard"
+            % _current_step_index,
+        )
         _current_step_index += 1
         _show_step()
         return
 
-    var rect: Rect2 = anchor.get_global_rect()
-    _update_dim_hole(rect)
+    var t_rect: Rect2 = target.get("rect", Rect2())
+    var preferred: int = target.get("preferred", TutorialTarget.PreferredSide.AUTO)
+    _update_dim_hole(t_rect)
 
     if step.unlock_anchor:
         _dim_full.visible = false
     else:
-        _dim_full.visible = true
+        _dim_full.color = Color.TRANSPARENT
         _dim_full.mouse_filter = Control.MOUSE_FILTER_STOP
-        _dim_full.position = rect.position
-        _dim_full.size = rect.size
+        _dim_full.position = t_rect.position
+        _dim_full.size = t_rect.size
+        _dim_full.visible = true
 
     _hint_label.text = step.text
     _hint_panel.visible = true
-    _position_near_anchor(_hint_panel, rect)
+    _position_near_anchor(_hint_panel, t_rect, preferred)
 
     set_process(true)
 
 
 func _show_popup(step: TutorialStep) -> void:
+    _dim_full.color = DIM_COLOR
     _dim_full.visible = true
     _dim_full.mouse_filter = Control.MOUSE_FILTER_STOP
     _dim_full.position = Vector2.ZERO
@@ -250,9 +360,28 @@ func get_hint_panel() -> PanelContainer:
     return _hint_panel
 
 
-## Returns the anchor Control registered under [param id], or null.
-func get_anchor(id: String) -> Control:
-    return _anchors.get(id) as Control if _anchors.has(id) else null
+## Returns the anchor registered under [param id] (Control or TutorialTarget),
+## or null. Preserved for backward compatibility with harness code.
+func get_anchor(id: String) -> Variant:
+    return _anchors.get(id) if _anchors.has(id) else null
+
+
+## Returns the resolved global rect for the target registered under [param id].
+## Handles both plain Control references and TutorialTarget nodes. Returns an
+## empty Rect2 when the id is unknown.
+func get_target_rect(id: String) -> Rect2:
+    var raw = _anchors.get(id)
+    if raw == null:
+        return Rect2()
+    if raw is TutorialTarget:
+        if not _is_node_renderable(raw):
+            return Rect2()
+        return raw.get_tutorial_rect()
+    if raw is Control:
+        if not _is_node_renderable(raw):
+            return Rect2()
+        return raw.get_global_rect()
+    return Rect2()
 
 
 ## Advances one step (as if the user clicked Next). Called by both the Next
@@ -276,7 +405,7 @@ func accept_offer() -> void:
     _popup_close.text = "×"
     var script_id := _offer_script_id
     _is_offer_showing = false
-    if _get_script(script_id).is_empty():
+    if TutorialScripts.resolve_script(script_id).is_empty():
         ToastManager.show_dev_error("Director.accept_offer: script '%s' no longer resolves" % script_id)
         _hide_overlay()
         _clear_playback_state()
@@ -343,7 +472,7 @@ func _clear_playback_state() -> void:
     _current_script = []
     _current_step_index = 0
     _current_script_id = ""
-    _last_anchor_rect = Rect2()
+    _last_target_info = { }
 
 
 func _on_scene_changed() -> void:
@@ -356,15 +485,6 @@ func _on_scene_changed() -> void:
             script_completed.emit(completed_id)
 
 # ══ Script management ══════════════════════════════════════════════════════════
-
-
-static func _get_script(script_id: String) -> Array[TutorialStep]:
-    match script_id:
-        "hub":
-            return TutorialScripts.hub_script()
-        "storage":
-            return TutorialScripts.storage_script()
-    return []
 
 
 func _end_tutorial() -> void:
@@ -410,35 +530,89 @@ func _update_dim_hole(hole: Rect2) -> void:
         dim.mouse_filter = Control.MOUSE_FILTER_STOP
 
 
-func _position_near_anchor(panel: Control, anchor_rect: Rect2) -> void:
+## Tries to place [param panel] on the given [param side] of [param target_rect]
+## within screen bounds. Returns the position if it fits, or null if clipping
+## occurs.
+func _try_place_on_side(
+        panel: Control,
+        target_rect: Rect2,
+        side: TutorialTarget.PreferredSide,
+        screen: Vector2,
+        margin: float,
+) -> Variant:
+    var pw := panel.custom_minimum_size.x if panel.custom_minimum_size.x > 0 else 280.0
+    var ph := panel.size.y if panel.size.y > 0 else 100.0
+
+    match side:
+        TutorialTarget.PreferredSide.RIGHT:
+            var px := target_rect.end.x + margin
+            if px + pw <= screen.x - margin:
+                return Vector2(px, clampf(target_rect.position.y, margin, screen.y - ph - margin))
+        TutorialTarget.PreferredSide.LEFT:
+            var px := target_rect.position.x - pw - margin
+            if px >= margin:
+                return Vector2(px, clampf(target_rect.position.y, margin, screen.y - ph - margin))
+        TutorialTarget.PreferredSide.TOP:
+            var py := target_rect.position.y - ph - margin
+            if py >= margin:
+                return Vector2(clampf(target_rect.position.x, margin, screen.x - pw - margin), py)
+        TutorialTarget.PreferredSide.BOTTOM:
+            var py := target_rect.end.y + margin
+            if py + ph <= screen.y - margin:
+                return Vector2(clampf(target_rect.position.x, margin, screen.x - pw - margin), py)
+        _:
+            return null
+    return null
+
+
+## Positions [param panel] near [param target_rect], trying [param preferred_side]
+## first when set, then falling through RIGHT → LEFT → BOTTOM → centered.
+## Full-viewport targets (>=90% screen in both axes) are always centered.
+func _position_near_anchor(
+        panel: Control,
+        target_rect: Rect2,
+        preferred_side: int = TutorialTarget.PreferredSide.AUTO,
+) -> void:
     var screen: Vector2 = _get_screen_size()
     var margin: float = 16.0
-    var preferred_width: float = 280.0
+    panel.custom_minimum_size.x = 280.0
+    var pw: float
 
-    panel.custom_minimum_size.x = preferred_width
-
-    # Full-screen anchor fallback: when the anchor covers most of the viewport,
-    # position the hint panel as a centered popup with margin offset rather than
-    # relative to the anchor's edges (which would shove it off-screen).
-    if anchor_rect.size.x >= screen.x * 0.9 and anchor_rect.size.y >= screen.y * 0.9:
+    # Full-viewport fallback: when the target covers most of the viewport, use
+    # a centered popup-style placement rather than edge-relative positioning.
+    if target_rect.size.x >= screen.x * 0.9 and target_rect.size.y >= screen.y * 0.9:
+        pw = panel.custom_minimum_size.x
         panel.position = Vector2(
-            clampi(int((screen.x - preferred_width) / 2), 0, int(screen.x - preferred_width)),
+            clampi(int((screen.x - pw) / 2), 0, int(screen.x - pw)),
             clampi(int(screen.y * 0.3), 0, int(screen.y - panel.size.y - margin if panel.size.y > 0 else screen.y - 200)),
         )
         return
 
-    var px: float = anchor_rect.position.x + anchor_rect.size.x + margin
-    var py: float = anchor_rect.position.y
+    # Try preferred side first when explicitly set.
+    if preferred_side != TutorialTarget.PreferredSide.AUTO:
+        var pos := _try_place_on_side(panel, target_rect, preferred_side, screen, margin)
+        if pos != null:
+            panel.position = pos as Vector2
+            return
 
-    if px + preferred_width > screen.x:
-        px = anchor_rect.position.x - preferred_width - margin
-        if px < margin:
-            px = anchor_rect.position.x
-            py = anchor_rect.position.y + anchor_rect.size.y + margin
+    # Default fallback order: RIGHT → LEFT → BOTTOM → TOP → centered.
+    var fallback_order: Array[int] = [
+        TutorialTarget.PreferredSide.RIGHT,
+        TutorialTarget.PreferredSide.LEFT,
+        TutorialTarget.PreferredSide.BOTTOM,
+        TutorialTarget.PreferredSide.TOP,
+    ]
+    for side: int in fallback_order:
+        var pos := _try_place_on_side(panel, target_rect, side, screen, margin)
+        if pos != null:
+            panel.position = pos as Vector2
+            return
 
+    # Last resort: centered with margin.
+    pw = panel.custom_minimum_size.x
     panel.position = Vector2(
-        clampf(px, margin, screen.x - preferred_width - margin),
-        clampf(py, margin, screen.y - panel.size.y - margin if panel.size.y > 0 else screen.y - 200),
+        clampf((screen.x - pw) / 2, margin, screen.x - pw - margin),
+        clampf(screen.y * 0.3, margin, screen.y - panel.size.y - margin if panel.size.y > 0 else screen.y - 200),
     )
 
 # ══ Per-frame hole update ══════════════════════════════════════════════════════
@@ -457,25 +631,28 @@ func _process(_delta: float) -> void:
         set_process(false)
         return
 
-    var anchor: Control = _anchors.get(step.anchor_id) as Control
-    if not is_instance_valid(anchor):
+    var target := _resolve_target(step)
+    if target.is_empty():
         return
 
-    var rect: Rect2 = anchor.get_global_rect()
-    # Skip redundant layout when the anchor rect has not changed since the last
-    # per-frame update. The rect is also reset at each step transition via
-    # _last_anchor_rect = Rect2() inside start_script.
-    if rect == _last_anchor_rect:
-        return
-    _last_anchor_rect = rect
+    var t_rect: Rect2 = target.get("rect", Rect2())
+    var preferred: int = target.get("preferred", TutorialTarget.PreferredSide.AUTO)
 
-    _update_dim_hole(rect)
+    # Skip redundant layout when the target rect has not changed since the last
+    # per-frame update. _last_target_info is reset at each step transition in
+    # _show_step, so stale data from a previous step never carries forward.
+    var cached_rect: Rect2 = _last_target_info.get("rect", Rect2())
+    if t_rect == cached_rect:
+        return
+    _last_target_info = { "rect": t_rect, "preferred": preferred }
+
+    _update_dim_hole(t_rect)
 
     if not step.unlock_anchor:
-        _dim_full.position = rect.position
-        _dim_full.size = rect.size
+        _dim_full.position = t_rect.position
+        _dim_full.size = t_rect.size
 
-    _position_near_anchor(_hint_panel, rect)
+    _position_near_anchor(_hint_panel, t_rect, preferred)
 
 # ══ Helpers ════════════════════════════════════════════════════════════════════
 

@@ -115,9 +115,9 @@ func go_to_fatal_error(title: String, errors: Array[String]) -> void:
     _pending_fatal_title = title
     _pending_fatal_errors = errors
     if scenes.fatal_error == null:
-        push_error("SceneRegistry.fatal_error is null — falling back to push_error")
+        push_error("SceneRegistry.fatal_error is null — falling back to push_error")  # push-error: boot
         for e: String in errors:
-            push_error("[FATAL] " + e)
+            push_error("[FATAL] " + e)  # push-error: boot
         get_tree().quit()
         return
     # Deferred so the scene tree is ready for a scene transition during

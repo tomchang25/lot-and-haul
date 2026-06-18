@@ -1,6 +1,7 @@
 # tutorial_scripts.gd
 # Static step arrays for hub and storage tutorials.
 # Not autoloaded — imported by Director.
+# The single surface for script id resolution and anchor validation.
 class_name TutorialScripts
 
 static func hub_script() -> Array[TutorialStep]:
@@ -43,7 +44,7 @@ You can Repair, Restore, and Research items using Action Points (AP).",
             "This table lists every item in storage. Columns show the item name, \
 condition (damage level), estimated value, and rarity. Click any row \
 to inspect it in detail.",
-            "item_table",
+            "item_browser",
         ),
         TutorialStep.new(
             TutorialStep.Kind.HINT,
@@ -54,15 +55,15 @@ is to 100%, the more accurate the estimate.",
         ),
         TutorialStep.new(
             TutorialStep.Kind.HINT,
-            "Repair improves an item's condition up to 50% — essential for items \
-in poor shape. Better condition means higher sale prices.",
+            "Repair improves condition up to 50%, and Restore pushes it from 50% \
+to 100%. Only one button appears based on the current state. \
+Better condition means higher sale prices.",
             "repair_btn",
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Restore takes over after Repair, pushing condition from 50% to 100%. \
-It only appears once Repair is complete on an item.",
-            "restore_btn",
+            TutorialStep.Advance.NEXT,
+            false,
+            null,
+            ["restore_btn"],
+            true,
         ),
         TutorialStep.new(
             TutorialStep.Kind.HINT,
@@ -94,3 +95,32 @@ your day. You can always come back to the Workshop later.",
             "leave_btn",
         ),
     ]
+
+
+static func resolve_script(script_id: String) -> Array[TutorialStep]:
+    match script_id:
+        "hub":
+            return hub_script()
+        "storage":
+            return storage_script()
+        _:
+            ToastManager.show_dev_error("TutorialScripts: unknown script id '%s'" % script_id)
+            return []
+
+
+static func known_script_ids() -> Array[String]:
+    return ["hub", "storage"]
+
+
+static func validate_anchors(script_id: String, anchors: Dictionary) -> Array[String]:
+    var missing: Array[String] = []
+    var script := resolve_script(script_id)
+    if script.is_empty():
+        return missing
+    for step: TutorialStep in script:
+        if not step.anchor_id.is_empty() and not anchors.has(step.anchor_id):
+            missing.append(step.anchor_id)
+        for fallback_id: String in step.fallback_anchor_ids:
+            if not anchors.has(fallback_id):
+                missing.append(fallback_id)
+    return missing

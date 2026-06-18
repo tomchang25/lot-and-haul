@@ -69,6 +69,12 @@ func _ready() -> void:
     _populate_browser()
     _refresh_detail()
 
+    # Auto-select first item so detail rail and action buttons are visible.
+    var _storage_items := MetaManager.storage.storage_items
+    if not _storage_items.is_empty():
+        _item_browser.set_selected(_storage_items[0])
+        _refresh_detail()
+
     Director.register_scene(
         "storage",
         {

@@ -39,17 +39,17 @@ static func load_error_filters_from_json() -> Dictionary:
     var path := "res://dev/ci/error_filters.json"
     if not FileAccess.file_exists(path):
         push_warning("TestbedChecks: error_filters.json not found at %s" % path)
-        return {}
+        return { }
     var file := FileAccess.open(path, FileAccess.READ)
     if file == null:
         push_warning("TestbedChecks: could not open %s" % path)
-        return {}
+        return { }
     var raw := file.get_as_text()
     file.close()
     var parsed := JSON.parse_string(raw)
     if parsed == null or typeof(parsed) != TYPE_DICTIONARY:
         push_warning("TestbedChecks: error_filters.json is not a valid JSON object")
-        return {}
+        return { }
     return parsed as Dictionary
 
 
@@ -85,10 +85,10 @@ static func overlaps_for_current_step() -> Array[Dictionary]:
     var aid := Director.step_anchor_id(step_idx)
     if aid.is_empty():
         return hits
-    var anchor: Control = Director.get_anchor(aid)
-    if anchor == null:
+    var target_rect: Rect2 = Director.get_target_rect(aid)
+    if target_rect.size.x <= 0 or target_rect.size.y <= 0:
         return hits
-    if panel.get_global_rect().intersects(anchor.get_global_rect()):
+    if panel.get_global_rect().intersects(target_rect):
         hits.append({ "step": step_idx, "covers": aid })
     return hits
 

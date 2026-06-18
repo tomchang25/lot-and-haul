@@ -14,6 +14,16 @@ Rules:
 
 ## v0.1.4 - Draft
 
+### Tutorial Highlight and Anchor Fixes
+
+- 2026-06-17 — [tutorial] Anchored tutorial hints now keep their targets visible while blocking locked interactions, recover cleanly from missing or hidden anchors, and refresh target geometry between steps
+- 2026-06-17 — [tutorial] Storage tutorial anchors corrected and made resilient to repair/restore button visibility, with workshop onboarding skipped when storage is empty
+- 2026-06-17 — [storage] Storage scene now opens with the first item selected so tutorial details and actions are immediately visible
+
+### Script Registry and Validation
+
+- 2026-06-17 — [tutorial] Moved script resolution from Director into TutorialScripts static registry with anchor validation, push_error for unknown ids, and known_script_ids() for test coverage
+
 ### Settings Main Menu Button
 
 - 2026-06-17 — [ui] Settings overlay now shows a "Return to Main Menu" button when opened in-game, hidden when on the start page; navigates to the title screen and closes the overlay on press
@@ -42,6 +52,14 @@ Rules:
 - [inspection] "Review Lot" button styled with green accent palette
 - [storage] State simplified: \_selected_entry removed, empty-label branch dropped
 - [ui] Hover/click audio moved into ItemBrowserPanel for consistent feedbacke
+
+### Debug Storage Buttons
+
+- 2026-06-17 — [debug] Hub scene gains debug-only "Add Random Item" and "Clear All Storage" buttons for storage state control during testing, gated behind `Debug.enabled`
+
+### Tutorial Target and Placement Modularization
+
+- 2026-06-17 — [tutorial] TutorialTarget node decouples logical highlight regions from layout Control rects with custom rect override, preferred-side placement, and deterministic fallback chain; full-viewport targets use centered popup; Director target resolution handles both TutorialTarget and plain Control anchors; harness overlap check and unit tests updated
 
 ## v0.1.3
 
