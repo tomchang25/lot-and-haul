@@ -54,8 +54,81 @@ Click the Storage button to continue.",
         ),
     ]
 
+# ══ Onboarding segment scripts ════════════════════════════════════════════════
 
-static func storage_script() -> Array[TutorialStep]:
+
+## Day 1 Day hub intro + chooser: teaches the hub UI and steers the player to
+## choose Auction.
+static func onboarding_hub_intro_choose_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.POPUP,
+            "Welcome to Lot & Haul!\n\nThis is your Hub. Each day has two time \
+slots: Day and Night. You can use each slot for one activity. \
+Let's start your first day with an Auction Run.",
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Click the Activity button to open the activity chooser.",
+            "activity_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.CHOOSER_OPENED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Choose Auction to begin your first run.",
+            "auction_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.ACTIVITY_CHOSEN,
+        ),
+    ]
+
+
+## Day 1 Night hub chooser: tells the player to choose Storage.
+static func onboarding_storage_choose_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.POPUP,
+            "Good run! Now let's visit Storage.\n\nYou can manage items, \
+repair them, and research hidden details.",
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Click the Activity button to open the chooser.",
+            "activity_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.CHOOSER_OPENED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Choose Storage to manage your items.",
+            "storage_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.ACTIVITY_CHOSEN,
+        ),
+    ]
+
+
+## Storage workshop tutorial for onboarding. Inlines storage_script content
+## with the final leave_btn step changed to SCENE_ENTERED hub so the
+## tutorial completes when the player leaves the storage scene.
+static func onboarding_storage_script() -> Array[TutorialStep]:
     return [
         TutorialStep.new(
             TutorialStep.Kind.POPUP,
@@ -121,297 +194,6 @@ the Workshop in a new slot.",
 your day. You can always come back to the Workshop later.",
             "leave_btn",
             TutorialStep.Advance.SCENE_ENTERED,
-            false,
-            null,
-            [],
-            false,
-            &"",
-            "hub",
-            false,
-        ),
-    ]
-
-# ══ Onboarding segment scripts ════════════════════════════════════════════════
-
-
-## Day 1 Day hub intro + chooser: teaches the hub UI and steers the player to
-## choose Auction.
-static func onboarding_hub_intro_choose_script() -> Array[TutorialStep]:
-    return [
-        TutorialStep.new(
-            TutorialStep.Kind.POPUP,
-            "Welcome to Lot & Haul!\n\nThis is your Hub. Each day has two time \
-slots: Day and Night. You can use each slot for one activity. \
-Let's start your first day with an Auction Run.",
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Click the Activity button to open the activity chooser.",
-            "activity_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.CHOOSER_OPENED,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Choose Auction to begin your first run.",
-            "auction_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.ACTIVITY_CHOSEN,
-        ),
-    ]
-
-
-## Covers the full auction-run scene chain: location select → lot browse →
-## inspection → auction → cargo → run review.
-static func onboarding_auction_run_script() -> Array[TutorialStep]:
-    return [
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Pick a location to visit. Each location has different lots \
-and travel costs.",
-            "cards_container",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.LOCATION_SELECTED,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Browse the available lots and choose one to inspect.",
-            "lot_cards",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.LOT_SELECTED,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Select the item card to inspect it.",
-            "item_browser",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.INSPECTION_ITEM_SELECTED,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Unveil the item to reveal its identity.",
-            "unveil_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.INSPECTION_ITEM_UNVEILED,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Inspect the unveiled item to reveal clue details.",
-            "inspect_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.INSPECTION_PERFORMED,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Review the lot before starting the auction.",
-            "review_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.INSPECTION_REVIEW_OPENED,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Start the auction when you're ready.",
-            "start_auction_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.INSPECTION_AUCTION_STARTED,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Click Bid to place your first bid. No rivals will bid in \
-this tutorial auction.",
-            "bid_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.BID_PLACED,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.POPUP,
-            "With no rival bids, wait for the auction to close.",
-            "",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.AUCTION_RESOLVED,
-            "",
-            false,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Reveal what you won before loading cargo.",
-            "reveal_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.REVEAL_COMPLETED,
-            "",
-            false,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Continue back to the lot list, then head to cargo loading.",
-            "continue_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.REVEAL_CONTINUED,
-            "",
-            false,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "All tutorial lots are resolved. Open cargo loading.",
-            "cargo_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.CARGO_OPENED,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Select the item you want to load.",
-            "item_list",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.CARGO_ITEM_SELECTED,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Place the item into your cargo grid.",
-            "cargo_grid",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.CARGO_ITEM_PLACED,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Click Continue when your cargo is ready.",
-            "continue_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.CARGO_CONTINUE_REQUESTED,
-            "",
-            false,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Review your run results and continue to the Hub.",
-            "continue_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.RUN_REVIEWED,
-            "",
-            false,
-        ),
-    ]
-
-
-## Day 1 Night hub chooser: tells the player to choose Storage.
-static func onboarding_storage_choose_script() -> Array[TutorialStep]:
-    return [
-        TutorialStep.new(
-            TutorialStep.Kind.POPUP,
-            "Good run! Now let's visit Storage.\n\nYou can manage items, \
-repair them, and research hidden details.",
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Click the Activity button to open the chooser.",
-            "activity_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.CHOOSER_OPENED,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Choose Storage to manage your items.",
-            "storage_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            [],
-            false,
-            TutorialEvents.ACTIVITY_CHOSEN,
-        ),
-    ]
-
-
-## Storage workshop tutorial for onboarding. Reuses the existing storage
-## tutorial steps but replaces the final NEXT leave_btn step with a
-## SCENE_ENTERED hub step so the tutorial completes when the player
-## leaves the storage scene, not when they click Next.
-static func onboarding_storage_script() -> Array[TutorialStep]:
-    var steps := storage_script()
-    if not steps.is_empty():
-        # Replace the last step: leave_btn NEXT → SCENE_ENTERED hub.
-        var last := steps.size() - 1
-        steps[last] = TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "When you're done, click here to return to the Hub and continue \
-your day. You can always come back to the Workshop later.",
-            "leave_btn",
-            TutorialStep.Advance.SCENE_ENTERED,
             true,
             null,
             [],
@@ -419,8 +201,8 @@ your day. You can always come back to the Workshop later.",
             &"",
             "hub",
             false,
-        )
-    return steps
+        ),
+    ]
 
 
 ## Day summary pass: brief summary of the day, then advance.
@@ -555,8 +337,7 @@ the multiplier.",
         TutorialStep.new(
             TutorialStep.Kind.HINT,
             "Green faces are good, red faces are bad. The result sets your final price. \
-            Press Confirm when ready. Review the receipt, then confirm to complete the sale. \
-            Funds are added to your balance immediately.",
+            Press Confirm when ready. Review the receipt, then confirm to complete the sale.",
             "deal_panel",
             TutorialStep.Advance.EVENT,
             false,
@@ -976,30 +757,12 @@ static func required_onboarding_unit_ids() -> Array[String]:
     ]
 
 
-## Run-phase milestone unit ids, used for legacy compatibility
-## (old `onboarding_auction_run` seen flag suppresses all of these).
-static func run_milestone_unit_ids() -> Array[String]:
-    return [
-        "onboarding_location_select",
-        "onboarding_lot_browse",
-        "onboarding_inspection",
-        "onboarding_auction",
-        "onboarding_reveal",
-        "onboarding_cargo",
-        "onboarding_run_review",
-    ]
-
-
 static func resolve_script(script_id: String) -> Array[TutorialStep]:
     match script_id:
         "hub":
             return hub_script()
-        "storage":
-            return storage_script()
         "onboarding_hub_intro_choose":
             return onboarding_hub_intro_choose_script()
-        "onboarding_auction_run":
-            return onboarding_auction_run_script()
         "onboarding_location_select":
             return onboarding_location_select_script()
         "onboarding_lot_browse":
@@ -1034,9 +797,7 @@ static func resolve_script(script_id: String) -> Array[TutorialStep]:
 static func known_script_ids() -> Array[String]:
     return [
         "hub",
-        "storage",
         "onboarding_hub_intro_choose",
-        "onboarding_auction_run",
         "onboarding_location_select",
         "onboarding_lot_browse",
         "onboarding_inspection",

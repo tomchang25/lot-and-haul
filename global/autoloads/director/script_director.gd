@@ -306,19 +306,8 @@ func _should_consider_unit(unit: TutorialScripts.TutorialUnit) -> bool:
     return not _is_unit_seen(unit.id)
 
 
-## Legacy compatibility: if the old monolithic `onboarding_auction_run` is in the
-## seen set, treat every new run-phase milestone as seen so existing saves do
-## not re-trigger the split run tutorial.
 func _is_unit_seen(unit_id: String) -> bool:
-    if MetaManager.progress.tutorial_seen.has(unit_id):
-        return true
-    if unit_id in _run_milestone_unit_ids() and MetaManager.progress.tutorial_seen.has("onboarding_auction_run"):
-        return true
-    return false
-
-
-func _run_milestone_unit_ids() -> Array[String]:
-    return TutorialScripts.run_milestone_unit_ids()
+    return MetaManager.progress.tutorial_seen.has(unit_id)
 
 
 ## Checks whether onboarding should complete. Two paths:

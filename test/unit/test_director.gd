@@ -122,7 +122,7 @@ func test_anchor_fallback_resolves_when_primary_hidden() -> void:
     }
     anchors["repair_btn"].hide()
     Director.register_scene("test_storage [DEBUG-PASS]", anchors)
-    Director.start_script("storage")
+    Director.start_script("onboarding_storage")
     # Advance through steps 0 (POPUP), 1 (item_browser), 2 (detail_rail).
     Director.advance_step()
     Director.advance_step()
@@ -157,7 +157,7 @@ func test_anchor_fallback_all_hidden_skips() -> void:
     anchors["repair_btn"].hide()
     anchors["restore_btn"].hide()
     Director.register_scene("test_storage [DEBUG-PASS]", anchors)
-    Director.start_script("storage")
+    Director.start_script("onboarding_storage")
     # Advance through steps 0-2.
     Director.advance_step()
     Director.advance_step()
@@ -175,13 +175,13 @@ func test_offer_accept_emits_signal() -> void:
     # Register storage anchors so that accepting the offer does not produce
     # anchor validation errors.
     Director.register_scene("test_storage [DIRECTOR-TEST]", _storage_anchors())
-    Director.show_offer_prompt("storage", "Test offer?", "Accept")
+    Director.show_offer_prompt("onboarding_storage", "Test offer?", "Accept")
     assert_true(Director.is_offer_showing(), "offer is showing after show_offer_prompt")
     Director.accept_offer()
     assert_signal_emitted(Director, "offer_accepted")
     var params = get_signal_parameters(Director, "offer_accepted")
     if params != null and (params as Array).size() > 0:
-        assert_eq((params as Array)[0], "storage")
+        assert_eq((params as Array)[0], "onboarding_storage")
 
 # ══ Unknown script id ═════════════════════════════════════════════════════
 
@@ -254,12 +254,12 @@ func test_unknown_script_id_returns_empty() -> void:
 
 
 func test_validate_anchors_finds_missing() -> void:
-    var missing := TutorialScripts.validate_anchors("storage", { "item_browser": _make_anchor_button() })
+    var missing := TutorialScripts.validate_anchors("onboarding_storage", { "item_browser": _make_anchor_button() })
     assert_true("detail_rail" in missing, "detail_rail reported missing")
 
 
 func test_validate_anchors_empty_when_all_present() -> void:
-    var missing := TutorialScripts.validate_anchors("storage", _storage_anchors())
+    var missing := TutorialScripts.validate_anchors("onboarding_storage", _storage_anchors())
     assert_true(missing.is_empty(), "no missing anchors when all present")
 
 
@@ -384,7 +384,6 @@ func test_trigger_onboarding_storage_choose_starts_independent_of_run() -> void:
 
 
 func test_onboarding_resolver_supports_storage_choose() -> void:
-    MetaManager.progress.mark_tutorial_seen("onboarding_auction_run")
     MetaManager.slot.set_slot(SlotStore.SLOT_NIGHT)
     Director.register_scene("hub", { "activity_btn": _make_anchor_button(), "storage_btn": _make_anchor_button() })
     assert_true(ScriptDirector.active, "onboarding storage_choose should start for night hub")
@@ -400,7 +399,6 @@ func test_onboarding_resolver_does_not_interfere_with_synthetic_scenes() -> void
 func test_onboarding_scripts_resolve() -> void:
     var ids := [
         "onboarding_hub_intro_choose",
-        "onboarding_auction_run",
         "onboarding_location_select",
         "onboarding_lot_browse",
         "onboarding_inspection",
@@ -435,10 +433,14 @@ func test_skip_all_onboarding_clears_chain() -> void:
     Director.skip_all_onboarding()
     assert_false(ScriptDirector.active, "script should not be active after skip all")
     assert_false(MetaManager.is_onboarding_pending(), "onboarding should be cleared after skip all")
-    assert_true(MetaManager.progress.tutorial_seen.has("onboarding_hub_intro_choose"),
-            "skip all marks hub_intro_choose seen")
-    assert_true(MetaManager.progress.tutorial_seen.has("onboarding_selling"),
-            "skip all marks selling seen")
+    assert_true(
+        MetaManager.progress.tutorial_seen.has("onboarding_hub_intro_choose"),
+        "skip all marks hub_intro_choose seen",
+    )
+    assert_true(
+        MetaManager.progress.tutorial_seen.has("onboarding_selling"),
+        "skip all marks selling seen",
+    )
 
 
 func test_selling_segment_completes_onboarding() -> void:
@@ -467,9 +469,9 @@ func test_selling_segment_completes_onboarding() -> void:
     # Step 5: aggressive, EVENT.
     assert_eq(Director.step_index(), 5, "at aggressive step")
     EventBus.tutorial_event.emit(TutorialEvents.SELL_AGGRESSIVE_REQUESTED, { })
-    # Step 6: dice, NEXT.
+    # Step 6: dice, EVENT (DICE_TOGGLED).
     assert_eq(Director.step_index(), 6, "at dice step")
-    Director.advance_step()
+    EventBus.tutorial_event.emit(TutorialEvents.DICE_TOGGLED, { })
     # Step 7: confirm sale, EVENT (SALE_COMPLETED).
     assert_eq(Director.step_index(), 7, "at confirm step")
     EventBus.tutorial_event.emit(TutorialEvents.SALE_COMPLETED, { })
@@ -498,7 +500,6 @@ func test_onboarding_location_select_starts_auction_segment() -> void:
 
 
 func test_onboarding_day_pass_starts_when_prereqs_met() -> void:
-    MetaManager.progress.mark_tutorial_seen("onboarding_auction_run")
     MetaManager.progress.mark_tutorial_seen("onboarding_storage_choose")
     MetaManager.progress.mark_tutorial_seen("onboarding_storage")
     Director.register_scene("day_summary", { "continue_btn": _make_anchor_button() })
@@ -507,7 +508,6 @@ func test_onboarding_day_pass_starts_when_prereqs_met() -> void:
 
 func test_onboarding_selling_skipped_when_storage_empty() -> void:
     MetaManager.progress.reset_onboarding()
-    MetaManager.progress.mark_tutorial_seen("onboarding_auction_run")
     MetaManager.progress.mark_tutorial_seen("onboarding_storage_choose")
     MetaManager.progress.mark_tutorial_seen("onboarding_storage")
     MetaManager.progress.mark_tutorial_seen("onboarding_day_pass")
@@ -525,26 +525,15 @@ func test_onboarding_day_summary_event_advances() -> void:
 
 
 func test_onboarding_bid_placed_event_advances() -> void:
-    ScriptDirector.start_script("onboarding_auction_run")
-    # Advance through steps 0-6 (location, lot, inspection flow, auction start).
-    # These are EVENT steps — we emit the matching events.
-    EventBus.tutorial_event.emit(TutorialEvents.LOCATION_SELECTED, { })
-    EventBus.tutorial_event.emit(TutorialEvents.LOT_SELECTED, { })
-    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_SELECTED, { })
-    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_UNVEILED, { })
-    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_PERFORMED, { })
-    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_REVIEW_OPENED, { })
-    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_AUCTION_STARTED, { })
-    # Step 7 is bid_btn, advance EVENT BID_PLACED.
+    ScriptDirector.start_script("onboarding_auction")
+    # The auction script has 2 EVENT steps: BID_PLACED then AUCTION_RESOLVED.
+    assert_eq(Director.step_index(), 0, "at step 0 (bid) after start")
     assert_true(ScriptDirector.active, "tutorial active at bid step")
-    assert_eq(Director.step_index(), 7, "at step 7 (bid) after inspection flow advances")
     EventBus.tutorial_event.emit(TutorialEvents.BID_PLACED, { })
     assert_true(ScriptDirector.active, "tutorial active after bid")
-    assert_eq(Director.step_index(), 8, "at step 8 (auction wait) after bid")
-    # Step 8 is AUCTION_RESOLVED.
+    assert_eq(Director.step_index(), 1, "at step 1 (auction wait) after bid")
     EventBus.tutorial_event.emit(TutorialEvents.AUCTION_RESOLVED, { })
-    assert_true(ScriptDirector.active, "tutorial active after auction reset")
-    assert_eq(Director.step_index(), 9, "at step 9 after auction resolved")
+    assert_false(ScriptDirector.active, "tutorial should end after auction resolved")
 
 
 func test_onboarding_storage_completes_on_scene_entered_hub() -> void:
