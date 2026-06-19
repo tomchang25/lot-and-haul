@@ -9,6 +9,7 @@ signal conservative_requested(price: int)
 signal aggressive_requested
 signal pitch_confirmed(price: int)
 signal dice_cancelled
+signal dice_toggled
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -281,6 +282,7 @@ func _on_dice_toggled(index: int, toggled: bool) -> void:
             _play_reject_shake(_dice_buttons[index])
             return
         _selected_dice_indices.append(index)
+        dice_toggled.emit()
     else:
         _selected_dice_indices.erase(index)
 

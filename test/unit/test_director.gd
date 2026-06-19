@@ -375,11 +375,12 @@ func test_onboarding_resolver_skips_when_segment_seen() -> void:
     assert_false(ScriptDirector.active, "onboarding should not start when segment already seen")
 
 
-func test_onboarding_chain_blocks_later_segment() -> void:
-    # storage_choose requires auction_run seen first.
+func test_trigger_onboarding_storage_choose_starts_independent_of_run() -> void:
+    # storage_choose no longer requires auction_run seen; its own trigger
+    # (night hub, day 0, onboarding_pending) decides independently.
     MetaManager.slot.set_slot(SlotStore.SLOT_NIGHT)
     Director.register_scene("hub", { "activity_btn": _make_anchor_button(), "storage_btn": _make_anchor_button() })
-    assert_false(ScriptDirector.active, "storage_choose should not start when auction_run not seen")
+    assert_true(ScriptDirector.active, "storage_choose should start from its own trigger when conditions match")
 
 
 func test_onboarding_resolver_supports_storage_choose() -> void:
@@ -400,6 +401,13 @@ func test_onboarding_scripts_resolve() -> void:
     var ids := [
         "onboarding_hub_intro_choose",
         "onboarding_auction_run",
+        "onboarding_location_select",
+        "onboarding_lot_browse",
+        "onboarding_inspection",
+        "onboarding_auction",
+        "onboarding_reveal",
+        "onboarding_cargo",
+        "onboarding_run_review",
         "onboarding_storage_choose",
         "onboarding_storage",
         "onboarding_day_pass",
@@ -411,13 +419,26 @@ func test_onboarding_scripts_resolve() -> void:
         assert_false(steps.is_empty(), "onboarding script '%s' should resolve" % id)
 
 
-func test_onboarding_close_skips_onboarding() -> void:
+func test_onboarding_close_marks_unit_seen_only() -> void:
     ScriptDirector.start_script("onboarding_hub_intro_choose")
     assert_true(ScriptDirector.active, "onboarding script should be active")
     assert_true(MetaManager.is_onboarding_pending(), "onboarding pending before close")
     ScriptDirector.stop_script()
     assert_false(ScriptDirector.active, "script should not be active after close")
-    assert_false(MetaManager.is_onboarding_pending(), "onboarding should be skipped after close")
+    assert_true(MetaManager.is_onboarding_pending(), "onboarding should STILL be pending after single-unit close")
+    assert_true(MetaManager.progress.tutorial_seen.has("onboarding_hub_intro_choose"), "closed unit should be marked seen")
+
+
+func test_skip_all_onboarding_clears_chain() -> void:
+    ScriptDirector.start_script("onboarding_hub_intro_choose")
+    assert_true(MetaManager.is_onboarding_pending(), "onboarding pending before skip all")
+    Director.skip_all_onboarding()
+    assert_false(ScriptDirector.active, "script should not be active after skip all")
+    assert_false(MetaManager.is_onboarding_pending(), "onboarding should be cleared after skip all")
+    assert_true(MetaManager.progress.tutorial_seen.has("onboarding_hub_intro_choose"),
+            "skip all marks hub_intro_choose seen")
+    assert_true(MetaManager.progress.tutorial_seen.has("onboarding_selling"),
+            "skip all marks selling seen")
 
 
 func test_selling_segment_completes_onboarding() -> void:

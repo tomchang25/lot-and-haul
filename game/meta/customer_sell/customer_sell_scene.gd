@@ -66,6 +66,7 @@ func _ready() -> void:
     _deal_panel.conservative_requested.connect(_on_conservative_requested)
     _deal_panel.aggressive_requested.connect(_on_aggressive_requested)
     _deal_panel.pitch_confirmed.connect(_on_pitch_confirmed)
+    _deal_panel.dice_toggled.connect(_on_dice_toggled)
 
     _receipt.receipt_confirmed.connect(_on_receipt_confirmed)
     _receipt.receipt_cancelled.connect(_on_receipt_cancelled)
@@ -221,6 +222,10 @@ func _on_conservative_requested(price: int) -> void:
     _pending_sale_price = price
     _pending_strategy = "conservative"
     _receipt.show_receipt(placed, price, "conservative")
+
+
+func _on_dice_toggled() -> void:
+    EventBus.tutorial_event.emit(TutorialEvents.DICE_TOGGLED, { })
 
 
 func _on_aggressive_requested() -> void:

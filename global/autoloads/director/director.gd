@@ -139,6 +139,13 @@ func start_script(script_id: String) -> void:
 func advance_step() -> void:
     advance_requested.emit()
 
+
+## Marks every onboarding unit as seen and clears the onboarding-pending flag
+## immediately. Only callable from debug menu or explicit user action — never
+## from the per-step X button. Delegates to the flow layer.
+func skip_all_onboarding() -> void:
+    ScriptDirector.skip_all_onboarding()
+
 # ══ Public accessors — delegated to ScriptDirector ════════════════════════════
 
 

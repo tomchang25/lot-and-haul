@@ -1,8 +1,26 @@
 # tutorial_scripts.gd
 # Static step arrays for hub and storage tutorials.
 # Not autoloaded — imported by Director.
-# The single surface for script id resolution and anchor validation.
+# The single surface for script id resolution, anchor validation, and unit registry.
 class_name TutorialScripts
+
+class TutorialUnit:
+    var id: String
+    var steps_resolver: Callable
+    var trigger: Callable
+    var once: bool = true
+
+
+    func _init(p_id: String, p_resolver: Callable, p_trigger: Callable, p_once: bool = true) -> void:
+        id = p_id
+        steps_resolver = p_resolver
+        trigger = p_trigger
+        once = p_once
+
+
+    func steps() -> Array[TutorialStep]:
+        return steps_resolver.call() as Array[TutorialStep]
+
 
 static func hub_script() -> Array[TutorialStep]:
     return [
@@ -333,7 +351,7 @@ this tutorial auction.",
         TutorialStep.new(
             TutorialStep.Kind.HINT,
             "Review your run results and continue to the Hub.",
-            "run_review_continue_btn",
+            "continue_btn",
             TutorialStep.Advance.EVENT,
             true,
             null,
@@ -523,16 +541,22 @@ the more dice you roll. Try it — press the Aggressive button.",
         TutorialStep.new(
             TutorialStep.Kind.HINT,
             "The dice show your luck: each die can add to or subtract from \
-the multiplier. Green faces are good, red faces are bad. The result \
-sets your final price. Press Confirm when ready.",
+the multiplier.",
             "deal_panel",
-            TutorialStep.Advance.NEXT,
+            TutorialStep.Advance.EVENT,
+            false,
+            null,
+            [],
+            false,
+            TutorialEvents.DICE_TOGGLED,
+            "",
             false,
         ),
         TutorialStep.new(
             TutorialStep.Kind.HINT,
-            "Review the receipt, then confirm to complete the sale. \
-Funds are added to your balance immediately.",
+            "Green faces are good, red faces are bad. The result sets your final price. \
+            Press Confirm when ready. Review the receipt, then confirm to complete the sale. \
+            Funds are added to your balance immediately.",
             "deal_panel",
             TutorialStep.Advance.EVENT,
             false,
@@ -566,6 +590,405 @@ The rest is up to you — good luck out there!",
         ),
     ]
 
+# ══ Run-phase split scripts (replaces onboarding_auction_run) ═══════════════════
+
+
+## Location-select: pick a location to start the run.
+static func onboarding_location_select_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Pick a location to visit. Each location has different lots \
+and travel costs.",
+            "cards_container",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.LOCATION_SELECTED,
+        ),
+    ]
+
+
+## Lot-browse: choose a lot to inspect.
+static func onboarding_lot_browse_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Browse the available lots and choose one to inspect.",
+            "lot_cards",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.LOT_SELECTED,
+        ),
+    ]
+
+
+## Inspection: select, unveil, inspect, review, and start auction.
+static func onboarding_inspection_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Select the item card to inspect it.",
+            "item_browser",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.INSPECTION_ITEM_SELECTED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Unveil the item to reveal its identity.",
+            "unveil_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.INSPECTION_ITEM_UNVEILED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Inspect the unveiled item to reveal clue details.",
+            "inspect_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.INSPECTION_PERFORMED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Review the lot before starting the auction.",
+            "review_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.INSPECTION_REVIEW_OPENED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Start the auction when you're ready.",
+            "start_auction_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.INSPECTION_AUCTION_STARTED,
+        ),
+    ]
+
+
+## Auction: bid then wait for resolution.
+static func onboarding_auction_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Click Bid to place your first bid. No rivals will bid in \
+this tutorial auction.",
+            "bid_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.BID_PLACED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.POPUP,
+            "With no rival bids, wait for the auction to close.",
+            "",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.AUCTION_RESOLVED,
+            "",
+            false,
+        ),
+    ]
+
+
+## Reveal: reveal won items before cargo.
+static func onboarding_reveal_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Reveal what you won before loading cargo.",
+            "reveal_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.REVEAL_COMPLETED,
+            "",
+            false,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Continue back to the lot list, then head to cargo loading.",
+            "continue_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.REVEAL_CONTINUED,
+            "",
+            false,
+        ),
+    ]
+
+
+## Cargo: select item, place in grid, continue.
+static func onboarding_cargo_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Select the item you want to load.",
+            "item_list",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.CARGO_ITEM_SELECTED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Place the item into your cargo grid.",
+            "cargo_grid",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.CARGO_ITEM_PLACED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Click Continue when your cargo is ready.",
+            "continue_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.CARGO_CONTINUE_REQUESTED,
+            "",
+            false,
+        ),
+    ]
+
+
+## Run-review: inspect the summary and return to hub.
+static func onboarding_run_review_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Review your run results and continue to the Hub.",
+            "continue_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.RUN_REVIEWED,
+            "",
+            false,
+        ),
+    ]
+
+
+## Hub intro (day 0 day slot).
+static func trigger_onboarding_hub_intro_choose(scene_id: String, ctx: Dictionary) -> bool:
+    if not ctx.get("onboarding_pending", false):
+        return false
+    if int(ctx.get("day", -1)) != 0:
+        return false
+    if int(ctx.get("slot", -1)) != SlotStore.SLOT_DAY:
+        return false
+    return scene_id == "hub"
+
+
+## Location select (day 0 day slot).
+static func trigger_onboarding_location_select(scene_id: String, ctx: Dictionary) -> bool:
+    if not ctx.get("onboarding_pending", false):
+        return false
+    if int(ctx.get("day", -1)) != 0:
+        return false
+    if int(ctx.get("slot", -1)) != SlotStore.SLOT_DAY:
+        return false
+    return scene_id == "location_select"
+
+
+## Lot browse (first tutorial run context).
+static func trigger_onboarding_lot_browse(scene_id: String, ctx: Dictionary) -> bool:
+    if not ctx.get("onboarding_pending", false):
+        return false
+    if not ctx.get("first_tutorial_run", false):
+        return false
+    return scene_id == "lot_browse"
+
+
+## Inspection (first tutorial run context).
+static func trigger_onboarding_inspection(scene_id: String, ctx: Dictionary) -> bool:
+    if not ctx.get("onboarding_pending", false):
+        return false
+    if not ctx.get("first_tutorial_run", false):
+        return false
+    return scene_id == "inspection"
+
+
+## Auction (first tutorial run context).
+static func trigger_onboarding_auction(scene_id: String, ctx: Dictionary) -> bool:
+    if not ctx.get("onboarding_pending", false):
+        return false
+    if not ctx.get("first_tutorial_run", false):
+        return false
+    return scene_id == "auction"
+
+
+## Reveal (first tutorial run context).
+static func trigger_onboarding_reveal(scene_id: String, ctx: Dictionary) -> bool:
+    if not ctx.get("onboarding_pending", false):
+        return false
+    if not ctx.get("first_tutorial_run", false):
+        return false
+    return scene_id == "reveal"
+
+
+## Cargo (first tutorial run context).
+static func trigger_onboarding_cargo(scene_id: String, ctx: Dictionary) -> bool:
+    if not ctx.get("onboarding_pending", false):
+        return false
+    if not ctx.get("first_tutorial_run", false):
+        return false
+    return scene_id == "cargo"
+
+
+## Run review (first tutorial run context).
+static func trigger_onboarding_run_review(scene_id: String, ctx: Dictionary) -> bool:
+    if not ctx.get("onboarding_pending", false):
+        return false
+    if not ctx.get("first_tutorial_run", false):
+        return false
+    return scene_id == "run_review"
+
+
+## Storage choose (day 0 night slot).
+static func trigger_onboarding_storage_choose(scene_id: String, ctx: Dictionary) -> bool:
+    if not ctx.get("onboarding_pending", false):
+        return false
+    if int(ctx.get("day", -1)) != 0:
+        return false
+    if int(ctx.get("slot", -1)) != SlotStore.SLOT_NIGHT:
+        return false
+    return scene_id == "hub"
+
+
+## Storage workshop (onboarding, items exist).
+static func trigger_onboarding_storage(scene_id: String, ctx: Dictionary) -> bool:
+    if not ctx.get("onboarding_pending", false):
+        return false
+    if int(ctx.get("storage_item_count", 0)) <= 0:
+        return false
+    return scene_id == "storage"
+
+
+## Day summary pass.
+static func trigger_onboarding_day_pass(scene_id: String, ctx: Dictionary) -> bool:
+    if not ctx.get("onboarding_pending", false):
+        return false
+    return scene_id == "day_summary"
+
+
+## Shop choose (day 1 day slot).
+static func trigger_onboarding_shop_choose(scene_id: String, ctx: Dictionary) -> bool:
+    if not ctx.get("onboarding_pending", false):
+        return false
+    if int(ctx.get("day", -1)) != 1:
+        return false
+    if int(ctx.get("slot", -1)) != SlotStore.SLOT_DAY:
+        return false
+    return scene_id == "hub"
+
+
+## Selling (onboarding, items exist).
+static func trigger_onboarding_selling(scene_id: String, ctx: Dictionary) -> bool:
+    if not ctx.get("onboarding_pending", false):
+        return false
+    if int(ctx.get("storage_item_count", 0)) <= 0:
+        return false
+    return scene_id == "customer_sell"
+
+# ══ Unit catalog ══════════════════════════════════════════════════════════════
+
+
+## Returns all registered tutorial units in evaluation order (first-match-wins).
+static func units() -> Array[TutorialUnit]:
+    return [
+        TutorialUnit.new("onboarding_hub_intro_choose", onboarding_hub_intro_choose_script, trigger_onboarding_hub_intro_choose),
+        TutorialUnit.new("onboarding_location_select", onboarding_location_select_script, trigger_onboarding_location_select),
+        TutorialUnit.new("onboarding_lot_browse", onboarding_lot_browse_script, trigger_onboarding_lot_browse),
+        TutorialUnit.new("onboarding_inspection", onboarding_inspection_script, trigger_onboarding_inspection),
+        TutorialUnit.new("onboarding_auction", onboarding_auction_script, trigger_onboarding_auction),
+        TutorialUnit.new("onboarding_reveal", onboarding_reveal_script, trigger_onboarding_reveal),
+        TutorialUnit.new("onboarding_cargo", onboarding_cargo_script, trigger_onboarding_cargo),
+        TutorialUnit.new("onboarding_run_review", onboarding_run_review_script, trigger_onboarding_run_review),
+        TutorialUnit.new("onboarding_storage_choose", onboarding_storage_choose_script, trigger_onboarding_storage_choose),
+        TutorialUnit.new("onboarding_storage", onboarding_storage_script, trigger_onboarding_storage),
+        TutorialUnit.new("onboarding_day_pass", onboarding_day_pass_script, trigger_onboarding_day_pass),
+        TutorialUnit.new("onboarding_shop_choose", onboarding_shop_choose_script, trigger_onboarding_shop_choose),
+        TutorialUnit.new("onboarding_selling", onboarding_selling_script, trigger_onboarding_selling),
+    ]
+
+
+## Script ids that, once all are seen (via completion or individual skip),
+## cause onboarding to be marked complete.
+static func required_onboarding_unit_ids() -> Array[String]:
+    return [
+        "onboarding_hub_intro_choose",
+        "onboarding_location_select",
+        "onboarding_lot_browse",
+        "onboarding_inspection",
+        "onboarding_auction",
+        "onboarding_reveal",
+        "onboarding_cargo",
+        "onboarding_run_review",
+        "onboarding_storage_choose",
+        "onboarding_storage",
+        "onboarding_day_pass",
+        "onboarding_shop_choose",
+        "onboarding_selling",
+    ]
+
+
+## Run-phase milestone unit ids, used for legacy compatibility
+## (old `onboarding_auction_run` seen flag suppresses all of these).
+static func run_milestone_unit_ids() -> Array[String]:
+    return [
+        "onboarding_location_select",
+        "onboarding_lot_browse",
+        "onboarding_inspection",
+        "onboarding_auction",
+        "onboarding_reveal",
+        "onboarding_cargo",
+        "onboarding_run_review",
+    ]
+
 
 static func resolve_script(script_id: String) -> Array[TutorialStep]:
     match script_id:
@@ -577,6 +1000,20 @@ static func resolve_script(script_id: String) -> Array[TutorialStep]:
             return onboarding_hub_intro_choose_script()
         "onboarding_auction_run":
             return onboarding_auction_run_script()
+        "onboarding_location_select":
+            return onboarding_location_select_script()
+        "onboarding_lot_browse":
+            return onboarding_lot_browse_script()
+        "onboarding_inspection":
+            return onboarding_inspection_script()
+        "onboarding_auction":
+            return onboarding_auction_script()
+        "onboarding_reveal":
+            return onboarding_reveal_script()
+        "onboarding_cargo":
+            return onboarding_cargo_script()
+        "onboarding_run_review":
+            return onboarding_run_review_script()
         "onboarding_storage_choose":
             return onboarding_storage_choose_script()
         "onboarding_storage":
@@ -600,6 +1037,13 @@ static func known_script_ids() -> Array[String]:
         "storage",
         "onboarding_hub_intro_choose",
         "onboarding_auction_run",
+        "onboarding_location_select",
+        "onboarding_lot_browse",
+        "onboarding_inspection",
+        "onboarding_auction",
+        "onboarding_reveal",
+        "onboarding_cargo",
+        "onboarding_run_review",
         "onboarding_storage_choose",
         "onboarding_storage",
         "onboarding_day_pass",

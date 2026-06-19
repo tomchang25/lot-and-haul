@@ -65,11 +65,21 @@ func stop_script() -> void:
         return
     var script_id := _active_script_id
     _mark_seen(script_id)
-    # Closing an onboarding script skips the entire onboarding.
-    if script_id.begins_with("onboarding_"):
-        MetaManager.skip_onboarding()
+    _complete_onboarding_if_all_milestones_seen(script_id)
     Director.hide_tutorial_overlay()
     _clear_state()
+
+
+## Marks every onboarding unit as seen, clears the pending flag, and stops
+## any currently active script. Only callable from debug menu or explicit
+## user action — never from the per-step X button.
+func skip_all_onboarding() -> void:
+    if _is_active:
+        stop_script()
+    for unit: TutorialScripts.TutorialUnit in TutorialScripts.units():
+        if unit.id.begins_with("onboarding_"):
+            MetaManager.mark_tutorial_seen(unit.id)
+    MetaManager.skip_onboarding()
 
 
 ## Clears runtime-only tutorial flow state without marking anything seen.
@@ -230,9 +240,7 @@ func _skip_non_renderable_next_steps() -> void:
 func _end_tutorial() -> void:
     var completed_id := _active_script_id
     _mark_seen(completed_id)
-    # Completing the selling segment finishes onboarding.
-    if completed_id == "onboarding_selling":
-        MetaManager.complete_onboarding()
+    _complete_onboarding_if_all_milestones_seen(completed_id)
     Director.hide_tutorial_overlay()
     _clear_state()
     Director.notify_script_completed(completed_id)
@@ -256,8 +264,17 @@ func _clear_state() -> void:
 
 
 func _decide_tutorial_for_scene(scene_id: String) -> void:
+    var ctx := _build_trigger_context()
+    for unit: TutorialScripts.TutorialUnit in TutorialScripts.units():
+        if not _should_consider_unit(unit):
+            continue
+        if not unit.trigger.call(scene_id, ctx):
+            continue
+        start_script(unit.id)
+        return
+
+    # When onboarding is still pending, do not fall through to legacy offers.
     if MetaManager.is_onboarding_pending():
-        _decide_onboarding_for_scene(scene_id)
         return
     match scene_id:
         "hub":
@@ -268,79 +285,55 @@ func _decide_tutorial_for_scene(scene_id: String) -> void:
             pass
 
 
-func _decide_onboarding_for_scene(scene_id: String) -> void:
-    var segment_id := _derive_onboarding_segment(scene_id)
-    if segment_id.is_empty():
-        return
-    if MetaManager.progress.tutorial_seen.has(segment_id):
-        return
-    if not _check_chain_prerequisite(segment_id):
-        return
-    start_script(segment_id)
+func _build_trigger_context() -> Dictionary:
+    return {
+        "day": MetaManager.progress.current_day,
+        "slot": MetaManager.slot.current_slot,
+        "onboarding_pending": MetaManager.is_onboarding_pending(),
+        "is_run_active": RunManager.is_run_active(),
+        "first_tutorial_run": _is_first_tutorial_run_context(),
+        "storage_item_count": MetaManager.storage.storage_items.size(),
+    }
 
 
-## Returns true when [param segment_id]'s chain prerequisite is met or the
-## segment has no prerequisite.
-func _check_chain_prerequisite(segment_id: String) -> bool:
-    var prereq: String = _onboarding_prerequisite(segment_id)
-    if prereq.is_empty():
+func _is_first_tutorial_run_context() -> bool:
+    return MetaManager.is_onboarding_pending() and MetaManager.progress.current_day == 0
+
+
+func _should_consider_unit(unit: TutorialScripts.TutorialUnit) -> bool:
+    if not unit.once:
         return true
-    return MetaManager.progress.tutorial_seen.has(prereq)
+    return not _is_unit_seen(unit.id)
 
 
-## Returns the prerequisite segment id for [param segment_id], or empty if none.
-func _onboarding_prerequisite(segment_id: String) -> String:
-    match segment_id:
-        "onboarding_auction_run":
-            return "onboarding_hub_intro_choose"
-        "onboarding_storage_choose":
-            return "onboarding_auction_run"
-        "onboarding_storage":
-            return "onboarding_storage_choose"
-        "onboarding_day_pass":
-            return "onboarding_storage"
-        "onboarding_shop_choose":
-            return "onboarding_day_pass"
-        "onboarding_selling":
-            return "onboarding_shop_choose"
-        _:
-            return ""
+## Legacy compatibility: if the old monolithic `onboarding_auction_run` is in the
+## seen set, treat every new run-phase milestone as seen so existing saves do
+## not re-trigger the split run tutorial.
+func _is_unit_seen(unit_id: String) -> bool:
+    if MetaManager.progress.tutorial_seen.has(unit_id):
+        return true
+    if unit_id in _run_milestone_unit_ids() and MetaManager.progress.tutorial_seen.has("onboarding_auction_run"):
+        return true
+    return false
 
 
-## Derives the onboarding segment id from the current game state and scene.
-## The segment is not persisted — it is recalculated on every scene registration
-## so resume always picks the right segment for the real economy state.
-func _derive_onboarding_segment(scene_id: String) -> String:
-    var day: int = MetaManager.progress.current_day
-    var slot: int = MetaManager.slot.current_slot
+func _run_milestone_unit_ids() -> Array[String]:
+    return TutorialScripts.run_milestone_unit_ids()
 
-    # location_select starts the auction-run segment even before the run is
-    # created, so the first step (pick a location) is visible immediately.
-    if scene_id == "location_select" and day == 0 and slot == SlotStore.SLOT_DAY:
-        return "onboarding_auction_run"
 
-    match scene_id:
-        "hub":
-            if day == 0 and slot == SlotStore.SLOT_DAY:
-                return "onboarding_hub_intro_choose"
-            if day == 0 and slot == SlotStore.SLOT_NIGHT:
-                return "onboarding_storage_choose"
-            if day == 1 and slot == SlotStore.SLOT_DAY:
-                return "onboarding_shop_choose"
-        "storage":
-            return "onboarding_storage"
-        "day_summary":
-            return "onboarding_day_pass"
-        "customer_sell":
-            # Only start selling segment when there are items to sell.
-            if MetaManager.storage.storage_items.is_empty():
-                return ""
-            return "onboarding_selling"
-
-    # For other run scenes during the first auction, derive via run state.
-    if RunManager.is_run_active() and (day == 0 or day == 1):
-        return "onboarding_auction_run"
-    return ""
+## Checks whether onboarding should complete. Two paths:
+## 1. The script that just ended is `onboarding_selling` — always complete.
+## 2. Every required onboarding milestone is seen — complete.
+func _complete_onboarding_if_all_milestones_seen(script_id: String) -> void:
+    if not MetaManager.is_onboarding_pending():
+        return
+    if script_id == "onboarding_selling":
+        MetaManager.complete_onboarding()
+        return
+    for unit_id: String in TutorialScripts.required_onboarding_unit_ids():
+        if not _is_unit_seen(unit_id):
+            return
+    MetaManager.complete_onboarding()
 
 
 func _on_hub_registered() -> void:
