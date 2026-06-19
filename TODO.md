@@ -233,6 +233,8 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 > Ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched.
 > All phases shipped → archive the plan file + delete this line.
 
+- [run_snapshot] Active run aggregate snapshot serialization standardization with shared Entry tables and Store snapshot methods — see `dev/docs/plans/run_snapshot_serialization_standardization.sketch.md`
+
 - [onboarding] First-game onboarding: Hub → Auction run → Storage → Selling over two real days, on the new tutorial machinery — see `dev/docs/plans/onboarding_flow.md`
 
 ---
@@ -242,6 +244,8 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
 - [affix_dictionary] Player-facing affix dictionary that tracks affix combination discovery, hidden-risk learning, and gated probability reads — see `dev/docs/plans/affix_dictionary.sketch.md`
+
+- [runtime_architecture] Runtime architecture vocabulary standardization: gameplay Managers become Systems, Instance becomes Entry, and archetype boundaries harden — see `dev/docs/plans/runtime_architecture_vocabulary_standardization.sketch.md`
 
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 
