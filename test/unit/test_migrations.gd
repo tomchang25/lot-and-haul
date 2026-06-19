@@ -223,12 +223,10 @@ func test_slot_v1_migration_is_idempotent() -> void:
     store.from_dict(data, ctx)
     assert_eq(store.current_slot, SlotStore.SLOT_DAY_ENDING, "re-run must not re-migrate to Night (2)")
 
-# ══ RunStore migration (v1 → v2) — disable_npc_bids ═══════════════════════
+# ══ RunStore migration (v1/v2 → v3) — disable_npc_bids removal ═══════════
 
 
-func test_run_store_v1_missing_disable_npc_bids_defaults_false() -> void:
-    # RunStore.restore_snapshot calls the migration path which adds the field.
-    # Use the public restore API so the test does not reach into private methods.
+func test_run_store_v1_migration_erases_disable_npc_bids() -> void:
     var ctx := SaveLoadContext.new()
     var store := RunStore.new()
     var v1_data := {
@@ -251,5 +249,59 @@ func test_run_store_v1_missing_disable_npc_bids_defaults_false() -> void:
     }
     var restored := store.restore_snapshot(v1_data, RunSnapshotContext.new(), ctx)
     assert_true(restored, "v1 run snapshot should restore through migration")
-    assert_false(store.disable_npc_bids, "disable_npc_bids defaults to false")
-    assert_eq(v1_data["_version"], 2, "version bumped to 2 after migration")
+    assert_false(v1_data.has("disable_npc_bids"), "disable_npc_bids should be erased after migration")
+    assert_eq(v1_data["_version"], 3, "version bumped to 3 after migration")
+
+
+func test_run_store_v2_migration_erases_disable_npc_bids() -> void:
+    var ctx := SaveLoadContext.new()
+    var store := RunStore.new()
+    var v2_data := {
+        "_version": 2,
+        "trailer_damage_applied": false,
+        "location_id": "suburban_storage",
+        "car_id": "van_basic",
+        "inspection_ap_cap": 10,
+        "refill_metric": 5,
+        "entry_fee": 0,
+        "fuel_cost": 0,
+        "stamina": 30,
+        "max_stamina": 30,
+        "paid_price": 0,
+        "onsite_proceeds": 0,
+        "browse_index": 0,
+        "disable_npc_bids": true,
+        "won_item_keys": [],
+        "cargo_item_keys": [],
+        "trailer_item_keys": [],
+    }
+    var restored := store.restore_snapshot(v2_data, RunSnapshotContext.new(), ctx)
+    assert_true(restored, "v2 run snapshot should restore through migration")
+    assert_false(v2_data.has("disable_npc_bids"), "disable_npc_bids should be erased after v2→v3 migration")
+    assert_eq(v2_data["_version"], 3, "version bumped to 3 after v2→v3 migration")
+
+
+func test_run_store_v3_round_trip() -> void:
+    var ctx := SaveLoadContext.new()
+    var store := RunStore.new()
+    var v3_data := {
+        "_version": 3,
+        "trailer_damage_applied": false,
+        "location_id": "suburban_storage",
+        "car_id": "van_basic",
+        "inspection_ap_cap": 10,
+        "refill_metric": 5,
+        "entry_fee": 0,
+        "fuel_cost": 0,
+        "stamina": 30,
+        "max_stamina": 30,
+        "paid_price": 0,
+        "onsite_proceeds": 0,
+        "browse_index": 0,
+        "won_item_keys": [],
+        "cargo_item_keys": [],
+        "trailer_item_keys": [],
+    }
+    var restored := store.restore_snapshot(v3_data, RunSnapshotContext.new(), ctx)
+    assert_true(restored, "v3 run snapshot should restore")
+    assert_eq(v3_data["_version"], 3, "version stays at 3")

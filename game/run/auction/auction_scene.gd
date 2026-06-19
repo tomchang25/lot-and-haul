@@ -117,7 +117,7 @@ func _ready() -> void:
     if Debug.enabled:
         _init_debug_overlay()
 
-    var assist := RunManager.is_disable_npc_bids()
+    var assist := Director.is_auction_assisted()
     if assist:
         _pass_button.disabled = true
         # No NPC timer or circle until the player places their first bid.
@@ -333,7 +333,7 @@ func _resolve() -> void:
     # Defensive guard: if assisted auction tries to resolve without a player
     # bid, restart the circle instead of allowing a loss. This should never
     # fire in normal flow — bid-placement starts the circle.
-    if RunManager.is_disable_npc_bids() and _last_bidder != "player":
+    if Director.is_auction_assisted() and _last_bidder != "player":
         ToastManager.show_dev_error("assisted auction tried to resolve without player bid")
         _start_circle(0.0)
         return
@@ -346,7 +346,7 @@ func _resolve() -> void:
             _npc_timer.stop()
         if _circle_tween:
             _circle_tween.kill()
-        if not RunManager.is_disable_npc_bids() and _current_display_price < _rolled_price:
+        if not Director.is_auction_assisted() and _current_display_price < _rolled_price:
             ToastManager.show_info("Auction resolved by timeout below NPC target.")
         _bid_button.disabled = true
         _pass_button.disabled = true

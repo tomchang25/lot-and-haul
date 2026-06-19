@@ -125,11 +125,6 @@ func apply_trailer_damage() -> int:
 func is_run_active() -> bool:
     return run != null
 
-
-## Returns true when the active run has NPC bidding disabled.
-func is_disable_npc_bids() -> bool:
-    return run != null and run.disable_npc_bids
-
 # ── Run-state mutations ────────────────────────────────────────────────────────
 
 
