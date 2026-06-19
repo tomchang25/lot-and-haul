@@ -81,6 +81,61 @@ func skip_all_onboarding() -> void:
             MetaManager.mark_tutorial_seen(unit.id)
     MetaManager.skip_onboarding()
 
+# ══ Tutorial-driven state queries ════════════════════════════════════════════
+# Called by gameplay scenes via Director facade. The decision logic lives here
+# because flow state (_active_script_id, _is_active) is owned by ScriptDirector.
+
+
+## Returns true when the location-select scene should show only the tutorial
+## location. Uses trigger context directly because this is evaluated before
+## the location_select unit is active.
+func use_tutorial_location() -> bool:
+    if _is_unit_seen("onboarding_location_select"):
+        return false
+    return TutorialScripts.trigger_onboarding_location_select("location_select", _build_trigger_context())
+
+
+## Returns true while the onboarding_auction unit is active. Removed scenarios:
+## - After stop_script mid-auction, returns false (NPC bidding resumes).
+## - When no unit is active, returns false.
+func is_auction_assisted() -> bool:
+    if not _is_active:
+        return false
+    return _active_script_id == "onboarding_auction"
+
+
+## Returns the targeted activity during onboarding, or an empty StringName
+## when no target is active.
+func activity_chooser_target() -> StringName:
+    return _derive_activity_chooser_target()
+
+
+## Returns true when the conservative sale button should be locked in the
+## customer_sell scene. True while onboarding is pending and the selling
+## tutorial has not been seen.
+func is_conservative_sale_locked() -> bool:
+    if not MetaManager.is_onboarding_pending():
+        return false
+    return not _is_unit_seen("onboarding_selling")
+
+
+## Returns true while the onboarding_lot_browse unit is active. Lot_browse
+## scene uses this to disable pass/skip buttons during the first lot browse.
+func should_disable_pass_in_lot_browse() -> bool:
+    return _is_active and _active_script_id == "onboarding_lot_browse"
+
+
+## Returns true while the onboarding_inspection unit is active and the player
+## has not yet performed an inspection (step index < 3). After INSPECTION_PERFORMED
+## (step 3), the review button is unlocked.
+func should_disable_inspection_review() -> bool:
+    if not _is_active or _active_script_id != "onboarding_inspection":
+        return false
+    var step := _current_step()
+    if step == null:
+        return false
+    return _active_step_index < 3
+
 
 ## Clears runtime-only tutorial flow state without marking anything seen.
 ## Save-slot reset/load creates new persistent ProgressStore state, so active
@@ -308,6 +363,22 @@ func _should_consider_unit(unit: TutorialScripts.TutorialUnit) -> bool:
 
 func _is_unit_seen(unit_id: String) -> bool:
     return MetaManager.progress.tutorial_seen.has(unit_id)
+
+
+## Derives the targeted activity during onboarding, or returns an empty
+## StringName when no activity is targeted.
+func _derive_activity_chooser_target() -> StringName:
+    if not MetaManager.is_onboarding_pending():
+        return &""
+    if MetaManager.progress.current_day == 0 and MetaManager.slot.current_slot == SlotStore.SLOT_DAY:
+        return &"auction"
+    if MetaManager.progress.current_day == 0 and MetaManager.slot.current_slot == SlotStore.SLOT_NIGHT:
+        return &"storage"
+    if MetaManager.progress.current_day == 1 and MetaManager.slot.current_slot == SlotStore.SLOT_DAY:
+        if MetaManager.storage.storage_items.is_empty():
+            return &""
+        return &"selling"
+    return &""
 
 
 ## Checks whether onboarding should complete. Two paths:

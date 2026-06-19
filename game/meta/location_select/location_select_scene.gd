@@ -37,7 +37,7 @@ func _populate_cards() -> void:
 
     # During the first onboarding run, show ONLY the tutorial location.
     # Never fall through to normal pool — tutorial must gate to the intended path.
-    if MetaManager.is_onboarding_pending():
+    if Director.use_tutorial_location():
         var tutorial_loc := LocationRegistry.get_tutorial_location()
         if tutorial_loc == null:
             ToastManager.show_dev_error("LocationSelectScene: no tutorial location found for onboarding")
@@ -61,14 +61,10 @@ func _populate_cards() -> void:
 func _on_card_pressed(card: LocationCard) -> void:
     var location := card.get_location_data()
 
-    # During the first onboarding run, use the tutorial location and enable
-    # assisted auction (no NPC bids, timer waits for player bid).
-    var assisted := MetaManager.is_onboarding_pending() and MetaManager.progress.current_day == 0
-
     # Create the run store first, then advance the slot + save.
     # This ensures the run snapshot is included in the save so a mid-run quit
     # does not leave the day slot consumed without a restorable run.
-    RunManager.create_run_store(location, MetaManager.garage.active_car, assisted)
+    RunManager.create_run_store(location, MetaManager.garage.active_car)
     RunManager.set_resume_target(RunStore.RESUME_LOCATION_ENTRY)
     MetaManager.begin_auction()
     EventBus.tutorial_event.emit(TutorialEvents.LOCATION_SELECTED, { })

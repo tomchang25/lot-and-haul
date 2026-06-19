@@ -107,7 +107,7 @@ func _ready() -> void:
 
     # During the onboarding_selling tutorial, lock conservative so the player
     # can't short-circuit the aggressive dice flow by closing the sale early.
-    if MetaManager.is_onboarding_pending() and not MetaManager.progress.tutorial_seen.has("onboarding_selling"):
+    if Director.is_conservative_sale_locked():
         _deal_panel.set_conservative_sale_locked(true)
         Director.script_completed.connect(_on_selling_tutorial_completed)
 

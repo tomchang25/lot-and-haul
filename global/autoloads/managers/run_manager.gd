@@ -25,7 +25,7 @@ var lot: LotStore = null
 ## [param car]. Resolves auction AP at the single construction point so no
 ## caller can forget to initialize it. Called by Location Select before the
 ## run phase begins.
-func create_run_store(location: LocationData, car: CarData, assisted: bool = false) -> void:
+func create_run_store(location: LocationData, car: CarData) -> void:
     var ap_cap := _resolve_inspection_ap_cap(car)
     var refill := _resolve_refill_reserve(car)
     var entry_fee := location.entry_fee if location != null else 0
@@ -35,7 +35,7 @@ func create_run_store(location: LocationData, car: CarData, assisted: bool = fal
         else 0
     )
     var r := RunStore.new()
-    r.initialize(location, car, ap_cap, refill, entry_fee, fuel_cost, assisted)
+    r.initialize(location, car, ap_cap, refill, entry_fee, fuel_cost)
     run = r
 
 

@@ -126,17 +126,16 @@ func _show_chooser() -> void:
     _auction_btn.disabled = false
     _storage_btn.disabled = false
     _sell_btn.disabled = false
-    if MetaManager.is_onboarding_pending():
-        var target := MetaManager.onboarding_target_activity()
-        if target == "auction":
-            _storage_btn.disabled = true
-            _sell_btn.disabled = true
-        elif target == "storage":
-            _auction_btn.disabled = true
-            _sell_btn.disabled = true
-        elif target == "selling":
-            _auction_btn.disabled = true
-            _storage_btn.disabled = true
+    var target := Director.activity_chooser_target()
+    if target == &"auction":
+        _storage_btn.disabled = true
+        _sell_btn.disabled = true
+    elif target == &"storage":
+        _auction_btn.disabled = true
+        _sell_btn.disabled = true
+    elif target == &"selling":
+        _auction_btn.disabled = true
+        _storage_btn.disabled = true
 
     _chooser.show()
 

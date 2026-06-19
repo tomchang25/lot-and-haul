@@ -146,6 +146,47 @@ func advance_step() -> void:
 func skip_all_onboarding() -> void:
     ScriptDirector.skip_all_onboarding()
 
+# ══ Tutorial-driven state queries — delegated to ScriptDirector ═════════════
+
+
+## Returns true when the location-select scene should show only the tutorial
+## location. Evaluated before the location_select unit is active, so it uses
+## trigger context directly.
+func use_tutorial_location() -> bool:
+    return ScriptDirector.use_tutorial_location()
+
+
+## Returns true while the onboarding_auction unit is active. Auction scene
+## uses this to disable NPC bidding and the pass button.
+func is_auction_assisted() -> bool:
+    return ScriptDirector.is_auction_assisted()
+
+
+## Returns the activity that the onboarding flow wants the player to choose
+## ("auction", "storage", "selling"), or an empty StringName when no target
+## is active. Hub scene uses this to gate the chooser buttons.
+func activity_chooser_target() -> StringName:
+    return ScriptDirector.activity_chooser_target()
+
+
+## Returns true while onboarding is pending and the selling tutorial has not
+## yet been seen. Customer_sell scene uses this to lock conservative sale.
+func is_conservative_sale_locked() -> bool:
+    return ScriptDirector.is_conservative_sale_locked()
+
+
+## Returns true while the onboarding_lot_browse unit is active. Lot_browse
+## scene uses this to disable the pass/skip buttons.
+func should_disable_pass_in_lot_browse() -> bool:
+    return ScriptDirector.should_disable_pass_in_lot_browse()
+
+
+## Returns true while the onboarding_inspection unit is active and the player
+## has not yet performed an inspection. Inspection scene uses this to disable
+## the review button.
+func should_disable_inspection_review() -> bool:
+    return ScriptDirector.should_disable_inspection_review()
+
 # ══ Public accessors — delegated to ScriptDirector ════════════════════════════
 
 

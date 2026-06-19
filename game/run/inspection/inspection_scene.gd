@@ -78,7 +78,7 @@ func _ready() -> void:
     _footer.show()
     _pass_button.show()
     _review_button.show()
-    _review_button.disabled = _is_onboarding_auction_run()
+    _review_button.disabled = Director.should_disable_inspection_review()
     _pass_button.pressed.connect(_on_pass_pressed)
     _pass_confirm_popup.confirmed.connect(_on_pass_confirmed)
     _review_button.pressed.connect(_on_review_pressed)
@@ -184,7 +184,7 @@ func _do_clue_chain(entry: ItemEntry) -> void:
 
     _complete_action()
     EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_PERFORMED, { })
-    if _is_onboarding_auction_run():
+    if not Director.should_disable_inspection_review():
         _review_button.disabled = false
 
 
@@ -374,7 +374,3 @@ func _on_summary_start_auction_requested() -> void:
     SaveManager.save()
     EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_AUCTION_STARTED, { })
     SceneRouter.go_to_auction()
-
-
-func _is_onboarding_auction_run() -> bool:
-    return MetaManager.is_onboarding_pending() and MetaManager.progress.current_day == 0

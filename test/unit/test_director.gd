@@ -570,3 +570,98 @@ func test_new_event_constants_exist() -> void:
     assert_eq(typeof(TutorialEvents.CARGO_CONTINUE_REQUESTED), TYPE_STRING_NAME, "CARGO_CONTINUE_REQUESTED should be a StringName")
     assert_eq(typeof(TutorialEvents.STORAGE_CONDITION_IMPROVED), TYPE_STRING_NAME, "STORAGE_CONDITION_IMPROVED should be a StringName")
     assert_eq(typeof(TutorialEvents.STORAGE_RESEARCH_PERFORMED), TYPE_STRING_NAME, "STORAGE_RESEARCH_PERFORMED should be a StringName")
+
+# ══ Phase 2 — Director query tests ═════════════════════════════════════════
+
+
+func test_use_tutorial_location_not_seen() -> void:
+    # before_each resets to day 0, slot DAY, onboarding_pending=true.
+    # The location_select unit trigger requires day 0, slot DAY, onboarding_pending.
+    assert_true(Director.use_tutorial_location(), "use_tutorial_location should be true when not seen and day 0 day slot")
+
+
+func test_use_tutorial_location_seen() -> void:
+    MetaManager.progress.mark_tutorial_seen("onboarding_location_select")
+    assert_false(Director.use_tutorial_location(), "use_tutorial_location should be false when seen")
+
+
+func test_is_auction_assisted_active() -> void:
+    Director.start_script("onboarding_auction")
+    assert_true(Director.is_auction_assisted(), "is_auction_assisted should be true when onboarding_auction active")
+    ScriptDirector.stop_script()
+    assert_false(Director.is_auction_assisted(), "is_auction_assisted should be false after stop_script")
+
+
+func test_is_auction_assisted_not_active() -> void:
+    assert_false(Director.is_auction_assisted(), "is_auction_assisted should be false with no active script")
+
+
+func test_is_auction_assisted_wrong_script() -> void:
+    Director.start_script("onboarding_inspection")
+    assert_false(Director.is_auction_assisted(), "is_auction_assisted should be false for non-auction script")
+    ScriptDirector.stop_script()
+
+
+func test_activity_chooser_target_day0_day() -> void:
+    # before_each resets to day 0, slot DAY, onboarding_pending=true.
+    assert_eq(Director.activity_chooser_target(), &"auction", "day 0 day slot should target auction")
+
+
+func test_activity_chooser_target_day0_night() -> void:
+    MetaManager.slot.set_slot(SlotStore.SLOT_NIGHT)
+    assert_eq(Director.activity_chooser_target(), &"storage", "day 0 night slot should target storage")
+
+
+func test_activity_chooser_target_not_pending() -> void:
+    MetaManager.progress.mark_onboarding_complete()
+    MetaManager.slot.set_slot(SlotStore.SLOT_DAY)
+    assert_eq(Director.activity_chooser_target(), &"", "empty when onboarding not pending")
+
+
+func test_is_conservative_sale_locked_not_pending() -> void:
+    MetaManager.progress.mark_onboarding_complete()
+    assert_false(Director.is_conservative_sale_locked(), "not locked when onboarding not pending")
+
+
+func test_is_conservative_sale_locked_when_pending_and_not_seen() -> void:
+    MetaManager.progress.reset_onboarding()
+    assert_false(MetaManager.progress.tutorial_seen.has("onboarding_selling"), "onboarding_selling not yet seen")
+    assert_true(Director.is_conservative_sale_locked(), "locked when pending and selling not seen")
+
+
+func test_is_conservative_sale_locked_not_when_seen() -> void:
+    MetaManager.progress.reset_onboarding()
+    MetaManager.progress.mark_tutorial_seen("onboarding_selling")
+    assert_false(Director.is_conservative_sale_locked(), "not locked when selling already seen")
+
+
+func test_should_disable_pass_in_lot_browse_active() -> void:
+    Director.start_script("onboarding_lot_browse")
+    assert_true(Director.should_disable_pass_in_lot_browse(), "pass disabled when lot_browse unit active")
+    ScriptDirector.stop_script()
+
+
+func test_should_disable_pass_in_lot_browse_not_active() -> void:
+    assert_false(Director.should_disable_pass_in_lot_browse(), "pass not disabled when no active script")
+
+
+func test_should_disable_inspection_review_active_early_step() -> void:
+    Director.start_script("onboarding_inspection")
+    assert_true(Director.should_disable_inspection_review(), "review disabled at step 0")
+    ScriptDirector.stop_script()
+
+
+func test_should_disable_inspection_review_not_active() -> void:
+    assert_false(Director.should_disable_inspection_review(), "review not disabled when no active script")
+
+
+func test_should_disable_inspection_review_after_inspect() -> void:
+    Director.start_script("onboarding_inspection")
+    # Advance through steps 0 (ITEM_SELECTED), 1 (ITEM_UNVEILED), 2 (INSPECTION_PERFORMED).
+    # Steps 0-2 are EVENT steps, so emit events to advance.
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_SELECTED, { })
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_UNVEILED, { })
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_PERFORMED, { })
+    # After step 2 (index 3), _active_step_index should be >= 3.
+    assert_false(Director.should_disable_inspection_review(), "review not disabled after inspection performed")
+    ScriptDirector.stop_script()

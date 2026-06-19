@@ -73,7 +73,7 @@ func _build_all_cards() -> void:
 
 func _refresh_view() -> void:
     var idx: int = RunManager.run.browse_index
-    var lock_pass := _is_onboarding_auction_run()
+    var lock_pass := Director.should_disable_pass_in_lot_browse()
     _skip_button.disabled = lock_pass
 
     if idx >= RunManager.run.browse_lots.size():
@@ -108,7 +108,7 @@ func _on_enter_pressed() -> void:
 
 
 func _on_pass_pressed() -> void:
-    if _is_onboarding_auction_run():
+    if Director.should_disable_pass_in_lot_browse():
         return
     RunManager.advance_browse_index()
     RunManager.set_resume_target(RunStore.RESUME_LOT_BROWSE)
@@ -117,7 +117,7 @@ func _on_pass_pressed() -> void:
 
 
 func _on_skip_pressed() -> void:
-    if _is_onboarding_auction_run():
+    if Director.should_disable_pass_in_lot_browse():
         return
     var remaining: int = RunManager.run.browse_lots.size() - RunManager.run.browse_index
     _skip_confirm_popup.dialog_text = (
@@ -137,10 +137,6 @@ func _on_cargo_pressed() -> void:
     SaveManager.save()
     EventBus.tutorial_event.emit(TutorialEvents.CARGO_OPENED, { })
     SceneRouter.go_to_cargo()
-
-
-func _is_onboarding_auction_run() -> bool:
-    return MetaManager.is_onboarding_pending() and MetaManager.progress.current_day == 0
 
 # ══ Sampling ══════════════════════════════════════════════════════════════════
 
