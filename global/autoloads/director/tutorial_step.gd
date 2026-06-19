@@ -29,22 +29,48 @@ func _init(
         p_text: String,
         p_anchor_id: String = "",
         p_advance: Advance = Advance.NEXT,
-        p_unlock: bool = false,
-        p_image: Texture2D = null,
-        p_fallback_anchor_ids: Array[String] = [],
-        p_fallback_when_anchor_unrenderable: bool = false,
-        p_advance_event_id: StringName = &"",
-        p_advance_scene_id: String = "",
-        p_blocks_input: bool = true,
 ) -> void:
     kind = p_kind
     text = p_text
     anchor_id = p_anchor_id
     advance = p_advance
-    unlock_anchor = p_unlock
-    image = p_image
-    fallback_anchor_ids = p_fallback_anchor_ids
-    fallback_when_anchor_unrenderable = p_fallback_when_anchor_unrenderable
-    advance_event_id = p_advance_event_id
-    advance_scene_id = p_advance_scene_id
-    blocks_input = p_blocks_input
+
+# ── Fluent factories ──────────────────────────────────────────────────────────
+
+
+static func hint(p_text: String, anchor: String = "") -> TutorialStep:
+    return new(Kind.HINT, p_text, anchor)
+
+
+static func popup(p_text: String) -> TutorialStep:
+    return new(Kind.POPUP, p_text)
+
+# ── Fluent modifiers ──────────────────────────────────────────────────────────
+
+
+func unlock() -> TutorialStep:
+    unlock_anchor = true
+    return self
+
+
+func on_event(event_id: StringName) -> TutorialStep:
+    advance = Advance.EVENT
+    advance_event_id = event_id
+    return self
+
+
+func on_scene(scene_id: String) -> TutorialStep:
+    advance = Advance.SCENE_ENTERED
+    advance_scene_id = scene_id
+    return self
+
+
+func no_block() -> TutorialStep:
+    blocks_input = false
+    return self
+
+
+func with_fallback(ids: Array[String]) -> TutorialStep:
+    fallback_anchor_ids = ids
+    fallback_when_anchor_unrenderable = true
+    return self

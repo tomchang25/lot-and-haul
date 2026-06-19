@@ -56,32 +56,17 @@ Rules:
 Examples:
 
 ```gdscript
-TutorialStep.new(
-        TutorialStep.Kind.HINT,
+TutorialStep.hint(
         "Choose a location.",
         "cards_container",
-        TutorialStep.Advance.EVENT,
-        false,
-        null,
-        [],
-        false,
-        TutorialEvents.LOCATION_SELECTED,
-)
+).unlock().on_event(TutorialEvents.LOCATION_SELECTED)
 ```
 
 ```gdscript
-TutorialStep.new(
-        TutorialStep.Kind.HINT,
+TutorialStep.hint(
         "Go to Storage.",
         "storage_btn",
-        TutorialStep.Advance.SCENE_ENTERED,
-        true,
-        null,
-        [],
-        false,
-        &"",
-        "storage",
-)
+).unlock().on_scene("storage")
 ```
 
 ---
