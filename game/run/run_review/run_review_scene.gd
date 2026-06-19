@@ -42,6 +42,8 @@ func _ready() -> void:
         SceneRouter.go_to_hub.call_deferred()
         return
 
+    RunManager.set_resume_target(RunStore.RESUME_RUN_REVIEW)
+
     _continue_btn.pressed.connect(_on_continue_pressed)
     _continue_btn.press_event = CONFIRM
 
@@ -53,6 +55,7 @@ func _ready() -> void:
 
     var cracked: int = RunManager.apply_trailer_damage()
     _cargo_panel.set_damage_count(cracked)
+    SaveManager.save()
 
     _populate_rows()
     _populate_finance()

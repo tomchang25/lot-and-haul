@@ -1,6 +1,6 @@
 # knowledge_manager.gd
 # Knowledge progression: category mastery, attribute levels, and unlocked perks.
-# Delegates persistent state to KnowledgeStore. Registers the Store with SaveManager.
+# Delegates persistent state to KnowledgeStore. Registered with SaveManager by GameManager.
 extends Node
 
 enum KnowledgeAction {
@@ -39,7 +39,6 @@ func _ready() -> void:
     _load_perk_registry()
     _load_attribute_registry()
     _knowledge = KnowledgeStore.new()
-    SaveManager.register_provider(self)
 
     # Subscribe to hub-phase business events emitted by MetaManager so mastery
     # XP accrues without a direct import dependency (cycle-free).

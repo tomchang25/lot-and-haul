@@ -65,6 +65,10 @@ func get_active_slot() -> int:
 ## owning autoload). The provider must implement to_dict() -> Dictionary,
 ## from_dict(Dictionary), and validate() -> bool.
 func register_provider(provider: Object) -> void:
+    if provider in _providers:
+        ToastManager.show_info("register_provider: %s already registered" % provider)
+        return
+
     if not provider.has_method("to_dict"):
         ToastManager.show_dev_error("register_provider: %s missing to_dict()" % provider)
         return

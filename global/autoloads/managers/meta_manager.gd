@@ -28,7 +28,6 @@ func _ready() -> void:
     progress = ProgressStore.new()
     customers = CustomersStore.new()
     shop_session = ShopSessionStore.new()
-    SaveManager.register_provider(self)
 
 
 ## Re-instantiates all domain stores to their default state. Called by
@@ -437,13 +436,15 @@ func resolve_current_run() -> void:
     var result: RunResult = RunManager.take_run_result()
     resolve_run(result)
     RunManager.clear_run_state()
+    SaveManager.save()
     EventBus.run_resolved.emit(result)
 
 
 ## Resolves a completed run from [param result]: applies cash delta, registers
 ## cargo into storage, stashes run economics as pending for end_day(), and sets
 ## current_slot to 3 so the player returns to the hub for the evening slot.
-## Saves once at the end. Called only from resolve_current_run().
+## Saves once at the end when called without an active run. resolve_current_run()
+## clears RunManager state first, then saves so settled runs do not resume.
 func resolve_run(result: RunResult) -> void:
     economy.apply_delta(
         result.onsite_proceeds - result.paid_price - result.entry_fee - result.fuel_cost,
@@ -459,4 +460,5 @@ func resolve_run(result: RunResult) -> void:
     # Auction consumed the Day slot; player returns for the Night slot.
     slot.set_slot(SlotStore.SLOT_NIGHT) # no inner save
 
-    SaveManager.save() # single commit
+    if not RunManager.is_run_active():
+        SaveManager.save() # single commit for synthetic/direct callers

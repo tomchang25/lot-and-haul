@@ -80,6 +80,9 @@ func _ready() -> void:
         SceneRouter.go_to_hub.call_deferred()
         return
 
+    RunManager.set_resume_target(RunStore.RESUME_CARGO)
+    SaveManager.save()
+
     _run_summary.add_theme_stylebox_override(
         &"panel",
         get_theme_stylebox(&"panel", &"RunSummary"),
@@ -228,6 +231,8 @@ func _on_confirm_popup_confirmed() -> void:
             unplaced_count += 1
 
     RunManager.commit_cargo(cargo, trailer, unplaced_count * Economy.ONSITE_SELL_PRICE)
+    RunManager.set_resume_target(RunStore.RESUME_RUN_REVIEW)
+    SaveManager.save()
     EventBus.tutorial_event.emit(TutorialEvents.CARGO_LOADED, { })
     SceneRouter.go_to_run_review()
 

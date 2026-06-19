@@ -3,7 +3,10 @@
 # duration of a run. Both are null between runs. Provides the factory, AP
 # resolution, and run-phase mutation methods. Scenes read run state via
 # RunManager.run.field and lot state via RunManager.lot.field.
+# Registered with SaveManager so the active run snapshot persists across restarts.
 extends Node
+
+const SAVE_SECTION := "run_snapshot"
 
 ## Full state for the current run. Null between runs.
 ## Scenes in the run phase should guard with RunManager.is_run_active() on entry and then
@@ -71,8 +74,10 @@ func clear_run_state() -> void:
 ## the flag actually flipped). On success and when the item has valid category
 ## data, emits item_unveiled so KnowledgeManager can award REVEAL XP.
 func unveil_item(entry: ItemEntry) -> void:
-    if entry.unveil() and entry.category_data != null:
-        EventBus.item_unveiled.emit(entry)
+    if entry.unveil():
+        SaveManager.mark_dirty()
+        if entry.category_data != null:
+            EventBus.item_unveiled.emit(entry)
 
 
 ## Mediates a clue-attempt roll. Looks up the attribute bonus for
@@ -85,6 +90,7 @@ func attempt_clue(entry: ItemEntry, clue: ClueData) -> bool:
     var before := entry.revealed_clue_ids.size()
     var succeeded := entry.attempt_clue(clue, attribute_bonus)
     if entry.revealed_clue_ids.size() > before:
+        SaveManager.mark_dirty()
         EventBus.item_revealed.emit(entry)
     return succeeded
 
@@ -92,7 +98,10 @@ func attempt_clue(entry: ItemEntry, clue: ClueData) -> bool:
 ## Mediates bulk surface-clue auto-reveal. No signal — this is a hub-return
 ## reveal, not a player-triggered discovery.
 func auto_reveal_all_surface(entry: ItemEntry) -> void:
+    var before := entry.revealed_clue_ids.size()
     entry.auto_reveal_all_surface()
+    if entry.revealed_clue_ids.size() > before:
+        SaveManager.mark_dirty()
 
 
 ## Applies trailer damage to all trailer items in the active run. Rolls each
@@ -103,16 +112,10 @@ func auto_reveal_all_surface(entry: ItemEntry) -> void:
 func apply_trailer_damage() -> int:
     if run == null:
         return 0
-    var car: CarData = run.car_data
-    if car.trailer_damage_chance <= 0.0:
-        return 0
-
-    var cracked := 0
-    for entry: ItemEntry in run.trailer_items:
-        if RandomUtils.randf() < car.trailer_damage_chance:
-            var ratio := RandomUtils.randf_range(car.trailer_damage_ratio_min, car.trailer_damage_ratio_max)
-            entry.apply_damage(ratio)
-            cracked += 1
+    var was_applied := run.trailer_damage_applied
+    var cracked := run.apply_trailer_damage()
+    if run.trailer_damage_applied != was_applied:
+        SaveManager.mark_dirty()
     return cracked
 
 # ── Run-state queries ──────────────────────────────────────────────────────────
@@ -129,6 +132,7 @@ func is_run_active() -> bool:
 func spend_ap(cost: int) -> void:
     if lot:
         lot.deduct_ap(cost)
+        SaveManager.mark_dirty()
 
 
 ## Records a won lot auction: writes the win to LotStore, then accumulates
@@ -139,6 +143,7 @@ func commit_lot_win(items: Array[ItemEntry], price: int) -> void:
         return
     lot.record_win(items, price)
     run.accumulate_lot_result(items, price)
+    SaveManager.mark_dirty()
 
 
 ## Initialises browse state for a fresh location visit: assigns [param lots]
@@ -147,12 +152,14 @@ func init_browse_lots(lots: Array[LotData]) -> void:
     if run == null:
         return
     run.init_browse(lots)
+    SaveManager.mark_dirty()
 
 
 ## Advances browse_index by one (player passed or entered a lot).
 func advance_browse_index() -> void:
     if run:
         run.advance_browse_index()
+        SaveManager.mark_dirty()
 
 
 ## Creates a new LotStore for [param entry] with deficit-refilled AP, replacing
@@ -170,6 +177,7 @@ func set_lot(entry: LotEntry) -> void:
     var l := LotStore.new()
     l.initialize(entry, initial_ap)
     lot = l
+    SaveManager.mark_dirty()
 
 
 ## Nulls the active LotStore. Called by reveal_scene after reading results
@@ -177,6 +185,7 @@ func set_lot(entry: LotEntry) -> void:
 ## normal flow — explicit clear only needed if exiting without starting a new lot.)
 func clear_lot() -> void:
     lot = null
+    SaveManager.mark_dirty()
 
 
 ## Commits cargo loading result: final [param cargo], [param trailer] items,
@@ -189,6 +198,7 @@ func commit_cargo(
     if run == null:
         return
     run.set_cargo_result(cargo, trailer, proceeds)
+    SaveManager.mark_dirty()
 
 # ── Auction AP resolution ──────────────────────────────────────────────────────
 # Single source of truth for a run's starting auction AP. Every modifier source
@@ -213,3 +223,88 @@ func _resolve_refill_reserve(_car: CarData) -> int:
     var reserve: int = Economy.INSPECTION_REFILL_METRIC_DEFAULT
     # Future modifiers fold in here.
     return reserve
+
+# ══ Save provider interface ════════════════════════════════════════════════════
+
+
+## Serializes the active run snapshot for SaveManager. Returns an empty payload
+## when no run is active.
+func to_dict() -> Dictionary:
+    if run == null:
+        return { }
+    var out := { }
+    var item_table := RunItemTable.new()
+    var snapshot := run.encode_with_item_table(item_table)
+    if lot != null:
+        snapshot["lot"] = lot.encode_with_item_table(item_table)
+    snapshot["items"] = item_table.encode_entries()
+    out[SAVE_SECTION] = snapshot
+    return out
+
+
+## Restores the active run from the run snapshot section. Invalid run payloads
+## are discarded as one unit so hub state remains coherent.
+func from_dict(data: Dictionary, ctx: SaveLoadContext) -> void:
+    var snapshot: Dictionary = data.get(SAVE_SECTION, { })
+    if snapshot.is_empty():
+        return
+
+    clear_run_state()
+    var item_table := RunItemTable.new()
+    if not item_table.restore_entries(snapshot.get("items", []), ctx):
+        ctx.warn("Active run could not be restored. Returning to hub.")
+        return
+
+    var restored := RunStore.new()
+    if not restored.restore_with_item_table(snapshot, ctx, item_table):
+        ctx.warn("Active run could not be restored. Returning to hub.")
+        return
+
+    run = restored
+
+    # Restore active lot when present.
+    var lot_data: Dictionary = snapshot.get("lot", { })
+    if not lot_data.is_empty():
+        var new_lot := LotStore.new()
+        if new_lot.restore_with_item_table(lot_data, run, item_table, ctx):
+            lot = new_lot
+        else:
+            clear_run_state()
+            ctx.warn("Active run could not be restored. Returning to hub.")
+
+
+## SaveManager validation hook. Active run state is optional, so there is no
+## cross-provider invariant to validate here.
+func validate() -> bool:
+    # Run state is optional — no validation needed when between runs.
+    return true
+
+
+## Clears active run state when SaveManager resets providers for a new game or
+## test slot.
+func reset() -> void:
+    clear_run_state()
+
+# ══ Resume target (delegated to RunStore) ═════════════════════════════════════
+
+
+## Returns the recorded resume target, or empty string when not set.
+func get_resume_target() -> String:
+    return run.resume_target if run != null else ""
+
+
+## Sets the resume target on the active RunStore. No-op when no run is active.
+func set_resume_target(target: String) -> void:
+    if run != null:
+        run.set_resume_target(target)
+        SaveManager.mark_dirty()
+
+# ══ Run-phase helpers ═════════════════════════════════════════════════════════
+
+
+## Returns the total cash committed during this run (entry fee + fuel + paid price).
+## Used by the auction scene to compute effective budget.
+func get_committed_spend() -> int:
+    if run == null:
+        return 0
+    return run.entry_fee + run.fuel_cost + run.paid_price

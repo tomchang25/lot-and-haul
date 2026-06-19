@@ -183,6 +183,12 @@ func _on_bid_pressed() -> void:
     if not _bid_enabled:
         return
 
+    # Enforce effective cash budget so committed spend never exceeds the wallet.
+    var effective_cash: int = MetaManager.economy.cash - RunManager.get_committed_spend()
+    if effective_cash < _current_display_price + MIN_STEP:
+        _bid_button.disabled = true
+        return
+
     _last_bidder = "player"
     _bid_enabled = false
     _bid_button.disabled = true
@@ -209,6 +215,8 @@ func _on_pass_pressed() -> void:
     if _circle_tween:
         _circle_tween.kill()
 
+    RunManager.set_resume_target(RunStore.RESUME_REVEAL)
+    SaveManager.save()
     SceneRouter.go_to_reveal()
 
 # ══ Auction setup ═════════════════════════════════════════════════════════════
@@ -322,6 +330,8 @@ func _resolve() -> void:
     else:
         _bid_button.disabled = true
         _pass_button.disabled = true
+        RunManager.set_resume_target(RunStore.RESUME_REVEAL)
+        SaveManager.save()
         EventBus.tutorial_event.emit(TutorialEvents.AUCTION_RESOLVED, { })
         SceneRouter.go_to_reveal()
 
@@ -345,6 +355,8 @@ func _win_now(price: int) -> void:
     _bid_enabled = false
 
     RunManager.commit_lot_win(RunManager.lot.lot_items, price)
+    RunManager.set_resume_target(RunStore.RESUME_REVEAL)
+    SaveManager.save()
     AudioManager.play_event(AUCTION_WON)
     EventBus.tutorial_event.emit(TutorialEvents.AUCTION_WON, { })
     EventBus.tutorial_event.emit(TutorialEvents.AUCTION_RESOLVED, { "won": true })

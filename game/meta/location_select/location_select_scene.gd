@@ -47,8 +47,12 @@ func _populate_cards() -> void:
 func _on_card_pressed(card: LocationCard) -> void:
     var location := card.get_location_data()
 
-    MetaManager.begin_auction()
+    # Create the run store first, then advance the slot + save.
+    # This ensures the run snapshot is included in the save so a mid-run quit
+    # does not leave the day slot consumed without a restorable run.
     RunManager.create_run_store(location, MetaManager.garage.active_car)
+    RunManager.set_resume_target(RunStore.RESUME_LOCATION_ENTRY)
+    MetaManager.begin_auction()
     EventBus.tutorial_event.emit(TutorialEvents.LOCATION_SELECTED, { })
     SceneRouter.go_to_location_entry()
 

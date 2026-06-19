@@ -247,8 +247,6 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 - [unlock_gating] Requirement-gated premium auction tiers + lot kinds, with location tier reference table & audit — see `dev/docs/plans/unlock_gating_location_tiers.md`
 
-- [run_persistence] Mid-run save/resume: phase-stable resume scenes, atomic auction, escrowed run economics — see `dev/docs/plans/run_phase_persistence.md`
-
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
 

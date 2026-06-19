@@ -14,6 +14,10 @@ Rules:
 
 ## v0.1.4 - Draft
 
+### Run Phase Persistence
+
+- 2026-06-19 — [run] Mid-run quit now resumes at the last phase scene with escrowed run economics intact; bids enforce the effective-cash budget and the day slot never advances without a restorable run
+
 ### TimeSlot Day/Night Rework
 
 - 2026-06-18 — [timeslot] Hub days now run as Day/Night activity slots with a cancellable chooser, Day-only auctions, slot-scaled Storage AP and selling volume, and save migration from the old three-slot model

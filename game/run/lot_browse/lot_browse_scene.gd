@@ -40,6 +40,8 @@ func _ready() -> void:
 
     if RunManager.run.browse_lots.is_empty():
         RunManager.init_browse_lots(_sample_lots(RunManager.run.location_data))
+        RunManager.set_resume_target(RunStore.RESUME_LOT_BROWSE)
+        SaveManager.save()
 
     _build_all_cards()
     _refresh_view()
@@ -96,12 +98,16 @@ func _on_enter_pressed() -> void:
     var entry := LotEntry.create(lot_data)
     RunManager.set_lot(entry)
     RunManager.advance_browse_index()
+    RunManager.set_resume_target(RunStore.RESUME_INSPECTION)
+    SaveManager.save()
     EventBus.tutorial_event.emit(TutorialEvents.LOT_SELECTED, { })
     SceneRouter.go_to_inspection()
 
 
 func _on_pass_pressed() -> void:
     RunManager.advance_browse_index()
+    RunManager.set_resume_target(RunStore.RESUME_LOT_BROWSE)
+    SaveManager.save()
     _refresh_view()
 
 
@@ -114,10 +120,14 @@ func _on_skip_pressed() -> void:
 
 
 func _on_skip_confirmed() -> void:
+    RunManager.set_resume_target(RunStore.RESUME_CARGO)
+    SaveManager.save()
     SceneRouter.go_to_cargo()
 
 
 func _on_cargo_pressed() -> void:
+    RunManager.set_resume_target(RunStore.RESUME_CARGO)
+    SaveManager.save()
     SceneRouter.go_to_cargo()
 
 # ══ Sampling ══════════════════════════════════════════════════════════════════

@@ -102,6 +102,42 @@ func go_to_customer_sell() -> void:
 func go_to_start_page() -> void:
     _navigate(scenes.start_page)
 
+
+## Routes to the correct scene after an explicit Load Game completes.
+func go_to_loaded_save_entry() -> void:
+    if RunManager.is_run_active():
+        go_to_run_resume(RunManager.get_resume_target())
+        return
+
+    if MetaManager.shop_session.has_session():
+        go_to_customer_sell()
+        return
+
+    go_to_hub()
+
+
+## Routes to the run scene matching [param target]. Falls back to hub when the
+## saved target is unknown.
+func go_to_run_resume(target: String) -> void:
+    match target:
+        RunStore.RESUME_LOCATION_ENTRY:
+            go_to_location_entry()
+        RunStore.RESUME_LOT_BROWSE:
+            go_to_lot_browse()
+        RunStore.RESUME_INSPECTION:
+            go_to_inspection()
+        RunStore.RESUME_REVEAL:
+            go_to_reveal()
+        RunStore.RESUME_CARGO:
+            go_to_cargo()
+        RunStore.RESUME_RUN_REVIEW:
+            go_to_run_review()
+        _:
+            ToastManager.show_warning("Saved run could not be resumed. Returning to hub.")
+            RunManager.clear_run_state()
+            SaveManager.save()
+            go_to_hub()
+
 # ── Fatal-error hand-off ──────────────────────────────────────────────────────
 
 var _pending_fatal_title: String = ""
@@ -115,9 +151,9 @@ func go_to_fatal_error(title: String, errors: Array[String]) -> void:
     _pending_fatal_title = title
     _pending_fatal_errors = errors
     if scenes.fatal_error == null:
-        push_error("SceneRegistry.fatal_error is null — falling back to push_error")  # push-error: boot
+        push_error("SceneRegistry.fatal_error is null — falling back to push_error") # push-error: boot
         for e: String in errors:
-            push_error("[FATAL] " + e)  # push-error: boot
+            push_error("[FATAL] " + e) # push-error: boot
         get_tree().quit()
         return
     # Deferred so the scene tree is ready for a scene transition during

@@ -72,6 +72,9 @@ func _ready() -> void:
         SceneRouter.go_to_hub.call_deferred()
         return
 
+    RunManager.set_resume_target(RunStore.RESUME_INSPECTION)
+    SaveManager.save()
+
     _footer.show()
     _pass_button.show()
     _review_button.show()
@@ -350,6 +353,8 @@ func _on_pass_pressed() -> void:
 
 
 func _on_pass_confirmed() -> void:
+    RunManager.set_resume_target(RunStore.RESUME_LOT_BROWSE)
+    SaveManager.save()
     SceneRouter.go_to_lot_browse()
 
 
@@ -359,4 +364,7 @@ func _on_review_pressed() -> void:
 
 
 func _on_summary_start_auction_requested() -> void:
+    # Resume target stays "inspection" so a reload lands at the completed
+    # inspection scene, not inside a live auction.
+    SaveManager.save()
     SceneRouter.go_to_auction()

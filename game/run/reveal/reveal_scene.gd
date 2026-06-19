@@ -39,6 +39,9 @@ func _ready() -> void:
         SceneRouter.go_to_hub.call_deferred()
         return
 
+    RunManager.set_resume_target(RunStore.RESUME_REVEAL)
+    SaveManager.save()
+
     _reveal_btn.pressed.connect(_on_reveal_pressed)
     _reveal_btn.press_event = null
     _continue_btn.pressed.connect(_on_continue_pressed)
@@ -74,6 +77,9 @@ func _on_reveal_pressed() -> void:
 
 
 func _on_continue_pressed() -> void:
+    RunManager.clear_lot()
+    RunManager.set_resume_target(RunStore.RESUME_LOT_BROWSE)
+    SaveManager.save()
     SceneRouter.go_to_lot_browse()
 
 
