@@ -26,6 +26,20 @@ func from_dict(_data: Dictionary, _ctx: SaveLoadContext) -> void:
     pass
 
 
+## Serializes this Store into an owning aggregate snapshot. Persisting Stores
+## usually do not override this; session-scoped aggregate Stores override it
+## with a project-specific context cast from [param snapshot_ctx].
+func encode_snapshot(_snapshot_ctx: RefCounted) -> Dictionary:
+    return { }
+
+
+## Restores this Store from an owning aggregate snapshot. Store-to-Store restore
+## dependencies should flow through [param snapshot_ctx], not direct Store
+## parameters, so the owning System remains the aggregate coordinator.
+func restore_snapshot(_data: Dictionary, _snapshot_ctx: RefCounted, _ctx: SaveLoadContext) -> bool:
+    return true
+
+
 ## Validates invariants. Returns true by default.
 func validate() -> bool:
     return true

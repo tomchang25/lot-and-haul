@@ -1,14 +1,21 @@
-# run_item_table.gd
-# Run-snapshot identity table for preserving shared ItemEntry references.
-class_name RunItemTable
+# run_snapshot_context.gd
+# RunManager-owned run-snapshot context for preserving shared ItemEntry
+# references across participating Store payloads. Owns the shared Entry table,
+# serialization of table entries, and aggregate version migration.
+class_name RunSnapshotContext
 extends RefCounted
 
+## Current aggregate snapshot version. Bump when the run_snapshot section shape
+## changes irreversibly. Append a migrate_v1_to_v2 block when bumping.
+const VERSION := 2
+
 var _entries: Array[ItemEntry] = []
+var _browse_lots_by_id: Dictionary = { }
 
 
 ## Returns the run-local item-table key for [param entry], appending it when it
 ## has not been encoded by another run collection yet.
-func key_for(entry: ItemEntry) -> int:
+func item_key_for(entry: ItemEntry) -> int:
     var index := _entries.find(entry)
     if index == -1:
         _entries.append(entry)
@@ -18,27 +25,33 @@ func key_for(entry: ItemEntry) -> int:
 
 ## Converts [param entries] to run-local item-table keys while preserving shared
 ## ItemEntry identity across run and lot collections.
-func keys_for(entries: Array[ItemEntry]) -> Array[int]:
+func item_keys_for(entries: Array[ItemEntry]) -> Array[int]:
     var keys: Array[int] = []
     for entry: ItemEntry in entries:
-        keys.append(key_for(entry))
+        keys.append(item_key_for(entry))
     return keys
 
 
 ## Serializes each unique run item exactly once. Collections in the snapshot
-## reference entries by index into this table.
-func encode_entries() -> Array[Dictionary]:
+## reference entries by index. Returns a named table dict for forward compat
+## with future entry types.
+func encode_entries() -> Dictionary:
     var serialized: Array[Dictionary] = []
     for entry: ItemEntry in _entries:
         serialized.append(entry.to_dict())
-    return serialized
+    return { "items": serialized }
 
 
-## Restores the run-local item table. Returns false on any missing referenced
-## data so the whole run can be discarded atomically.
-func restore_entries(raw_items: Variant, ctx: SaveLoadContext) -> bool:
+## Restores the run-local item table from [param raw_entries] (a dict like
+## { "items": [...] }). Returns false on any missing referenced data so the
+## whole run can be discarded atomically.
+func restore_entries(raw_entries: Variant, ctx: SaveLoadContext) -> bool:
+    if not (raw_entries is Dictionary):
+        ctx.info("Run snapshot entries must be a dictionary")
+        return false
+    var raw_items: Variant = raw_entries.get("items", [])
     if not (raw_items is Array):
-        ctx.info("Run item table is not an array")
+        ctx.info("Run entry table items is not an array")
         return false
     _entries.clear()
     for item_value: Variant in raw_items:
@@ -57,7 +70,7 @@ func restore_entries(raw_items: Variant, ctx: SaveLoadContext) -> bool:
 
 ## Restores [param target] from run-local item-table keys. Returns false when a
 ## key is invalid so the owning provider can discard the whole run snapshot.
-func restore_refs_into(
+func restore_item_refs_into(
         target: Array[ItemEntry],
         raw_keys: Variant,
         ctx: SaveLoadContext,
@@ -77,6 +90,56 @@ func restore_refs_into(
             return false
         target.append(_entries[index])
     return true
+
+
+## Binds the already-restored run browse pool so child Stores can resolve
+## aggregate-local lot references without depending on RunStore directly.
+func bind_browse_lots(browse_lots: Array[LotData]) -> void:
+    _browse_lots_by_id.clear()
+    for lot: LotData in browse_lots:
+        if lot == null or lot.lot_id.is_empty():
+            continue
+        _browse_lots_by_id[lot.lot_id] = lot
+
+
+## Resolves a lot id from the aggregate-local browse pool. Returns null and logs
+## detail when the id cannot be resolved.
+func resolve_browse_lot(lot_id: String, ctx: SaveLoadContext) -> LotData:
+    if lot_id.is_empty():
+        ctx.info("Active lot id is empty")
+        return null
+    var lot: LotData = _browse_lots_by_id.get(lot_id, null)
+    if lot == null:
+        ctx.info("Active lot '%s' not found in browse pool — lot not restored" % lot_id)
+    return lot
+
+
+## Migrates a legacy v1 run_snapshot payload (flat shape) to the current v2
+## aggregate shape ({ _version, resume_target, entries: { items: [...] },
+## stores: { run: {...}, lot?: {...} }}).
+static func migrate_v1_to_v2(v1: Dictionary) -> Dictionary:
+    var run_store_fields := { }
+    for key in v1.keys():
+        if key in ["items", "lot", "resume_target"]:
+            continue
+        run_store_fields[key] = v1[key]
+
+    var out := {
+        "_version": VERSION,
+        "resume_target": v1.get("resume_target", ""),
+        "entries": {
+            "items": v1.get("items", []),
+        },
+        "stores": {
+            "run": run_store_fields,
+        },
+    }
+    if v1.has("lot"):
+        out["stores"]["lot"] = v1["lot"]
+
+    # Stamp VERSION for re-entry safety.
+    out["_version"] = VERSION
+    return out
 
 
 ## Verifies ItemEntry.from_dict() resolved every designer-resource reference

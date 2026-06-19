@@ -329,12 +329,48 @@ def check_bare_push_error(path: str, text: str) -> list[Violation]:
     return violations
 
 
+# ── Tier 1: aggregate restore Store dependency ban (runtime archetypes §Store) ─
+
+RESTORE_SNAPSHOT_RE = re.compile(
+    r"func\s+restore_snapshot\s*\((?P<params>.*?)\)\s*->",
+    re.DOTALL,
+)
+STORE_TYPED_PARAM_RE = re.compile(r":\s*\w*Store\b")
+
+
+def check_snapshot_store_dependencies(path: str, text: str) -> list[Violation]:
+    """Aggregate Store restore helpers must not take another Store directly.
+
+    Cross-Store restore dependencies belong in the aggregate context, coordinated
+    by the owning System/Manager. This keeps sibling Stores unaware of each other
+    and prevents ad-hoc Store-to-Store coupling in restore_snapshot signatures.
+    (runtime_type_archetypes.md §Store / mutation mediation rule)"""
+    violations: list[Violation] = []
+    for m in RESTORE_SNAPSHOT_RE.finditer(text):
+        params = m.group("params")
+        if not STORE_TYPED_PARAM_RE.search(params):
+            continue
+        line = text[: m.start()].count("\n") + 1
+        violations.append(
+            Violation(
+                path,
+                line,
+                "snapshot-store-dependency",
+                "runtime-archetypes §Store",
+                "restore_snapshot takes a Store-typed parameter. Cross-Store "
+                "restore dependencies must flow through the aggregate context "
+                "(e.g. RefCounted snapshot_ctx), not direct Store parameters.",
+            )
+        )
+    return violations
+
+
 # ── Dispatch ─────────────────────────────────────────────────────────────────
 
 # Check families by scope. Add new checks here as more rules graduate from the
 # manifest into machine enforcement.
 GD_SCENE_CHECKS = (check_node_source, check_match_wildcard)
-GD_ERROR_GUARD_CHECKS = (check_bare_push_error,)
+GD_ERROR_GUARD_CHECKS = (check_bare_push_error, check_snapshot_store_dependencies)
 TSCN_CHECKS = (check_tscn_connections,)
 
 

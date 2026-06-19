@@ -17,6 +17,7 @@ Rules:
 ### Run Phase Persistence
 
 - 2026-06-19 — [run] Mid-run quit now resumes at the last phase scene with escrowed run economics intact; bids enforce the effective-cash budget and the day slot never advances without a restorable run
+- 2026-06-19 — [run] Active run save section is now a System-owned aggregate snapshot with a shared Entry table, Store `encode_snapshot`/`restore_snapshot` hooks, atomic discard on any reference miss, and v1 migration from the flat legacy shape
 
 ### TimeSlot Day/Night Rework
 

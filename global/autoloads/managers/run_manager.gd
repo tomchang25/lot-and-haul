@@ -232,14 +232,20 @@ func _resolve_refill_reserve(_car: CarData) -> int:
 func to_dict() -> Dictionary:
     if run == null:
         return { }
-    var out := { }
-    var item_table := RunItemTable.new()
-    var snapshot := run.encode_with_item_table(item_table)
+    var snapshot_ctx := RunSnapshotContext.new()
+    var stores := {
+        "run": run.encode_snapshot(snapshot_ctx),
+    }
     if lot != null:
-        snapshot["lot"] = lot.encode_with_item_table(item_table)
-    snapshot["items"] = item_table.encode_entries()
-    out[SAVE_SECTION] = snapshot
-    return out
+        stores["lot"] = lot.encode_snapshot(snapshot_ctx)
+    return {
+        SAVE_SECTION: {
+            "_version": RunSnapshotContext.VERSION,
+            "resume_target": get_resume_target(),
+            "entries": snapshot_ctx.encode_entries(),
+            "stores": stores,
+        },
+    }
 
 
 ## Restores the active run from the run snapshot section. Invalid run payloads
@@ -250,27 +256,60 @@ func from_dict(data: Dictionary, ctx: SaveLoadContext) -> void:
         return
 
     clear_run_state()
-    var item_table := RunItemTable.new()
-    if not item_table.restore_entries(snapshot.get("items", []), ctx):
+
+    # Detect and migrate legacy v1 flat shape.
+    if not snapshot.has("stores"):
+        snapshot = RunSnapshotContext.migrate_v1_to_v2(snapshot)
+
+    var snapshot_ctx := RunSnapshotContext.new()
+    if not snapshot_ctx.restore_entries(snapshot.get("entries", { }), ctx):
         ctx.warn("Active run could not be restored. Returning to hub.")
         return
 
-    var restored := RunStore.new()
-    if not restored.restore_with_item_table(snapshot, ctx, item_table):
+    var stores_value: Variant = snapshot.get("stores", { })
+    if not (stores_value is Dictionary):
+        ctx.info("Run snapshot stores must be a dictionary")
         ctx.warn("Active run could not be restored. Returning to hub.")
         return
+    var stores: Dictionary = stores_value
 
-    run = restored
+    var run_value: Variant = stores.get("run", { })
+    if not (run_value is Dictionary):
+        ctx.info("Run snapshot run store must be a dictionary")
+        ctx.warn("Active run could not be restored. Returning to hub.")
+        return
+    var run_data: Dictionary = run_value
 
-    # Restore active lot when present.
-    var lot_data: Dictionary = snapshot.get("lot", { })
-    if not lot_data.is_empty():
-        var new_lot := LotStore.new()
-        if new_lot.restore_with_item_table(lot_data, run, item_table, ctx):
-            lot = new_lot
-        else:
+    var restored_run := RunStore.new()
+    if not restored_run.restore_snapshot(run_data, snapshot_ctx, ctx):
+        ctx.warn("Active run could not be restored. Returning to hub.")
+        return
+    run = restored_run
+    snapshot_ctx.bind_browse_lots(run.browse_lots)
+
+    # Apply root resume target after RunStore is restored.
+    var resume_target: String = str(snapshot.get("resume_target", ""))
+    if resume_target.is_empty() or not RunStore.is_valid_resume_target(resume_target):
+        clear_run_state()
+        ctx.warn("Active run could not be restored. Returning to hub.")
+        return
+    run.set_resume_target(resume_target)
+
+    # Restore optional active lot when present.
+    if stores.has("lot"):
+        var lot_value: Variant = stores["lot"]
+        if not (lot_value is Dictionary):
+            clear_run_state()
+            ctx.info("Run snapshot lot store must be a dictionary")
+            ctx.warn("Active run could not be restored. Returning to hub.")
+            return
+        var lot_data: Dictionary = lot_value
+        var restored_lot := LotStore.new()
+        if not restored_lot.restore_snapshot(lot_data, snapshot_ctx, ctx):
             clear_run_state()
             ctx.warn("Active run could not be restored. Returning to hub.")
+            return
+        lot = restored_lot
 
 
 ## SaveManager validation hook. Active run state is optional, so there is no

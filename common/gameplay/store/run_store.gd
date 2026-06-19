@@ -224,12 +224,11 @@ func apply_trailer_damage() -> int:
 # ══ Serialization ═════════════════════════════════════════════════════════════
 
 
-## Encodes this run into the owning run snapshot. Item collections are stored as
-## indexes into [param item_table] so object identity survives restore.
-func encode_with_item_table(item_table: RunItemTable) -> Dictionary:
-    var d := {
+## Encodes local scalar fields into a dictionary for the run snapshot. The caller
+## (encode_snapshot) appends item-key arrays on top.
+func _encode_fields() -> Dictionary:
+    return {
         "_version": _store_version(),
-        "resume_target": _resume_target,
         "trailer_damage_applied": _trailer_damage_applied,
         "location_id": _location_data.location_id if _location_data != null else "",
         "car_id": _car_data.car_id if _car_data != null else "",
@@ -243,26 +242,12 @@ func encode_with_item_table(item_table: RunItemTable) -> Dictionary:
         "onsite_proceeds": _onsite_proceeds,
         "browse_index": _browse_index,
         "browse_lot_ids": [],
-        "won_item_keys": item_table.keys_for(_won_items),
-        "cargo_item_keys": item_table.keys_for(_cargo_items),
-        "trailer_item_keys": item_table.keys_for(_trailer_items),
     }
-    for lot: LotData in _browse_lots:
-        d["browse_lot_ids"].append(lot.lot_id)
-    return d
 
 
-## Restores this run from the owning run snapshot. Returns false when any
-## referenced designer data or item key cannot be resolved.
-func restore_with_item_table(data: Dictionary, ctx: SaveLoadContext, item_table: RunItemTable) -> bool:
-    var version: int = int(data.get("_version", 1))
-    data = _apply_migrations(data, version, ctx)
-
-    _resume_target = str(data.get("resume_target", ""))
-    if not is_valid_resume_target(_resume_target):
-        ctx.info("Run resume target '%s' is invalid" % _resume_target)
-        return false
-
+## Restores local scalar fields from [param data]. Returns false when any
+## referenced designer resource cannot be resolved.
+func _restore_fields(data: Dictionary, ctx: SaveLoadContext) -> bool:
     _trailer_damage_applied = bool(data.get("trailer_damage_applied", false))
 
     var loc_id: String = str(data.get("location_id", ""))
@@ -304,11 +289,42 @@ func restore_with_item_table(data: Dictionary, ctx: SaveLoadContext, item_table:
         ctx.info("Browse index %d is out of range for %d lot(s)" % [_browse_index, _browse_lots.size()])
         return false
 
-    if not item_table.restore_refs_into(_won_items, data.get("won_item_keys", []), ctx, "won_items"):
+    return true
+
+
+## Encodes this run into the owning run snapshot. Item collections are stored as
+## indexes into [param snapshot_ctx] so object identity survives restore.
+func encode_snapshot(snapshot_ctx: RefCounted) -> Dictionary:
+    var run_snapshot_ctx := snapshot_ctx as RunSnapshotContext
+    if run_snapshot_ctx == null:
+        ToastManager.show_dev_error("RunStore.encode_snapshot requires RunSnapshotContext")
+        return _encode_fields()
+    var d := _encode_fields()
+    for lot: LotData in _browse_lots:
+        d["browse_lot_ids"].append(lot.lot_id)
+    d["won_item_keys"] = run_snapshot_ctx.item_keys_for(_won_items)
+    d["cargo_item_keys"] = run_snapshot_ctx.item_keys_for(_cargo_items)
+    d["trailer_item_keys"] = run_snapshot_ctx.item_keys_for(_trailer_items)
+    return d
+
+
+## Restores this run from the owning run snapshot. Returns false when any
+## referenced designer data or item key cannot be resolved.
+func restore_snapshot(data: Dictionary, snapshot_ctx: RefCounted, ctx: SaveLoadContext) -> bool:
+    var run_snapshot_ctx := snapshot_ctx as RunSnapshotContext
+    if run_snapshot_ctx == null:
+        ctx.info("RunStore restore requires RunSnapshotContext")
         return false
-    if not item_table.restore_refs_into(_cargo_items, data.get("cargo_item_keys", []), ctx, "cargo_items"):
+    var version: int = int(data.get("_version", 1))
+    data = _apply_migrations(data, version, ctx)
+
+    if not _restore_fields(data, ctx):
         return false
-    if not item_table.restore_refs_into(_trailer_items, data.get("trailer_item_keys", []), ctx, "trailer_items"):
+    if not run_snapshot_ctx.restore_item_refs_into(_won_items, data.get("won_item_keys", []), ctx, "won_items"):
+        return false
+    if not run_snapshot_ctx.restore_item_refs_into(_cargo_items, data.get("cargo_item_keys", []), ctx, "cargo_items"):
+        return false
+    if not run_snapshot_ctx.restore_item_refs_into(_trailer_items, data.get("trailer_item_keys", []), ctx, "trailer_items"):
         return false
 
     return true
