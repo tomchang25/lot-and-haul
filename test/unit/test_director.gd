@@ -162,10 +162,10 @@ func test_anchor_fallback_all_hidden_skips() -> void:
     Director.advance_step()
     Director.advance_step()
     Director.advance_step()
-    # Step 3: primary hidden, fallback hidden, both non-renderable → skip.
-    # Step 4 (research_btn) should render next.
-    assert_eq(Director.step_index(), 4, "step index 4 after all-anchor skip of step 3")
-    assert_eq(Director.step_count(), STORAGE_SCRIPT_SIZE, "tutorial still active after skip")
+    # Step 3 is NEXT; both primary and fallback condition anchors hidden, so the
+    # step is skipped and tutorial advances to step 4 (research_btn).
+    assert_eq(Director.step_index(), 4, "next step skipped when all condition anchors are hidden")
+    assert_eq(Director.step_count(), STORAGE_SCRIPT_SIZE, "tutorial still active while waiting")
 
 # ══ Offer acceptance ══════════════════════════════════════════════════════
 
@@ -375,7 +375,15 @@ func test_onboarding_resolver_skips_when_segment_seen() -> void:
     assert_false(ScriptDirector.active, "onboarding should not start when segment already seen")
 
 
+func test_onboarding_chain_blocks_later_segment() -> void:
+    # storage_choose requires auction_run seen first.
+    MetaManager.slot.set_slot(SlotStore.SLOT_NIGHT)
+    Director.register_scene("hub", { "activity_btn": _make_anchor_button(), "storage_btn": _make_anchor_button() })
+    assert_false(ScriptDirector.active, "storage_choose should not start when auction_run not seen")
+
+
 func test_onboarding_resolver_supports_storage_choose() -> void:
+    MetaManager.progress.mark_tutorial_seen("onboarding_auction_run")
     MetaManager.slot.set_slot(SlotStore.SLOT_NIGHT)
     Director.register_scene("hub", { "activity_btn": _make_anchor_button(), "storage_btn": _make_anchor_button() })
     assert_true(ScriptDirector.active, "onboarding storage_choose should start for night hub")
@@ -415,13 +423,39 @@ func test_onboarding_close_skips_onboarding() -> void:
 func test_selling_segment_completes_onboarding() -> void:
     MetaManager.progress.reset_onboarding()
     assert_true(MetaManager.is_onboarding_pending(), "onboarding pending before test")
+    # Register all anchors the selling script references.
+    var anchors := {
+        "customer_queue": _make_anchor_button(),
+        "item_list": _make_anchor_button(),
+        "car_panel": _make_anchor_button(),
+        "deal_panel": _make_anchor_button(),
+        "back_btn": _make_anchor_button(),
+    }
+    Director.register_scene("customer_sell", anchors)
     ScriptDirector.start_script("onboarding_selling")
-    # Steps 0 and 1 are POPUP (NEXT), step 2 is EVENT (SALE_COMPLETED).
-    Director.advance_step() # 0 → 1
-    Director.advance_step() # 1 → 2
-    assert_true(ScriptDirector.active, "script active after advancing to step 2")
+    # Steps 0-2 are NEXT (popup, customer, item card).
+    Director.advance_step() # 0
+    Director.advance_step() # 1
+    Director.advance_step() # 2
+    # Step 3: car grid placement, EVENT (SELL_ITEM_PLACED).
+    assert_eq(Director.step_index(), 3, "at car grid step")
+    EventBus.tutorial_event.emit(TutorialEvents.SELL_ITEM_PLACED, { })
+    # Step 4: conservative, NEXT.
+    assert_eq(Director.step_index(), 4, "at conservative step")
+    Director.advance_step()
+    # Step 5: aggressive, EVENT.
+    assert_eq(Director.step_index(), 5, "at aggressive step")
+    EventBus.tutorial_event.emit(TutorialEvents.SELL_AGGRESSIVE_REQUESTED, { })
+    # Step 6: dice, NEXT.
+    assert_eq(Director.step_index(), 6, "at dice step")
+    Director.advance_step()
+    # Step 7: confirm sale, EVENT (SALE_COMPLETED).
+    assert_eq(Director.step_index(), 7, "at confirm step")
     EventBus.tutorial_event.emit(TutorialEvents.SALE_COMPLETED, { })
-    assert_false(ScriptDirector.active, "script should end after sale event")
+    # Step 8: back_btn, NEXT.
+    assert_eq(Director.step_index(), 8, "at leave step")
+    Director.advance_step()
+    assert_false(ScriptDirector.active, "script should end after leave step")
     assert_false(MetaManager.is_onboarding_pending(), "onboarding should be complete after selling segment")
 
 
@@ -431,3 +465,98 @@ func test_auction_resolved_event_constant_exists() -> void:
 
 func test_chooser_opened_event_constant_exists() -> void:
     assert_eq(typeof(TutorialEvents.CHOOSER_OPENED), TYPE_STRING_NAME, "CHOOSER_OPENED should be a StringName")
+
+# ══ New onboarding chain and event tests ═══════════════════════════
+
+
+func test_onboarding_location_select_starts_auction_segment() -> void:
+    # day 0, slot DAY, onboarding pending + prereq seen → triggers auction.
+    MetaManager.progress.mark_tutorial_seen("onboarding_hub_intro_choose")
+    Director.register_scene("location_select", { "cards_container": _make_anchor_button() })
+    assert_true(ScriptDirector.active, "auction_run should start for location_select")
+
+
+func test_onboarding_day_pass_starts_when_prereqs_met() -> void:
+    MetaManager.progress.mark_tutorial_seen("onboarding_auction_run")
+    MetaManager.progress.mark_tutorial_seen("onboarding_storage_choose")
+    MetaManager.progress.mark_tutorial_seen("onboarding_storage")
+    Director.register_scene("day_summary", { "continue_btn": _make_anchor_button() })
+    assert_true(ScriptDirector.active, "day_pass should start for day_summary when prereqs met")
+
+
+func test_onboarding_selling_skipped_when_storage_empty() -> void:
+    MetaManager.progress.reset_onboarding()
+    MetaManager.progress.mark_tutorial_seen("onboarding_auction_run")
+    MetaManager.progress.mark_tutorial_seen("onboarding_storage_choose")
+    MetaManager.progress.mark_tutorial_seen("onboarding_storage")
+    MetaManager.progress.mark_tutorial_seen("onboarding_day_pass")
+    MetaManager.progress.mark_tutorial_seen("onboarding_shop_choose")
+    Director.register_scene("customer_sell", { "customer_queue": _make_anchor_button() })
+    assert_false(ScriptDirector.active, "selling segment should not start with empty storage")
+
+
+func test_onboarding_day_summary_event_advances() -> void:
+    ScriptDirector.start_script("onboarding_day_pass")
+    assert_true(ScriptDirector.active, "tutorial active on day summary hint")
+    assert_eq(Director.step_index(), 0, "day summary waits at continue hint")
+    EventBus.tutorial_event.emit(TutorialEvents.DAY_SUMMARY_CONTINUED, { })
+    assert_false(ScriptDirector.active, "tutorial should end after DAY_SUMMARY_CONTINUED")
+
+
+func test_onboarding_bid_placed_event_advances() -> void:
+    ScriptDirector.start_script("onboarding_auction_run")
+    # Advance through steps 0-6 (location, lot, inspection flow, auction start).
+    # These are EVENT steps — we emit the matching events.
+    EventBus.tutorial_event.emit(TutorialEvents.LOCATION_SELECTED, { })
+    EventBus.tutorial_event.emit(TutorialEvents.LOT_SELECTED, { })
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_SELECTED, { })
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_UNVEILED, { })
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_PERFORMED, { })
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_REVIEW_OPENED, { })
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_AUCTION_STARTED, { })
+    # Step 7 is bid_btn, advance EVENT BID_PLACED.
+    assert_true(ScriptDirector.active, "tutorial active at bid step")
+    assert_eq(Director.step_index(), 7, "at step 7 (bid) after inspection flow advances")
+    EventBus.tutorial_event.emit(TutorialEvents.BID_PLACED, { })
+    assert_true(ScriptDirector.active, "tutorial active after bid")
+    assert_eq(Director.step_index(), 8, "at step 8 (auction wait) after bid")
+    # Step 8 is AUCTION_RESOLVED.
+    EventBus.tutorial_event.emit(TutorialEvents.AUCTION_RESOLVED, { })
+    assert_true(ScriptDirector.active, "tutorial active after auction reset")
+    assert_eq(Director.step_index(), 9, "at step 9 after auction resolved")
+
+
+func test_onboarding_storage_completes_on_scene_entered_hub() -> void:
+    Director.register_scene("storage", _storage_anchors())
+    ScriptDirector.start_script("onboarding_storage")
+    # Repair and Research steps are NEXT — player clicks Next to advance, no event
+    # required. Walk to the last step, then complete it by registering hub.
+    var step_count := Director.step_count()
+    Director.advance_step()
+    Director.advance_step()
+    Director.advance_step()
+    assert_eq(Director.step_index(), 3, "at repair hint step")
+    Director.advance_step()
+    assert_eq(Director.step_index(), 4, "at research hint step")
+    Director.advance_step()
+    while Director.step_index() < step_count - 1:
+        Director.advance_step()
+    assert_eq(Director.step_index(), step_count - 1, "at last step")
+    assert_true(ScriptDirector.active, "tutorial active waiting for hub scene")
+    # Registering hub completes the SCENE_ENTERED step.
+    Director.register_scene("hub", { "storage_btn": _make_anchor_button(), "activity_btn": _make_anchor_button(), "sell_btn": _make_anchor_button() })
+    assert_false(ScriptDirector.active, "tutorial should end after hub scene registered")
+
+
+func test_new_event_constants_exist() -> void:
+    assert_eq(typeof(TutorialEvents.BID_PLACED), TYPE_STRING_NAME, "BID_PLACED should be a StringName")
+    assert_eq(typeof(TutorialEvents.DAY_SUMMARY_CONTINUED), TYPE_STRING_NAME, "DAY_SUMMARY_CONTINUED should be a StringName")
+    assert_eq(typeof(TutorialEvents.INSPECTION_ITEM_SELECTED), TYPE_STRING_NAME, "INSPECTION_ITEM_SELECTED should be a StringName")
+    assert_eq(typeof(TutorialEvents.INSPECTION_ITEM_UNVEILED), TYPE_STRING_NAME, "INSPECTION_ITEM_UNVEILED should be a StringName")
+    assert_eq(typeof(TutorialEvents.INSPECTION_REVIEW_OPENED), TYPE_STRING_NAME, "INSPECTION_REVIEW_OPENED should be a StringName")
+    assert_eq(typeof(TutorialEvents.INSPECTION_AUCTION_STARTED), TYPE_STRING_NAME, "INSPECTION_AUCTION_STARTED should be a StringName")
+    assert_eq(typeof(TutorialEvents.CARGO_ITEM_SELECTED), TYPE_STRING_NAME, "CARGO_ITEM_SELECTED should be a StringName")
+    assert_eq(typeof(TutorialEvents.CARGO_ITEM_PLACED), TYPE_STRING_NAME, "CARGO_ITEM_PLACED should be a StringName")
+    assert_eq(typeof(TutorialEvents.CARGO_CONTINUE_REQUESTED), TYPE_STRING_NAME, "CARGO_CONTINUE_REQUESTED should be a StringName")
+    assert_eq(typeof(TutorialEvents.STORAGE_CONDITION_IMPROVED), TYPE_STRING_NAME, "STORAGE_CONDITION_IMPROVED should be a StringName")
+    assert_eq(typeof(TutorialEvents.STORAGE_RESEARCH_PERFORMED), TYPE_STRING_NAME, "STORAGE_RESEARCH_PERFORMED should be a StringName")

@@ -25,6 +25,7 @@ func _ready() -> void:
     _start_auction_button.pressed.connect(_on_start_auction_pressed)
     _close_button.pressed.connect(_on_back_pressed)
     close_requested.connect(_on_back_pressed)
+    visibility_changed.connect(_on_visibility_changed)
 
 
 func setup(lot: LotEntry) -> void:
@@ -43,3 +44,10 @@ func _on_back_pressed() -> void:
 func _on_start_auction_pressed() -> void:
     start_auction_requested.emit()
     hide()
+
+
+func _on_visibility_changed() -> void:
+    if visible:
+        Director.register_anchor("start_auction_btn", _start_auction_button)
+    else:
+        Director.unregister_anchor("start_auction_btn")

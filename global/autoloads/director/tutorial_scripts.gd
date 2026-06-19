@@ -62,7 +62,8 @@ is to 100%, the more accurate the estimate.",
             TutorialStep.Kind.HINT,
             "Repair improves condition up to 50%, and Restore pushes it from 50% \
 to 100%. Only one button appears based on the current state. \
-Better condition means higher sale prices.",
+Better condition means higher sale prices. Improve this item's condition, \
+then continue.",
             "repair_btn",
             TutorialStep.Advance.NEXT,
             false,
@@ -73,8 +74,11 @@ Better condition means higher sale prices.",
         TutorialStep.new(
             TutorialStep.Kind.HINT,
             "Research reveals hidden details about an item. Each discovery can \
-dramatically change the item's value — for better or worse.",
+dramatically change the item's value — for better or worse. \
+Try researching this item, then continue.",
             "research_btn",
+            TutorialStep.Advance.NEXT,
+            false,
         ),
         TutorialStep.new(
             TutorialStep.Kind.POPUP,
@@ -98,6 +102,14 @@ the Workshop in a new slot.",
             "When you're done, click here to return to the Hub and continue \
 your day. You can always come back to the Workshop later.",
             "leave_btn",
+            TutorialStep.Advance.SCENE_ENTERED,
+            false,
+            null,
+            [],
+            false,
+            &"",
+            "hub",
+            false,
         ),
     ]
 
@@ -168,8 +180,29 @@ and travel costs.",
         ),
         TutorialStep.new(
             TutorialStep.Kind.HINT,
-            "Inspect items to learn about their condition and value. \
-Spend Action Points (AP) to reveal clue details.",
+            "Select the item card to inspect it.",
+            "item_browser",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.INSPECTION_ITEM_SELECTED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Unveil the item to reveal its identity.",
+            "unveil_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.INSPECTION_ITEM_UNVEILED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Inspect the unveiled item to reveal clue details.",
             "inspect_btn",
             TutorialStep.Advance.EVENT,
             true,
@@ -180,38 +213,135 @@ Spend Action Points (AP) to reveal clue details.",
         ),
         TutorialStep.new(
             TutorialStep.Kind.HINT,
-            "Bid on the lot or pass. The auction is real — win or lose, \
-the run continues.",
-            "bid_btn",
-            TutorialStep.Advance.EVENT,
-            true,
-            null,
-            ["pass_btn"],
-            true,
-            TutorialEvents.AUCTION_RESOLVED,
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.HINT,
-            "Load items into your cargo to bring them home. Items left \
-behind are sold on-site.",
-            "cargo_grid",
+            "Review the lot before starting the auction.",
+            "review_btn",
             TutorialStep.Advance.EVENT,
             true,
             null,
             [],
             false,
-            TutorialEvents.CARGO_LOADED,
+            TutorialEvents.INSPECTION_REVIEW_OPENED,
         ),
         TutorialStep.new(
             TutorialStep.Kind.HINT,
-            "Review your run results and continue to the Hub.",
+            "Start the auction when you're ready.",
+            "start_auction_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.INSPECTION_AUCTION_STARTED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Click Bid to place your first bid. No rivals will bid in \
+this tutorial auction.",
+            "bid_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.BID_PLACED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.POPUP,
+            "With no rival bids, wait for the auction to close.",
+            "",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.AUCTION_RESOLVED,
+            "",
+            false,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Reveal what you won before loading cargo.",
+            "reveal_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.REVEAL_COMPLETED,
+            "",
+            false,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Continue back to the lot list, then head to cargo loading.",
             "continue_btn",
             TutorialStep.Advance.EVENT,
             true,
             null,
             [],
             false,
+            TutorialEvents.REVEAL_CONTINUED,
+            "",
+            false,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "All tutorial lots are resolved. Open cargo loading.",
+            "cargo_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.CARGO_OPENED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Select the item you want to load.",
+            "item_list",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.CARGO_ITEM_SELECTED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Place the item into your cargo grid.",
+            "cargo_grid",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.CARGO_ITEM_PLACED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Click Continue when your cargo is ready.",
+            "continue_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
+            TutorialEvents.CARGO_CONTINUE_REQUESTED,
+            "",
+            false,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Review your run results and continue to the Hub.",
+            "run_review_continue_btn",
+            TutorialStep.Advance.EVENT,
+            true,
+            null,
+            [],
+            false,
             TutorialEvents.RUN_REVIEWED,
+            "",
+            false,
         ),
     ]
 
@@ -250,25 +380,46 @@ repair them, and research hidden details.",
 
 
 ## Storage workshop tutorial for onboarding. Reuses the existing storage
-## tutorial steps but auto-starts instead of going through the offer prompt.
+## tutorial steps but replaces the final NEXT leave_btn step with a
+## SCENE_ENTERED hub step so the tutorial completes when the player
+## leaves the storage scene, not when they click Next.
 static func onboarding_storage_script() -> Array[TutorialStep]:
-    return storage_script()
+    var steps := storage_script()
+    if not steps.is_empty():
+        # Replace the last step: leave_btn NEXT → SCENE_ENTERED hub.
+        var last := steps.size() - 1
+        steps[last] = TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "When you're done, click here to return to the Hub and continue \
+your day. You can always come back to the Workshop later.",
+            "leave_btn",
+            TutorialStep.Advance.SCENE_ENTERED,
+            true,
+            null,
+            [],
+            false,
+            &"",
+            "hub",
+            false,
+        )
+    return steps
 
 
 ## Day summary pass: brief summary of the day, then advance.
 static func onboarding_day_pass_script() -> Array[TutorialStep]:
     return [
         TutorialStep.new(
-            TutorialStep.Kind.POPUP,
-            "Day 1 is complete! Here's a summary of your earnings and \
-expenses. Today's net profit is shown below.",
-        ),
-        TutorialStep.new(
             TutorialStep.Kind.HINT,
-            "Click Continue to move to Day 2.",
+            "Day 1 is complete! Review your net profit, then click Continue to move to Day 2.",
             "continue_btn",
-            TutorialStep.Advance.NEXT,
+            TutorialStep.Advance.EVENT,
             true,
+            null,
+            [],
+            false,
+            TutorialEvents.DAY_SUMMARY_CONTINUED,
+            "",
+            false,
         ),
     ]
 
@@ -305,29 +456,113 @@ static func onboarding_shop_choose_script() -> Array[TutorialStep]:
     ]
 
 
-## Nightly customer selling: brief intro, then wait for a completed sale.
+## Nightly customer selling: in-depth walkthrough of the customer flow,
+## item packing, deal strategies, dice mechanics, and sale confirmation.
 static func onboarding_selling_script() -> Array[TutorialStep]:
     return [
         TutorialStep.new(
             TutorialStep.Kind.POPUP,
-            "Welcome to your shop! Select a customer, pack their car with \
-matching items, and make a deal.",
-        ),
-        TutorialStep.new(
-            TutorialStep.Kind.POPUP,
-            "Complete a sale to finish the onboarding and continue \
-playing freely.",
+            "Welcome to your shop! Let's walk through serving your first customer \
+step by step.",
         ),
         TutorialStep.new(
             TutorialStep.Kind.HINT,
-            "Serve a customer to complete the sale.",
+            "This is your customer queue. Each tab shows a customer and their \
+demand tags — the kinds of items they're looking for. Click a tab \
+to select a customer.",
             "customer_queue",
+            TutorialStep.Advance.NEXT,
+            false,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "These are your item cards. The top number is the price, the badge \
+shows rarity, and the coloured bar indicates condition. Tags at the \
+bottom show which categories this item matches.",
+            "item_list",
+            TutorialStep.Advance.NEXT,
+            false,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Pick up an item from the list and drop it into the car grid on \
+the right. Items must fit the customer's car shape and match their \
+demand tags to count toward the sale.",
+            "car_panel",
+            TutorialStep.Advance.EVENT,
+            false,
+            null,
+            [],
+            false,
+            TutorialEvents.SELL_ITEM_PLACED,
+            "",
+            false,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Conservative selling gives a safe ×1.2 multiplier on the total \
+item value. It guarantees the sale — no risk, no dice. Handy when \
+you want a sure deal.",
+            "deal_panel",
+            TutorialStep.Advance.NEXT,
+            false,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Aggressive selling rolls dice to multiply the total item value. \
+The better your item fit (depth) and the more verified items you have, \
+the more dice you roll. Try it — press the Aggressive button.",
+            "deal_panel",
             TutorialStep.Advance.EVENT,
             true,
             null,
             [],
             false,
+            TutorialEvents.SELL_AGGRESSIVE_REQUESTED,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "The dice show your luck: each die can add to or subtract from \
+the multiplier. Green faces are good, red faces are bad. The result \
+sets your final price. Press Confirm when ready.",
+            "deal_panel",
+            TutorialStep.Advance.NEXT,
+            false,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Review the receipt, then confirm to complete the sale. \
+Funds are added to your balance immediately.",
+            "deal_panel",
+            TutorialStep.Advance.EVENT,
+            false,
+            null,
+            [],
+            false,
             TutorialEvents.SALE_COMPLETED,
+            "",
+            false,
+        ),
+        TutorialStep.new(
+            TutorialStep.Kind.HINT,
+            "Great! You can serve more customers or click Back to return \
+to the Hub and finish the day.",
+            "back_btn",
+            TutorialStep.Advance.NEXT,
+            false,
+        ),
+    ]
+
+
+## Final onboarding popup shown on the Hub after the player completes
+## the selling tutorial. Marks onboarding fully done.
+static func onboarding_complete_script() -> Array[TutorialStep]:
+    return [
+        TutorialStep.new(
+            TutorialStep.Kind.POPUP,
+            "Congratulations! You've completed the Lot & Haul tutorial.\n\n\
+You know how to run auctions, manage storage, and sell to customers. \
+The rest is up to you — good luck out there!",
         ),
     ]
 
@@ -352,6 +587,8 @@ static func resolve_script(script_id: String) -> Array[TutorialStep]:
             return onboarding_shop_choose_script()
         "onboarding_selling":
             return onboarding_selling_script()
+        "onboarding_complete":
+            return onboarding_complete_script()
         _:
             ToastManager.show_dev_error("TutorialScripts: unknown script id '%s'" % script_id)
             return []
@@ -368,6 +605,7 @@ static func known_script_ids() -> Array[String]:
         "onboarding_day_pass",
         "onboarding_shop_choose",
         "onboarding_selling",
+        "onboarding_complete",
     ]
 
 

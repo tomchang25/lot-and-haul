@@ -104,6 +104,12 @@ func _ready() -> void:
         },
     )
 
+    # During the onboarding_selling tutorial, lock conservative so the player
+    # can't short-circuit the aggressive dice flow by closing the sale early.
+    if MetaManager.is_onboarding_pending() and not MetaManager.progress.tutorial_seen.has("onboarding_selling"):
+        _deal_panel.set_conservative_sale_locked(true)
+        Director.script_completed.connect(_on_selling_tutorial_completed)
+
 # ══ Signal handlers ═══════════════════════════════════════════════════════════
 
 
@@ -191,6 +197,7 @@ func _on_grid_cell_clicked(pos: Vector2i) -> void:
     AudioManager.play_event(SELL_GRID_PUT_DOWN)
     _item_list.update_row_states(grid)
     _item_list.play_card_pulse(item)
+    EventBus.tutorial_event.emit(TutorialEvents.SELL_ITEM_PLACED, { })
 
 
 func _on_car_clear_requested() -> void:
@@ -228,6 +235,7 @@ func _on_aggressive_requested() -> void:
     var pool := _get_dice_pool_size(customer, placed)
     var rolls := SellMath.roll_dice(pool)
     _deal_panel.show_dice(rolls, placed)
+    EventBus.tutorial_event.emit(TutorialEvents.SELL_AGGRESSIVE_REQUESTED, { })
 
 
 func _on_pitch_confirmed(price: int) -> void:
@@ -280,6 +288,12 @@ func _on_back_pressed() -> void:
     MetaManager.customers.clear_customers()
     SaveManager.save()
     SceneRouter.go_to_hub()
+
+
+func _on_selling_tutorial_completed(_script_id: String) -> void:
+    _deal_panel.set_conservative_sale_locked(false)
+    if Director.script_completed.is_connected(_on_selling_tutorial_completed):
+        Director.script_completed.disconnect(_on_selling_tutorial_completed)
 
 # ══ Customer selection ════════════════════════════════════════════════════════
 

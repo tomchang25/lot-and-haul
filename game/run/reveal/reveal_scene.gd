@@ -55,9 +55,17 @@ func _ready() -> void:
 
     if _won_items.is_empty():
         _show_auction_lost_state()
-        return
+    else:
+        _populate_rows()
 
-    _populate_rows()
+    Director.register_scene(
+        "reveal",
+        {
+            "item_list": _item_list_panel,
+            "reveal_btn": _reveal_btn,
+            "continue_btn": _continue_btn,
+        },
+    )
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
@@ -74,12 +82,14 @@ func _on_reveal_pressed() -> void:
 
     _reveal_btn.hide()
     _continue_btn.show()
+    EventBus.tutorial_event.emit(TutorialEvents.REVEAL_COMPLETED, { })
 
 
 func _on_continue_pressed() -> void:
     RunManager.clear_lot()
     RunManager.set_resume_target(RunStore.RESUME_LOT_BROWSE)
     SaveManager.save()
+    EventBus.tutorial_event.emit(TutorialEvents.REVEAL_CONTINUED, { })
     SceneRouter.go_to_lot_browse()
 
 

@@ -25,7 +25,7 @@ var lot: LotStore = null
 ## [param car]. Resolves auction AP at the single construction point so no
 ## caller can forget to initialize it. Called by Location Select before the
 ## run phase begins.
-func create_run_store(location: LocationData, car: CarData) -> void:
+func create_run_store(location: LocationData, car: CarData, assisted: bool = false) -> void:
     var ap_cap := _resolve_inspection_ap_cap(car)
     var refill := _resolve_refill_reserve(car)
     var entry_fee := location.entry_fee if location != null else 0
@@ -35,7 +35,7 @@ func create_run_store(location: LocationData, car: CarData) -> void:
         else 0
     )
     var r := RunStore.new()
-    r.initialize(location, car, ap_cap, refill, entry_fee, fuel_cost)
+    r.initialize(location, car, ap_cap, refill, entry_fee, fuel_cost, assisted)
     run = r
 
 
@@ -124,6 +124,11 @@ func apply_trailer_damage() -> int:
 ## Returns true when a run is currently active (run is non-null).
 func is_run_active() -> bool:
     return run != null
+
+
+## Returns true when the active run has NPC bidding disabled.
+func is_disable_npc_bids() -> bool:
+    return run != null and run.disable_npc_bids
 
 # ── Run-state mutations ────────────────────────────────────────────────────────
 

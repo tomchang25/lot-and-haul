@@ -233,7 +233,7 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 > Ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched.
 > All phases shipped → archive the plan file + delete this line.
 
-- [onboarding] First-game onboarding: Hub → Auction run → Storage → Selling over two real days, on the new tutorial machinery — see `dev/docs/plans/onboarding_flow.md`
+Nothing currently in progress.
 
 ---
 
@@ -259,8 +259,6 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 ## Chore
 
 One-line, no reasoning, no backing doc.
-
-- [tutorial] tutorial cover whole gameplay
 
 ​
 

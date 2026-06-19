@@ -1,0 +1,113 @@
+# ============================================================
+# Lot & Haul — Tutorial Onboarding Data
+# data/yaml/tutorial_data.yaml
+#
+# Pipeline: this file → yaml_to_tres.py → data/tres/lots/*.tres
+#                                        + data/tres/locations/*.tres
+#                                        + data/tres/items/*.tres (via item gen pipeline)
+#
+# Tutorial-only content used during the first-game onboarding.
+# All entries carry is_tutorial: true so normal location/lot/item
+# sampling excludes them.
+#
+# TODO: once content-pool gating is implemented, ensure
+# is_tutorial entries are always excluded from non-onboarding
+# location/lot sampling and item generation.
+# ============================================================
+
+# ── Tutorial anchors ──────────────────────────────────────
+anchors:
+  - anchor_id: tutorial_vase_anchor
+    known_text: Vase
+    category_scope: vase
+    base_value: 120
+    shape_id: s1x2
+    weight_kg: 2.0
+    tier: 1
+
+# ── Tutorial clues ────────────────────────────────────────
+clues:
+  - clue_id: tutorial_vase_surface_material
+    known_text: Glazed Porcelain
+    type: surface
+    domain: vase
+    attribute: appraisal
+    dc: 6
+    effect_op: add
+    effect_amount: 30
+
+  - clue_id: tutorial_vase_surface_mark
+    known_text: Maker's Mark
+    type: surface
+    domain: vase
+    attribute: perception
+    dc: 10
+    effect_op: add
+    effect_amount: 60
+
+  - clue_id: tutorial_vase_hidden_authentic
+    known_text: Rare Provenance
+    type: hidden
+    domain: vase
+    attribute: investigation
+    dc: 8
+    effect_op: mul
+    effect_amount: 1.8
+
+# ── Tutorial affixes ──────────────────────────────────────
+affix_combinations:
+  - combination_id: tutorial_combo
+    affix_id: tutorial_affix
+    weight: 1
+    surface_clue_ids:
+      - tutorial_vase_surface_material
+      - tutorial_vase_surface_mark
+    hidden_clue_ids:
+      - tutorial_vase_hidden_authentic
+
+affixes:
+  - affix_id: tutorial_affix
+    naming_slot: prefix
+    display_name: Antique
+    scope_mode: all
+    weight: 1
+    combination_ids:
+      - tutorial_combo
+
+# ── Tutorial lots ─────────────────────────────────────────
+lots:
+  - lot_id: tutorial_first_lot
+    is_tutorial: true
+    aggressive_factor_min: 0.1
+    aggressive_factor_max: 0.3
+    aggressive_lerp_min: 0.5
+    aggressive_lerp_max: 0.8
+    npc_layer_sight_chance: 0.1
+    npc_clue_sight_chance: 0.05
+    opening_bid_factor: 0.15
+    veiled_chance: 1.0
+    item_count_min: 1
+    item_count_max: 1
+    commodity_count_min: 0
+    commodity_count_max: 0
+    tier_weights: { 1: 100, 2: 0, 3: 0, 4: 0, 5: 0 }
+    rarity_weights: { 0: 100, 1: 0, 2: 0, 3: 0, 4: 0 }
+    super_category_weights: {}
+    category_weights: { vase: 1 }
+    price_floor_factor: 0.5
+    price_ceiling_factor: 1.1
+    price_variance_min: 0.95
+    price_variance_max: 1.05
+    action_quota: 20
+
+# ── Tutorial locations ────────────────────────────────────
+locations:
+  - location_id: tutorial_first_run
+    is_tutorial: true
+    display_name: Training Yard
+    description: A small fenced yard with a single instructional lot.
+    entry_fee: 0
+    travel_days: 0
+    lot_number: 1
+    lot_pool:
+      - tutorial_first_lot

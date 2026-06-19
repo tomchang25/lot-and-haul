@@ -18,6 +18,7 @@ var _active_script: Array[TutorialStep] = []
 var _active_step_index: int = 0
 var _is_active: bool = false
 var _current_scene_id: String = ""
+var _layout_retry_serial: int = 0
 
 
 func _ready() -> void:
@@ -33,6 +34,7 @@ func _ready() -> void:
 
 
 func start_script(script_id: String) -> void:
+    _layout_retry_serial += 1
     var script: Array[TutorialStep] = TutorialScripts.resolve_script(script_id)
     if script.is_empty():
         ToastManager.show_dev_error("ScriptDirector.start_script: unknown script '%s'" % script_id)
@@ -114,16 +116,8 @@ func _on_scene_registered(scene_id: String) -> void:
         return
 
     # Re-evaluate anchor availability for the new scene and re-render if possible.
-    if step.kind == TutorialStep.Kind.HINT and not step.anchor_id.is_empty():
-        var target := Director.resolve_target(step)
-        if not target.is_empty():
-            Director.render_step(step)
-        else:
-            Director.hide_tutorial_overlay()
-    elif step.kind == TutorialStep.Kind.POPUP:
-        Director.render_step(step)
-    else:
-        Director.hide_tutorial_overlay()
+    # Scene registration must not skip NEXT steps; only explicit advancement does that.
+    _show_current_step(true, false)
 
 
 func _on_offer_accepted(script_id: String) -> void:
@@ -173,7 +167,7 @@ func _advance_step() -> void:
     _show_current_step()
 
 
-func _show_current_step() -> void:
+func _show_current_step(allow_layout_retry: bool = true, allow_next_skip: bool = true) -> void:
     if not _is_active:
         return
 
@@ -181,19 +175,34 @@ func _show_current_step() -> void:
     # Do not skip EVENT steps — they wait for a gameplay event.
     # Only skip NEXT steps whose anchors are unresolvable (old static-tutorial
     # behavior).
-    _skip_non_renderable_next_steps()
+    if allow_next_skip:
+        _skip_non_renderable_next_steps()
 
     if _active_step_index >= _active_script.size():
         _end_tutorial()
         return
 
     var step: TutorialStep = _active_script[_active_step_index]
-    if step.advance in [TutorialStep.Advance.SCENE_ENTERED, TutorialStep.Advance.EVENT]:
-        # Cannot render yet — scene or event will trigger completion.
-        if step.kind != TutorialStep.Kind.POPUP and not step.anchor_id.is_empty() and Director.resolve_target(step).is_empty():
-            Director.hide_tutorial_overlay()
-            return
+    if step.kind != TutorialStep.Kind.POPUP and not step.anchor_id.is_empty() and Director.resolve_target(step).is_empty():
+        Director.hide_tutorial_overlay()
+        if step.advance in [TutorialStep.Advance.SCENE_ENTERED, TutorialStep.Advance.EVENT] and allow_layout_retry:
+            _request_layout_retry(_active_script_id, _active_step_index)
+        return
     Director.render_step(step)
+
+
+func _request_layout_retry(script_id: String, step_idx: int) -> void:
+    _layout_retry_serial += 1
+    _retry_current_step_after_layout.call_deferred(script_id, step_idx, _layout_retry_serial)
+
+
+func _retry_current_step_after_layout(script_id: String, step_idx: int, serial: int) -> void:
+    await get_tree().process_frame
+    if serial != _layout_retry_serial:
+        return
+    if not _is_active or _active_script_id != script_id or _active_step_index != step_idx:
+        return
+    _show_current_step(false, false)
 
 
 ## Skips NEXT steps whose anchors cannot be resolved in the current scene.
@@ -236,6 +245,7 @@ func _mark_seen(script_id: String) -> void:
 
 
 func _clear_state() -> void:
+    _layout_retry_serial += 1
     _active_script = []
     _active_step_index = 0
     _active_script_id = ""
@@ -264,7 +274,37 @@ func _decide_onboarding_for_scene(scene_id: String) -> void:
         return
     if MetaManager.progress.tutorial_seen.has(segment_id):
         return
+    if not _check_chain_prerequisite(segment_id):
+        return
     start_script(segment_id)
+
+
+## Returns true when [param segment_id]'s chain prerequisite is met or the
+## segment has no prerequisite.
+func _check_chain_prerequisite(segment_id: String) -> bool:
+    var prereq: String = _onboarding_prerequisite(segment_id)
+    if prereq.is_empty():
+        return true
+    return MetaManager.progress.tutorial_seen.has(prereq)
+
+
+## Returns the prerequisite segment id for [param segment_id], or empty if none.
+func _onboarding_prerequisite(segment_id: String) -> String:
+    match segment_id:
+        "onboarding_auction_run":
+            return "onboarding_hub_intro_choose"
+        "onboarding_storage_choose":
+            return "onboarding_auction_run"
+        "onboarding_storage":
+            return "onboarding_storage_choose"
+        "onboarding_day_pass":
+            return "onboarding_storage"
+        "onboarding_shop_choose":
+            return "onboarding_day_pass"
+        "onboarding_selling":
+            return "onboarding_shop_choose"
+        _:
+            return ""
 
 
 ## Derives the onboarding segment id from the current game state and scene.
@@ -273,6 +313,12 @@ func _decide_onboarding_for_scene(scene_id: String) -> void:
 func _derive_onboarding_segment(scene_id: String) -> String:
     var day: int = MetaManager.progress.current_day
     var slot: int = MetaManager.slot.current_slot
+
+    # location_select starts the auction-run segment even before the run is
+    # created, so the first step (pick a location) is visible immediately.
+    if scene_id == "location_select" and day == 0 and slot == SlotStore.SLOT_DAY:
+        return "onboarding_auction_run"
+
     match scene_id:
         "hub":
             if day == 0 and slot == SlotStore.SLOT_DAY:
@@ -286,21 +332,34 @@ func _derive_onboarding_segment(scene_id: String) -> String:
         "day_summary":
             return "onboarding_day_pass"
         "customer_sell":
+            # Only start selling segment when there are items to sell.
+            if MetaManager.storage.storage_items.is_empty():
+                return ""
             return "onboarding_selling"
-    # For run scenes during the first auction (day 0 or 1), derive via the
-    # run state rather than per-scene matching.
+
+    # For other run scenes during the first auction, derive via run state.
     if RunManager.is_run_active() and (day == 0 or day == 1):
         return "onboarding_auction_run"
     return ""
 
 
 func _on_hub_registered() -> void:
+    # Show completion popup once after onboarding is fully finished.
+    if not MetaManager.is_onboarding_pending() and _has_seen_onboarding_segment():
+        if not MetaManager.progress.tutorial_seen.has("onboarding_complete"):
+            start_script("onboarding_complete")
+        return
+
+    if _has_seen_onboarding_segment():
+        return
     if MetaManager.progress.tutorial_seen.has("hub"):
         return
     start_script("hub")
 
 
 func _on_storage_registered() -> void:
+    if _has_seen_onboarding_segment():
+        return
     if MetaManager.progress.tutorial_seen.has("storage"):
         Director.show_help_button("storage")
         return
@@ -311,3 +370,10 @@ func _on_storage_registered() -> void:
         "Welcome to the Workshop!\n\nWould you like a quick tour of the features?",
         "Yes, show me around!",
     )
+
+
+func _has_seen_onboarding_segment() -> bool:
+    for script_id: String in MetaManager.progress.tutorial_seen.keys():
+        if script_id.begins_with("onboarding_"):
+            return true
+    return false

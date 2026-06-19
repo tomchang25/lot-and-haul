@@ -8,6 +8,9 @@ extends Resource
 # Stable identifier for this lot. Must match the .tres filename stem.
 @export var lot_id: String = ""
 
+# Whether this lot is tutorial-only. Excluded from normal sampling.
+@export var is_tutorial: bool = false
+
 # ── NPC aggression ────────────────────────────────────────────────────────────
 
 # Range from which aggressive_factor is rolled at run start.

@@ -14,6 +14,12 @@ Rules:
 
 ## v0.1.4 - Draft
 
+### Onboarding Flow
+
+- 2026-06-19 — [onboarding] First-game onboarding now walks new players through a full Day-1 assisted auction run (no NPC bids, pass/skip locked), Storage workshop, and Day-2 customer selling, completing with a finishing popup; each segment advances on real gameplay events and chain prerequisites enforce correct ordering
+- 2026-06-19 — [onboarding] Selling tutorial expanded to a full walkthrough — customer queue, item packing, conservative vs aggressive dice strategy, and sale confirmation — with conservative sale locked until the aggressive flow is learned
+- 2026-06-19 — [onboarding] Tutorial hints and popups gain non-blocking mode (`blocks_input=false`) so informational steps overlay without dimming the scene; layout_retry mechanism ensures anchor-dependent steps recover after async UI settlement
+
 ### Run Phase Persistence
 
 - 2026-06-19 — [run] Mid-run quit now resumes at the last phase scene with escrowed run economics intact; bids enforce the effective-cash budget and the day slot never advances without a restorable run

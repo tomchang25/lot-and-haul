@@ -30,6 +30,9 @@ var _placed_items: Array = []
 var _dice_rolls: Array[int] = []
 var _selected_dice_indices: Array[int] = []
 var _dice_buttons: Array[Button] = []
+## External lock for flows that need to temporarily prevent conservative sales.
+## The aggressive button is unaffected.
+var _conservative_sale_locked: bool = false
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -65,8 +68,16 @@ func set_placed_items(items: Array) -> void:
 
 
 func disable_sell_buttons(disabled: bool) -> void:
-    _conservative_button.disabled = disabled
+    _conservative_button.disabled = disabled or _conservative_sale_locked
     _aggressive_button.disabled = disabled
+
+
+## Locks conservative sale while preserving aggressive sale availability.
+## Call again with [param locked] = false to restore normal behaviour.
+func set_conservative_sale_locked(locked: bool) -> void:
+    _conservative_sale_locked = locked
+    if locked:
+        _conservative_button.disabled = true
 
 
 func show_dice(rolls: Array[int], placed_items: Array) -> void:

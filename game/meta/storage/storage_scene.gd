@@ -108,6 +108,7 @@ func _on_repair_pressed() -> void:
         _item_browser.refresh_entry(entry)
         _refresh_ap_label()
         _refresh_detail()
+        EventBus.tutorial_event.emit(TutorialEvents.STORAGE_CONDITION_IMPROVED, { })
 
 
 func _on_research_pressed() -> void:
@@ -119,6 +120,7 @@ func _on_research_pressed() -> void:
         _item_browser.refresh_entry(entry)
         _refresh_ap_label()
         _refresh_detail()
+        EventBus.tutorial_event.emit(TutorialEvents.STORAGE_RESEARCH_PERFORMED, { })
 
 
 func _on_restore_pressed() -> void:
@@ -130,6 +132,7 @@ func _on_restore_pressed() -> void:
         _item_browser.refresh_entry(entry)
         _refresh_ap_label()
         _refresh_detail()
+        EventBus.tutorial_event.emit(TutorialEvents.STORAGE_CONDITION_IMPROVED, { })
 
 # ══ AP label ══════════════════════════════════════════════════════════════════
 

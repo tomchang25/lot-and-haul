@@ -380,9 +380,15 @@ func _show_hint(step: TutorialStep) -> void:
 
     var t_rect: Rect2 = target.get("rect", Rect2())
     var preferred: int = target.get("preferred", TutorialTarget.PreferredSide.AUTO)
-    _update_dim_hole(t_rect)
+    if step.blocks_input:
+        _update_dim_hole(t_rect)
+    else:
+        _dim_top.visible = false
+        _dim_bottom.visible = false
+        _dim_left.visible = false
+        _dim_right.visible = false
 
-    if step.unlock_anchor:
+    if step.unlock_anchor or not step.blocks_input:
         _dim_full.visible = false
     else:
         _dim_full.color = Color.TRANSPARENT
@@ -400,11 +406,15 @@ func _show_hint(step: TutorialStep) -> void:
 
 
 func _show_popup(step: TutorialStep) -> void:
-    _dim_full.color = DIM_COLOR
-    _dim_full.visible = true
-    _dim_full.mouse_filter = Control.MOUSE_FILTER_STOP
-    _dim_full.position = Vector2.ZERO
-    _dim_full.size = _get_screen_size()
+    if step.blocks_input:
+        _dim_full.color = DIM_COLOR
+        _dim_full.visible = true
+        _dim_full.mouse_filter = Control.MOUSE_FILTER_STOP
+        _dim_full.position = Vector2.ZERO
+        _dim_full.size = _get_screen_size()
+    else:
+        _dim_full.visible = false
+        _dim_full.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
     if step.image != null:
         _popup_image.texture = step.image
@@ -537,9 +547,15 @@ func _process(_delta: float) -> void:
         return
     _last_target_info = { "rect": t_rect, "preferred": preferred }
 
-    _update_dim_hole(t_rect)
+    if _rendered_step.blocks_input:
+        _update_dim_hole(t_rect)
+    else:
+        _dim_top.visible = false
+        _dim_bottom.visible = false
+        _dim_left.visible = false
+        _dim_right.visible = false
 
-    if not _rendered_step.unlock_anchor:
+    if _rendered_step.blocks_input and not _rendered_step.unlock_anchor:
         _dim_full.position = t_rect.position
         _dim_full.size = t_rect.size
 

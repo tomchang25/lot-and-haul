@@ -15,9 +15,11 @@ class LotSpec:
     yaml_key: str = "lots"
     tres_subdir: str = "lots"
     uid_prefix: str = "lot"
-    script_paths: dict[str, str] = field(default_factory=lambda: {
-        "lot_data": "res://data/definitions/lot_data.gd",
-    })
+    script_paths: dict[str, str] = field(
+        default_factory=lambda: {
+            "lot_data": "res://data/definitions/lot_data.gd",
+        }
+    )
 
     def entity_id(self, entry: dict) -> str:
         return entry["lot_id"]
@@ -39,6 +41,7 @@ class LotSpec:
         )
         w.add_field('script = ExtResource("1_lotdef")')
         w.add_field_str("lot_id", lot_id)
+        w.add_field_bool("is_tutorial", bool(entry.get("is_tutorial", False)))
         w.add_field_float(
             "aggressive_factor_min",
             float(entry.get("aggressive_factor_min", 0.3)),
@@ -63,18 +66,10 @@ class LotSpec:
             "opening_bid_factor",
             float(entry.get("opening_bid_factor", 0.25)),
         )
-        w.add_field_float(
-            "veiled_chance", float(entry.get("veiled_chance", 0.4))
-        )
-        w.add_field_int(
-            "item_count_min", int(entry.get("item_count_min", 3))
-        )
-        w.add_field_int(
-            "item_count_max", int(entry.get("item_count_max", 5))
-        )
-        w.add_field_dict_auto_keys(
-            "tier_weights", entry.get("tier_weights", {}) or {}
-        )
+        w.add_field_float("veiled_chance", float(entry.get("veiled_chance", 0.4)))
+        w.add_field_int("item_count_min", int(entry.get("item_count_min", 3)))
+        w.add_field_int("item_count_max", int(entry.get("item_count_max", 5)))
+        w.add_field_dict_auto_keys("tier_weights", entry.get("tier_weights", {}) or {})
         w.add_field_dict_auto_keys(
             "rarity_weights", entry.get("rarity_weights", {}) or {}
         )
@@ -136,6 +131,10 @@ class LotSpec:
         ]
 
         lot: dict = {"lot_id": lot_id}
+        is_tutorial_val = tres_field(text, "is_tutorial")
+        lot["is_tutorial"] = (
+            is_tutorial_val == "true" if is_tutorial_val is not None else False
+        )
         for key in _FLOAT_FIELDS:
             val = tres_field(text, key)
             if val is not None:

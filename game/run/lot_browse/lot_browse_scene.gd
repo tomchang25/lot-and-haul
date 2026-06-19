@@ -73,6 +73,8 @@ func _build_all_cards() -> void:
 
 func _refresh_view() -> void:
     var idx: int = RunManager.run.browse_index
+    var lock_pass := _is_onboarding_auction_run()
+    _skip_button.disabled = lock_pass
 
     if idx >= RunManager.run.browse_lots.size():
         _show_cargo_state()
@@ -83,6 +85,7 @@ func _refresh_view() -> void:
 
     for i in _lot_cards.size():
         _lot_cards[i].set_active(i == idx)
+        _lot_cards[i].set_pass_disabled(lock_pass)
 
 
 func _show_cargo_state() -> void:
@@ -105,6 +108,8 @@ func _on_enter_pressed() -> void:
 
 
 func _on_pass_pressed() -> void:
+    if _is_onboarding_auction_run():
+        return
     RunManager.advance_browse_index()
     RunManager.set_resume_target(RunStore.RESUME_LOT_BROWSE)
     SaveManager.save()
@@ -112,6 +117,8 @@ func _on_pass_pressed() -> void:
 
 
 func _on_skip_pressed() -> void:
+    if _is_onboarding_auction_run():
+        return
     var remaining: int = RunManager.run.browse_lots.size() - RunManager.run.browse_index
     _skip_confirm_popup.dialog_text = (
         "Skip the remaining %d lot(s) and go straight to cargo?" % remaining
@@ -128,7 +135,12 @@ func _on_skip_confirmed() -> void:
 func _on_cargo_pressed() -> void:
     RunManager.set_resume_target(RunStore.RESUME_CARGO)
     SaveManager.save()
+    EventBus.tutorial_event.emit(TutorialEvents.CARGO_OPENED, { })
     SceneRouter.go_to_cargo()
+
+
+func _is_onboarding_auction_run() -> bool:
+    return MetaManager.is_onboarding_pending() and MetaManager.progress.current_day == 0
 
 # ══ Sampling ══════════════════════════════════════════════════════════════════
 

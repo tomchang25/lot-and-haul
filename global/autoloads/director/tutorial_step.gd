@@ -20,6 +20,8 @@ var advance_event_id: StringName = &""
 ## Target scene id checked when advance == Advance.SCENE_ENTERED.
 ## Empty string matches any scene registration.
 var advance_scene_id: String = ""
+## False for informational popups that should not dim or block the scene.
+var blocks_input: bool = true
 
 
 func _init(
@@ -33,6 +35,7 @@ func _init(
         p_fallback_when_anchor_unrenderable: bool = false,
         p_advance_event_id: StringName = &"",
         p_advance_scene_id: String = "",
+        p_blocks_input: bool = true,
 ) -> void:
     kind = p_kind
     text = p_text
@@ -44,3 +47,4 @@ func _init(
     fallback_when_anchor_unrenderable = p_fallback_when_anchor_unrenderable
     advance_event_id = p_advance_event_id
     advance_scene_id = p_advance_scene_id
+    blocks_input = p_blocks_input

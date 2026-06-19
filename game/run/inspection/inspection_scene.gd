@@ -78,6 +78,7 @@ func _ready() -> void:
     _footer.show()
     _pass_button.show()
     _review_button.show()
+    _review_button.disabled = _is_onboarding_auction_run()
     _pass_button.pressed.connect(_on_pass_pressed)
     _pass_confirm_popup.confirmed.connect(_on_pass_confirmed)
     _review_button.pressed.connect(_on_review_pressed)
@@ -97,7 +98,6 @@ func _ready() -> void:
         "inspection",
         {
             "item_browser": _item_browser,
-            "pass_btn": _pass_button,
             "review_btn": _review_button,
             "unveil_btn": _action_unveil_button,
             "inspect_btn": _action_inspect_button,
@@ -123,6 +123,7 @@ func _populate_browser() -> void:
 func _on_browser_entry_pressed(entry: ItemEntry) -> void:
     _selected_entry = entry
     _refresh_detail()
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_SELECTED, { })
 
 
 func _on_unveil_pressed() -> void:
@@ -153,6 +154,7 @@ func _do_unveil(entry: ItemEntry) -> void:
     RunManager.spend_ap(UNVEIL_COST)
     _reveal_item(entry)
     AudioManager.play_event(REVEAL_GOOD)
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_UNVEILED, { })
 
     _complete_action()
 
@@ -181,13 +183,15 @@ func _do_clue_chain(entry: ItemEntry) -> void:
     _clue_result_section.show()
 
     _complete_action()
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_PERFORMED, { })
+    if _is_onboarding_auction_run():
+        _review_button.disabled = false
 
 
 func _complete_action() -> void:
     _item_browser.refresh()
     _refresh_hud()
     _refresh_detail()
-    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_PERFORMED, { })
 
     if RunManager.lot.actions_remaining <= 0:
         _finish_inspection()
@@ -361,10 +365,16 @@ func _on_pass_confirmed() -> void:
 func _on_review_pressed() -> void:
     _summary_popup.setup(RunManager.lot.lot_entry)
     _summary_popup.popup_centered()
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_REVIEW_OPENED, { })
 
 
 func _on_summary_start_auction_requested() -> void:
     # Resume target stays "inspection" so a reload lands at the completed
     # inspection scene, not inside a live auction.
     SaveManager.save()
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_AUCTION_STARTED, { })
     SceneRouter.go_to_auction()
+
+
+func _is_onboarding_auction_run() -> bool:
+    return MetaManager.is_onboarding_pending() and MetaManager.progress.current_day == 0

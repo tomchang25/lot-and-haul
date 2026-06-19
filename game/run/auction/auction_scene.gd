@@ -35,7 +35,6 @@ var _rolled_price: int = 0
 var _current_display_price: int = 0
 var _displayed_price: int = 0 # tracks the label's in-flight value for tweening
 var _last_bidder: String = "npc" # "player" or "npc"
-var _in_reach: bool = false # true once current_display_price >= rolled_price
 var _bid_enabled: bool = true
 var _shorten_next_npc_tick: bool = false
 var _last_npc_index: int = -1 # tracks the last NPC to prevent repeats
@@ -51,6 +50,7 @@ var _npc_timer: Timer = null
 var _circle_fill: float = 0.0 # 0.0–1.0, snapshot kept across tween kills
 var _circle_tween: Tween = null
 var _price_tween: Tween = null
+var _has_started: bool = false # true after first bid starts the closing circle
 
 # ── Node references ───────────────────────────────────────────────────────────
 
@@ -116,13 +116,19 @@ func _ready() -> void:
     Debug.toggled.connect(_on_debug_toggled)
     if Debug.enabled:
         _init_debug_overlay()
-    _start_npc_timer()
-    _start_circle(0.0)
+
+    var assist := RunManager.is_disable_npc_bids()
+    if assist:
+        _pass_button.disabled = true
+        # No NPC timer or circle until the player places their first bid.
+    else:
+        _start_npc_timer()
+        # Circle starts on the first bid (player or NPC), not here.
+
     Director.register_scene(
         "auction",
         {
             "bid_btn": _bid_button,
-            "pass_btn": _pass_button,
             "price_label": _price_label,
         },
     )
@@ -131,9 +137,6 @@ func _ready() -> void:
 
 
 func _on_npc_tick() -> void:
-    if _in_reach:
-        return
-
     var progress := float(_current_display_price) / float(_rolled_price)
     var step_multiplier := 1.0
 
@@ -156,27 +159,24 @@ func _on_npc_tick() -> void:
 
     _tween_price_to(_current_display_price)
     _show_npc_popup(_current_display_price)
-    _reset_circle()
+    if not _has_started:
+        _has_started = true
+        _start_circle(0.0)
+    else:
+        _reset_circle()
 
     # Re-enable Bid button now that NPC has bid
     _bid_enabled = true
     _bid_button.disabled = false
     _pass_button.disabled = false
 
-    # Termination check
-    if _current_display_price >= _rolled_price:
-        _in_reach = true
-        # NPC timer stops; circle will complete and fire _resolve()
-    else:
+    # NPCs stop bidding at their rolled target; the closing circle decides resolution.
+    if _current_display_price < _rolled_price:
         _start_npc_timer()
 
 
 func _on_circle_completed() -> void:
-    if _in_reach:
-        _resolve()
-    else:
-        # Purely atmospheric in normal state — loop.
-        _start_circle(0.0)
+    _resolve()
 
 
 func _on_bid_pressed() -> void:
@@ -200,13 +200,15 @@ func _on_bid_pressed() -> void:
     _show_player_bid_in_stack(_current_display_price)
     _refresh_budget()
 
-    _reset_circle()
-
-    if _current_display_price >= _rolled_price:
-        _in_reach = true
+    if not _has_started:
+        _has_started = true
+        _start_circle(0.0)
+    else:
+        _reset_circle()
 
     _shorten_next_npc_tick = true
     AudioManager.play_event(BID_CONFIRM)
+    EventBus.tutorial_event.emit(TutorialEvents.BID_PLACED, { })
 
 
 func _on_pass_pressed() -> void:
@@ -325,9 +327,27 @@ func _reset_circle() -> void:
 
 
 func _resolve() -> void:
+    if _resolved:
+        return
+
+    # Defensive guard: if assisted auction tries to resolve without a player
+    # bid, restart the circle instead of allowing a loss. This should never
+    # fire in normal flow — bid-placement starts the circle.
+    if RunManager.is_disable_npc_bids() and _last_bidder != "player":
+        ToastManager.show_dev_error("assisted auction tried to resolve without player bid")
+        _start_circle(0.0)
+        return
+
     if _last_bidder == "player":
         _win_now(_current_display_price)
     else:
+        _resolved = true
+        if _npc_timer:
+            _npc_timer.stop()
+        if _circle_tween:
+            _circle_tween.kill()
+        if not RunManager.is_disable_npc_bids() and _current_display_price < _rolled_price:
+            ToastManager.show_info("Auction resolved by timeout below NPC target.")
         _bid_button.disabled = true
         _pass_button.disabled = true
         RunManager.set_resume_target(RunStore.RESUME_REVEAL)

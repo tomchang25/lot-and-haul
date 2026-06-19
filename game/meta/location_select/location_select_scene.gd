@@ -33,9 +33,23 @@ func _ready() -> void:
 
 
 func _populate_cards() -> void:
-    if MetaManager.progress.available_locations.is_empty():
-        MetaManager.roll_available_locations()
-    for location: LocationData in MetaManager.progress.available_locations:
+    var locations: Array[LocationData] = []
+
+    # During the first onboarding run, show ONLY the tutorial location.
+    # Never fall through to normal pool — tutorial must gate to the intended path.
+    if MetaManager.is_onboarding_pending():
+        var tutorial_loc := LocationRegistry.get_tutorial_location()
+        if tutorial_loc == null:
+            ToastManager.show_dev_error("LocationSelectScene: no tutorial location found for onboarding")
+            return
+        locations = [tutorial_loc]
+    else:
+        # Normal path: roll and sample available locations.
+        if MetaManager.progress.available_locations.is_empty():
+            MetaManager.roll_available_locations()
+        locations = MetaManager.progress.available_locations
+
+    for location: LocationData in locations:
         var card: LocationCard = LocationCardScene.instantiate()
         card.setup(location)
         card.pressed.connect(_on_card_pressed)
@@ -47,10 +61,14 @@ func _populate_cards() -> void:
 func _on_card_pressed(card: LocationCard) -> void:
     var location := card.get_location_data()
 
+    # During the first onboarding run, use the tutorial location and enable
+    # assisted auction (no NPC bids, timer waits for player bid).
+    var assisted := MetaManager.is_onboarding_pending() and MetaManager.progress.current_day == 0
+
     # Create the run store first, then advance the slot + save.
     # This ensures the run snapshot is included in the save so a mid-run quit
     # does not leave the day slot consumed without a restorable run.
-    RunManager.create_run_store(location, MetaManager.garage.active_car)
+    RunManager.create_run_store(location, MetaManager.garage.active_car, assisted)
     RunManager.set_resume_target(RunStore.RESUME_LOCATION_ENTRY)
     MetaManager.begin_auction()
     EventBus.tutorial_event.emit(TutorialEvents.LOCATION_SELECTED, { })

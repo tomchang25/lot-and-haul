@@ -17,8 +17,18 @@ func get_location_by_id(location_id: String) -> LocationData:
     return get_by_id(location_id) as LocationData
 
 
-func get_all_locations() -> Array[LocationData]:
+func get_all_locations(include_tutorial: bool = false) -> Array[LocationData]:
     var result: Array[LocationData] = []
     for loc: LocationData in get_all():
+        if loc.is_tutorial and not include_tutorial:
+            continue
         result.append(loc)
     return result
+
+
+## Returns the first tutorial-only location, or null if none exist.
+func get_tutorial_location() -> LocationData:
+    for loc: LocationData in get_all():
+        if loc.is_tutorial:
+            return loc
+    return null

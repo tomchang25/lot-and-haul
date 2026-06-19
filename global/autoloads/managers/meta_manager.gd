@@ -107,6 +107,8 @@ func is_onboarding_pending() -> bool:
 
 ## Returns the intended activity during onboarding, or empty if onboarding is
 ## not active or the player is not in a hub-chooser state.
+## Relaxes gating when the selling segment's local condition (non-empty
+## storage) is not met, so the player can acquire items freely.
 func onboarding_target_activity() -> String:
     if not progress.onboarding_pending:
         return &""
@@ -115,6 +117,9 @@ func onboarding_target_activity() -> String:
     if progress.current_day == 0 and slot.current_slot == SlotStore.SLOT_NIGHT:
         return &"storage"
     if progress.current_day == 1 and slot.current_slot == SlotStore.SLOT_DAY:
+        # Only gate to selling if there are items to sell.
+        if storage.storage_items.is_empty():
+            return &""
         return &"selling"
     return &""
 
@@ -128,10 +133,12 @@ func complete_onboarding() -> void:
     SaveManager.mark_dirty()
 
 
-## Marks onboarding as skipped and saves. Does not mark hub/storage as seen
-## so the player can still receive individual tutorial offers.
+## Marks onboarding as skipped and saves. Also marks the legacy hub/storage
+## tutorials as seen so they do not appear after the onboarding flow ends.
 func skip_onboarding() -> void:
     progress.mark_onboarding_complete()
+    progress.mark_tutorial_seen("hub")
+    progress.mark_tutorial_seen("storage")
     SaveManager.mark_dirty()
 
 

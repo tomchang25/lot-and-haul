@@ -43,13 +43,9 @@ func _ready() -> void:
     _sell_btn.pressed.connect(_on_sell_chosen)
     _cancel_btn.pressed.connect(_on_chooser_cancelled)
 
-    if MetaManager.slot.current_slot > SlotStore.SLOT_NIGHT:
-        _end_day_and_navigate.call_deferred()
-        return
-
-    _refresh_display()
-    _debug_container.storage_changed.connect(_refresh_display)
-
+    # Register anchors before the slot check so tutorials that wait for
+    # hub (SCENE_ENTERED) can advance even when this visit immediately
+    # ends the day.
     Director.register_scene(
         "hub",
         {
@@ -60,6 +56,13 @@ func _ready() -> void:
             "sell_btn": _sell_btn,
         },
     )
+
+    if MetaManager.slot.current_slot > SlotStore.SLOT_NIGHT:
+        _end_day_and_navigate.call_deferred()
+        return
+
+    _refresh_display()
+    _debug_container.storage_changed.connect(_refresh_display)
 
 # ══ Signal handlers — activity chooser ════════════════════════════════════════
 

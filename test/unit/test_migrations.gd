@@ -222,3 +222,34 @@ func test_slot_v1_migration_is_idempotent() -> void:
     # Re-feeding the same dict — the stamped _version should bypass migration.
     store.from_dict(data, ctx)
     assert_eq(store.current_slot, SlotStore.SLOT_DAY_ENDING, "re-run must not re-migrate to Night (2)")
+
+# ══ RunStore migration (v1 → v2) — disable_npc_bids ═══════════════════════
+
+
+func test_run_store_v1_missing_disable_npc_bids_defaults_false() -> void:
+    # RunStore.restore_snapshot calls the migration path which adds the field.
+    # Use the public restore API so the test does not reach into private methods.
+    var ctx := SaveLoadContext.new()
+    var store := RunStore.new()
+    var v1_data := {
+        "_version": 1,
+        "trailer_damage_applied": false,
+        "location_id": "suburban_storage",
+        "car_id": "van_basic",
+        "inspection_ap_cap": 10,
+        "refill_metric": 5,
+        "entry_fee": 0,
+        "fuel_cost": 0,
+        "stamina": 30,
+        "max_stamina": 30,
+        "paid_price": 0,
+        "onsite_proceeds": 0,
+        "browse_index": 0,
+        "won_item_keys": [],
+        "cargo_item_keys": [],
+        "trailer_item_keys": [],
+    }
+    var restored := store.restore_snapshot(v1_data, RunSnapshotContext.new(), ctx)
+    assert_true(restored, "v1 run snapshot should restore through migration")
+    assert_false(store.disable_npc_bids, "disable_npc_bids defaults to false")
+    assert_eq(v1_data["_version"], 2, "version bumped to 2 after migration")

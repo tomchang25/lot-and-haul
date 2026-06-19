@@ -50,6 +50,7 @@ var _browse_index: int = 0
 
 var _resume_target: String = ""
 var _trailer_damage_applied: bool = false
+var _disable_npc_bids: bool = false
 
 # ── Getters (read-public) ──────────────────────────────────────────────────────
 
@@ -127,6 +128,10 @@ var trailer_damage_applied: bool:
     get:
         return _trailer_damage_applied
 
+var disable_npc_bids: bool:
+    get:
+        return _disable_npc_bids
+
 # ══ Construction ══════════════════════════════════════════════════════════════
 
 
@@ -139,6 +144,7 @@ func initialize(
         p_refill: int,
         p_entry_fee: int,
         p_fuel_cost: int,
+        p_disable_npc_bids: bool = false,
 ) -> void:
     _location_data = p_location
     _car_data = p_car
@@ -148,6 +154,7 @@ func initialize(
     _refill_metric = p_refill
     _entry_fee = p_entry_fee
     _fuel_cost = p_fuel_cost
+    _disable_npc_bids = p_disable_npc_bids
 
 # ══ Run-phase mutations ════════════════════════════════════════════════════════
 
@@ -242,6 +249,7 @@ func _encode_fields() -> Dictionary:
         "onsite_proceeds": _onsite_proceeds,
         "browse_index": _browse_index,
         "browse_lot_ids": [],
+        "disable_npc_bids": _disable_npc_bids,
     }
 
 
@@ -271,6 +279,7 @@ func _restore_fields(data: Dictionary, ctx: SaveLoadContext) -> bool:
     _paid_price = int(data.get("paid_price", 0))
     _onsite_proceeds = int(data.get("onsite_proceeds", 0))
     _browse_index = int(data.get("browse_index", 0))
+    _disable_npc_bids = bool(data.get("disable_npc_bids", false))
 
     _browse_lots.clear()
     for lot_id: Variant in data.get("browse_lot_ids", []):
@@ -331,4 +340,14 @@ func restore_snapshot(data: Dictionary, snapshot_ctx: RefCounted, ctx: SaveLoadC
 
 
 func _store_version() -> int:
-    return 1
+    return 2
+
+
+## Migrates from older schema versions.
+## Version 1 → 2: adds disable_npc_bids flag (default false).
+func _apply_migrations(data: Dictionary, from_version: int, _ctx: SaveLoadContext) -> Dictionary:
+    if from_version < 2:
+        if not data.has("disable_npc_bids"):
+            data["disable_npc_bids"] = false
+    data["_version"] = _store_version()
+    return data

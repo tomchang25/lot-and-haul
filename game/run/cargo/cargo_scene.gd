@@ -164,6 +164,7 @@ func _on_packing_grid_cell_clicked(pos: Vector2i) -> void:
         _active_origin = ""
         _recalc_totals()
         _refresh_ui()
+        EventBus.tutorial_event.emit(TutorialEvents.CARGO_ITEM_PLACED, { })
     elif item != null:
         AudioManager.play_event(BLOCKED_ERROR)
 
@@ -212,6 +213,7 @@ func _on_reset_pressed() -> void:
 
 
 func _on_continue_pressed() -> void:
+    EventBus.tutorial_event.emit(TutorialEvents.CARGO_CONTINUE_REQUESTED, { })
     _confirm_popup.dialog_text = _build_summary_text()
     _confirm_popup.popup_centered()
 
@@ -305,6 +307,7 @@ func _on_item_row_pressed(entry: ItemEntry) -> void:
     if _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
         _cargo_grid.cancel_placement()
     _lift_item_entry(entry)
+    EventBus.tutorial_event.emit(TutorialEvents.CARGO_ITEM_SELECTED, { })
 
 
 func _on_row_tooltip_requested(entry: ItemEntry, anchor: Rect2) -> void:
