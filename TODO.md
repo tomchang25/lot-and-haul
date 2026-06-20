@@ -253,8 +253,6 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
 
 - [balance_preview_v2] Balance preview HTML report — rich HTML output with per-clue information tables, category breakdowns, affix-aware balance preview mode, and value distribution charts
-- [tutorial_unit_refactor] Tutorial unit refactor: convert onboarding from a single chain into independent trigger-based units, move tutorial flag queries out of gameplay into Director, remove `disable_npc_bids` from RunStore — see `dev/docs/plans/tutorial_unit_refactor.sketch.md`
-
 ---
 
 ## Chore

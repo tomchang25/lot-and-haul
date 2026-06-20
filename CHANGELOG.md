@@ -20,6 +20,11 @@ Rules:
 - 2026-06-19 — [onboarding] Selling tutorial expanded to a full walkthrough — customer queue, item packing, conservative vs aggressive dice strategy, and sale confirmation — with conservative sale locked until the aggressive flow is learned
 - 2026-06-19 — [onboarding] Tutorial hints and popups gain non-blocking mode (`blocks_input=false`) so informational steps overlay without dimming the scene; layout_retry mechanism ensures anchor-dependent steps recover after async UI settlement
 
+### Tutorial Unit and Override Architecture
+
+- 2026-06-20 — [tutorial] Onboarding split into independently-triggered per-scene units so skipping one segment no longer breaks others; scenes read tutorial state from Director instead of game managers; RunStore disable_npc_bids removed (schema v3) — NPC bid suppression is now Director-driven, not persisted
+- 2026-06-20 — [tutorial] GameplayOverride runtime store decouples gameplay gates from tutorial flow state; scenes read overrides instead of calling Director query methods; skip-all-tutorials toggle with confirm dialogs added
+
 ### Run Phase Persistence
 
 - 2026-06-19 — [run] Mid-run quit now resumes at the last phase scene with escrowed run economics intact; bids enforce the effective-cash budget and the day slot never advances without a restorable run
