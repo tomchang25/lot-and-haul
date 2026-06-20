@@ -94,7 +94,7 @@ zh_TW:
   UI_FATAL_ERROR_TITLE: 致命錯誤
   UI_FUEL_LABEL: "燃料：$%d"
   UI_GARAGE: 車庫
-  UI_GRID_UNKNOWN: "G：？"
+  UI_GRID_UNKNOWN: "G：？？？"
   UI_HUB_TITLE: 樞紐
   UI_INSPECTION_TITLE: 檢查
   UI_INSPECT_CLUES_ACTION: 檢查線索（2 AP）
@@ -121,7 +121,7 @@ zh_TW:
   UI_PASS: 跳過
   UI_PASS_LOT_CONFIRM: "你確定要跳過這個拍品嗎？"
   UI_PASS_LOT_TITLE: 跳過拍品
-  UI_PERKS: 技能
+  UI_PERKS: 專長
   UI_PRICE_CONVERGENCE: 價格收斂度
   UI_PRICE_LABEL: "價格：$%d"
   UI_QUESTION_MARK: "？"
@@ -178,7 +178,7 @@ zh_TW:
   UI_VIEW_CARDS: 卡片
   UI_VIEW_TABLE: 表格
   UI_WANTS_LABEL: "需求：%s"
-  UI_WEIGHT_UNKNOWN: "W：？"
+  UI_WEIGHT_UNKNOWN: "W：？？？"
   UI_ZERO_ITEMS: "%d 個物品"
 
   # ── 財務分類帳 ──
@@ -266,7 +266,7 @@ zh_TW:
 
   # ── 知識面板 ──
   UI_NO_ATTRIBUTES: "沒有找到屬性"
-  UI_NO_PERKS: "沒有發現技能"
+  UI_NO_PERKS: "沒有發現專長"
 
   # ── 車輛商店 ──
   UI_NO_CARS_AVAILABLE: "沒有可用車輛 — 你已經擁有全部。"
