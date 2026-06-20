@@ -6,7 +6,7 @@ zh_TW:
   UI_START_SELECT_SLOT: 選擇存檔
   UI_START_BACK: 返回
   UI_START_NEW_GAME_CONFIRM: 開始新遊戲
-  UI_START_NEW_GAME_CONFIRM_BODY: 開始新遊戲？當前進度將遺失。
+  UI_START_NEW_GAME_CONFIRM_BODY: 開始新遊戲？目前進度將遺失。
   UI_START_OVERWRITE_SLOT_TITLE: 覆蓋存檔
   UI_START_OVERWRITE: 覆蓋
   UI_START_OVERWRITE_BODY: 此存檔的所有進度將遺失。
@@ -28,150 +28,152 @@ zh_TW:
   UI_SETTINGS_CONFIRM_SKIP_LABEL: "跳過所有剩餘教學？\n\n教學將不再自動啟動。你可以隨時在設定中重新開啟。"
   UI_SETTINGS_YES: 是
   UI_SETTINGS_NO: 否
-  UI_ACTIONS_HEADER: ACTIONS
-  UI_ACTIVE: ACTIVE
-  UI_ACTIVE_TASKS: Active · Tasks
-  UI_ACTIVITY: Activity
-  UI_AGGRESSIVE: Aggressive
-  UI_ALL_LOTS_REVIEWED: All lots reviewed. Ready to load cargo.
-  UI_AP_LABEL: "AP:  0 / 10"
-  UI_ATTRIBUTES: Attributes
-  UI_AUCTION_TITLE: Auction
-  UI_AUTH: ● AUTH
-  UI_AUTHENTICATED: ● AUTHENTICATED
-  UI_BACK: Back
-  UI_BACK_TO_HUB: Back to Hub
-  UI_BALANCE_LABEL: "Balance:   $0"
-  UI_BAND_BAD: "2-4: Bad (x0.7)"
-  UI_BAND_BIG_WIN: "10-12: Big Win (x1.5)"
-  UI_BAND_SOLID: "5-9: Solid (x1.1)"
-  UI_BID: Bid
-  UI_BUDGET_LABEL: "Budget: $0"
-  UI_BUY: Buy
-  UI_CANCEL: Cancel
-  UI_CAPACITY_LABEL: "Capacity: ???"
-  UI_CARGO_MANIFEST: ▼ Cargo Manifest
-  UI_CARGO_TITLE: Cargo
-  UI_CAR_CARGO: Car cargo
-  UI_CAR_SHOP: Car Shop
-  UI_CAR_TOTAL_LABEL: "Car total: $0"
-  UI_CATEGORIES_LABEL: "Categories: —"
-  UI_CHOOSE_ACTIVITY: Choose Activity
-  UI_CLEAR_CAR: Clear Car
-  UI_CLICK_TO_VIEW: Click an item to view details
-  UI_CLOSE_SHOP: Close Shop
+  UI_ACTIONS_HEADER: 動作
+  UI_ACTIVE: 啟用中
+  UI_ACTIVE_TASKS: 啟用中·任務
+  UI_ACTIVITY: 活動
+  UI_AGGRESSIVE: 激進
+  UI_ALL_LOTS_REVIEWED: 所有拍品已審閱。準備裝載貨物。
+  UI_AP_LABEL: "AP：0 / 10"
+  UI_ATTRIBUTES: 屬性
+  UI_AUCTION_TITLE: 拍賣
+  UI_AUTH: ● 認證
+  UI_AUTHENTICATED: ● 已認證
+  UI_BACK: 返回
+  UI_BACK_TO_HUB: 返回樞紐
+  UI_BALANCE_LABEL: "餘額：$0"
+  UI_BAND_BAD: "2-4：不佳（x0.7）"
+  UI_BAND_BIG_WIN: "10-12：大勝（x1.5）"
+  UI_BAND_SOLID: "5-9：穩健（x1.1）"
+  UI_BID: 出價
+  UI_BUDGET_LABEL: "預算：$0"
+  UI_BUY: 購買
+  UI_CANCEL: 取消
+  UI_CAPACITY_LABEL: "容量：？"
+  UI_CARGO_MANIFEST: ▼ 貨物清單
+  UI_CARGO_TITLE: 貨物
+  UI_CAR_CARGO: 車輛貨物
+  UI_CAR_SHOP: 車輛商店
+  UI_CAR_TOTAL_LABEL: "車輛總計：$0"
+  UI_CATEGORIES_LABEL: "類別：—"
+  UI_CHOOSE_ACTIVITY: 選擇活動
+  UI_CLEAR_CAR: 清空車輛
+  UI_CLICK_TO_VIEW: 點擊物品查看詳細資訊
+  UI_CLOSE_SHOP: 關閉商店
   UI_CLOSE_X: ✕
-  UI_CLUES_HEADER: CLUES
-  UI_CLUE_RESULTS: Clue Results
-  UI_CONDITION: Condition
-  UI_CONFIRM: Confirm
-  UI_CONFIRM_DICE: Confirm Dice
-  UI_CONFIRM_SALE: Confirm Sale
-  UI_CONSERVATIVE: Conservative
-  UI_CONTINUE: Continue
-  UI_CONTINUE_TITLE: "Continue?"
-  UI_COPY_ERRORS: Copy Errors
-  UI_COUNT_UNKNOWN: "×?"
+  UI_CLUES_HEADER: 線索
+  UI_CLUE_RESULTS: 線索結果
+  UI_CONDITION: 狀況
+  UI_CONFIRM: 確認
+  UI_CONFIRM_DICE: 確認骰子
+  UI_CONFIRM_SALE: 確認銷售
+  UI_CONSERVATIVE: 保守
+  UI_CONTINUE: 繼續
+  UI_CONTINUE_TITLE: "繼續？"
+  UI_COPY_ERRORS: 複製錯誤
+  UI_COUNT_UNKNOWN: "×？"
   UI_CURRENCY_LABEL: $0
-  UI_CUSTOMERS_LABEL: "Customers:"
-  UI_CUSTOMER_NAME: Customer Name
-  UI_CUSTOMER_SALES: Customer Sales
-  UI_CUSTOMER_SELL_TITLE: Sell to Customer
-  UI_DAILY: Daily
-  UI_DAY_LABEL: Day 1
-  UI_DAY_PHASE_LABEL: "Day 0   |   > Day  - Night"
-  UI_DAY_SUMMARY_TITLE: Day Summary
-  UI_DEBUG_ADD_RANDOM: Add Random Item
-  UI_DEBUG_CLEAR_STORAGE: Clear All Storage
-  UI_DEBUG_LABEL: "[DEBUG]"
-  UI_DICE_ROLL_RESULTS: Dice Roll Results
+  UI_CUSTOMERS_LABEL: "顧客："
+  UI_CUSTOMER_NAME: 顧客名稱
+  UI_CUSTOMER_SALES: 顧客銷售
+  UI_CUSTOMER_SELL_TITLE: 向顧客銷售
+  UI_DAILY: 每日
+  UI_DAY_LABEL: 第 1 天
+  UI_DAY_PHASE_LABEL: "第 0 天   |   > 白天 - 夜晚"
+  UI_DAY_SUMMARY_TITLE: 每日摘要
+  UI_DEBUG_ADD_RANDOM: 添加隨機物品
+  UI_DEBUG_CLEAR_STORAGE: 清空所有儲存
+  UI_DEBUG_LABEL: "[除錯]"
+  UI_DICE_ROLL_RESULTS: 擲骰結果
   UI_EM_DASH: —
-  UI_ENTER: Enter
-  UI_ENTRY_FEE_LABEL: "Entry Fee:   $0"
-  UI_EST_COST_LABEL: "Est. Cost:   $0"
-  UI_EST_VALUE: Est. Value
-  UI_EXTRA_CATEGORY_LABEL: "Extra Category: —"
-  UI_FATAL_ERROR_TITLE: Fatal Error
-  UI_FUEL_LABEL: "Fuel:   $0"
-  UI_GARAGE: Garage
-  UI_GRID_UNKNOWN: "G: ???"
-  UI_HUB_TITLE: Hub
-  UI_INSPECTION_TITLE: Inspect
-  UI_INSPECT_CLUES_ACTION: Inspect Clues (2 AP)
-  UI_ITEM_DETAILS: Item Details
-  UI_KNOWLEDGE_TITLE: Knowledge
+  UI_ENTER: 進入
+  UI_ENTRY_FEE_LABEL: "入場費：$0"
+  UI_EST_COST_LABEL: "估計成本：$0"
+  UI_EST_VALUE: 估計價值
+  UI_EXTRA_CATEGORY_LABEL: "額外類別：—"
+  UI_FATAL_ERROR_TITLE: 致命錯誤
+  UI_FUEL_LABEL: "燃料：$0"
+  UI_GARAGE: 車庫
+  UI_GRID_UNKNOWN: "G：？"
+  UI_HUB_TITLE: 樞紐
+  UI_INSPECTION_TITLE: 檢查
+  UI_INSPECT_CLUES_ACTION: 檢查線索（2 AP）
+  UI_ITEM_DETAILS: 物品詳細資訊
+  UI_KNOWLEDGE_TITLE: 知識
   UI_LABEL_SEPARATOR: " - "
-  UI_LEAVE_WORKSHOP: Leave Workshop
-  UI_LOCATION_ENTRY_TITLE: Enter Location
-  UI_LOCATION_SELECT_TITLE: Select Location
-  UI_LOTS_LABEL: "Lots:   0"
-  UI_LOT_BROWSE_TITLE: Browse Lots
-  UI_LOT_NUMBER: Lot 1 / 1
-  UI_LOT_REVIEW: LOT REVIEW
-  UI_MASTERY: Mastery
-  UI_MASTERY_RANK_LABEL: "Mastery Rank: -"
-  UI_NO_CUSTOMERS: No customers loaded
-  UI_NO_CUSTOMERS_TONIGHT: No customers tonight.
-  UI_NO_INSPECTION_AVAILABLE: No further inspection available
-  UI_NO_ITEMS: No items.
-  UI_NO_ITEM_SELECTED: No item selected
-  UI_NO_MATCHING_ITEMS: No matching items loaded.
-  UI_OK: OK
-  UI_OPENING_BID: OPENING BID
-  UI_PASS: Pass
-  UI_PASS_LOT_CONFIRM: "Are you sure you want to pass this lot?"
-  UI_PASS_LOT_TITLE: Pass Lot
-  UI_PERKS: Perks
-  UI_PRICE_CONVERGENCE: Price convergence
-  UI_PRICE_LABEL: "Price: $-"
-  UI_QUESTION_MARK: "?"
-  UI_QUIT: Quit
-  UI_RARITY_LABEL: "Rarity: —"
-  UI_REPAIR: Repair
-  UI_RESEARCH: Research
-  UI_RESET: Reset
-  UI_RESTORE: Restore
-  UI_REVEAL_NEXT: Reveal Next
-  UI_REVEAL_TITLE: Reveal
-  UI_REVIEW_LOT: Review Lot
-  UI_ROLLING_DICE: Rolling 4 dice...
-  UI_RUN_REVIEW_TITLE: Run Review
-  UI_SALE_RESULT: Sale Result
-  UI_SELECT: Select
-  UI_SELECTED: Selected
-  UI_SELECTED_ITEM: Selected Item
-  UI_SELECT_DICE: Select 2 dice to keep
-  UI_SELECT_TO_INSPECT: Select an item to inspect.
-  UI_SELL: Sell
-  UI_SELL_STRATEGY: Sell Strategy
+  UI_LEAVE_WORKSHOP: 離開工作坊
+  UI_LOCATION_ENTRY_TITLE: 進入地點
+  UI_LOCATION_SELECT_TITLE: 選擇地點
+  UI_LOTS_LABEL: "拍品：0"
+  UI_LOT_BROWSE_TITLE: 瀏覽拍品
+  UI_LOT_NUMBER: 拍品 1 / 1
+  UI_LOT_REVIEW: 拍品審閱
+  UI_MASTERY: 精通
+  UI_MASTERY_RANK_LABEL: "精通等級：-"
+  UI_NO_CUSTOMERS: 沒有載入顧客
+  UI_NO_CUSTOMERS_TONIGHT: 今晚沒有顧客。
+  UI_NO_INSPECTION_AVAILABLE: 無法進一步檢查
+  UI_NO_ITEMS: 沒有物品。
+  UI_NO_ITEM_SELECTED: 未選取物品
+  UI_NO_MATCHING_ITEMS: 沒有載入符合的物品。
+  UI_OK: 確定
+  UI_OPENING_BID: 起拍價
+  UI_PASS: 跳過
+  UI_PASS_LOT_CONFIRM: "你確定要跳過這個拍品嗎？"
+  UI_PASS_LOT_TITLE: 跳過拍品
+  UI_PERKS: 技能
+  UI_PRICE_CONVERGENCE: 價格收斂度
+  UI_PRICE_LABEL: "價格：$-"
+  UI_QUESTION_MARK: "？"
+  UI_QUIT: 退出
+  UI_RARITY_LABEL: "稀有度：—"
+  UI_REPAIR: 修理
+  UI_RESEARCH: 研究
+  UI_RESET: 重設
+  UI_RESTORE: 修復
+  UI_REVEAL_NEXT: 揭示下一個
+  UI_REVEAL_TITLE: 揭示
+  UI_REVIEW_LOT: 審閱拍品
+  UI_ROLLING_DICE: 正在擲 4 顆骰子...
+  UI_RUN_REVIEW_TITLE: 運行回顧
+  UI_SALE_RESULT: 銷售結果
+  UI_SELECT: 選取
+  UI_SELECTED: 已選取
+  UI_SELECTED_ITEM: 已選取物品
+  UI_SELECT_DICE: 選擇 2 顆骰子保留
+  UI_SELECT_TO_INSPECT: 選擇一個物品進行檢查。
+  UI_SELL: 銷售
+  UI_SELL_STRATEGY: 銷售策略
   UI_SETTINGS_ICON: ⚙
-  UI_SETTLEMENT: Settlement
-  UI_SKIP_CARGO_CONFIRM: "Skip the remaining lots and go straight to cargo?"
-  UI_SKIP_TO_CARGO: Skip to Cargo
-  UI_SKIP_TO_CARGO_TITLE: Skip to Cargo
-  UI_SOLD_LABEL: " SOLD! "
+  UI_SETTLEMENT: 結算
+  UI_SKIP_CARGO_CONFIRM: "跳過剩餘拍品並直接前往貨物？"
+  UI_SKIP_TO_CARGO: 跳至貨物
+  UI_SKIP_TO_CARGO_TITLE: 跳至貨物
+  UI_SOLD_LABEL: " 已售出！"
   UI_SORT_ASC: ▲
-  UI_SORT_LABEL: "Sort:"
-  UI_START_AUCTION: Start Auction
-  UI_START_LOAD_GAME: Load Game
-  UI_START_NEW_GAME: New Game
-  UI_START_QUIT: Quit
-  UI_START_SETTINGS: Settings
-  UI_STORAGE_COUNT_LABEL: "Storage:   0 items"
-  UI_STORAGE_TITLE: Storage
-  UI_SUM_LABEL: "Sum: —"
+  UI_SORT_LABEL: "排序："
+  UI_START_AUCTION: 開始拍賣
+  UI_START_LOAD_GAME: 載入遊戲
+  UI_START_NEW_GAME: 新遊戲
+  UI_START_QUIT: 退出
+  UI_START_SETTINGS: 設定
+  UI_STORAGE_COUNT_LABEL: "儲存：0 個物品"
+  UI_STORAGE_TITLE: 儲存
+  UI_SUM_LABEL: "總和：—"
   UI_TASK_COUNT: 0/4
-  UI_TOTAL_ESTIMATE: TOTAL ESTIMATE
-  UI_TOTAL_LABEL: "Total: —"
-  UI_TRAILER: Trailer
-  UI_TRAVEL_LABEL: "Travel:   1 day"
-  UI_TRIP: Trip
-  UI_UNVEIL_ACTION: Unveil (1 AP)
-  UI_UPGRADE: Upgrade
-  UI_VEHICLE_TITLE: Vehicle
-  UI_VERIFIED_LABEL: "Verified: 0 / 0"
-  UI_VIEW_CARDS: Cards
-  UI_VIEW_TABLE: Table
-  UI_WANTS_LABEL: "Wants: -"
-  UI_WEIGHT_UNKNOWN: "W: ???"
-  UI_ZERO_ITEMS: 0 items
+  UI_TOTAL_ESTIMATE: 總估計
+  UI_TOTAL_LABEL: "總計：—"
+  UI_TRAILER: 拖車
+  UI_TRAVEL_LABEL: "旅行：1 天"
+  UI_TRIP: 行程
+  UI_UNVEIL_ACTION: 揭曉（1 AP）
+  UI_UPGRADE: 升級
+  UI_UPGRADE_COST_FORMAT: "升級  $%d"
+  UI_NOT_ENOUGH_CASH: 現金不足
+  UI_VEHICLE_TITLE: 車輛
+  UI_VERIFIED_LABEL: "已驗證：0 / 0"
+  UI_VIEW_CARDS: 卡片
+  UI_VIEW_TABLE: 表格
+  UI_WANTS_LABEL: "需求：-"
+  UI_WEIGHT_UNKNOWN: "W：？"
+  UI_ZERO_ITEMS: 0 個物品
