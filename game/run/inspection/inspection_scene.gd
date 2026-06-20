@@ -277,7 +277,7 @@ func _update_detail_section(entry: ItemEntry) -> void:
     )
 
     var price_text := ItemEntryDisplayHelper.estimated_value_text(entry)
-    if price_text != ItemEntryDisplayHelper.UNKNOWN_TEXT:
+    if price_text != ItemEntryDisplayHelper.unknown_text():
         _detail_value_label.text = price_text
         _detail_value_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(entry))
     else:

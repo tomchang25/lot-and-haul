@@ -52,7 +52,7 @@ func show_for(entry: ItemEntry, anchor: Rect2) -> void:
 
     # ── Conditional: price ───────────────────────────────────────────────────
     var price_text := ItemEntryDisplayHelper.estimated_value_text(entry)
-    if price_text != ItemEntryDisplayHelper.UNKNOWN_TEXT:
+    if price_text != ItemEntryDisplayHelper.unknown_text():
         _price_label.text = "%s: %s" % [ItemRow.get_price_header(), price_text]
         _price_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(entry))
         _price_label.show()
@@ -74,7 +74,7 @@ func show_for(entry: ItemEntry, anchor: Rect2) -> void:
 
     var weight := ItemEntryDisplayHelper.weight_text(entry)
     var grid := ItemEntryDisplayHelper.grid_text(entry)
-    if not entry.is_veiled() and weight != ItemEntryDisplayHelper.UNKNOWN_TEXT and grid != ItemEntryDisplayHelper.UNKNOWN_TEXT:
+    if not entry.is_veiled() and weight != ItemEntryDisplayHelper.unknown_text() and grid != ItemEntryDisplayHelper.unknown_text():
         _weight_label.text = "Weight:  %s" % weight
         _grid_label.text = "Grid:  %s" % grid
         _weight_label.show()

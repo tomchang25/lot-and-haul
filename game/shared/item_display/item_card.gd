@@ -65,7 +65,7 @@ func _apply() -> void:
     # Condition — known after unveil
     var cond_text := ItemEntryDisplayHelper.condition_text(_entry)
     var cond_secondary := ItemEntryDisplayHelper.condition_secondary_text(_entry)
-    if cond_text != ItemEntryDisplayHelper.UNKNOWN_TEXT:
+    if cond_text != ItemEntryDisplayHelper.unknown_text():
         _condition_label.text = cond_text
         _condition_label.modulate = ItemEntryDisplayHelper.condition_display_color(_entry)
         _condition_label.show()

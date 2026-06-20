@@ -93,7 +93,7 @@ func _apply() -> void:
         _conv_ratio_label.modulate = ItemEntryDisplayHelper.PRICE_COLOR
     elif _entry.is_veiled():
         _value_title_label.text = "Est. Value"
-        _conv_ratio_label.text = ItemEntryDisplayHelper.UNKNOWN_TEXT
+        _conv_ratio_label.text = ItemEntryDisplayHelper.unknown_text()
         _conv_ratio_label.modulate = Color(0.55, 0.58, 0.63)
     elif _entry.is_price_converged():
         _value_title_label.text = "Est. Value"

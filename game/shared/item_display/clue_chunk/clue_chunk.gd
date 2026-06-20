@@ -9,8 +9,6 @@ extends VBoxContainer
 
 const SURFACE_ICON := "●"
 const HIDDEN_ICON := "◆"
-const UNKNOWN_TEXT := "???"
-
 const KNOWN_COLOR := Color(0.85, 0.85, 0.85)
 const UNKNOWN_COLOR := Color(0.5, 0.5, 0.5)
 const HEADER_COLOR := Color(0.55, 0.58, 0.63)
@@ -87,7 +85,7 @@ func _build_anchor(idx: int) -> int:
     idx += 1
 
     var anchor := _entry.anchor
-    var text: String = anchor.known_text if _entry.unveiled else UNKNOWN_TEXT
+    var text: String = anchor.known_text if _entry.unveiled else ItemEntryDisplayHelper.unknown_text()
     var color := KNOWN_COLOR if _entry.unveiled else UNKNOWN_COLOR
     var row := _ensure_child(idx, Label) as Label
     row.text = "■  %s" % text
@@ -115,7 +113,7 @@ func _build_surface(idx: int) -> int:
 
     for clue: ClueData in clues:
         var revealed := _entry.revealed_clue_ids.has(clue.clue_id)
-        var text: String = clue.known_text if revealed else UNKNOWN_TEXT
+        var text: String = clue.known_text if revealed else ItemEntryDisplayHelper.unknown_text()
         var color := KNOWN_COLOR if revealed else UNKNOWN_COLOR
         var row := _ensure_child(idx, Label) as Label
         row.text = "%s  %s" % [SURFACE_ICON, text]
@@ -143,7 +141,7 @@ func _build_hidden(idx: int) -> int:
 
     for clue: ClueData in clues:
         var revealed := _entry.revealed_clue_ids.has(clue.clue_id)
-        var text: String = clue.known_text if revealed else UNKNOWN_TEXT
+        var text: String = clue.known_text if revealed else ItemEntryDisplayHelper.unknown_text()
         var color := VERIFIED_COLOR if revealed else UNKNOWN_COLOR
         var row := _ensure_child(idx, Label) as Label
         row.text = "%s  %s" % [HIDDEN_ICON, text]

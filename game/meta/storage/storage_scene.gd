@@ -210,7 +210,7 @@ func _refresh_detail() -> void:
         _detail_conv_ratio.modulate = ItemEntryDisplayHelper.PRICE_COLOR
         _value_title_label.text = "True Value"
     elif entry.is_veiled():
-        _detail_conv_ratio.text = ItemEntryDisplayHelper.UNKNOWN_TEXT
+        _detail_conv_ratio.text = ItemEntryDisplayHelper.unknown_text()
         _detail_conv_ratio.modulate = Color(0.5, 0.5, 0.5)
         _value_title_label.text = "Est. Value"
     elif entry.is_price_converged():

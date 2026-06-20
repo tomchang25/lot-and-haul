@@ -8,7 +8,8 @@ extends RefCounted
 
 # ── Display constants ─────────────────────────────────────────────────────────
 
-const UNKNOWN_TEXT := "???"
+static func unknown_text() -> String:
+    return TranslationServer.translate("SYS_UNKNOWN_PLACEHOLDER")
 
 const PRICE_COLOR := Color(0.4, 1.0, 0.5)
 const PRICE_UNKNOWN_COLOR := Color(0.6, 0.6, 0.6)
@@ -40,7 +41,7 @@ static func display_name(entry: ItemEntry) -> String:
     parts.append_array(suffixes)
 
     if parts.is_empty():
-        return "Unknown Item"
+        return TranslationServer.translate("SYS_UNKNOWN_ITEM")
 
     var has_qualifier := (not prefixes.is_empty() or not suffixes.is_empty())
     if not has_qualifier and not body_text.is_empty():
@@ -48,7 +49,7 @@ static func display_name(entry: ItemEntry) -> String:
             "ItemEntryDisplayHelper.display_name: unveiled item has no affix; falling back to Unknown %s"
             % body_text,
         )
-        return "Unknown " + body_text
+        return TranslationServer.translate("SYS_UNKNOWN_FORMAT") % body_text
 
     return " ".join(parts)
 
@@ -68,7 +69,7 @@ static func short_name(entry: ItemEntry) -> String:
 static func estimated_value_text(entry: ItemEntry) -> String:
     var v := entry.resolve_price()
     if not v.known:
-        return UNKNOWN_TEXT
+        return unknown_text()
     if v.exact or v.max_value <= v.min_value:
         return "$%d" % v.min_value
     return "$%d - $%d" % [v.min_value, v.max_value]
@@ -76,8 +77,8 @@ static func estimated_value_text(entry: ItemEntry) -> String:
 
 static func condition_text(entry: ItemEntry) -> String:
     if entry.is_veiled():
-        return UNKNOWN_TEXT
-    return "%d%%" % int(entry.condition * 100)
+        return unknown_text()
+    return TranslationServer.translate("SYS_PERCENT_FORMAT") % int(entry.condition * 100)
 
 
 static func condition_secondary_text(entry: ItemEntry) -> String:
@@ -88,42 +89,39 @@ static func condition_secondary_text(entry: ItemEntry) -> String:
 
 static func condition_detail_text(entry: ItemEntry) -> String:
     var text := condition_text(entry)
-    if text == UNKNOWN_TEXT:
+    if text == unknown_text():
         return ""
-    return "Condition:  %s (%s)" % [text, condition_secondary_text(entry)]
+    return TranslationServer.translate("SYS_CONDITION_FORMAT") % [text, condition_secondary_text(entry)]
 
 
 static func base_value_text(entry: ItemEntry) -> String:
     var v := entry.get_base_value()
     if v == 0:
-        return UNKNOWN_TEXT
+        return unknown_text()
     return "$%d" % v
 
 
 static func rarity_text(entry: ItemEntry) -> String:
     if entry.is_veiled():
-        return UNKNOWN_TEXT
+        return unknown_text()
 
-    if Economy.RARITY_NAME.has(entry.rarity):
-        return Economy.RARITY_NAME[entry.rarity]
-
-    return UNKNOWN_TEXT
+    return Economy.rarity_display_name(entry.rarity)
 
 
 static func weight_text(entry: ItemEntry) -> String:
     if entry.is_veiled():
-        return UNKNOWN_TEXT
-    return "%.1f kg" % entry.get_weight()
+        return unknown_text()
+    return TranslationServer.translate("SYS_WEIGHT_FORMAT") % entry.get_weight()
 
 
 static func grid_text(entry: ItemEntry) -> String:
     if entry.is_veiled():
-        return UNKNOWN_TEXT
-    return "%d  %s" % [entry.get_cells().size(), entry.get_shape_id()]
+        return unknown_text()
+    return TranslationServer.translate("SYS_GRID_FORMAT") % [entry.get_cells().size(), entry.get_shape_id()]
 
 
 static func inspection_text(entry: ItemEntry) -> String:
-    return UNKNOWN_TEXT if entry.is_veiled() else "%d%%" % int(entry.inspection_level * 100)
+    return unknown_text() if entry.is_veiled() else TranslationServer.translate("SYS_PERCENT_FORMAT") % int(entry.inspection_level * 100)
 
 # ── Color methods ─────────────────────────────────────────────────────────────
 
