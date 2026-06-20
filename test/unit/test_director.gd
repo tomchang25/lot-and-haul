@@ -599,6 +599,21 @@ func test_assisted_auction_deactivated_on_stop() -> void:
     )
 
 
+func test_assisted_auction_deactivated_on_completion() -> void:
+    ScriptDirector.start_script("onboarding_auction")
+    assert_true(
+        GameplayOverride.is_active(GameplayOverride.ASSISTED_AUCTION),
+        "assisted_auction active after start",
+    )
+    # Drive the 2-step script to completion via its EVENT advances.
+    EventBus.tutorial_event.emit(TutorialEvents.BID_PLACED, { })
+    EventBus.tutorial_event.emit(TutorialEvents.AUCTION_RESOLVED, { })
+    assert_false(
+        GameplayOverride.is_active(GameplayOverride.ASSISTED_AUCTION),
+        "assisted_auction inactive after tutorial completes naturally",
+    )
+
+
 func test_assisted_auction_not_active_with_wrong_script() -> void:
     ScriptDirector.start_script("onboarding_inspection")
     assert_false(
@@ -633,6 +648,19 @@ func test_lot_pass_locked_deactivated_on_stop() -> void:
     )
 
 
+func test_lot_pass_locked_deactivated_on_completion() -> void:
+    ScriptDirector.start_script("onboarding_lot_browse")
+    assert_true(
+        GameplayOverride.is_active(GameplayOverride.LOT_PASS_LOCKED),
+        "lot_pass_locked active after start",
+    )
+    EventBus.tutorial_event.emit(TutorialEvents.LOT_SELECTED, { })
+    assert_false(
+        GameplayOverride.is_active(GameplayOverride.LOT_PASS_LOCKED),
+        "lot_pass_locked inactive after tutorial completes naturally",
+    )
+
+
 func test_inspection_review_gated_active_early_step() -> void:
     ScriptDirector.start_script("onboarding_inspection")
     assert_true(
@@ -660,6 +688,25 @@ func test_inspection_review_gated_inactive_with_no_script() -> void:
     assert_false(
         GameplayOverride.is_active(GameplayOverride.INSPECTION_REVIEW_GATED),
         "inspection_review_gated inactive with no active script",
+    )
+
+
+func test_inspection_review_gated_deactivated_on_completion() -> void:
+    ScriptDirector.start_script("onboarding_inspection")
+    assert_true(
+        GameplayOverride.is_active(GameplayOverride.INSPECTION_REVIEW_GATED),
+        "inspection_review_gated active after start",
+    )
+    # Drive all 5 steps to completion: ITEM_SELECTED -> ITEM_UNVEILED ->
+    # INSPECTION_PERFORMED -> REVIEW_OPENED -> AUCTION_STARTED.
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_SELECTED, { })
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_UNVEILED, { })
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_PERFORMED, { })
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_REVIEW_OPENED, { })
+    EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_AUCTION_STARTED, { })
+    assert_false(
+        GameplayOverride.is_active(GameplayOverride.INSPECTION_REVIEW_GATED),
+        "inspection_review_gated inactive after tutorial completes naturally",
     )
 
 

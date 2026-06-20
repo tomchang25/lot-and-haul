@@ -19,9 +19,13 @@ const START_PAGE_PATH := "res://game/meta/start/start_page_scene.tscn"
 @onready var _debug_check: CheckBox = %DebugCheck
 @onready var _close_btn: Button = %CloseButton
 @onready var _main_menu_btn: Button = %MainMenuButton
-
+@onready var _skip_tutorial_check: CheckBox = %SkipTutorialCheck
+@onready var _confirm_canvas: CanvasLayer = %ConfirmCanvas
+@onready var _confirm_yes: Button = %ConfirmYes
+@onready var _confirm_no: Button = %ConfirmNo
 
 # ══ Lifecycle ══════════════════════════════════════════════════════════════════
+
 
 func _ready() -> void:
     process_mode = Node.PROCESS_MODE_ALWAYS
@@ -35,11 +39,14 @@ func _ready() -> void:
     _main_menu_btn.pressed.connect(_on_main_menu_pressed)
 
     _main_menu_btn.visible = get_tree().current_scene.scene_file_path != START_PAGE_PATH
+    _skip_tutorial_check.toggled.connect(_on_skip_tutorial_toggled)
+    _confirm_yes.pressed.connect(_on_confirm_yes)
+    _confirm_no.pressed.connect(_on_confirm_no)
 
     _apply()
 
-
 # ══ Signal handlers ════════════════════════════════════════════════════════════
+
 
 func _on_master_changed(value: float) -> void:
     SettingsStore.master_volume = value / 100.0
@@ -74,6 +81,29 @@ func _on_debug_toggled(pressed: bool) -> void:
     Debug.set_debug_mode(pressed)
 
 
+func _on_skip_tutorial_toggled(pressed: bool) -> void:
+    if pressed:
+        AudioManager.play_event(SETTING_TOGGLE)
+        _confirm_canvas.visible = true
+        _skip_tutorial_check.set_pressed_no_signal(true)
+    else:
+        SettingsStore.tutorial_skip_all = false
+        SettingsStore.save_settings()
+
+
+func _on_confirm_yes() -> void:
+    _confirm_canvas.visible = false
+    SettingsStore.tutorial_skip_all = true
+    SettingsStore.save_settings()
+    if ScriptDirector.active:
+        Director.stop_script()
+
+
+func _on_confirm_no() -> void:
+    _confirm_canvas.visible = false
+    _skip_tutorial_check.set_pressed_no_signal(false)
+
+
 func _on_close_pressed() -> void:
     closed.emit()
 
@@ -82,8 +112,8 @@ func _on_main_menu_pressed() -> void:
     closed.emit()
     SceneRouter.go_to_start_page()
 
-
 # ══ View ═══════════════════════════════════════════════════════════════════════
+
 
 func _apply() -> void:
     _master_slider.set_value_no_signal(SettingsStore.master_volume * 100.0)
@@ -94,3 +124,4 @@ func _apply() -> void:
     _music_value_label.text = "%d%%" % int(SettingsStore.music_volume * 100.0)
     _fullscreen_check.set_pressed_no_signal(SettingsStore.fullscreen)
     _debug_check.set_pressed_no_signal(SettingsStore.debug_mode)
+    _skip_tutorial_check.set_pressed_no_signal(SettingsStore.tutorial_skip_all)

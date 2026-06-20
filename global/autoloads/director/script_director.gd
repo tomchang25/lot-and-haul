@@ -372,6 +372,8 @@ func _clear_onboarding_overrides() -> void:
 
 
 func _decide_tutorial_for_scene(scene_id: String) -> void:
+    if SettingsStore.tutorial_skip_all:
+        return
     var ctx := _build_trigger_context()
     for unit: TutorialScripts.TutorialUnit in TutorialScripts.units():
         if not _should_consider_unit(unit):
@@ -436,6 +438,8 @@ func _complete_onboarding_if_all_milestones_seen(script_id: String) -> void:
 
 
 func _on_hub_registered() -> void:
+    if SettingsStore.tutorial_skip_all:
+        return
     # Show completion popup once after onboarding is fully finished.
     if not MetaManager.is_onboarding_pending() and _has_seen_onboarding_segment():
         if not MetaManager.progress.tutorial_seen.has("onboarding_complete"):
@@ -450,6 +454,8 @@ func _on_hub_registered() -> void:
 
 
 func _on_storage_registered() -> void:
+    if SettingsStore.tutorial_skip_all:
+        return
     if _has_seen_onboarding_segment():
         return
     if MetaManager.progress.tutorial_seen.has("storage"):

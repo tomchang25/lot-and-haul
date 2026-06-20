@@ -12,6 +12,8 @@ const UNLOCKED_HOLE_PADDING := 8.0
 const PANEL_BG := Color(0.15, 0.15, 0.18, 1.0)
 const PANEL_BORDER := Color(0.3, 0.3, 0.35, 1.0)
 const TEXT_COLOR := Color(0.88, 0.88, 0.92, 1.0)
+const CONFIRM_LAYER := 130
+const CONFIRM_BG_COLOR := Color(0.0, 0.0, 0.0, 0.4)
 
 ## Emitted when a scene registers its anchors. ScriptDirector connects to this
 ## to decide whether to start a tutorial, show an offer, or show Help.
@@ -50,6 +52,14 @@ var _popup_image: TextureRect
 var _popup_next: Button
 var _popup_close: Button
 var _help_btn: Button
+var _hint_skip_all: Button
+var _popup_skip_all: Button
+var _confirm_canvas: CanvasLayer
+var _confirm_bg: ColorRect
+var _confirm_panel: PanelContainer
+var _confirm_label: Label
+var _confirm_yes: Button
+var _confirm_no: Button
 
 # ── Presentation state ─────────────────────────────────────────────────────────
 var _anchors: Dictionary = { }
@@ -147,6 +157,11 @@ func advance_step() -> void:
 ## from the per-step X button. Delegates to the flow layer.
 func skip_all_onboarding() -> void:
     ScriptDirector.skip_all_onboarding()
+
+
+## Stops the currently active tutorial if any. Delegates to the flow layer.
+func stop_script() -> void:
+    ScriptDirector.stop_script()
 
 # ══ Public accessors — delegated to ScriptDirector ════════════════════════════
 
@@ -441,6 +456,7 @@ func _hide_step_ui() -> void:
     _dim_full.visible = false
     _dim_full.mouse_filter = Control.MOUSE_FILTER_IGNORE
     _hide_dim_hole()
+    _hide_skip_all_confirm()
 
 
 func _hide_offer_state() -> void:
@@ -476,6 +492,39 @@ func _on_popup_close_pressed() -> void:
 func _on_help_pressed() -> void:
     if not _help_script_id.is_empty():
         ScriptDirector.start_script(_help_script_id)
+
+# ══ Skip-all button handlers ══════════════════════════════════════════════════
+
+
+func _on_hint_skip_all_pressed() -> void:
+    _show_skip_all_confirm()
+
+
+func _on_popup_skip_all_pressed() -> void:
+    _show_skip_all_confirm()
+
+
+func _show_skip_all_confirm() -> void:
+    _confirm_label.text = "Skip all remaining tutorials?\n\nTutorials will no longer auto-start. You can turn them back on anytime in Settings."
+    _confirm_bg.visible = true
+    _confirm_panel.visible = true
+
+
+func _on_skip_all_confirmed() -> void:
+    SettingsStore.tutorial_skip_all = true
+    SettingsStore.save_settings()
+    if ScriptDirector.active:
+        ScriptDirector.stop_script()
+    _hide_skip_all_confirm()
+
+
+func _on_skip_all_cancelled() -> void:
+    _hide_skip_all_confirm()
+
+
+func _hide_skip_all_confirm() -> void:
+    _confirm_bg.visible = false
+    _confirm_panel.visible = false
 
 # ══ Offer button handlers ══════════════════════════════════════════════════════
 
@@ -716,6 +765,21 @@ func _build_overlay() -> void:
     hint_vbox.add_theme_constant_override("separation", 12)
     hint_margin.add_child(hint_vbox)
 
+    var hint_skip_hbox := HBoxContainer.new()
+    hint_skip_hbox.add_theme_constant_override("separation", 4)
+    hint_vbox.add_child(hint_skip_hbox)
+
+    _hint_skip_all = Button.new()
+    _hint_skip_all.text = "Skip All"
+    _hint_skip_all.flat = true
+    _hint_skip_all.add_theme_font_size_override("font_size", 11)
+    _hint_skip_all.pressed.connect(_on_hint_skip_all_pressed)
+    hint_skip_hbox.add_child(_hint_skip_all)
+
+    var hint_skip_spacer := Control.new()
+    hint_skip_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    hint_skip_hbox.add_child(hint_skip_spacer)
+
     _hint_label = Label.new()
     _hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     _hint_label.add_theme_color_override("font_color", TEXT_COLOR)
@@ -757,6 +821,21 @@ func _build_overlay() -> void:
     popup_vbox.add_theme_constant_override("separation", 16)
     popup_margin.add_child(popup_vbox)
 
+    var popup_skip_hbox := HBoxContainer.new()
+    popup_skip_hbox.add_theme_constant_override("separation", 4)
+    popup_vbox.add_child(popup_skip_hbox)
+
+    _popup_skip_all = Button.new()
+    _popup_skip_all.text = "Skip All"
+    _popup_skip_all.flat = true
+    _popup_skip_all.add_theme_font_size_override("font_size", 11)
+    _popup_skip_all.pressed.connect(_on_popup_skip_all_pressed)
+    popup_skip_hbox.add_child(_popup_skip_all)
+
+    var popup_skip_spacer := Control.new()
+    popup_skip_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    popup_skip_hbox.add_child(popup_skip_spacer)
+
     _popup_image = TextureRect.new()
     _popup_image.visible = false
     _popup_image.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
@@ -794,6 +873,58 @@ func _build_overlay() -> void:
     _help_btn.position = Vector2(8, 0)
     _canvas.add_child(_help_btn)
 
+    # node-src: ephemeral - confirm dialog, autoload exempt from scene-source rule
+    _confirm_canvas = CanvasLayer.new()
+    _confirm_canvas.layer = CONFIRM_LAYER
+    add_child(_confirm_canvas)
+
+    _confirm_bg = ColorRect.new()
+    _confirm_bg.color = CONFIRM_BG_COLOR
+    _confirm_bg.mouse_filter = Control.MOUSE_FILTER_STOP
+    _confirm_bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+    _confirm_bg.visible = false
+    _confirm_canvas.add_child(_confirm_bg)
+
+    _confirm_panel = PanelContainer.new()
+    _confirm_panel.visible = false
+    _confirm_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+    _confirm_panel.set_anchors_preset(Control.PRESET_CENTER)
+    _confirm_panel.custom_minimum_size = Vector2(360, 0)
+    _confirm_canvas.add_child(_confirm_panel)
+
+    var confirm_margin := MarginContainer.new()
+    confirm_margin.add_theme_constant_override("margin_left", 24)
+    confirm_margin.add_theme_constant_override("margin_right", 24)
+    confirm_margin.add_theme_constant_override("margin_top", 20)
+    confirm_margin.add_theme_constant_override("margin_bottom", 20)
+    _confirm_panel.add_child(confirm_margin)
+
+    var confirm_vbox := VBoxContainer.new()
+    confirm_vbox.add_theme_constant_override("separation", 16)
+    confirm_margin.add_child(confirm_vbox)
+
+    _confirm_label = Label.new()
+    _confirm_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    _confirm_label.add_theme_color_override("font_color", TEXT_COLOR)
+    _confirm_label.add_theme_font_size_override("font_size", 14)
+    _confirm_label.custom_minimum_size = Vector2(300, 0)
+    confirm_vbox.add_child(_confirm_label)
+
+    var confirm_btn_hbox := HBoxContainer.new()
+    confirm_btn_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+    confirm_btn_hbox.add_theme_constant_override("separation", 12)
+    confirm_vbox.add_child(confirm_btn_hbox)
+
+    _confirm_no = Button.new()
+    _confirm_no.text = "No"
+    _confirm_no.pressed.connect(_on_skip_all_cancelled)
+    confirm_btn_hbox.add_child(_confirm_no)
+
+    _confirm_yes = Button.new()
+    _confirm_yes.text = "Yes"
+    _confirm_yes.pressed.connect(_on_skip_all_confirmed)
+    confirm_btn_hbox.add_child(_confirm_yes)
+
     for panel in [_hint_panel, _popup_panel]:
         var sb := StyleBoxFlat.new()
         sb.bg_color = PANEL_BG
@@ -805,3 +936,14 @@ func _build_overlay() -> void:
         sb.content_margin_top = 0
         sb.content_margin_bottom = 0
         panel.add_theme_stylebox_override("panel", sb)
+
+    var confirm_sb := StyleBoxFlat.new()
+    confirm_sb.bg_color = PANEL_BG
+    confirm_sb.border_color = PANEL_BORDER
+    confirm_sb.set_border_width_all(1)
+    confirm_sb.set_corner_radius_all(6)
+    confirm_sb.content_margin_left = 0
+    confirm_sb.content_margin_right = 0
+    confirm_sb.content_margin_top = 0
+    confirm_sb.content_margin_bottom = 0
+    _confirm_panel.add_theme_stylebox_override("panel", confirm_sb)
