@@ -36,7 +36,7 @@ func _build_content() -> void:
 
     for sc: SuperCategoryData in SuperCategoryRegistry.get_all_super_categories():
         var sc_rank: int = KnowledgeManager.get_super_category_rank(sc)
-        var header_text := "%s — rank %d" % [sc.display_name, sc_rank]
+        var header_text := "%s — rank %d" % [TranslationServer.translate(sc.display_name_key), sc_rank]
 
         var category_lines := PackedStringArray()
         for cat: CategoryData in SuperCategoryRegistry.get_categories_for_super(sc):
@@ -51,7 +51,7 @@ func _build_content() -> void:
                 progress_text = "%d / %d" % [points, next_threshold]
 
             category_lines.append(
-                "    %s — %s  (rank %d)" % [cat.display_name, progress_text, rank],
+                "    %s — %s  (rank %d)" % [TranslationServer.translate(cat.display_name_key), progress_text, rank],
             )
 
         var row: MasteryRow = MasteryRowScene.instantiate()

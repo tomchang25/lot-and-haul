@@ -1,15 +1,15 @@
 super_categories:
   - super_category_id: test_super
-    display_name: Test
+    display_name_key: CAT_TEST
 
 categories:
   - category_id: test_category
     super_category: test_super
-    display_name: Test Category
+    display_name_key: CAT_TEST_CATEGORY
 
 anchors:
   - anchor_id: test_anchor_01
-    known_text: Test Box
+    known_text_key: ANCHOR_TEST_ANCHOR_01
     category_scope: test_category
     base_value: 100
     shape_id: s1x1
@@ -18,7 +18,7 @@ anchors:
 
 clues:
   - clue_id: test_surface_easy
-    known_text: Easy
+    known_text_key: CLUE_TEST_SURFACE_EASY
     type: surface
     domain: test_category
     attribute: appraisal
@@ -26,7 +26,7 @@ clues:
     effect_op: add
     effect_amount: 50
   - clue_id: test_surface_hard
-    known_text: Hard
+    known_text_key: CLUE_TEST_SURFACE_HARD
     type: surface
     domain: test_category
     attribute: appraisal
@@ -34,7 +34,7 @@ clues:
     effect_op: add
     effect_amount: 100
   - clue_id: test_surface_mul
-    known_text: Multiplier
+    known_text_key: CLUE_TEST_SURFACE_MUL
     type: surface
     domain: test_category
     attribute: appraisal
@@ -42,7 +42,7 @@ clues:
     effect_op: mul
     effect_amount: 1.5
   - clue_id: test_hidden_gem
-    known_text: Hidden Gem
+    known_text_key: CLUE_TEST_HIDDEN_GEM
     type: hidden
     domain: test_category
     attribute: investigation
@@ -50,7 +50,7 @@ clues:
     effect_op: mul
     effect_amount: 2.0
   - clue_id: test_hidden_override
-    known_text: Override Base
+    known_text_key: CLUE_TEST_HIDDEN_OVERRIDE
     type: hidden
     domain: test_category
     attribute: investigation
@@ -70,7 +70,7 @@ affix_combinations:
 affixes:
   - affix_id: test_affix
     naming_slot: prefix
-    display_name: Test
+    display_name_key: AFFIX_TEST
     scope_mode: all
     weight: 1
     combination_ids:
@@ -96,7 +96,8 @@ lots:
 
 locations:
   - location_id: test_location
-    display_name: Test Location
+    display_name_key: LOC_TEST_LOCATION
+    description_key: LOC_TEST_LOCATION_DESC
     entry_fee: 50
     travel_days: 2
     lot_number: 1

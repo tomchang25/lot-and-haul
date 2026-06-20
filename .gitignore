@@ -16,6 +16,7 @@
 **/*.tmp
 
 **/localization/generated
+**/localization/report.json
 
 data/tres/
 

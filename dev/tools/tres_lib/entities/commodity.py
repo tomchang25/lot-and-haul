@@ -52,7 +52,7 @@ class CommoditySpec:
 
         w.add_field('script = ExtResource("1_commoditydef")')
         w.add_field_str("commodity_id", commodity_id)
-        w.add_field_str("display_name", entry.get("display_name", commodity_id))
+        w.add_field_str("display_name_key", entry.get("display_name_key", commodity_id))
         w.add_field_ext_ref("category_data", "2_cat" if (cat_uid and cat_id) else None)
         w.add_field_int("base_value", int(entry.get("base_value", 0)))
         return w.render()
@@ -72,7 +72,7 @@ class CommoditySpec:
 
         return {
             "commodity_id": commodity_id,
-            "display_name": tres_field(text, "display_name") or commodity_id,
+            "display_name_key": tres_field(text, "display_name_key") or commodity_id,
             "category_id": category_id,
             "base_value": int(tres_field(text, "base_value") or 0),
         }

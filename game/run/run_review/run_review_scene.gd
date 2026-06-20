@@ -51,7 +51,10 @@ func _ready() -> void:
     _cargo_panel.tooltip_dismissed.connect(_tooltip.hide_popup)
 
     var loc := RunManager.run.location_data
-    _location_label.text = loc.display_name if loc != null else ""
+    if loc != null:
+        _location_label.text = TranslationServer.translate(loc.display_name_key)
+    else:
+        _location_label.text = ""
 
     var cracked: int = RunManager.apply_trailer_damage()
     _cargo_panel.set_damage_count(cracked)

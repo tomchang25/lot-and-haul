@@ -11,6 +11,7 @@ extends RefCounted
 static func unknown_text() -> String:
     return TranslationServer.translate("SYS_UNKNOWN_PLACEHOLDER")
 
+
 const PRICE_COLOR := Color(0.4, 1.0, 0.5)
 const PRICE_UNKNOWN_COLOR := Color(0.6, 0.6, 0.6)
 
@@ -25,14 +26,14 @@ static func display_name(entry: ItemEntry) -> String:
 
     for pool_entry in pool:
         if pool_entry is AnchorData:
-            body_text = (pool_entry as AnchorData).known_text
+            body_text = TranslationServer.translate((pool_entry as AnchorData).known_text_key)
         elif pool_entry is AffixData:
             var affix := pool_entry as AffixData
             match affix.naming_slot:
                 "prefix":
-                    prefixes.append(affix.display_name)
+                    prefixes.append(TranslationServer.translate(affix.display_name_key))
                 "suffix":
-                    suffixes.append(affix.display_name)
+                    suffixes.append(TranslationServer.translate(affix.display_name_key))
 
     var parts: Array[String] = []
     parts.append_array(prefixes)
@@ -61,7 +62,6 @@ static func short_name(entry: ItemEntry) -> String:
         if not word.is_empty():
             abbrev += word[0].to_upper()
     return abbrev
-
 
 # ── Formatted text methods ────────────────────────────────────────────────────
 
@@ -121,7 +121,9 @@ static func grid_text(entry: ItemEntry) -> String:
 
 
 static func inspection_text(entry: ItemEntry) -> String:
-    return unknown_text() if entry.is_veiled() else TranslationServer.translate("SYS_PERCENT_FORMAT") % int(entry.inspection_level * 100)
+    if entry.is_veiled():
+        return unknown_text()
+    return TranslationServer.translate("SYS_PERCENT_FORMAT") % int(entry.inspection_level * 100)
 
 # ── Color methods ─────────────────────────────────────────────────────────────
 

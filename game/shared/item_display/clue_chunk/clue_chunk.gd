@@ -85,7 +85,11 @@ func _build_anchor(idx: int) -> int:
     idx += 1
 
     var anchor := _entry.anchor
-    var text: String = anchor.known_text if _entry.unveiled else ItemEntryDisplayHelper.unknown_text()
+    var text: String
+    if _entry.unveiled:
+        text = TranslationServer.translate(anchor.known_text_key)
+    else:
+        text = ItemEntryDisplayHelper.unknown_text()
     var color := KNOWN_COLOR if _entry.unveiled else UNKNOWN_COLOR
     var row := _ensure_child(idx, Label) as Label
     row.text = "■  %s" % text
@@ -113,7 +117,11 @@ func _build_surface(idx: int) -> int:
 
     for clue: ClueData in clues:
         var revealed := _entry.revealed_clue_ids.has(clue.clue_id)
-        var text: String = clue.known_text if revealed else ItemEntryDisplayHelper.unknown_text()
+        var text: String
+        if revealed:
+            text = TranslationServer.translate(clue.known_text_key)
+        else:
+            text = ItemEntryDisplayHelper.unknown_text()
         var color := KNOWN_COLOR if revealed else UNKNOWN_COLOR
         var row := _ensure_child(idx, Label) as Label
         row.text = "%s  %s" % [SURFACE_ICON, text]
@@ -141,7 +149,11 @@ func _build_hidden(idx: int) -> int:
 
     for clue: ClueData in clues:
         var revealed := _entry.revealed_clue_ids.has(clue.clue_id)
-        var text: String = clue.known_text if revealed else ItemEntryDisplayHelper.unknown_text()
+        var text: String
+        if revealed:
+            text = TranslationServer.translate(clue.known_text_key)
+        else:
+            text = ItemEntryDisplayHelper.unknown_text()
         var color := VERIFIED_COLOR if revealed else UNKNOWN_COLOR
         var row := _ensure_child(idx, Label) as Label
         row.text = "%s  %s" % [HIDDEN_ICON, text]

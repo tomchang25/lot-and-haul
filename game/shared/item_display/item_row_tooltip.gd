@@ -127,10 +127,10 @@ func _populate_clue_section(item: ItemEntry) -> void:
         row.custom_minimum_size = Vector2(200.0, 0.0)
 
         if item.revealed_clue_ids.has(clue.clue_id):
-            row.text = "● %s" % clue.known_text
+            row.text = "● %s" % TranslationServer.translate(clue.known_text_key)
             row.add_theme_color_override(&"font_color", Color.WHITE)
         else:
-            row.text = "○ %s (DC %d, %s)" % [clue.known_text, clue.dc, clue.attribute.capitalize()]
+            row.text = "○ %s (DC %d, %s)" % [TranslationServer.translate(clue.known_text_key), clue.dc, clue.attribute.capitalize()]
             row.add_theme_color_override(&"font_color", Color(0.55, 0.55, 0.55))
 
         # node-src: ephemeral — per-clue row, rebuilt per refresh

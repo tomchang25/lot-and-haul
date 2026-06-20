@@ -175,7 +175,7 @@ The work is ordered so that the pipeline and infrastructure land first, then con
    - Validate: all locales have identical key sets after resolution
    - Resolve fallback chain per the algorithm in the sketch
    - Write `localization/generated/{block}.csv`
-   - Write `localization/generated/report.json`
+    - Write `localization/report.json`
 
 3. Create empty/seed YAML source files for all locales × blocks under `localization/source/`.
 
@@ -258,7 +258,7 @@ The work is ordered so that the pipeline and infrastructure land first, then con
 21. Run `localization_yaml_to_csv.py` end-to-end. Verify:
     - All blocks generate valid CSV
     - No hard-missing keys
-    - report.json is produced
+    - `localization/report.json` is produced
 
 22. Boot the game with `locale/test="zh_TW"` in `project.godot`. Verify CJK text renders, Settings overlay shows 繁體中文, and navigation works.
 
@@ -282,7 +282,7 @@ The work is ordered so that the pipeline and infrastructure land first, then con
 
 ## Acceptance Criteria
 
-1. Running `dev/tools/localization_yaml_to_csv.py` with complete source YAML files generates valid CSV files under `localization/generated/` with no errors, and produces a `report.json`.
+1. Running `dev/tools/localization_yaml_to_csv.py` with complete source YAML files generates valid CSV files under `localization/generated/` with no errors, and produces a `localization/report.json`.
 
 2. Running the script with a missing key in a non-en locale triggers a warning in `report.json` showing fallback resolution. Running with a missing key in en fails the script.
 

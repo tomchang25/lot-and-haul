@@ -8,26 +8,26 @@
 
 commodities:
   - commodity_id: used_handbag_bundle
-    display_name: Used Handbag Bundle
+    display_name_key: CMD_USED_HANDBAG_BUNDLE
     category_id: handbag
     base_value: 45
 
   - commodity_id: costume_watch_lot
-    display_name: Costume Watch Lot
+    display_name_key: CMD_COSTUME_WATCH_LOT
     category_id: wristwatch
     base_value: 70
 
   - commodity_id: working_oil_lamp
-    display_name: Working Oil Lamp
+    display_name_key: CMD_WORKING_OIL_LAMP
     category_id: oil_lamp
     base_value: 55
 
   - commodity_id: framed_poster_stack
-    display_name: Framed Poster Stack
+    display_name_key: CMD_FRAMED_POSTER_STACK
     category_id: poster
     base_value: 35
 
   - commodity_id: surplus_tool_case
-    display_name: Surplus Range Case
+    display_name_key: CMD_SURPLUS_TOOL_CASE
     category_id: pistol
     base_value: 90

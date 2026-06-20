@@ -10,9 +10,9 @@ extends Resource
 # This is the string stored in KnowledgeManager.unlocked_perks.
 @export var perk_id: String = ""
 
-@export var display_name: String = ""
+@export var display_name_key: String = ""
 
-@export var description: String = ""
+@export var description_key: String = ""
 
 # Attribute that gates this perk.
 @export var required_attribute: String = ""

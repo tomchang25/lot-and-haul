@@ -195,15 +195,13 @@ def main() -> None:
             print(f"  ✗ {e}")
         sys.exit(1)
 
-    report_path = root / "localization" / "generated" / "report.json"
+    report_path = root / "localization" / "report.json"
     if not args.dry_run:
         report_path.parent.mkdir(parents=True, exist_ok=True)
         report_path.write_text(
             json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8"
         )
         print(f"\nWrote {report_path.name}")
-
-    print("\nDone.")
 
 
 if __name__ == "__main__":

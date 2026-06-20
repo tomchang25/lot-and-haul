@@ -8,8 +8,8 @@ extends Resource
 # Unique identifier for this anchor variant.
 @export var anchor_id: String = ""
 
-# Display text; always the default body naming slot when unveiled.
-@export var known_text: String = ""
+# Localization key for the anchor display text.
+@export var known_text_key: String = ""
 
 # The category this anchor variant belongs to (pool scope for the future generator).
 @export var category_data: CategoryData = null

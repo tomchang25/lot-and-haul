@@ -46,7 +46,7 @@ class SuperCategorySpec:
                 "Use dict form with 'super_category_id' instead."
             )
         super_category_id = entry["super_category_id"]
-        display_name = entry.get("display_name", super_category_id)
+        display_name_key = entry.get("display_name_key", super_category_id)
         uid = deterministic_uid(self.uid_prefix, super_category_id)
         ctx.uid_cache[super_category_id] = uid
 
@@ -59,7 +59,7 @@ class SuperCategorySpec:
         )
         w.add_field('script = ExtResource("1_superdef")')
         w.add_field_str("super_category_id", super_category_id)
-        w.add_field_str("display_name", display_name)
+        w.add_field_str("display_name_key", display_name_key)
         w.add_field_float(
             "market_mean_min",
             float(entry.get("market_mean_min", 0.7)),
@@ -81,10 +81,10 @@ class SuperCategorySpec:
     def parse_tres(self, text: str, ctx: ParseCtx) -> dict:
         uid = header_uid(text)
         super_cat_id = tres_field(text, "super_category_id") or ""
-        display_name = tres_field(text, "display_name") or super_cat_id
+        display_name_key = tres_field(text, "display_name_key") or super_cat_id
         if uid:
             ctx.uid_to_id[uid] = super_cat_id
-        ctx.super_cat_display_by_id[super_cat_id] = display_name
+        ctx.super_cat_display_by_id[super_cat_id] = display_name_key
 
         market_mean_min = float(tres_field(text, "market_mean_min") or 0.7)
         market_mean_max = float(tres_field(text, "market_mean_max") or 1.3)
@@ -93,7 +93,7 @@ class SuperCategorySpec:
 
         return {
             "super_category_id": super_cat_id,
-            "display_name": display_name,
+            "display_name_key": display_name_key,
             "market_mean_min": market_mean_min,
             "market_mean_max": market_mean_max,
             "market_stddev": market_stddev,

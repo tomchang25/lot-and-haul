@@ -67,7 +67,7 @@ func _apply() -> void:
     _name_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.display_name_color(_entry))
 
     if _entry.category_data != null:
-        _category_label.text = "%s  \u00b7  #%d" % [_entry.category_data.display_name, _entry.id]
+        _category_label.text = "%s  \u00b7  #%d" % [TranslationServer.translate(_entry.category_data.display_name_key), _entry.id]
     else:
         _category_label.text = "#%d" % _entry.id
 

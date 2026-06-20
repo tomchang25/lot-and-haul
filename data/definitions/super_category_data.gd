@@ -7,5 +7,5 @@ extends Resource
 # Internal identifier, snake_case. Matches the .tres filename stem.
 @export var super_category_id: String = ""
 
-# Human-readable label shown to the player.
-@export var display_name: String = ""
+# Localization key for the super-category display name.
+@export var display_name_key: String = ""

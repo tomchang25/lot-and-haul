@@ -48,7 +48,7 @@ class ClueSpec:
         )
         w.add_field('script = ExtResource("1_cluedef")')
         w.add_field_str("clue_id", clue_id)
-        w.add_field_str("known_text", entry.get("known_text", ""))
+        w.add_field_str("known_text_key", entry.get("known_text_key", ""))
         w.add_field_int("type", _CLUE_TYPE_TO_INT.get(ctype, 0))
         w.add_field_str("attribute", entry.get("attribute", ""))
         w.add_field_int("dc", int(entry.get("dc", 10)))
@@ -70,7 +70,7 @@ class ClueSpec:
             ctx.uid_to_id[uid] = clue_id
         return {
             "clue_id": clue_id,
-            "known_text": tres_field(text, "known_text") or "",
+            "known_text_key": tres_field(text, "known_text_key") or "",
             "type": _INT_TO_CLUE_TYPE.get(
                 int(tres_field(text, "type") or 0), "surface"
             ),
@@ -100,9 +100,9 @@ class ClueSpec:
             else:
                 seen_ids[cid] = i
 
-            known_text = clue.get("known_text", "")
-            if not isinstance(known_text, str) or not known_text.strip():
-                errors.append(f"clue '{cid}': known_text is required")
+            known_text_key = clue.get("known_text_key", "")
+            if not isinstance(known_text_key, str) or not known_text_key.strip():
+                errors.append(f"clue '{cid}': known_text_key is required")
 
             ctype = clue.get("type", "")
             if ctype not in ("surface", "hidden"):
@@ -138,13 +138,13 @@ class ClueSpec:
                     f"clue '{cid}': effect_amount must be non-zero on {ctype} clues"
                 )
 
-            # Three-word ceiling on known_text.
-            known_text = clue.get("known_text", "")
-            if isinstance(known_text, str) and known_text.strip():
-                word_count = len(known_text.split())
+            # Three-word ceiling on known_text_key.
+            known_text_key = clue.get("known_text_key", "")
+            if isinstance(known_text_key, str) and known_text_key.strip():
+                word_count = len(known_text_key.split())
                 if word_count > 3:
                     errors.append(
-                        f"clue '{cid}': known_text \"{known_text}\" has {word_count} words (max 3)"
+                        f"clue '{cid}': known_text_key \"{known_text_key}\" has {word_count} words (max 3)"
                     )
 
             # Validate naming block.

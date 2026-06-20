@@ -12,5 +12,5 @@ extends Resource
 # Broad item type. References a SuperCategoryData resource.
 @export var super_category: SuperCategoryData = null
 
-# Fine-grained item type shown to the player (e.g. "Painting", "Pocket Watch").
-@export var display_name: String = ""
+# Localization key for the category display name.
+@export var display_name_key: String = ""

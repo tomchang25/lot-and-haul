@@ -43,8 +43,8 @@ func get_location_data() -> LocationData:
 
 
 func _apply() -> void:
-    _name_label.text = _location_data.display_name
-    _description_label.text = _location_data.description
+    _name_label.text = TranslationServer.translate(_location_data.display_name_key)
+    _description_label.text = TranslationServer.translate(_location_data.description_key)
     _entry_fee_label.text = "Entry Fee:   $%d" % _location_data.entry_fee
     _travel_days_label.text = "Travel:   %d day%s" % [
         _location_data.travel_days,

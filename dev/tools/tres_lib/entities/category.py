@@ -54,7 +54,7 @@ class CategorySpec:
         w.add_field('script = ExtResource("1_catdef")')
         w.add_field_str("category_id", cat_id)
         w.add_field('super_category = ExtResource("2_super")')
-        w.add_field_str("display_name", entry["display_name"])
+        w.add_field_str("display_name_key", entry.get("display_name_key", ""))
         return w.render()
 
     def parse_tres(self, text: str, ctx: ParseCtx) -> dict:
@@ -63,7 +63,7 @@ class CategorySpec:
         if uid:
             ctx.uid_to_id[uid] = cat_id
 
-        display_name = tres_field(text, "display_name") or cat_id
+        display_name_key = tres_field(text, "display_name_key") or cat_id
 
         ext_res = ext_resources(text)
         super_cat_id = ""
@@ -75,7 +75,7 @@ class CategorySpec:
         return {
             "category_id": cat_id,
             "super_category": super_cat_id,
-            "display_name": display_name,
+            "display_name_key": display_name_key,
         }
 
     def validate(self, entries: list, all_data: dict) -> list[str]:

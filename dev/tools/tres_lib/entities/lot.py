@@ -63,6 +63,10 @@ class LotSpec:
             float(entry.get("npc_layer_sight_chance", 0.5)),
         )
         w.add_field_float(
+            "npc_clue_sight_chance",
+            float(entry.get("npc_clue_sight_chance", 0.15)),
+        )
+        w.add_field_float(
             "opening_bid_factor",
             float(entry.get("opening_bid_factor", 0.25)),
         )
@@ -111,6 +115,7 @@ class LotSpec:
             "aggressive_lerp_min",
             "aggressive_lerp_max",
             "npc_layer_sight_chance",
+            "npc_clue_sight_chance",
             "opening_bid_factor",
             "veiled_chance",
             "price_floor_factor",

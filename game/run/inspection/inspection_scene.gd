@@ -171,10 +171,10 @@ func _do_clue_chain(entry: ItemEntry) -> void:
         var succeeded: bool = RunManager.attempt_clue(entry, clue)
         if succeeded:
             AudioManager.play_event(REVEAL_GOOD)
-            clue_texts.append("[color=#66ff80]%s[/color]" % clue.known_text)
+            clue_texts.append("[color=#66ff80]%s[/color]" % TranslationServer.translate(clue.known_text_key))
         else:
             AudioManager.play_event(REVEAL_BAD)
-            clue_texts.append("[color=#8c949f]Failed: %s[/color]" % clue.known_text)
+            clue_texts.append("[color=#8c949f]Failed: %s[/color]" % TranslationServer.translate(clue.known_text_key))
             break
 
     if clue_texts.is_empty():
@@ -298,14 +298,14 @@ func _refresh_clues_section(entry: ItemEntry) -> void:
 
     if entry.unveiled and entry.anchor != null:
         var a: AnchorData = entry.anchor
-        rows.append({ "text": a.known_text, "op": "base", "amount": float(a.base_value), "anchor": true })
+        rows.append({ "text": TranslationServer.translate(a.known_text_key), "op": "base", "amount": float(a.base_value), "anchor": true })
 
     for clue: ClueData in entry.surface_clues:
         if clue.type != ClueData.ClueType.SURFACE:
             continue
         if not entry.revealed_clue_ids.has(clue.clue_id):
             continue
-        rows.append({ "text": clue.known_text, "op": clue.effect_op, "amount": clue.effect_amount, "anchor": false })
+        rows.append({ "text": TranslationServer.translate(clue.known_text_key), "op": clue.effect_op, "amount": clue.effect_amount, "anchor": false })
 
     if rows.is_empty():
         _clues_vbox.hide()

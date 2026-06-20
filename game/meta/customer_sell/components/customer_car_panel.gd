@@ -117,7 +117,10 @@ func _format_demand_tags() -> String:
     var tag_names: Array[String] = []
     for tag: String in _customer.demand_tags:
         var clue := ClueRegistry.get_clue_by_id(tag)
-        tag_names.append(clue.known_text if clue != null and clue.known_text != "" else tag)
+        if clue != null and clue.known_text_key != "":
+            tag_names.append(TranslationServer.translate(clue.known_text_key))
+        else:
+            tag_names.append(tag)
     return ", ".join(tag_names)
 
 

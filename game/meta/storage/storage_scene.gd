@@ -184,7 +184,7 @@ func _refresh_detail() -> void:
     _auth_tag_label.visible = entry.verified
     if entry.category_data != null:
         _detail_category_label.text = "%s · #%d" % [
-            entry.category_data.display_name,
+            TranslationServer.translate(entry.category_data.display_name_key),
             entry.id,
         ]
     else:
