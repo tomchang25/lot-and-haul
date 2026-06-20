@@ -230,6 +230,9 @@ zh_TW:
   # ── 物品提示 ──
   UI_WEIGHT_TOOLTIP: "重量：%s"
   UI_GRID_TOOLTIP: "網格：%s"
+  UI_CLUE_REVEALED_FORMAT: "● %s"
+  UI_CLUE_UNREVEALED_FORMAT: "○ %s（DC %d，%s）"
+  UI_CAR_STATS_LINE: "網格：%d\u00d7%d    重量：%d    耐力：%d    每日燃料：%d    額外槽位：%d"
   # ── 線索區塊 ──
   UI_CLUE_IDENTITY: "身份"
   UI_CLUE_SURFACE: "表面"

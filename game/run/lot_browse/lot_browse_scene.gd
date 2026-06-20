@@ -22,7 +22,6 @@ const LotCardScene := preload("res://game/run/lot_browse/lot_card/lot_card.tscn"
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-# var _lot_card: LotCard = null
 var _lot_cards: Array[LotCard] = []
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════

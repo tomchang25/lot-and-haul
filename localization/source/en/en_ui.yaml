@@ -230,6 +230,9 @@ en:
   # ── New keys for item row tooltip ──
   UI_WEIGHT_TOOLTIP: "Weight:  %s"
   UI_GRID_TOOLTIP: "Grid:  %s"
+  UI_CLUE_REVEALED_FORMAT: "● %s"
+  UI_CLUE_UNREVEALED_FORMAT: "○ %s (DC %d, %s)"
+  UI_CAR_STATS_LINE: "Grid: %d\u00d7%d    Weight: %d    Stamina: %d    Fuel/day: %d    Extra slots: %d"
   # ── New keys for clue chunk ──
   UI_CLUE_IDENTITY: "IDENTITY"
   UI_CLUE_SURFACE: "SURFACE"

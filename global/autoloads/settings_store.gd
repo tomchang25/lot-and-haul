@@ -3,7 +3,6 @@
 extends Node
 
 signal debug_mode_changed(value: bool)
-signal locale_changed(value: String)
 
 const SETTINGS_PATH := "user://settings.json"
 const SettingsOverlayScene := preload("res://game/shared/settings_overlay/settings_overlay.tscn")
@@ -27,8 +26,6 @@ var locale: String = "en":
             return
         locale = value
         TranslationServer.set_locale(value)
-        get_tree().root.propagate_notification(NOTIFICATION_TRANSLATION_CHANGED)
-        locale_changed.emit(value)
 
 var _overlay_instance: CanvasLayer = null
 

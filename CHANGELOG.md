@@ -12,9 +12,9 @@ Rules:
 - When a phase ships, append the entry here and cut the shipped work from its plan/TODO source.
 - Do not add entries for dev-process-only maintenance, including closeout workflow changes, CHANGELOG/TODO edits, plan archival, or tracking cleanup.
 
-## v0.1.5 - Draft
+## v0.1.6 - Draft
 
-## v0.1.4
+## v0.1.5
 
 ### Onboarding Flow
 
@@ -58,6 +58,8 @@ Rules:
 ### Script Registry and Validation
 
 - 2026-06-17 — [tutorial] Moved script resolution from Director into TutorialScripts static registry with anchor validation, push_error for unknown ids, and known_script_ids() for test coverage
+
+## v0.1.4
 
 ### Settings Main Menu Button
 

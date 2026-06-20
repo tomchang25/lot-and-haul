@@ -53,6 +53,18 @@ RULES_BY_FILE: dict[str, list[tuple[str, str, str, str, str]]] = {
         ("perks", "perk_id", "display_name_key", "PERK", ""),
         ("perks", "perk_id", "description_key", "PERK", "_DESC"),
     ],
+    "_test_item_generator.yaml": [
+        ("super_categories", "super_category_id", "display_name_key", "CAT", ""),
+        ("categories", "category_id", "display_name_key", "CAT", ""),
+        ("anchors", "anchor_id", "known_text_key", "ANCHOR", ""),
+        ("clues", "clue_id", "known_text_key", "CLUE", ""),
+        ("affixes", "affix_id", "display_name_key", "AFFIX", ""),
+    ],
+    "tutorial_data.yaml": [
+        ("anchors", "anchor_id", "known_text_key", "ANCHOR", ""),
+        ("clues", "clue_id", "known_text_key", "CLUE", ""),
+        ("affixes", "affix_id", "display_name_key", "AFFIX", ""),
+    ],
 }
 
 # ── Result type ────────────────────────────────────────────────────────────
@@ -129,7 +141,8 @@ def _find_entry_id_line(
         stripped = line.strip()
         if stripped.startswith("#"):
             continue
-        if f"{id_field}: {id_val}" in line:
+        pattern = rf"^\s*-?\s*{re.escape(id_field)}:\s*{re.escape(id_val)}\s*(#.*)?$"
+        if re.match(pattern, stripped):
             return i
     return -1
 

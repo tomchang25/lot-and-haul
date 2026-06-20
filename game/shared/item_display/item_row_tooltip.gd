@@ -127,11 +127,33 @@ func _populate_clue_section(item: ItemEntry) -> void:
         row.custom_minimum_size = Vector2(200.0, 0.0)
 
         if item.revealed_clue_ids.has(clue.clue_id):
-            row.text = "● %s" % TranslationServer.translate(clue.known_text_key)
+            var clue_name := TranslationServer.translate(clue.known_text_key)
+            row.text = TranslationServer.translate("UI_CLUE_REVEALED_FORMAT") % clue_name
             row.add_theme_color_override(&"font_color", Color.WHITE)
         else:
-            row.text = "○ %s (DC %d, %s)" % [TranslationServer.translate(clue.known_text_key), clue.dc, clue.attribute.capitalize()]
+            row.text = TranslationServer.translate("UI_CLUE_UNREVEALED_FORMAT") % [
+                TranslationServer.translate(clue.known_text_key),
+                clue.dc,
+                _attribute_display_name(clue.attribute),
+            ]
             row.add_theme_color_override(&"font_color", Color(0.55, 0.55, 0.55))
 
         # node-src: ephemeral — per-clue row, rebuilt per refresh
         _clue_container.add_child(row)
+
+
+func _attribute_display_name(attribute: String) -> String:
+    match attribute:
+        "appraisal":
+            return TranslationServer.translate("SYS_ATTR_APPRAISAL")
+        "perception":
+            return TranslationServer.translate("SYS_ATTR_PERCEPTION")
+        "restoration":
+            return TranslationServer.translate("SYS_ATTR_RESTORATION")
+        "negotiation":
+            return TranslationServer.translate("SYS_ATTR_NEGOTIATION")
+        "investigation":
+            return TranslationServer.translate("SYS_ATTR_INVESTIGATION")
+        _:
+            push_warning("ItemRowTooltip._attribute_display_name: unknown attribute %s" % attribute)
+            return attribute

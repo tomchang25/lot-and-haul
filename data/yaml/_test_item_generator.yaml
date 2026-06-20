@@ -1,6 +1,6 @@
 super_categories:
   - super_category_id: test_super
-    display_name_key: CAT_TEST
+    display_name_key: CAT_TEST_SUPER
 
 categories:
   - category_id: test_category
@@ -70,7 +70,7 @@ affix_combinations:
 affixes:
   - affix_id: test_affix
     naming_slot: prefix
-    display_name_key: AFFIX_TEST
+    display_name_key: AFFIX_TEST_AFFIX
     scope_mode: all
     weight: 1
     combination_ids:

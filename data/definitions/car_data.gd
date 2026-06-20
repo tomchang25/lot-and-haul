@@ -49,14 +49,11 @@ func total_slots() -> int:
 
 
 func stats_line() -> String:
-    return (
-        "Grid: %d×%d    Weight: %d    Stamina: %d    Fuel/day: %d    Extra slots: %d"
-        % [
-            grid_columns,
-            grid_rows,
-            int(max_weight),
-            stamina_cap,
-            fuel_cost_per_day,
-            extra_slot_count,
-        ]
-    )
+    return TranslationServer.translate("UI_CAR_STATS_LINE") % [
+        grid_columns,
+        grid_rows,
+        int(max_weight),
+        stamina_cap,
+        fuel_cost_per_day,
+        extra_slot_count,
+    ]
