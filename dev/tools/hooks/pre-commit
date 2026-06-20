@@ -12,17 +12,29 @@
 # It lints ONLY the files staged in this commit, so adoption stays incremental
 # and a pre-existing backlog never blocks an unrelated commit.
 
-files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(gd|tscn)$')
-[ -z "$files" ] && exit 0
+gd_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(gd|tscn)$')
+yaml_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.yaml$')
 
-# shellcheck disable=SC2086  # intentional word-splitting: pass each file as an arg
-python dev/tools/lint_standards.py --files $files
-status=$?
+status=0
+
+if [ -n "$gd_files" ]; then
+  # shellcheck disable=SC2086
+  python dev/tools/lint_standards.py --files $gd_files
+  status=$?
+fi
+
+if [ -n "$yaml_files" ]; then
+  # shellcheck disable=SC2086
+  python dev/tools/lint_yaml_keys.py --files $yaml_files
+  yaml_status=$?
+  [ "$yaml_status" -ne 0 ] && status=$yaml_status
+fi
 
 if [ "$status" -ne 0 ]; then
   echo ""
-  echo "Commit blocked by standards lint. Fix the violations above, or run"
-  echo "  python dev/tools/lint_standards.py --files $files"
+  echo "Commit blocked by lint. Fix the violations above, or run"
+  echo "  python dev/tools/lint_standards.py --files \$gd_files"
+  echo "  python dev/tools/lint_yaml_keys.py --files \$yaml_files"
   echo "to re-check. (To bypass in an emergency: git commit --no-verify.)"
 fi
 
