@@ -40,9 +40,20 @@ func _ready() -> void:
 
     if RunManager.run.browse_lots.is_empty():
         RunManager.init_browse_lots(_sample_lots(RunManager.run.location_data))
+        RunManager.set_resume_target(RunStore.RESUME_LOT_BROWSE)
+        SaveManager.save()
 
     _build_all_cards()
+    Director.register_scene(
+        "lot_browse",
+        {
+            "lot_cards": _lot_card_container,
+            "cargo_btn": _cargo_button,
+            "skip_btn": _skip_button,
+        },
+    )
     _refresh_view()
+    GameplayOverride.override_changed.connect(_on_lot_browse_override_changed)
 
 # ══ View helpers ══════════════════════════════════════════════════════════════
 
@@ -63,6 +74,8 @@ func _build_all_cards() -> void:
 
 func _refresh_view() -> void:
     var idx: int = RunManager.run.browse_index
+    var lock_pass := GameplayOverride.is_active(GameplayOverride.LOT_PASS_LOCKED)
+    _skip_button.disabled = lock_pass
 
     if idx >= RunManager.run.browse_lots.size():
         _show_cargo_state()
@@ -73,6 +86,7 @@ func _refresh_view() -> void:
 
     for i in _lot_cards.size():
         _lot_cards[i].set_active(i == idx)
+        _lot_cards[i].set_pass_disabled(lock_pass)
 
 
 func _show_cargo_state() -> void:
@@ -88,15 +102,24 @@ func _on_enter_pressed() -> void:
     var entry := LotEntry.create(lot_data)
     RunManager.set_lot(entry)
     RunManager.advance_browse_index()
+    RunManager.set_resume_target(RunStore.RESUME_INSPECTION)
+    SaveManager.save()
+    EventBus.tutorial_event.emit(TutorialEvents.LOT_SELECTED, { })
     SceneRouter.go_to_inspection()
 
 
 func _on_pass_pressed() -> void:
+    if GameplayOverride.is_active(GameplayOverride.LOT_PASS_LOCKED):
+        return
     RunManager.advance_browse_index()
+    RunManager.set_resume_target(RunStore.RESUME_LOT_BROWSE)
+    SaveManager.save()
     _refresh_view()
 
 
 func _on_skip_pressed() -> void:
+    if GameplayOverride.is_active(GameplayOverride.LOT_PASS_LOCKED):
+        return
     var remaining: int = RunManager.run.browse_lots.size() - RunManager.run.browse_index
     _skip_confirm_popup.dialog_text = (
         "Skip the remaining %d lot(s) and go straight to cargo?" % remaining
@@ -105,10 +128,20 @@ func _on_skip_pressed() -> void:
 
 
 func _on_skip_confirmed() -> void:
+    RunManager.set_resume_target(RunStore.RESUME_CARGO)
+    SaveManager.save()
     SceneRouter.go_to_cargo()
 
 
+func _on_lot_browse_override_changed(id: StringName, _active: bool, _payload: Variant) -> void:
+    if id == GameplayOverride.LOT_PASS_LOCKED:
+        _refresh_view()
+
+
 func _on_cargo_pressed() -> void:
+    RunManager.set_resume_target(RunStore.RESUME_CARGO)
+    SaveManager.save()
+    EventBus.tutorial_event.emit(TutorialEvents.CARGO_OPENED, { })
     SceneRouter.go_to_cargo()
 
 # ══ Sampling ══════════════════════════════════════════════════════════════════

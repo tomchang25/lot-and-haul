@@ -48,6 +48,12 @@ func _ready() -> void:
         return
 
     _render(summary)
+    Director.register_scene(
+        "day_summary",
+        {
+            "continue_btn": _continue_btn,
+        },
+    )
 
 # ══ Display ═══════════════════════════════════════════════════════════════════
 
@@ -114,4 +120,5 @@ func _render(summary: DaySummary) -> void:
 
 
 func _on_continue_pressed() -> void:
+    EventBus.tutorial_event.emit(TutorialEvents.DAY_SUMMARY_CONTINUED, { })
     SceneRouter.go_to_hub()

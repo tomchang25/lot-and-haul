@@ -7,6 +7,9 @@ extends Resource
 # Stable identifier for this location. Must match the .tres filename stem.
 @export var location_id: String = ""
 
+# Whether this location is tutorial-only. Excluded from normal sampling.
+@export var is_tutorial: bool = false
+
 # Player-facing name shown on the location selection screen.
 @export var display_name: String = ""
 

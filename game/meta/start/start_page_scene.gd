@@ -204,10 +204,7 @@ func _execute_new_game(slot: int) -> void:
 ## Loads a save from the specified [param slot].
 func _execute_load_game(slot: int) -> void:
     SaveManager.switch_to_slot(slot)
-    if MetaManager.shop_session.pending_scene == ShopSessionStore.SCENE_CUSTOMER_SELL:
-        SceneRouter.go_to_customer_sell()
-    else:
-        SceneRouter.go_to_hub()
+    SceneRouter.go_to_loaded_save_entry()
 
 # ══ View ═══════════════════════════════════════════════════════════════════════
 

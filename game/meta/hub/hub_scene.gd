@@ -42,14 +42,11 @@ func _ready() -> void:
     _storage_btn.pressed.connect(_on_storage_chosen)
     _sell_btn.pressed.connect(_on_sell_chosen)
     _cancel_btn.pressed.connect(_on_chooser_cancelled)
+    GameplayOverride.override_changed.connect(_on_gameplay_override_changed)
 
-    if MetaManager.slot.current_slot > SlotStore.SLOT_NIGHT:
-        _end_day_and_navigate.call_deferred()
-        return
-
-    _refresh_display()
-    _debug_container.storage_changed.connect(_refresh_display)
-
+    # Register anchors before the slot check so tutorials that wait for
+    # hub (SCENE_ENTERED) can advance even when this visit immediately
+    # ends the day.
     Director.register_scene(
         "hub",
         {
@@ -61,6 +58,13 @@ func _ready() -> void:
         },
     )
 
+    if MetaManager.slot.current_slot > SlotStore.SLOT_NIGHT:
+        _end_day_and_navigate.call_deferred()
+        return
+
+    _refresh_display()
+    _debug_container.storage_changed.connect(_refresh_display)
+
 # ══ Signal handlers — activity chooser ════════════════════════════════════════
 
 
@@ -70,23 +74,32 @@ func _on_activity_pressed() -> void:
 
 func _on_auction_chosen() -> void:
     _close_chooser()
+    EventBus.tutorial_event.emit(TutorialEvents.ACTIVITY_CHOSEN, { })
     SceneRouter.go_to_location_select()
 
 
 func _on_storage_chosen() -> void:
     _close_chooser()
+    EventBus.tutorial_event.emit(TutorialEvents.ACTIVITY_CHOSEN, { })
     MetaManager.begin_storage_slot()
     SceneRouter.go_to_storage()
 
 
 func _on_sell_chosen() -> void:
     _close_chooser()
+    EventBus.tutorial_event.emit(TutorialEvents.ACTIVITY_CHOSEN, { })
     MetaManager.begin_open_shop()
     SceneRouter.go_to_customer_sell()
 
 
 func _on_chooser_cancelled() -> void:
     _close_chooser()
+
+
+func _on_gameplay_override_changed(id: StringName, _active: bool, _payload: Variant) -> void:
+    if id != GameplayOverride.FORCED_ACTIVITY:
+        return
+    _refresh_activity_choice_locks()
 
 # ══ Signal handlers — utility navigation ══════════════════════════════════════
 
@@ -111,11 +124,18 @@ func _end_day_and_navigate() -> void:
 func _show_chooser() -> void:
     var is_day: bool = MetaManager.slot.current_slot == SlotStore.SLOT_DAY
     _auction_btn.visible = is_day
+    _storage_btn.visible = true
+    _sell_btn.visible = true
+    _cancel_btn.visible = true
+    _refresh_activity_choice_locks()
+
     _chooser.show()
 
     Director.register_anchor("auction_btn", _auction_btn)
     Director.register_anchor("storage_btn", _storage_btn)
     Director.register_anchor("sell_btn", _sell_btn)
+
+    EventBus.tutorial_event.emit(TutorialEvents.CHOOSER_OPENED, { })
 
 
 func _close_chooser() -> void:
@@ -124,6 +144,23 @@ func _close_chooser() -> void:
     Director.unregister_anchor("auction_btn")
     Director.unregister_anchor("storage_btn")
     Director.unregister_anchor("sell_btn")
+
+
+func _refresh_activity_choice_locks() -> void:
+    # Onboarding gating: disable non-target activity options.
+    _auction_btn.disabled = false
+    _storage_btn.disabled = false
+    _sell_btn.disabled = false
+    var target := GameplayOverride.payload(GameplayOverride.FORCED_ACTIVITY)
+    if target == &"auction":
+        _storage_btn.disabled = true
+        _sell_btn.disabled = true
+    elif target == &"storage":
+        _auction_btn.disabled = true
+        _sell_btn.disabled = true
+    elif target == &"selling":
+        _auction_btn.disabled = true
+        _storage_btn.disabled = true
 
 # ══ Display ═══════════════════════════════════════════════════════════════════
 

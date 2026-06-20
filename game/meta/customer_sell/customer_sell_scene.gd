@@ -66,6 +66,7 @@ func _ready() -> void:
     _deal_panel.conservative_requested.connect(_on_conservative_requested)
     _deal_panel.aggressive_requested.connect(_on_aggressive_requested)
     _deal_panel.pitch_confirmed.connect(_on_pitch_confirmed)
+    _deal_panel.dice_toggled.connect(_on_dice_toggled)
 
     _receipt.receipt_confirmed.connect(_on_receipt_confirmed)
     _receipt.receipt_cancelled.connect(_on_receipt_cancelled)
@@ -92,6 +93,22 @@ func _ready() -> void:
             _select_customer(idx)
             _suppress_placement_update = false
         _apply_saved_placement(MetaManager.shop_session.placement)
+
+    Director.register_scene(
+        "customer_sell",
+        {
+            "customer_queue": _customer_queue,
+            "item_list": _item_list,
+            "car_panel": _car_panel,
+            "deal_panel": _deal_panel,
+            "back_btn": _back_button,
+        },
+    )
+
+    # During the onboarding_selling tutorial, lock conservative so the player
+    # can't short-circuit the aggressive dice flow by closing the sale early.
+    _apply_conservative_lock()
+    GameplayOverride.override_changed.connect(_on_customer_sell_override_changed)
 
 # ══ Signal handlers ═══════════════════════════════════════════════════════════
 
@@ -180,6 +197,7 @@ func _on_grid_cell_clicked(pos: Vector2i) -> void:
     AudioManager.play_event(SELL_GRID_PUT_DOWN)
     _item_list.update_row_states(grid)
     _item_list.play_card_pulse(item)
+    EventBus.tutorial_event.emit(TutorialEvents.SELL_ITEM_PLACED, { })
 
 
 func _on_car_clear_requested() -> void:
@@ -197,12 +215,18 @@ func _on_car_placement_changed() -> void:
 
 
 func _on_conservative_requested(price: int) -> void:
+    if GameplayOverride.is_active(GameplayOverride.CONSERVATIVE_SALE_LOCKED):
+        return
     var placed := _car_panel.get_grid().get_placed_items()
     if placed.is_empty():
         return
     _pending_sale_price = price
     _pending_strategy = "conservative"
     _receipt.show_receipt(placed, price, "conservative")
+
+
+func _on_dice_toggled() -> void:
+    EventBus.tutorial_event.emit(TutorialEvents.DICE_TOGGLED, { })
 
 
 func _on_aggressive_requested() -> void:
@@ -217,6 +241,7 @@ func _on_aggressive_requested() -> void:
     var pool := _get_dice_pool_size(customer, placed)
     var rolls := SellMath.roll_dice(pool)
     _deal_panel.show_dice(rolls, placed)
+    EventBus.tutorial_event.emit(TutorialEvents.SELL_AGGRESSIVE_REQUESTED, { })
 
 
 func _on_pitch_confirmed(price: int) -> void:
@@ -269,6 +294,15 @@ func _on_back_pressed() -> void:
     MetaManager.customers.clear_customers()
     SaveManager.save()
     SceneRouter.go_to_hub()
+
+
+func _apply_conservative_lock() -> void:
+    _deal_panel.set_conservative_sale_locked(GameplayOverride.is_active(GameplayOverride.CONSERVATIVE_SALE_LOCKED))
+
+
+func _on_customer_sell_override_changed(id: StringName, active: bool, _payload: Variant) -> void:
+    if id == GameplayOverride.CONSERVATIVE_SALE_LOCKED:
+        _deal_panel.set_conservative_sale_locked(active)
 
 # ══ Customer selection ════════════════════════════════════════════════════════
 

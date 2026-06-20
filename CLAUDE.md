@@ -23,8 +23,6 @@ Full placement rules and tie-breakers live in `dev/README.md`.
 
 **No hard-wrapped prose**: Do not hard-wrap prose lines — let the client handle line wrapping. This is a global rule that applies to all writing, not just commits.
 
-**No unicode**: Never use non-ASCII characters (em dashes, ellipsis, multiplication signs, etc.) in any source file (.gd, .tscn, .tres, .yaml). Use ASCII equivalents: `...` for ellipsis, `x` for multiplication, `-` for dashes, `--` for em dashes. Unicode in GDScript `\uXXXX` escape sequences is acceptable, but prefer plain ASCII wherever possible.
-
 When asked to build a plan, implementation spec, or sketch, follow the matching workflow in `dev/workflows/` (`plan_standard.md`, `implementation_spec_standard.md`, `sketch_standard.md`), the plan lifecycle in `dev/docs/README.md`, and `dev/standards/` for any relevant domain standard. Plans and sketches go in `dev/docs/plans/` with a one-line pointer in `TODO.md`. The spec author explores the codebase directly against the plan — there is no separate scout stage. Small features with conversation-settled design take the sketch route (one document, non-normative code allowed, no spec).
 
 Resolve unknowns by asking me directly during the planning conversation — never emit an `## Open Questions` section or leave unresolved decisions parked in a plan or spec. Stop and ask the moment a decision is unclear; hand over a plan or spec only once every such question has been answered and folded into the relevant Requirement, Design, or Relational Context line.
@@ -116,8 +114,6 @@ stage/        Testbeds, demo runs, and tile sets (mostly empty)
 
 ## Autoloads (load order matters)
 
-EventBus → SettingsStore → Debug → AudioManager → ClueRegistry → ItemRegistry → RunManager → CarRegistry → LocationRegistry → CategoryRegistry → SuperCategoryRegistry → SaveManager → KnowledgeManager → MetaManager → SceneRouter → Director → ScriptDirector → GameManager
-
 MetaManager and KnowledgeManager call `SaveManager.register_provider(self)` in `_ready()`. `GameManager._ready()` calls `SaveManager.load()` then `SaveManager.run_validation()`. Per-store versioned migrations run inside each store's `from_dict()` via `_apply_migrations()` — there is no top-level migration pass. The `schema_version` field in the save file is a legacy stamp; it is always written but never checked on load.
 
 ## Data Pipeline
@@ -150,6 +146,7 @@ Check TODO.md ## Active Section
 - **Theme** (styling, colors, font sizes, styleboxes): read `dev/standards/theme_standard.md` — covers the centralized theme, semantic color palette, typography scale, and rules for when GDScript overrides are acceptable.
 - **Debug** (adding debug-conditional code or UI): read `dev/standards/debug_standard.md` — covers the two-layer gate (`OS.is_debug_build()` + `SettingsStore.debug_mode`), the `Debug` autoload API, and node-source rules for debug nodes.
 - **Error guards** (replacing `assert()`, writing precondition checks): read `dev/standards/error_guard_standard.md` — covers the three guard categories (runtime, programmer error, recovery warning), ToastManager channel selection, fire-once for high-frequency guards, and the pattern for each.
+- **Tutorials** (adding/editing tutorial scripts, anchors, tutorial events, or Director/ScriptDirector flow): read `dev/standards/tutorial_standard.md` — covers presentation/flow ownership, advance kinds, anchor registration, tutorial events, triggers, runtime reset, and tests.
 - **Project structure** (placing new files or folders): read `dev/standards/project_structure.md`.
 - **Change summaries** (commit messages, review notes, PR titles/descriptions, CHANGELOG entries, closeout summaries): read `dev/standards/change_summary_standard.md` — shared outcome-focused wording rules and examples.
 - **Commits**: conventional commits format — read `dev/skills/conventional_commits.md` when writing commit messages. Do not hard-wrap prose lines (bullet points, PR descriptions, commit bodies) at a column boundary — let the client handle line wrapping.

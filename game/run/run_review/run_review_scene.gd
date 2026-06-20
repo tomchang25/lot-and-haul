@@ -42,6 +42,8 @@ func _ready() -> void:
         SceneRouter.go_to_hub.call_deferred()
         return
 
+    RunManager.set_resume_target(RunStore.RESUME_RUN_REVIEW)
+
     _continue_btn.pressed.connect(_on_continue_pressed)
     _continue_btn.press_event = CONFIRM
 
@@ -53,10 +55,18 @@ func _ready() -> void:
 
     var cracked: int = RunManager.apply_trailer_damage()
     _cargo_panel.set_damage_count(cracked)
+    SaveManager.save()
 
     _populate_rows()
     _populate_finance()
     _cargo_panel.set_expanded(false)
+    Director.register_scene(
+        "run_review",
+        {
+            "cargo_panel": _cargo_panel,
+            "continue_btn": _continue_btn,
+        },
+    )
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
@@ -77,6 +87,7 @@ func _on_row_tooltip_requested(
 
 func _resolve_run_and_navigate() -> void:
     MetaManager.resolve_current_run()
+    EventBus.tutorial_event.emit(TutorialEvents.RUN_REVIEWED, { })
     AudioManager.play_event(CASH_CREDITED)
     SceneRouter.go_to_hub()
 

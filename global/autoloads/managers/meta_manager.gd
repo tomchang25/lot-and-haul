@@ -28,7 +28,6 @@ func _ready() -> void:
     progress = ProgressStore.new()
     customers = CustomersStore.new()
     shop_session = ShopSessionStore.new()
-    SaveManager.register_provider(self)
 
 
 ## Re-instantiates all domain stores to their default state. Called by
@@ -98,6 +97,29 @@ func spend_cash(amount: int) -> bool:
 ## Marks a scene tutorial as seen and schedules a deferred save.
 func mark_tutorial_seen(scene_id: String) -> void:
     progress.mark_tutorial_seen(scene_id)
+    SaveManager.mark_dirty()
+
+
+## Whether onboarding is still pending for this save.
+func is_onboarding_pending() -> bool:
+    return progress.onboarding_pending
+
+
+## Marks onboarding as completed and saves. Also marks the basic hub and storage
+## tutorials as seen so they do not trigger after onboarding finishes.
+func complete_onboarding() -> void:
+    progress.mark_onboarding_complete()
+    progress.mark_tutorial_seen("hub")
+    progress.mark_tutorial_seen("storage")
+    SaveManager.mark_dirty()
+
+
+## Marks onboarding as skipped and saves. Also marks the legacy hub/storage
+## tutorials as seen so they do not appear after the onboarding flow ends.
+func skip_onboarding() -> void:
+    progress.mark_onboarding_complete()
+    progress.mark_tutorial_seen("hub")
+    progress.mark_tutorial_seen("storage")
     SaveManager.mark_dirty()
 
 
@@ -284,6 +306,7 @@ func resolve_customer_sale(
         customers.remove_customer(customer)
     for entry: ItemEntry in items:
         EventBus.sale_resolved.emit(entry)
+    EventBus.tutorial_event.emit(TutorialEvents.SALE_COMPLETED, { })
     SaveManager.save()
 
 # ══ Storage AP actions ════════════════════════════════════════════════════════
@@ -401,13 +424,15 @@ func resolve_current_run() -> void:
     var result: RunResult = RunManager.take_run_result()
     resolve_run(result)
     RunManager.clear_run_state()
+    SaveManager.save()
     EventBus.run_resolved.emit(result)
 
 
 ## Resolves a completed run from [param result]: applies cash delta, registers
 ## cargo into storage, stashes run economics as pending for end_day(), and sets
 ## current_slot to 3 so the player returns to the hub for the evening slot.
-## Saves once at the end. Called only from resolve_current_run().
+## Saves once at the end when called without an active run. resolve_current_run()
+## clears RunManager state first, then saves so settled runs do not resume.
 func resolve_run(result: RunResult) -> void:
     economy.apply_delta(
         result.onsite_proceeds - result.paid_price - result.entry_fee - result.fuel_cost,
@@ -423,4 +448,5 @@ func resolve_run(result: RunResult) -> void:
     # Auction consumed the Day slot; player returns for the Night slot.
     slot.set_slot(SlotStore.SLOT_NIGHT) # no inner save
 
-    SaveManager.save() # single commit
+    if not RunManager.is_run_active():
+        SaveManager.save() # single commit for synthetic/direct callers

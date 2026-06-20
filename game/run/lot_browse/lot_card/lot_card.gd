@@ -91,6 +91,10 @@ func set_active(active: bool) -> void:
 
     modulate = Color(1, 1, 1, 1) if active else Color(0.5, 0.5, 0.5, 1)
 
+
+func set_pass_disabled(disabled: bool) -> void:
+    _pass_button.disabled = disabled
+
 # ══ Display helpers ════════════════════════════════════════════════════════════
 
 

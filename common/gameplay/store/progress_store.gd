@@ -11,6 +11,7 @@ extends StoreBase
 var _current_day: int = 0
 var _available_locations: Array[LocationData] = []
 var _tutorial_seen: Dictionary = { }
+var _onboarding_pending: bool = true
 
 ## Calendar day counter. Starts at 0, incremented by end_day(). Read-only externally.
 var current_day: int:
@@ -27,6 +28,22 @@ var available_locations: Array[LocationData]:
 var tutorial_seen: Dictionary:
     get:
         return _tutorial_seen.duplicate()
+
+## Onboarding pending flag. Read-only externally. Starts true for new games
+## existing saves from before the onboarding feature are migrated to false.
+var onboarding_pending: bool:
+    get:
+        return _onboarding_pending
+
+
+## Marks onboarding as done (completed or skipped). Does not save.
+func mark_onboarding_complete() -> void:
+    _onboarding_pending = false
+
+
+## Resets onboarding to pending. Test-helper — not used in production.
+func reset_onboarding() -> void:
+    _onboarding_pending = true
 
 
 ## Increments current_day by one. Does not save.
@@ -55,8 +72,9 @@ func section_id() -> String:
 
 
 ## Returns current schema version. Version 2 adds tutorial_seen flags.
+## Version 3 adds onboarding_pending flag.
 func _store_version() -> int:
-    return 2
+    return 3
 
 
 ## Serializes progress state to a save payload.
@@ -69,6 +87,7 @@ func to_dict() -> Dictionary:
         "current_day": _current_day,
         "available_location_ids": available_location_ids,
         "tutorial_seen": _tutorial_seen.duplicate(),
+        "onboarding_pending": _onboarding_pending,
     }
 
 
@@ -92,13 +111,18 @@ func from_dict(data: Dictionary, ctx: SaveLoadContext) -> void:
     _tutorial_seen = data.get("tutorial_seen", { })
     if not _tutorial_seen is Dictionary:
         _tutorial_seen = { }
+    _onboarding_pending = bool(data.get("onboarding_pending", true))
 
 
 ## Migrates saved payloads from older schema versions.
 ## Version 2: adds default tutorial_seen dict.
+## Version 3: adds onboarding_pending flag (default false for existing saves).
 func _apply_migrations(data: Dictionary, from_version: int, _ctx: SaveLoadContext) -> Dictionary:
     if from_version < 2:
         if not data.has("tutorial_seen") or not data["tutorial_seen"] is Dictionary:
             data["tutorial_seen"] = { }
+    if from_version < 3:
+        if not data.has("onboarding_pending"):
+            data["onboarding_pending"] = false
     data["_version"] = _store_version()
     return data

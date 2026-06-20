@@ -80,6 +80,9 @@ func _ready() -> void:
         SceneRouter.go_to_hub.call_deferred()
         return
 
+    RunManager.set_resume_target(RunStore.RESUME_CARGO)
+    SaveManager.save()
+
     _run_summary.add_theme_stylebox_override(
         &"panel",
         get_theme_stylebox(&"panel", &"RunSummary"),
@@ -116,6 +119,15 @@ func _ready() -> void:
     Debug.toggled.connect(_on_debug_toggled)
     if Debug.enabled:
         _init_debug_overlay()
+    Director.register_scene(
+        "cargo",
+        {
+            "item_list": _item_list_vbox,
+            "cargo_grid": _cargo_grid,
+            "continue_btn": _continue_btn,
+            "reset_btn": _reset_btn,
+        },
+    )
 
 
 func _input(event: InputEvent) -> void:
@@ -152,6 +164,7 @@ func _on_packing_grid_cell_clicked(pos: Vector2i) -> void:
         _active_origin = ""
         _recalc_totals()
         _refresh_ui()
+        EventBus.tutorial_event.emit(TutorialEvents.CARGO_ITEM_PLACED, { })
     elif item != null:
         AudioManager.play_event(BLOCKED_ERROR)
 
@@ -200,6 +213,7 @@ func _on_reset_pressed() -> void:
 
 
 func _on_continue_pressed() -> void:
+    EventBus.tutorial_event.emit(TutorialEvents.CARGO_CONTINUE_REQUESTED, { })
     _confirm_popup.dialog_text = _build_summary_text()
     _confirm_popup.popup_centered()
 
@@ -219,6 +233,9 @@ func _on_confirm_popup_confirmed() -> void:
             unplaced_count += 1
 
     RunManager.commit_cargo(cargo, trailer, unplaced_count * Economy.ONSITE_SELL_PRICE)
+    RunManager.set_resume_target(RunStore.RESUME_RUN_REVIEW)
+    SaveManager.save()
+    EventBus.tutorial_event.emit(TutorialEvents.CARGO_LOADED, { })
     SceneRouter.go_to_run_review()
 
 
@@ -290,6 +307,7 @@ func _on_item_row_pressed(entry: ItemEntry) -> void:
     if _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
         _cargo_grid.cancel_placement()
     _lift_item_entry(entry)
+    EventBus.tutorial_event.emit(TutorialEvents.CARGO_ITEM_SELECTED, { })
 
 
 func _on_row_tooltip_requested(entry: ItemEntry, anchor: Rect2) -> void:

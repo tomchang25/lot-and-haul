@@ -235,9 +235,6 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 
 Nothing currently in progress.
 
-- [tutorial_infra] Tutorial presentation/flow split + event-based advance for interactive onboarding — see `dev/docs/plans/tutorial_infrastructure_rework.md`
-- [onboarding] First-game onboarding: Hub → Auction run → Storage → Selling over two real days, on the new tutorial machinery — see `dev/docs/plans/onboarding_flow.md`
-
 ---
 
 ## Plan
@@ -246,24 +243,21 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 - [affix_dictionary] Player-facing affix dictionary that tracks affix combination discovery, hidden-risk learning, and gated probability reads — see `dev/docs/plans/affix_dictionary.sketch.md`
 
+- [runtime_architecture] Runtime architecture vocabulary standardization: gameplay Managers become Systems, Instance becomes Entry, and archetype boundaries harden — see `dev/docs/plans/runtime_architecture_vocabulary_standardization.sketch.md`
+
 - [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
 
 - [unlock_gating] Requirement-gated premium auction tiers + lot kinds, with location tier reference table & audit — see `dev/docs/plans/unlock_gating_location_tiers.md`
-
-- [run_persistence] Mid-run save/resume: phase-stable resume scenes, atomic auction, escrowed run economics — see `dev/docs/plans/run_phase_persistence.md`
 
 - [garage-sale] Buy-side garage sale with unveiled items, cargo grid, and haggle pricing — see `dev/docs/plans/garage_sale_auction.md`
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
 
 - [balance_preview_v2] Balance preview HTML report — rich HTML output with per-clue information tables, category breakdowns, affix-aware balance preview mode, and value distribution charts
-
 ---
 
 ## Chore
 
 One-line, no reasoning, no backing doc.
-
-- [tutorial] tutorial cover whole gameplay
 
 ​
 

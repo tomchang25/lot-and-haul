@@ -1,8 +1,8 @@
 # store_base.gd
 # Base class for all Store archetypes. Provides default no-op implementations
 # of the save-section interface so subclasses only override what they need.
-# Persisting Stores override all four methods; session-scoped Stores (e.g.
-# RunStore) override none — they carry no save payload.
+# Persisting Stores override the relevant save methods; session-scoped Stores
+# can still be serialized as part of an owning provider's save section.
 class_name StoreBase
 extends RefCounted
 
@@ -12,16 +12,32 @@ func section_id() -> String:
     return ""
 
 
-## Serializes this store's state to a Dictionary for saving.
-## Returns an empty dict by default.
+## Serializes this store's state to a Dictionary for saving. Persisting stores
+## override this. Session-scoped stores usually do not because an owning save
+## provider encodes them as part of a larger payload.
 func to_dict() -> Dictionary:
     return { }
 
 
-## Restores this store's state from [param data]. Threads [param ctx] for
-## diagnostics (warnings and migration notes). No-op by default.
+## Restores this store's state from [param data]. Persisting stores override
+## this. Session-scoped stores restored by an owning provider should expose an
+## explicit helper for that payload shape instead.
 func from_dict(_data: Dictionary, _ctx: SaveLoadContext) -> void:
     pass
+
+
+## Serializes this Store into an owning aggregate snapshot. Persisting Stores
+## usually do not override this; session-scoped aggregate Stores override it
+## with a project-specific context cast from [param snapshot_ctx].
+func encode_snapshot(_snapshot_ctx: RefCounted) -> Dictionary:
+    return { }
+
+
+## Restores this Store from an owning aggregate snapshot. Store-to-Store restore
+## dependencies should flow through [param snapshot_ctx], not direct Store
+## parameters, so the owning System remains the aggregate coordinator.
+func restore_snapshot(_data: Dictionary, _snapshot_ctx: RefCounted, _ctx: SaveLoadContext) -> bool:
+    return true
 
 
 ## Validates invariants. Returns true by default.

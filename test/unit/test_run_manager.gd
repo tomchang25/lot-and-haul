@@ -73,28 +73,18 @@ func test_ap_lifecycle_create_and_spend() -> void:
 
 
 func test_clue_hit_and_miss() -> void:
-    var cat := CategoryRegistry.get_category_by_id("test_category")
-    assert_not_null(cat, "test category should exist in registry")
-
     var rng := RandomNumberGenerator.new()
     rng.seed = 2
-    var entry := ItemGenerator.draw(cat, { }, rng)
-    assert_not_null(entry, "item should be generated")
-    assert_gt(entry.surface_clues.size(), 0, "should have surface clues")
 
+    var easy := ClueRegistry.get_clue_by_id("test_surface_easy")
+    var hard := ClueRegistry.get_clue_by_id("test_surface_hard")
+    assert_not_null(easy, "test_surface_easy should exist in ClueRegistry")
+    assert_not_null(hard, "test_surface_hard should exist in ClueRegistry")
+
+    var entry := ItemEntry.new()
+    entry.surface_clues = [easy, hard]
     entry.unveil()
     assert_true(entry.unveiled, "item should be unveiled")
-
-    var easy: ClueData = null
-    var hard: ClueData = null
-    for c: ClueData in entry.surface_clues:
-        if c.clue_id == "test_surface_easy":
-            easy = c
-        elif c.clue_id == "test_surface_hard":
-            hard = c
-
-    assert_not_null(easy, "test_surface_easy should be in drawn clues")
-    assert_not_null(hard, "test_surface_hard should be in drawn clues")
 
     entry.revealed_clue_ids.clear()
     assert_true(entry.attempt_clue(easy, 1, rng), "easy clue should succeed with attribute bonus")

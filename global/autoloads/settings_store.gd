@@ -18,6 +18,8 @@ var debug_mode: bool = false:
         debug_mode = value
         debug_mode_changed.emit(value)
 
+var tutorial_skip_all: bool = false
+
 var _overlay_instance: CanvasLayer = null
 
 
@@ -41,6 +43,7 @@ func save_settings() -> void:
         "music_volume": music_volume,
         "fullscreen": fullscreen,
         "debug_mode": debug_mode,
+        "tutorial_skip_all": tutorial_skip_all,
     }
     var file := FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
     if file == null:
@@ -66,6 +69,7 @@ func load_settings() -> void:
     music_volume = d.get("music_volume", 1.0)
     fullscreen = d.get("fullscreen", false)
     debug_mode = d.get("debug_mode", false)
+    tutorial_skip_all = d.get("tutorial_skip_all", false)
 
 
 func apply_audio() -> void:
