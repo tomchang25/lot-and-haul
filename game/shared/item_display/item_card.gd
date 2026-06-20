@@ -15,7 +15,6 @@ var _entry: ItemEntry = null
 var _is_selected: bool = false
 var _has_intuition_mark: bool = false
 
-@onready var _sprite_rect: ColorRect = $VBox/SpriteRect
 @onready var _name_label: Label = $VBox/NameLabel
 @onready var _price_label: Label = $VBox/PriceLabel
 @onready var _condition_label: Label = $VBox/ConditionLabel

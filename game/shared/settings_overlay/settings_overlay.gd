@@ -20,6 +20,7 @@ const START_PAGE_PATH := "res://game/meta/start/start_page_scene.tscn"
 @onready var _close_btn: Button = %CloseButton
 @onready var _main_menu_btn: Button = %MainMenuButton
 @onready var _skip_tutorial_check: CheckBox = %SkipTutorialCheck
+@onready var _language_option: OptionButton = %LanguageOption
 @onready var _confirm_canvas: CanvasLayer = %ConfirmCanvas
 @onready var _confirm_yes: Button = %ConfirmYes
 @onready var _confirm_no: Button = %ConfirmNo
@@ -42,6 +43,12 @@ func _ready() -> void:
     _skip_tutorial_check.toggled.connect(_on_skip_tutorial_toggled)
     _confirm_yes.pressed.connect(_on_confirm_yes)
     _confirm_no.pressed.connect(_on_confirm_no)
+
+    _language_option.item_selected.connect(_on_language_selected)
+    _language_option.selected = 0
+    _language_option.set_item_metadata(0, "en")
+    _language_option.set_item_metadata(1, "zh_TW")
+    _language_option.set_item_metadata(2, "zh_CN")
 
     _apply()
 
@@ -111,6 +118,11 @@ func _on_main_menu_pressed() -> void:
     closed.emit()
     SceneRouter.go_to_start_page()
 
+
+func _on_language_selected(index: int) -> void:
+    SettingsStore.locale = _language_option.get_item_metadata(index)
+    SettingsStore.save_settings()
+
 # ══ View ═══════════════════════════════════════════════════════════════════════
 
 
@@ -124,3 +136,11 @@ func _apply() -> void:
     _fullscreen_check.set_pressed_no_signal(SettingsStore.fullscreen)
     _debug_check.set_pressed_no_signal(SettingsStore.debug_mode)
     _skip_tutorial_check.set_pressed_no_signal(SettingsStore.tutorial_skip_all)
+
+    var locale_idx := 0
+    var current := SettingsStore.locale
+    for i in _language_option.item_count:
+        if _language_option.get_item_metadata(i) == current:
+            locale_idx = i
+            break
+    _language_option.select(locale_idx)

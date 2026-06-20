@@ -1,0 +1,52 @@
+keys,en,zh_TW,zh_CN
+SYS_CONDITION_FORMAT,Condition: %s (%s),Condition: %s (%s),Condition: %s (%s)
+SYS_PERCENT_FORMAT,%d%%,%d%%,%d%%
+SYS_RARITY_COMMON,Common,Common,Common
+SYS_RARITY_LEGENDARY,Legendary,Legendary,Legendary
+SYS_RARITY_RARE,Rare,Rare,Rare
+SYS_RARITY_UNCOMMON,Uncommon,Uncommon,Uncommon
+SYS_STACK_FORMAT,%d  %s,%d  %s,%d  %s
+SYS_UNKNOWN_FORMAT,Unknown %s,Unknown %s,Unknown %s
+SYS_UNKNOWN_ITEM,Unknown Item,Unknown Item,Unknown Item
+SYS_UNKNOWN_PLACEHOLDER,???,???,???
+SYS_WEIGHT_FORMAT,%.1f kg,%.1f kg,%.1f kg
+UI_AUCTION_TITLE,Auction,Auction,Auction
+UI_CARGO_TITLE,Cargo,Cargo,Cargo
+UI_CUSTOMER_SELL_TITLE,Sell to Customer,Sell to Customer,Sell to Customer
+UI_DAY_SUMMARY_TITLE,Day Summary,Day Summary,Day Summary
+UI_FATAL_ERROR_TITLE,Fatal Error,Fatal Error,Fatal Error
+UI_HUB_TITLE,Hub,Hub,Hub
+UI_INSPECTION_TITLE,Inspect,Inspect,Inspect
+UI_KNOWLEDGE_TITLE,Knowledge,Knowledge,Knowledge
+UI_LOCATION_ENTRY_TITLE,Enter Location,Enter Location,Enter Location
+UI_LOCATION_SELECT_TITLE,Select Location,Select Location,Select Location
+UI_LOT_BROWSE_TITLE,Browse Lots,Browse Lots,Browse Lots
+UI_REVEAL_TITLE,Reveal,Reveal,Reveal
+UI_RUN_REVIEW_TITLE,Run Review,Run Review,Run Review
+UI_SETTINGS_AUDIO,Audio,音訊,音频
+UI_SETTINGS_CLOSE,Close,關閉,关闭
+UI_SETTINGS_CONFIRM_SKIP_BODY,Tutorials will no longer auto-start. You can turn them back on anytime in Settings.,教學將不再自動啟動。你可以隨時在設定中重新開啟。,教程将不再自动启动。你可以随时在设置中重新开启。
+UI_SETTINGS_CONFIRM_SKIP_TITLE,Skip all remaining tutorials?,跳過所有剩餘教學？,跳过所有剩余教程？
+UI_SETTINGS_DEBUG_MODE,Debug Mode,除錯模式,调试模式
+UI_SETTINGS_DISPLAY,Display,顯示,显示
+UI_SETTINGS_ENGLISH,English,English,English
+UI_SETTINGS_FULLSCREEN,Fullscreen,全螢幕,全屏
+UI_SETTINGS_GAMEPLAY,Gameplay,遊戲,游戏
+UI_SETTINGS_LANGUAGE,Language,語言,语言
+UI_SETTINGS_MASTER,Master,主音量,主音量
+UI_SETTINGS_MUSIC,Music,音樂,音乐
+UI_SETTINGS_NO,No,否,否
+UI_SETTINGS_RETURN_TO_MAIN_MENU,Return to Main Menu,返回主選單,返回主菜单
+UI_SETTINGS_SFX,SFX,音效,音效
+UI_SETTINGS_SIMPLIFIED_CHINESE,简体中文,简体中文,简体中文
+UI_SETTINGS_SKIP_TUTORIALS,Skip Tutorials,跳過教學,跳过教程
+UI_SETTINGS_TITLE,Settings,設定,设置
+UI_SETTINGS_TRADITIONAL_CHINESE,繁體中文,繁體中文,繁體中文
+UI_SETTINGS_YES,Yes,是,是
+UI_START_LOAD_GAME,Load Game,Load Game,Load Game
+UI_START_NEW_GAME,New Game,New Game,New Game
+UI_START_QUIT,Quit,Quit,Quit
+UI_START_SETTINGS,Settings,Settings,Settings
+UI_START_TITLE,Lot & Haul,裝載搬運,装载搬运
+UI_STORAGE_TITLE,Storage,Storage,Storage
+UI_VEHICLE_TITLE,Vehicle,Vehicle,Vehicle

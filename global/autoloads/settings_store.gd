@@ -3,6 +3,7 @@
 extends Node
 
 signal debug_mode_changed(value: bool)
+signal locale_changed(value: String)
 
 const SETTINGS_PATH := "user://settings.json"
 const SettingsOverlayScene := preload("res://game/shared/settings_overlay/settings_overlay.tscn")
@@ -19,6 +20,15 @@ var debug_mode: bool = false:
         debug_mode_changed.emit(value)
 
 var tutorial_skip_all: bool = false
+
+var locale: String = "en":
+    set(value):
+        if locale == value:
+            return
+        locale = value
+        TranslationServer.set_locale(value)
+        get_tree().root.propagate_notification(NOTIFICATION_TRANSLATION_CHANGED)
+        locale_changed.emit(value)
 
 var _overlay_instance: CanvasLayer = null
 
@@ -44,6 +54,7 @@ func save_settings() -> void:
         "fullscreen": fullscreen,
         "debug_mode": debug_mode,
         "tutorial_skip_all": tutorial_skip_all,
+        "locale": locale,
     }
     var file := FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
     if file == null:
@@ -70,6 +81,7 @@ func load_settings() -> void:
     fullscreen = d.get("fullscreen", false)
     debug_mode = d.get("debug_mode", false)
     tutorial_skip_all = d.get("tutorial_skip_all", false)
+    locale = d.get("locale", "en")
 
 
 func apply_audio() -> void:

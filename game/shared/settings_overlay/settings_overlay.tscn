@@ -131,6 +131,27 @@ horizontal_alignment = 2
 [node name="HSeparator2" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000022]
 layout_mode = 2
 
+[node name="LanguageRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/RootVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LanguageLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/RootVBox/LanguageRow"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Language"
+
+[node name="LanguageOption" type="OptionButton" parent="CenterContainer/Panel/MarginContainer/RootVBox/LanguageRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+item_count = 3
+popup/item_0/text = "English"
+popup/item_1/text = "繁體中文"
+popup/item_2/text = "简体中文"
+
+[node name="HSeparator6" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/RootVBox"]
+layout_mode = 2
+
 [node name="DisplayLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/RootVBox" unique_id=1200000023]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
