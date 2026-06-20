@@ -38,7 +38,7 @@ size_flags_vertical = 3
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
-text = "Fatal Boot Error"
+text = "UI_FATAL_ERROR_TITLE"
 horizontal_alignment = 1
 
 [node name="ErrorList" type="RichTextLabel" parent="RootVBox" unique_id=1106122367]
@@ -62,14 +62,14 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Quit"
+text = "UI_QUIT"
 
 [node name="CopyButton" type="Button" parent="RootVBox/ButtonsHBox" unique_id=1274697247]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Copy Errors"
+text = "UI_COPY_ERRORS"
 
 [node name="SpacerBottom" type="Control" parent="RootVBox" unique_id=702391882]
 layout_mode = 2

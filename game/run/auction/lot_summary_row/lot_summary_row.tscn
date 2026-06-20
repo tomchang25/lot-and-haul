@@ -4,6 +4,6 @@
 
 [node name="LotSummaryRow" type="Label"]
 theme_override_font_sizes/font_size = 15
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 horizontal_alignment = 1
 script = ExtResource("1_script")

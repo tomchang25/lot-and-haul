@@ -15,7 +15,7 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(120, 36)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Customers:"
+text = "UI_CUSTOMERS_LABEL"
 vertical_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="HBox"]
@@ -32,5 +32,5 @@ theme_override_constants/separation = 6
 [node name="QueuePlaceholderLabel" type="Label" parent="HBox/ScrollContainer/TabsRow"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "No customers loaded"
+text = "UI_NO_CUSTOMERS"
 vertical_alignment = 1

@@ -4,5 +4,5 @@
 
 [node name="BidHistoryRow" type="Label"]
 theme_override_font_sizes/font_size = 14
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 script = ExtResource("1_script")

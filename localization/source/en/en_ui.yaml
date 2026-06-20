@@ -1,52 +1,188 @@
 en:
-  UI_SETTINGS_TITLE: Settings
-  UI_SETTINGS_AUDIO: Audio
-  UI_SETTINGS_LANGUAGE: Language
-  UI_SETTINGS_DISPLAY: Display
-  UI_SETTINGS_GAMEPLAY: Gameplay
-  UI_SETTINGS_MASTER: Master
-  UI_SETTINGS_SFX: SFX
-  UI_SETTINGS_MUSIC: Music
-  UI_SETTINGS_FULLSCREEN: Fullscreen
-  UI_SETTINGS_DEBUG_MODE: Debug Mode
-  UI_SETTINGS_SKIP_TUTORIALS: Skip Tutorials
-  UI_SETTINGS_CLOSE: Close
-  UI_SETTINGS_RETURN_TO_MAIN_MENU: Return to Main Menu
-  UI_SETTINGS_CONFIRM_SKIP_TITLE: Skip all remaining tutorials?
-  UI_SETTINGS_CONFIRM_SKIP_BODY: Tutorials will no longer auto-start. You can turn them back on anytime in Settings.
-  UI_SETTINGS_YES: "Yes"
-  UI_SETTINGS_NO: "No"
-  UI_SETTINGS_ENGLISH: English
-  UI_SETTINGS_TRADITIONAL_CHINESE: 繁體中文
-  UI_SETTINGS_SIMPLIFIED_CHINESE: 简体中文
-  UI_START_TITLE: Lot & Haul
-  UI_START_NEW_GAME: New Game
-  UI_START_LOAD_GAME: Load Game
-  UI_START_SETTINGS: Settings
-  UI_START_QUIT: Quit
-  UI_STORAGE_TITLE: Storage
-  UI_DAY_SUMMARY_TITLE: Day Summary
-  UI_HUB_TITLE: Hub
-  UI_KNOWLEDGE_TITLE: Knowledge
-  UI_LOCATION_SELECT_TITLE: Select Location
-  UI_VEHICLE_TITLE: Vehicle
-  UI_CUSTOMER_SELL_TITLE: Sell to Customer
-  UI_AUCTION_TITLE: Auction
-  UI_CARGO_TITLE: Cargo
-  UI_INSPECTION_TITLE: Inspect
-  UI_LOT_BROWSE_TITLE: Browse Lots
-  UI_REVEAL_TITLE: Reveal
-  UI_RUN_REVIEW_TITLE: Run Review
-  UI_LOCATION_ENTRY_TITLE: Enter Location
-  UI_FATAL_ERROR_TITLE: Fatal Error
-  SYS_UNKNOWN_PLACEHOLDER: ???
-  SYS_UNKNOWN_ITEM: Unknown Item
-  SYS_UNKNOWN_FORMAT: Unknown %s
   SYS_CONDITION_FORMAT: "Condition: %s (%s)"
-  SYS_WEIGHT_FORMAT: "%.1f kg"
-  SYS_STACK_FORMAT: "%d  %s"
   SYS_PERCENT_FORMAT: "%d%%"
   SYS_RARITY_COMMON: Common
-  SYS_RARITY_UNCOMMON: Uncommon
-  SYS_RARITY_RARE: Rare
   SYS_RARITY_LEGENDARY: Legendary
+  SYS_RARITY_RARE: Rare
+  SYS_RARITY_UNCOMMON: Uncommon
+  SYS_STACK_FORMAT: "%d  %s"
+  SYS_UNKNOWN_FORMAT: "Unknown %s"
+  SYS_UNKNOWN_ITEM: Unknown Item
+  SYS_UNKNOWN_PLACEHOLDER: "???"
+  SYS_WEIGHT_FORMAT: "%.1f kg"
+  UI_ACTIONS_HEADER: ACTIONS
+  UI_ACTIVE: ACTIVE
+  UI_ACTIVE_TASKS: Active · Tasks
+  UI_ACTIVITY: Activity
+  UI_AGGRESSIVE: Aggressive
+  UI_ALL_LOTS_REVIEWED: All lots reviewed. Ready to load cargo.
+  UI_AP_LABEL: "AP:  0 / 10"
+  UI_ATTRIBUTES: Attributes
+  UI_AUCTION_TITLE: Auction
+  UI_AUTH: ● AUTH
+  UI_AUTHENTICATED: ● AUTHENTICATED
+  UI_BACK: Back
+  UI_BACK_TO_HUB: Back to Hub
+  UI_BALANCE_LABEL: "Balance:   $0"
+  UI_BAND_BAD: "2-4: Bad (x0.7)"
+  UI_BAND_BIG_WIN: "10-12: Big Win (x1.5)"
+  UI_BAND_SOLID: "5-9: Solid (x1.1)"
+  UI_BID: Bid
+  UI_BUDGET_LABEL: "Budget: $0"
+  UI_BUY: Buy
+  UI_CANCEL: Cancel
+  UI_CAPACITY_LABEL: "Capacity: ???"
+  UI_CARGO_MANIFEST: ▼ Cargo Manifest
+  UI_CARGO_TITLE: Cargo
+  UI_CAR_CARGO: Car cargo
+  UI_CAR_SHOP: Car Shop
+  UI_CAR_TOTAL_LABEL: "Car total: $0"
+  UI_CATEGORIES_LABEL: "Categories: —"
+  UI_CHOOSE_ACTIVITY: Choose Activity
+  UI_CLEAR_CAR: Clear Car
+  UI_CLICK_TO_VIEW: Click an item to view details
+  UI_CLOSE_SHOP: Close Shop
+  UI_CLOSE_X: ✕
+  UI_CLUES_HEADER: CLUES
+  UI_CLUE_RESULTS: Clue Results
+  UI_CONDITION: Condition
+  UI_CONFIRM: Confirm
+  UI_CONFIRM_DICE: Confirm Dice
+  UI_CONFIRM_SALE: Confirm Sale
+  UI_CONSERVATIVE: Conservative
+  UI_CONTINUE: Continue
+  UI_CONTINUE_TITLE: "Continue?"
+  UI_COPY_ERRORS: Copy Errors
+  UI_COUNT_UNKNOWN: "×?"
+  UI_CURRENCY_LABEL: $0
+  UI_CUSTOMERS_LABEL: "Customers:"
+  UI_CUSTOMER_NAME: Customer Name
+  UI_CUSTOMER_SALES: Customer Sales
+  UI_CUSTOMER_SELL_TITLE: Sell to Customer
+  UI_DAILY: Daily
+  UI_DAY_LABEL: Day 1
+  UI_DAY_PHASE_LABEL: "Day 0   |   > Day  - Night"
+  UI_DAY_SUMMARY_TITLE: Day Summary
+  UI_DEBUG_ADD_RANDOM: Add Random Item
+  UI_DEBUG_CLEAR_STORAGE: Clear All Storage
+  UI_DEBUG_LABEL: "[DEBUG]"
+  UI_DICE_ROLL_RESULTS: Dice Roll Results
+  UI_EM_DASH: —
+  UI_ENTER: Enter
+  UI_ENTRY_FEE_LABEL: "Entry Fee:   $0"
+  UI_EST_COST_LABEL: "Est. Cost:   $0"
+  UI_EST_VALUE: Est. Value
+  UI_EXTRA_CATEGORY_LABEL: "Extra Category: —"
+  UI_FATAL_ERROR_TITLE: Fatal Error
+  UI_FUEL_LABEL: "Fuel:   $0"
+  UI_GARAGE: Garage
+  UI_GRID_UNKNOWN: "G: ???"
+  UI_HUB_TITLE: Hub
+  UI_INSPECTION_TITLE: Inspect
+  UI_INSPECT_CLUES_ACTION: Inspect Clues (2 AP)
+  UI_ITEM_DETAILS: Item Details
+  UI_KNOWLEDGE_TITLE: Knowledge
+  UI_LABEL_SEPARATOR: " - "
+  UI_LEAVE_WORKSHOP: Leave Workshop
+  UI_LOCATION_ENTRY_TITLE: Enter Location
+  UI_LOCATION_SELECT_TITLE: Select Location
+  UI_LOTS_LABEL: "Lots:   0"
+  UI_LOT_BROWSE_TITLE: Browse Lots
+  UI_LOT_NUMBER: Lot 1 / 1
+  UI_LOT_REVIEW: LOT REVIEW
+  UI_MASTERY: Mastery
+  UI_MASTERY_RANK_LABEL: "Mastery Rank: -"
+  UI_NO_CUSTOMERS: No customers loaded
+  UI_NO_CUSTOMERS_TONIGHT: No customers tonight.
+  UI_NO_INSPECTION_AVAILABLE: No further inspection available
+  UI_NO_ITEMS: No items.
+  UI_NO_ITEM_SELECTED: No item selected
+  UI_NO_MATCHING_ITEMS: No matching items loaded.
+  UI_OK: OK
+  UI_OPENING_BID: OPENING BID
+  UI_PASS: Pass
+  UI_PASS_LOT_CONFIRM: "Are you sure you want to pass this lot?"
+  UI_PASS_LOT_TITLE: Pass Lot
+  UI_PERKS: Perks
+  UI_PRICE_CONVERGENCE: Price convergence
+  UI_PRICE_LABEL: "Price: $-"
+  UI_QUESTION_MARK: "?"
+  UI_QUIT: Quit
+  UI_RARITY_LABEL: "Rarity: —"
+  UI_REPAIR: Repair
+  UI_RESEARCH: Research
+  UI_RESET: Reset
+  UI_RESTORE: Restore
+  UI_REVEAL_NEXT: Reveal Next
+  UI_REVEAL_TITLE: Reveal
+  UI_REVIEW_LOT: Review Lot
+  UI_ROLLING_DICE: Rolling 4 dice...
+  UI_RUN_REVIEW_TITLE: Run Review
+  UI_SALE_RESULT: Sale Result
+  UI_SELECT: Select
+  UI_SELECTED: Selected
+  UI_SELECTED_ITEM: Selected Item
+  UI_SELECT_DICE: Select 2 dice to keep
+  UI_SELECT_TO_INSPECT: Select an item to inspect.
+  UI_SELL: Sell
+  UI_SELL_STRATEGY: Sell Strategy
+  UI_SETTINGS_AUDIO: Audio
+  UI_SETTINGS_CLOSE: Close
+  UI_SETTINGS_CONFIRM_SKIP_BODY: Tutorials will no longer auto-start. You can turn them back on anytime in Settings.
+  UI_SETTINGS_CONFIRM_SKIP_LABEL: "Skip all remaining tutorials?\n\nTutorials will no longer auto-start. You can turn them back on anytime in Settings."
+  UI_SETTINGS_CONFIRM_SKIP_TITLE: "Skip all remaining tutorials?"
+  UI_SETTINGS_DEBUG_MODE: Debug Mode
+  UI_SETTINGS_DISPLAY: Display
+  UI_SETTINGS_ENGLISH: English
+  UI_SETTINGS_FULLSCREEN: Fullscreen
+  UI_SETTINGS_GAMEPLAY: Gameplay
+  UI_SETTINGS_ICON: ⚙
+  UI_SETTINGS_LANGUAGE: Language
+  UI_SETTINGS_MASTER: Master
+  UI_SETTINGS_MUSIC: Music
+  UI_SETTINGS_NO: No
+  UI_SETTINGS_RETURN_TO_MAIN_MENU: Return to Main Menu
+  UI_SETTINGS_SFX: SFX
+  UI_SETTINGS_SIMPLIFIED_CHINESE: 简体中文
+  UI_SETTINGS_SKIP_TUTORIALS: Skip Tutorials
+  UI_SETTINGS_TITLE: Settings
+  UI_SETTINGS_TRADITIONAL_CHINESE: 繁體中文
+  UI_SETTINGS_YES: Yes
+  UI_SETTLEMENT: Settlement
+  UI_SKIP_CARGO_CONFIRM: "Skip the remaining lots and go straight to cargo?"
+  UI_SKIP_TO_CARGO: Skip to Cargo
+  UI_SKIP_TO_CARGO_TITLE: Skip to Cargo
+  UI_SOLD_LABEL: " SOLD! "
+  UI_SORT_ASC: ▲
+  UI_SORT_LABEL: "Sort:"
+  UI_START_AUCTION: Start Auction
+  UI_START_BACK: Back
+  UI_START_LOAD_GAME: Load Game
+  UI_START_NEW_GAME: New Game
+  UI_START_NEW_GAME_CONFIRM: Start New Game
+  UI_START_NEW_GAME_CONFIRM_BODY: "Start a new game? Current progress will be lost."
+  UI_START_OVERWRITE: Overwrite
+  UI_START_OVERWRITE_BODY: All progress in this slot will be lost.
+  UI_START_OVERWRITE_SLOT_TITLE: Overwrite Slot
+  UI_START_QUIT: Quit
+  UI_START_SELECT_SLOT: Select Slot
+  UI_START_SETTINGS: Settings
+  UI_START_TITLE: "Lot & Haul"
+  UI_STORAGE_COUNT_LABEL: "Storage:   0 items"
+  UI_STORAGE_TITLE: Storage
+  UI_SUM_LABEL: "Sum: —"
+  UI_TASK_COUNT: 0/4
+  UI_TOTAL_ESTIMATE: TOTAL ESTIMATE
+  UI_TOTAL_LABEL: "Total: —"
+  UI_TRAILER: Trailer
+  UI_TRAVEL_LABEL: "Travel:   1 day"
+  UI_TRIP: Trip
+  UI_UNVEIL_ACTION: Unveil (1 AP)
+  UI_UPGRADE: Upgrade
+  UI_VEHICLE_TITLE: Vehicle
+  UI_VERIFIED_LABEL: "Verified: 0 / 0"
+  UI_VIEW_CARDS: Cards
+  UI_VIEW_TABLE: Table
+  UI_WANTS_LABEL: "Wants: -"
+  UI_WEIGHT_UNKNOWN: "W: ???"
+  UI_ZERO_ITEMS: 0 items

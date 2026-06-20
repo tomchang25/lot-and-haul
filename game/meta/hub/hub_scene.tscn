@@ -37,7 +37,7 @@ alignment = 1
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
-text = "Hub"
+text = "UI_HUB_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -45,7 +45,7 @@ vertical_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 0.7, 1, 1)
 theme_override_font_sizes/font_size = 18
-text = "Mastery Rank:   0"
+text = "UI_MASTERY_RANK_LABEL"
 horizontal_alignment = 1
 
 [node name="InfoContainer" type="VBoxContainer" parent="RootVBox" unique_id=1000000005]
@@ -56,13 +56,13 @@ theme_override_constants/separation = 8
 [node name="BalanceLabel" type="Label" parent="RootVBox/InfoContainer" unique_id=1000000006]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "Balance:   $0"
+text = "UI_BALANCE_LABEL"
 horizontal_alignment = 1
 
 [node name="StorageCountLabel" type="Label" parent="RootVBox/InfoContainer" unique_id=1000000007]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Storage:   0 items"
+text = "UI_STORAGE_COUNT_LABEL"
 horizontal_alignment = 1
 
 [node name="SlotLabel" type="Label" parent="RootVBox" unique_id=1000000014]
@@ -70,7 +70,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.75, 0.85, 1, 1)
 theme_override_font_sizes/font_size = 16
-text = "Day 0   |   > Day  - Night"
+text = "UI_DAY_PHASE_LABEL"
 horizontal_alignment = 1
 
 [node name="ButtonsVBox" type="VBoxContainer" parent="RootVBox" unique_id=1000000008]
@@ -83,21 +83,21 @@ alignment = 1
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Activity"
+text = "UI_ACTIVITY"
 script = ExtResource("99_sfx")
 
 [node name="VehicleButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000012]
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Vehicle"
+text = "UI_VEHICLE_TITLE"
 script = ExtResource("99_sfx")
 
 [node name="KnowledgeButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1000000013]
 custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Knowledge"
+text = "UI_KNOWLEDGE_TITLE"
 script = ExtResource("99_sfx")
 
 [node name="SettingsButtonOverlay" parent="." unique_id=216254243 instance=ExtResource("2_sbo")]
@@ -138,33 +138,33 @@ theme_override_constants/separation = 12
 custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "Choose Activity"
+text = "UI_CHOOSE_ACTIVITY"
 horizontal_alignment = 1
 
 [node name="AuctionButton" type="Button" parent="ActivityChooser/ChooserMargin/PopupVBox" unique_id=1000000022]
 custom_minimum_size = Vector2(240, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Auction"
+text = "UI_AUCTION_TITLE"
 script = ExtResource("99_sfx")
 
 [node name="StorageButton" type="Button" parent="ActivityChooser/ChooserMargin/PopupVBox" unique_id=1000000023]
 custom_minimum_size = Vector2(240, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Storage"
+text = "UI_STORAGE_TITLE"
 script = ExtResource("99_sfx")
 
 [node name="SellingButton" type="Button" parent="ActivityChooser/ChooserMargin/PopupVBox" unique_id=1000000024]
 custom_minimum_size = Vector2(240, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Sell"
+text = "UI_SELL"
 script = ExtResource("99_sfx")
 
 [node name="CancelButton" type="Button" parent="ActivityChooser/ChooserMargin/PopupVBox" unique_id=1000000025]
 custom_minimum_size = Vector2(240, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Cancel"
+text = "UI_CANCEL"
 script = ExtResource("99_sfx")

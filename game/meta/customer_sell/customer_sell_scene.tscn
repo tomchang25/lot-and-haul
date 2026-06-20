@@ -46,7 +46,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Day 1"
+text = "UI_DAY_LABEL"
 vertical_alignment = 1
 
 [node name="BackButton" type="Button" parent="RootVBox/HeaderRow" unique_id=720366815]
@@ -55,7 +55,7 @@ custom_minimum_size = Vector2(120, 36)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_font_sizes/font_size = 14
-text = "  Back to Hub"
+text = "UI_BACK_TO_HUB"
 script = ExtResource("99_sfx")
 
 [node name="TitleLabel" type="Label" parent="RootVBox/HeaderRow" unique_id=1218286169]
@@ -63,7 +63,7 @@ custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 28
-text = "Night Market"
+text = "UI_CUSTOMER_SELL_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -128,7 +128,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 24
-text = "No customers tonight."
+text = "UI_NO_CUSTOMERS_TONIGHT"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -138,7 +138,7 @@ custom_minimum_size = Vector2(180, 44)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 16
-text = "Close Shop"
+text = "UI_CLOSE_SHOP"
 script = ExtResource("99_sfx")
 
 [node name="SaleReceiptDialog" parent="." unique_id=215182387 instance=ExtResource("8_srd")]

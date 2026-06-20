@@ -34,7 +34,7 @@ offset_right = -8.0
 offset_bottom = 8.0
 grow_horizontal = 0
 theme_override_font_sizes/font_size = 16
-text = "Budget: $0"
+text = "UI_BUDGET_LABEL"
 horizontal_alignment = 2
 
 [node name="RootVBox" type="VBoxContainer" parent="." unique_id=443503367]
@@ -65,7 +65,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 42
-text = "$0"
+text = "UI_CURRENCY_LABEL"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -92,12 +92,12 @@ alignment = 1
 script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
-text = "Pass"
+text = "UI_PASS"
 
 [node name="BidButton" type="Button" parent="RootVBox/ButtonBar" unique_id=702685876]
 script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
-text = "Bid"
+text = "UI_BID"
 
 [node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]

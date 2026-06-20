@@ -138,7 +138,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.92, 0.95, 1)
 theme_override_font_sizes/font_size = 20
-text = "LOT REVIEW"
+text = "UI_LOT_REVIEW"
 
 [node name="HeaderSpacer" type="Control" parent="PopupPanel/PopupMargin/VBox/HeaderRow" unique_id=213199609]
 layout_mode = 2
@@ -179,7 +179,7 @@ theme_override_constants/separation = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 10
-text = "TOTAL ESTIMATE"
+text = "UI_TOTAL_ESTIMATE"
 
 [node name="TotalEstimateLabel" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/EstimateCard/EstimateContent" unique_id=1128001547]
 unique_name_in_owner = true
@@ -199,7 +199,7 @@ theme_override_constants/separation = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 10
-text = "OPENING BID"
+text = "UI_OPENING_BID"
 
 [node name="OpeningBidLabel" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/BidCard/BidContent" unique_id=1165743760]
 unique_name_in_owner = true
@@ -228,7 +228,7 @@ size_flags_horizontal = 3
 unique_name_in_owner = true
 custom_minimum_size = Vector2(130, 0)
 layout_mode = 2
-text = "Back"
+text = "UI_BACK"
 
 [node name="StartAuctionButton" type="Button" parent="PopupPanel/PopupMargin/VBox/FooterActions" unique_id=1395598753]
 unique_name_in_owner = true
@@ -241,4 +241,4 @@ theme_override_colors/font_disabled_color = Color(0.35, 0.5, 0.35, 1)
 theme_override_styles/normal = SubResource("accent_btn_normal")
 theme_override_styles/pressed = SubResource("accent_btn_pressed")
 theme_override_styles/hover = SubResource("accent_btn_hover")
-text = "Start Auction"
+text = "UI_START_AUCTION"

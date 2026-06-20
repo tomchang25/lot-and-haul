@@ -14,7 +14,7 @@ theme_override_constants/separation = 6
 [node name="TitleLabel" type="Label" parent="VBox" unique_id=1624744891]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Sell Strategy"
+text = "UI_SELL_STRATEGY"
 vertical_alignment = 1
 
 [node name="BodyRow" type="HBoxContainer" parent="VBox" unique_id=2114897575]
@@ -31,7 +31,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
-text = "Conservative"
+text = "UI_CONSERVATIVE"
 script = ExtResource("2_sfx")
 
 [node name="AggressiveButton" type="Button" parent="VBox/BodyRow/ButtonColumn" unique_id=1708635709]
@@ -39,7 +39,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
-text = "Aggressive"
+text = "UI_AGGRESSIVE"
 script = ExtResource("2_sfx")
 
 [node name="DiceSection" type="VBoxContainer" parent="VBox/BodyRow" unique_id=2136538789]
@@ -52,21 +52,21 @@ theme_override_constants/separation = 4
 [node name="DiceTitleLabel" type="Label" parent="VBox/BodyRow/DiceSection" unique_id=349120602]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Dice Roll Results"
+text = "UI_DICE_ROLL_RESULTS"
 
 [node name="PoolSizeLabel" type="Label" parent="VBox/BodyRow/DiceSection" unique_id=1687404000]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
-text = "Rolling 4 dice..."
+text = "UI_ROLLING_DICE"
 
 [node name="DiceHint" type="Label" parent="VBox/BodyRow/DiceSection" unique_id=569091747]
 unique_name_in_owner = true
 modulate = Color(0.7, 0.7, 0.7, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
-text = "Select 2 dice to keep"
+text = "UI_SELECT_DICE"
 
 [node name="DiceRow" type="HFlowContainer" parent="VBox/BodyRow/DiceSection" unique_id=1594438907]
 unique_name_in_owner = true
@@ -81,14 +81,14 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
-text = "Sum: —"
+text = "UI_SUM_LABEL"
 
 [node name="DiceTotalLabel" type="Label" parent="VBox/BodyRow/DiceSection/DiceTotalsRow" unique_id=1941889040]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
-text = "Total: —"
+text = "UI_TOTAL_LABEL"
 horizontal_alignment = 2
 
 [node name="MultiplierBands" type="HBoxContainer" parent="VBox/BodyRow/DiceSection" unique_id=1687404001]
@@ -101,7 +101,7 @@ custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 11
-text = "2-4: Bad (x0.7)"
+text = "UI_BAND_BAD"
 horizontal_alignment = 1
 
 [node name="Band5_9" type="Label" parent="VBox/BodyRow/DiceSection/MultiplierBands" unique_id=1687404003]
@@ -110,7 +110,7 @@ custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 11
-text = "5-9: Solid (x1.1)"
+text = "UI_BAND_SOLID"
 horizontal_alignment = 1
 
 [node name="Band10_12" type="Label" parent="VBox/BodyRow/DiceSection/MultiplierBands" unique_id=1687404004]
@@ -119,7 +119,7 @@ custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 11
-text = "10-12: Big Win (x1.5)"
+text = "UI_BAND_BIG_WIN"
 horizontal_alignment = 1
 
 [node name="DiceBtnRow" type="HBoxContainer" parent="VBox/BodyRow/DiceSection" unique_id=1560005387]
@@ -129,12 +129,12 @@ theme_override_constants/separation = 8
 [node name="CancelDiceButton" type="Button" parent="VBox/BodyRow/DiceSection/DiceBtnRow" unique_id=649169907]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Cancel"
+text = "UI_CANCEL"
 script = ExtResource("2_sfx")
 
 [node name="ConfirmDiceButton" type="Button" parent="VBox/BodyRow/DiceSection/DiceBtnRow" unique_id=248845062]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
-text = "Confirm Dice"
+text = "UI_CONFIRM_DICE"
 script = ExtResource("2_sfx")

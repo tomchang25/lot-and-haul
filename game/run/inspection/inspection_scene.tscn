@@ -109,7 +109,7 @@ theme_override_constants/separation = 12
 [node name="TitleLabel" type="Label" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=100000006]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "Inspection"
+text = "UI_INSPECTION_TITLE"
 
 [node name="HeaderSpacer" type="Control" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=100000007]
 layout_mode = 2
@@ -159,7 +159,7 @@ size_flags_horizontal = 3
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
-text = "Pass"
+text = "UI_PASS"
 script = ExtResource("99_sfx")
 
 [node name="ReviewButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=1061694818]
@@ -173,7 +173,7 @@ theme_override_colors/font_disabled_color = Color(0.35, 0.5, 0.35, 1)
 theme_override_styles/normal = SubResource("accent_btn_normal")
 theme_override_styles/pressed = SubResource("accent_btn_pressed")
 theme_override_styles/hover = SubResource("accent_btn_hover")
-text = "Review Lot"
+text = "UI_REVIEW_LOT"
 script = ExtResource("99_sfx")
 
 [node name="SidebarSep" type="VSeparator" parent="RootHBox" unique_id=100000020]
@@ -202,7 +202,7 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
 theme_override_font_sizes/font_size = 12
-text = "Select an item to inspect."
+text = "UI_SELECT_TO_INSPECT"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -216,7 +216,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 11
-text = "Clue Results"
+text = "UI_CLUE_RESULTS"
 
 [node name="ClueResultLabel" type="RichTextLabel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ClueResultSection" unique_id=1564928163]
 unique_name_in_owner = true
@@ -238,7 +238,7 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 11
-text = "Selected Item"
+text = "UI_SELECTED_ITEM"
 
 [node name="HoverNameLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000043]
 unique_name_in_owner = true
@@ -274,7 +274,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 9
-text = "Condition"
+text = "UI_CONDITION"
 
 [node name="CondValueLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ConditionPanel/CondMargin/CondVBox" unique_id=100000050]
 unique_name_in_owner = true
@@ -300,7 +300,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 9
-text = "Est. Value"
+text = "UI_EST_VALUE"
 
 [node name="ValueValueLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ValuePanel/ValueMargin/ValueVBox" unique_id=100000055]
 unique_name_in_owner = true
@@ -321,7 +321,7 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.58, 0.63, 1)
 theme_override_font_sizes/font_size = 10
-text = "CLUES"
+text = "UI_CLUES_HEADER"
 
 [node name="ClueRows" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/CluesVBox" unique_id=100000093]
 unique_name_in_owner = true
@@ -339,21 +339,21 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.58, 0.63, 1)
 theme_override_font_sizes/font_size = 10
-text = "ACTIONS"
+text = "UI_ACTIONS_HEADER"
 
 [node name="UnveilButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ActionSection" unique_id=100000103]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Unveil (1 AP)"
+text = "UI_UNVEIL_ACTION"
 
 [node name="InspectCluesButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ActionSection" unique_id=100000104]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Inspect Clues (2 AP)"
+text = "UI_INSPECT_CLUES_ACTION"
 
 [node name="ActionCompleteLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ActionSection" unique_id=100000105]
 unique_name_in_owner = true
@@ -361,7 +361,7 @@ visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
 theme_override_font_sizes/font_size = 12
-text = "No further inspection available"
+text = "UI_NO_INSPECTION_AVAILABLE"
 
 [node name="SummaryPopup" parent="." unique_id=1462834888 instance=ExtResource("4_summary")]
 unique_name_in_owner = true
@@ -369,9 +369,9 @@ visible = false
 
 [node name="PassConfirmPopup" type="ConfirmationDialog" parent="." unique_id=1602018568]
 unique_name_in_owner = true
-title = "Pass Lot"
+title = "UI_PASS_LOT_TITLE"
 initial_position = 2
 size = Vector2i(360, 120)
-dialog_text = "Are you sure you want to pass this lot?"
+dialog_text = "UI_PASS_LOT_CONFIRM"
 
 [node name="SettingsButtonOverlay" parent="." unique_id=1558973680 instance=ExtResource("5_sbo")]

@@ -34,7 +34,7 @@ grow_vertical = 2
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Day Summary"
+text = "UI_DAY_SUMMARY_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -73,7 +73,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 16
-text = "Trip"
+text = "UI_TRIP"
 
 [node name="OnsiteLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup" unique_id=1725687769]
 layout_mode = 2
@@ -99,7 +99,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 16
-text = "Customer Sales"
+text = "UI_CUSTOMER_SALES"
 
 [node name="ConservativeLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup" unique_id=262069269]
 layout_mode = 2
@@ -121,7 +121,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 16
-text = "Daily"
+text = "UI_DAILY"
 
 [node name="LivingLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup" unique_id=1394461495]
 layout_mode = 2
@@ -135,7 +135,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 16
-text = "Cargo"
+text = "UI_CARGO_TITLE"
 
 [node name="CargoCountLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CargoGroup" unique_id=417052490]
 layout_mode = 2
@@ -164,6 +164,6 @@ script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(160, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Continue"
+text = "UI_CONTINUE"
 
 [node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]

@@ -25,6 +25,11 @@ Rules:
 - 2026-06-20 — [tutorial] Onboarding split into independently-triggered per-scene units so skipping one segment no longer breaks others; scenes read tutorial state from Director instead of game managers; RunStore disable_npc_bids removed (schema v3) — NPC bid suppression is now Director-driven, not persisted
 - 2026-06-20 — [tutorial] GameplayOverride runtime store decouples gameplay gates from tutorial flow state; scenes read overrides instead of calling Director query methods; skip-all-tutorials toggle with confirm dialogs added
 
+### Localization UI Translation
+
+- 2026-06-20 — [i18n] All ~44 gameplay scene files migrated from hardcoded English `text="..."` properties to `UI_*` / `SYS_*` translation keys across settings, hub, storage, knowledge, vehicle, location, customer sell, auction, cargo, inspection, lot browse, reveal, run review, and shared components
+- 2026-06-20 — [i18n] Added ~126 new UI translation keys to en/zh_TW/zh_CN locale source files with seed translations; regenerated ui.csv with 187 total keys
+
 ### Run Phase Persistence
 
 - 2026-06-19 — [run] Mid-run quit now resumes at the last phase scene with escrowed run economics intact; bids enforce the effective-cash budget and the day slot never advances without a restorable run
