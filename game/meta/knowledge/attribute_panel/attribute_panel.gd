@@ -24,7 +24,7 @@ func _build_content() -> void:
     var attrs: Array[AttributeData] = KnowledgeManager.get_all_attributes()
     if attrs.is_empty():
         var empty := Label.new()
-        empty.text = "No attributes found"
+        empty.text = TranslationServer.translate("UI_NO_ATTRIBUTES")
 
         # node-src: ephemeral — empty-state label
         _content.add_child(empty)

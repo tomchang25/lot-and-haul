@@ -74,10 +74,10 @@ func _ready() -> void:
     _customers = MetaManager.customers.nightly_customers.duplicate()
 
     if _customers.is_empty():
-        _show_empty_state("No customers tonight.")
+        _show_empty_state(TranslationServer.translate("UI_NO_CUSTOMERS_TONIGHT"))
         return
 
-    _day_label.text = "Day %d" % MetaManager.progress.current_day
+    _day_label.text = TranslationServer.translate("UI_DAY_LABEL") % MetaManager.progress.current_day
     _customer_queue.setup(_customers)
     _customer_queue.set_selected(0)
     _suppress_placement_update = true
@@ -274,7 +274,7 @@ func _on_receipt_confirmed(price: int, strategy: String) -> void:
     _preview_entry = null
 
     if _customers.is_empty():
-        _show_empty_state("All customers served! End of night.")
+        _show_empty_state(TranslationServer.translate("UI_ALL_CUSTOMERS_SERVED"))
         _customer_queue.hide()
         return
 

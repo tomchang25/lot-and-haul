@@ -31,7 +31,7 @@ func _build_content() -> void:
     var perks: Array[PerkData] = KnowledgeManager.get_all_perks()
     if perks.is_empty():
         var empty := Label.new()
-        empty.text = "No perks discovered"
+        empty.text = TranslationServer.translate("UI_NO_PERKS")
 
         # node-src: ephemeral — empty-state label
         _content.add_child(empty)

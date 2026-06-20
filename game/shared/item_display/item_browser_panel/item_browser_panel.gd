@@ -228,7 +228,7 @@ func _refresh_visibility() -> void:
     _table_panel.visible = has_entries and in_table
     _empty_label.visible = not has_entries
     if not has_entries:
-        _empty_label.text = "No items."
+        _empty_label.text = TranslationServer.translate("UI_NO_ITEMS")
     _sort_hbox.visible = has_entries and in_card and not _columns.is_empty()
 
 
@@ -278,7 +278,12 @@ func _sort_entries() -> void:
 func _rebuild_sort_options() -> void:
     _sort_option_button.clear()
     for col in _columns:
-        var text: String = ItemRow.COLUMN_HEADERS.get(col, "?")
+        var key: String = ItemRow.COLUMN_HEADERS.get(col, "?")
+        var text: String
+        if key != "?":
+            text = TranslationServer.translate(key)
+        else:
+            text = "?"
         _sort_option_button.add_item(text, col)
     _sync_sort_ui()
 

@@ -32,7 +32,7 @@ func _on_back_pressed() -> void:
 
 
 func _build_content() -> void:
-    _heading_label.text = "Mastery Rank: %d" % KnowledgeManager.get_mastery_rank()
+    _heading_label.text = TranslationServer.translate("UI_MASTERY_RANK_LABEL") % KnowledgeManager.get_mastery_rank()
 
     for sc: SuperCategoryData in SuperCategoryRegistry.get_all_super_categories():
         var sc_rank: int = KnowledgeManager.get_super_category_rank(sc)
@@ -45,10 +45,10 @@ func _build_content() -> void:
 
             var progress_text: String
             if rank >= 5:
-                progress_text = "MAX"
+                progress_text = TranslationServer.translate("UI_MASTERY_MAX")
             else:
                 var next_threshold: int = KnowledgeManager.RANK_THRESHOLDS[rank + 1]
-                progress_text = "%d / %d" % [points, next_threshold]
+                progress_text = TranslationServer.translate("UI_PROGRESS_FORMAT") % [points, next_threshold]
 
             category_lines.append(
                 "    %s — %s  (rank %d)" % [TranslationServer.translate(cat.display_name_key), progress_text, rank],

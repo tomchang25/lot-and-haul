@@ -5,27 +5,27 @@ en:
   UI_ACTIVITY: Activity
   UI_AGGRESSIVE: Aggressive
   UI_ALL_LOTS_REVIEWED: All lots reviewed. Ready to load cargo.
-  UI_AP_LABEL: "AP:  0 / 10"
+  UI_AP_LABEL: "AP:  %d / %d"
   UI_ATTRIBUTES: Attributes
   UI_AUCTION_TITLE: Auction
   UI_AUTH: ● AUTH
   UI_AUTHENTICATED: ● AUTHENTICATED
   UI_BACK: Back
   UI_BACK_TO_HUB: Back to Hub
-  UI_BALANCE_LABEL: "Balance:   $0"
+  UI_BALANCE_LABEL: "Balance:   $%d"
   UI_BAND_BAD: "2-4: Bad (x0.7)"
   UI_BAND_BIG_WIN: "10-12: Big Win (x1.5)"
   UI_BAND_SOLID: "5-9: Solid (x1.1)"
   UI_BID: Bid
-  UI_BUDGET_LABEL: "Budget: $0"
+  UI_BUDGET_LABEL: "Budget: $%d"
   UI_BUY: Buy
   UI_CANCEL: Cancel
-  UI_CAPACITY_LABEL: "Capacity: ???"
+  UI_CAPACITY_LABEL: "Capacity: %d\u00d7%d"
   UI_CARGO_MANIFEST: ▼ Cargo Manifest
   UI_CARGO_TITLE: Cargo
   UI_CAR_CARGO: Car cargo
   UI_CAR_SHOP: Car Shop
-  UI_CAR_TOTAL_LABEL: "Car total: $0"
+  UI_CAR_TOTAL_LABEL: "Car total: $%d"
   UI_CATEGORIES_LABEL: "Categories: —"
   UI_CHOOSE_ACTIVITY: Choose Activity
   UI_CLEAR_CAR: Clear Car
@@ -43,13 +43,13 @@ en:
   UI_CONTINUE_TITLE: "Continue?"
   UI_COPY_ERRORS: Copy Errors
   UI_COUNT_UNKNOWN: "×?"
-  UI_CURRENCY_LABEL: $0
+  UI_CURRENCY_LABEL: $%d
   UI_CUSTOMERS_LABEL: "Customers:"
   UI_CUSTOMER_NAME: Customer Name
   UI_CUSTOMER_SALES: Customer Sales
   UI_CUSTOMER_SELL_TITLE: Sell to Customer
   UI_DAILY: Daily
-  UI_DAY_LABEL: Day 1
+  UI_DAY_LABEL: "Day %d"
   UI_DAY_PHASE_LABEL: "Day 0   |   > Day  - Night"
   UI_DAY_SUMMARY_TITLE: Day Summary
   UI_DEBUG_ADD_RANDOM: Add Random Item
@@ -58,12 +58,12 @@ en:
   UI_DICE_ROLL_RESULTS: Dice Roll Results
   UI_EM_DASH: —
   UI_ENTER: Enter
-  UI_ENTRY_FEE_LABEL: "Entry Fee:   $0"
-  UI_EST_COST_LABEL: "Est. Cost:   $0"
+  UI_ENTRY_FEE_LABEL: "Entry Fee: $%d"
+  UI_EST_COST_LABEL: "Est. Cost: $%d"
   UI_EST_VALUE: Est. Value
   UI_EXTRA_CATEGORY_LABEL: "Extra Category: —"
   UI_FATAL_ERROR_TITLE: Fatal Error
-  UI_FUEL_LABEL: "Fuel:   $0"
+  UI_FUEL_LABEL: "Fuel: $%d"
   UI_GARAGE: Garage
   UI_GRID_UNKNOWN: "G: ???"
   UI_HUB_TITLE: Hub
@@ -75,12 +75,12 @@ en:
   UI_LEAVE_WORKSHOP: Leave Workshop
   UI_LOCATION_ENTRY_TITLE: Enter Location
   UI_LOCATION_SELECT_TITLE: Select Location
-  UI_LOTS_LABEL: "Lots:   0"
+  UI_LOTS_LABEL: "Lots: %d"
   UI_LOT_BROWSE_TITLE: Browse Lots
-  UI_LOT_NUMBER: Lot 1 / 1
+  UI_LOT_NUMBER: "Lot %d / %d"
   UI_LOT_REVIEW: LOT REVIEW
   UI_MASTERY: Mastery
-  UI_MASTERY_RANK_LABEL: "Mastery Rank: -"
+  UI_MASTERY_RANK_LABEL: "Mastery Rank:   %d"
   UI_NO_CUSTOMERS: No customers loaded
   UI_NO_CUSTOMERS_TONIGHT: No customers tonight.
   UI_NO_INSPECTION_AVAILABLE: No further inspection available
@@ -94,7 +94,7 @@ en:
   UI_PASS_LOT_TITLE: Pass Lot
   UI_PERKS: Perks
   UI_PRICE_CONVERGENCE: Price convergence
-  UI_PRICE_LABEL: "Price: $-"
+  UI_PRICE_LABEL: "Price: $%d"
   UI_QUESTION_MARK: "?"
   UI_QUIT: Quit
   UI_RARITY_LABEL: "Rarity: —"
@@ -105,13 +105,13 @@ en:
   UI_REVEAL_NEXT: Reveal Next
   UI_REVEAL_TITLE: Reveal
   UI_REVIEW_LOT: Review Lot
-  UI_ROLLING_DICE: Rolling 4 dice...
+  UI_ROLLING_DICE: Rolling %d dice...
   UI_RUN_REVIEW_TITLE: Run Review
   UI_SALE_RESULT: Sale Result
   UI_SELECT: Select
   UI_SELECTED: Selected
   UI_SELECTED_ITEM: Selected Item
-  UI_SELECT_DICE: Select 2 dice to keep
+  UI_SELECT_DICE: Select %d dice to keep
   UI_SELECT_TO_INSPECT: Select an item to inspect.
   UI_SELL: Sell
   UI_SELL_STRATEGY: Sell Strategy
@@ -138,7 +138,7 @@ en:
   UI_SETTINGS_TRADITIONAL_CHINESE: 繁體中文
   UI_SETTINGS_YES: Yes
   UI_SETTLEMENT: Settlement
-  UI_SKIP_CARGO_CONFIRM: "Skip the remaining lots and go straight to cargo?"
+  UI_SKIP_CARGO_CONFIRM: "Skip the remaining %d lot(s) and go straight to cargo?"
   UI_SKIP_TO_CARGO: Skip to Cargo
   UI_SKIP_TO_CARGO_TITLE: Skip to Cargo
   UI_SOLD_LABEL: " SOLD! "
@@ -157,23 +157,172 @@ en:
   UI_START_SELECT_SLOT: Select Slot
   UI_START_SETTINGS: Settings
   UI_START_TITLE: "Lot & Haul"
-  UI_STORAGE_COUNT_LABEL: "Storage:   0 items"
+  UI_STORAGE_COUNT_LABEL: "Storage:   %d items"
   UI_STORAGE_TITLE: Storage
-  UI_SUM_LABEL: "Sum: —"
+  UI_SUM_LABEL: "Sum: %d (x%.1f)"
   UI_TASK_COUNT: 0/4
   UI_TOTAL_ESTIMATE: TOTAL ESTIMATE
-  UI_TOTAL_LABEL: "Total: —"
+  UI_TOTAL_LABEL: "Total: $%d"
   UI_TRAILER: Trailer
-  UI_TRAVEL_LABEL: "Travel:   1 day"
+  UI_TRAVEL_LABEL: "Travel: %d days"
   UI_TRIP: Trip
   UI_UNVEIL_ACTION: Unveil (1 AP)
   UI_UPGRADE: Upgrade
   UI_UPGRADE_COST_FORMAT: "Upgrade  $%d"
+  UI_SKIP_LABEL: "Skip"
+  UI_SKIP_ALL_LABEL: "Skip All"
+  UI_NEXT_LABEL: "Next"
   UI_NOT_ENOUGH_CASH: Not enough cash
   UI_VEHICLE_TITLE: Vehicle
-  UI_VERIFIED_LABEL: "Verified: 0 / 0"
+  UI_VERIFIED_LABEL: "Verified: %d / %d"
   UI_VIEW_CARDS: Cards
   UI_VIEW_TABLE: Table
-  UI_WANTS_LABEL: "Wants: -"
+  UI_WANTS_LABEL: "Wants: %s"
   UI_WEIGHT_UNKNOWN: "W: ???"
-  UI_ZERO_ITEMS: 0 items
+  UI_ZERO_ITEMS: "%d items"
+
+  # ── New keys for finance ledger ──
+  UI_CASH_FLOW_LABEL: "Cash Flow: $%d"
+  UI_PURCHASES_LABEL: "Purchases: $%d"
+  UI_ONSITE_LABEL: "On-site: $%d"
+  UI_CARGO_VALUE_LABEL: "Cargo Value: $%d"
+  UI_EST_PROFIT_LABEL: "Est. Profit: $%d"
+  UI_FUEL_MULTI_LABEL: "Fuel (\u00d7%d days): $%d"
+
+  # ── New keys for storage action buttons ──
+  UI_REPAIR_ACTION_LABEL: "Repair  [%d AP]"
+  UI_RESTORE_ACTION_LABEL: "Restore  [%d AP]"
+  UI_RESEARCH_ACTION_LABEL: "Research  [%d AP]"
+
+  # ── New keys for storage tooltips ──
+  UI_REPAIR_DONE_TOOLTIP: "Condition already at 50%% — use Restore to continue"
+  UI_REPAIR_AP_TOOLTIP: "Not enough AP (need %d)"
+  UI_RESTORE_REPAIR_TOOLTIP: "Repair to 50%% before restoring"
+  UI_RESTORE_DONE_TOOLTIP: "Condition already fully restored"
+  UI_RESTORE_AP_TOOLTIP: "Not enough AP (need %d)"
+  UI_RESEARCH_DONE_TOOLTIP: "No hidden clues remaining"
+  UI_RESEARCH_REPAIR_TOOLTIP: "Repair to 50%% condition before researching"
+  UI_RESEARCH_AP_TOOLTIP: "Not enough AP (need %d)"
+
+  # ── New keys for value/convergence labels ──
+  UI_VERIFIED_BADGE: "Verified"
+  UI_TRUE_VALUE: "True Value"
+  UI_CONVERGED: "Converged"
+  UI_VERIFICATION_LABEL: "Verification: %s"
+  UI_UNVERIFIED: "Unverified"
+
+  # ── New keys for hub ──
+  UI_DAY_SLOT_NAME: "Day"
+  UI_NIGHT_SLOT_NAME: "Night"
+  UI_ACTIVITY_BTN: "Activity  (%s)"
+
+  # ── New keys for cargo manifest ──
+  UI_DAMAGE_LABEL: "%d trailer item(s) cracked during transport"
+
+  # ── New keys for item row columns ──
+  UI_COLUMN_ITEM: "Item"
+  UI_COLUMN_CONDITION: "Condition"
+  UI_COLUMN_BASE_VALUE: "Base Value"
+  UI_COLUMN_WEIGHT: "Weight"
+  UI_COLUMN_GRID: "Grid"
+  UI_COLUMN_INSPECTION: "Inspection"
+
+  # ── New keys for item row tooltip ──
+  UI_WEIGHT_TOOLTIP: "Weight:  %s"
+  UI_GRID_TOOLTIP: "Grid:  %s"
+  # ── New keys for clue chunk ──
+  UI_CLUE_IDENTITY: "IDENTITY"
+  UI_CLUE_SURFACE: "SURFACE"
+  UI_CLUE_HIDDEN: "HIDDEN"
+
+  # ── New keys for day summary ──
+  UI_DAY_TO_DAY: "Day %d \u2192 Day %d"
+  UI_SOLD_ONSITE_LABEL: "Sold On-site:   $%d"
+  UI_ENTRY_FEE_DEBIT: "Entry Fee:   -$%d"
+  UI_FUEL_COST_DEBIT: "Fuel Cost:   -$%d"
+  UI_AMOUNT_PAID: "Amount Paid:   -$%d"
+  UI_CONSERVATIVE_SUMMARY: "Conservative: %d items, $%d"
+  UI_AGGRESSIVE_SUMMARY: "Aggressive: %d items, $%d"
+  UI_TOTAL_CUSTOMER_SALES: "Total Customer Sales: $%d"
+  UI_LIVING_COST: "Living:   -$%d"
+  UI_CARGO_BACK: "Cargo brought back: %d items"
+  UI_NET_CREDIT: "Net:   +$%d"
+  UI_NET_DEBIT: "Net:   -$%d"
+
+  # ── New keys for storage detail ──
+  UI_RESEARCH_PROGRESS: "Research: %d / %d"
+  UI_AP_HUD: "AP  %d / %d"
+  UI_ITEM_COUNT: "%d items"
+  UI_EST_VALUE_LABEL: "Est. Value"
+
+  # ── New keys for auction ──
+  UI_AUCTION_LOST: "Auction Lost"
+
+  # ── New keys for inspection ──
+  UI_NO_CLUES_LEFT: "No more clues to investigate."
+  UI_NOT_ENOUGH_AP: "Not enough AP"
+  UI_UNVEIL_TOOLTIP: "Unveil this item (%d AP)"
+  UI_INSPECT_TOOLTIP: "Inspect remaining clues (%d AP)"
+
+  # ── New keys for knowledge ──
+  UI_NO_ATTRIBUTES: "No attributes found"
+  UI_NO_PERKS: "No perks discovered"
+
+  # ── New keys for car shop ──
+  UI_NO_CARS_AVAILABLE: "No cars available — you own them all."
+
+  # ── New keys for cargo ──
+  UI_WEIGHT_EXCEEDED: "Weight limit exceeded! Cannot place item."
+
+  # ── New keys for customer sell ──
+  UI_CAPACITY_FORMAT: "Capacity: %d\u00d7%d"
+
+  # ── New keys for lot card ──
+  UI_ITEM_COUNT_RANGE: "%d items"
+  UI_ITEM_COUNT_RANGE_MULTI: "%d\u2013%d items"
+  UI_RARITY_RANGE: "Rarity: %s"
+  UI_SUPER_CATEGORY: "Super Category: %s"
+  UI_EXTRA_CATEGORY: "Extra Category: %s"
+  UI_UNKNOWN_RARITY: "Unknown"
+  UI_NONE: "None"
+  UI_MIXED_TYPES: "Mixed (%d types)"
+
+  # ── New keys for sell scene ──
+  UI_ALL_CUSTOMERS_SERVED: "All customers served! End of night."
+
+  # ── New keys for deal panel ──
+  UI_ROLLING_DICE_COUNT: "Rolling %d dice..."
+  UI_SUM_PLACEHOLDER: "Sum: —"
+  UI_TOTAL_PLACEHOLDER: "Total: —"
+
+  # ── New keys for mastery panel ──
+  UI_MASTERY_MAX: "MAX"
+  UI_PROGRESS_FORMAT: "%d / %d"
+
+  # ── New keys for sale receipt ──
+  UI_SALE_TITLE: "%s Sale"
+  UI_SALE_ITEMS_COUNT: "Items: %d"
+  UI_VERIFIED_TAG: " (verified)"
+  UI_SELL_PRICE: "Sell Price: $%d"
+
+  # ── New keys for day summary ──
+  UI_NET_LABEL: "Net: $%d"
+  UI_WANTS_FORMAT: "Wants: %s"
+
+  # ── New keys for start page ──
+  UI_TESTBEDS: "Testbeds"
+  UI_NEW_GAME_CONFIRM: "Start a new game in Slot %d? All progress in this slot will be lost."
+  UI_NEW_GAME_SELECT: "New Game — Select a Slot"
+  UI_LOAD_GAME_SELECT: "Load Game — Select a Slot"
+  UI_SLOT_INFO: "Slot %d\nDay %d  \u00b7  $%d  \u00b7  %s"
+  UI_SLOT_EMPTY: "Slot %d\nEmpty"
+  UI_TIME_TODAY: "today"
+  UI_TIME_YESTERDAY: "yesterday"
+  UI_TIME_DAYS_AGO: "%d days ago"
+  UI_TIME_WEEKS_AGO: "%dw ago"
+  UI_TIME_MONTHS_AGO: "%dm ago"
+
+  # ── New keys for location_info display ──
+  UI_LOCATION_INFO: "Location Info"
+  UI_LOT_INFO: "Lot Info"
+  UI_RUNNING_REVIEW: "Running Review"

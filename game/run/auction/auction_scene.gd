@@ -400,7 +400,7 @@ func _win_now(price: int) -> void:
 func _refresh_budget() -> void:
     var committed: int = RunManager.run.paid_price + RunManager.run.entry_fee + RunManager.run.fuel_cost
     var remaining := maxi(MetaManager.economy.cash - committed, 0)
-    _budget_label.text = "Budget: $%d" % remaining
+    _budget_label.text = TranslationServer.translate("UI_BUDGET_LABEL") % remaining
 
 # ══ Display helpers ════════════════════════════════════════════════════════════
 

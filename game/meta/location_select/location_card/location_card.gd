@@ -45,17 +45,14 @@ func get_location_data() -> LocationData:
 func _apply() -> void:
     _name_label.text = TranslationServer.translate(_location_data.display_name_key)
     _description_label.text = TranslationServer.translate(_location_data.description_key)
-    _entry_fee_label.text = "Entry Fee:   $%d" % _location_data.entry_fee
-    _travel_days_label.text = "Travel:   %d day%s" % [
-        _location_data.travel_days,
-        "" if _location_data.travel_days == 1 else "s",
-    ]
-    _lot_number_label.text = "Lots:   %d" % _location_data.lot_number
+    _entry_fee_label.text = TranslationServer.translate("UI_ENTRY_FEE_LABEL") % _location_data.entry_fee
+    _travel_days_label.text = TranslationServer.translate("UI_TRAVEL_LABEL") % _location_data.travel_days
+    _lot_number_label.text = TranslationServer.translate("UI_LOTS_LABEL") % _location_data.lot_number
     var car: CarData = MetaManager.garage.active_car
     var fuel_cost := car.fuel_cost_per_day * _location_data.travel_days if car else 0
-    _fuel_cost_label.text = "Fuel:   $%d" % fuel_cost
+    _fuel_cost_label.text = TranslationServer.translate("UI_FUEL_LABEL") % fuel_cost
     var total_cost := _location_data.entry_fee + fuel_cost
-    _total_cost_label.text = "Est. Cost:   $%d" % total_cost
+    _total_cost_label.text = TranslationServer.translate("UI_EST_COST_LABEL") % total_cost
 
 
 func _on_select_button_pressed() -> void:

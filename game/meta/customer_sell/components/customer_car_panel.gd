@@ -81,20 +81,21 @@ func set_car_info(placed_items: Array) -> void:
         if SellMath.is_item_verified(entry):
             verified_count += 1
     _animate_car_total(total)
-    _verified_count_label.text = "Verified: %d / %d" % [verified_count, placed_items.size()]
+    _verified_count_label.text = TranslationServer.translate("UI_VERIFIED_LABEL") % [verified_count, placed_items.size()]
 
 
 func _animate_car_total(target: int) -> void:
     var current: int = 0
     var raw := _car_total_label.text
-    if raw.begins_with("Car total: $"):
-        current = int(raw.trim_prefix("Car total: $"))
+    var prefix := TranslationServer.translate("UI_CAR_TOTAL_LABEL").split("$")[0]
+    if raw.begins_with(prefix):
+        current = int(raw.trim_prefix(prefix))
     if current == target:
         return
     var tween := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
     tween.tween_method(
         func(val: float) -> void:
-            _car_total_label.text = "Car total: $%d" % int(val),
+            _car_total_label.text = TranslationServer.translate("UI_CAR_TOTAL_LABEL") % int(val),
         float(current),
         float(target),
         0.3,
@@ -107,10 +108,10 @@ func _apply() -> void:
     if _customer == null:
         return
     _customer_name_label.text = _customer.display_name
-    _capacity_label.text = "Capacity: %d\u00d7%d" % [_customer.grid_columns, _customer.grid_rows]
-    _demand_tags_label.text = "Wants: %s" % _format_demand_tags()
-    _car_total_label.text = "Car total: $0"
-    _verified_count_label.text = "Verified: 0 / 0"
+    _capacity_label.text = TranslationServer.translate("UI_CAPACITY_LABEL") % [_customer.grid_columns, _customer.grid_rows]
+    _demand_tags_label.text = TranslationServer.translate("UI_WANTS_LABEL") % _format_demand_tags()
+    _car_total_label.text = TranslationServer.translate("UI_CAR_TOTAL_LABEL") % 0
+    _verified_count_label.text = TranslationServer.translate("UI_VERIFIED_LABEL") % [0, 0]
 
 
 func _format_demand_tags() -> String:

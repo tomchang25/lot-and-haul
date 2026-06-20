@@ -79,8 +79,8 @@ func _apply() -> void:
         _condition_mult_label.hide()
 
     # Cargo stats — always visible (observable even for veiled items)
-    _weight_label.text = "W: %s" % ItemEntryDisplayHelper.weight_text(_entry)
-    _grid_label.text = "G: %s" % ItemEntryDisplayHelper.grid_text(_entry)
+    _weight_label.text = TranslationServer.translate("UI_WEIGHT_TOOLTIP") % ItemEntryDisplayHelper.weight_text(_entry)
+    _grid_label.text = TranslationServer.translate("UI_GRID_TOOLTIP") % ItemEntryDisplayHelper.grid_text(_entry)
     _weight_label.show()
     _grid_label.show()
 

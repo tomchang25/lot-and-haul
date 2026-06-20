@@ -40,7 +40,7 @@ func _on_buy_pressed(car: CarData) -> void:
 
 
 func _refresh() -> void:
-    _balance_label.text = "Balance:   $%d" % MetaManager.economy.cash
+    _balance_label.text = TranslationServer.translate("UI_BALANCE_LABEL") % MetaManager.economy.cash
     _populate_rows()
 
 
@@ -56,7 +56,7 @@ func _populate_rows() -> void:
     if inventory.is_empty():
         var empty_label := Label.new()
         empty_label.add_theme_font_size_override("font_size", 16)
-        empty_label.text = "No cars available — you own them all."
+        empty_label.text = TranslationServer.translate("UI_NO_CARS_AVAILABLE")
         empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
         # node-src: ephemeral — empty-state label

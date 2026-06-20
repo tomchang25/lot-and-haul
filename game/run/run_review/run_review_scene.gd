@@ -112,35 +112,34 @@ func _populate_finance() -> void:
     var onsite: int = run.onsite_proceeds
     var cash_flow: int = onsite - entry_fee - fuel - auction
 
-    _entry_fee_label.text = "Entry Fee:     -$%d" % entry_fee
+    _entry_fee_label.text = TranslationServer.translate("UI_ENTRY_FEE_LABEL") % (-entry_fee)
 
     var travel_days := run.location_data.travel_days if run.location_data != null else 0
     if travel_days > 0:
-        var day_label: String = "s" if travel_days != 1 else ""
-        _fuel_cost_label.text = "Fuel (\u00d7%d day%s): -$%d" % [travel_days, day_label, fuel]
+        _fuel_cost_label.text = TranslationServer.translate("UI_FUEL_MULTI_LABEL") % [travel_days, -fuel]
     else:
-        _fuel_cost_label.text = "Fuel:          -$%d" % fuel
+        _fuel_cost_label.text = TranslationServer.translate("UI_FUEL_LABEL") % (-fuel)
 
-    _auction_paid_label.text = "Purchases:     -$%d" % auction
-    _onsite_label.text = "On-site:       +$%d" % onsite
+    _auction_paid_label.text = TranslationServer.translate("UI_PURCHASES_LABEL") % (-auction)
+    _onsite_label.text = TranslationServer.translate("UI_ONSITE_LABEL") % onsite
 
     if cash_flow >= 0:
-        _cash_flow_label.text = "Cash Flow:     +$%d" % cash_flow
+        _cash_flow_label.text = TranslationServer.translate("UI_CASH_FLOW_LABEL") % cash_flow
         _cash_flow_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.PRICE_COLOR)
     else:
-        _cash_flow_label.text = "Cash Flow:     -$%d" % (-cash_flow)
+        _cash_flow_label.text = TranslationServer.translate("UI_CASH_FLOW_LABEL") % cash_flow
         _cash_flow_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
 
     var cargo_items: Array[ItemEntry] = run.cargo_items + run.trailer_items
     var estimate_price: int = 0
     for entry: ItemEntry in cargo_items:
         estimate_price += (entry.estimated_value_min + entry.estimated_value_max) / 2
-    _cargo_value_label.text = "Cargo Value:   $%d" % estimate_price
+    _cargo_value_label.text = TranslationServer.translate("UI_CARGO_VALUE_LABEL") % estimate_price
 
     var estimate_profit: int = cash_flow + estimate_price
     if estimate_profit >= 0:
-        _est_profit_label.text = "Est. Profit:   +$%d" % estimate_profit
+        _est_profit_label.text = TranslationServer.translate("UI_EST_PROFIT_LABEL") % estimate_profit
         _est_profit_label.add_theme_color_override(&"font_color", Color(0.4, 1.0, 0.5))
     else:
-        _est_profit_label.text = "Est. Profit:   -$%d" % (-estimate_profit)
+        _est_profit_label.text = TranslationServer.translate("UI_EST_PROFIT_LABEL") % estimate_profit
         _est_profit_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))

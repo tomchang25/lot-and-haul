@@ -79,7 +79,7 @@ func _build_anchor(idx: int) -> int:
     idx += 1
 
     var header := _ensure_child(idx, Label) as Label
-    header.text = "IDENTITY"
+    header.text = TranslationServer.translate("UI_CLUE_IDENTITY")
     header.add_theme_font_size_override(&"font_size", 10)
     header.add_theme_color_override(&"font_color", HEADER_COLOR)
     idx += 1
@@ -110,7 +110,7 @@ func _build_surface(idx: int) -> int:
     idx += 1
 
     var header := _ensure_child(idx, Label) as Label
-    header.text = "SURFACE"
+    header.text = TranslationServer.translate("UI_CLUE_SURFACE")
     header.add_theme_font_size_override(&"font_size", 10)
     header.add_theme_color_override(&"font_color", HEADER_COLOR)
     idx += 1
@@ -142,7 +142,7 @@ func _build_hidden(idx: int) -> int:
     idx += 1
 
     var header := _ensure_child(idx, Label) as Label
-    header.text = "HIDDEN"
+    header.text = TranslationServer.translate("UI_CLUE_HIDDEN")
     header.add_theme_font_size_override(&"font_size", 10)
     header.add_theme_color_override(&"font_color", HEADER_COLOR)
     idx += 1

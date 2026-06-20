@@ -30,7 +30,7 @@ func setup(columns: Array, items: Array) -> void:
 
 func set_damage_count(count: int) -> void:
     if count > 0:
-        _damage_label.text = "%d trailer item(s) cracked during transport" % count
+        _damage_label.text = TranslationServer.translate("UI_DAMAGE_LABEL") % count
         _damage_label.visible = true
     else:
         _damage_label.visible = false
@@ -52,7 +52,11 @@ func set_expanded(v: bool) -> void:
 func _on_toggle() -> void:
     _expanded = not _expanded
     _content.visible = _expanded
-    _toggle_btn.text = "▼ Cargo Manifest" if _expanded else "▶ Cargo Manifest"
+    var manifest: String = TranslationServer.translate("UI_CARGO_MANIFEST")
+    if _expanded:
+        _toggle_btn.text = manifest
+    else:
+        _toggle_btn.text = manifest.replace("▼", "▶")
 
 
 func _on_card_gui_input(event: InputEvent) -> void:

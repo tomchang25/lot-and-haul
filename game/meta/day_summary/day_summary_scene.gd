@@ -61,20 +61,20 @@ func _ready() -> void:
 func _render(summary: DaySummary) -> void:
     # Day header
     if summary.days_elapsed > 1:
-        _day_header.text = "Day %d → Day %d" % [summary.start_day, summary.end_day]
+        _day_header.text = TranslationServer.translate("UI_DAY_TO_DAY") % [summary.start_day, summary.end_day]
     else:
-        _day_header.text = "Day %d" % summary.end_day
+        _day_header.text = TranslationServer.translate("UI_DAY_LABEL") % summary.end_day
 
     # Trip group — visible only for run data
     _trip_group.visible = summary.has_run_data()
     if summary.has_run_data():
-        _onsite_label.text = "Sold On-site:   $%d" % summary.onsite_proceeds
+        _onsite_label.text = TranslationServer.translate("UI_SOLD_ONSITE_LABEL") % summary.onsite_proceeds
         _entry_fee_label.visible = summary.entry_fee != 0
-        _entry_fee_label.text = "Entry Fee:   -$%d" % summary.entry_fee
+        _entry_fee_label.text = TranslationServer.translate("UI_ENTRY_FEE_DEBIT") % summary.entry_fee
         _fuel_label.visible = summary.fuel_cost != 0
-        _fuel_label.text = "Fuel Cost:   -$%d" % summary.fuel_cost
+        _fuel_label.text = TranslationServer.translate("UI_FUEL_COST_DEBIT") % summary.fuel_cost
         _paid_label.visible = summary.paid_price != 0
-        _paid_label.text = "Amount Paid:   -$%d" % summary.paid_price
+        _paid_label.text = TranslationServer.translate("UI_AMOUNT_PAID") % summary.paid_price
 
     # Customer sales section
     _customer_group.visible = summary.has_customer_sales()
@@ -90,31 +90,29 @@ func _render(summary: DaySummary) -> void:
             elif sale.strategy == "aggressive":
                 agg_count += sale.item_count
                 agg_total += sale.sale_price
-        _conservative_label.text = "Conservative: %d items, $%d" % [cons_count, cons_total]
-        _aggressive_label.text = "Aggressive: %d items, $%d" % [agg_count, agg_total]
-        _customer_total_label.text = "Total Customer Sales: $%d" % summary.customer_sales_total
+        _conservative_label.text = TranslationServer.translate("UI_CONSERVATIVE_SUMMARY") % [cons_count, cons_total]
+        _aggressive_label.text = TranslationServer.translate("UI_AGGRESSIVE_SUMMARY") % [agg_count, agg_total]
+        _customer_total_label.text = TranslationServer.translate("UI_TOTAL_CUSTOMER_SALES") % summary.customer_sales_total
 
     # Daily group — always visible
-    _living_label.text = "Living:   -$%d" % summary.living_cost
+    _living_label.text = TranslationServer.translate("UI_LIVING_COST") % summary.living_cost
 
     # Cargo count
     _cargo_group.visible = summary.cargo_count > 0
-    if summary.cargo_count == 1:
-        _cargo_count_label.text = "Cargo brought back: 1 item"
-    elif summary.cargo_count > 1:
-        _cargo_count_label.text = "Cargo brought back: %d items" % summary.cargo_count
+    if summary.cargo_count > 0:
+        _cargo_count_label.text = TranslationServer.translate("UI_CARGO_BACK") % summary.cargo_count
 
     # Net change + balance
     var net: int = summary.net_change
     if net >= 0:
-        _net_label.text = "Net:   +$%d" % net
+        _net_label.text = TranslationServer.translate("UI_NET_CREDIT") % net
         _net_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.PRICE_COLOR)
         AudioManager.play_event(CASH_CREDITED)
     else:
-        _net_label.text = "Net:   -$%d" % (-net)
+        _net_label.text = TranslationServer.translate("UI_NET_DEBIT") % (-net)
         _net_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
 
-    _balance_label.text = "Balance:   $%d" % MetaManager.economy.cash
+    _balance_label.text = TranslationServer.translate("UI_BALANCE_LABEL") % MetaManager.economy.cash
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 

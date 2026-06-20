@@ -11,7 +11,6 @@ locales:
 blocks:
   - ui
   - tutorial
-  - items
   - clues
   - locations
   - affixes

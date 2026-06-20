@@ -47,21 +47,21 @@ func setup(lot_data: LotData, index: int, total: int) -> void:
 
 
 func _apply() -> void:
-    _index_label.text = "Lot %d / %d" % [_index + 1, _total]
+    _index_label.text = TranslationServer.translate("UI_LOT_NUMBER") % [_index + 1, _total]
     var min_count := _lot_data.item_count_min
     var max_count := _lot_data.item_count_max
     if min_count == max_count:
-        _item_count_label.text = "%d items" % min_count
+        _item_count_label.text = TranslationServer.translate("UI_ITEM_COUNT_RANGE") % min_count
     else:
-        _item_count_label.text = "%d–%d items" % [min_count, max_count]
-    _rarity_label.text = "Rarity: %s" % _rarity_range_text(_lot_data.rarity_weights)
+        _item_count_label.text = TranslationServer.translate("UI_ITEM_COUNT_RANGE_MULTI") % [min_count, max_count]
+    _rarity_label.text = TranslationServer.translate("UI_RARITY_RANGE") % _rarity_range_text(_lot_data.rarity_weights)
 
     # Super Category row
     if _lot_data.super_category_weights.is_empty():
         _super_category_label.visible = false
     else:
         _super_category_label.visible = true
-        _super_category_label.text = "Super Category: %s" % _category_text(_lot_data.super_category_weights)
+        _super_category_label.text = TranslationServer.translate("UI_SUPER_CATEGORY") % _category_text(_lot_data.super_category_weights)
 
     # Build the set of category IDs already covered by super-category weights.
     var covered: Dictionary = { }
@@ -82,7 +82,7 @@ func _apply() -> void:
         _category_label.visible = false
     else:
         _category_label.visible = true
-        _category_label.text = "Extra Category: %s" % _category_text(extra_weights)
+        _category_label.text = TranslationServer.translate("UI_EXTRA_CATEGORY") % _category_text(extra_weights)
 
 
 func set_active(active: bool) -> void:
@@ -104,7 +104,7 @@ func _rarity_range_text(weights: Dictionary) -> String:
         if (weights[key] as int) > 0:
             present.append(int(key))
     if present.is_empty():
-        return "Unknown"
+        return TranslationServer.translate("UI_UNKNOWN_RARITY")
     present.sort()
     var min_r: int = present[0]
     var max_r: int = present[present.size() - 1]
@@ -118,7 +118,7 @@ func _rarity_range_text(weights: Dictionary) -> String:
 func _category_text(weights: Dictionary) -> String:
     var cats: Array = weights.keys()
     if cats.is_empty():
-        return "None"
+        return TranslationServer.translate("UI_NONE")
     if cats.size() == 1:
         return (cats[0] as String).capitalize()
     if cats.size() <= 3:
@@ -126,4 +126,4 @@ func _category_text(weights: Dictionary) -> String:
         for c in cats:
             names.append((c as String).capitalize())
         return ", ".join(names)
-    return "Mixed (%d types)" % cats.size()
+    return TranslationServer.translate("UI_MIXED_TYPES") % cats.size()

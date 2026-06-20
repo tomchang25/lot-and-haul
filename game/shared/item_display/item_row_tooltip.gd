@@ -75,8 +75,8 @@ func show_for(entry: ItemEntry, anchor: Rect2) -> void:
     var weight := ItemEntryDisplayHelper.weight_text(entry)
     var grid := ItemEntryDisplayHelper.grid_text(entry)
     if not entry.is_veiled() and weight != ItemEntryDisplayHelper.unknown_text() and grid != ItemEntryDisplayHelper.unknown_text():
-        _weight_label.text = "Weight:  %s" % weight
-        _grid_label.text = "Grid:  %s" % grid
+        _weight_label.text = TranslationServer.translate("UI_WEIGHT_TOOLTIP") % weight
+        _grid_label.text = TranslationServer.translate("UI_GRID_TOOLTIP") % grid
         _weight_label.show()
         _grid_label.show()
     else:
@@ -113,7 +113,7 @@ func _populate_clue_section(item: ItemEntry) -> void:
     _clue_container.show()
 
     var header := Label.new()
-    header.text = "Clues"
+    header.text = TranslationServer.translate("UI_CLUES_HEADER")
     header.add_theme_font_size_override(&"font_size", 11)
     header.add_theme_color_override(&"font_color", Color(0.65, 0.65, 0.65))
 

@@ -135,7 +135,7 @@ func _build_header() -> void:
         var btn: ColumnHeaderButton = ColumnHeaderButtonScene.instantiate()
         btn.setup(
             col,
-            ItemRow.COLUMN_HEADERS[col],
+            TranslationServer.translate(ItemRow.COLUMN_HEADERS[col] as String),
             col == _sort_column,
             _sort_ascending,
             col == ItemRow.Column.NAME,

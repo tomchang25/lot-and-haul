@@ -178,7 +178,7 @@ func _do_clue_chain(entry: ItemEntry) -> void:
             break
 
     if clue_texts.is_empty():
-        _clue_result_label.text = "No more clues to investigate."
+        _clue_result_label.text = TranslationServer.translate("UI_NO_CLUES_LEFT")
     else:
         _clue_result_label.text = "\n".join(clue_texts)
     _clue_result_section.show()
@@ -240,18 +240,18 @@ func _refresh_action_section(entry: ItemEntry) -> void:
         _action_complete_label.hide()
         _action_unveil_button.disabled = ap < UNVEIL_COST
         if ap < UNVEIL_COST:
-            _action_unveil_button.tooltip_text = "Not enough AP"
+            _action_unveil_button.tooltip_text = TranslationServer.translate("UI_NOT_ENOUGH_AP")
         else:
-            _action_unveil_button.tooltip_text = "Unveil this item (%d AP)" % UNVEIL_COST
+            _action_unveil_button.tooltip_text = TranslationServer.translate("UI_UNVEIL_TOOLTIP") % UNVEIL_COST
     elif entry.has_inspection_clues():
         _action_unveil_button.hide()
         _action_inspect_button.show()
         _action_complete_label.hide()
         _action_inspect_button.disabled = ap < CLUE_CHAIN_COST
         if ap < CLUE_CHAIN_COST:
-            _action_inspect_button.tooltip_text = "Not enough AP"
+            _action_inspect_button.tooltip_text = TranslationServer.translate("UI_NOT_ENOUGH_AP")
         else:
-            _action_inspect_button.tooltip_text = "Inspect remaining clues (%d AP)" % CLUE_CHAIN_COST
+            _action_inspect_button.tooltip_text = TranslationServer.translate("UI_INSPECT_TOOLTIP") % CLUE_CHAIN_COST
     else:
         _action_unveil_button.hide()
         _action_inspect_button.hide()
