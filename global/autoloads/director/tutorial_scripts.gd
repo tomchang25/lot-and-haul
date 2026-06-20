@@ -4,11 +4,32 @@
 # The single surface for script id resolution, anchor validation, and unit registry.
 class_name TutorialScripts
 
+class TutorialOverrideSpec:
+    var id: StringName
+    var payload: Variant = null
+    var release_event: StringName = &""
+
+
+    static func whole(p_id: StringName, _payload: Variant = null) -> TutorialOverrideSpec:
+        var s := TutorialOverrideSpec.new()
+        s.id = p_id
+        s.payload = _payload
+        return s
+
+
+    static func until(p_id: StringName, event: StringName) -> TutorialOverrideSpec:
+        var s := TutorialOverrideSpec.new()
+        s.id = p_id
+        s.release_event = event
+        return s
+
+
 class TutorialUnit:
     var id: String
     var steps_resolver: Callable
     var trigger: Callable
     var once: bool = true
+    var overrides: Array[TutorialOverrideSpec] = []
 
 
     func _init(p_id: String, p_resolver: Callable, p_trigger: Callable, p_once: bool = true) -> void:
@@ -429,21 +450,51 @@ static func trigger_onboarding_selling(scene_id: String, ctx: Dictionary) -> boo
 
 ## Returns all registered tutorial units in evaluation order (first-match-wins).
 static func units() -> Array[TutorialUnit]:
-    return [
-        TutorialUnit.new("onboarding_hub_intro_choose", onboarding_hub_intro_choose_script, trigger_onboarding_hub_intro_choose),
-        TutorialUnit.new("onboarding_location_select", onboarding_location_select_script, trigger_onboarding_location_select),
-        TutorialUnit.new("onboarding_lot_browse", onboarding_lot_browse_script, trigger_onboarding_lot_browse),
-        TutorialUnit.new("onboarding_inspection", onboarding_inspection_script, trigger_onboarding_inspection),
-        TutorialUnit.new("onboarding_auction", onboarding_auction_script, trigger_onboarding_auction),
-        TutorialUnit.new("onboarding_reveal", onboarding_reveal_script, trigger_onboarding_reveal),
-        TutorialUnit.new("onboarding_cargo", onboarding_cargo_script, trigger_onboarding_cargo),
-        TutorialUnit.new("onboarding_run_review", onboarding_run_review_script, trigger_onboarding_run_review),
-        TutorialUnit.new("onboarding_storage_choose", onboarding_storage_choose_script, trigger_onboarding_storage_choose),
-        TutorialUnit.new("onboarding_storage", onboarding_storage_script, trigger_onboarding_storage),
-        TutorialUnit.new("onboarding_day_pass", onboarding_day_pass_script, trigger_onboarding_day_pass),
-        TutorialUnit.new("onboarding_shop_choose", onboarding_shop_choose_script, trigger_onboarding_shop_choose),
-        TutorialUnit.new("onboarding_selling", onboarding_selling_script, trigger_onboarding_selling),
-    ]
+    var units_list: Array[TutorialUnit] = []
+
+    var u0 := TutorialUnit.new("onboarding_hub_intro_choose", onboarding_hub_intro_choose_script, trigger_onboarding_hub_intro_choose)
+    units_list.append(u0)
+
+    var u1 := TutorialUnit.new("onboarding_location_select", onboarding_location_select_script, trigger_onboarding_location_select)
+    units_list.append(u1)
+
+    var u2 := TutorialUnit.new("onboarding_lot_browse", onboarding_lot_browse_script, trigger_onboarding_lot_browse)
+    u2.overrides = [TutorialOverrideSpec.whole(GameplayOverride.LOT_PASS_LOCKED)]
+    units_list.append(u2)
+
+    var u3 := TutorialUnit.new("onboarding_inspection", onboarding_inspection_script, trigger_onboarding_inspection)
+    u3.overrides = [TutorialOverrideSpec.until(GameplayOverride.INSPECTION_REVIEW_GATED, TutorialEvents.INSPECTION_PERFORMED)]
+    units_list.append(u3)
+
+    var u4 := TutorialUnit.new("onboarding_auction", onboarding_auction_script, trigger_onboarding_auction)
+    u4.overrides = [TutorialOverrideSpec.whole(GameplayOverride.ASSISTED_AUCTION)]
+    units_list.append(u4)
+
+    var u5 := TutorialUnit.new("onboarding_reveal", onboarding_reveal_script, trigger_onboarding_reveal)
+    units_list.append(u5)
+
+    var u6 := TutorialUnit.new("onboarding_cargo", onboarding_cargo_script, trigger_onboarding_cargo)
+    units_list.append(u6)
+
+    var u7 := TutorialUnit.new("onboarding_run_review", onboarding_run_review_script, trigger_onboarding_run_review)
+    units_list.append(u7)
+
+    var u8 := TutorialUnit.new("onboarding_storage_choose", onboarding_storage_choose_script, trigger_onboarding_storage_choose)
+    units_list.append(u8)
+
+    var u9 := TutorialUnit.new("onboarding_storage", onboarding_storage_script, trigger_onboarding_storage)
+    units_list.append(u9)
+
+    var u10 := TutorialUnit.new("onboarding_day_pass", onboarding_day_pass_script, trigger_onboarding_day_pass)
+    units_list.append(u10)
+
+    var u11 := TutorialUnit.new("onboarding_shop_choose", onboarding_shop_choose_script, trigger_onboarding_shop_choose)
+    units_list.append(u11)
+
+    var u12 := TutorialUnit.new("onboarding_selling", onboarding_selling_script, trigger_onboarding_selling)
+    units_list.append(u12)
+
+    return units_list
 
 
 ## Script ids that, once all are seen (via completion or individual skip),

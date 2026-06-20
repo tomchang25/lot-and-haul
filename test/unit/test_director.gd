@@ -433,6 +433,11 @@ func test_skip_all_onboarding_clears_chain() -> void:
     Director.skip_all_onboarding()
     assert_false(ScriptDirector.active, "script should not be active after skip all")
     assert_false(MetaManager.is_onboarding_pending(), "onboarding should be cleared after skip all")
+    assert_eq(
+        GameplayOverride.payload(GameplayOverride.FORCED_ACTIVITY) as Variant,
+        null,
+        "skip all clears forced_activity immediately",
+    )
     assert_true(
         MetaManager.progress.tutorial_seen.has("onboarding_hub_intro_choose"),
         "skip all marks hub_intro_choose seen",
@@ -571,97 +576,203 @@ func test_new_event_constants_exist() -> void:
     assert_eq(typeof(TutorialEvents.STORAGE_CONDITION_IMPROVED), TYPE_STRING_NAME, "STORAGE_CONDITION_IMPROVED should be a StringName")
     assert_eq(typeof(TutorialEvents.STORAGE_RESEARCH_PERFORMED), TYPE_STRING_NAME, "STORAGE_RESEARCH_PERFORMED should be a StringName")
 
-# ══ Phase 2 — Director query tests ═════════════════════════════════════════
+# ══ GameplayOverride tests ════════════════════════════════════════════════
+# Unit-scoped overrides are activated/deactivated by ScriptDirector as units
+# start, stop, or release. Onboarding-scoped overrides are refreshed on every
+# scene registration. Runtime reset clears everything.
 
 
-func test_use_tutorial_location_not_seen() -> void:
-    # before_each resets to day 0, slot DAY, onboarding_pending=true.
-    # The location_select unit trigger requires day 0, slot DAY, onboarding_pending.
-    assert_true(Director.use_tutorial_location(), "use_tutorial_location should be true when not seen and day 0 day slot")
+func test_assisted_auction_activated_on_start() -> void:
+    ScriptDirector.start_script("onboarding_auction")
+    assert_true(
+        GameplayOverride.is_active(GameplayOverride.ASSISTED_AUCTION),
+        "assisted_auction active when onboarding_auction is playing",
+    )
 
 
-func test_use_tutorial_location_seen() -> void:
-    MetaManager.progress.mark_tutorial_seen("onboarding_location_select")
-    assert_false(Director.use_tutorial_location(), "use_tutorial_location should be false when seen")
-
-
-func test_is_auction_assisted_active() -> void:
-    Director.start_script("onboarding_auction")
-    assert_true(Director.is_auction_assisted(), "is_auction_assisted should be true when onboarding_auction active")
+func test_assisted_auction_deactivated_on_stop() -> void:
+    ScriptDirector.start_script("onboarding_auction")
     ScriptDirector.stop_script()
-    assert_false(Director.is_auction_assisted(), "is_auction_assisted should be false after stop_script")
+    assert_false(
+        GameplayOverride.is_active(GameplayOverride.ASSISTED_AUCTION),
+        "assisted_auction inactive after onboarding_auction stops",
+    )
 
 
-func test_is_auction_assisted_not_active() -> void:
-    assert_false(Director.is_auction_assisted(), "is_auction_assisted should be false with no active script")
-
-
-func test_is_auction_assisted_wrong_script() -> void:
-    Director.start_script("onboarding_inspection")
-    assert_false(Director.is_auction_assisted(), "is_auction_assisted should be false for non-auction script")
-    ScriptDirector.stop_script()
-
-
-func test_activity_chooser_target_day0_day() -> void:
-    # before_each resets to day 0, slot DAY, onboarding_pending=true.
-    assert_eq(Director.activity_chooser_target(), &"auction", "day 0 day slot should target auction")
-
-
-func test_activity_chooser_target_day0_night() -> void:
-    MetaManager.slot.set_slot(SlotStore.SLOT_NIGHT)
-    assert_eq(Director.activity_chooser_target(), &"storage", "day 0 night slot should target storage")
-
-
-func test_activity_chooser_target_not_pending() -> void:
-    MetaManager.progress.mark_onboarding_complete()
-    MetaManager.slot.set_slot(SlotStore.SLOT_DAY)
-    assert_eq(Director.activity_chooser_target(), &"", "empty when onboarding not pending")
-
-
-func test_is_conservative_sale_locked_not_pending() -> void:
-    MetaManager.progress.mark_onboarding_complete()
-    assert_false(Director.is_conservative_sale_locked(), "not locked when onboarding not pending")
-
-
-func test_is_conservative_sale_locked_when_pending_and_not_seen() -> void:
-    MetaManager.progress.reset_onboarding()
-    assert_false(MetaManager.progress.tutorial_seen.has("onboarding_selling"), "onboarding_selling not yet seen")
-    assert_true(Director.is_conservative_sale_locked(), "locked when pending and selling not seen")
-
-
-func test_is_conservative_sale_locked_not_when_seen() -> void:
-    MetaManager.progress.reset_onboarding()
-    MetaManager.progress.mark_tutorial_seen("onboarding_selling")
-    assert_false(Director.is_conservative_sale_locked(), "not locked when selling already seen")
-
-
-func test_should_disable_pass_in_lot_browse_active() -> void:
-    Director.start_script("onboarding_lot_browse")
-    assert_true(Director.should_disable_pass_in_lot_browse(), "pass disabled when lot_browse unit active")
+func test_assisted_auction_not_active_with_wrong_script() -> void:
+    ScriptDirector.start_script("onboarding_inspection")
+    assert_false(
+        GameplayOverride.is_active(GameplayOverride.ASSISTED_AUCTION),
+        "assisted_auction inactive when a non-auction script is active",
+    )
     ScriptDirector.stop_script()
 
 
-func test_should_disable_pass_in_lot_browse_not_active() -> void:
-    assert_false(Director.should_disable_pass_in_lot_browse(), "pass not disabled when no active script")
+func test_assisted_auction_not_active_with_no_script() -> void:
+    assert_false(
+        GameplayOverride.is_active(GameplayOverride.ASSISTED_AUCTION),
+        "assisted_auction inactive when no script is active",
+    )
 
 
-func test_should_disable_inspection_review_active_early_step() -> void:
-    Director.start_script("onboarding_inspection")
-    assert_true(Director.should_disable_inspection_review(), "review disabled at step 0")
+func test_lot_pass_locked_activated_on_start() -> void:
+    ScriptDirector.start_script("onboarding_lot_browse")
+    assert_true(
+        GameplayOverride.is_active(GameplayOverride.LOT_PASS_LOCKED),
+        "lot_pass_locked active when lot_browse is playing",
+    )
     ScriptDirector.stop_script()
 
 
-func test_should_disable_inspection_review_not_active() -> void:
-    assert_false(Director.should_disable_inspection_review(), "review not disabled when no active script")
+func test_lot_pass_locked_deactivated_on_stop() -> void:
+    ScriptDirector.start_script("onboarding_lot_browse")
+    ScriptDirector.stop_script()
+    assert_false(
+        GameplayOverride.is_active(GameplayOverride.LOT_PASS_LOCKED),
+        "lot_pass_locked inactive after lot_browse stops",
+    )
 
 
-func test_should_disable_inspection_review_after_inspect() -> void:
-    Director.start_script("onboarding_inspection")
-    # Advance through steps 0 (ITEM_SELECTED), 1 (ITEM_UNVEILED), 2 (INSPECTION_PERFORMED).
-    # Steps 0-2 are EVENT steps, so emit events to advance.
+func test_inspection_review_gated_active_early_step() -> void:
+    ScriptDirector.start_script("onboarding_inspection")
+    assert_true(
+        GameplayOverride.is_active(GameplayOverride.INSPECTION_REVIEW_GATED),
+        "inspection_review_gated active when onboarding_inspection starts",
+    )
+    ScriptDirector.stop_script()
+
+
+func test_inspection_review_gated_released_on_event() -> void:
+    ScriptDirector.start_script("onboarding_inspection")
+    # Emit events for steps 0 (ITEM_SELECTED), 1 (ITEM_UNVEILED), 2 (INSPECTION_PERFORMED).
     EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_SELECTED, { })
     EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_UNVEILED, { })
     EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_PERFORMED, { })
-    # After step 2 (index 3), _active_step_index should be >= 3.
-    assert_false(Director.should_disable_inspection_review(), "review not disabled after inspection performed")
+    # The override declares INSPECTION_PERFORMED as its release event.
+    assert_false(
+        GameplayOverride.is_active(GameplayOverride.INSPECTION_REVIEW_GATED),
+        "inspection_review_gated released after INSPECTION_PERFORMED fires",
+    )
     ScriptDirector.stop_script()
+
+
+func test_inspection_review_gated_inactive_with_no_script() -> void:
+    assert_false(
+        GameplayOverride.is_active(GameplayOverride.INSPECTION_REVIEW_GATED),
+        "inspection_review_gated inactive with no active script",
+    )
+
+
+func test_forced_activity_day0_day() -> void:
+    # before_each: day 0, slot DAY, onboarding_pending=true.
+    assert_eq(
+        GameplayOverride.payload(GameplayOverride.FORCED_ACTIVITY) as StringName,
+        &"auction",
+        "day 0 day slot targets auction",
+    )
+
+
+func test_forced_activity_day0_night() -> void:
+    MetaManager.slot.set_slot(SlotStore.SLOT_NIGHT)
+    Director.register_scene("refresh_night_overrides [DEBUG-PASS]", { })
+    assert_eq(
+        GameplayOverride.payload(GameplayOverride.FORCED_ACTIVITY) as StringName,
+        &"storage",
+        "day 0 night slot targets storage",
+    )
+
+
+func test_forced_activity_not_pending() -> void:
+    MetaManager.progress.mark_onboarding_complete()
+    Director.register_scene("refresh_completed_overrides [DEBUG-PASS]", { })
+    assert_eq(
+        GameplayOverride.payload(GameplayOverride.FORCED_ACTIVITY) as Variant,
+        null,
+        "forced_activity cleared when onboarding not pending",
+    )
+
+
+func test_forced_tutorial_location_active_when_not_seen() -> void:
+    # before_each: day 0, slot DAY, onboarding_pending=true.
+    assert_true(
+        GameplayOverride.is_active(GameplayOverride.FORCED_TUTORIAL_LOCATION),
+        "forced_tutorial_location active when day 0 day slot, not seen",
+    )
+
+
+func test_forced_tutorial_location_inactive_when_seen() -> void:
+    MetaManager.progress.mark_tutorial_seen("onboarding_location_select")
+    Director.register_scene("refresh_seen_overrides [DEBUG-PASS]", { })
+    assert_false(
+        GameplayOverride.is_active(GameplayOverride.FORCED_TUTORIAL_LOCATION),
+        "forced_tutorial_location inactive when location_select seen",
+    )
+
+
+func test_conservative_sale_locked_when_pending() -> void:
+    # before_each: onboarding_pending=true, not seen.
+    assert_true(
+        GameplayOverride.is_active(GameplayOverride.CONSERVATIVE_SALE_LOCKED),
+        "conservative_sale_locked active when onboarding pending",
+    )
+
+
+func test_conservative_sale_locked_not_when_not_pending() -> void:
+    MetaManager.progress.mark_onboarding_complete()
+    Director.register_scene("refresh_completed_overrides [DEBUG-PASS]", { })
+    assert_false(
+        GameplayOverride.is_active(GameplayOverride.CONSERVATIVE_SALE_LOCKED),
+        "conservative_sale_locked inactive when onboarding not pending",
+    )
+
+
+func test_conservative_sale_locked_not_when_seen() -> void:
+    MetaManager.progress.reset_onboarding()
+    MetaManager.progress.mark_tutorial_seen("onboarding_selling")
+    Director.register_scene("refresh_seen_overrides [DEBUG-PASS]", { })
+    assert_false(
+        GameplayOverride.is_active(GameplayOverride.CONSERVATIVE_SALE_LOCKED),
+        "conservative_sale_locked inactive when selling seen",
+    )
+
+
+func test_runtime_reset_clears_overrides() -> void:
+    ScriptDirector.start_script("onboarding_auction")
+    assert_true(
+        GameplayOverride.is_active(GameplayOverride.ASSISTED_AUCTION),
+        "assisted_auction active before reset",
+    )
+    ScriptDirector.reset_runtime()
+    assert_false(
+        GameplayOverride.is_active(GameplayOverride.ASSISTED_AUCTION),
+        "assisted_auction inactive after runtime reset",
+    )
+    assert_false(
+        GameplayOverride.is_active(GameplayOverride.INSPECTION_REVIEW_GATED),
+        "all overrides cleared after runtime reset",
+    )
+
+
+func test_override_changed_signal_on_activate() -> void:
+    var state := { "fired": false, "received_id": &"" }
+    GameplayOverride.override_changed.connect(
+        func(id: StringName, _a: bool, _p: Variant) -> void:
+            state.fired = true
+            state.received_id = id
+    )
+    GameplayOverride.activate(GameplayOverride.ASSISTED_AUCTION, null)
+    assert_true(state.fired, "override_changed fired on activate")
+    assert_eq(state.received_id, GameplayOverride.ASSISTED_AUCTION, "override_changed carries the correct id")
+    GameplayOverride.deactivate(GameplayOverride.ASSISTED_AUCTION)
+
+
+func test_override_changed_signal_on_deactivate() -> void:
+    GameplayOverride.activate(GameplayOverride.ASSISTED_AUCTION, null)
+    var state := { "fired": false }
+    GameplayOverride.override_changed.connect(
+        func(_id: StringName, active: bool, _p: Variant) -> void:
+            if not active:
+                state.fired = true
+    )
+    GameplayOverride.deactivate(GameplayOverride.ASSISTED_AUCTION)
+    assert_true(state.fired, "override_changed fired on deactivate")

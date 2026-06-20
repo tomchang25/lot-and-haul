@@ -19,6 +19,7 @@ var _active_step_index: int = 0
 var _is_active: bool = false
 var _current_scene_id: String = ""
 var _layout_retry_serial: int = 0
+var _active_unit_overrides: Array[StringName] = []
 
 
 func _ready() -> void:
@@ -57,6 +58,7 @@ func start_script(script_id: String) -> void:
     _active_step_index = 0
     _is_active = true
     active = true
+    _activate_unit_overrides(script_id)
     _show_current_step()
 
 
@@ -64,6 +66,7 @@ func stop_script() -> void:
     if not _is_active:
         return
     var script_id := _active_script_id
+    _deactivate_unit_overrides()
     _mark_seen(script_id)
     _complete_onboarding_if_all_milestones_seen(script_id)
     Director.hide_tutorial_overlay()
@@ -80,67 +83,15 @@ func skip_all_onboarding() -> void:
         if unit.id.begins_with("onboarding_"):
             MetaManager.mark_tutorial_seen(unit.id)
     MetaManager.skip_onboarding()
-
-# ══ Tutorial-driven state queries ════════════════════════════════════════════
-# Called by gameplay scenes via Director facade. The decision logic lives here
-# because flow state (_active_script_id, _is_active) is owned by ScriptDirector.
-
-
-## Returns true when the location-select scene should show only the tutorial
-## location. Uses trigger context directly because this is evaluated before
-## the location_select unit is active.
-func use_tutorial_location() -> bool:
-    if _is_unit_seen("onboarding_location_select"):
-        return false
-    return TutorialScripts.trigger_onboarding_location_select("location_select", _build_trigger_context())
-
-
-## Returns true while the onboarding_auction unit is active. Removed scenarios:
-## - After stop_script mid-auction, returns false (NPC bidding resumes).
-## - When no unit is active, returns false.
-func is_auction_assisted() -> bool:
-    if not _is_active:
-        return false
-    return _active_script_id == "onboarding_auction"
-
-
-## Returns the targeted activity during onboarding, or an empty StringName
-## when no target is active.
-func activity_chooser_target() -> StringName:
-    return _derive_activity_chooser_target()
-
-
-## Returns true when the conservative sale button should be locked in the
-## customer_sell scene. True while onboarding is pending and the selling
-## tutorial has not been seen.
-func is_conservative_sale_locked() -> bool:
-    if not MetaManager.is_onboarding_pending():
-        return false
-    return not _is_unit_seen("onboarding_selling")
-
-
-## Returns true while the onboarding_lot_browse unit is active. Lot_browse
-## scene uses this to disable pass/skip buttons during the first lot browse.
-func should_disable_pass_in_lot_browse() -> bool:
-    return _is_active and _active_script_id == "onboarding_lot_browse"
-
-
-## Returns true while the onboarding_inspection unit is active and the player
-## has not yet performed an inspection (step index < 3). After INSPECTION_PERFORMED
-## (step 3), the review button is unlocked.
-func should_disable_inspection_review() -> bool:
-    if not _is_active or _active_script_id != "onboarding_inspection":
-        return false
-    var step := _current_step()
-    if step == null:
-        return false
-    return _active_step_index < 3
+    _refresh_onboarding_overrides()
 
 
 ## Clears runtime-only tutorial flow state without marking anything seen.
 ## Save-slot reset/load creates new persistent ProgressStore state, so active
 ## tutorial flow from the prior slot must be discarded separately.
 func reset_runtime() -> void:
+    _deactivate_unit_overrides()
+    GameplayOverride.clear_all()
     Director.reset_tutorial_presentation()
     _current_scene_id = ""
     phase = &""
@@ -165,6 +116,7 @@ func step_anchor_id(idx: int) -> String:
 
 func _on_scene_registered(scene_id: String) -> void:
     _current_scene_id = scene_id
+    _refresh_onboarding_overrides()
 
     if not _is_active:
         _decide_tutorial_for_scene(scene_id)
@@ -212,6 +164,13 @@ func _on_tutorial_closed() -> void:
 func _on_tutorial_event(event_id: StringName, _payload: Dictionary) -> void:
     if not _is_active:
         return
+    # Release any unit overrides that declared this event as their release point.
+    var unit := _find_unit(_active_script_id)
+    if unit != null:
+        for spec in unit.overrides:
+            if spec.release_event == event_id and GameplayOverride.is_active(spec.id):
+                GameplayOverride.deactivate(spec.id)
+                _active_unit_overrides.erase(spec.id)
     var step: TutorialStep = _current_step()
     if step == null:
         return
@@ -294,6 +253,7 @@ func _skip_non_renderable_next_steps() -> void:
 
 func _end_tutorial() -> void:
     var completed_id := _active_script_id
+    _deactivate_unit_overrides()
     _mark_seen(completed_id)
     _complete_onboarding_if_all_milestones_seen(completed_id)
     Director.hide_tutorial_overlay()
@@ -314,6 +274,99 @@ func _clear_state() -> void:
     _active_script_id = ""
     _is_active = false
     active = false
+
+# ══ Override helpers ═══════════════════════════════════════════════════════════
+
+
+func _activate_unit_overrides(script_id: String) -> void:
+    var unit := _find_unit(script_id)
+    if unit == null:
+        return
+    for spec in unit.overrides:
+        GameplayOverride.activate(spec.id, spec.payload)
+        _active_unit_overrides.append(spec.id)
+
+
+func _deactivate_unit_overrides() -> void:
+    for id in _active_unit_overrides:
+        GameplayOverride.deactivate(id)
+    _active_unit_overrides.clear()
+
+
+func _find_unit(script_id: String) -> TutorialScripts.TutorialUnit:
+    for unit: TutorialScripts.TutorialUnit in TutorialScripts.units():
+        if unit.id == script_id:
+            return unit
+    return null
+
+
+## Recomputes onboarding-scoped overrides (forced activity, forced tutorial
+## location, conservative sale lock) and pushes changes to the override store.
+## Called on every scene registration and on onboarding completion.
+func _refresh_onboarding_overrides() -> void:
+    if not MetaManager.is_onboarding_pending():
+        _clear_onboarding_overrides()
+        return
+    var ctx := _build_trigger_context()
+    _set_onboarding_override(
+        GameplayOverride.FORCED_TUTORIAL_LOCATION,
+        _onboarding_forced_tutorial_location(ctx),
+    )
+    _set_onboarding_override(
+        GameplayOverride.FORCED_ACTIVITY,
+        _onboarding_forced_activity(ctx),
+    )
+    _set_onboarding_override(
+        GameplayOverride.CONSERVATIVE_SALE_LOCKED,
+        _onboarding_conservative_sale_locked(ctx),
+    )
+
+
+func _set_onboarding_override(id: StringName, payload: Variant) -> void:
+    if payload == null:
+        if GameplayOverride.is_active(id):
+            GameplayOverride.deactivate(id)
+        return
+    if not GameplayOverride.is_active(id) or GameplayOverride.payload(id) != payload:
+        GameplayOverride.activate(id, payload)
+
+
+func _onboarding_forced_tutorial_location(ctx: Dictionary) -> Variant:
+    if _is_unit_seen("onboarding_location_select"):
+        return null
+    if int(ctx.get("day", -1)) == 0 and int(ctx.get("slot", -1)) == SlotStore.SLOT_DAY:
+        return true
+    return null
+
+
+func _onboarding_forced_activity(ctx: Dictionary) -> Variant:
+    var day := int(ctx.get("day", -1))
+    var slot := int(ctx.get("slot", -1))
+    if day == 0 and slot == SlotStore.SLOT_DAY:
+        return &"auction"
+    if day == 0 and slot == SlotStore.SLOT_NIGHT:
+        return &"storage"
+    if day == 1 and slot == SlotStore.SLOT_DAY:
+        var storage_count := int(ctx.get("storage_item_count", 0))
+        if storage_count > 0:
+            return &"selling"
+    return null
+
+
+func _onboarding_conservative_sale_locked(ctx: Dictionary) -> Variant:
+    if _is_unit_seen("onboarding_selling"):
+        return null
+    return ctx.get("onboarding_pending", false)
+
+
+func _clear_onboarding_overrides() -> void:
+    for id in [
+        GameplayOverride.FORCED_TUTORIAL_LOCATION,
+        GameplayOverride.FORCED_ACTIVITY,
+        GameplayOverride.CONSERVATIVE_SALE_LOCKED,
+    ]:
+        if GameplayOverride.is_active(id):
+            GameplayOverride.deactivate(id)
 
 # ══ Scene registration decision (for non-active state) ════════════════════════
 
@@ -365,22 +418,6 @@ func _is_unit_seen(unit_id: String) -> bool:
     return MetaManager.progress.tutorial_seen.has(unit_id)
 
 
-## Derives the targeted activity during onboarding, or returns an empty
-## StringName when no activity is targeted.
-func _derive_activity_chooser_target() -> StringName:
-    if not MetaManager.is_onboarding_pending():
-        return &""
-    if MetaManager.progress.current_day == 0 and MetaManager.slot.current_slot == SlotStore.SLOT_DAY:
-        return &"auction"
-    if MetaManager.progress.current_day == 0 and MetaManager.slot.current_slot == SlotStore.SLOT_NIGHT:
-        return &"storage"
-    if MetaManager.progress.current_day == 1 and MetaManager.slot.current_slot == SlotStore.SLOT_DAY:
-        if MetaManager.storage.storage_items.is_empty():
-            return &""
-        return &"selling"
-    return &""
-
-
 ## Checks whether onboarding should complete. Two paths:
 ## 1. The script that just ended is `onboarding_selling` — always complete.
 ## 2. Every required onboarding milestone is seen — complete.
@@ -389,11 +426,13 @@ func _complete_onboarding_if_all_milestones_seen(script_id: String) -> void:
         return
     if script_id == "onboarding_selling":
         MetaManager.complete_onboarding()
+        _clear_onboarding_overrides()
         return
     for unit_id: String in TutorialScripts.required_onboarding_unit_ids():
         if not _is_unit_seen(unit_id):
             return
     MetaManager.complete_onboarding()
+    _clear_onboarding_overrides()
 
 
 func _on_hub_registered() -> void:

@@ -19,16 +19,19 @@ Does not apply to:
 
 # 1. Ownership Boundary
 
-Tutorial infrastructure has two layers: presentation and flow.
+Tutorial infrastructure has three layers: presentation, flow, and gameplay overrides.
 
-`Director` is the presentation layer. It owns overlay nodes, dimming, highlight holes, panel placement, offer prompts, Help button display, and anchor lookup. It must not own script order, current step index, wait conditions, tutorial completion, or tutorial-seen persistence.
+`Director` is the presentation layer. It owns overlay nodes, dimming, highlight holes, panel placement, offer prompts, Help button display, and anchor lookup. It must not own script order, current step index, wait conditions, tutorial completion, tutorial-seen persistence, or gameplay override state.
 
-`ScriptDirector` is the flow layer. It owns the active tutorial id, active step list, current step index, wait-condition evaluation, cross-scene continuation, runtime reset, and tutorial-seen marking.
+`ScriptDirector` is the flow layer. It owns the active tutorial id, active step list, current step index, wait-condition evaluation, cross-scene continuation, runtime reset, tutorial-seen marking, and the lifecycle of `GameplayOverride` (activating/deactivating unit-scoped overrides and refreshing onboarding-scoped overrides).
+
+`GameplayOverride` is a runtime-only autoload that stores named gameplay overrides. The flow layer pushes overrides (which modifiers are active for the current tutorial unit or onboarding phase). Gameplay scenes read the override store and react to its change signal. The override store is cleared on save-slot reset.
 
 Rules:
 
 - Do not add step-order state to `Director`.
-- Do not make gameplay scenes call `ScriptDirector` to advance tutorial steps.
+- Do not make gameplay scenes call `ScriptDirector` to advance tutorial steps, or to query tutorial flow state (active script id, step index, seen status).
+- Do not make gameplay scenes call `Director` for gameplay-affecting overrides (assisted auction, locked sale, forced activity, and so on). Those live in `GameplayOverride` and are pushed by `ScriptDirector`, not pulled by scenes.
 - Do not make gameplay systems reference tutorial copy, tutorial ids, or tutorial step indexes.
 - Use `Director.start_script()` only as a compatibility facade or UI entry point; new orchestration logic belongs in `ScriptDirector`.
 - If a caller needs a tutorial step to advance because a gameplay action happened, emit a tutorial event instead of calling tutorial flow directly.
@@ -229,6 +232,17 @@ _chooser.hide()
 # missing Director.unregister_anchor(...)
 ```
 
+```gdscript
+# Wrong: gameplay scene queries tutorial flow layer for state.
+if Director.is_auction_assisted():
+    _pass_button.disabled = true
+```
+
+```gdscript
+# Wrong: gameplay scene connects to tutorial completion signal.
+Director.script_completed.connect(_unlock_something)
+```
+
 Correct shapes:
 
 ```gdscript
@@ -242,4 +256,10 @@ EventBus.save_runtime_reset.emit()
 ```gdscript
 Director.register_anchor("storage_btn", _storage_btn)
 Director.unregister_anchor("storage_btn")
+```
+
+```gdscript
+# Correct: gameplay scene reads the override store.
+if GameplayOverride.is_active(GameplayOverride.ASSISTED_AUCTION):
+    _pass_button.disabled = true
 ```

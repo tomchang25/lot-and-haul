@@ -20,7 +20,6 @@ const LocationCardScene := preload("res://game/meta/location_select/location_car
 func _ready() -> void:
     _back_button.pressed.connect(_on_back_pressed)
     _back_button.press_event = CANCEL
-    _populate_cards()
     Director.register_scene(
         "location_select",
         {
@@ -28,6 +27,7 @@ func _ready() -> void:
             "back_btn": _back_button,
         },
     )
+    _populate_cards()
 
 # ══ Population ════════════════════════════════════════════════════════════════
 
@@ -37,7 +37,7 @@ func _populate_cards() -> void:
 
     # During the first onboarding run, show ONLY the tutorial location.
     # Never fall through to normal pool — tutorial must gate to the intended path.
-    if Director.use_tutorial_location():
+    if GameplayOverride.is_active(GameplayOverride.FORCED_TUTORIAL_LOCATION):
         var tutorial_loc := LocationRegistry.get_tutorial_location()
         if tutorial_loc == null:
             ToastManager.show_dev_error("LocationSelectScene: no tutorial location found for onboarding")

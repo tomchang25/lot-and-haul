@@ -42,6 +42,7 @@ func _ready() -> void:
     _storage_btn.pressed.connect(_on_storage_chosen)
     _sell_btn.pressed.connect(_on_sell_chosen)
     _cancel_btn.pressed.connect(_on_chooser_cancelled)
+    GameplayOverride.override_changed.connect(_on_gameplay_override_changed)
 
     # Register anchors before the slot check so tutorials that wait for
     # hub (SCENE_ENTERED) can advance even when this visit immediately
@@ -94,6 +95,13 @@ func _on_sell_chosen() -> void:
 func _on_chooser_cancelled() -> void:
     _close_chooser()
 
+
+func _on_gameplay_override_changed(id: StringName, _active: bool, _payload: Variant) -> void:
+    if id != GameplayOverride.FORCED_ACTIVITY:
+        return
+    if _chooser.visible:
+        _refresh_activity_choice_locks()
+
 # ══ Signal handlers — utility navigation ══════════════════════════════════════
 
 
@@ -120,22 +128,7 @@ func _show_chooser() -> void:
     _storage_btn.visible = true
     _sell_btn.visible = true
     _cancel_btn.visible = true
-
-    # Onboarding gating: disable non-target activity options.
-    # Reset all to enabled first.
-    _auction_btn.disabled = false
-    _storage_btn.disabled = false
-    _sell_btn.disabled = false
-    var target := Director.activity_chooser_target()
-    if target == &"auction":
-        _storage_btn.disabled = true
-        _sell_btn.disabled = true
-    elif target == &"storage":
-        _auction_btn.disabled = true
-        _sell_btn.disabled = true
-    elif target == &"selling":
-        _auction_btn.disabled = true
-        _storage_btn.disabled = true
+    _refresh_activity_choice_locks()
 
     _chooser.show()
 
@@ -152,6 +145,23 @@ func _close_chooser() -> void:
     Director.unregister_anchor("auction_btn")
     Director.unregister_anchor("storage_btn")
     Director.unregister_anchor("sell_btn")
+
+
+func _refresh_activity_choice_locks() -> void:
+    # Onboarding gating: disable non-target activity options.
+    _auction_btn.disabled = false
+    _storage_btn.disabled = false
+    _sell_btn.disabled = false
+    var target := GameplayOverride.payload(GameplayOverride.FORCED_ACTIVITY) as StringName
+    if target == &"auction":
+        _storage_btn.disabled = true
+        _sell_btn.disabled = true
+    elif target == &"storage":
+        _auction_btn.disabled = true
+        _sell_btn.disabled = true
+    elif target == &"selling":
+        _auction_btn.disabled = true
+        _storage_btn.disabled = true
 
 # ══ Display ═══════════════════════════════════════════════════════════════════
 

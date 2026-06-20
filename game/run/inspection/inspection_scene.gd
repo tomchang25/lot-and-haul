@@ -78,7 +78,6 @@ func _ready() -> void:
     _footer.show()
     _pass_button.show()
     _review_button.show()
-    _review_button.disabled = Director.should_disable_inspection_review()
     _pass_button.pressed.connect(_on_pass_pressed)
     _pass_confirm_popup.confirmed.connect(_on_pass_confirmed)
     _review_button.pressed.connect(_on_review_pressed)
@@ -103,6 +102,8 @@ func _ready() -> void:
             "inspect_btn": _action_inspect_button,
         },
     )
+    _review_button.disabled = GameplayOverride.is_active(GameplayOverride.INSPECTION_REVIEW_GATED)
+    GameplayOverride.override_changed.connect(_on_inspection_override_changed)
 
 
 func _process(_delta: float) -> void:
@@ -184,8 +185,6 @@ func _do_clue_chain(entry: ItemEntry) -> void:
 
     _complete_action()
     EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_PERFORMED, { })
-    if not Director.should_disable_inspection_review():
-        _review_button.disabled = false
 
 
 func _complete_action() -> void:
@@ -200,6 +199,11 @@ func _complete_action() -> void:
 func _clear_clue_result() -> void:
     _clue_result_label.text = ""
     _clue_result_section.hide()
+
+
+func _on_inspection_override_changed(id: StringName, active: bool, _payload: Variant) -> void:
+    if id == GameplayOverride.INSPECTION_REVIEW_GATED:
+        _review_button.disabled = active
 
 
 func _reveal_item(item: ItemEntry) -> void:

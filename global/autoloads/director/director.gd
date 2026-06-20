@@ -7,6 +7,8 @@ extends Node
 
 const OVERLAY_LAYER := 120
 const DIM_COLOR := Color(0.0, 0.0, 0.0, 0.55)
+const UNLOCKED_DIM_COLOR := Color(0.0, 0.0, 0.0, 0.35)
+const UNLOCKED_HOLE_PADDING := 8.0
 const PANEL_BG := Color(0.15, 0.15, 0.18, 1.0)
 const PANEL_BORDER := Color(0.3, 0.3, 0.35, 1.0)
 const TEXT_COLOR := Color(0.88, 0.88, 0.92, 1.0)
@@ -146,47 +148,6 @@ func advance_step() -> void:
 func skip_all_onboarding() -> void:
     ScriptDirector.skip_all_onboarding()
 
-# ══ Tutorial-driven state queries — delegated to ScriptDirector ═════════════
-
-
-## Returns true when the location-select scene should show only the tutorial
-## location. Evaluated before the location_select unit is active, so it uses
-## trigger context directly.
-func use_tutorial_location() -> bool:
-    return ScriptDirector.use_tutorial_location()
-
-
-## Returns true while the onboarding_auction unit is active. Auction scene
-## uses this to disable NPC bidding and the pass button.
-func is_auction_assisted() -> bool:
-    return ScriptDirector.is_auction_assisted()
-
-
-## Returns the activity that the onboarding flow wants the player to choose
-## ("auction", "storage", "selling"), or an empty StringName when no target
-## is active. Hub scene uses this to gate the chooser buttons.
-func activity_chooser_target() -> StringName:
-    return ScriptDirector.activity_chooser_target()
-
-
-## Returns true while onboarding is pending and the selling tutorial has not
-## yet been seen. Customer_sell scene uses this to lock conservative sale.
-func is_conservative_sale_locked() -> bool:
-    return ScriptDirector.is_conservative_sale_locked()
-
-
-## Returns true while the onboarding_lot_browse unit is active. Lot_browse
-## scene uses this to disable the pass/skip buttons.
-func should_disable_pass_in_lot_browse() -> bool:
-    return ScriptDirector.should_disable_pass_in_lot_browse()
-
-
-## Returns true while the onboarding_inspection unit is active and the player
-## has not yet performed an inspection. Inspection scene uses this to disable
-## the review button.
-func should_disable_inspection_review() -> bool:
-    return ScriptDirector.should_disable_inspection_review()
-
 # ══ Public accessors — delegated to ScriptDirector ════════════════════════════
 
 
@@ -266,6 +227,7 @@ func show_offer_prompt(script_id: String, offer_text: String, accept_text: Strin
 func hide_offer_prompt() -> void:
     _is_offer_showing = false
     _dim_full.visible = false
+    _dim_full.mouse_filter = Control.MOUSE_FILTER_IGNORE
     _popup_panel.visible = false
     _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
     _offer_safe_disconnect(_popup_next.pressed, _on_offer_start_pressed)
@@ -429,15 +391,13 @@ func _show_hint(step: TutorialStep) -> void:
     var t_rect: Rect2 = target.get("rect", Rect2())
     var preferred: int = target.get("preferred", TutorialTarget.PreferredSide.AUTO)
     if step.blocks_input:
-        _update_dim_hole(t_rect)
+        _update_dim_hole(_hint_hole_rect(step, t_rect), _hint_dim_color(step))
     else:
-        _dim_top.visible = false
-        _dim_bottom.visible = false
-        _dim_left.visible = false
-        _dim_right.visible = false
+        _hide_dim_hole()
 
     if step.unlock_anchor or not step.blocks_input:
         _dim_full.visible = false
+        _dim_full.mouse_filter = Control.MOUSE_FILTER_IGNORE
     else:
         _dim_full.color = Color.TRANSPARENT
         _dim_full.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -479,15 +439,14 @@ func _hide_step_ui() -> void:
     _hint_panel.visible = false
     _popup_panel.visible = false
     _dim_full.visible = false
-    _dim_top.visible = false
-    _dim_bottom.visible = false
-    _dim_left.visible = false
-    _dim_right.visible = false
+    _dim_full.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _hide_dim_hole()
 
 
 func _hide_offer_state() -> void:
     _is_offer_showing = false
     _dim_full.visible = false
+    _dim_full.mouse_filter = Control.MOUSE_FILTER_IGNORE
     _popup_panel.visible = false
 
 # ══ Navigation buttons ═════════════════════════════════════════════════════════
@@ -548,7 +507,7 @@ func _on_scene_changed() -> void:
 # ══ Dim / hole layout ══════════════════════════════════════════════════════════
 
 
-func _update_dim_hole(hole: Rect2) -> void:
+func _update_dim_hole(hole: Rect2, dim_color: Color = DIM_COLOR) -> void:
     var screen: Vector2 = _get_screen_size()
 
     var hole_top: float = maxf(hole.position.y, 0.0)
@@ -569,8 +528,27 @@ func _update_dim_hole(hole: Rect2) -> void:
     _dim_right.size = Vector2(maxf(screen.x - hole_right, 0), hole.size.y)
 
     for dim in [_dim_top, _dim_bottom, _dim_left, _dim_right]:
+        dim.color = dim_color
         dim.visible = true
         dim.mouse_filter = Control.MOUSE_FILTER_STOP
+
+
+func _hide_dim_hole() -> void:
+    for dim in [_dim_top, _dim_bottom, _dim_left, _dim_right]:
+        dim.visible = false
+        dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func _hint_hole_rect(step: TutorialStep, target_rect: Rect2) -> Rect2:
+    if step.unlock_anchor:
+        return target_rect.grow(UNLOCKED_HOLE_PADDING)
+    return target_rect
+
+
+func _hint_dim_color(step: TutorialStep) -> Color:
+    if step.unlock_anchor:
+        return UNLOCKED_DIM_COLOR
+    return DIM_COLOR
 
 # ══ Per-frame hole update ══════════════════════════════════════════════════════
 
@@ -596,12 +574,9 @@ func _process(_delta: float) -> void:
     _last_target_info = { "rect": t_rect, "preferred": preferred }
 
     if _rendered_step.blocks_input:
-        _update_dim_hole(t_rect)
+        _update_dim_hole(_hint_hole_rect(_rendered_step, t_rect), _hint_dim_color(_rendered_step))
     else:
-        _dim_top.visible = false
-        _dim_bottom.visible = false
-        _dim_left.visible = false
-        _dim_right.visible = false
+        _hide_dim_hole()
 
     if _rendered_step.blocks_input and not _rendered_step.unlock_anchor:
         _dim_full.position = t_rect.position

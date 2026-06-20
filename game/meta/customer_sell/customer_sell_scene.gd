@@ -107,9 +107,8 @@ func _ready() -> void:
 
     # During the onboarding_selling tutorial, lock conservative so the player
     # can't short-circuit the aggressive dice flow by closing the sale early.
-    if Director.is_conservative_sale_locked():
-        _deal_panel.set_conservative_sale_locked(true)
-        Director.script_completed.connect(_on_selling_tutorial_completed)
+    _apply_conservative_lock()
+    GameplayOverride.override_changed.connect(_on_customer_sell_override_changed)
 
 # ══ Signal handlers ═══════════════════════════════════════════════════════════
 
@@ -216,6 +215,8 @@ func _on_car_placement_changed() -> void:
 
 
 func _on_conservative_requested(price: int) -> void:
+    if GameplayOverride.is_active(GameplayOverride.CONSERVATIVE_SALE_LOCKED):
+        return
     var placed := _car_panel.get_grid().get_placed_items()
     if placed.is_empty():
         return
@@ -295,10 +296,13 @@ func _on_back_pressed() -> void:
     SceneRouter.go_to_hub()
 
 
-func _on_selling_tutorial_completed(_script_id: String) -> void:
-    _deal_panel.set_conservative_sale_locked(false)
-    if Director.script_completed.is_connected(_on_selling_tutorial_completed):
-        Director.script_completed.disconnect(_on_selling_tutorial_completed)
+func _apply_conservative_lock() -> void:
+    _deal_panel.set_conservative_sale_locked(GameplayOverride.is_active(GameplayOverride.CONSERVATIVE_SALE_LOCKED))
+
+
+func _on_customer_sell_override_changed(id: StringName, active: bool, _payload: Variant) -> void:
+    if id == GameplayOverride.CONSERVATIVE_SALE_LOCKED:
+        _deal_panel.set_conservative_sale_locked(active)
 
 # ══ Customer selection ════════════════════════════════════════════════════════
 

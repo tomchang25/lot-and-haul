@@ -44,7 +44,6 @@ func _ready() -> void:
         SaveManager.save()
 
     _build_all_cards()
-    _refresh_view()
     Director.register_scene(
         "lot_browse",
         {
@@ -53,6 +52,7 @@ func _ready() -> void:
             "skip_btn": _skip_button,
         },
     )
+    _refresh_view()
 
 # ══ View helpers ══════════════════════════════════════════════════════════════
 
@@ -73,7 +73,7 @@ func _build_all_cards() -> void:
 
 func _refresh_view() -> void:
     var idx: int = RunManager.run.browse_index
-    var lock_pass := Director.should_disable_pass_in_lot_browse()
+    var lock_pass := GameplayOverride.is_active(GameplayOverride.LOT_PASS_LOCKED)
     _skip_button.disabled = lock_pass
 
     if idx >= RunManager.run.browse_lots.size():
@@ -108,7 +108,7 @@ func _on_enter_pressed() -> void:
 
 
 func _on_pass_pressed() -> void:
-    if Director.should_disable_pass_in_lot_browse():
+    if GameplayOverride.is_active(GameplayOverride.LOT_PASS_LOCKED):
         return
     RunManager.advance_browse_index()
     RunManager.set_resume_target(RunStore.RESUME_LOT_BROWSE)
@@ -117,7 +117,7 @@ func _on_pass_pressed() -> void:
 
 
 func _on_skip_pressed() -> void:
-    if Director.should_disable_pass_in_lot_browse():
+    if GameplayOverride.is_active(GameplayOverride.LOT_PASS_LOCKED):
         return
     var remaining: int = RunManager.run.browse_lots.size() - RunManager.run.browse_index
     _skip_confirm_popup.dialog_text = (
