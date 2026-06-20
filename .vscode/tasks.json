@@ -67,6 +67,39 @@
             "problemMatcher": []
         },
         {
+            "label": "Localization: YAML → CSV",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/dev/tools/localization_yaml_to_csv.py",
+                "--godot-root",
+                "${workspaceFolder}"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Localization: YAML → CSV (dry-run)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/dev/tools/localization_yaml_to_csv.py",
+                "--godot-root",
+                "${workspaceFolder}",
+                "--dry-run"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "YAML Stats",
             "type": "shell",
             "command": "python",
