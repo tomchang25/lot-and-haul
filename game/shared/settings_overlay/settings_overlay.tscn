@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://s3da6lc55hky"]
 
 [ext_resource type="Script" uid="uid://do8f0uelvy7ki" path="res://game/shared/settings_overlay/settings_overlay.gd" id="1_sogd"]
-[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
 bg_color = Color(0.12, 0.12, 0.15, 1)
@@ -29,6 +29,7 @@ mouse_filter = 2
 color = Color(0, 0, 0, 0.6)
 
 [node name="CenterContainer" type="Control" parent="." unique_id=1200000003]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -38,13 +39,11 @@ grow_vertical = 2
 [node name="Panel" type="PanelContainer" parent="CenterContainer" unique_id=1200000004]
 custom_minimum_size = Vector2(480, 0)
 layout_mode = 1
-anchors_preset = 0
+anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 0.05
 anchor_right = 0.5
 anchor_bottom = 0.95
-margin_left = -240
-margin_right = 240
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_1")
@@ -56,188 +55,200 @@ theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 24
 
-[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/Panel/MarginContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/Panel/MarginContainer" unique_id=1588747009]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="RootVBox" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer" unique_id=1200000006]
+[node name="ScrollContentMargin" type="MarginContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer" unique_id=1252033111]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 4
+
+[node name="RootVBox" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin" unique_id=1200000006]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000007]
+[node name="TitleLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000007]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "UI_SETTINGS_TITLE"
 horizontal_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000008]
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000008]
 layout_mode = 2
 
-[node name="AudioLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000009]
+[node name="AudioLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000009]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "UI_SETTINGS_AUDIO"
 
-[node name="MasterRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000010]
+[node name="MasterRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000010]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="MasterLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/MasterRow" unique_id=1200000011]
+[node name="MasterLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/MasterRow" unique_id=1200000011]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "UI_SETTINGS_MASTER"
 
-[node name="MasterSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/MasterRow" unique_id=1200000012]
+[node name="MasterSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/MasterRow" unique_id=1200000012]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MasterValueLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/MasterRow" unique_id=1200000013]
+[node name="MasterValueLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/MasterRow" unique_id=1200000013]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(48, 0)
 layout_mode = 2
 text = "100%"
 horizontal_alignment = 2
 
-[node name="SfxRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000014]
+[node name="SfxRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000014]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="SfxLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/SfxRow" unique_id=1200000015]
+[node name="SfxLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/SfxRow" unique_id=1200000015]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "UI_SETTINGS_SFX"
 
-[node name="SfxSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/SfxRow" unique_id=1200000016]
+[node name="SfxSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/SfxRow" unique_id=1200000016]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SfxValueLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/SfxRow" unique_id=1200000017]
+[node name="SfxValueLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/SfxRow" unique_id=1200000017]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(48, 0)
 layout_mode = 2
 text = "100%"
 horizontal_alignment = 2
 
-[node name="MusicRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000018]
+[node name="MusicRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000018]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="MusicLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/MusicRow" unique_id=1200000019]
+[node name="MusicLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/MusicRow" unique_id=1200000019]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "UI_SETTINGS_MUSIC"
 
-[node name="MusicSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/MusicRow" unique_id=1200000020]
+[node name="MusicSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/MusicRow" unique_id=1200000020]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MusicValueLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/MusicRow" unique_id=1200000021]
+[node name="MusicValueLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/MusicRow" unique_id=1200000021]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(48, 0)
 layout_mode = 2
 text = "100%"
 horizontal_alignment = 2
 
-[node name="HSeparator2" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000022]
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000022]
 layout_mode = 2
 
-[node name="LanguageRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox"]
+[node name="LanguageRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1852830082]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="LanguageLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/LanguageRow"]
+[node name="LanguageLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/LanguageRow" unique_id=1252093478]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "UI_SETTINGS_LANGUAGE"
 
-[node name="LanguageOption" type="OptionButton" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/LanguageRow"]
+[node name="LanguageOption" type="OptionButton" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/LanguageRow" unique_id=109534943]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 item_count = 3
 popup/item_0/text = "UI_SETTINGS_ENGLISH"
+popup/item_0/id = 0
 popup/item_1/text = "UI_SETTINGS_TRADITIONAL_CHINESE"
+popup/item_1/id = 1
 popup/item_2/text = "UI_SETTINGS_SIMPLIFIED_CHINESE"
+popup/item_2/id = 2
 
-[node name="HSeparator6" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox"]
+[node name="HSeparator6" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1374048425]
 layout_mode = 2
 
-[node name="DisplayLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000023]
+[node name="DisplayLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000023]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "UI_SETTINGS_DISPLAY"
 
-[node name="FullscreenRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000024]
+[node name="FullscreenRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000024]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="FullscreenLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/FullscreenRow" unique_id=1200000025]
+[node name="FullscreenLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/FullscreenRow" unique_id=1200000025]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "UI_SETTINGS_FULLSCREEN"
 
-[node name="FullscreenCheck" type="CheckBox" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/FullscreenRow" unique_id=1200000026]
+[node name="FullscreenCheck" type="CheckBox" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/FullscreenRow" unique_id=1200000026]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="HSeparator3" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000027]
+[node name="HSeparator3" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000027]
 layout_mode = 2
 
-[node name="GameplayLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000028]
+[node name="GameplayLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000028]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "UI_SETTINGS_GAMEPLAY"
 
-[node name="DebugRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000029]
+[node name="DebugRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000029]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="DebugLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/DebugRow" unique_id=1200000030]
+[node name="DebugLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/DebugRow" unique_id=1200000030]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "UI_SETTINGS_DEBUG_MODE"
 
-[node name="DebugCheck" type="CheckBox" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/DebugRow" unique_id=1200000031]
+[node name="DebugCheck" type="CheckBox" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/DebugRow" unique_id=1200000031]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="HSeparator4" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000032]
+[node name="HSeparator4" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000032]
 layout_mode = 2
 
-[node name="SkipTutorialRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000035]
+[node name="SkipTutorialRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000035]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="SkipTutorialLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/SkipTutorialRow" unique_id=1200000036]
+[node name="SkipTutorialLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/SkipTutorialRow" unique_id=1200000036]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "UI_SETTINGS_SKIP_TUTORIALS"
 
-[node name="SkipTutorialCheck" type="CheckBox" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox/SkipTutorialRow" unique_id=1200000037]
+[node name="SkipTutorialCheck" type="CheckBox" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox/SkipTutorialRow" unique_id=1200000037]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="HSeparator5" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000038]
+[node name="HSeparator5" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000038]
 layout_mode = 2
 
-[node name="CloseButton" type="Button" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000033]
-script = ExtResource("99_sfx")
+[node name="CloseButton" type="Button" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000033]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "UI_SETTINGS_CLOSE"
-
-[node name="MainMenuButton" type="Button" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/RootVBox" unique_id=1200000034]
 script = ExtResource("99_sfx")
+
+[node name="MainMenuButton" type="Button" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000034]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 40)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "UI_SETTINGS_RETURN_TO_MAIN_MENU"
+script = ExtResource("99_sfx")
 
 [node name="ConfirmCanvas" type="CanvasLayer" parent="." unique_id=1200000040]
 unique_name_in_owner = true
@@ -256,24 +267,20 @@ color = Color(0, 0, 0, 0.4)
 
 [node name="ConfirmPanel" type="PanelContainer" parent="ConfirmCanvas" unique_id=1200000042]
 unique_name_in_owner = true
-mouse_filter = 2
+custom_minimum_size = Vector2(360, 0)
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -180.0
-margin_top = -80.0
-margin_right = 180.0
-margin_bottom = 80.0
-custom_minimum_size = Vector2(360, 0)
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_1")
 
 [node name="ConfirmMargin" type="MarginContainer" parent="ConfirmCanvas/ConfirmPanel" unique_id=1200000043]
 layout_mode = 2
 theme_override_constants/margin_left = 24
-theme_override_constants/margin_right = 24
 theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 20
 
 [node name="ConfirmVBox" type="VBoxContainer" parent="ConfirmCanvas/ConfirmPanel/ConfirmMargin" unique_id=1200000044]
@@ -283,13 +290,13 @@ theme_override_constants/separation = 16
 [node name="ConfirmLabel" type="Label" parent="ConfirmCanvas/ConfirmPanel/ConfirmMargin/ConfirmVBox" unique_id=1200000045]
 unique_name_in_owner = true
 layout_mode = 2
-autowrap_mode = 3
 text = "UI_SETTINGS_CONFIRM_SKIP_LABEL"
+autowrap_mode = 3
 
 [node name="ConfirmBtnHBox" type="HBoxContainer" parent="ConfirmCanvas/ConfirmPanel/ConfirmMargin/ConfirmVBox" unique_id=1200000046]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 12
+alignment = 1
 
 [node name="ConfirmNo" type="Button" parent="ConfirmCanvas/ConfirmPanel/ConfirmMargin/ConfirmVBox/ConfirmBtnHBox" unique_id=1200000047]
 unique_name_in_owner = true
