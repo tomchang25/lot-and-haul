@@ -53,6 +53,7 @@ func _ready() -> void:
         },
     )
     _refresh_view()
+    GameplayOverride.override_changed.connect(_on_lot_browse_override_changed)
 
 # ══ View helpers ══════════════════════════════════════════════════════════════
 
@@ -130,6 +131,11 @@ func _on_skip_confirmed() -> void:
     RunManager.set_resume_target(RunStore.RESUME_CARGO)
     SaveManager.save()
     SceneRouter.go_to_cargo()
+
+
+func _on_lot_browse_override_changed(id: StringName, _active: bool, _payload: Variant) -> void:
+    if id == GameplayOverride.LOT_PASS_LOCKED:
+        _refresh_view()
 
 
 func _on_cargo_pressed() -> void:

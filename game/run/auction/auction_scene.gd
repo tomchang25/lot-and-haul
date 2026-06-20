@@ -132,6 +132,7 @@ func _ready() -> void:
     else:
         _start_npc_timer()
         # Circle starts on the first bid (player or NPC), not here.
+    GameplayOverride.override_changed.connect(_on_auction_override_changed)
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 
@@ -209,6 +210,14 @@ func _on_bid_pressed() -> void:
     _shorten_next_npc_tick = true
     AudioManager.play_event(BID_CONFIRM)
     EventBus.tutorial_event.emit(TutorialEvents.BID_PLACED, { })
+
+
+func _on_auction_override_changed(id: StringName, active: bool, _payload: Variant) -> void:
+    if id != GameplayOverride.ASSISTED_AUCTION:
+        return
+    if not active and not _has_started:
+        _pass_button.disabled = false
+        _start_npc_timer()
 
 
 func _on_pass_pressed() -> void:

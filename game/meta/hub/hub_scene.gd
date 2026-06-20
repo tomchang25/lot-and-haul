@@ -99,8 +99,7 @@ func _on_chooser_cancelled() -> void:
 func _on_gameplay_override_changed(id: StringName, _active: bool, _payload: Variant) -> void:
     if id != GameplayOverride.FORCED_ACTIVITY:
         return
-    if _chooser.visible:
-        _refresh_activity_choice_locks()
+    _refresh_activity_choice_locks()
 
 # ══ Signal handlers — utility navigation ══════════════════════════════════════
 
@@ -152,7 +151,7 @@ func _refresh_activity_choice_locks() -> void:
     _auction_btn.disabled = false
     _storage_btn.disabled = false
     _sell_btn.disabled = false
-    var target := GameplayOverride.payload(GameplayOverride.FORCED_ACTIVITY) as StringName
+    var target := GameplayOverride.payload(GameplayOverride.FORCED_ACTIVITY)
     if target == &"auction":
         _storage_btn.disabled = true
         _sell_btn.disabled = true

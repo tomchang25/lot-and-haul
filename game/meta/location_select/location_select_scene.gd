@@ -28,6 +28,7 @@ func _ready() -> void:
         },
     )
     _populate_cards()
+    GameplayOverride.override_changed.connect(_on_location_override_changed)
 
 # ══ Population ════════════════════════════════════════════════════════════════
 
@@ -69,6 +70,14 @@ func _on_card_pressed(card: LocationCard) -> void:
     MetaManager.begin_auction()
     EventBus.tutorial_event.emit(TutorialEvents.LOCATION_SELECTED, { })
     SceneRouter.go_to_location_entry()
+
+
+func _on_location_override_changed(id: StringName, active: bool, _payload: Variant) -> void:
+    if id == GameplayOverride.FORCED_TUTORIAL_LOCATION and not active:
+        # Clear and repopulate cards when the forced tutorial location override drops.
+        for child in _cards_container.get_children():
+            child.queue_free()
+        _populate_cards()
 
 
 func _on_back_pressed() -> void:

@@ -513,8 +513,8 @@ func _show_skip_all_confirm() -> void:
 func _on_skip_all_confirmed() -> void:
     SettingsStore.tutorial_skip_all = true
     SettingsStore.save_settings()
-    if ScriptDirector.active:
-        ScriptDirector.stop_script()
+    ScriptDirector.dismiss_script()
+    ScriptDirector.refresh_overrides()
     _hide_skip_all_confirm()
 
 

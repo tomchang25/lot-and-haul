@@ -69,8 +69,25 @@ func stop_script() -> void:
     _deactivate_unit_overrides()
     _mark_seen(script_id)
     _complete_onboarding_if_all_milestones_seen(script_id)
+    _refresh_onboarding_overrides()
     Director.hide_tutorial_overlay()
     _clear_state()
+
+
+## Cleans up an active tutorial without marking anything seen or modifying
+## onboarding-pending state. Used when the player bypasses tutorials via the
+## settings toggle or "Skip All" button, so toggling off later can re-trigger.
+func dismiss_script() -> void:
+    if not _is_active:
+        return
+    _deactivate_unit_overrides()
+    Director.hide_tutorial_overlay()
+    _clear_state()
+
+
+## Public wrapper so Director can trigger an override refresh.
+func refresh_overrides() -> void:
+    _refresh_onboarding_overrides()
 
 
 ## Marks every onboarding unit as seen, clears the pending flag, and stops
@@ -256,6 +273,7 @@ func _end_tutorial() -> void:
     _deactivate_unit_overrides()
     _mark_seen(completed_id)
     _complete_onboarding_if_all_milestones_seen(completed_id)
+    _refresh_onboarding_overrides()
     Director.hide_tutorial_overlay()
     _clear_state()
     Director.notify_script_completed(completed_id)
@@ -307,6 +325,9 @@ func _refresh_onboarding_overrides() -> void:
     if not MetaManager.is_onboarding_pending():
         _clear_onboarding_overrides()
         return
+    if SettingsStore.tutorial_skip_all:
+        _clear_onboarding_overrides()
+        return
     var ctx := _build_trigger_context()
     _set_onboarding_override(
         GameplayOverride.FORCED_TUTORIAL_LOCATION,
@@ -343,12 +364,16 @@ func _onboarding_forced_activity(ctx: Dictionary) -> Variant:
     var day := int(ctx.get("day", -1))
     var slot := int(ctx.get("slot", -1))
     if day == 0 and slot == SlotStore.SLOT_DAY:
+        if _is_unit_seen("onboarding_hub_intro_choose"):
+            return null
         return &"auction"
     if day == 0 and slot == SlotStore.SLOT_NIGHT:
+        if _is_unit_seen("onboarding_storage_choose"):
+            return null
         return &"storage"
     if day == 1 and slot == SlotStore.SLOT_DAY:
         var storage_count := int(ctx.get("storage_item_count", 0))
-        if storage_count > 0:
+        if storage_count > 0 and not _is_unit_seen("onboarding_shop_choose"):
             return &"selling"
     return null
 

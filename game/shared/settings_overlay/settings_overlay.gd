@@ -95,8 +95,7 @@ func _on_confirm_yes() -> void:
     _confirm_canvas.visible = false
     SettingsStore.tutorial_skip_all = true
     SettingsStore.save_settings()
-    if ScriptDirector.active:
-        Director.stop_script()
+    ScriptDirector.refresh_overrides()
 
 
 func _on_confirm_no() -> void:
