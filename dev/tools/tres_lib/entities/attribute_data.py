@@ -18,9 +18,11 @@ class AttributeDataSpec:
     yaml_key: str = "attributes"
     tres_subdir: str = "attributes"
     uid_prefix: str = "attribute"
-    script_paths: dict[str, str] = field(default_factory=lambda: {
-        "attribute_data": "res://data/definitions/attribute_data.gd",
-    })
+    script_paths: dict[str, str] = field(
+        default_factory=lambda: {
+            "attribute_data": "res://data/definitions/attribute_data.gd",
+        }
+    )
 
     def entity_id(self, entry: dict) -> str:
         return entry["attribute_id"]
@@ -43,7 +45,7 @@ class AttributeDataSpec:
 
         w.add_field('script = ExtResource("1_attr")')
         w.add_field_str("attribute_id", aid)
-        w.add_field_str("display_name", entry["display_name"])
+        w.add_field_str("display_name_key", entry.get("display_name_key", ""))
         w.add_field_int("starting_value", int(entry.get("starting_value", 1)))
         return w.render()
 
@@ -53,12 +55,12 @@ class AttributeDataSpec:
         if uid:
             ctx.uid_to_id[uid] = attribute_id
 
-        display_name = tres_field(text, "display_name") or attribute_id
+        display_name_key = tres_field(text, "display_name_key") or ""
         starting_value = int(tres_field(text, "starting_value") or 1)
 
         return {
             "attribute_id": attribute_id,
-            "display_name": display_name,
+            "display_name_key": display_name_key,
             "starting_value": starting_value,
         }
 
@@ -75,8 +77,8 @@ class AttributeDataSpec:
                 errors.append(f"Duplicate attribute_id: '{aid}'")
             seen_ids.add(aid)
 
-            if not attr.get("display_name"):
-                errors.append(f"Attribute '{aid}': missing display_name")
+            if not attr.get("display_name_key"):
+                errors.append(f"Attribute '{aid}': missing display_name_key")
 
         return errors
 

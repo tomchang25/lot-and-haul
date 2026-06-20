@@ -1,15 +1,4 @@
 en:
-  SYS_CONDITION_FORMAT: "Condition: %s (%s)"
-  SYS_PERCENT_FORMAT: "%d%%"
-  SYS_RARITY_COMMON: Common
-  SYS_RARITY_LEGENDARY: Legendary
-  SYS_RARITY_RARE: Rare
-  SYS_RARITY_UNCOMMON: Uncommon
-  SYS_STACK_FORMAT: "%d  %s"
-  SYS_UNKNOWN_FORMAT: "Unknown %s"
-  SYS_UNKNOWN_ITEM: Unknown Item
-  SYS_UNKNOWN_PLACEHOLDER: "???"
-  SYS_WEIGHT_FORMAT: "%.1f kg"
   UI_ACTIONS_HEADER: ACTIONS
   UI_ACTIVE: ACTIVE
   UI_ACTIVE_TASKS: Active · Tasks
@@ -179,6 +168,8 @@ en:
   UI_TRIP: Trip
   UI_UNVEIL_ACTION: Unveil (1 AP)
   UI_UPGRADE: Upgrade
+  UI_UPGRADE_COST_FORMAT: "Upgrade  $%d"
+  UI_NOT_ENOUGH_CASH: Not enough cash
   UI_VEHICLE_TITLE: Vehicle
   UI_VERIFIED_LABEL: "Verified: 0 / 0"
   UI_VIEW_CARDS: Cards

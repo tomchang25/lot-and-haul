@@ -8,8 +8,8 @@ extends Resource
 # Internal identifier. snake_case. Matches the .tres filename stem.
 @export var attribute_id: String = ""
 
-# Human-readable label shown to the player.
-@export var display_name: String = ""
+# Localization key for the human-readable label shown to the player.
+@export var display_name_key: String = ""
 
 # Starting value when a new game begins.
 @export var starting_value: int = 1

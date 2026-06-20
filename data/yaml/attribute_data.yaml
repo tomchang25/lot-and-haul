@@ -1,20 +1,20 @@
 attributes:
   - attribute_id: appraisal
-    display_name: Appraisal
+    display_name_key: SYS_ATTR_APPRAISAL
     starting_value: 1
 
   - attribute_id: perception
-    display_name: Perception
+    display_name_key: SYS_ATTR_PERCEPTION
     starting_value: 1
 
   - attribute_id: restoration
-    display_name: Restoration
+    display_name_key: SYS_ATTR_RESTORATION
     starting_value: 1
 
   - attribute_id: negotiation
-    display_name: Negotiation
+    display_name_key: SYS_ATTR_NEGOTIATION
     starting_value: 1
 
   - attribute_id: investigation
-    display_name: Investigation
+    display_name_key: SYS_ATTR_INVESTIGATION
     starting_value: 1

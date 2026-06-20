@@ -28,17 +28,6 @@ zh_CN:
   UI_SETTINGS_CONFIRM_SKIP_LABEL: "跳过所有剩余教程？\n\n教程将不再自动启动。你可以随时在设置中重新开启。"
   UI_SETTINGS_YES: 是
   UI_SETTINGS_NO: 否
-  SYS_CONDITION_FORMAT: "Condition: %s (%s)"
-  SYS_PERCENT_FORMAT: "%d%%"
-  SYS_RARITY_COMMON: Common
-  SYS_RARITY_LEGENDARY: Legendary
-  SYS_RARITY_RARE: Rare
-  SYS_RARITY_UNCOMMON: Uncommon
-  SYS_STACK_FORMAT: "%d  %s"
-  SYS_UNKNOWN_FORMAT: "Unknown %s"
-  SYS_UNKNOWN_ITEM: Unknown Item
-  SYS_UNKNOWN_PLACEHOLDER: "???"
-  SYS_WEIGHT_FORMAT: "%.1f kg"
   UI_ACTIONS_HEADER: ACTIONS
   UI_ACTIVE: ACTIVE
   UI_ACTIVE_TASKS: Active · Tasks
