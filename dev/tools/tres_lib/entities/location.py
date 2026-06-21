@@ -113,6 +113,7 @@ class LocationSpec:
         w.add_field('script = ExtResource("1_locdef")')
         w.add_field_str("location_id", location_id)
         w.add_field_bool("is_tutorial", bool(entry.get("is_tutorial", False)))
+        w.add_field_bool("is_test", bool(entry.get("is_test", False)))
         w.add_field_str("display_name_key", entry.get("display_name_key", ""))
         w.add_field_str("description_key", entry.get("description_key", ""))
         w.add_field_int("entry_fee", int(entry.get("entry_fee", 0)))
@@ -137,6 +138,7 @@ class LocationSpec:
         lot_number = int(tres_field(text, "lot_number") or 3)
         transition_type = tres_field(text, "transition_type") or "sliding_door"
         is_tutorial = (tres_field(text, "is_tutorial") or "").strip().lower() == "true"
+        is_test = (tres_field(text, "is_test") or "").strip().lower() == "true"
 
         ext_res = ext_resources(text)
 
@@ -152,6 +154,7 @@ class LocationSpec:
         return {
             "location_id": location_id,
             "is_tutorial": is_tutorial,
+            "is_test": is_test,
             "display_name_key": display_name_key,
             "description_key": description_key,
             "entry_fee": entry_fee,

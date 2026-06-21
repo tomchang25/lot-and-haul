@@ -11,6 +11,9 @@ extends Resource
 # Whether this lot is tutorial-only. Excluded from normal sampling.
 @export var is_tutorial: bool = false
 
+# Whether this lot is test-only. Excluded from normal sampling.
+@export var is_test: bool = false
+
 # ── NPC aggression ────────────────────────────────────────────────────────────
 
 # Range from which aggressive_factor is rolled at run start.

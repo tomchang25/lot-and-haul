@@ -10,6 +10,9 @@ extends Resource
 # Whether this location is tutorial-only. Excluded from normal sampling.
 @export var is_tutorial: bool = false
 
+# Whether this location is test-only. Excluded from normal sampling.
+@export var is_test: bool = false
+
 # Localization key for the location display name.
 @export var display_name_key: String = ""
 
