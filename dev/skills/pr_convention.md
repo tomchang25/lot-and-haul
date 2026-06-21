@@ -20,7 +20,7 @@ The PR title follows the same format as a commit subject line:
 
 ## Description
 
-Use these sections, in this order. `## Summary` and `## Changes` are REQUIRED; the rest appear only when applicable.
+Use these sections, in this order. `## Summary` and `## Changes` are REQUIRED; the rest appear only when useful.
 
 ### `## Summary` (required)
 
@@ -28,16 +28,12 @@ Use these sections, in this order. `## Summary` and `## Changes` are REQUIRED; t
 
 ### `## Changes` (required)
 
-The logical changes the PR makes. Format is free — use whatever reads clearest for this PR: a bullet list (one logical change per `-` bullet), prose, or grouped sub-headings for a larger PR. Bullets, when used, follow the same imperative style as commit bodies (e.g. `- Add demand tags to CustomerEntry`). Summarize logical changes, not commits — the two need not map 1:1.
+The logical changes the PR makes. Format is free for simple PRs: use prose or a bullet list with one logical change per `-` bullet. Bullets, when used, follow the same imperative style as commit bodies (e.g. `- Add demand tags to CustomerEntry`). Summarize logical changes, not commits — the two need not map 1:1.
 
-For a PR large enough to warrant grouping, pick whichever grouping fits the PR; default to **by area** when in doubt:
+For a PR large enough to warrant grouping, use `###` subheadings inside `## Changes`. Do not use bold-label bullets as section substitutes (for example, avoid `- **Localization** — ...` or `**Localization** — ...`). Pick whichever grouping fits the PR; default to **by area** when in doubt:
 
-- **By area / module** (default) — group bullets under the module or scene they touch (`**CustomerEntry**`, `**customer_sell scene**`, …). Matches how a reviewer reads the diff, so it's the safe choice for most PRs.
+- **By area / module** (default) — group bullets under `###` headings for the module or scene they touch (`### CustomerEntry`, `### customer_sell scene`, …). Matches how a reviewer reads the diff, so it's the safe choice for most PRs.
 - **By feature / theme** — group under each self-contained sub-feature or theme (`### Demand-tag matching`, `### Incidental fixes`, …). Use only when one PR genuinely carries several independent strands; if the strands are fully independent, prefer splitting into separate PRs instead.
-
-### `## Testing` (when code changed)
-
-How the change was verified: headless check, linter on changed files, manual scene walkthrough, etc. One bullet per verification step. Omit for docs-only PRs.
 
 ### `## Breaking changes` (when applicable)
 
@@ -72,10 +68,32 @@ Customers previously bought any item regardless of category, making demand tags 
 - Add demand-tag match check to CustomerSellService price resolution
 - Surface matched tags on the customer card in customer_sell scene
 - Add `demand_bonus` constant to economy constants
+```
 
-## Testing
+Grouped PRs use `###` subheadings inside `## Changes`:
 
-- Headless check via /tmp snapshot procedure — boots clean
-- Linter on changed files — no findings
-- Manual hub-night walkthrough: matched and unmatched items price as expected
+```
+feat(i18n): add multilingual localization support
+
+## Summary
+
+Hardcoded game strings are now externalized into per-language localization sources. The game can present UI and data text in multiple languages without scene-specific string edits.
+
+## Changes
+
+### Localization framework
+
+- Add per-language localization source files
+- Migrate UI and data-definition strings to localization keys
+
+### Dev tooling
+
+- Add YAML key naming lint coverage
+- Add localization export support
+```
+
+Optional verification, when useful:
+
+```
+
 ```

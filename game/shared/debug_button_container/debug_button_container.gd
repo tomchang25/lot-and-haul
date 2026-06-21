@@ -30,6 +30,8 @@ func _on_add_item() -> void:
     var entry: ItemEntry = ItemGenerator.draw(cat, { })
     if entry == null:
         return
+    entry.unveil()
+    entry.auto_reveal_all_surface()
     MetaManager.register_storage_items([entry])
     storage_changed.emit()
 

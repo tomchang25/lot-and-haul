@@ -325,6 +325,9 @@ zh_TW:
   UI_TIME_WEEKS_AGO: "%d 週前"
   UI_TIME_MONTHS_AGO: "%d 個月前"
 
+  # ── 破產補助 ──
+  UI_BANKRUPTCY_BAILOUT: "緊急補助金：+$%d"
+
   # ── 位置資訊顯示 ──
   UI_LOCATION_INFO: "位置資訊"
   UI_LOT_INFO: "拍品資訊"

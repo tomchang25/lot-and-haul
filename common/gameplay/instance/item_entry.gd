@@ -260,7 +260,7 @@ func roll_npc_estimate(sight_chance: float, rng: RandomNumberGenerator = null) -
                     add_sum += clue.effect_amount
                 "mul":
                     mul_product *= clue.effect_amount
-    return int((float(_anchor_base_value()) + add_sum) * mul_product)
+    return maxi(Economy.MIN_ITEM_VALUE, int((float(_anchor_base_value()) + add_sum) * mul_product))
 
 # ══ Computed properties ═══════════════════════════════════════════════════════
 
@@ -283,7 +283,7 @@ func resolve_price() -> PriceView:
     view.known = true
     var cond := get_condition_multiplier()
     if verified:
-        var v := maxi(1, int(appraised_with_hidden() * cond))
+        var v := maxi(Economy.MIN_ITEM_VALUE, int(appraised_with_hidden() * cond))
         view.exact = true
         view.min_value = v
         view.max_value = v
@@ -292,9 +292,9 @@ func resolve_price() -> PriceView:
     var base := _raw_appraised_value()
     var spread := MAX_SPREAD * (1.0 - inspection_level)
     var offset := center_offset * (1.0 - inspection_level)
-    view.min_value = maxi(1, int(base * (1.0 - spread + offset) * cond))
-    view.max_value = maxi(1, int(base * (1.0 + spread + offset) * cond))
-    view.point_value = maxi(1, int(base * cond))
+    view.min_value = maxi(Economy.MIN_ITEM_VALUE, int(base * (1.0 - spread + offset) * cond))
+    view.max_value = maxi(Economy.MIN_ITEM_VALUE, int(base * (1.0 + spread + offset) * cond))
+    view.point_value = maxi(Economy.MIN_ITEM_VALUE, int(base * cond))
     return view
 
 
@@ -350,6 +350,9 @@ func get_inspection_clues() -> Array[ClueData]:
 
 func auto_reveal_all_surface() -> void:
     for clue: ClueData in _get_surface_clues():
+        if is_veiled():
+            unveil()
+
         if not revealed_clue_ids.has(clue.clue_id):
             revealed_clue_ids.append(clue.clue_id)
 

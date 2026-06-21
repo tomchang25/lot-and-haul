@@ -126,6 +126,14 @@ class ClueSpec:
                 errors.append(f"clue '{cid}': effect_amount is not a valid number")
                 amount = None
 
+            # Negative add is forbidden — all value reduction must use mul < 1.0
+            # or override (hidden-only). Add is only for positive flat bonuses.
+            if op == "add" and amount is not None and amount < 0.0:
+                errors.append(
+                    f"clue '{cid}': negative add ({amount}) is forbidden — "
+                    f"use mul < 1.0 instead for value reduction"
+                )
+
             # "override" is only legal on hidden clues.
             if op == "override" and ctype != "hidden":
                 errors.append(

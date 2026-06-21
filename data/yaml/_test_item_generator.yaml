@@ -89,6 +89,7 @@ cars:
 
 lots:
   - lot_id: test_lot
+    is_test: true
     tier_weights: { 1: 100 }
     rarity_weights: { 0: 100 }
     category_weights: { test_category: 1 }
@@ -96,6 +97,7 @@ lots:
 
 locations:
   - location_id: test_location
+    is_test: true
     display_name_key: LOC_TEST_LOCATION
     description_key: LOC_TEST_LOCATION_DESC
     entry_fee: 50

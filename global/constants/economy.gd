@@ -69,11 +69,21 @@ static func rarity_for_clue_count(count: int) -> Economy.Rarity:
             return rarity
     return Economy.Rarity.COMMON
 
+## Minimum value for any item-price display or transaction.
+## All price outputs floor at this value.
+const MIN_ITEM_VALUE: int = 10
 
 const STARTING_CASH: int = 1000
 const DAILY_BASE_COST: int = 100
 const ONSITE_SELL_PRICE: int = 50
 const LOCATION_SAMPLE_SIZE: int = 3
+
+# ── Bankruptcy safety net ──────────────────────────────────────────────────────
+
+## Minimum cash threshold below which the bailout triggers (after daily costs).
+const BANKRUPTCY_FLOOR: int = 200
+## Target cash amount after a bankruptcy bailout.
+const BANKRUPTCY_TOP_UP: int = 500
 
 # ── Customer selling volume (Day/Night model) ────────────────────────────────
 

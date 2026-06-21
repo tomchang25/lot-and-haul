@@ -115,18 +115,10 @@ func get_tracked_category_ids() -> Array:
 
 func get_category_rank(category: CategoryData) -> int:
     var points: int = _knowledge.category_points.get(category.category_id, 0)
-    if points >= 25600:
-        return 5
-    elif points >= 6400:
-        return 4
-    elif points >= 1600:
-        return 3
-    elif points >= 400:
-        return 2
-    elif points >= 100:
-        return 1
-    else:
-        return 0
+    for i in range(RANK_THRESHOLDS.size() - 1, 0, -1):
+        if points >= RANK_THRESHOLDS[i]:
+            return i
+    return 0
 
 
 func get_super_category_rank(sc: SuperCategoryData) -> int:

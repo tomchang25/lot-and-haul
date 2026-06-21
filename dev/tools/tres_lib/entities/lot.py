@@ -42,6 +42,7 @@ class LotSpec:
         w.add_field('script = ExtResource("1_lotdef")')
         w.add_field_str("lot_id", lot_id)
         w.add_field_bool("is_tutorial", bool(entry.get("is_tutorial", False)))
+        w.add_field_bool("is_test", bool(entry.get("is_test", False)))
         w.add_field_float(
             "aggressive_factor_min",
             float(entry.get("aggressive_factor_min", 0.3)),
@@ -140,6 +141,8 @@ class LotSpec:
         lot["is_tutorial"] = (
             is_tutorial_val == "true" if is_tutorial_val is not None else False
         )
+        is_test_val = tres_field(text, "is_test")
+        lot["is_test"] = is_test_val == "true" if is_test_val is not None else False
         for key in _FLOAT_FIELDS:
             val = tres_field(text, key)
             if val is not None:

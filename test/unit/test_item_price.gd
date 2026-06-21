@@ -206,6 +206,51 @@ func test_item_price_applies_condition() -> void:
     var cond := item.get_condition_multiplier()
     assert_eq(item.item_price, int(100.0 * cond), "item_price = base * condition_multiplier")
 
+# ── Minimum value floor ──────────────────────────────────────────────────
+
+
+func test_price_floor_enforced_appraised() -> void:
+    var item := _make_item(
+        _make_anchor(30),
+        [_make_surface("huge_neg", "add", -9999)],
+    )
+    item.revealed_clue_ids.append("huge_neg")
+    item.condition = 0.0
+    assert_eq(item.item_price, Economy.MIN_ITEM_VALUE, "appraised negative value floors at MIN_ITEM_VALUE")
+
+
+func test_price_floor_enforced_verified() -> void:
+    var item := _make_item(
+        _make_anchor(30),
+        [],
+        [_make_hidden("low_override", "override", 5)],
+    )
+    item.revealed_clue_ids.append("low_override")
+    item.condition = 0.0
+    assert_eq(item.item_price, Economy.MIN_ITEM_VALUE, "verified low value floors at MIN_ITEM_VALUE")
+
+
+func test_price_floor_enforced_range() -> void:
+    var item := _make_item(
+        _make_anchor(30),
+        [_make_surface("huge_neg", "add", -9999)],
+    )
+    item.revealed_clue_ids.append("huge_neg")
+    item.condition = 0.0
+    var view := item.resolve_price()
+    assert_true(view.min_value >= Economy.MIN_ITEM_VALUE, "range min_value floors at MIN_ITEM_VALUE")
+    assert_true(view.point_value >= Economy.MIN_ITEM_VALUE, "point_value floors at MIN_ITEM_VALUE")
+
+
+func test_npc_estimate_floor_enforced() -> void:
+    var item := _make_item(
+        _make_anchor(30),
+        [_make_surface("huge_neg", "add", -9999)],
+    )
+    item.revealed_clue_ids.append("huge_neg")
+    var estimate := item.roll_npc_estimate(1.0)
+    assert_true(estimate >= Economy.MIN_ITEM_VALUE, "NPC estimate floors at MIN_ITEM_VALUE")
+
 
 func test_item_price_with_condition_and_clues() -> void:
     var item := _make_item(

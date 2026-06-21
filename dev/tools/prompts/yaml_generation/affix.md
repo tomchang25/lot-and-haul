@@ -94,16 +94,27 @@ A combination typically bundles:
 - **1–3 surface clues** that thematically fit the affix (material, condition, feature).
 - **0–1 hidden clues** that represent the affix's true identity reveal — a genuine-maker `_leaf_` clue, a counterfeit `_override_` clue, or a condition-based negative.
 
-### Thematic Bundling
+#### Negative Effect Tiers
+
+All value-reducing `mul` clues must use one of these tiers — never use negative `add`:
+
+| Tier                | Range     | Use Case                                       |
+| ------------------- | --------- | ---------------------------------------------- |
+| Minor Defect        | 0.80–0.95 | Cosmetic imperfection, light wear              |
+| Missing/Compromised | 0.50–0.75 | Missing/non-original part, significant flaw    |
+| Severe Damage       | 0.25–0.40 | Major structural damage, extensive degradation |
+| Counterfeit/Forgery | override  | Hidden-only base-value replacement             |
+
+## Thematic Bundling
 
 Affixes should group clues that tell a coherent story:
 
-- A **Rustic** handbag affix bundles worn/faded/tarnished surface clues and a lower-tier leaf or a replica override.
+- A **Rustic** handbag affix bundles worn/faded/tarnished surface clues (Minor Defect tier) and a lower-tier leaf or a replica override.
 - A **Luxury** handbag affix bundles premium material/hardware surface clues and a high-end leaf — or an override replica as the minority risk.
-- A **Vintage** watch affix bundles patina/winding surface clues and a period-correct leaf.
+- A **Vintage** watch affix bundles patina/winding surface clues (Minor Defect tier) and a period-correct leaf.
 - A **Modern** watch affix bundles quartz/chronograph surface clues and a contemporary leaf.
 
-Each affix should offer at least one positive path and one negative/minority path across its combinations (the "bet" the player makes by Authenticating).
+Each affix should offer at least one positive path and one negative/minority path across its combinations (the "bet" the player makes by Authenticating). Negative paths should use `mul < 1.0` at the appropriate tier for the flaw theme.
 
 ---
 

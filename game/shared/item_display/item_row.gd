@@ -65,6 +65,7 @@ var _last_applied_columns: Array = []
 
 @onready var _h_box_container: HBoxContainer = $HBoxContainer
 @onready var _name_cell: HBoxContainer = $HBoxContainer/NameHBox
+@onready var _category_icon: TextureRect = $HBoxContainer/NameHBox/CategoryIcon
 @onready var _name_label: Label = $HBoxContainer/NameHBox/NameLabel
 @onready var _condition_label: Label = $HBoxContainer/ConditionLabel
 @onready var _estimated_value_label: Label = $HBoxContainer/EstimatedValueLabel
@@ -158,6 +159,16 @@ func _refresh() -> void:
     _apply_column_order()
 
     # ── NAME ──────────────────────────────────────────────────────────────────
+    var entry: ItemEntry = _entry as ItemEntry
+    if entry != null and entry.category_data != null and entry.category_data.icon != null:
+        _category_icon.texture = entry.category_data.icon
+        _category_icon.modulate = Color.WHITE
+        _category_icon.show()
+    else:
+        _category_icon.texture = null
+        _category_icon.modulate = Color(0.22, 0.22, 0.3, 1)
+        _category_icon.hide()
+
     _name_label.text = ItemEntryDisplayHelper.display_name(_entry)
     _name_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.display_name_color(_entry))
 

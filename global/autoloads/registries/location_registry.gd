@@ -17,10 +17,12 @@ func get_location_by_id(location_id: String) -> LocationData:
     return get_by_id(location_id) as LocationData
 
 
-func get_all_locations(include_tutorial: bool = false) -> Array[LocationData]:
+func get_all_locations(include_tutorial: bool = false, include_test: bool = false) -> Array[LocationData]:
     var result: Array[LocationData] = []
     for loc: LocationData in get_all():
         if loc.is_tutorial and not include_tutorial:
+            continue
+        if loc.is_test and not include_test:
             continue
         result.append(loc)
     return result

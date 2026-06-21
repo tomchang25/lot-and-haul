@@ -31,6 +31,7 @@ const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres
 
 @onready var _net_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/NetLabel
 @onready var _balance_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/BalanceLabel
+@onready var _bankruptcy_label: Label = $RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/BankruptcyLabel
 
 @onready var _continue_btn: Button = $RootVBox/Footer/ContinueButton
 
@@ -113,6 +114,11 @@ func _render(summary: DaySummary) -> void:
         _net_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
 
     _balance_label.text = TranslationServer.translate("UI_BALANCE_LABEL") % MetaManager.economy.cash
+
+    # Bankruptcy bailout notice
+    _bankruptcy_label.visible = summary.bailout_amount > 0
+    if summary.bailout_amount > 0:
+        _bankruptcy_label.text = TranslationServer.translate("UI_BANKRUPTCY_BAILOUT") % summary.bailout_amount
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 

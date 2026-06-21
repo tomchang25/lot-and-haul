@@ -19,6 +19,7 @@ categories:
   - category_id: snake_case string
     super_category: string
     display_name: string
+    icon: string (res:// path to 64 px placeholder PNG)
     weight: float
     shape_id: string
 ```
@@ -28,6 +29,7 @@ categories:
 - `category_id`: unique snake_case ID. Must match the `.tres` filename stem.
 - `super_category`: snake_case id of the parent super-category. Must match a `super_category_id` defined in the `super_categories:` block (`fashion`, `decorative`, `fine_art`, `weapon`). Not a display string.
 - `display_name`: fine-grained player-facing category label, such as `Oil Lamp`, `Pocket Watch`, `Handbag`.
+- `icon`: resource path to the 64 px placeholder PNG in `assets/categories/`, e.g. `res://assets/categories/handbag_64.png`.
 - `weight`: typical item weight in kilograms for this category.
 - `shape_id`: cargo grid footprint.
 

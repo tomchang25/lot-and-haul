@@ -38,7 +38,7 @@ func _ready() -> void:
     _skip_confirm_popup.confirmed.connect(_on_skip_confirmed)
 
     if RunManager.run.browse_lots.is_empty():
-        RunManager.init_browse_lots(_sample_lots(RunManager.run.location_data))
+        RunManager.init_browse_lots(LotPoolSampler.sample(RunManager.run.location_data))
         RunManager.set_resume_target(RunStore.RESUME_LOT_BROWSE)
         SaveManager.save()
 
@@ -142,12 +142,3 @@ func _on_cargo_pressed() -> void:
     SaveManager.save()
     EventBus.tutorial_event.emit(TutorialEvents.CARGO_OPENED, { })
     SceneRouter.go_to_cargo()
-
-# ══ Sampling ══════════════════════════════════════════════════════════════════
-
-
-func _sample_lots(location_data: LocationData) -> Array[LotData]:
-    var pool: Array[LotData] = location_data.lot_pool.duplicate()
-    RandomUtils.shuffle(pool)
-    var count := mini(location_data.lot_number, pool.size())
-    return pool.slice(0, count)

@@ -1,9 +1,9 @@
 # meta_manager.gd
-# Hub-phase transactional authority. Holds seven domain stores (EconomyStore,
+# Hub-phase transactional authority. Holds eight domain stores (EconomyStore,
 # GarageStore, StorageStore, SlotStore, ProgressStore, CustomersStore,
-# ShopSessionStore); each owns its domain's live fields, save payload, and the
-# operations that mutate them. Store references are plain public fields — scenes
-# read state directly via MetaManager.economy.cash,
+# ShopSessionStore, StorageSessionStore); each owns its domain's live fields,
+# save payload, and the operations that mutate them. Store references are plain
+# public fields — scenes read state directly via MetaManager.economy.cash,
 # MetaManager.storage.storage_items, etc. Cross-domain transactions (day end,
 # run resolution, customer sale, shop close) remain here as single coordinated
 # methods that call store methods and save exactly once.
@@ -18,6 +18,7 @@ var slot: SlotStore
 var progress: ProgressStore
 var customers: CustomersStore
 var shop_session: ShopSessionStore
+var storage_session: StorageSessionStore
 
 
 func _ready() -> void:
@@ -28,6 +29,7 @@ func _ready() -> void:
     progress = ProgressStore.new()
     customers = CustomersStore.new()
     shop_session = ShopSessionStore.new()
+    storage_session = StorageSessionStore.new()
 
 
 ## Re-instantiates all domain stores to their default state. Called by
@@ -42,6 +44,7 @@ func reset() -> void:
     progress = ProgressStore.new()
     customers = CustomersStore.new()
     shop_session = ShopSessionStore.new()
+    storage_session = StorageSessionStore.new()
 
 # ══ Save section interface ════════════════════════════════════════════════════
 
@@ -57,6 +60,7 @@ func to_dict() -> Dictionary:
     out[progress.section_id()] = progress.to_dict()
     out[customers.section_id()] = customers.to_dict()
     out[shop_session.section_id()] = shop_session.to_dict()
+    out[storage_session.section_id()] = storage_session.to_dict()
     return out
 
 
@@ -70,6 +74,7 @@ func from_dict(data: Dictionary, ctx: SaveLoadContext) -> void:
     progress.from_dict(data.get(progress.section_id(), { }), ctx)
     customers.from_dict(data.get(customers.section_id(), { }), ctx)
     shop_session.from_dict(data.get(shop_session.section_id(), { }), ctx)
+    storage_session.from_dict(data.get(storage_session.section_id(), { }), ctx)
 
 
 ## Aggregates validate() across all stores. Returns true when all pass.
@@ -82,6 +87,7 @@ func validate() -> bool:
     ok = progress.validate() and ok
     ok = customers.validate() and ok
     ok = shop_session.validate() and ok
+    ok = storage_session.validate() and ok
     return ok
 
 # ══ Cross-autoload cash helper ════════════════════════════════════════════════
@@ -169,8 +175,8 @@ func _advance_slot() -> void:
 
 ## Begins a Storage slot: validates Day or Night, refreshes storage_ap to a
 ## full pool (Day grants the enlarged deep-storage AP budget; Night grants
-## base AP), advances one slot, and saves. Call before navigating to the
-## storage scene.
+## base AP), advances one slot, begins the storage session, and saves.
+## Call before navigating to the storage scene.
 func begin_storage_slot() -> void:
     if slot.current_slot != SlotStore.SLOT_DAY and slot.current_slot != SlotStore.SLOT_NIGHT:
         ToastManager.show_dev_error("Storage can only begin in slot Day or Night, got %d" % slot.current_slot)
@@ -180,7 +186,17 @@ func begin_storage_slot() -> void:
     var ap: int = roundi(Economy.STORAGE_AP_MAX * Economy.DEEP_STORAGE_AP_MULTIPLIER) if is_day else Economy.STORAGE_AP_MAX
     _advance_slot()
     slot.set_storage_ap(ap)
-    SaveManager.mark_dirty()
+    var items := storage.storage_items
+    var first_id: int = items[0].id if not items.is_empty() else -1
+    storage_session.begin(first_id)
+    SaveManager.save()
+
+
+## Ends the active Storage session and clears the resume pointer. Saves
+## immediately so boot routing will not re-enter the storage scene.
+func close_storage_session() -> void:
+    storage_session.clear()
+    SaveManager.save()
 
 
 ## Begins an Auction slot: validates Day, advances one slot to Night, and saves.
@@ -253,6 +269,7 @@ func end_day() -> DaySummary:
 
     progress.advance_day()
     economy.apply_delta(-Economy.DAILY_BASE_COST)
+    summary.bailout_amount = economy.apply_bankruptcy_safety_net()
     summary.end_day = progress.current_day
 
     # Capture customer sales recorded during Open Shop.
@@ -327,7 +344,8 @@ func repair_item(entry: ItemEntry) -> bool:
     ResearchSlot.apply_repair(entry)
     EventBus.item_repaired.emit(entry)
     slot.charge_ap(Economy.REPAIR_AP_COST)
-    SaveManager.mark_dirty()
+    storage_session.set_selected_entry(entry)
+    SaveManager.save()
     return true
 
 
@@ -348,7 +366,8 @@ func restore_item(entry: ItemEntry) -> bool:
     ResearchSlot.apply_restore(entry, restoration_attr)
     EventBus.item_restored.emit(entry)
     slot.charge_ap(Economy.RESTORE_AP_COST)
-    SaveManager.mark_dirty()
+    storage_session.set_selected_entry(entry)
+    SaveManager.save()
     return true
 
 
@@ -372,7 +391,8 @@ func research_item(entry: ItemEntry) -> bool:
     if revealed:
         EventBus.item_revealed.emit(entry)
     slot.charge_ap(Economy.RESEARCH_AP_COST)
-    SaveManager.mark_dirty()
+    storage_session.set_selected_entry(entry)
+    SaveManager.save()
     return true
 
 # ══ Vehicle management ════════════════════════════════════════════════════════
