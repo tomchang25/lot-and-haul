@@ -58,7 +58,7 @@ theme_override_constants/separation = 12
 [node name="TitleLabel" type="Label" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=1905116386]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "Storage"
+text = "UI_STORAGE_TITLE"
 
 [node name="TableMargin" type="MarginContainer" parent="RootHBox/LeftVBox" unique_id=1721913328]
 layout_mode = 2
@@ -102,7 +102,7 @@ layout_mode = 2
 size_flags_vertical = 5
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 11
-text = "0 items"
+text = "UI_ZERO_ITEMS"
 
 [node name="FooterSpacer" type="Control" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=2106467926]
 layout_mode = 2
@@ -113,7 +113,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Leave Workshop"
+text = "UI_LEAVE_WORKSHOP"
 script = ExtResource("99_sfx")
 
 [node name="SidebarSep" type="VSeparator" parent="RootHBox" unique_id=568005494]
@@ -147,7 +147,7 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 11
-text = "Active · Tasks"
+text = "UI_ACTIVE_TASKS"
 
 [node name="TaskSpacer" type="Control" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection/TaskHeaderHBox" unique_id=1122867691]
 layout_mode = 2
@@ -158,7 +158,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.58, 0.63, 1)
 theme_override_font_sizes/font_size = 11
-text = "0/4"
+text = "UI_TASK_COUNT"
 
 [node name="TaskContainer" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection" unique_id=707284430]
 unique_name_in_owner = true
@@ -178,7 +178,7 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 11
-text = "Selected"
+text = "UI_SELECTED"
 
 [node name="DetailNameHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=552442018]
 layout_mode = 2
@@ -241,7 +241,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 9
-text = "Condition"
+text = "UI_CONDITION"
 
 [node name="CondValueLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox/ConditionPanel/CondMargin/CondVBox" unique_id=2103365378]
 unique_name_in_owner = true
@@ -268,7 +268,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 9
-text = "Est. Value"
+text = "UI_EST_VALUE"
 
 [node name="ValueValueLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox/ValuePanel/ValueMargin/ValueVBox" unique_id=478361176]
 unique_name_in_owner = true
@@ -294,7 +294,7 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
 theme_override_font_sizes/font_size = 9
-text = "Price convergence"
+text = "UI_PRICE_CONVERGENCE"
 
 [node name="ConvHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ConvergencePanel/ConvMargin/ConvVBox" unique_id=1328347395]
 layout_mode = 2
@@ -320,7 +320,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
 theme_override_font_sizes/font_size = 16
-text = "AP:  0 / 10"
+text = "UI_AP_LABEL"
 horizontal_alignment = 1
 
 [node name="ActionGrid" type="GridContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=420510029]
@@ -336,7 +336,7 @@ custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
-text = "Repair"
+text = "UI_REPAIR"
 script = ExtResource("99_sfx")
 
 [node name="RestoreButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1111111111]
@@ -345,7 +345,7 @@ custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
-text = "Restore"
+text = "UI_RESTORE"
 script = ExtResource("99_sfx")
 
 [node name="ResearchButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1962471177]
@@ -353,7 +353,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
-text = "Research"
+text = "UI_RESEARCH"
 script = ExtResource("99_sfx")
 
 [node name="NoSelectionLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=567673002]
@@ -361,7 +361,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
 theme_override_font_sizes/font_size = 12
-text = "Click an item to view details"
+text = "UI_CLICK_TO_VIEW"
 horizontal_alignment = 1
 vertical_alignment = 1
 

@@ -163,8 +163,8 @@ lots:
 locations:
   # ── Starter location — cheap, short trip, forgiving lots ───
   - location_id: suburban_storage
-    display_name: Suburban Storage
-    description: A quiet self-storage facility on the outskirts of town.
+    display_name_key: LOC_SUBURBAN_STORAGE
+    description_key: LOC_SUBURBAN_STORAGE_DESC
     entry_fee: 50
     travel_days: 1
     lot_number: 3
@@ -176,8 +176,8 @@ locations:
 
   # ── Mid-tier location — costlier, longer trip, better lots ─
   - location_id: midtown_warehouse
-    display_name: Midtown Warehouse
-    description: A large commercial warehouse with higher-quality inventory.
+    display_name_key: LOC_MIDTOWN_WAREHOUSE
+    description_key: LOC_MIDTOWN_WAREHOUSE_DESC
     entry_fee: 200
     travel_days: 2
     lot_number: 3

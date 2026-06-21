@@ -113,8 +113,8 @@ class LocationSpec:
         w.add_field('script = ExtResource("1_locdef")')
         w.add_field_str("location_id", location_id)
         w.add_field_bool("is_tutorial", bool(entry.get("is_tutorial", False)))
-        w.add_field_str("display_name", entry.get("display_name", ""))
-        w.add_field_str("description", entry.get("description", ""))
+        w.add_field_str("display_name_key", entry.get("display_name_key", ""))
+        w.add_field_str("description_key", entry.get("description_key", ""))
         w.add_field_int("entry_fee", int(entry.get("entry_fee", 0)))
         w.add_field_int("travel_days", int(entry.get("travel_days", 1)))
         w.add_field_int("lot_number", int(entry.get("lot_number", 3)))
@@ -130,8 +130,8 @@ class LocationSpec:
         if uid:
             ctx.uid_to_id[uid] = location_id
 
-        display_name = tres_field(text, "display_name") or location_id
-        description = tres_field(text, "description") or ""
+        display_name_key = tres_field(text, "display_name_key") or location_id
+        description_key = tres_field(text, "description_key") or ""
         entry_fee = int(tres_field(text, "entry_fee") or 0)
         travel_days = int(tres_field(text, "travel_days") or 1)
         lot_number = int(tres_field(text, "lot_number") or 3)
@@ -152,8 +152,8 @@ class LocationSpec:
         return {
             "location_id": location_id,
             "is_tutorial": is_tutorial,
-            "display_name": display_name,
-            "description": description,
+            "display_name_key": display_name_key,
+            "description_key": description_key,
             "entry_fee": entry_fee,
             "travel_days": travel_days,
             "lot_number": lot_number,

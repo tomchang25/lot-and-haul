@@ -134,7 +134,7 @@ func _on_slot_pressed(slot: int) -> void:
             AudioManager.play_event(CONFIRM)
             if is_occupied:
                 _pending_slot = slot
-                _overwrite_dialog.dialog_text = "Start a new game in Slot %d? All progress in this slot will be lost." % slot
+                _overwrite_dialog.dialog_text = TranslationServer.translate("UI_NEW_GAME_CONFIRM") % slot
                 _overwrite_dialog.popup_centered()
             else:
                 _execute_new_game(slot)
@@ -169,9 +169,9 @@ func _show_picker() -> void:
 
     match _picker_mode:
         PickerMode.NEW_GAME:
-            _picker_title.text = "New Game — Select a Slot"
+            _picker_title.text = TranslationServer.translate("UI_NEW_GAME_SELECT")
         PickerMode.LOAD:
-            _picker_title.text = "Load Game — Select a Slot"
+            _picker_title.text = TranslationServer.translate("UI_LOAD_GAME_SELECT")
 
     for i: int in 3:
         var btn: Button = _slot_btns[i]
@@ -180,10 +180,10 @@ func _show_picker() -> void:
             var day: int = summary.get("day", 0)
             var cash: int = summary.get("cash", 0)
             var last_played: String = _relative_time(summary.get("last_played", ""))
-            btn.text = "Slot %d\nDay %d  ·  $%d  ·  %s" % [i + 1, day, cash, last_played]
+            btn.text = TranslationServer.translate("UI_SLOT_INFO") % [i + 1, day, cash, last_played]
             btn.disabled = false
         else:
-            btn.text = "Slot %d\nEmpty" % [i + 1]
+            btn.text = TranslationServer.translate("UI_SLOT_EMPTY") % [i + 1]
             btn.disabled = (_picker_mode == PickerMode.LOAD)
 
 
@@ -241,14 +241,14 @@ func _relative_time(iso_timestamp: String) -> String:
     delta_days += month_offset * 15 # rough halfway
 
     if delta_days <= 0:
-        return "today"
+        return TranslationServer.translate("UI_TIME_TODAY")
     elif delta_days == 1:
-        return "yesterday"
+        return TranslationServer.translate("UI_TIME_YESTERDAY")
     elif delta_days < 7:
-        return "%d days ago" % delta_days
+        return TranslationServer.translate("UI_TIME_DAYS_AGO") % delta_days
     elif delta_days < 30:
         var weeks: int = delta_days / 7
-        return "%dw ago" % weeks
+        return TranslationServer.translate("UI_TIME_WEEKS_AGO") % weeks
     else:
         var months: int = delta_days / 30
-        return "%dm ago" % months
+        return TranslationServer.translate("UI_TIME_MONTHS_AGO") % months

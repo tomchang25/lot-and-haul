@@ -13,8 +13,8 @@ enum ClueType { SURFACE, HIDDEN }
 # Unique identifier across all clues in the project.
 @export var clue_id: String = ""
 
-# Text shown when this clue has been revealed.
-@export var known_text: String = ""
+# Localization key for the clue display text.
+@export var known_text_key: String = ""
 
 # Controls which reveal mechanic applies to this clue.
 @export var type: ClueType = ClueType.SURFACE

@@ -37,7 +37,7 @@ alignment = 1
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
-text = "Choose a Location"
+text = "UI_LOCATION_SELECT_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -59,6 +59,6 @@ custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 16
-text = "Back"
+text = "UI_BACK"
 
 [node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]

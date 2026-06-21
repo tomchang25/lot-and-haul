@@ -33,7 +33,7 @@ anchor_right = 1.0
 offset_bottom = 50.0
 grow_horizontal = 2
 theme_override_font_sizes/font_size = 26
-text = "Cargo Loading"
+text = "UI_CARGO_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -82,7 +82,7 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
 theme_override_font_sizes/font_size = 12
-text = "Car cargo"
+text = "UI_CAR_CARGO"
 horizontal_alignment = 1
 
 [node name="CargoGrid" type="GridContainer" parent="MainHBox/VehiclePanel/CargoSection" unique_id=178417464]
@@ -101,7 +101,7 @@ custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
 theme_override_font_sizes/font_size = 12
-text = "Trailer"
+text = "UI_TRAILER"
 vertical_alignment = 1
 
 [node name="TrailerSlotContainer" type="HBoxContainer" parent="MainHBox/VehiclePanel/TrailerSection" unique_id=1029681779]
@@ -125,13 +125,13 @@ theme_override_constants/separation = 8
 [node name="LoadedCountLabel" type="Label" parent="MainHBox/VehiclePanel/RunSummary/SummaryVBox/LoadedLine" unique_id=100000041]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 
 [node name="LoadedValueLabel" type="Label" parent="MainHBox/VehiclePanel/RunSummary/SummaryVBox/LoadedLine" unique_id=100000042]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 horizontal_alignment = 2
 
 [node name="UnloadedLine" type="HBoxContainer" parent="MainHBox/VehiclePanel/RunSummary/SummaryVBox" unique_id=100000050]
@@ -141,24 +141,24 @@ theme_override_constants/separation = 8
 [node name="UnloadedCountLabel" type="Label" parent="MainHBox/VehiclePanel/RunSummary/SummaryVBox/UnloadedLine" unique_id=100000051]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 
 [node name="UnloadedSellLabel" type="Label" parent="MainHBox/VehiclePanel/RunSummary/SummaryVBox/UnloadedLine" unique_id=100000052]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 horizontal_alignment = 2
 
 [node name="WeightLabel" type="Label" parent="MainHBox/VehiclePanel/RunSummary/SummaryVBox" unique_id=100000060]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 
 [node name="SlotsLabel" type="Label" parent="MainHBox/VehiclePanel/RunSummary/SummaryVBox" unique_id=100000061]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 
 [node name="TrailerLine" type="HBoxContainer" parent="MainHBox/VehiclePanel/RunSummary/SummaryVBox" unique_id=100000070]
 visible = false
@@ -168,12 +168,12 @@ theme_override_constants/separation = 8
 [node name="TrailerRiskLabel" type="Label" parent="MainHBox/VehiclePanel/RunSummary/SummaryVBox/TrailerLine" unique_id=100000071]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Trailer risk:"
+text = "UI_TRAILER_RISK"
 
 [node name="TrailerRiskValue" type="Label" parent="MainHBox/VehiclePanel/RunSummary/SummaryVBox/TrailerLine" unique_id=100000072]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 
 [node name="ResetButton" type="Button" parent="." unique_id=1359420237]
 custom_minimum_size = Vector2(120, 40)
@@ -187,7 +187,7 @@ offset_right = 136.0
 offset_bottom = -16.0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 15
-text = "Reset"
+text = "UI_RESET"
 script = ExtResource("99_sfx")
 
 [node name="ContinueButton" type="Button" parent="." unique_id=362281920]
@@ -205,12 +205,12 @@ offset_bottom = -16.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 15
-text = "Continue"
+text = "UI_CONTINUE"
 script = ExtResource("99_sfx")
 
 [node name="ConfirmPopup" type="ConfirmationDialog" parent="." unique_id=500000002]
-title = "Continue?"
-ok_button_text = "Confirm"
+title = "UI_CONTINUE_TITLE"
+ok_button_text = "UI_CONFIRM"
 
 [node name="TooltipPopup" parent="." unique_id=1000000100 instance=ExtResource("3_popup")]
 unique_name_in_owner = true

@@ -1,18 +1,18 @@
 perks:
   - perk_id: dealers_eye
-    display_name: Dealer's Eye
-    description: Years of handling lots have sharpened your eye for overlooked value.
+    display_name_key: PERK_DEALERS_EYE
+    description_key: PERK_DEALERS_EYE_DESC
     required_attribute: appraisal
     required_attribute_value: 3
 
   - perk_id: auction_access
-    display_name: Auction Access
-    description: Grants entry to restricted high-value auction sites.
+    display_name_key: PERK_AUCTION_ACCESS
+    description_key: PERK_AUCTION_ACCESS_DESC
     required_attribute: negotiation
     required_attribute_value: 2
 
   - perk_id: restoration_basics
-    display_name: Restoration Basics
-    description: Fundamentals of cleaning and preserving aged goods.
+    display_name_key: PERK_RESTORATION_BASICS
+    description_key: PERK_RESTORATION_BASICS_DESC
     required_attribute: restoration
     required_attribute_value: 2

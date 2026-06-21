@@ -2,6 +2,9 @@
 # Push-model diagnostics channel threaded through the load path.
 # SaveManager constructs one per successful load; every from_dict() /
 # _apply_migrations() writes into it. SaveManager drains it once at the end.
+#
+# Uses push_warning for console parity in ctx.info() — lint-exempt per
+# error_guard_standard.md §3a.
 class_name SaveLoadContext
 extends RefCounted
 

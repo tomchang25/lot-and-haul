@@ -5,4 +5,4 @@ extends VBoxContainer
 
 
 func update_ap(current: int, maximum: int) -> void:
-    _ap_label.text = "AP  %d / %d" % [current, maximum]
+    _ap_label.text = TranslationServer.translate("UI_AP_HUD") % [current, maximum]

@@ -8,6 +8,15 @@ extends Control
 
 const SLOT_NAMES: Array[String] = ["", "Day", "Night"]
 
+
+static func _slot_name(i: int) -> String:
+    match i:
+        1:
+            return TranslationServer.translate("UI_DAY_SLOT_NAME")
+        2:
+            return TranslationServer.translate("UI_NIGHT_SLOT_NAME")
+    return ""
+
 # ── Node references — display ─────────────────────────────────────────────────
 
 @onready var _mastery_rank_label: Label = $RootVBox/MasteryRankLabel
@@ -166,9 +175,9 @@ func _refresh_activity_choice_locks() -> void:
 
 
 func _refresh_display() -> void:
-    _mastery_rank_label.text = "Mastery Rank:   %d" % KnowledgeManager.get_mastery_rank()
-    _balance_label.text = "Balance:   $%d" % MetaManager.economy.cash
-    _storage_count_label.text = "Storage:   %d items" % MetaManager.storage.storage_items.size()
+    _mastery_rank_label.text = TranslationServer.translate("UI_MASTERY_RANK_LABEL") % KnowledgeManager.get_mastery_rank()
+    _balance_label.text = TranslationServer.translate("UI_BALANCE_LABEL") % MetaManager.economy.cash
+    _storage_count_label.text = TranslationServer.translate("UI_STORAGE_COUNT_LABEL") % MetaManager.storage.storage_items.size()
 
     _refresh_slot_label()
     _refresh_activity_button()
@@ -180,13 +189,14 @@ func _refresh_slot_label() -> void:
     for i: int in SLOT_NAMES.size():
         if i == 0:
             continue
+        var slot_label := _slot_name(i)
         if i < slot:
-            tray += "* %s  " % SLOT_NAMES[i]
+            tray += "* %s  " % slot_label
         elif i == slot:
-            tray += "> %s  " % SLOT_NAMES[i]
+            tray += "> %s  " % slot_label
         else:
-            tray += "- %s  " % SLOT_NAMES[i]
-    _slot_label.text = "Day %d   |   %s" % [MetaManager.progress.current_day, tray.strip_edges()]
+            tray += "- %s  " % slot_label
+    _slot_label.text = "%s   |   %s" % [TranslationServer.translate("UI_DAY_LABEL") % MetaManager.progress.current_day, tray.strip_edges()]
 
 
 func _refresh_activity_button() -> void:
@@ -197,8 +207,8 @@ func _refresh_activity_button() -> void:
     # after the slot has been advanced past Night.
     var slot_name: String = ""
     if slot >= 1 and slot < SLOT_NAMES.size():
-        slot_name = SLOT_NAMES[slot]
+        slot_name = _slot_name(slot)
     else:
         ToastManager.show_warning("Invalid slot: %d" % slot)
 
-    _activity_btn.text = "Activity  (%s)" % slot_name
+    _activity_btn.text = TranslationServer.translate("UI_ACTIVITY_BTN") % slot_name

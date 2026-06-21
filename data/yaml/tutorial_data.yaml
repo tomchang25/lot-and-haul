@@ -18,7 +18,7 @@
 # ── Tutorial anchors ──────────────────────────────────────
 anchors:
   - anchor_id: tutorial_vase_anchor
-    known_text: Vase
+    known_text_key: ANCHOR_TUTORIAL_VASE_ANCHOR
     category_scope: vase
     base_value: 120
     shape_id: s1x2
@@ -28,7 +28,7 @@ anchors:
 # ── Tutorial clues ────────────────────────────────────────
 clues:
   - clue_id: tutorial_vase_surface_material
-    known_text: Glazed Porcelain
+    known_text_key: CLUE_TUTORIAL_VASE_SURFACE_MATERIAL
     type: surface
     domain: vase
     attribute: appraisal
@@ -37,7 +37,7 @@ clues:
     effect_amount: 30
 
   - clue_id: tutorial_vase_surface_mark
-    known_text: Maker's Mark
+    known_text_key: CLUE_TUTORIAL_VASE_SURFACE_MARK
     type: surface
     domain: vase
     attribute: perception
@@ -46,7 +46,7 @@ clues:
     effect_amount: 60
 
   - clue_id: tutorial_vase_hidden_authentic
-    known_text: Rare Provenance
+    known_text_key: CLUE_TUTORIAL_VASE_HIDDEN_AUTHENTIC
     type: hidden
     domain: vase
     attribute: investigation
@@ -68,7 +68,7 @@ affix_combinations:
 affixes:
   - affix_id: tutorial_affix
     naming_slot: prefix
-    display_name: Antique
+    display_name_key: AFFIX_TUTORIAL_AFFIX
     scope_mode: all
     weight: 1
     combination_ids:
@@ -104,8 +104,8 @@ lots:
 locations:
   - location_id: tutorial_first_run
     is_tutorial: true
-    display_name: Training Yard
-    description: A small fenced yard with a single instructional lot.
+    display_name_key: LOC_TUTORIAL_FIRST_RUN
+    description_key: LOC_TUTORIAL_FIRST_RUN_DESC
     entry_fee: 0
     travel_days: 0
     lot_number: 1

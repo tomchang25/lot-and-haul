@@ -42,14 +42,23 @@ const RARITY_SORT_WEIGHT: Dictionary = {
     Economy.Rarity.LEGENDARY: 4.0,
 }
 
+
 ## Display name per rarity tier.
-const RARITY_NAME: Dictionary = {
-    Economy.Rarity.COMMON: "Common",
-    Economy.Rarity.UNCOMMON: "Uncommon",
-    Economy.Rarity.RARE: "Rare",
-    Economy.Rarity.EPIC: "Epic",
-    Economy.Rarity.LEGENDARY: "Legendary",
-}
+static func rarity_display_name(rarity: Economy.Rarity) -> String:
+    match rarity:
+        Economy.Rarity.COMMON:
+            return TranslationServer.translate("SYS_RARITY_COMMON")
+        Economy.Rarity.UNCOMMON:
+            return TranslationServer.translate("SYS_RARITY_UNCOMMON")
+        Economy.Rarity.RARE:
+            return TranslationServer.translate("SYS_RARITY_RARE")
+        Economy.Rarity.EPIC:
+            return TranslationServer.translate("SYS_RARITY_EPIC")
+        Economy.Rarity.LEGENDARY:
+            return TranslationServer.translate("SYS_RARITY_LEGENDARY")
+        _:
+            ToastManager.show_warning("Economy.rarity_display_name: unknown rarity %d" % rarity)
+            return TranslationServer.translate("SYS_UNKNOWN_ITEM")
 
 
 ## Returns the rarity tier matching [param count] hidden clues.

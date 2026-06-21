@@ -36,7 +36,7 @@ alignment = 1
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Knowledge"
+text = "UI_KNOWLEDGE_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -52,7 +52,7 @@ custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
-text = "Mastery"
+text = "UI_MASTERY"
 
 [node name="AttributesButton" type="Button" parent="RootVBox/ButtonsVBox"]
 script = ExtResource("99_sfx")
@@ -60,7 +60,7 @@ custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
-text = "Attributes"
+text = "UI_ATTRIBUTES"
 
 [node name="PerksButton" type="Button" parent="RootVBox/ButtonsVBox"]
 script = ExtResource("99_sfx")
@@ -68,7 +68,7 @@ custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 18
-text = "Perks"
+text = "UI_PERKS"
 
 [node name="Footer" type="HBoxContainer" parent="RootVBox"]
 layout_mode = 2
@@ -79,6 +79,6 @@ script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(200, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Back"
+text = "UI_BACK"
 
 [node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]

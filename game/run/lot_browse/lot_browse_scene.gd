@@ -22,7 +22,6 @@ const LotCardScene := preload("res://game/run/lot_browse/lot_card/lot_card.tscn"
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-# var _lot_card: LotCard = null
 var _lot_cards: Array[LotCard] = []
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
@@ -122,7 +121,7 @@ func _on_skip_pressed() -> void:
         return
     var remaining: int = RunManager.run.browse_lots.size() - RunManager.run.browse_index
     _skip_confirm_popup.dialog_text = (
-        "Skip the remaining %d lot(s) and go straight to cargo?" % remaining
+        TranslationServer.translate("UI_SKIP_CARGO_CONFIRM") % remaining
     )
     _skip_confirm_popup.popup_centered()
 

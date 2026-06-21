@@ -50,7 +50,7 @@ func clear_display() -> void:
 
 func _apply() -> void:
     if _entry == null:
-        _name_label.text = "No item selected"
+        _name_label.text = TranslationServer.translate("UI_NO_ITEM_SELECTED")
         _name_label.remove_theme_color_override(&"font_color")
         _category_label.text = ""
         _rarity_label.text = ""
@@ -58,7 +58,7 @@ func _apply() -> void:
         _condition_value_label.modulate = Color.WHITE
         _value_value_label.text = "-"
         _value_value_label.remove_theme_color_override(&"font_color")
-        _value_title_label.text = "Est. Value"
+        _value_title_label.text = TranslationServer.translate("UI_EST_VALUE_LABEL")
         _verified_label.text = ""
         _conv_ratio_label.text = ""
         return
@@ -67,7 +67,7 @@ func _apply() -> void:
     _name_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.display_name_color(_entry))
 
     if _entry.category_data != null:
-        _category_label.text = "%s  \u00b7  #%d" % [_entry.category_data.display_name, _entry.id]
+        _category_label.text = "%s  \u00b7  #%d" % [TranslationServer.translate(_entry.category_data.display_name_key), _entry.id]
     else:
         _category_label.text = "#%d" % _entry.id
 
@@ -84,25 +84,29 @@ func _apply() -> void:
         verified = SellMath.is_item_verified(_entry)
     else:
         verified = _entry.verified
-    _verified_label.text = "Verification: %s" % ("Verified" if verified else "Unverified")
+
+    _verified_label.text = TranslationServer.translate(
+        "UI_VERIFICATION_LABEL",
+    ) % (TranslationServer.translate("UI_VERIFIED_BADGE") if verified else TranslationServer.translate("UI_UNVERIFIED"))
+
     _verified_label.modulate = Color(0.4, 1.0, 0.5) if verified else Color(1.0, 0.7, 0.3)
 
     if verified:
-        _value_title_label.text = "True Value"
-        _conv_ratio_label.text = "Verified"
+        _value_title_label.text = TranslationServer.translate("UI_TRUE_VALUE")
+        _conv_ratio_label.text = TranslationServer.translate("UI_VERIFIED_BADGE")
         _conv_ratio_label.modulate = ItemEntryDisplayHelper.PRICE_COLOR
     elif _entry.is_veiled():
-        _value_title_label.text = "Est. Value"
-        _conv_ratio_label.text = ItemEntryDisplayHelper.UNKNOWN_TEXT
+        _value_title_label.text = TranslationServer.translate("UI_EST_VALUE_LABEL")
+        _conv_ratio_label.text = ItemEntryDisplayHelper.unknown_text()
         _conv_ratio_label.modulate = Color(0.55, 0.58, 0.63)
     elif _entry.is_price_converged():
-        _value_title_label.text = "Est. Value"
-        _conv_ratio_label.text = "Converged"
+        _value_title_label.text = TranslationServer.translate("UI_EST_VALUE_LABEL")
+        _conv_ratio_label.text = TranslationServer.translate("UI_CONVERGED")
         _conv_ratio_label.modulate = ItemEntryDisplayHelper.PRICE_COLOR
     else:
         var lo: int = _entry.estimated_value_min
         var hi: int = _entry.estimated_value_max
         var ratio: float = float(lo) / float(hi) * 100.0 if hi > 0 else 0.0
-        _value_title_label.text = "Est. Value"
+        _value_title_label.text = TranslationServer.translate("UI_EST_VALUE_LABEL")
         _conv_ratio_label.text = "%d%%" % int(ratio)
         _conv_ratio_label.modulate = Color(0.95, 0.75, 0.3) if ratio < 60.0 else Color.WHITE

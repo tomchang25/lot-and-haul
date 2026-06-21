@@ -48,5 +48,5 @@ func _apply() -> void:
     _icon_rect.texture = _car.icon
     _name_label.text = _car.display_name
     _stats_label.text = _car.stats_line()
-    _price_label.text = "Price:   $%d" % _car.price
+    _price_label.text = TranslationServer.translate("UI_PRICE_LABEL") % _car.price
     _buy_button.disabled = not _affordable

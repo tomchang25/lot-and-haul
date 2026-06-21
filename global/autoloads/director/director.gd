@@ -14,6 +14,7 @@ const PANEL_BORDER := Color(0.3, 0.3, 0.35, 1.0)
 const TEXT_COLOR := Color(0.88, 0.88, 0.92, 1.0)
 const CONFIRM_LAYER := 130
 const CONFIRM_BG_COLOR := Color(0.0, 0.0, 0.0, 0.4)
+const SKIP_ALL_ACCENT := Color(0.92, 0.72, 0.18, 1.0)
 
 ## Emitted when a scene registers its anchors. ScriptDirector connects to this
 ## to decide whether to start a tutorial, show an offer, or show Help.
@@ -229,7 +230,7 @@ func show_offer_prompt(script_id: String, offer_text: String, accept_text: Strin
     _popup_label.text = offer_text
     _popup_next.text = accept_text
     _popup_panel.visible = true
-    _popup_close.text = "Skip"
+    _popup_close.text = TranslationServer.translate("UI_SKIP_LABEL")
     _popup_close.visible = true
 
     _offer_safe_disconnect(_popup_close.pressed, _on_offer_skip_pressed)
@@ -505,7 +506,7 @@ func _on_popup_skip_all_pressed() -> void:
 
 
 func _show_skip_all_confirm() -> void:
-    _confirm_label.text = "Skip all remaining tutorials?\n\nTutorials will no longer auto-start. You can turn them back on anytime in Settings."
+    _confirm_label.text = TranslationServer.translate("UI_SETTINGS_CONFIRM_SKIP_LABEL")
     _confirm_bg.visible = true
     _confirm_panel.visible = true
 
@@ -770,9 +771,9 @@ func _build_overlay() -> void:
     hint_vbox.add_child(hint_skip_hbox)
 
     _hint_skip_all = Button.new()
-    _hint_skip_all.text = "Skip All"
-    _hint_skip_all.flat = true
-    _hint_skip_all.add_theme_font_size_override("font_size", 11)
+    _hint_skip_all.text = TranslationServer.translate("UI_SKIP_ALL_LABEL")
+    _hint_skip_all.add_theme_font_size_override("font_size", 14)
+    _hint_skip_all.add_theme_color_override("font_color", SKIP_ALL_ACCENT)
     _hint_skip_all.pressed.connect(_on_hint_skip_all_pressed)
     hint_skip_hbox.add_child(_hint_skip_all)
 
@@ -783,7 +784,7 @@ func _build_overlay() -> void:
     _hint_label = Label.new()
     _hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     _hint_label.add_theme_color_override("font_color", TEXT_COLOR)
-    _hint_label.add_theme_font_size_override("font_size", 13)
+    _hint_label.add_theme_font_size_override("font_size", 15)
     _hint_label.custom_minimum_size = Vector2(260, 0)
     hint_vbox.add_child(_hint_label)
 
@@ -799,7 +800,7 @@ func _build_overlay() -> void:
     hint_btn_hbox.add_child(_hint_close)
 
     _hint_next = Button.new()
-    _hint_next.text = "Next"
+    _hint_next.text = TranslationServer.translate("UI_NEXT_LABEL")
     _hint_next.pressed.connect(_on_hint_next_pressed)
     hint_btn_hbox.add_child(_hint_next)
 
@@ -826,9 +827,9 @@ func _build_overlay() -> void:
     popup_vbox.add_child(popup_skip_hbox)
 
     _popup_skip_all = Button.new()
-    _popup_skip_all.text = "Skip All"
-    _popup_skip_all.flat = true
-    _popup_skip_all.add_theme_font_size_override("font_size", 11)
+    _popup_skip_all.text = TranslationServer.translate("UI_SKIP_ALL_LABEL")
+    _popup_skip_all.add_theme_font_size_override("font_size", 14)
+    _popup_skip_all.add_theme_color_override("font_color", SKIP_ALL_ACCENT)
     _popup_skip_all.pressed.connect(_on_popup_skip_all_pressed)
     popup_skip_hbox.add_child(_popup_skip_all)
 
@@ -845,7 +846,7 @@ func _build_overlay() -> void:
     _popup_label = Label.new()
     _popup_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     _popup_label.add_theme_color_override("font_color", TEXT_COLOR)
-    _popup_label.add_theme_font_size_override("font_size", 14)
+    _popup_label.add_theme_font_size_override("font_size", 16)
     popup_vbox.add_child(_popup_label)
 
     var popup_btn_hbox := HBoxContainer.new()
@@ -860,7 +861,7 @@ func _build_overlay() -> void:
     popup_btn_hbox.add_child(_popup_close)
 
     _popup_next = Button.new()
-    _popup_next.text = "Next"
+    _popup_next.text = TranslationServer.translate("UI_NEXT_LABEL")
     _popup_next.pressed.connect(_on_popup_next_pressed)
     popup_btn_hbox.add_child(_popup_next)
 
@@ -906,7 +907,7 @@ func _build_overlay() -> void:
     _confirm_label = Label.new()
     _confirm_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     _confirm_label.add_theme_color_override("font_color", TEXT_COLOR)
-    _confirm_label.add_theme_font_size_override("font_size", 14)
+    _confirm_label.add_theme_font_size_override("font_size", 16)
     _confirm_label.custom_minimum_size = Vector2(300, 0)
     confirm_vbox.add_child(_confirm_label)
 
@@ -916,12 +917,12 @@ func _build_overlay() -> void:
     confirm_vbox.add_child(confirm_btn_hbox)
 
     _confirm_no = Button.new()
-    _confirm_no.text = "No"
+    _confirm_no.text = TranslationServer.translate("UI_SETTINGS_NO")
     _confirm_no.pressed.connect(_on_skip_all_cancelled)
     confirm_btn_hbox.add_child(_confirm_no)
 
     _confirm_yes = Button.new()
-    _confirm_yes.text = "Yes"
+    _confirm_yes.text = TranslationServer.translate("UI_SETTINGS_YES")
     _confirm_yes.pressed.connect(_on_skip_all_confirmed)
     confirm_btn_hbox.add_child(_confirm_yes)
 

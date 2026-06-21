@@ -46,19 +46,14 @@ class TutorialUnit:
 static func hub_script() -> Array[TutorialStep]:
     return [
         TutorialStep.hint(
-            "This shows the current day and your available time slots. \
-You have two slots per day: Day and Night. \
-Each slot can be used for one activity. Click the Activity button to choose.",
+            TranslationServer.translate("TUT_HUB_BODY"),
             "slot_label",
         ),
         TutorialStep.popup(
-            "From here you can start an Auction run, manage items in Storage, \
-open your Shop to sell to nightly customers, upgrade your Vehicle, \
-or study Knowledge to improve your attributes.",
+            TranslationServer.translate("TUT_HUB_CHOOSER_BODY"),
         ),
         TutorialStep.hint(
-            "Let's visit the Workshop to see what you've collected. \
-Click the Storage button to continue.",
+            TranslationServer.translate("TUT_HUB_STORAGE_NAVIGATE_BODY"),
             "storage_btn",
         ).unlock().on_scene("storage"),
     ]
@@ -71,16 +66,14 @@ Click the Storage button to continue.",
 static func onboarding_hub_intro_choose_script() -> Array[TutorialStep]:
     return [
         TutorialStep.popup(
-            "Welcome to Lot & Haul!\n\nThis is your Hub. Each day has two time \
-slots: Day and Night. You can use each slot for one activity. \
-Let's start your first day with an Auction Run.",
+            TranslationServer.translate("TUT_ONBOARDING_INTRO_TITLE"),
         ),
         TutorialStep.hint(
-            "Click the Activity button to open the activity chooser.",
+            TranslationServer.translate("TUT_HUB_ACTIVITY_CHOOSER_HINT"),
             "activity_btn",
         ).unlock().on_event(TutorialEvents.CHOOSER_OPENED),
         TutorialStep.hint(
-            "Choose Auction to begin your first run.",
+            TranslationServer.translate("TUT_HUB_CHOOSE_AUCTION_HINT"),
             "auction_btn",
         ).unlock().on_event(TutorialEvents.ACTIVITY_CHOSEN),
     ]
@@ -90,15 +83,14 @@ Let's start your first day with an Auction Run.",
 static func onboarding_storage_choose_script() -> Array[TutorialStep]:
     return [
         TutorialStep.popup(
-            "Good run! Now let's visit Storage.\n\nYou can manage items, \
-repair them, and research hidden details.",
+            TranslationServer.translate("TUT_STORAGE_CHOOSE_BODY"),
         ),
         TutorialStep.hint(
-            "Click the Activity button to open the chooser.",
+            TranslationServer.translate("TUT_HUB_CHOOSER_HINT"),
             "activity_btn",
         ).unlock().on_event(TutorialEvents.CHOOSER_OPENED),
         TutorialStep.hint(
-            "Choose Storage to manage your items.",
+            TranslationServer.translate("TUT_HUB_CHOOSE_STORAGE_HINT"),
             "storage_btn",
         ).unlock().on_event(TutorialEvents.ACTIVITY_CHOSEN),
     ]
@@ -110,49 +102,33 @@ repair them, and research hidden details.",
 static func onboarding_storage_script() -> Array[TutorialStep]:
     return [
         TutorialStep.popup(
-            "Welcome to the Workshop! This is where you prepare items for sale. \
-You can Repair, Restore, and Research items using Action Points (AP).",
+            TranslationServer.translate("TUT_WORKSHOP_INTRO_BODY"),
         ),
         TutorialStep.hint(
-            "This table lists every item in storage. Columns show the item name, \
-condition (damage level), estimated value, and rarity. Click any row \
-to inspect it in detail.",
+            TranslationServer.translate("TUT_WORKSHOP_ITEM_BROWSER_HINT"),
             "item_browser",
         ),
         TutorialStep.hint(
-            "Select an item to see its details here: name, category, rarity, \
-condition, estimated value, and price convergence. The closer convergence \
-is to 100%, the more accurate the estimate.",
+            TranslationServer.translate("TUT_WORKSHOP_DETAIL_RAIL_HINT"),
             "detail_rail",
         ),
         TutorialStep.hint(
-            "Repair improves condition up to 50%, and Restore pushes it from 50% \
-to 100%. Only one button appears based on the current state. \
-Better condition means higher sale prices. Improve this item's condition, \
-then continue.",
+            TranslationServer.translate("TUT_WORKSHOP_REPAIR_HINT"),
             "repair_btn",
         ).with_fallback(["restore_btn"]),
         TutorialStep.hint(
-            "Research reveals hidden details about an item. Each discovery can \
-dramatically change the item's value — for better or worse. \
-Try researching this item, then continue.",
+            TranslationServer.translate("TUT_WORKSHOP_RESEARCH_HINT"),
             "research_btn",
         ),
         TutorialStep.popup(
-            "Appraised vs. Verified Value: The items you collect have surface clues \
-that give an estimated value range. Research uncovers hidden clues, \
-revealing the true verified value which may be far higher — or lower — \
-than the estimate.",
+            TranslationServer.translate("TUT_WORKSHOP_APPRAISED_VS_VERIFIED_BODY"),
         ),
         TutorialStep.hint(
-            "AP (Action Points) fuel all workshop actions. Each Repair, Restore, \
-or Research action costs AP. Your AP pool refills each time you visit \
-the Workshop in a new slot.",
+            TranslationServer.translate("TUT_WORKSHOP_AP_HINT"),
             "ap_label",
         ),
         TutorialStep.hint(
-            "When you're done, click here to return to the Hub and continue \
-your day. You can always come back to the Workshop later.",
+            TranslationServer.translate("TUT_WORKSHOP_LEAVE_HINT"),
             "leave_btn",
         ).unlock().on_scene("hub").no_block(),
     ]
@@ -162,7 +138,7 @@ your day. You can always come back to the Workshop later.",
 static func onboarding_day_pass_script() -> Array[TutorialStep]:
     return [
         TutorialStep.hint(
-            "Day 1 is complete! Review your net profit, then click Continue to move to Day 2.",
+            TranslationServer.translate("TUT_DAY_PASS_HINT"),
             "continue_btn",
         ).unlock().on_event(TutorialEvents.DAY_SUMMARY_CONTINUED).no_block(),
     ]
@@ -171,13 +147,13 @@ static func onboarding_day_pass_script() -> Array[TutorialStep]:
 ## Day 2 Day hub chooser: tells the player to choose Selling.
 static func onboarding_shop_choose_script() -> Array[TutorialStep]:
     return [
-        TutorialStep.popup("Welcome to Day 2! Let's try selling to nightly customers."),
+        TutorialStep.popup(TranslationServer.translate("TUT_SHOP_CHOOSE_BODY")),
         TutorialStep.hint(
-            "Click the Activity button to open the chooser.",
+            TranslationServer.translate("TUT_HUB_CHOOSER_HINT"),
             "activity_btn",
         ).unlock().on_event(TutorialEvents.CHOOSER_OPENED),
         TutorialStep.hint(
-            "Choose Selling to open your shop.",
+            TranslationServer.translate("TUT_HUB_CHOOSE_SELL_HINT"),
             "sell_btn",
         ).unlock().on_event(TutorialEvents.ACTIVITY_CHOSEN),
     ]
@@ -188,52 +164,38 @@ static func onboarding_shop_choose_script() -> Array[TutorialStep]:
 static func onboarding_selling_script() -> Array[TutorialStep]:
     return [
         TutorialStep.popup(
-            "Welcome to your shop! Let's walk through serving your first customer \
-step by step.",
+            TranslationServer.translate("TUT_SELLING_INTRO_BODY"),
         ),
         TutorialStep.hint(
-            "This is your customer queue. Each tab shows a customer and their \
-demand tags — the kinds of items they're looking for. Click a tab \
-to select a customer.",
+            TranslationServer.translate("TUT_SELLING_CUSTOMER_QUEUE_HINT"),
             "customer_queue",
         ),
         TutorialStep.hint(
-            "These are your item cards. The top number is the price, the badge \
-shows rarity, and the coloured bar indicates condition. Tags at the \
-bottom show which categories this item matches.",
+            TranslationServer.translate("TUT_SELLING_ITEM_LIST_HINT"),
             "item_list",
         ),
         TutorialStep.hint(
-            "Pick up an item from the list and drop it into the car grid on \
-the right. Items must fit the customer's car shape and match their \
-demand tags to count toward the sale.",
+            TranslationServer.translate("TUT_SELLING_CAR_PANEL_HINT"),
             "car_panel",
         ).on_event(TutorialEvents.SELL_ITEM_PLACED).no_block(),
         TutorialStep.hint(
-            "Conservative selling gives a safe ×1.2 multiplier on the total \
-item value. It guarantees the sale — no risk, no dice. Handy when \
-you want a sure deal.",
+            TranslationServer.translate("TUT_SELLING_CONSERVATIVE_HINT"),
             "deal_panel",
         ),
         TutorialStep.hint(
-            "Aggressive selling rolls dice to multiply the total item value. \
-The better your item fit (depth) and the more verified items you have, \
-the more dice you roll. Try it — press the Aggressive button.",
+            TranslationServer.translate("TUT_SELLING_AGGRESSIVE_HINT"),
             "deal_panel",
         ).unlock().on_event(TutorialEvents.SELL_AGGRESSIVE_REQUESTED),
         TutorialStep.hint(
-            "The dice show your luck: each die can add to or subtract from \
-the multiplier.",
+            TranslationServer.translate("TUT_SELLING_DICE_HINT"),
             "deal_panel",
         ).on_event(TutorialEvents.DICE_TOGGLED).no_block(),
         TutorialStep.hint(
-            "Green faces are good, red faces are bad. The result sets your final price. \
-        Press Confirm when ready. Review the receipt, then confirm to complete the sale.",
+            TranslationServer.translate("TUT_SELLING_RESULT_HINT"),
             "deal_panel",
         ).on_event(TutorialEvents.SALE_COMPLETED).no_block(),
         TutorialStep.hint(
-            "Great! You can serve more customers or click Back to return \
-to the Hub and finish the day.",
+            TranslationServer.translate("TUT_SELLING_COMPLETE_HINT"),
             "back_btn",
         ),
     ]
@@ -244,9 +206,7 @@ to the Hub and finish the day.",
 static func onboarding_complete_script() -> Array[TutorialStep]:
     return [
         TutorialStep.popup(
-            "Congratulations! You've completed the Lot & Haul tutorial.\n\n\
-You know how to run auctions, manage storage, and sell to customers. \
-The rest is up to you — good luck out there!",
+            TranslationServer.translate("TUT_COMPLETE_BODY"),
         ),
     ]
 
@@ -257,8 +217,7 @@ The rest is up to you — good luck out there!",
 static func onboarding_location_select_script() -> Array[TutorialStep]:
     return [
         TutorialStep.hint(
-            "Pick a location to visit. Each location has different lots \
-and travel costs.",
+            TranslationServer.translate("TUT_LOCATION_SELECT_HINT"),
             "cards_container",
         ).unlock().on_event(TutorialEvents.LOCATION_SELECTED),
     ]
@@ -268,7 +227,7 @@ and travel costs.",
 static func onboarding_lot_browse_script() -> Array[TutorialStep]:
     return [
         TutorialStep.hint(
-            "Browse the available lots and choose one to inspect.",
+            TranslationServer.translate("TUT_LOT_BROWSE_HINT"),
             "lot_cards",
         ).unlock().on_event(TutorialEvents.LOT_SELECTED),
     ]
@@ -277,11 +236,11 @@ static func onboarding_lot_browse_script() -> Array[TutorialStep]:
 ## Inspection: select, unveil, inspect, review, and start auction.
 static func onboarding_inspection_script() -> Array[TutorialStep]:
     return [
-        TutorialStep.hint("Select the item card to inspect it.", "item_browser").unlock().on_event(TutorialEvents.INSPECTION_ITEM_SELECTED),
-        TutorialStep.hint("Unveil the item to reveal its identity.", "unveil_btn").unlock().on_event(TutorialEvents.INSPECTION_ITEM_UNVEILED),
-        TutorialStep.hint("Inspect the unveiled item to reveal clue details.", "inspect_btn").unlock().on_event(TutorialEvents.INSPECTION_PERFORMED),
-        TutorialStep.hint("Review the lot before starting the auction.", "review_btn").unlock().on_event(TutorialEvents.INSPECTION_REVIEW_OPENED),
-        TutorialStep.hint("Start the auction when you're ready.", "start_auction_btn").unlock().on_event(TutorialEvents.INSPECTION_AUCTION_STARTED),
+        TutorialStep.hint(TranslationServer.translate("TUT_INSPECTION_ITEM_SELECT_HINT"), "item_browser").unlock().on_event(TutorialEvents.INSPECTION_ITEM_SELECTED),
+        TutorialStep.hint(TranslationServer.translate("TUT_INSPECTION_UNVEIL_HINT"), "unveil_btn").unlock().on_event(TutorialEvents.INSPECTION_ITEM_UNVEILED),
+        TutorialStep.hint(TranslationServer.translate("TUT_INSPECTION_INSPECT_HINT"), "inspect_btn").unlock().on_event(TutorialEvents.INSPECTION_PERFORMED),
+        TutorialStep.hint(TranslationServer.translate("TUT_INSPECTION_REVIEW_HINT"), "review_btn").unlock().on_event(TutorialEvents.INSPECTION_REVIEW_OPENED),
+        TutorialStep.hint(TranslationServer.translate("TUT_INSPECTION_START_AUCTION_HINT"), "start_auction_btn").unlock().on_event(TutorialEvents.INSPECTION_AUCTION_STARTED),
     ]
 
 
@@ -289,12 +248,11 @@ static func onboarding_inspection_script() -> Array[TutorialStep]:
 static func onboarding_auction_script() -> Array[TutorialStep]:
     return [
         TutorialStep.hint(
-            "Click Bid to place your first bid. No rivals will bid in \
-this tutorial auction.",
+            TranslationServer.translate("TUT_AUCTION_BID_HINT"),
             "bid_btn",
         ).unlock().on_event(TutorialEvents.BID_PLACED),
         TutorialStep.popup(
-            "With no rival bids, wait for the auction to close.",
+            TranslationServer.translate("TUT_AUCTION_WAIT_BODY"),
         ).unlock().on_event(TutorialEvents.AUCTION_RESOLVED).no_block(),
     ]
 
@@ -302,24 +260,24 @@ this tutorial auction.",
 ## Reveal: reveal won items before cargo.
 static func onboarding_reveal_script() -> Array[TutorialStep]:
     return [
-        TutorialStep.hint("Reveal what you won before loading cargo.", "reveal_btn").unlock().on_event(TutorialEvents.REVEAL_COMPLETED).no_block(),
-        TutorialStep.hint("Continue back to the lot list, then head to cargo loading.", "continue_btn").unlock().on_event(TutorialEvents.REVEAL_CONTINUED).no_block(),
+        TutorialStep.hint(TranslationServer.translate("TUT_REVEAL_HINT"), "reveal_btn").unlock().on_event(TutorialEvents.REVEAL_COMPLETED).no_block(),
+        TutorialStep.hint(TranslationServer.translate("TUT_REVEAL_CONTINUE_HINT"), "continue_btn").unlock().on_event(TutorialEvents.REVEAL_CONTINUED).no_block(),
     ]
 
 
 ## Cargo: select item, place in grid, continue.
 static func onboarding_cargo_script() -> Array[TutorialStep]:
     return [
-        TutorialStep.hint("Select the item you want to load.", "item_list").unlock().on_event(TutorialEvents.CARGO_ITEM_SELECTED),
-        TutorialStep.hint("Place the item into your cargo grid.", "cargo_grid").unlock().on_event(TutorialEvents.CARGO_ITEM_PLACED),
-        TutorialStep.hint("Click Continue when your cargo is ready.", "continue_btn").unlock().on_event(TutorialEvents.CARGO_CONTINUE_REQUESTED).no_block(),
+        TutorialStep.hint(TranslationServer.translate("TUT_CARGO_SELECT_HINT"), "item_list").unlock().on_event(TutorialEvents.CARGO_ITEM_SELECTED),
+        TutorialStep.hint(TranslationServer.translate("TUT_CARGO_PLACE_HINT"), "cargo_grid").unlock().on_event(TutorialEvents.CARGO_ITEM_PLACED),
+        TutorialStep.hint(TranslationServer.translate("TUT_CARGO_CONTINUE_HINT"), "continue_btn").unlock().on_event(TutorialEvents.CARGO_CONTINUE_REQUESTED).no_block(),
     ]
 
 
 ## Run-review: inspect the summary and return to hub.
 static func onboarding_run_review_script() -> Array[TutorialStep]:
     return [
-        TutorialStep.hint("Review your run results and continue to the Hub.", "continue_btn").unlock().on_event(TutorialEvents.RUN_REVIEWED).no_block(),
+        TutorialStep.hint(TranslationServer.translate("TUT_RUN_REVIEW_HINT"), "continue_btn").unlock().on_event(TutorialEvents.RUN_REVIEWED).no_block(),
     ]
 
 

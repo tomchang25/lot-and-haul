@@ -171,14 +171,14 @@ func _do_clue_chain(entry: ItemEntry) -> void:
         var succeeded: bool = RunManager.attempt_clue(entry, clue)
         if succeeded:
             AudioManager.play_event(REVEAL_GOOD)
-            clue_texts.append("[color=#66ff80]%s[/color]" % clue.known_text)
+            clue_texts.append("[color=#66ff80]%s[/color]" % TranslationServer.translate(clue.known_text_key))
         else:
             AudioManager.play_event(REVEAL_BAD)
-            clue_texts.append("[color=#8c949f]Failed: %s[/color]" % clue.known_text)
+            clue_texts.append("[color=#8c949f]Failed: %s[/color]" % TranslationServer.translate(clue.known_text_key))
             break
 
     if clue_texts.is_empty():
-        _clue_result_label.text = "No more clues to investigate."
+        _clue_result_label.text = TranslationServer.translate("UI_NO_CLUES_LEFT")
     else:
         _clue_result_label.text = "\n".join(clue_texts)
     _clue_result_section.show()
@@ -221,7 +221,7 @@ func _refresh_hud() -> void:
 
 
 func _refresh_detail() -> void:
-    if _selected_entry == null or _inspection_finished:
+    if _selected_entry == null:
         _clear_detail_section()
         _empty_selection_label.show()
         return
@@ -240,18 +240,18 @@ func _refresh_action_section(entry: ItemEntry) -> void:
         _action_complete_label.hide()
         _action_unveil_button.disabled = ap < UNVEIL_COST
         if ap < UNVEIL_COST:
-            _action_unveil_button.tooltip_text = "Not enough AP"
+            _action_unveil_button.tooltip_text = TranslationServer.translate("UI_NOT_ENOUGH_AP")
         else:
-            _action_unveil_button.tooltip_text = "Unveil this item (%d AP)" % UNVEIL_COST
+            _action_unveil_button.tooltip_text = TranslationServer.translate("UI_UNVEIL_TOOLTIP") % UNVEIL_COST
     elif entry.has_inspection_clues():
         _action_unveil_button.hide()
         _action_inspect_button.show()
         _action_complete_label.hide()
         _action_inspect_button.disabled = ap < CLUE_CHAIN_COST
         if ap < CLUE_CHAIN_COST:
-            _action_inspect_button.tooltip_text = "Not enough AP"
+            _action_inspect_button.tooltip_text = TranslationServer.translate("UI_NOT_ENOUGH_AP")
         else:
-            _action_inspect_button.tooltip_text = "Inspect remaining clues (%d AP)" % CLUE_CHAIN_COST
+            _action_inspect_button.tooltip_text = TranslationServer.translate("UI_INSPECT_TOOLTIP") % CLUE_CHAIN_COST
     else:
         _action_unveil_button.hide()
         _action_inspect_button.hide()
@@ -277,7 +277,7 @@ func _update_detail_section(entry: ItemEntry) -> void:
     )
 
     var price_text := ItemEntryDisplayHelper.estimated_value_text(entry)
-    if price_text != ItemEntryDisplayHelper.UNKNOWN_TEXT:
+    if price_text != ItemEntryDisplayHelper.unknown_text():
         _detail_value_label.text = price_text
         _detail_value_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(entry))
     else:
@@ -298,14 +298,20 @@ func _refresh_clues_section(entry: ItemEntry) -> void:
 
     if entry.unveiled and entry.anchor != null:
         var a: AnchorData = entry.anchor
-        rows.append({ "text": a.known_text, "op": "base", "amount": float(a.base_value), "anchor": true })
+        rows.append({ "text": TranslationServer.translate(a.known_text_key), "op": "base", "amount": float(a.base_value), "anchor": true })
 
     for clue: ClueData in entry.surface_clues:
         if clue.type != ClueData.ClueType.SURFACE:
             continue
         if not entry.revealed_clue_ids.has(clue.clue_id):
             continue
-        rows.append({ "text": clue.known_text, "op": clue.effect_op, "amount": clue.effect_amount, "anchor": false })
+        rows.append({ "text": TranslationServer.translate(clue.known_text_key), "op": clue.effect_op, "amount": clue.effect_amount, "anchor": false })
+
+    if entry.verified:
+        for clue: ClueData in entry.hidden_clues:
+            if not entry.revealed_clue_ids.has(clue.clue_id):
+                continue
+            rows.append({ "text": TranslationServer.translate(clue.known_text_key), "op": clue.effect_op, "amount": clue.effect_amount, "anchor": false })
 
     if rows.is_empty():
         _clues_vbox.hide()
@@ -340,6 +346,7 @@ func _clear_detail_section() -> void:
     _action_inspect_button.hide()
     _action_complete_label.hide()
     _selected_entry = null
+    _item_browser.set_selected(null)
 
 # ══ Summary / exit ══════════════════════════════════════════════════════════
 
@@ -350,10 +357,10 @@ func _finish_inspection() -> void:
 
     _inspection_finished = true
 
-    _clear_detail_section()
     _clear_clue_result()
     _item_browser.refresh()
     _refresh_hud()
+    _refresh_detail()
 
 
 func _on_pass_pressed() -> void:

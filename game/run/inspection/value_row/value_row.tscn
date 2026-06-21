@@ -10,7 +10,7 @@ script = ExtResource("1_script")
 layout_mode = 2
 size_flags_horizontal = 3
 clip_text = true
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 
 [node name="ValueLabel" type="Label" parent="."]
 layout_mode = 2

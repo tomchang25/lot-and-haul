@@ -35,7 +35,7 @@ grow_vertical = 2
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Reveal"
+text = "UI_REVEAL_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -61,7 +61,7 @@ alignment = 1
 custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Reveal Next"
+text = "UI_REVEAL_NEXT"
 script = ExtResource("99_sfx")
 
 [node name="ContinueButton" type="Button" parent="RootVBox/Footer" unique_id=1969516138]
@@ -69,7 +69,7 @@ visible = false
 custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Continue"
+text = "UI_CONTINUE"
 script = ExtResource("99_sfx")
 
 [node name="TooltipPopup" parent="." unique_id=1000000101 instance=ExtResource("3_popup")]

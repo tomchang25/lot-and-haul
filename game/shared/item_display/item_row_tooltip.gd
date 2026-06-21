@@ -52,7 +52,7 @@ func show_for(entry: ItemEntry, anchor: Rect2) -> void:
 
     # ── Conditional: price ───────────────────────────────────────────────────
     var price_text := ItemEntryDisplayHelper.estimated_value_text(entry)
-    if price_text != ItemEntryDisplayHelper.UNKNOWN_TEXT:
+    if price_text != ItemEntryDisplayHelper.unknown_text():
         _price_label.text = "%s: %s" % [ItemRow.get_price_header(), price_text]
         _price_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(entry))
         _price_label.show()
@@ -74,9 +74,9 @@ func show_for(entry: ItemEntry, anchor: Rect2) -> void:
 
     var weight := ItemEntryDisplayHelper.weight_text(entry)
     var grid := ItemEntryDisplayHelper.grid_text(entry)
-    if not entry.is_veiled() and weight != ItemEntryDisplayHelper.UNKNOWN_TEXT and grid != ItemEntryDisplayHelper.UNKNOWN_TEXT:
-        _weight_label.text = "Weight:  %s" % weight
-        _grid_label.text = "Grid:  %s" % grid
+    if not entry.is_veiled() and weight != ItemEntryDisplayHelper.unknown_text() and grid != ItemEntryDisplayHelper.unknown_text():
+        _weight_label.text = TranslationServer.translate("UI_WEIGHT_TOOLTIP") % weight
+        _grid_label.text = TranslationServer.translate("UI_GRID_TOOLTIP") % grid
         _weight_label.show()
         _grid_label.show()
     else:
@@ -113,7 +113,7 @@ func _populate_clue_section(item: ItemEntry) -> void:
     _clue_container.show()
 
     var header := Label.new()
-    header.text = "Clues"
+    header.text = TranslationServer.translate("UI_CLUES_HEADER")
     header.add_theme_font_size_override(&"font_size", 11)
     header.add_theme_color_override(&"font_color", Color(0.65, 0.65, 0.65))
 
@@ -127,11 +127,32 @@ func _populate_clue_section(item: ItemEntry) -> void:
         row.custom_minimum_size = Vector2(200.0, 0.0)
 
         if item.revealed_clue_ids.has(clue.clue_id):
-            row.text = "● %s" % clue.known_text
+            var clue_name := TranslationServer.translate(clue.known_text_key)
+            row.text = TranslationServer.translate("UI_CLUE_REVEALED_FORMAT") % clue_name
             row.add_theme_color_override(&"font_color", Color.WHITE)
         else:
-            row.text = "○ %s (DC %d, %s)" % [clue.known_text, clue.dc, clue.attribute.capitalize()]
+            row.text = TranslationServer.translate("UI_CLUE_UNREVEALED_FORMAT") % [
+                TranslationServer.translate(clue.known_text_key),
+                clue.dc,
+                _attribute_display_name(clue.attribute),
+            ]
             row.add_theme_color_override(&"font_color", Color(0.55, 0.55, 0.55))
 
         # node-src: ephemeral — per-clue row, rebuilt per refresh
         _clue_container.add_child(row)
+
+
+func _attribute_display_name(attribute: String) -> String:
+    match attribute:
+        "appraisal":
+            return TranslationServer.translate("SYS_ATTR_APPRAISAL")
+        "perception":
+            return TranslationServer.translate("SYS_ATTR_PERCEPTION")
+        "restoration":
+            return TranslationServer.translate("SYS_ATTR_RESTORATION")
+        "negotiation":
+            return TranslationServer.translate("SYS_ATTR_NEGOTIATION")
+        "investigation":
+            return TranslationServer.translate("SYS_ATTR_INVESTIGATION")
+    ToastManager.show_warning("ItemRowTooltip._attribute_display_name: unknown attribute %s" % attribute)
+    return attribute

@@ -147,7 +147,7 @@ func _write_report(report: Dictionary) -> void:
     var path := _shot_dir.path_join("%s_report.json" % _id)
     var file := FileAccess.open(path, FileAccess.WRITE)
     if file == null:
-        push_warning("TestbedPilot: could not write report to %s" % path)
+        ToastManager.show_warning("TestbedPilot: could not write report to %s" % path)
         return
     file.store_string(JSON.stringify(report, "\t"))
     file.close()

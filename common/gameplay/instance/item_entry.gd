@@ -435,12 +435,14 @@ func super_category_text() -> String:
     var cat := _get_category_data()
     if cat == null or cat.super_category == null:
         return ""
-    return cat.super_category.display_name
+    return TranslationServer.translate(cat.super_category.display_name_key)
 
 
 func category_text() -> String:
     var cat := _get_category_data()
-    return cat.display_name if cat != null else ""
+    if cat == null:
+        return ""
+    return TranslationServer.translate(cat.display_name_key)
 
 
 ## Returns true if the item has any unrevealed surface or hidden clues available

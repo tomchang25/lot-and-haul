@@ -12,9 +12,31 @@ Rules:
 - When a phase ships, append the entry here and cut the shipped work from its plan/TODO source.
 - Do not add entries for dev-process-only maintenance, including closeout workflow changes, CHANGELOG/TODO edits, plan archival, or tracking cleanup.
 
-## v0.1.5 - Draft
+## v0.1.7 - Draft
 
-## v0.1.4
+## v0.1.6
+
+### Localization
+
+- 2026-06-20 — [i18n] Multilingual CJK support added: Noto Sans/SC/TC fonts, localization config, and translation source files for en, zh_CN, and zh_TW locales across UI, system, tutorial, and YAML data domains
+- 2026-06-20 — [i18n] All ~44 gameplay scene files migrated from hardcoded English `text="..."` properties to `UI_*` / `SYS_*` translation keys across settings, hub, storage, knowledge, vehicle, location, customer sell, auction, cargo, inspection, lot browse, reveal, run review, and shared components
+- 2026-06-20 — [i18n] YAML data definitions (affixes, categories, clues, commodities, locations, perks, attributes, tutorial data) gain `*_key` fields so item names, affix labels, and category names are translatable at the data resource level
+- 2026-06-20 — [i18n] Display helpers and rarity names migrated to `SYS_*` translation keys; tutorial scripts and Director strings extracted to translation keys; AttributeData keys deduplicated and migrated
+- 2026-06-20 — [i18n] Added ~187 UI translation keys across en/zh_TW/zh_CN locale source files with seed translations and CSV generation pipeline; zh_CN and zh_TW missing translations filled and polished for terminology consistency
+
+### Director Overlay Improvements
+
+- 2026-06-20 — [director] Tutorial overlay typography improved with better hierarchy and readability; skip-all-tutorials button gains visual prominence in confirmation dialogs
+
+### Error Guard Migration
+
+- 2026-06-20 — [error_guard] `push_warning` calls migrated to `ToastManager.show_dev_error()` across state_machine, garage_store, item_entry, lot_entry, and testbed_checks; lint rule added to detect bare `push_warning` at call sites
+
+### Settings Overlay Layout
+
+- 2026-06-20 — [ui] Settings overlay layout corrected for consistent spacing, alignment, and CJK text fit
+
+## v0.1.5
 
 ### Onboarding Flow
 
@@ -53,6 +75,8 @@ Rules:
 ### Script Registry and Validation
 
 - 2026-06-17 — [tutorial] Moved script resolution from Director into TutorialScripts static registry with anchor validation, push_error for unknown ids, and known_script_ids() for test coverage
+
+## v0.1.4
 
 ### Settings Main Menu Button
 

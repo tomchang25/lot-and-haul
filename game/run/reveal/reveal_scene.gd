@@ -109,7 +109,7 @@ func _populate_rows() -> void:
 
 
 func _show_auction_lost_state() -> void:
-    _title_label.text = "Auction Lost"
+    _title_label.text = TranslationServer.translate("UI_AUCTION_LOST")
     AudioManager.play_event(AUCTION_LOST)
     _item_list_panel.hide()
     _reveal_btn.hide()

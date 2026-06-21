@@ -79,6 +79,11 @@ ui_settings={
 ]
 }
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://localization/generated/affixes.en.translation", "res://localization/generated/affixes.zh_CN.translation", "res://localization/generated/affixes.zh_TW.translation", "res://localization/generated/categories.en.translation", "res://localization/generated/categories.zh_CN.translation", "res://localization/generated/categories.zh_TW.translation", "res://localization/generated/clues.en.translation", "res://localization/generated/clues.zh_CN.translation", "res://localization/generated/clues.zh_TW.translation", "res://localization/generated/commodities.en.translation", "res://localization/generated/commodities.zh_CN.translation", "res://localization/generated/commodities.zh_TW.translation", "res://localization/generated/locations.en.translation", "res://localization/generated/locations.zh_CN.translation", "res://localization/generated/locations.zh_TW.translation", "res://localization/generated/perks.en.translation", "res://localization/generated/perks.zh_CN.translation", "res://localization/generated/perks.zh_TW.translation", "res://localization/generated/system.en.translation", "res://localization/generated/system.zh_CN.translation", "res://localization/generated/system.zh_TW.translation", "res://localization/generated/tutorial.en.translation", "res://localization/generated/tutorial.zh_CN.translation", "res://localization/generated/tutorial.zh_TW.translation", "res://localization/generated/ui.en.translation", "res://localization/generated/ui.zh_CN.translation", "res://localization/generated/ui.zh_TW.translation")
+locale/test="en"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"

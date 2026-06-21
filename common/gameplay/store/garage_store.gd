@@ -56,9 +56,9 @@ func to_dict() -> Dictionary:
 
 
 ## Restores garage state. Unresolved car ids are dropped with a warning.
-func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
+func from_dict(data: Dictionary, ctx: SaveLoadContext) -> void:
     var version: int = int(data.get("_version", 1))
-    data = _apply_migrations(data, version, _ctx)
+    data = _apply_migrations(data, version, ctx)
     if data.has("active_car_id") and data["active_car_id"] is String:
         var id: String = data["active_car_id"]
         if id.is_empty():
@@ -66,7 +66,7 @@ func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
         else:
             var car: CarData = CarRegistry.get_car_by_id(id)
             if car == null:
-                push_warning("GarageStore: active_car_id '%s' not found — dropped" % id)
+                ctx.warn("GarageStore: active_car_id '%s' not found — dropped" % id)
             _active_car = car
     if data.has("owned_car_ids") and data["owned_car_ids"] is Array:
         _owned_cars = []
@@ -75,6 +75,6 @@ func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
                 continue
             var car: CarData = CarRegistry.get_car_by_id(id_variant as String)
             if car == null:
-                push_warning("GarageStore: owned_car_id '%s' not found — dropped" % id_variant)
+                ctx.warn("GarageStore: owned_car_id '%s' not found — dropped" % id_variant)
                 continue
             _owned_cars.append(car)

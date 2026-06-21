@@ -15,7 +15,6 @@ var _entry: ItemEntry = null
 var _is_selected: bool = false
 var _has_intuition_mark: bool = false
 
-@onready var _sprite_rect: ColorRect = $VBox/SpriteRect
 @onready var _name_label: Label = $VBox/NameLabel
 @onready var _price_label: Label = $VBox/PriceLabel
 @onready var _condition_label: Label = $VBox/ConditionLabel
@@ -66,7 +65,7 @@ func _apply() -> void:
     # Condition — known after unveil
     var cond_text := ItemEntryDisplayHelper.condition_text(_entry)
     var cond_secondary := ItemEntryDisplayHelper.condition_secondary_text(_entry)
-    if cond_text != ItemEntryDisplayHelper.UNKNOWN_TEXT:
+    if cond_text != ItemEntryDisplayHelper.unknown_text():
         _condition_label.text = cond_text
         _condition_label.modulate = ItemEntryDisplayHelper.condition_display_color(_entry)
         _condition_label.show()
@@ -80,8 +79,8 @@ func _apply() -> void:
         _condition_mult_label.hide()
 
     # Cargo stats — always visible (observable even for veiled items)
-    _weight_label.text = "W: %s" % ItemEntryDisplayHelper.weight_text(_entry)
-    _grid_label.text = "G: %s" % ItemEntryDisplayHelper.grid_text(_entry)
+    _weight_label.text = TranslationServer.translate("UI_WEIGHT_TOOLTIP") % ItemEntryDisplayHelper.weight_text(_entry)
+    _grid_label.text = TranslationServer.translate("UI_GRID_TOOLTIP") % ItemEntryDisplayHelper.grid_text(_entry)
     _weight_label.show()
     _grid_label.show()
 

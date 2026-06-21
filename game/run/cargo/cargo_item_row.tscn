@@ -22,7 +22,7 @@ custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 vertical_alignment = 1
 autowrap_mode = 0
 text_overrun_behavior = 2
@@ -32,7 +32,7 @@ mouse_filter = 2
 custom_minimum_size = Vector2(90, 28)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 vertical_alignment = 1
 mouse_filter = 2
 
@@ -40,7 +40,7 @@ mouse_filter = 2
 custom_minimum_size = Vector2(60, 28)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 vertical_alignment = 1
 mouse_filter = 2
 
@@ -48,7 +48,7 @@ mouse_filter = 2
 custom_minimum_size = Vector2(50, 28)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 vertical_alignment = 1
 mouse_filter = 2
 

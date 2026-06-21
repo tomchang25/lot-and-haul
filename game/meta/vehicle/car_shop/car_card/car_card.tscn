@@ -25,21 +25,21 @@ theme_override_constants/separation = 4
 [node name="NameLabel" type="Label" parent="HBoxContainer/Stats" unique_id=1766951218]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 
 [node name="StatsLabel" type="Label" parent="HBoxContainer/Stats" unique_id=877907888]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = " - "
+text = "UI_LABEL_SEPARATOR"
 
 [node name="PriceLabel" type="Label" parent="HBoxContainer/Stats" unique_id=995789177]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Price: $-"
+text = "UI_PRICE_LABEL"
 
 [node name="BuyButton" type="Button" parent="HBoxContainer" unique_id=574155382]
 script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
 size_flags_vertical = 4
-text = "Buy"
+text = "UI_BUY"

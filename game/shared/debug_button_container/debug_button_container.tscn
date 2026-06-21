@@ -42,7 +42,7 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
 theme_override_font_sizes/font_size = 12
-text = "[DEBUG]"
+text = "UI_DEBUG_LABEL"
 
 [node name="DebugAddItemBtn" type="Button" parent="VBox" unique_id=429407710]
 unique_name_in_owner = true
@@ -51,7 +51,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.6, 0.4, 1)
 theme_override_colors/font_hover_color = Color(1, 0.8, 0.6, 1)
 theme_override_font_sizes/font_size = 13
-text = "Add Random Item"
+text = "UI_DEBUG_ADD_RANDOM"
 
 [node name="DebugClearStorageBtn" type="Button" parent="VBox" unique_id=1450738408]
 unique_name_in_owner = true
@@ -60,4 +60,4 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
 theme_override_colors/font_hover_color = Color(1, 0.6, 0.6, 1)
 theme_override_font_sizes/font_size = 13
-text = "Clear All Storage"
+text = "UI_DEBUG_CLEAR_STORAGE"

@@ -37,7 +37,7 @@ from pathlib import Path
 # autoloads / global managers, resource definitions under data/, or common
 # framework scripts. We approximate that scope by directory.
 #
-# The error-guard check (bare push_error ban) applies to ALL GDScript in the
+# The error-guard check (bare push_error / push_warning ban) applies to ALL GDScript in the
 # project — guards live mostly in managers and runtime types, so limiting it
 # to scene dirs would make it a dead letter.
 
@@ -280,8 +280,13 @@ def check_match_wildcard(path: str, text: str) -> list[Violation]:
 #     the comment line directly above, making the claim greppable for review.
 
 PUSH_ERROR_RE = re.compile(r"\bpush_error\s*\(")
+PUSH_WARNING_RE = re.compile(r"\bpush_warning\s*\(")
 PUSH_ERROR_BOOT_MARKER_RE = re.compile(r"#\s*push-error:\s*boot\b")
 PUSH_ERROR_EXEMPT_FILES = frozenset({"global/autoloads/toast_manager.gd"})
+PUSH_WARNING_EXEMPT_FILES = frozenset({
+    "global/autoloads/toast_manager.gd",
+    "global/autoloads/save_load_context.gd",
+})
 
 
 def check_bare_push_error(path: str, text: str) -> list[Violation]:
@@ -321,6 +326,56 @@ def check_bare_push_error(path: str, text: str) -> list[Violation]:
                 "bare push_error at call site. Runtime guards: "
                 "ToastManager.show_error() (logs internally). Programmer "
                 "errors: ToastManager.show_dev_error(). Code running before "
+                "the ToastManager autoload loads may declare "
+                "`# push-error: boot`.",
+            )
+        )
+
+    return violations
+
+
+# ── Tier 1: bare push_warning ban (error_guard_standard.md §3a) ────────────────
+#
+# All warnings go through ToastManager.show_warning(). A bare push_warning at a
+# call site is a violation, with exceptions:
+#
+#   - toast_manager.gd itself — the single home of the underlying push_warning.
+#   - save_load_context.gd — uses push_warning for console parity in ctx.info().
+#   - Boot-phase code that runs before the ToastManager autoload exists
+#     (same marker as push_error: `# push-error: boot`).
+
+
+def check_bare_push_warning(path: str, text: str) -> list[Violation]:
+    """Flag every bare push_warning call site. Warnings must use
+    ToastManager.show_warning(). Pre-ToastManager boot code may declare
+    the exception with `# push-error: boot`.
+    (error_guard_standard.md §3a)"""
+    if path in PUSH_WARNING_EXEMPT_FILES:
+        return []
+
+    violations: list[Violation] = []
+    lines = text.splitlines()
+    for i, line in enumerate(lines, start=1):
+        m = PUSH_WARNING_RE.search(line)
+        if not m:
+            continue
+        hash_idx = line.find("#")
+        if hash_idx != -1 and hash_idx < m.start():
+            continue
+        if PUSH_ERROR_BOOT_MARKER_RE.search(line):
+            continue
+        if i >= 2:
+            prev = lines[i - 2]
+            if prev.lstrip().startswith("#") and PUSH_ERROR_BOOT_MARKER_RE.search(prev):
+                continue
+        violations.append(
+            Violation(
+                path,
+                i,
+                "bare-push-warning",
+                "error-guard §3a",
+                "bare push_warning at call site. "
+                "Use ToastManager.show_warning() instead. Code running before "
                 "the ToastManager autoload loads may declare "
                 "`# push-error: boot`.",
             )
@@ -370,7 +425,11 @@ def check_snapshot_store_dependencies(path: str, text: str) -> list[Violation]:
 # Check families by scope. Add new checks here as more rules graduate from the
 # manifest into machine enforcement.
 GD_SCENE_CHECKS = (check_node_source, check_match_wildcard)
-GD_ERROR_GUARD_CHECKS = (check_bare_push_error, check_snapshot_store_dependencies)
+GD_ERROR_GUARD_CHECKS = (
+    check_bare_push_error,
+    check_bare_push_warning,
+    check_snapshot_store_dependencies,
+)
 TSCN_CHECKS = (check_tscn_connections,)
 
 

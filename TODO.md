@@ -253,13 +253,14 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
 
 - [balance_preview_v2] Balance preview HTML report — rich HTML output with per-clue information tables, category breakdowns, affix-aware balance preview mode, and value distribution charts
+
+- [localization] Localization system: YAML→CSV pipeline, locale×block file split, fallback chains, CJK font, settings UI — see `dev/docs/plans/localization_architecture.sketch.md` and `dev/docs/plans/localization_implementation.spec.md`
+
 ---
 
 ## Chore
 
 One-line, no reasoning, no backing doc.
-
-​
 
 - [fix] update changelog before 0.2.0
 - [fix] update changelog rule to disallow unicode and force to be "compact"
@@ -271,14 +272,4 @@ One-line, no reasoning, no backing doc.
 
 - [refactor] ItemYaml - Refactor Yaml strcuture, so I can list all affix and clues situation in each categories
 
-- [feat] Localization
-
 ---
-
-## Bug
-
-One-line defect to fix.
-
-```
-
-```

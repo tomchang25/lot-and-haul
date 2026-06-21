@@ -1,0 +1,331 @@
+zh_CN:
+  UI_SETTINGS_ENGLISH: English
+  UI_SETTINGS_TRADITIONAL_CHINESE: 繁體中文
+  UI_SETTINGS_SIMPLIFIED_CHINESE: 简体中文
+  UI_START_TITLE: "Lot & Haul"
+  UI_START_SELECT_SLOT: 选择存档
+  UI_START_BACK: 返回
+  UI_START_NEW_GAME_CONFIRM: 开始新游戏
+  UI_START_NEW_GAME_CONFIRM_BODY: 开始新游戏？当前进度将丢失。
+  UI_START_OVERWRITE_SLOT_TITLE: 覆盖存档
+  UI_START_OVERWRITE: 覆盖
+  UI_START_OVERWRITE_BODY: 此存档的所有进度将丢失。
+  UI_SETTINGS_TITLE: 设置
+  UI_SETTINGS_LANGUAGE: 语言
+  UI_SETTINGS_AUDIO: 音频
+  UI_SETTINGS_DISPLAY: 显示
+  UI_SETTINGS_GAMEPLAY: 游戏
+  UI_SETTINGS_MASTER: 主音量
+  UI_SETTINGS_SFX: 音效
+  UI_SETTINGS_MUSIC: 音乐
+  UI_SETTINGS_FULLSCREEN: 全屏
+  UI_SETTINGS_DEBUG_MODE: 调试模式
+  UI_SETTINGS_SKIP_TUTORIALS: 跳过教程
+  UI_SETTINGS_CLOSE: 关闭
+  UI_SETTINGS_RETURN_TO_MAIN_MENU: 返回主菜单
+  UI_SETTINGS_CONFIRM_SKIP_TITLE: 跳过所有剩余教程？
+  UI_SETTINGS_CONFIRM_SKIP_BODY: 教程将不再自动启动。你可以随时在设置中重新开启。
+  UI_SETTINGS_CONFIRM_SKIP_LABEL: "跳过所有剩余教程？\n\n教程将不再自动启动。你可以随时在设置中重新开启。"
+  UI_SETTINGS_YES: 是
+  UI_SETTINGS_NO: 否
+  UI_ACTIONS_HEADER: 动作
+  UI_ACTIVE: 启用中
+  UI_ACTIVE_TASKS: 启用中·任务
+  UI_ACTIVITY: 活动
+  UI_AGGRESSIVE: 激进
+  UI_ALL_LOTS_REVIEWED: 所有拍品已审阅。准备装载货物。
+  UI_AP_LABEL: "AP：%d / %d"
+  UI_ATTRIBUTES: 属性
+  UI_AUCTION_TITLE: 拍卖
+  UI_AUTH: ● 认证
+  UI_AUTHENTICATED: ● 已认证
+  UI_BACK: 返回
+  UI_BACK_TO_HUB: 返回枢纽
+  UI_BALANCE_LABEL: "余额：$%d"
+  UI_BAND_BAD: "2-4：不佳（x0.7）"
+  UI_BAND_BIG_WIN: "10-12：大胜（x1.5）"
+  UI_BAND_SOLID: "5-9：稳健（x1.1）"
+  UI_BID: 出价
+  UI_BUDGET_LABEL: "预算：$%d"
+  UI_BUY: 购买
+  UI_CANCEL: 取消
+  UI_CAPACITY_LABEL: "容量：%d\u00d7%d"
+  UI_CARGO_MANIFEST: ▼ 货物清单
+  UI_CARGO_TITLE: 货物
+  UI_CAR_CARGO: 车辆货物
+  UI_CAR_SHOP: 车辆商店
+  UI_CAR_TOTAL_LABEL: "车辆总计：$%d"
+  UI_CATEGORIES_LABEL: "类别：—"
+  UI_CHOOSE_ACTIVITY: 选择活动
+  UI_CLEAR_CAR: 清空车辆
+  UI_CLICK_TO_VIEW: 点击物品查看详细信息
+  UI_CLOSE_SHOP: 关闭商店
+  UI_CLOSE_X: ✕
+  UI_CLUES_HEADER: 线索
+  UI_CLUE_RESULTS: 线索结果
+  UI_CONDITION: 状况
+  UI_CONFIRM: 确认
+  UI_CONFIRM_DICE: 确认骰子
+  UI_CONFIRM_SALE: 确认销售
+  UI_CONSERVATIVE: 保守
+  UI_CONTINUE: 继续
+  UI_CONTINUE_TITLE: "继续？"
+  UI_COPY_ERRORS: 复制错误
+  UI_COUNT_UNKNOWN: "×？"
+  UI_CURRENCY_LABEL: $%d
+  UI_CUSTOMERS_LABEL: "顾客："
+  UI_CUSTOMER_NAME: 顾客名称
+  UI_CUSTOMER_SALES: 顾客销售
+  UI_CUSTOMER_SELL_TITLE: 向顾客销售
+  UI_DAILY: 每日
+  UI_DAY_LABEL: "第 %d 天"
+  UI_DAY_PHASE_LABEL: "第 0 天   |   > 白天 - 夜晚"
+  UI_DAY_SUMMARY_TITLE: 每日摘要
+  UI_DEBUG_ADD_RANDOM: 添加随机物品
+  UI_DEBUG_CLEAR_STORAGE: 清空所有存储
+  UI_DEBUG_LABEL: "[调试]"
+  UI_DICE_ROLL_RESULTS: 掷骰结果
+  UI_EM_DASH: —
+  UI_ENTER: 进入
+  UI_ENTRY_FEE_LABEL: "入场费：$%d"
+  UI_EST_COST_LABEL: "估计成本：$%d"
+  UI_EST_VALUE: 估计价值
+  UI_EXTRA_CATEGORY_LABEL: "额外类别：—"
+  UI_FATAL_ERROR_TITLE: 致命错误
+  UI_FUEL_LABEL: "燃料：$%d"
+  UI_GARAGE: 车库
+  UI_GRID_UNKNOWN: "G：？？？"
+  UI_HUB_TITLE: 枢纽
+  UI_INSPECTION_TITLE: 检查
+  UI_INSPECT_CLUES_ACTION: 检查线索（2 AP）
+  UI_ITEM_DETAILS: 物品详细信息
+  UI_KNOWLEDGE_TITLE: 知识
+  UI_LABEL_SEPARATOR: " - "
+  UI_LEAVE_WORKSHOP: 离开车间
+  UI_LOCATION_ENTRY_TITLE: 进入地点
+  UI_LOCATION_SELECT_TITLE: 选择地点
+  UI_LOTS_LABEL: "拍品：%d"
+  UI_LOT_BROWSE_TITLE: 浏览拍品
+  UI_LOT_NUMBER: "拍品 %d / %d"
+  UI_LOT_REVIEW: 拍品审阅
+  UI_MASTERY: 精通
+  UI_MASTERY_RANK_LABEL: "精通等级：%d"
+  UI_NO_CUSTOMERS: 没有载入顾客
+  UI_NO_CUSTOMERS_TONIGHT: 今晚没有顾客。
+  UI_NO_INSPECTION_AVAILABLE: 无法进一步检查
+  UI_NO_ITEMS: 没有物品。
+  UI_NO_ITEM_SELECTED: 未选中物品
+  UI_NO_MATCHING_ITEMS: 没有载入匹配的物品。
+  UI_OK: 确定
+  UI_OPENING_BID: 起拍价
+  UI_PASS: 跳过
+  UI_PASS_LOT_CONFIRM: "你确定要跳过这个拍品吗？"
+  UI_PASS_LOT_TITLE: 跳过拍品
+  UI_PERKS: 专长
+  UI_PRICE_CONVERGENCE: 价格收敛度
+  UI_PRICE_LABEL: "价格：$%d"
+  UI_QUESTION_MARK: "？"
+  UI_QUIT: 退出
+  UI_RARITY_LABEL: "稀有度：—"
+  UI_REPAIR: 修理
+  UI_RESEARCH: 研究
+  UI_RESET: 重置
+  UI_RESTORE: 修复
+  UI_REVEAL_NEXT: 揭示下一个
+  UI_REVEAL_TITLE: 揭示
+  UI_REVIEW_LOT: 审阅拍品
+  UI_ROLLING_DICE: 正在掷 %d 颗骰子...
+  UI_RUN_REVIEW_TITLE: 运行回顾
+  UI_SALE_RESULT: 销售结果
+  UI_SELECT: 选中
+  UI_SELECTED: 已选中
+  UI_SELECTED_ITEM: 已选中物品
+  UI_SELECT_DICE: 选择 %d 颗骰子保留
+  UI_SELECT_TO_INSPECT: 选择一个物品进行检查。
+  UI_SELL: 销售
+  UI_SELL_STRATEGY: 销售策略
+  UI_SETTINGS_ICON: ⚙
+  UI_SETTLEMENT: 结算
+  UI_SKIP_CARGO_CONFIRM: "跳过剩余 %d 个拍品并直接前往货物？"
+  UI_SKIP_TO_CARGO: 跳至货物
+  UI_SKIP_TO_CARGO_TITLE: 跳至货物
+  UI_SOLD_LABEL: " 已售出！"
+  UI_SORT_ASC: ▲
+  UI_SORT_LABEL: "排序："
+  UI_START_AUCTION: 开始拍卖
+  UI_START_LOAD_GAME: 载入游戏
+  UI_START_NEW_GAME: 新游戏
+  UI_START_QUIT: 退出
+  UI_START_SETTINGS: 设置
+  UI_STORAGE_COUNT_LABEL: "存储：%d 个物品"
+  UI_STORAGE_TITLE: 存储
+  UI_SUM_LABEL: "总和：%d（x%.1f）"
+  UI_TASK_COUNT: 0/4
+  UI_TOTAL_ESTIMATE: 总估计
+  UI_TOTAL_LABEL: "总计：$%d"
+  UI_TRAILER: 拖车
+  UI_TRAVEL_LABEL: "旅行：%d 天"
+  UI_TRIP: 行程
+  UI_UNVEIL_ACTION: 揭晓（1 AP）
+  UI_UPGRADE: 升级
+  UI_UPGRADE_COST_FORMAT: "升级  $%d"
+  UI_SKIP_LABEL: "跳过"
+  UI_SKIP_ALL_LABEL: "全部跳过"
+  UI_NEXT_LABEL: "下一步"
+  UI_NOT_ENOUGH_CASH: 现金不足
+  UI_VEHICLE_TITLE: 车辆
+  UI_VERIFIED_LABEL: "已验证：%d / %d"
+  UI_VIEW_CARDS: 卡片
+  UI_VIEW_TABLE: 表格
+  UI_WANTS_LABEL: "需求：%s"
+  UI_WEIGHT_UNKNOWN: "W：？？？"
+  UI_ZERO_ITEMS: "%d 个物品"
+
+  # ── 财务分类帐 ──
+  UI_CASH_FLOW_LABEL: "现金流：$%d"
+  UI_PURCHASES_LABEL: "购买：$%d"
+  UI_ONSITE_LABEL: "现场：$%d"
+  UI_CARGO_VALUE_LABEL: "货物价值：$%d"
+  UI_EST_PROFIT_LABEL: "预计利润：$%d"
+  UI_FUEL_MULTI_LABEL: "燃料（\u00d7%d 天）：$%d"
+
+  # ── 存储操作按钮 ──
+  UI_REPAIR_ACTION_LABEL: "修理 [%d AP]"
+  UI_RESTORE_ACTION_LABEL: "修复 [%d AP]"
+  UI_RESEARCH_ACTION_LABEL: "研究 [%d AP]"
+
+  # ── 存储提示文字 ──
+  UI_REPAIR_DONE_TOOLTIP: "状况已达 50%% — 请使用修复继续"
+  UI_REPAIR_AP_TOOLTIP: "AP 不足（需要 %d）"
+  UI_RESTORE_REPAIR_TOOLTIP: "请先将状况修理到 50%%"
+  UI_RESTORE_DONE_TOOLTIP: "状况已完全修复"
+  UI_RESTORE_AP_TOOLTIP: "AP 不足（需要 %d）"
+  UI_RESEARCH_DONE_TOOLTIP: "没有剩余的隐藏线索"
+  UI_RESEARCH_REPAIR_TOOLTIP: "请先将状况修理到 50%%"
+  UI_RESEARCH_AP_TOOLTIP: "AP 不足（需要 %d）"
+
+  # ── 价值/收敛度标签 ──
+  UI_VERIFIED_BADGE: "已验证"
+  UI_TRUE_VALUE: "真实价值"
+  UI_CONVERGED: "已收敛"
+  UI_VERIFICATION_LABEL: "验证：%s"
+  UI_UNVERIFIED: "未验证"
+
+  # ── 枢纽 ──
+  UI_DAY_SLOT_NAME: "白天"
+  UI_NIGHT_SLOT_NAME: "夜晚"
+  UI_ACTIVITY_BTN: "活动（%s）"
+
+  # ── 货物清单 ──
+  UI_DAMAGE_LABEL: "运输过程中有 %d 件拖车物品损坏"
+
+  # ── 物品行表头 ──
+  UI_COLUMN_ITEM: "物品"
+  UI_COLUMN_CONDITION: "状况"
+  UI_COLUMN_BASE_VALUE: "基础价值"
+  UI_COLUMN_WEIGHT: "重量"
+  UI_COLUMN_GRID: "网格"
+  UI_COLUMN_INSPECTION: "检查"
+
+  # ── 物品提示 ──
+  UI_WEIGHT_TOOLTIP: "重量：%s"
+  UI_GRID_TOOLTIP: "网格：%s"
+  UI_CLUE_REVEALED_FORMAT: "● %s"
+  UI_CLUE_UNREVEALED_FORMAT: "○ %s（DC %d，%s）"
+  UI_CAR_STATS_LINE: "网格：%d\u00d7%d    重量：%d    耐力：%d    每日燃料：%d    额外槽位：%d"
+  # ── 线索区块 ──
+  UI_CLUE_IDENTITY: "身份"
+  UI_CLUE_SURFACE: "表面"
+  UI_CLUE_HIDDEN: "隐藏"
+
+  # ── 每日摘要 ──
+  UI_DAY_TO_DAY: "第 %d 天 → 第 %d 天"
+  UI_SOLD_ONSITE_LABEL: "现场出售：$%d"
+  UI_ENTRY_FEE_DEBIT: "入场费：-$%d"
+  UI_FUEL_COST_DEBIT: "燃料费：-$%d"
+  UI_AMOUNT_PAID: "已支付：-$%d"
+  UI_CONSERVATIVE_SUMMARY: "保守：%d 件物品，$%d"
+  UI_AGGRESSIVE_SUMMARY: "激进：%d 件物品，$%d"
+  UI_TOTAL_CUSTOMER_SALES: "顾客销售总计：$%d"
+  UI_LIVING_COST: "生活：-$%d"
+  UI_CARGO_BACK: "带回货物：%d 件物品"
+  UI_NET_CREDIT: "净额：+$%d"
+  UI_NET_DEBIT: "净额：-$%d"
+
+  # ── 存储详情 ──
+  UI_RESEARCH_PROGRESS: "研究：%d / %d"
+  UI_AP_HUD: "AP  %d / %d"
+  UI_ITEM_COUNT: "%d 件物品"
+  UI_EST_VALUE_LABEL: "估计价值"
+
+  # ── 拍卖 ──
+  UI_AUCTION_LOST: "拍卖失败"
+
+  # ── 检查 ──
+  UI_NO_CLUES_LEFT: "没有更多线索可调查。"
+  UI_NOT_ENOUGH_AP: "AP 不足"
+  UI_UNVEIL_TOOLTIP: "揭晓此物品（%d AP）"
+  UI_INSPECT_TOOLTIP: "检查剩余线索（%d AP）"
+
+  # ── 知识面板 ──
+  UI_NO_ATTRIBUTES: "没有找到属性"
+  UI_NO_PERKS: "没有发现专长"
+
+  # ── 车辆商店 ──
+  UI_NO_CARS_AVAILABLE: "没有可用车辆 — 你已经拥有全部。"
+
+  # ── 货物 ──
+  UI_WEIGHT_EXCEEDED: "超过重量限制！无法放置物品。"
+
+  # ── 顾客销售 ──
+  UI_CAPACITY_FORMAT: "容量：%d\u00d7%d"
+
+  # ── 拍品卡片 ──
+  UI_ITEM_COUNT_RANGE: "%d 件物品"
+  UI_ITEM_COUNT_RANGE_MULTI: "%d\u2013%d 件物品"
+  UI_RARITY_RANGE: "稀有度：%s"
+  UI_SUPER_CATEGORY: "超级类别：%s"
+  UI_EXTRA_CATEGORY: "额外类别：%s"
+  UI_UNKNOWN_RARITY: "未知"
+  UI_NONE: "无"
+  UI_MIXED_TYPES: "混合（%d 种类型）"
+
+  # ── 销售场景 ──
+  UI_ALL_CUSTOMERS_SERVED: "所有顾客已接待！夜晚结束。"
+
+  # ── 骰子面板 ──
+  UI_ROLLING_DICE_COUNT: "正在掷 %d 颗骰子..."
+  UI_SUM_PLACEHOLDER: "总和：—"
+  UI_TOTAL_PLACEHOLDER: "总计：—"
+
+  # ── 精通面板 ──
+  UI_MASTERY_MAX: "最高"
+  UI_PROGRESS_FORMAT: "%d / %d"
+
+  # ── 收据 ──
+  UI_SALE_TITLE: "%s 销售"
+  UI_SALE_ITEMS_COUNT: "物品：%d"
+  UI_VERIFIED_TAG: "（已验证）"
+  UI_SELL_PRICE: "售价：$%d"
+
+  # ── 每日摘要 ──
+  UI_NET_LABEL: "净额：$%d"
+  UI_WANTS_FORMAT: "需求：%s"
+
+  # ── 起始页面 ──
+  UI_TESTBEDS: "测试台"
+  UI_NEW_GAME_CONFIRM: "在存档位 %d 开始新游戏？此存档位的所有进度将丢失。"
+  UI_NEW_GAME_SELECT: "新游戏 — 选择存档位"
+  UI_LOAD_GAME_SELECT: "载入游戏 — 选择存档位"
+  UI_SLOT_INFO: "存档位 %d\n第 %d 天  ·  $%d  ·  %s"
+  UI_SLOT_EMPTY: "存档位 %d\n空"
+  UI_TIME_TODAY: "今天"
+  UI_TIME_YESTERDAY: "昨天"
+  UI_TIME_DAYS_AGO: "%d 天前"
+  UI_TIME_WEEKS_AGO: "%d 周前"
+  UI_TIME_MONTHS_AGO: "%d 个月前"
+
+  # ── 位置信息显示 ──
+  UI_LOCATION_INFO: "位置信息"
+  UI_LOT_INFO: "拍品信息"
+  UI_RUNNING_REVIEW: "运行回顾"

@@ -71,7 +71,7 @@ class AnchorSpec:
 
         w.add_field('script = ExtResource("1_anchordef")')
         w.add_field_str("anchor_id", anchor_id)
-        w.add_field_str("known_text", entry.get("known_text", ""))
+        w.add_field_str("known_text_key", entry.get("known_text_key", ""))
         w.add_field_ext_ref("category_data", cat_tag)
         w.add_field_float("base_value", float(entry.get("base_value", 0.0)))
         w.add_field_str("shape_id", entry.get("shape_id", "s1x1"))
@@ -95,7 +95,7 @@ class AnchorSpec:
 
         return {
             "anchor_id": anchor_id,
-            "known_text": tres_field(text, "known_text") or "",
+            "known_text_key": tres_field(text, "known_text_key") or "",
             "category_scope": category_scope,
             "base_value": float(tres_field(text, "base_value") or 0.0),
             "shape_id": tres_field(text, "shape_id") or "s1x1",
@@ -131,9 +131,9 @@ class AnchorSpec:
                     f"anchor '{aid}': category_scope '{cat_scope}' not in category table"
                 )
 
-            known_text = anchor.get("known_text", "")
-            if not isinstance(known_text, str) or not known_text.strip():
-                errors.append(f"anchor '{aid}': known_text is required")
+            known_text_key = anchor.get("known_text_key", "")
+            if not isinstance(known_text_key, str) or not known_text_key.strip():
+                errors.append(f"anchor '{aid}': known_text_key is required")
 
             try:
                 base_value = float(anchor.get("base_value", "MISSING"))
@@ -165,12 +165,12 @@ class AnchorSpec:
             except (ValueError, TypeError):
                 errors.append(f"anchor '{aid}': tier is not a valid integer")
 
-            # Three-word ceiling on known_text.
-            if isinstance(known_text, str) and known_text.strip():
-                word_count = len(known_text.split())
+            # Three-word ceiling on known_text_key.
+            if isinstance(known_text_key, str) and known_text_key.strip():
+                word_count = len(known_text_key.split())
                 if word_count > 3:
                     errors.append(
-                        f"anchor '{aid}': known_text \"{known_text}\" has {word_count} words (max 3)"
+                        f"anchor '{aid}': known_text_key \"{known_text_key}\" has {word_count} words (max 3)"
                     )
 
         return errors

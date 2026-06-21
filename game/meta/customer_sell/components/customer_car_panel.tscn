@@ -23,19 +23,19 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
-text = "Customer Name"
+text = "UI_CUSTOMER_NAME"
 
 [node name="CapacityLabel" type="Label" parent="VBox/CustomerHeaderRow" unique_id=1168133706]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Capacity: ???"
+text = "UI_CAPACITY_LABEL"
 
 [node name="DemandTagsLabel" type="Label" parent="VBox" unique_id=1685664173]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Wants: -"
+text = "UI_WANTS_LABEL"
 autowrap_mode = 2
 max_lines_visible = 3
 
@@ -47,13 +47,13 @@ theme_override_constants/separation = 12
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Car total: $0"
+text = "UI_CAR_TOTAL_LABEL"
 
 [node name="VerifiedCountLabel" type="Label" parent="VBox/CarSummaryRow" unique_id=2001962363]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Verified: 0 / 0"
+text = "UI_VERIFIED_LABEL"
 
 [node name="PackingGrid" type="GridContainer" parent="VBox" unique_id=659388510]
 unique_name_in_owner = true
@@ -75,7 +75,7 @@ layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
 theme_override_font_sizes/font_size = 15
-text = "Clear Car"
+text = "UI_CLEAR_CAR"
 script = ExtResource("3_sfx")
 
 [node name="BottomActionRow" type="HBoxContainer" parent="VBox" unique_id=2094169341]

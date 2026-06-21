@@ -87,14 +87,14 @@ func show_dice(rolls: Array[int], placed_items: Array) -> void:
     _selected_dice_indices.clear()
     _state = OfferState.ROLLING
     disable_sell_buttons(true)
-    _dice_hint_label.text = "Select %d dice to keep" % MAX_SELECTED_DICE
-    _dice_sum_label.text = "Sum: —"
-    _dice_total_label.text = "Total: —"
+    _dice_hint_label.text = TranslationServer.translate("UI_SELECT_DICE") % MAX_SELECTED_DICE
+    _dice_sum_label.text = TranslationServer.translate("UI_SUM_PLACEHOLDER")
+    _dice_total_label.text = TranslationServer.translate("UI_TOTAL_PLACEHOLDER")
     _confirm_dice_button.disabled = true
     _confirm_dice_button.hide()
     _cancel_dice_button.hide()
     _clear_band_highlights()
-    _pool_size_label.text = "Rolling %d dice..." % rolls.size()
+    _pool_size_label.text = TranslationServer.translate("UI_ROLLING_DICE_COUNT") % rolls.size()
     _pool_size_label.show()
     _dice_section.show()
     _play_roll_in_animation()
@@ -152,7 +152,7 @@ func _play_roll_in_animation() -> void:
             _state = OfferState.SELECTING_DICE
             _confirm_dice_button.show()
             _cancel_dice_button.show()
-            _dice_hint_label.text = "Select %d dice to keep" % MAX_SELECTED_DICE
+            _dice_hint_label.text = TranslationServer.translate("UI_SELECT_DICE") % MAX_SELECTED_DICE
     )
 
 # ══ Internal - Dice buttons ════════════════════════════════════════════════════
@@ -183,9 +183,9 @@ func _clear_children(container: Node) -> void:
 
 func _refresh_dice_totals() -> void:
     if _selected_dice_indices.size() != MAX_SELECTED_DICE:
-        _dice_hint_label.text = "Select %d dice to keep" % MAX_SELECTED_DICE
-        _dice_sum_label.text = "Sum: —"
-        _dice_total_label.text = "Total: —"
+        _dice_hint_label.text = TranslationServer.translate("UI_SELECT_DICE") % MAX_SELECTED_DICE
+        _dice_sum_label.text = TranslationServer.translate("UI_SUM_PLACEHOLDER")
+        _dice_total_label.text = TranslationServer.translate("UI_TOTAL_PLACEHOLDER")
         _confirm_dice_button.disabled = true
         _clear_band_highlights()
         return
@@ -197,7 +197,7 @@ func _refresh_dice_totals() -> void:
     var total := SellMath.aggressive_total(_placed_items, sum)
 
     _dice_hint_label.text = ""
-    _dice_sum_label.text = "Sum: %d (x%.1f)" % [sum, multiplier]
+    _dice_sum_label.text = TranslationServer.translate("UI_SUM_LABEL") % [sum, multiplier]
     _confirm_dice_button.disabled = false
 
     _highlight_band_for_sum(sum)
@@ -207,12 +207,13 @@ func _refresh_dice_totals() -> void:
 func _animate_total_to(target: int) -> void:
     var current: int = 0
     var raw_total := _dice_total_label.text
-    if raw_total.begins_with("Total: $"):
-        current = int(raw_total.trim_prefix("Total: $"))
+    var prefix := TranslationServer.translate("UI_TOTAL_PLACEHOLDER").split("$")[0]
+    if raw_total.begins_with(prefix):
+        current = int(raw_total.trim_prefix(prefix))
 
     var tween := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
     tween.tween_method(
-        func(val: float) -> void: _dice_total_label.text = "Total: $%d" % int(val),
+        func(val: float) -> void: _dice_total_label.text = TranslationServer.translate("UI_TOTAL_LABEL") % int(val),
         float(current),
         float(target),
         0.35,

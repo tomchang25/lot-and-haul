@@ -10,11 +10,11 @@ extends Resource
 # Whether this location is tutorial-only. Excluded from normal sampling.
 @export var is_tutorial: bool = false
 
-# Player-facing name shown on the location selection screen.
-@export var display_name: String = ""
+# Localization key for the location display name.
+@export var display_name_key: String = ""
 
-# One-line flavor / summary shown on the location selection screen.
-@export var description: String = ""
+# Localization key for the location description.
+@export var description_key: String = ""
 
 # Upfront cost deducted when entering this location.
 @export var entry_fee: int = 0

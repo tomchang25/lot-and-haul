@@ -4,6 +4,9 @@
 [ext_resource type="Texture2D" uid="uid://bfllr21svmq0k" path="res://global/theme/icons/checkbox_checked_disabled.png" id="cb_checked_dis"]
 [ext_resource type="Texture2D" uid="uid://dnwe3h5xq87rp" path="res://global/theme/icons/checkbox_unchecked.png" id="cb_unchecked"]
 [ext_resource type="Texture2D" uid="uid://b43au5bscst6t" path="res://global/theme/icons/checkbox_unchecked_disabled.png" id="cb_unchecked_dis"]
+[ext_resource type="FontFile" uid="uid://xnx728uegd0c" path="res://global/theme/fonts/NotoSans-Variable.ttf" id="font_latin"]
+[ext_resource type="FontFile" uid="uid://ni5vsdnw84ki" path="res://global/theme/fonts/NotoSansSC-Variable.ttf" id="font_sc"]
+[ext_resource type="FontFile" uid="uid://8kq0k5t82ufl" path="res://global/theme/fonts/NotoSansTC-Variable.ttf" id="font_tc"]
 
 [sub_resource type="StyleBoxFlat" id="btn_disabled"]
 content_margin_left = 12.0
@@ -191,7 +194,12 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
+[sub_resource type="FontVariation" id="main_font"]
+fallbacks = Array[Font]([ExtResource("font_sc"), ExtResource("font_tc")])
+base_font = ExtResource("font_latin")
+
 [resource]
+default_font = SubResource("main_font")
 default_font_size = 16
 Button/colors/font_color = Color(0.88, 0.88, 0.92, 1)
 Button/colors/font_disabled_color = Color(0.45, 0.48, 0.53, 1)

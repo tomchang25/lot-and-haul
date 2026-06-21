@@ -104,7 +104,7 @@ static func _draw_category(data: LotData, rng: RandomNumberGenerator = null) -> 
                 sc_values.append(data.super_category_weights[k])
             var sc_idx := RandomUtils.pick_weighted_index(sc_values, rng)
             if sc_idx < 0:
-                push_warning("Super-category roll failed")
+                ToastManager.show_warning("Super-category roll failed")
                 return null
             var super_category_id: String = sc_keys[sc_idx]
             var sc_ref: SuperCategoryData = SuperCategoryRegistry.get_super_category_by_id(super_category_id)
@@ -121,7 +121,7 @@ static func _draw_category(data: LotData, rng: RandomNumberGenerator = null) -> 
                 cat_values.append(data.category_weights[k])
             var cat_idx := RandomUtils.pick_weighted_index(cat_values, rng)
             if cat_idx < 0:
-                push_warning("Category roll failed")
+                ToastManager.show_warning("Category roll failed")
                 return null
             category_id = cat_keys[cat_idx]
 
@@ -129,7 +129,7 @@ static func _draw_category(data: LotData, rng: RandomNumberGenerator = null) -> 
         if cat != null:
             return cat
 
-    push_warning("_draw_category: no category found after %d attempts" % MAX_ATTEMPTS)
+    ToastManager.show_warning("_draw_category: no category found after %d attempts" % MAX_ATTEMPTS)
     return null
 
 

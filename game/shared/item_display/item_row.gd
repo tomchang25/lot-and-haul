@@ -33,14 +33,14 @@ enum Column {
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 const COLUMN_HEADERS: Dictionary = {
-    Column.NAME: "Item",
-    Column.CONDITION: "Condition",
-    Column.ESTIMATED_VALUE: "Est. Value",
-    Column.BASE_VALUE: "Base Value",
-    Column.RARITY: "Rarity",
-    Column.WEIGHT: "Weight",
-    Column.GRID: "Grid",
-    Column.INSPECTION: "Inspection",
+    Column.NAME: "UI_COLUMN_ITEM",
+    Column.CONDITION: "UI_COLUMN_CONDITION",
+    Column.ESTIMATED_VALUE: "UI_EST_VALUE",
+    Column.BASE_VALUE: "UI_COLUMN_BASE_VALUE",
+    Column.RARITY: "UI_RARITY_LABEL",
+    Column.WEIGHT: "UI_COLUMN_WEIGHT",
+    Column.GRID: "UI_COLUMN_GRID",
+    Column.INSPECTION: "UI_COLUMN_INSPECTION",
 }
 
 const COLUMN_MIN_WIDTH: Dictionary = {
@@ -119,11 +119,11 @@ func set_selection_state(state: SelectionState) -> void:
             remove_theme_stylebox_override(&"panel")
             mouse_default_cursor_shape = Control.CURSOR_ARROW
         _:
-            push_warning("Unknown SelectionState: %d" % state)
+            ToastManager.show_dev_error("Unknown SelectionState: %d" % state)
 
 
 static func get_price_header() -> String:
-    return "Est. Value"
+    return TranslationServer.translate("UI_EST_VALUE")
 
 # ══ Input ═════════════════════════════════════════════════════════════════════
 

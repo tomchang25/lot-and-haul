@@ -31,7 +31,7 @@ func _build_content() -> void:
     var perks: Array[PerkData] = KnowledgeManager.get_all_perks()
     if perks.is_empty():
         var empty := Label.new()
-        empty.text = "No perks discovered"
+        empty.text = TranslationServer.translate("UI_NO_PERKS")
 
         # node-src: ephemeral — empty-state label
         _content.add_child(empty)
@@ -44,9 +44,9 @@ func _build_content() -> void:
         perk_label.add_theme_font_size_override("font_size", 18)
 
         if unlocked:
-            perk_label.text = "%s — %s" % [perk.display_name, perk.description]
+            perk_label.text = "%s — %s" % [TranslationServer.translate(perk.display_name_key), TranslationServer.translate(perk.description_key)]
         else:
-            perk_label.text = "%s — ???" % perk.display_name
+            perk_label.text = "%s — ???" % TranslationServer.translate(perk.display_name_key)
             perk_label.modulate = Color(0.5, 0.5, 0.5)
 
         # node-src: ephemeral — per-perk label, rebuilt per refresh

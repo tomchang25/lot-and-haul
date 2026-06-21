@@ -229,7 +229,7 @@ class AffixSpec:
         w.add_field('script = ExtResource("1_affixdef")')
         w.add_field_str("affix_id", affix_id)
         w.add_field_str("naming_slot", entry.get("naming_slot", ""))
-        w.add_field_str("display_name", entry.get("display_name", ""))
+        w.add_field_str("display_name_key", entry.get("display_name_key", ""))
         w.add_field_str("scope_mode", entry.get("scope_mode", "categories"))
 
         # Category scope — written as ext-refs so Godot resolves to CategoryData refs.
@@ -288,7 +288,7 @@ class AffixSpec:
         return {
             "affix_id": affix_id,
             "naming_slot": tres_field(text, "naming_slot") or "",
-            "display_name": tres_field(text, "display_name") or "",
+            "display_name_key": tres_field(text, "display_name_key") or "",
             "scope_mode": tres_field(text, "scope_mode") or "categories",
             "category_scope": parsed_scope,
             "weight": int(tres_field(text, "weight") or 1),

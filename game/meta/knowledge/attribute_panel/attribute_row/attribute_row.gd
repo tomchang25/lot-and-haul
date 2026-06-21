@@ -44,13 +44,13 @@ func setup(attr: AttributeData, level: int, cost: int, can_afford: bool) -> void
 
 
 func _apply() -> void:
-    _name_label.text = "%s  %d" % [_attr.display_name, _level]
+    _name_label.text = "%s  %d" % [TranslationServer.translate(_attr.display_name_key), _level]
 
     if _can_afford:
-        _upgrade_button.text = "Upgrade  $%d" % _cost
+        _upgrade_button.text = tr("UI_UPGRADE_COST_FORMAT") % _cost
         _upgrade_button.disabled = false
         _upgrade_button.tooltip_text = ""
     else:
         _upgrade_button.text = "$%d" % _cost
         _upgrade_button.disabled = true
-        _upgrade_button.tooltip_text = "Not enough cash"
+        _upgrade_button.tooltip_text = tr("UI_NOT_ENOUGH_CASH")

@@ -140,7 +140,7 @@ func _on_restore_pressed() -> void:
 func _refresh_ap_label() -> void:
     var ap: int = MetaManager.slot.storage_ap
     var max_ap: int = MetaManager.slot.storage_ap_max
-    _ap_label.text = "AP:  %d / %d" % [ap, max_ap]
+    _ap_label.text = TranslationServer.translate("UI_AP_LABEL") % [ap, max_ap]
     if ap == 0:
         _ap_label.add_theme_color_override("font_color", Color(0.6, 0.4, 0.4))
     elif ap <= 4:
@@ -157,7 +157,7 @@ func _populate_browser() -> void:
     _item_browser.populate(items)
 
     var count: int = items.size()
-    _footer_status_label.text = "%d item%s" % [count, "" if count == 1 else "s"]
+    _footer_status_label.text = TranslationServer.translate("UI_ITEM_COUNT") % count
 
 # ══ Detail panel ══════════════════════════════════════════════════════════════
 
@@ -184,7 +184,7 @@ func _refresh_detail() -> void:
     _auth_tag_label.visible = entry.verified
     if entry.category_data != null:
         _detail_category_label.text = "%s · #%d" % [
-            entry.category_data.display_name,
+            TranslationServer.translate(entry.category_data.display_name_key),
             entry.id,
         ]
     else:
@@ -206,24 +206,24 @@ func _refresh_detail() -> void:
 
     # ── Price convergence / verified value title ──────────────────────────────
     if entry.verified:
-        _detail_conv_ratio.text = "Verified"
+        _detail_conv_ratio.text = TranslationServer.translate("UI_VERIFIED_BADGE")
         _detail_conv_ratio.modulate = ItemEntryDisplayHelper.PRICE_COLOR
-        _value_title_label.text = "True Value"
+        _value_title_label.text = TranslationServer.translate("UI_TRUE_VALUE")
     elif entry.is_veiled():
-        _detail_conv_ratio.text = ItemEntryDisplayHelper.UNKNOWN_TEXT
+        _detail_conv_ratio.text = ItemEntryDisplayHelper.unknown_text()
         _detail_conv_ratio.modulate = Color(0.5, 0.5, 0.5)
-        _value_title_label.text = "Est. Value"
+        _value_title_label.text = TranslationServer.translate("UI_EST_VALUE_LABEL")
     elif entry.is_price_converged():
-        _detail_conv_ratio.text = "Converged"
+        _detail_conv_ratio.text = TranslationServer.translate("UI_CONVERGED")
         _detail_conv_ratio.modulate = ItemEntryDisplayHelper.PRICE_COLOR
-        _value_title_label.text = "Est. Value"
+        _value_title_label.text = TranslationServer.translate("UI_EST_VALUE_LABEL")
     else:
         var lo: int = entry.estimated_value_min
         var hi: int = entry.estimated_value_max
         var ratio: float = float(lo) / float(hi) * 100.0 if hi > 0 else 0.0
         _detail_conv_ratio.text = "%d%%" % int(ratio)
         _detail_conv_ratio.modulate = Color(0.95, 0.75, 0.3) if ratio < 60.0 else Color.WHITE
-        _value_title_label.text = "Est. Value"
+        _value_title_label.text = TranslationServer.translate("UI_EST_VALUE_LABEL")
 
     # ── Research progress ─────────────────────────────────────────────────────
     if entry.has_unrevealed_hidden() and not entry.research_progress.is_empty():
@@ -232,7 +232,7 @@ func _refresh_detail() -> void:
                 continue
             var progress: int = int(entry.research_progress.get(clue.clue_id, 0))
             if progress > 0:
-                _progress_label.text = "Research: %d / %d" % [progress, clue.dc]
+                _progress_label.text = TranslationServer.translate("UI_RESEARCH_PROGRESS") % [progress, clue.dc]
                 _progress_label.visible = true
             break
 
@@ -247,11 +247,11 @@ func _configure_action_buttons(entry: ItemEntry) -> void:
     var repair_done: bool = ResearchSlot.is_repair_complete(entry)
     var can_repair: bool = ap >= Economy.REPAIR_AP_COST and not repair_done
     _repair_btn.disabled = not can_repair
-    _repair_btn.text = "Repair  [%d AP]" % Economy.REPAIR_AP_COST
+    _repair_btn.text = TranslationServer.translate("UI_REPAIR_ACTION_LABEL") % Economy.REPAIR_AP_COST
     if repair_done:
-        _repair_btn.tooltip_text = "Condition already at 50% — use Restore to continue"
+        _repair_btn.tooltip_text = TranslationServer.translate("UI_REPAIR_DONE_TOOLTIP")
     elif ap < Economy.REPAIR_AP_COST:
-        _repair_btn.tooltip_text = "Not enough AP (need %d)" % Economy.REPAIR_AP_COST
+        _repair_btn.tooltip_text = TranslationServer.translate("UI_REPAIR_AP_TOOLTIP") % Economy.REPAIR_AP_COST
     else:
         _repair_btn.tooltip_text = ""
 
@@ -260,13 +260,13 @@ func _configure_action_buttons(entry: ItemEntry) -> void:
     var not_ready: bool = entry.condition < 0.5
     var can_restore: bool = ap >= Economy.RESTORE_AP_COST and not not_ready and not restore_done
     _restore_btn.disabled = not can_restore
-    _restore_btn.text = "Restore  [%d AP]" % Economy.RESTORE_AP_COST
+    _restore_btn.text = TranslationServer.translate("UI_RESTORE_ACTION_LABEL") % Economy.RESTORE_AP_COST
     if not_ready:
-        _restore_btn.tooltip_text = "Repair to 50%% before restoring"
+        _restore_btn.tooltip_text = TranslationServer.translate("UI_RESTORE_REPAIR_TOOLTIP")
     elif restore_done:
-        _restore_btn.tooltip_text = "Condition already fully restored"
+        _restore_btn.tooltip_text = TranslationServer.translate("UI_RESTORE_DONE_TOOLTIP")
     elif ap < Economy.RESTORE_AP_COST:
-        _restore_btn.tooltip_text = "Not enough AP (need %d)" % Economy.RESTORE_AP_COST
+        _restore_btn.tooltip_text = TranslationServer.translate("UI_RESTORE_AP_TOOLTIP") % Economy.RESTORE_AP_COST
     else:
         _restore_btn.tooltip_text = ""
 
@@ -290,12 +290,12 @@ func _configure_action_buttons(entry: ItemEntry) -> void:
         and not research_needs_repair
     )
     _research_btn.disabled = not can_research
-    _research_btn.text = "Research  [%d AP]" % Economy.RESEARCH_AP_COST
+    _research_btn.text = TranslationServer.translate("UI_RESEARCH_ACTION_LABEL") % Economy.RESEARCH_AP_COST
     if not has_hidden:
-        _research_btn.tooltip_text = "No hidden clues remaining"
+        _research_btn.tooltip_text = TranslationServer.translate("UI_RESEARCH_DONE_TOOLTIP")
     elif research_needs_repair:
-        _research_btn.tooltip_text = "Repair to 50%% condition before researching"
+        _research_btn.tooltip_text = TranslationServer.translate("UI_RESEARCH_REPAIR_TOOLTIP")
     elif ap < Economy.RESEARCH_AP_COST:
-        _research_btn.tooltip_text = "Not enough AP (need %d)" % Economy.RESEARCH_AP_COST
+        _research_btn.tooltip_text = TranslationServer.translate("UI_RESEARCH_AP_TOOLTIP") % Economy.RESEARCH_AP_COST
     else:
         _research_btn.tooltip_text = ""

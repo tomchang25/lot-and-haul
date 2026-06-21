@@ -13,8 +13,8 @@ extends Resource
 # composition in Spec B; unused in the generation core.
 @export var naming_slot: String = ""
 
-# Human-readable label for debug and tooltip display.
-@export var display_name: String = ""
+# Localization key for the display name.
+@export var display_name_key: String = ""
 
 # Scope mode for draw eligibility.
 # "all" means this affix can appear on any category.

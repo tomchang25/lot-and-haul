@@ -1,0 +1,9 @@
+en:
+  LOC_MIDTOWN_WAREHOUSE: Midtown Warehouse
+  LOC_MIDTOWN_WAREHOUSE_DESC: A large commercial warehouse with higher-quality inventory.
+  LOC_SUBURBAN_STORAGE: Suburban Storage
+  LOC_SUBURBAN_STORAGE_DESC: A quiet self-storage facility on the outskirts of town.
+  LOC_TEST_LOCATION: Test Location
+  LOC_TEST_LOCATION_DESC: A test location used by the item generator test.
+  LOC_TUTORIAL_FIRST_RUN: Training Yard
+  LOC_TUTORIAL_FIRST_RUN_DESC: A small fenced yard with a single instructional lot.

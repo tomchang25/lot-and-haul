@@ -11,7 +11,7 @@
 #
 # All error logging goes through show_error / show_dev_error — bare push_error
 # at call sites is forbidden (error_guard_standard.md). This file is the single
-# lint-exempt home of push_error.
+# lint-exempt home of push_error and push_warning.
 extends Node
 
 const _WARN_DURATION := 6.0

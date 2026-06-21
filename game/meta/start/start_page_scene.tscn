@@ -34,7 +34,7 @@ alignment = 1
 [node name="TitleLabel" type="Label" parent="RootVBox" unique_id=1100000004]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
-text = "Lot & Haul"
+text = "UI_START_TITLE"
 horizontal_alignment = 1
 
 [node name="ButtonsVBox" type="VBoxContainer" parent="RootVBox" unique_id=1100000005]
@@ -49,7 +49,7 @@ custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 20
-text = "New Game"
+text = "UI_START_NEW_GAME"
 script = ExtResource("99_sfx")
 
 [node name="LoadGameButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000009]
@@ -58,7 +58,7 @@ custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 20
-text = "Load Game"
+text = "UI_START_LOAD_GAME"
 script = ExtResource("99_sfx")
 
 [node name="SettingsButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000007]
@@ -67,7 +67,7 @@ custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 20
-text = "Settings"
+text = "UI_START_SETTINGS"
 script = ExtResource("99_sfx")
 
 [node name="QuitButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000008]
@@ -76,15 +76,15 @@ custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 20
-text = "Quit"
+text = "UI_START_QUIT"
 script = ExtResource("99_sfx")
 
 [node name="NewGameConfirmDialog" type="ConfirmationDialog" parent="." unique_id=1100000011]
 unique_name_in_owner = true
-title = "New Game"
+title = "UI_START_NEW_GAME"
 size = Vector2i(400, 150)
-ok_button_text = "Start New Game"
-dialog_text = "Start a new game? Current progress will be lost."
+ok_button_text = "UI_START_NEW_GAME_CONFIRM"
+dialog_text = "UI_START_NEW_GAME_CONFIRM_BODY"
 dialog_autowrap = true
 
 [node name="SlotPickerPanel" type="Panel" parent="." unique_id=1100000012]
@@ -115,7 +115,7 @@ size_flags_vertical = 3
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "Select Slot"
+text = "UI_START_SELECT_SLOT"
 horizontal_alignment = 1
 
 [node name="SlotsVBox" type="VBoxContainer" parent="SlotPickerPanel/PickerVBox" unique_id=1100000016]
@@ -153,7 +153,7 @@ custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 20
-text = "Back"
+text = "UI_START_BACK"
 script = ExtResource("99_sfx")
 
 [node name="SpacerBottom" type="Control" parent="SlotPickerPanel/PickerVBox" unique_id=1100000021]
@@ -162,8 +162,8 @@ size_flags_vertical = 3
 
 [node name="OverwriteDialog" type="ConfirmationDialog" parent="." unique_id=1100000022]
 unique_name_in_owner = true
-title = "Overwrite Slot"
+title = "UI_START_OVERWRITE_SLOT_TITLE"
 size = Vector2i(400, 150)
-ok_button_text = "Overwrite"
-dialog_text = "All progress in this slot will be lost."
+ok_button_text = "UI_START_OVERWRITE"
+dialog_text = "UI_START_OVERWRITE_BODY"
 dialog_autowrap = true

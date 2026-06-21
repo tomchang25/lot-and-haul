@@ -20,6 +20,13 @@ var debug_mode: bool = false:
 
 var tutorial_skip_all: bool = false
 
+var locale: String = "en":
+    set(value):
+        if locale == value:
+            return
+        locale = value
+        TranslationServer.set_locale(value)
+
 var _overlay_instance: CanvasLayer = null
 
 
@@ -44,6 +51,7 @@ func save_settings() -> void:
         "fullscreen": fullscreen,
         "debug_mode": debug_mode,
         "tutorial_skip_all": tutorial_skip_all,
+        "locale": locale,
     }
     var file := FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
     if file == null:
@@ -70,6 +78,7 @@ func load_settings() -> void:
     fullscreen = d.get("fullscreen", false)
     debug_mode = d.get("debug_mode", false)
     tutorial_skip_all = d.get("tutorial_skip_all", false)
+    locale = d.get("locale", "en")
 
 
 func apply_audio() -> void:

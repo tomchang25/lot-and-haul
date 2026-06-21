@@ -50,7 +50,7 @@ theme_override_constants/separation = 10
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "Sale Result"
+text = "UI_SALE_RESULT"
 horizontal_alignment = 1
 
 [node name="ReceiptText" type="Label" parent="ReceiptCenter/ReceiptPanel/VBox" unique_id=1687403906]
@@ -67,7 +67,7 @@ visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 theme_override_colors/font_color = Color(1, 0.7, 0, 1)
-text = " SOLD! "
+text = "UI_SOLD_LABEL"
 horizontal_alignment = 1
 
 [node name="ButtonRow" type="HBoxContainer" parent="ReceiptCenter/ReceiptPanel/VBox" unique_id=1687403908]
@@ -80,7 +80,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Cancel"
+text = "UI_CANCEL"
 script = ExtResource("2_sfx")
 
 [node name="ConfirmBtn" type="Button" parent="ReceiptCenter/ReceiptPanel/VBox/ButtonRow" unique_id=1687403910]
@@ -88,5 +88,5 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 36)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Confirm Sale"
+text = "UI_CONFIRM_SALE"
 script = ExtResource("2_sfx")

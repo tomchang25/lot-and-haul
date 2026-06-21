@@ -1,0 +1,9 @@
+zh_CN:
+  LOC_MIDTOWN_WAREHOUSE: 市中心仓库
+  LOC_MIDTOWN_WAREHOUSE_DESC: 一个大型商业仓库，拥有更高质量的库存。
+  LOC_SUBURBAN_STORAGE: 郊区仓储
+  LOC_SUBURBAN_STORAGE_DESC: 位于城郊的安静自助仓储设施。
+  LOC_TEST_LOCATION: 测试地点
+  LOC_TEST_LOCATION_DESC: 用于物品生成器测试的测试地点。
+  LOC_TUTORIAL_FIRST_RUN: 训练场
+  LOC_TUTORIAL_FIRST_RUN_DESC: 一个带有单个教学拍品的小型围栏场地。

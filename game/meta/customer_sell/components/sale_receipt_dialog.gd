@@ -29,7 +29,8 @@ func show_receipt(items: Array, price: int, strategy: String) -> void:
     _pending_price = price
     _pending_strategy = strategy
     _receipt_text.text = _build_text(items, price)
-    _title_label.text = "%s Sale" % strategy.capitalize()
+    var strategy_label := _strategy_display_name(strategy)
+    _title_label.text = TranslationServer.translate("UI_SALE_TITLE") % strategy_label
     _stamp_label.hide()
     _stamp_label.rotation = 0.0
     _stamp_label.modulate = Color(1, 1, 1, 1)
@@ -46,7 +47,7 @@ func hide_receipt() -> void:
 
 func _build_text(items: Array, price: int) -> String:
     var lines: PackedStringArray = []
-    lines.append("Items: %d" % items.size())
+    lines.append(TranslationServer.translate("UI_SALE_ITEMS_COUNT") % items.size())
     lines.append("")
     for item in items:
         var entry := item as ItemEntry
@@ -54,7 +55,9 @@ func _build_text(items: Array, price: int) -> String:
             ToastManager.show_dev_error("SaleReceiptDialog._build_text: item is not ItemEntry")
             continue
         var contribution := SellMath.item_contribution(entry)
-        var verified_label := " (verified)" if SellMath.is_item_verified(entry) else ""
+        var verified_label := ""
+        if SellMath.is_item_verified(entry):
+            verified_label = TranslationServer.translate("UI_VERIFIED_TAG")
         lines.append(
             "\u2022 %s \u2014 $%d%s" % [
                 ItemEntryDisplayHelper.display_name(entry),
@@ -63,8 +66,18 @@ func _build_text(items: Array, price: int) -> String:
             ],
         )
     lines.append("")
-    lines.append("Sell Price: $%d" % price)
+    lines.append(TranslationServer.translate("UI_SELL_PRICE") % price)
     return "\n".join(lines)
+
+
+func _strategy_display_name(strategy: String) -> String:
+    match strategy:
+        "conservative":
+            return TranslationServer.translate("UI_CONSERVATIVE")
+        "aggressive":
+            return TranslationServer.translate("UI_AGGRESSIVE")
+    ToastManager.show_warning("SaleReceiptDialog._strategy_display_name: unknown strategy %s" % strategy)
+    return strategy
 
 
 func _on_confirm() -> void:

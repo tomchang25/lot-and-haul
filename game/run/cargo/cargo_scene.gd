@@ -471,7 +471,7 @@ func _refresh_ui() -> void:
     _update_summary(pending_slots, pending_weight, weight_exceeded, max_slots, max_weight)
 
     if weight_exceeded:
-        _error_label.text = "Weight limit exceeded! Cannot place item."
+        _error_label.text = TranslationServer.translate("UI_WEIGHT_EXCEEDED")
     else:
         _error_label.text = ""
 
@@ -501,7 +501,7 @@ func _update_summary(pending_slots: int, pending_weight: float, weight_exceeded:
     var unplaced_count := _won_items.size() - loaded_count
     var unplaced_sell := unplaced_count * Economy.ONSITE_SELL_PRICE
     _summary_unloaded_count.text = "%d item%s" % [unplaced_count, "s" if unplaced_count != 1 else ""]
-    _summary_unloaded_sell.text = "On-site sell: $%d" % unplaced_sell
+    _summary_unloaded_sell.text = TranslationServer.translate("UI_ONSITE_LABEL") % unplaced_sell
 
     # ── Weight ──────────────────────────────────────────────────────────────
     if pending_weight > 0.0:
