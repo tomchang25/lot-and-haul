@@ -20,9 +20,11 @@ class CategorySpec:
     yaml_key: str = "categories"
     tres_subdir: str = "categories"
     uid_prefix: str = "category"
-    script_paths: dict[str, str] = field(default_factory=lambda: {
-        "category_data": "res://data/definitions/category_data.gd",
-    })
+    script_paths: dict[str, str] = field(
+        default_factory=lambda: {
+            "category_data": "res://data/definitions/category_data.gd",
+        }
+    )
 
     def entity_id(self, entry: dict) -> str:
         return entry["category_id"]
@@ -38,7 +40,11 @@ class CategorySpec:
         uid = deterministic_uid(self.uid_prefix, cat_id)
         ctx.uid_cache[cat_id] = uid
 
-        w = TresWriter("Resource", "CategoryData", uid)
+        icon_path = str(entry.get("icon", ""))
+        has_icon = bool(icon_path)
+        load_steps = 4 if has_icon else 3
+
+        w = TresWriter("Resource", "CategoryData", uid, load_steps=load_steps)
         w.add_ext_resource(
             "1_catdef",
             "Script",
@@ -51,10 +57,18 @@ class CategorySpec:
             f"res://data/tres/super_categories/{super_cat_id}.tres",
             super_cat_uid,
         )
+
+        if has_icon:
+            w.add_ext_resource("3_icon", "Texture2D", icon_path)
+
         w.add_field('script = ExtResource("1_catdef")')
         w.add_field_str("category_id", cat_id)
         w.add_field('super_category = ExtResource("2_super")')
         w.add_field_str("display_name_key", entry.get("display_name_key", ""))
+
+        if has_icon:
+            w.add_field('icon = ExtResource("3_icon")')
+
         return w.render()
 
     def parse_tres(self, text: str, ctx: ParseCtx) -> dict:

@@ -25,17 +25,39 @@ theme_override_font_sizes/font_size = 16
 text = "UI_RARITY_LABEL"
 horizontal_alignment = 1
 
-[node name="SuperCategoryLabel" type="Label" parent="." unique_id=366465724]
+[node name="SuperCategoryHBox" type="HBoxContainer" parent="." unique_id=3664657240]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 6
+
+[node name="SuperCategoryIcon" type="TextureRect" parent="SuperCategoryHBox" unique_id=3664657241]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 3
+
+[node name="SuperCategoryLabel" type="Label" parent="SuperCategoryHBox" unique_id=366465724]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "UI_CATEGORIES_LABEL"
-horizontal_alignment = 1
 
-[node name="CategoryLabel" type="Label" parent="." unique_id=100000005]
+[node name="CategoryHBox" type="HBoxContainer" parent="." unique_id=1000000050]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 6
+
+[node name="CategoryIcon" type="TextureRect" parent="CategoryHBox" unique_id=1000000051]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 3
+
+[node name="CategoryLabel" type="Label" parent="CategoryHBox" unique_id=100000005]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "UI_EXTRA_CATEGORY_LABEL"
-horizontal_alignment = 1
 
 [node name="Spacer" type="Control" parent="." unique_id=100000006]
 custom_minimum_size = Vector2(0, 20)

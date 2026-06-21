@@ -17,6 +17,13 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
+[node name="CategoryIcon" type="TextureRect" parent="HBoxContainer/NameHBox" unique_id=502677165]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 3
+
 [node name="NameLabel" type="Label" parent="HBoxContainer/NameHBox" unique_id=1000000002]
 layout_mode = 2
 size_flags_horizontal = 3

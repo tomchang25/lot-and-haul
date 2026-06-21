@@ -12,5 +12,8 @@ extends Resource
 # Broad item type. References a SuperCategoryData resource.
 @export var super_category: SuperCategoryData = null
 
+# Placeholder icon for this category.
+@export var icon: Texture2D = null
+
 # Localization key for the category display name.
 @export var display_name_key: String = ""

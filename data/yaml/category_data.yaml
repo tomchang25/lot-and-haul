@@ -58,12 +58,14 @@ categories:
   - category_id: handbag
     super_category: fashion
     display_name_key: CAT_HANDBAG
+    icon: res://assets/categories/handbag_64.png
     weight: 0.5
     shape_id: s1x2
 
   - category_id: wristwatch
     super_category: fashion
     display_name_key: CAT_WRISTWATCH
+    icon: res://assets/categories/wristwatch_64.png
     weight: 0.1
     shape_id: s1x1
 
@@ -71,30 +73,35 @@ categories:
   - category_id: oil_lamp
     super_category: decorative
     display_name_key: CAT_OIL_LAMP
+    icon: res://assets/categories/oil_lamp_64.png
     weight: 3.0
     shape_id: s1x2
 
   - category_id: clock
     super_category: decorative
     display_name_key: CAT_CLOCK
+    icon: res://assets/categories/clock_64.png
     weight: 4.0
     shape_id: s1x3
 
   - category_id: porcelain_figurine
     super_category: decorative
     display_name_key: CAT_PORCELAIN_FIGURINE
+    icon: res://assets/categories/porcelain_figurine_64.png
     weight: 0.8
     shape_id: s1x1
 
   - category_id: vase
     super_category: decorative
     display_name_key: CAT_VASE
+    icon: res://assets/categories/vase_64.png
     weight: 2.0
     shape_id: s1x2
 
   - category_id: poster
     super_category: decorative
     display_name_key: CAT_POSTER
+    icon: res://assets/categories/poster_64.png
     weight: 0.2
     shape_id: s1x3
 
@@ -102,12 +109,14 @@ categories:
   - category_id: painting
     super_category: fine_art
     display_name_key: CAT_PAINTING
+    icon: res://assets/categories/painting_64.png
     weight: 1.5
     shape_id: s1x3
 
   - category_id: sculpture
     super_category: fine_art
     display_name_key: CAT_SCULPTURE
+    icon: res://assets/categories/sculpture_64.png
     weight: 8.0
     shape_id: s1x3
 
@@ -115,17 +124,20 @@ categories:
   - category_id: pistol
     super_category: weapon
     display_name_key: CAT_PISTOL
+    icon: res://assets/categories/pistol_64.png
     weight: 1.2
     shape_id: sL11
 
   - category_id: rifle
     super_category: weapon
     display_name_key: CAT_RIFLE
+    icon: res://assets/categories/rifle_64.png
     weight: 4.5
     shape_id: sL12
 
   - category_id: crossbow
     super_category: weapon
     display_name_key: CAT_CROSSBOW
+    icon: res://assets/categories/crossbow_64.png
     weight: 3.5
     shape_id: sT3

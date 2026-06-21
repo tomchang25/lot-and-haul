@@ -38,22 +38,14 @@ func _build_content() -> void:
         var sc_rank: int = KnowledgeManager.get_super_category_rank(sc)
         var header_text := "%s — rank %d" % [TranslationServer.translate(sc.display_name_key), sc_rank]
 
-        var category_lines := PackedStringArray()
-        for cat: CategoryData in SuperCategoryRegistry.get_categories_for_super(sc):
-            var points: int = KnowledgeManager.get_category_points(cat)
-            var rank: int = KnowledgeManager.get_category_rank(cat)
-
-            var progress_text: String
-            if rank >= 5:
-                progress_text = TranslationServer.translate("UI_MASTERY_MAX")
-            else:
-                var next_threshold: int = KnowledgeManager.RANK_THRESHOLDS[rank + 1]
-                progress_text = TranslationServer.translate("UI_PROGRESS_FORMAT") % [points, next_threshold]
-
-            category_lines.append(
-                "    %s — %s  (rank %d)" % [TranslationServer.translate(cat.display_name_key), progress_text, rank],
-            )
+        var cats: Array[CategoryData] = SuperCategoryRegistry.get_categories_for_super(sc).duplicate()
+        cats.sort_custom(
+            func(a: CategoryData, b: CategoryData) -> bool:
+                return KnowledgeManager.get_category_rank(a) > KnowledgeManager.get_category_rank(b) \
+                or (KnowledgeManager.get_category_rank(a) == KnowledgeManager.get_category_rank(b) \
+                    and KnowledgeManager.get_category_points(a) > KnowledgeManager.get_category_points(b) )
+        )
 
         var row: MasteryRow = MasteryRowScene.instantiate()
-        row.setup(header_text, category_lines)
+        row.setup_with_data(header_text, cats)
         _rows_container.add_child(row)

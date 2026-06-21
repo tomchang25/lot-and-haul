@@ -18,8 +18,12 @@ var _total: int = 0
 @onready var _index_label: Label = $IndexLabel
 @onready var _item_count_label: Label = $ItemCountLabel
 @onready var _rarity_label: Label = $RarityLabel
-@onready var _super_category_label: Label = $SuperCategoryLabel
-@onready var _category_label: Label = $CategoryLabel
+@onready var _super_category_hbox: HBoxContainer = $SuperCategoryHBox
+@onready var _super_category_icon: TextureRect = $SuperCategoryHBox/SuperCategoryIcon
+@onready var _super_category_label: Label = $SuperCategoryHBox/SuperCategoryLabel
+@onready var _category_hbox: HBoxContainer = $CategoryHBox
+@onready var _category_icon: TextureRect = $CategoryHBox/CategoryIcon
+@onready var _category_label: Label = $CategoryHBox/CategoryLabel
 @onready var _enter_button: Button = $ButtonBar/EnterButton
 @onready var _pass_button: Button = $ButtonBar/PassButton
 
@@ -58,10 +62,12 @@ func _apply() -> void:
 
     # Super Category row
     if _lot_data.super_category_weights.is_empty():
-        _super_category_label.visible = false
+        _super_category_hbox.visible = false
     else:
-        _super_category_label.visible = true
+        _super_category_hbox.visible = true
         _super_category_label.text = TranslationServer.translate("UI_SUPER_CATEGORY") % _category_text(_lot_data.super_category_weights)
+        # Show icon of the first super-category's first member category.
+        _set_first_super_category_icon()
 
     # Build the set of category IDs already covered by super-category weights.
     var covered: Dictionary = { }
@@ -79,10 +85,12 @@ func _apply() -> void:
             extra_weights[cat_id] = _lot_data.category_weights[cat_id]
 
     if extra_weights.is_empty():
-        _category_label.visible = false
+        _category_hbox.visible = false
     else:
-        _category_label.visible = true
+        _category_hbox.visible = true
         _category_label.text = TranslationServer.translate("UI_EXTRA_CATEGORY") % _category_text(extra_weights)
+        # Show icon of the first extra category.
+        _set_first_extra_category_icon(extra_weights)
 
 
 func set_active(active: bool) -> void:
@@ -140,3 +148,34 @@ func _category_name(category_id: String) -> String:
 
     ToastManager.show_warning("LotCard._category_name: unknown category id %s" % category_id)
     return category_id
+
+
+func _set_first_super_category_icon() -> void:
+    _super_category_icon.texture = null
+    _super_category_icon.modulate = Color(0.22, 0.22, 0.3, 1)
+    var sc_ids: Array = _lot_data.super_category_weights.keys()
+    if sc_ids.is_empty():
+        return
+    var sc: SuperCategoryData = SuperCategoryRegistry.get_super_category_by_id(sc_ids[0] as String)
+    if sc == null:
+        return
+    var members: Array[CategoryData] = SuperCategoryRegistry.get_categories_for_super(sc)
+    if members.is_empty():
+        return
+    var icon_tex: Texture2D = members[0].icon
+    if icon_tex != null:
+        _super_category_icon.texture = icon_tex
+        _super_category_icon.modulate = Color.WHITE
+
+
+func _set_first_extra_category_icon(weights: Dictionary) -> void:
+    _category_icon.texture = null
+    _category_icon.modulate = Color(0.22, 0.22, 0.3, 1)
+    var cat_ids: Array = weights.keys()
+    if cat_ids.is_empty():
+        return
+    var cat: CategoryData = CategoryRegistry.get_category_by_id(cat_ids[0] as String)
+    if cat == null or cat.icon == null:
+        return
+    _category_icon.texture = cat.icon
+    _category_icon.modulate = Color.WHITE

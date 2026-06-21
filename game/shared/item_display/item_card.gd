@@ -23,6 +23,7 @@ var _has_intuition_mark: bool = false
 @onready var _grid_label: Label = $VBox/GridLabel
 @onready var _cargo_sep: HSeparator = $VBox/CargoSep
 @onready var _clue_chunk: ClueChunk = $VBox/ClueChunk
+@onready var _category_icon: TextureRect = $VBox/CategoryIcon
 @onready var _auth_tag_label: Label = $VBox/AuthTagLabel
 
 
@@ -52,6 +53,14 @@ func refresh(changed: StringName = &"") -> void:
 func _apply() -> void:
     if _entry == null:
         return
+
+    var cat := _entry.category_data
+    if cat != null and cat.icon != null:
+        _category_icon.texture = cat.icon
+        _category_icon.modulate = Color.WHITE
+    else:
+        _category_icon.texture = null
+        _category_icon.modulate = Color(0.22, 0.22, 0.3, 1)
 
     _name_label.text = ItemEntryDisplayHelper.display_name(_entry)
     _name_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.display_name_color(_entry))

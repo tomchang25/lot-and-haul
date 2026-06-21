@@ -11,11 +11,13 @@ script = ExtResource("1_itemcard")
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="SpriteRect" type="ColorRect" parent="VBox" unique_id=1447237142]
+[node name="CategoryIcon" type="TextureRect" parent="VBox" unique_id=1447237142]
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 mouse_filter = 2
-color = Color(0.22, 0.22, 0.3, 1)
+expand_mode = 1
+stretch_mode = 3
+modulate = Color(0.22, 0.22, 0.3, 1)
 
 [node name="NameLabel" type="Label" parent="VBox" unique_id=1741335459]
 layout_mode = 2
