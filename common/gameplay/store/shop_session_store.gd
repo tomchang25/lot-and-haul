@@ -7,7 +7,7 @@
 # Owns the fields and their save payload. Fields are read-public via
 # getters. Mutation goes through the owning Manager only.
 class_name ShopSessionStore
-extends StoreBase
+extends SessionStore
 
 const SCENE_CUSTOMER_SELL: String = "customer_sell"
 
@@ -38,9 +38,19 @@ var pending_scene: String:
         return _pending_scene
 
 
-## True when this store represents a resumeable shop session.
-func has_session() -> bool:
-    return _pending_scene == SCENE_CUSTOMER_SELL
+## Returns whether the shop session is active.
+func is_active() -> bool:
+    return not _pending_scene.is_empty()
+
+
+## Returns the boot-routing scene target.
+func get_resume_target() -> String:
+    return _pending_scene
+
+
+## Returns whether [param target] is a supported shop resume target.
+func is_valid_resume_target(target: String) -> bool:
+    return target == SCENE_CUSTOMER_SELL
 
 
 ## Returns the top-left cell stored for [param item_id], or Vector2i(-1, -1)

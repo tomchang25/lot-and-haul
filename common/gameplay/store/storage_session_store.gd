@@ -5,7 +5,7 @@
 # Owns the fields and their save payload. Fields are read-public via getters.
 # Mutation goes through the owning Manager only.
 class_name StorageSessionStore
-extends StoreBase
+extends SessionStore
 
 const SCENE_STORAGE: String = "storage"
 
@@ -32,9 +32,19 @@ var selected_entry_id: int:
         return _selected_entry_id
 
 
-## True when this store represents a resumeable Storage session.
-func has_session() -> bool:
-    return _active and _resume_target == SCENE_STORAGE
+## Returns whether the storage session is active.
+func is_active() -> bool:
+    return _active
+
+
+## Returns the boot-routing scene target.
+func get_resume_target() -> String:
+    return _resume_target
+
+
+## Returns whether [param target] is a supported Storage resume target.
+func is_valid_resume_target(target: String) -> bool:
+    return target == SCENE_STORAGE
 
 
 ## Section id for the storage_session save payload.
