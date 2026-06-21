@@ -69,10 +69,17 @@ func _ready() -> void:
     _populate_browser()
     _refresh_detail()
 
-    # Auto-select first item so detail rail and action buttons are visible.
+    # Auto-select: restore saved session selection, then fall back to first item.
     var _storage_items := MetaManager.storage.storage_items
     if not _storage_items.is_empty():
-        _item_browser.set_selected(_storage_items[0])
+        var selected: ItemEntry = _storage_items[0]
+        var saved_id := MetaManager.storage_session.selected_entry_id
+        if saved_id >= 0:
+            for e in _storage_items:
+                if e.id == saved_id:
+                    selected = e
+                    break
+        _item_browser.set_selected(selected)
         _refresh_detail()
 
     Director.register_scene(
@@ -92,6 +99,7 @@ func _ready() -> void:
 
 
 func _on_back_pressed() -> void:
+    MetaManager.close_storage_session()
     SceneRouter.go_to_hub()
 
 

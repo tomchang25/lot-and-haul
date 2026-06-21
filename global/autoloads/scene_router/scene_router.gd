@@ -104,6 +104,7 @@ func go_to_start_page() -> void:
 
 
 ## Routes to the correct scene after an explicit Load Game completes.
+## Priority: active run → shop session → storage session → hub.
 func go_to_loaded_save_entry() -> void:
     if RunManager.is_run_active():
         go_to_run_resume(RunManager.get_resume_target())
@@ -111,6 +112,10 @@ func go_to_loaded_save_entry() -> void:
 
     if MetaManager.shop_session.has_session():
         go_to_customer_sell()
+        return
+
+    if MetaManager.storage_session.has_session():
+        go_to_storage()
         return
 
     go_to_hub()
