@@ -253,6 +253,7 @@ func end_day() -> DaySummary:
 
     progress.advance_day()
     economy.apply_delta(-Economy.DAILY_BASE_COST)
+    summary.bailout_amount = economy.apply_bankruptcy_safety_net()
     summary.end_day = progress.current_day
 
     # Capture customer sales recorded during Open Shop.

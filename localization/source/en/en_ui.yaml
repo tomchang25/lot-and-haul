@@ -325,6 +325,9 @@ en:
   UI_TIME_WEEKS_AGO: "%dw ago"
   UI_TIME_MONTHS_AGO: "%dm ago"
 
+  # ── Bankruptcy bailout ──
+  UI_BANKRUPTCY_BAILOUT: "Emergency funds granted: +$%d"
+
   # ── New keys for location_info display ──
   UI_LOCATION_INFO: "Location Info"
   UI_LOT_INFO: "Lot Info"

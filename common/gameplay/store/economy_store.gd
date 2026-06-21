@@ -47,6 +47,16 @@ func apply_delta(delta: int) -> void:
     _cash += delta
 
 
+## If cash is below BANKRUPTCY_FLOOR, tops up to BANKRUPTCY_TOP_UP and
+## returns the amount granted. Returns 0 when no bailout was needed.
+func apply_bankruptcy_safety_net() -> int:
+    if _cash >= Economy.BANKRUPTCY_FLOOR:
+        return 0
+    var granted: int = Economy.BANKRUPTCY_TOP_UP - _cash
+    _cash = Economy.BANKRUPTCY_TOP_UP
+    return granted
+
+
 ## Section id for the economy save payload.
 func section_id() -> String:
     return "economy"

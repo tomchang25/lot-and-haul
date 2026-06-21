@@ -19,6 +19,9 @@ var fuel_cost: int = 0
 var cargo_count: int = 0
 var living_cost: int = 0
 
+# Bankruptcy bailout (non-zero when the safety net triggered)
+var bailout_amount: int = 0
+
 # Customer sales (captured before nightly generation clears it)
 var customer_sales_total: int = 0
 var customer_sales_detail: Array[Dictionary] = []

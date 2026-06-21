@@ -78,6 +78,13 @@ const DAILY_BASE_COST: int = 100
 const ONSITE_SELL_PRICE: int = 50
 const LOCATION_SAMPLE_SIZE: int = 3
 
+# ── Bankruptcy safety net ──────────────────────────────────────────────────────
+
+## Minimum cash threshold below which the bailout triggers (after daily costs).
+const BANKRUPTCY_FLOOR: int = 200
+## Target cash amount after a bankruptcy bailout.
+const BANKRUPTCY_TOP_UP: int = 500
+
 # ── Customer selling volume (Day/Night model) ────────────────────────────────
 
 ## Customer count range for Day selling.

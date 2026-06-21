@@ -325,6 +325,9 @@ zh_CN:
   UI_TIME_WEEKS_AGO: "%d 周前"
   UI_TIME_MONTHS_AGO: "%d 个月前"
 
+  # ── 破产补助 ──
+  UI_BANKRUPTCY_BAILOUT: "紧急补助金：+$%d"
+
   # ── 位置信息显示 ──
   UI_LOCATION_INFO: "位置信息"
   UI_LOT_INFO: "拍品信息"
