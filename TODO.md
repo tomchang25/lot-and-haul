@@ -233,8 +233,6 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 > Ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched.
 > All phases shipped → archive the plan file + delete this line.
 
-- [storage_session] Run-style Storage session snapshot with resume routing, selected-item restore, and atomic discard policy — see `dev/docs/plans/storage_session_snapshot.sketch.md`
-
 - [runtime_architecture] Runtime architecture vocabulary standardization: gameplay Managers become Systems, Instance becomes Entry, and archetype boundaries harden — see `dev/docs/plans/runtime_architecture_vocabulary_standardization.sketch.md`
 
 ---
@@ -261,7 +259,6 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 One-line, no reasoning, no backing doc.
 
-- [fix] update changelog before 0.2.0
 - [fix] update changelog rule to disallow unicode and force to be "compact"
 
 - [tune] Attribute Rework

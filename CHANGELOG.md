@@ -14,6 +14,42 @@ Rules:
 
 ## v0.1.7 - Draft
 
+### Category Icons
+
+- 2026-06-21 — [category] CategoryData gains icon texture support sourced from YAML and the TRES pipeline
+- 2026-06-21 — [category] 64px and 256px category icon assets added for every item category, with placeholder-generation tooling for future visual batches
+- 2026-06-21 — [ui] Category icons now appear across lot cards, item cards, item rows, and mastery rows so item identity is easier to scan
+
+### Storage Session Snapshot
+
+- 2026-06-21 — [storage] Storage sessions now resume after quit/relaunch with the committed activity state and selected item restored
+- 2026-06-21 — [storage] Storage session checkpoints save on entry, after committed AP actions, and on intentional close so activity-slot progress does not diverge from item state
+- 2026-06-21 — [storage] Incoherent Storage session restores are discarded atomically back to the hub instead of opening a partial session
+- 2026-06-21 — [session] Flat session resume checks are centralized in a shared SessionStore base used by shop and storage session stores
+
+### Pricing and Economy
+
+- 2026-06-21 — [pricing] Item pricing now clamps final values to a $10 minimum so clue combinations cannot produce zero or negative sell values
+- 2026-06-21 — [pricing] Negative additive clue effects were replaced with proportional multipliers in YAML content, prompts, and balance references
+- 2026-06-21 — [economy] Bankruptcy safety net tops cash up from the floor amount and reports the bailout in the day summary
+
+### Lot Pool Sampling
+
+- 2026-06-21 — [lot_pool] Lot pool sampling moved into a dedicated service with `is_test` filtering so authored test lots stay out of normal location draws
+- 2026-06-21 — [lot_pool] Location and lot data pipeline definitions now carry lot-pool metadata through YAML and generated resources
+
+### Inspection Display
+
+- 2026-06-21 — [inspection] Clue operation copy now presents multiplier and negative-effect results more clearly during inspection
+
+### Debug Fixtures
+
+- 2026-06-21 — [debug] Debug item-add actions now create properly veiled items instead of pre-unveiled or fully revealed fixtures
+
+### Knowledge Rank Maintenance
+
+- 2026-06-21 — [knowledge] Category-rank lookup now derives from the shared rank threshold table instead of a duplicated branch ladder
+
 ## v0.1.6
 
 ### Localization
