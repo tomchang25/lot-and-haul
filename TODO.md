@@ -266,7 +266,6 @@ One-line, no reasoning, no backing doc.
 - [fix] update changelog rule to disallow unicode and force to be "compact"
 
 - [tune] Attribute costs, customer generation weighting, perk balance — won't stabilise until earlier systems impose real constraints.
-- [refactor] Collapse the duplicated rank-threshold ladder in `get_category_rank()` to loop over `RANK_THRESHOLDS`
 
 - [ci] Diagnose GitHub Actions infinite loop in Godot GUT/smoke jobs and re-enable the disabled CI layers.
 
