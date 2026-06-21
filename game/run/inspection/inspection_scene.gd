@@ -323,14 +323,21 @@ func _refresh_clues_section(entry: ItemEntry) -> void:
         var val_text: String
         var val_color: Color
         if op == "mul":
-            val_text = "×%.2f" % amount
-            val_color = Color(0.92, 0.72, 0.18, 1.0) if amount >= 1.0 else Color(0.85, 0.40, 0.35, 1.0)
+            if amount >= 1.0:
+                val_text = "+%d%%" % (int(amount * 100) - 100)
+                val_color = Color(0.92, 0.72, 0.18, 1.0)
+            else:
+                val_text = "-%d%%" % (100 - int(amount * 100))
+                val_color = Color(0.85, 0.40, 0.35, 1.0)
         elif amount == 0.0:
             val_text = "—"
             val_color = Color(0.55, 0.58, 0.63, 1)
-        else:
+        elif amount > 0.0:
             val_text = "+$%d" % int(amount)
             val_color = Color(0.55, 0.85, 0.60, 1.0)
+        else:
+            val_text = "-$%d" % int(-amount)
+            val_color = Color(0.85, 0.40, 0.35, 1.0)
 
         var clue_row: ValueRow = ValueRowScene.instantiate()
         clue_row.setup(row["text"], val_text, val_color, 12, 4)
