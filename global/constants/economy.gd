@@ -69,6 +69,9 @@ static func rarity_for_clue_count(count: int) -> Economy.Rarity:
             return rarity
     return Economy.Rarity.COMMON
 
+## Minimum value for any item-price display or transaction.
+## All price outputs floor at this value.
+const MIN_ITEM_VALUE: int = 10
 
 const STARTING_CASH: int = 1000
 const DAILY_BASE_COST: int = 100

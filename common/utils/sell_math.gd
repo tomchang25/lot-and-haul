@@ -116,12 +116,12 @@ static func car_total(items: Array, multiplier: float) -> int:
     var total := 0.0
     for entry in items:
         total += _item_base_contribution(entry)
-    return maxi(1, int(total * multiplier))
+    return maxi(Economy.MIN_ITEM_VALUE, int(total * multiplier))
 
 
 ## A single item's contribution to the sale, including the verified ×1.2 bonus.
 static func item_contribution(entry) -> int:
-    return maxi(1, int(_item_base_contribution(entry)))
+    return maxi(Economy.MIN_ITEM_VALUE, int(_item_base_contribution(entry)))
 
 
 ## Conservative sell: flat multiplier on car total.

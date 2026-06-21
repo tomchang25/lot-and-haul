@@ -254,8 +254,8 @@ clues:
     domain: handbag
     attribute: appraisal
     dc: 10
-    effect_op: add
-    effect_amount: -40
+    effect_op: mul
+    effect_amount: 0.85
   - clue_id: bag_exterior_crocodile
     known_text_key: CLUE_BAG_EXTERIOR_CROCODILE
     type: surface
@@ -294,8 +294,8 @@ clues:
     domain: handbag
     attribute: perception
     dc: 12
-    effect_op: add
-    effect_amount: -35
+    effect_op: mul
+    effect_amount: 0.88
   - clue_id: bag_stitching_handmade
     known_text_key: CLUE_BAG_STITCHING_HANDMADE
     type: surface
@@ -310,8 +310,8 @@ clues:
     domain: handbag
     attribute: restoration
     dc: 12
-    effect_op: add
-    effect_amount: -60
+    effect_op: mul
+    effect_amount: 0.7
   - clue_id: bag_interior_dated
     known_text_key: CLUE_BAG_INTERIOR_DATED
     type: surface
@@ -427,8 +427,8 @@ clues:
     domain: wristwatch
     attribute: perception
     dc: 12
-    effect_op: add
-    effect_amount: -50
+    effect_op: mul
+    effect_amount: 0.82
   - clue_id: watch_crown_wind
     known_text_key: CLUE_WATCH_CROWN_WIND
     type: surface
@@ -499,8 +499,8 @@ clues:
     domain: wristwatch
     attribute: restoration
     dc: 10
-    effect_op: add
-    effect_amount: -30
+    effect_op: mul
+    effect_amount: 0.7
   - clue_id: watch_leaf_roleex
     known_text_key: CLUE_WATCH_LEAF_ROLEEX
     type: hidden
@@ -576,8 +576,8 @@ clues:
     domain: oil_lamp
     attribute: perception
     dc: 10
-    effect_op: add
-    effect_amount: -40
+    effect_op: mul
+    effect_amount: 0.85
   - clue_id: lamp_cast_scrollwork
     known_text_key: CLUE_LAMP_CAST_SCROLLWORK
     type: surface
@@ -632,8 +632,8 @@ clues:
     domain: oil_lamp
     attribute: restoration
     dc: 12
-    effect_op: add
-    effect_amount: -80
+    effect_op: mul
+    effect_amount: 0.35
   - clue_id: lamp_leaf_moser
     known_text_key: CLUE_LAMP_LEAF_MOSER
     type: hidden
@@ -700,8 +700,8 @@ clues:
     domain: clock
     attribute: restoration
     dc: 10
-    effect_op: add
-    effect_amount: -70
+    effect_op: mul
+    effect_amount: 0.65
   - clue_id: clock_joinery_dovetail
     known_text_key: CLUE_CLOCK_JOINERY_DOVETAIL
     type: surface
@@ -800,8 +800,8 @@ clues:
     domain: porcelain_figurine
     attribute: perception
     dc: 10
-    effect_op: add
-    effect_amount: -45
+    effect_op: mul
+    effect_amount: 0.85
   - clue_id: figurine_base_marked
     known_text_key: CLUE_FIGURINE_BASE_MARKED
     type: surface
@@ -816,8 +816,8 @@ clues:
     domain: porcelain_figurine
     attribute: investigation
     dc: 12
-    effect_op: add
-    effect_amount: -60
+    effect_op: mul
+    effect_amount: 0.65
   - clue_id: figurine_painting_detail
     known_text_key: CLUE_FIGURINE_PAINTING_DETAIL
     type: surface
@@ -840,8 +840,8 @@ clues:
     domain: porcelain_figurine
     attribute: restoration
     dc: 12
-    effect_op: add
-    effect_amount: -120
+    effect_op: mul
+    effect_amount: 0.3
   - clue_id: figurine_gilding_intact
     known_text_key: CLUE_FIGURINE_GILDING_INTACT
     type: surface
@@ -908,8 +908,8 @@ clues:
     domain: vase
     attribute: perception
     dc: 10
-    effect_op: add
-    effect_amount: -50
+    effect_op: mul
+    effect_amount: 0.85
   - clue_id: vase_rim_polished
     known_text_key: CLUE_VASE_RIM_POLISHED
     type: surface
@@ -924,8 +924,8 @@ clues:
     domain: vase
     attribute: restoration
     dc: 10
-    effect_op: add
-    effect_amount: -90
+    effect_op: mul
+    effect_amount: 0.6
   - clue_id: vase_body_cameo
     known_text_key: CLUE_VASE_BODY_CAMEO
     type: surface
@@ -956,8 +956,8 @@ clues:
     domain: vase
     attribute: restoration
     dc: 12
-    effect_op: add
-    effect_amount: -35
+    effect_op: mul
+    effect_amount: 0.88
   - clue_id: vase_leaf_galle
     known_text_key: CLUE_VASE_LEAF_GALLE
     type: hidden
@@ -1016,8 +1016,8 @@ clues:
     domain: poster
     attribute: appraisal
     dc: 10
-    effect_op: add
-    effect_amount: -40
+    effect_op: mul
+    effect_amount: 0.85
   - clue_id: poster_print_lithograph
     known_text_key: CLUE_POSTER_PRINT_LITHOGRAPH
     type: surface
@@ -1032,8 +1032,8 @@ clues:
     domain: poster
     attribute: investigation
     dc: 12
-    effect_op: add
-    effect_amount: -30
+    effect_op: mul
+    effect_amount: 0.9
   - clue_id: poster_color_vibrant
     known_text_key: CLUE_POSTER_COLOR_VIBRANT
     type: surface
@@ -1048,8 +1048,8 @@ clues:
     domain: poster
     attribute: perception
     dc: 10
-    effect_op: add
-    effect_amount: -65
+    effect_op: mul
+    effect_amount: 0.7
   - clue_id: poster_backing_linen
     known_text_key: CLUE_POSTER_BACKING_LINEN
     type: surface
@@ -1064,8 +1064,8 @@ clues:
     domain: poster
     attribute: perception
     dc: 12
-    effect_op: add
-    effect_amount: -80
+    effect_op: mul
+    effect_amount: 0.6
   - clue_id: poster_leaf_mucha
     known_text_key: CLUE_POSTER_LEAF_MUCHA
     type: hidden
@@ -1124,8 +1124,8 @@ clues:
     domain: painting
     attribute: perception
     dc: 10
-    effect_op: add
-    effect_amount: -80
+    effect_op: mul
+    effect_amount: 0.65
   - clue_id: painting_medium_oil
     known_text_key: CLUE_PAINTING_MEDIUM_OIL
     type: surface
@@ -1164,8 +1164,8 @@ clues:
     domain: painting
     attribute: restoration
     dc: 14
-    effect_op: add
-    effect_amount: -100
+    effect_op: mul
+    effect_amount: 0.85
   - clue_id: painting_signature_present
     known_text_key: CLUE_PAINTING_SIGNATURE_PRESENT
     type: surface
@@ -1180,8 +1180,8 @@ clues:
     domain: painting
     attribute: investigation
     dc: 14
-    effect_op: add
-    effect_amount: -200
+    effect_op: mul
+    effect_amount: 0.5
   - clue_id: painting_frame_original
     known_text_key: CLUE_PAINTING_FRAME_ORIGINAL
     type: surface
@@ -1288,8 +1288,8 @@ clues:
     domain: sculpture
     attribute: restoration
     dc: 14
-    effect_op: add
-    effect_amount: -150
+    effect_op: mul
+    effect_amount: 0.55
   - clue_id: sculpture_foundry_marked
     known_text_key: CLUE_SCULPTURE_FOUNDRY_MARKED
     type: surface
@@ -1320,16 +1320,16 @@ clues:
     domain: sculpture
     attribute: investigation
     dc: 14
-    effect_op: add
-    effect_amount: -180
+    effect_op: mul
+    effect_amount: 0.5
   - clue_id: sculpture_surface_pitted
     known_text_key: CLUE_SCULPTURE_SURFACE_PITTED
     type: surface
     domain: sculpture
     attribute: restoration
     dc: 12
-    effect_op: add
-    effect_amount: -120
+    effect_op: mul
+    effect_amount: 0.3
   - clue_id: sculpture_wax_original
     known_text_key: CLUE_SCULPTURE_WAX_ORIGINAL
     type: surface
@@ -1404,8 +1404,8 @@ clues:
     domain: pistol
     attribute: perception
     dc: 12
-    effect_op: add
-    effect_amount: -70
+    effect_op: mul
+    effect_amount: 0.65
   - clue_id: pistol_proof_stamped
     known_text_key: CLUE_PISTOL_PROOF_STAMPED
     type: surface
@@ -1444,8 +1444,8 @@ clues:
     domain: pistol
     attribute: restoration
     dc: 12
-    effect_op: add
-    effect_amount: -90
+    effect_op: mul
+    effect_amount: 0.6
   - clue_id: pistol_stock_walnut
     known_text_key: CLUE_PISTOL_STOCK_WALNUT
     type: surface
@@ -1528,8 +1528,8 @@ clues:
     domain: rifle
     attribute: perception
     dc: 12
-    effect_op: add
-    effect_amount: -90
+    effect_op: mul
+    effect_amount: 0.6
   - clue_id: rifle_proof_stamped
     known_text_key: CLUE_RIFLE_PROOF_STAMPED
     type: surface
@@ -1552,8 +1552,8 @@ clues:
     domain: rifle
     attribute: restoration
     dc: 12
-    effect_op: add
-    effect_amount: -60
+    effect_op: mul
+    effect_amount: 0.85
   - clue_id: rifle_maker_signed
     known_text_key: CLUE_RIFLE_MAKER_SIGNED
     type: surface
@@ -1652,8 +1652,8 @@ clues:
     domain: crossbow
     attribute: perception
     dc: 12
-    effect_op: add
-    effect_amount: -80
+    effect_op: mul
+    effect_amount: 0.65
   - clue_id: crossbow_prod_steel
     known_text_key: CLUE_CROSSBOW_PROD_STEEL
     type: surface
@@ -1668,8 +1668,8 @@ clues:
     domain: crossbow
     attribute: restoration
     dc: 12
-    effect_op: add
-    effect_amount: -100
+    effect_op: mul
+    effect_amount: 0.35
   - clue_id: crossbow_mech_triggered
     known_text_key: CLUE_CROSSBOW_MECH_TRIGGERED
     type: surface

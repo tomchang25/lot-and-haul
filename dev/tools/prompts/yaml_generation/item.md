@@ -92,10 +92,11 @@ clues:
 
 ### Surface clues (2–6 per item, count varies by super-category)
 
-- `effect_op: add` is the default — a flat addition to the running price. `effect_op: mul` is allowed for proportional quality/wear effects (e.g. `0.85` heavy wear, `1.3` exceptional finish).
+- `effect_op: add` is the default — a flat addition to the running price. **Add is value-positive only — never use add with a negative amount.**
+- `effect_op: mul` is used for proportional quality/wear effects (e.g. `0.85` heavy wear, `1.3` exceptional finish).
 - `effect_amount` must be **non-zero**.
   - Positive `add`: value-adding detail (maker mark, fine material, good feature).
-  - **Negative required**: every category pool must include at least one value-reducing surface clue — a negative `add` (`-500`…`-20`) or a `mul < 1.0`.
+  - **Negative required**: every category pool must include at least one value-reducing surface clue — use `mul < 1.0` (never negative add).
 - `dc`: 10–18.
 - `known_text`: one word preferred; two or three only when one is unclear.
 - Surface clues may be used by affix combinations as readable tells, but they do not contribute display-name slots directly.
@@ -104,8 +105,8 @@ clues:
 
 - `effect_op`:
   - `mul > 1.0` — positive discovery (genuine, rare variant, premium maker).
-  - `mul < 1.0` — negative discovery (forgery tell, replacement part, damage).
-  - `add` — flat bonus or penalty.
+  - `mul < 1.0` — negative discovery (forgery tell, replacement part, damage). See the Negative Effect Tiers table for ranges.
+  - `add` — flat bonus only (positive amount). Negative hidden add is forbidden.
   - `override` — **base-replacement**: when revealed, replaces the anchor base entirely (a sleeper reveal uses a large override; a counterfeit collapse uses a small one). **At most one override per item.**
 - `effect_amount` must be **non-zero**.
 - `dc`: 20–25.
@@ -119,13 +120,24 @@ clues:
 | Resource | effect_op  | Budget                                                                                    |
 | -------- | ---------- | ----------------------------------------------------------------------------------------- |
 | anchor   | base_value | tier 1: 20–150 · tier 2: 150–400 · tier 3: 400–800 · tier 4: 800–1500 · tier 5: 1500–4000 |
-| surface  | add        | positive: 30–2000 · negative: −500…−20                                                    |
+| surface  | add        | positive only: 30–2000 (negative add is forbidden — use mul < 1.0 instead)                |
 | surface  | mul        | positive: 1.05–1.5 · negative: 0.6–0.95                                                   |
 | hidden   | mul        | positive: 1.1–3.5 · counterfeit: 0.05–0.6                                                 |
 | hidden   | override   | sleeper: 5×–20× anchor base · counterfeit collapse: 10%–40% of anchor base                |
-| hidden   | add        | ±50 to ±3000                                                                              |
+| hidden   | add        | positive only: 50–3000 (negative hidden add is forbidden — use mul < 1.0 instead)         |
 
-**Positive/negative mix (required per category pool):** at least one negative surface clue (negative `add` or `mul < 1.0`) **and** at least one negative hidden clue (`mul < 1.0` or a low-value `override`).
+## Negative Effect Tiers (mul < 1.0)
+
+All value-reduction **must** use `effect_op: mul` with `effect_amount < 1.0`. Use these tiers:
+
+| Tier                | Range     | Category                                                                  | Examples                                                          |
+| ------------------- | --------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Minor Defect        | 0.80–0.95 | Cosmetic imperfection, light wear, minor blemish                          | Scratched surface, mold seam, faded color, synthetic material     |
+| Missing/Compromised | 0.50–0.75 | Missing part, replaced non-original component, significant feature absent | Frayed stitching, replaced band, chipped rim, unmarked base       |
+| Severe Damage       | 0.25–0.40 | Major structural damage, extensive degradation                            | Cracked glass, pitted surface, broken mechanism, rusted component |
+| Counterfeit/Forgery | override  | Hidden-only base-value replacement                                        | Replica, forgery, cast copy, franken-build                        |
+
+**Positive/negative mix (required per category pool):** at least one negative surface clue `mul < 1.0` **and** at least one negative hidden clue (`mul < 1.0` or a low-value `override`).
 
 **Research EV constraint:** high-rarity items must keep a **positive long-run expected research value** — players must never learn to skip Legendaries. Keep each category's hidden pool net-positive in expectation: more and higher-weighted positive discoveries than negative ones, with counterfeits the minority risk, not the norm.
 
