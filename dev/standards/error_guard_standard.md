@@ -34,7 +34,7 @@ if RunManager.lot == null:
 | **Programmer error** | Developer   | `ToastManager.show_dev_error()` (debug-gated) | `return` / `return safe sentinel` |
 | **Recovery warning** | Player      | `ToastManager.show_warning()` (always)        | Continue with the recovered state |
 
-Both error channels write to the error log via `push_error` internally, so every error — runtime or programmer — leaves a trail in release exports that a player can report. Call sites never call `push_error` themselves (see §3).
+Both error channels write to the error log via `push_error` internally, so every error — runtime or programmer — leaves a trail in release exports that a player can report. Call sites never call `push_error` or `push_warning` themselves (see §3).
 
 ## 2a. Runtime Guard
 
@@ -130,11 +130,15 @@ Rule of thumb: use `show_dev_error` for programmer invariants and violated inter
 
 Never use `show_info` for error guards — it is reserved for migration/load diagnostics, and inside the save/load path it is reached via `ctx.info()`, never called directly.
 
-## 3a. No Bare `push_error` (lint-enforced)
+## 3a. No Bare `push_error` / `push_warning` (lint-enforced)
 
 All error logging flows through `show_error` / `show_dev_error` — both call `push_error` internally. A bare `push_error` at a call site is a violation: it either duplicates the toast channel's log or silently skips the toast the category requires. ToastManager itself is the single exempt file.
 
-**Boot-phase exception.** `EventBus`, `SettingsStore`, and `Debug` load before the ToastManager autoload and cannot call it. A bare `push_error` there must declare the exception with a `# push-error: boot` marker, trailing the call or on the comment line directly above:
+Similarly, warnings must use `ToastManager.show_warning()`. A bare `push_warning` at a call site is a violation, with exempt files:
+- `toast_manager.gd` — the single home of the underlying `push_warning`.
+- `save_load_context.gd` — uses `push_warning` for console parity in `ctx.info()`.
+
+**Boot-phase exception.** `EventBus`, `SettingsStore`, and `Debug` load before the ToastManager autoload and cannot call it. A bare `push_error` / `push_warning` there must declare the exception with a `# push-error: boot` marker, trailing the call or on the comment line directly above:
 
 ```gdscript
 push_error("SettingsStore: settings file corrupt, using defaults") # push-error: boot

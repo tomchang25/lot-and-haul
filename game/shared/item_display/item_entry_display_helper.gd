@@ -168,7 +168,7 @@ static func display_name_color(entry: ItemEntry) -> Color:
         Economy.Rarity.LEGENDARY:
             return Color(1.0, 0.75, 0.2)
         _:
-            push_warning("Unknown rarity: %d" % entry.rarity)
+            ToastManager.show_dev_error("Unknown rarity: %d" % entry.rarity)
     return Color(0.85, 0.85, 0.85)
 
 # ── Sort value dispatch ───────────────────────────────────────────────────────
@@ -196,7 +196,7 @@ static func sort_value(entry: ItemEntry, column: int) -> Variant:
         ItemRow.Column.INSPECTION:
             return entry.inspection_level
         _:
-            push_warning("Unknown Column: %d" % column)
+            ToastManager.show_dev_error("Unknown Column: %d" % column)
     if column == ItemRow.Column.CONDITION:
         return 0.0
     return 0

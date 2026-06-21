@@ -119,7 +119,7 @@ func set_selection_state(state: SelectionState) -> void:
             remove_theme_stylebox_override(&"panel")
             mouse_default_cursor_shape = Control.CURSOR_ARROW
         _:
-            push_warning("Unknown SelectionState: %d" % state)
+            ToastManager.show_dev_error("Unknown SelectionState: %d" % state)
 
 
 static func get_price_header() -> String:

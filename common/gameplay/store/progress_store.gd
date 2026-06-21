@@ -103,7 +103,7 @@ func from_dict(data: Dictionary, ctx: SaveLoadContext) -> void:
                 continue
             var loc: LocationData = LocationRegistry.get_location_by_id(id_variant as String)
             if loc == null:
-                push_warning(
+                ctx.warn(
                     "ProgressStore: available_location_id '%s' not found — dropped" % id_variant,
                 )
                 continue

@@ -154,6 +154,5 @@ func _attribute_display_name(attribute: String) -> String:
             return TranslationServer.translate("SYS_ATTR_NEGOTIATION")
         "investigation":
             return TranslationServer.translate("SYS_ATTR_INVESTIGATION")
-        _:
-            push_warning("ItemRowTooltip._attribute_display_name: unknown attribute %s" % attribute)
-            return attribute
+    ToastManager.show_warning("ItemRowTooltip._attribute_display_name: unknown attribute %s" % attribute)
+    return attribute

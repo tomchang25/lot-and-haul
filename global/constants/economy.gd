@@ -57,7 +57,7 @@ static func rarity_display_name(rarity: Economy.Rarity) -> String:
         Economy.Rarity.LEGENDARY:
             return TranslationServer.translate("SYS_RARITY_LEGENDARY")
         _:
-            push_warning("Economy.rarity_display_name: unknown rarity %d" % rarity)
+            ToastManager.show_warning("Economy.rarity_display_name: unknown rarity %d" % rarity)
             return TranslationServer.translate("SYS_UNKNOWN_ITEM")
 
 

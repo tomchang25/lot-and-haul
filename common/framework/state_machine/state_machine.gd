@@ -41,7 +41,7 @@ func _ready() -> void:
         if child is State:
             var state := child as State
             if state.state_id < 0:
-                push_warning("StateMachine: state '%s' has invalid state_id" % state.name)
+                ToastManager.show_warning("StateMachine: state '%s' has invalid state_id" % state.name)
                 continue
 
             states[state.state_id] = state
@@ -97,14 +97,14 @@ func _physics_process(delta: float) -> void:
 ## cannot corrupt the FSM with a late-arriving signal.
 func _on_transition_requested(from: State, to: int) -> void:
     if _transitioning:
-        push_warning("StateMachine: transition requested mid-transition from '%s', ignoring" % from.name)
+        ToastManager.show_warning("StateMachine: transition requested mid-transition from '%s', ignoring" % from.name)
         return
 
     if from != current_state:
         return
 
     if not states.has(to):
-        push_warning("StateMachine: missing target state id %s" % str(to))
+        ToastManager.show_warning("StateMachine: missing target state id %s" % str(to))
         return
 
     var new_state := states[to] as State
@@ -120,14 +120,14 @@ func _on_transition_requested(from: State, to: int) -> void:
 ## (e.g. instant death, cutscene takeover).
 func request_transition(to: int, force: bool = false) -> void:
     if _transitioning:
-        push_warning("StateMachine: request_transition called mid-transition to id %s, ignoring" % str(to))
+        ToastManager.show_warning("StateMachine: request_transition called mid-transition to id %s, ignoring" % str(to))
         return
 
     if current_state == null:
         return
 
     if not states.has(to):
-        push_warning("StateMachine: missing target state id %s" % str(to))
+        ToastManager.show_warning("StateMachine: missing target state id %s" % str(to))
         return
 
     if not force and not current_state.interruptible:

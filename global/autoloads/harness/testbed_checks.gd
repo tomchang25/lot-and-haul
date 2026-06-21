@@ -38,17 +38,17 @@ const ERROR_PATTERNS: Array[String] = [
 static func load_error_filters_from_json() -> Dictionary:
     var path := "res://dev/ci/error_filters.json"
     if not FileAccess.file_exists(path):
-        push_warning("TestbedChecks: error_filters.json not found at %s" % path)
+        ToastManager.show_warning("TestbedChecks: error_filters.json not found at %s" % path)
         return { }
     var file := FileAccess.open(path, FileAccess.READ)
     if file == null:
-        push_warning("TestbedChecks: could not open %s" % path)
+        ToastManager.show_warning("TestbedChecks: could not open %s" % path)
         return { }
     var raw := file.get_as_text()
     file.close()
     var parsed := JSON.parse_string(raw)
     if parsed == null or typeof(parsed) != TYPE_DICTIONARY:
-        push_warning("TestbedChecks: error_filters.json is not a valid JSON object")
+        ToastManager.show_warning("TestbedChecks: error_filters.json is not a valid JSON object")
         return { }
     return parsed as Dictionary
 

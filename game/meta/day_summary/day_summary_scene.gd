@@ -43,7 +43,7 @@ func _ready() -> void:
 
     var summary: DaySummary = SceneRouter.consume_pending_day_summary()
     if summary == null:
-        push_warning("DaySummaryScene: no pending summary — returning to hub")
+        ToastManager.show_warning("DaySummaryScene: no pending summary — returning to hub")
         SceneRouter.go_to_hub()
         return
 

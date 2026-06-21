@@ -240,12 +240,12 @@ func wipe_slot(slot: int) -> void:
             ProjectSettings.globalize_path(_slot_counter_path(slot, counter)),
         )
         if err != OK:
-            push_warning("SaveManager: could not delete slot %d counter %d (error %d)" % [slot, counter, err])
+            ToastManager.show_warning("SaveManager: could not delete slot %d counter %d (error %d)" % [slot, counter, err])
     var manifest_path := _slot_manifest_path(slot)
     if FileAccess.file_exists(manifest_path):
         var err := DirAccess.remove_absolute(ProjectSettings.globalize_path(manifest_path))
         if err != OK:
-            push_warning("SaveManager: could not delete manifest for slot %d (error %d)" % [slot, err])
+            ToastManager.show_warning("SaveManager: could not delete manifest for slot %d (error %d)" % [slot, err])
 
 
 ## Wipes all slots and the last-active pointer.
@@ -619,7 +619,7 @@ func _cleanup_old_saves_in_dir(dir: String) -> void:
         var oldest: int = counters.pop_back()
         var err := DirAccess.remove_absolute(abs_path.path_join("save_%d.json" % oldest))
         if err != OK:
-            push_warning("SaveManager: could not delete %s/save_%d.json (error %d)" % [dir, oldest, err])
+            ToastManager.show_warning("SaveManager: could not delete %s/save_%d.json (error %d)" % [dir, oldest, err])
 
 
 ## Tries to parse and structurally validate [param path].

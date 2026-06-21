@@ -120,10 +120,23 @@ func _category_text(weights: Dictionary) -> String:
     if cats.is_empty():
         return TranslationServer.translate("UI_NONE")
     if cats.size() == 1:
-        return (cats[0] as String).capitalize()
+        return _category_name(cats[0] as String)
     if cats.size() <= 3:
         var names: Array[String] = []
         for c in cats:
-            names.append((c as String).capitalize())
+            names.append(_category_name(c as String))
         return ", ".join(names)
     return TranslationServer.translate("UI_MIXED_TYPES") % cats.size()
+
+
+func _category_name(category_id: String) -> String:
+    var category: CategoryData = CategoryRegistry.get_category_by_id(category_id)
+    if category != null and category.display_name_key != "":
+        return TranslationServer.translate(category.display_name_key)
+
+    var super_category: SuperCategoryData = SuperCategoryRegistry.get_super_category_by_id(category_id)
+    if super_category != null and super_category.display_name_key != "":
+        return TranslationServer.translate(super_category.display_name_key)
+
+    ToastManager.show_warning("LotCard._category_name: unknown category id %s" % category_id)
+    return category_id
