@@ -323,12 +323,11 @@ func _refresh_clues_section(entry: ItemEntry) -> void:
         var val_text: String
         var val_color: Color
         if op == "mul":
+            val_text = "x%.2f" % amount
             if amount >= 1.0:
-                val_text = "+%d%%" % (int(amount * 100) - 100)
-                val_color = Color(0.92, 0.72, 0.18, 1.0)
+                val_color = Color(0.35, 0.70, 0.40, 1.0)
             else:
-                val_text = "-%d%%" % (100 - int(amount * 100))
-                val_color = Color(0.85, 0.40, 0.35, 1.0)
+                val_color = Color(0.65, 0.25, 0.20, 1.0)
         elif amount == 0.0:
             val_text = "—"
             val_color = Color(0.55, 0.58, 0.63, 1)
