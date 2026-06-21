@@ -21,6 +21,7 @@ Players buy mystery lots at auction and identify items over time. Item knowledge
 - Use snake_case for IDs.
 - IDs must be stable, readable, and unique within their resource type.
 - The example YAML in related prompts is for schema illustration only. Do not replicate its structure or pattern labels.
+- Always quote string values that match YAML boolean keywords (`Yes`, `No`, `True`, `False`, `On`, `Off`) to prevent YAML from parsing them as booleans. Use `"Yes"` not `Yes`.
 
 ## ID Standards
 

@@ -168,7 +168,7 @@ def main() -> None:
                 for key in sorted(all_keys_set):
                     row = [key]
                     for locale in LOCALE_ORDER:
-                        val = resolve_value(locale, key, block_sources)
+                        val = str(resolve_value(locale, key, block_sources))
                         row.append(val)
                         fb_log: dict = {}
                         if key not in block_sources.get(locale, {}):
