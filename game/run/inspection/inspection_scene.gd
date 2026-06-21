@@ -221,7 +221,7 @@ func _refresh_hud() -> void:
 
 
 func _refresh_detail() -> void:
-    if _selected_entry == null or _inspection_finished:
+    if _selected_entry == null:
         _clear_detail_section()
         _empty_selection_label.show()
         return
@@ -307,6 +307,12 @@ func _refresh_clues_section(entry: ItemEntry) -> void:
             continue
         rows.append({ "text": TranslationServer.translate(clue.known_text_key), "op": clue.effect_op, "amount": clue.effect_amount, "anchor": false })
 
+    if entry.verified:
+        for clue: ClueData in entry.hidden_clues:
+            if not entry.revealed_clue_ids.has(clue.clue_id):
+                continue
+            rows.append({ "text": TranslationServer.translate(clue.known_text_key), "op": clue.effect_op, "amount": clue.effect_amount, "anchor": false })
+
     if rows.is_empty():
         _clues_vbox.hide()
         return
@@ -340,6 +346,7 @@ func _clear_detail_section() -> void:
     _action_inspect_button.hide()
     _action_complete_label.hide()
     _selected_entry = null
+    _item_browser.set_selected(null)
 
 # ══ Summary / exit ══════════════════════════════════════════════════════════
 
@@ -350,10 +357,10 @@ func _finish_inspection() -> void:
 
     _inspection_finished = true
 
-    _clear_detail_section()
     _clear_clue_result()
     _item_browser.refresh()
     _refresh_hud()
+    _refresh_detail()
 
 
 func _on_pass_pressed() -> void:
