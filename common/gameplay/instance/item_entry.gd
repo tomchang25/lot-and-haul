@@ -350,6 +350,9 @@ func get_inspection_clues() -> Array[ClueData]:
 
 func auto_reveal_all_surface() -> void:
     for clue: ClueData in _get_surface_clues():
+        if is_veiled():
+            unveil()
+
         if not revealed_clue_ids.has(clue.clue_id):
             revealed_clue_ids.append(clue.clue_id)
 
