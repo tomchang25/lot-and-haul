@@ -11,13 +11,17 @@ const UNKNOWN_OFFER_ID := "nonexistent_offer [DEBUG-PASS]"
 
 var _hub_anchors: Dictionary = { }
 var _owned_controls: Array[Control] = []
+var _previous_tutorial_skip_all := false
 
 
 func before_all() -> void:
+    _previous_tutorial_skip_all = SettingsStore.tutorial_skip_all
+    SettingsStore.tutorial_skip_all = false
     MetaManager.reset()
 
 
 func before_each() -> void:
+    SettingsStore.tutorial_skip_all = false
     MetaManager.reset()
     _hub_anchors = {
         "slot_label": _make_anchor_button(),
@@ -29,11 +33,16 @@ func before_each() -> void:
 
 func after_each() -> void:
     ScriptDirector.reset_runtime()
+    SettingsStore.tutorial_skip_all = false
     for control: Control in _owned_controls:
         if is_instance_valid(control):
             control.free()
     _owned_controls.clear()
     _hub_anchors.clear()
+
+
+func after_all() -> void:
+    SettingsStore.tutorial_skip_all = _previous_tutorial_skip_all
 
 
 func _make_anchor_button() -> Button:
@@ -54,6 +63,14 @@ func _storage_anchors() -> Dictionary:
         "ap_label": _make_anchor_button(),
         "leave_btn": _make_anchor_button(),
     }
+
+
+func _assert_forced_activity_payload(expected: StringName, message: String) -> void:
+    var payload: Variant = GameplayOverride.payload(GameplayOverride.FORCED_ACTIVITY)
+    assert_eq(typeof(payload), TYPE_STRING_NAME, "%s payload should be StringName" % message)
+    if typeof(payload) != TYPE_STRING_NAME:
+        return
+    assert_eq(payload, expected, message)
 
 # ══ Accessor lifecycle ═════════════════════════════════════════════════════
 
@@ -712,21 +729,13 @@ func test_inspection_review_gated_deactivated_on_completion() -> void:
 
 func test_forced_activity_day0_day() -> void:
     # before_each: day 0, slot DAY, onboarding_pending=true.
-    assert_eq(
-        GameplayOverride.payload(GameplayOverride.FORCED_ACTIVITY) as StringName,
-        &"auction",
-        "day 0 day slot targets auction",
-    )
+    _assert_forced_activity_payload(&"auction", "day 0 day slot targets auction")
 
 
 func test_forced_activity_day0_night() -> void:
     MetaManager.slot.set_slot(SlotStore.SLOT_NIGHT)
     Director.register_scene("refresh_night_overrides [DEBUG-PASS]", { })
-    assert_eq(
-        GameplayOverride.payload(GameplayOverride.FORCED_ACTIVITY) as StringName,
-        &"storage",
-        "day 0 night slot targets storage",
-    )
+    _assert_forced_activity_payload(&"storage", "day 0 night slot targets storage")
 
 
 func test_forced_activity_not_pending() -> void:
