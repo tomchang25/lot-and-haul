@@ -184,7 +184,7 @@ en:
   UI_VERIFIED_LABEL: "Verified: %d / %d"
   UI_VIEW_CARDS: Cards
   UI_VIEW_TABLE: Table
-  UI_WANTS_LABEL: "Wants: %s"
+  UI_WANTS_LABEL: "Wants: "
   UI_WEIGHT_UNKNOWN: "W: ???"
   UI_ZERO_ITEMS: "%d items"
 
@@ -244,6 +244,11 @@ en:
   UI_CLUE_IDENTITY: "IDENTITY"
   UI_CLUE_SURFACE: "SURFACE"
   UI_CLUE_HIDDEN: "HIDDEN"
+
+  # ── New keys for clue tooltip ──
+  UI_CLUE_ATTR_DC_FORMAT: "%s DC %d"
+  UI_CLUE_OVERRIDE_FORMAT: "Override base: $%d"
+  UI_CLUE_VALUED_FORMAT: "★ Valued flaw: +$%d"
 
   # ── New keys for day summary ──
   UI_DAY_TO_DAY: "Day %d \u2192 Day %d"

@@ -184,7 +184,7 @@ zh_CN:
   UI_VERIFIED_LABEL: "已验证：%d / %d"
   UI_VIEW_CARDS: 卡片
   UI_VIEW_TABLE: 表格
-  UI_WANTS_LABEL: "需求：%s"
+  UI_WANTS_LABEL: "需求："
   UI_WEIGHT_UNKNOWN: "W：？？？"
   UI_ZERO_ITEMS: "%d 个物品"
 
@@ -244,6 +244,10 @@ zh_CN:
   UI_CLUE_IDENTITY: "身份"
   UI_CLUE_SURFACE: "表面"
   UI_CLUE_HIDDEN: "隐藏"
+
+  UI_CLUE_ATTR_DC_FORMAT: "%s DC %d"
+  UI_CLUE_OVERRIDE_FORMAT: "基础替换：$%d"
+  UI_CLUE_VALUED_FORMAT: "★ 重视缺陷：+$%d"
 
   # ── 每日摘要 ──
   UI_DAY_TO_DAY: "第 %d 天 → 第 %d 天"

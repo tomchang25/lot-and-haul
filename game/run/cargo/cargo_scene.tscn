@@ -5,7 +5,6 @@
 [ext_resource type="PackedScene" uid="uid://tnbmlptuuk3i" path="res://game/shared/item_display/item_card_popup.tscn" id="3_popup"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 [ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="4_sbo"]
-
 [node name="CargoSceneV2" type="Control" unique_id=1664710573]
 layout_mode = 3
 anchors_preset = 15

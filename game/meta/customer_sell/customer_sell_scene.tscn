@@ -8,7 +8,6 @@
 [ext_resource type="PackedScene" uid="uid://cvyujuur8ye7x" path="res://game/meta/customer_sell/components/sale_receipt_dialog.tscn" id="8_srd"]
 [ext_resource type="PackedScene" uid="uid://dk4vsndd2lfnm" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="9_sbo"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
-
 [node name="CustomerSellScene" type="Control" unique_id=331840253]
 layout_mode = 3
 anchors_preset = 15

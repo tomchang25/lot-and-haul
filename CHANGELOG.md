@@ -14,6 +14,10 @@ Rules:
 
 ## v0.1.7 - Draft
 
+### Valued Surface-Negative Customer Pricing
+
+- 2026-06-22 — [customer_sell] Customers can value specific negative surface clues, skipping the multiplier penalty and applying a fixed bonus instead; ClueTag and ClueTooltip components added with color-coded clue display in customer sell panels and item cards
+
 ### CustomerData Template Generation
 
 - 2026-06-22 — [customer_sell] Nightly customer generation now uses authored CustomerData personas with template demand pools, storage-fit tag blending, hidden-tag caps, and authored car grid pools

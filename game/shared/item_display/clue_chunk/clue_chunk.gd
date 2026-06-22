@@ -7,18 +7,15 @@ extends VBoxContainer
 
 # ── Display constants ──────────────────────────────────────────────────────────
 
-const SURFACE_ICON := "●"
-const HIDDEN_ICON := "◆"
-const KNOWN_COLOR := Color(0.85, 0.85, 0.85)
-const UNKNOWN_COLOR := Color(0.5, 0.5, 0.5)
 const HEADER_COLOR := Color(0.55, 0.58, 0.63)
-const VERIFIED_COLOR := Color(0.4, 1.0, 0.5)
+
+const ClueTagScene: PackedScene = preload("res://game/shared/item_display/clue_tag/clue_tag.tscn")
 
 # ── State ──────────────────────────────────────────────────────────────────────
 
 var _entry: ItemEntry = null
 
-# ══ Public API ═════════════════════════════════════════════════════════════════
+# ══ Common API ════════════════════════════════════════════════════════════════
 
 
 func setup(entry: ItemEntry) -> void:
@@ -30,7 +27,7 @@ func setup(entry: ItemEntry) -> void:
 func refresh() -> void:
     _apply()
 
-# ══ Internal ═══════════════════════════════════════════════════════════════════
+# ══ Internal ══════════════════════════════════════════════════════════════════
 
 
 func _apply() -> void:
@@ -43,9 +40,14 @@ func _apply() -> void:
     idx = _build_surface(idx)
     idx = _build_hidden(idx)
 
-    # Remove surplus children left over from a previous larger layout
     while get_child_count() > idx:
         var child := get_child(get_child_count() - 1)
+        remove_child(child)
+        child.queue_free()
+
+
+func _clear_children() -> void:
+    for child in get_children():
         remove_child(child)
         child.queue_free()
 
@@ -58,17 +60,17 @@ func _ensure_child(index: int, type: Variant) -> Node:
         remove_child(existing)
         existing.queue_free()
 
-    var child = type.new()
+    var child: Node
+    if type == ClueTag:
+        child = ClueTagScene.instantiate()
+    elif type is PackedScene:
+        child = type.instantiate()
+    else:
+        child = type.new()
     # node-src: ephemeral — rebuilt per _apply()
     add_child(child)
     move_child(child, index)
     return child
-
-
-func _clear_children() -> void:
-    for child in get_children():
-        remove_child(child)
-        child.queue_free()
 
 
 func _build_anchor(idx: int) -> int:
@@ -90,9 +92,9 @@ func _build_anchor(idx: int) -> int:
         text = TranslationServer.translate(anchor.known_text_key)
     else:
         text = ItemEntryDisplayHelper.unknown_text()
-    var color := KNOWN_COLOR if _entry.unveiled else UNKNOWN_COLOR
+    var color := ClueColors.UNREVEALED_COLOR if not _entry.unveiled else ClueColors.ANCHOR_REVEALED_COLOR
     var row := _ensure_child(idx, Label) as Label
-    row.text = "■  %s" % text
+    row.text = "\u25a0  %s" % text
     row.add_theme_font_size_override(&"font_size", 11)
     row.add_theme_color_override(&"font_color", color)
     row.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -116,18 +118,9 @@ func _build_surface(idx: int) -> int:
     idx += 1
 
     for clue: ClueData in clues:
+        var tag := _ensure_child(idx, ClueTag) as ClueTag
         var revealed := _entry.revealed_clue_ids.has(clue.clue_id)
-        var text: String
-        if revealed:
-            text = TranslationServer.translate(clue.known_text_key)
-        else:
-            text = ItemEntryDisplayHelper.unknown_text()
-        var color := KNOWN_COLOR if revealed else UNKNOWN_COLOR
-        var row := _ensure_child(idx, Label) as Label
-        row.text = "%s  %s" % [SURFACE_ICON, text]
-        row.add_theme_font_size_override(&"font_size", 11)
-        row.add_theme_color_override(&"font_color", color)
-        row.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        tag.setup(clue, revealed, false)
         idx += 1
 
     return idx
@@ -148,18 +141,9 @@ func _build_hidden(idx: int) -> int:
     idx += 1
 
     for clue: ClueData in clues:
+        var tag := _ensure_child(idx, ClueTag) as ClueTag
         var revealed := _entry.revealed_clue_ids.has(clue.clue_id)
-        var text: String
-        if revealed:
-            text = TranslationServer.translate(clue.known_text_key)
-        else:
-            text = ItemEntryDisplayHelper.unknown_text()
-        var color := VERIFIED_COLOR if revealed else UNKNOWN_COLOR
-        var row := _ensure_child(idx, Label) as Label
-        row.text = "%s  %s" % [HIDDEN_ICON, text]
-        row.add_theme_font_size_override(&"font_size", 11)
-        row.add_theme_color_override(&"font_color", color)
-        row.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        tag.setup(clue, revealed, false)
         idx += 1
 
     return idx

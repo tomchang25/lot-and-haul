@@ -235,8 +235,6 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 
 - [runtime_architecture] Runtime architecture vocabulary standardization: gameplay Managers become Systems, Instance becomes Entry, and archetype boundaries harden — see `dev/docs/plans/runtime_architecture_vocabulary_standardization.sketch.md`
 
-- [customer_sell] Surface-negative niche customer pricing — see `dev/docs/plans/valued_surface_negative_customer_pricing.sketch.md`
-
 ---
 
 ## Plan
