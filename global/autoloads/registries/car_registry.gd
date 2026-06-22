@@ -17,8 +17,10 @@ func get_car_by_id(car_id: String) -> CarData:
     return get_by_id(car_id) as CarData
 
 
-func get_all_cars() -> Array[CarData]:
+func get_all_cars(include_test: bool = false) -> Array[CarData]:
     var result: Array[CarData] = []
     for car: CarData in get_all():
+        if car.is_test and not include_test:
+            continue
         result.append(car)
     return result

@@ -71,7 +71,9 @@ affixes:
   - affix_id: test_affix
     naming_slot: prefix
     display_name_key: AFFIX_TEST_AFFIX
-    scope_mode: all
+    scope_mode: categories
+    category_scope:
+      - test_category
     weight: 1
     combination_ids:
       - test_comb
@@ -79,6 +81,7 @@ affixes:
 cars:
   - car_id: test_car
     display_name: Test Car
+    is_test: true
     grid_columns: 4
     grid_rows: 3
     max_weight: 500.0

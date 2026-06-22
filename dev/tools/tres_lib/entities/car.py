@@ -14,9 +14,11 @@ class CarSpec:
     yaml_key: str = "cars"
     tres_subdir: str = "cars"
     uid_prefix: str = "car"
-    script_paths: dict[str, str] = field(default_factory=lambda: {
-        "car_data": "res://data/definitions/car_data.gd",
-    })
+    script_paths: dict[str, str] = field(
+        default_factory=lambda: {
+            "car_data": "res://data/definitions/car_data.gd",
+        }
+    )
 
     def entity_id(self, entry: dict) -> str:
         return entry["car_id"]
@@ -53,10 +55,19 @@ class CarSpec:
         w.add_field_int("stamina_cap", int(entry["stamina_cap"]))
         w.add_field_int("fuel_cost_per_day", int(entry.get("fuel_cost_per_day", 0)))
         w.add_field_int("extra_slot_count", int(entry.get("extra_slot_count", 0)))
-        w.add_field_float("trailer_damage_chance", float(entry.get("trailer_damage_chance", 0.0)))
-        w.add_field_float("trailer_damage_ratio_min", float(entry.get("trailer_damage_ratio_min", 0.0)))
-        w.add_field_float("trailer_damage_ratio_max", float(entry.get("trailer_damage_ratio_max", 0.0)))
+        w.add_field_float(
+            "trailer_damage_chance", float(entry.get("trailer_damage_chance", 0.0))
+        )
+        w.add_field_float(
+            "trailer_damage_ratio_min",
+            float(entry.get("trailer_damage_ratio_min", 0.0)),
+        )
+        w.add_field_float(
+            "trailer_damage_ratio_max",
+            float(entry.get("trailer_damage_ratio_max", 0.0)),
+        )
         w.add_field_int("price", int(entry.get("price", 0)))
+        w.add_field_bool("is_test", bool(entry.get("is_test", False)))
 
         if has_icon:
             w.add_field('icon = ExtResource("2_icon")')
@@ -122,29 +133,37 @@ class CarSpec:
                 )
 
             trailer_damage_chance = car.get("trailer_damage_chance", 0.0)
-            if not isinstance(trailer_damage_chance, (int, float)) or not (0.0 <= trailer_damage_chance <= 1.0):
+            if not isinstance(trailer_damage_chance, (int, float)) or not (
+                0.0 <= trailer_damage_chance <= 1.0
+            ):
                 errors.append(
                     f"car '{car_id}': trailer_damage_chance must be a float"
                     f" in [0, 1], got {trailer_damage_chance!r}"
                 )
 
             trailer_damage_ratio_min = car.get("trailer_damage_ratio_min", 0.0)
-            if not isinstance(trailer_damage_ratio_min, (int, float)) or not (0.0 <= trailer_damage_ratio_min <= 1.0):
+            if not isinstance(trailer_damage_ratio_min, (int, float)) or not (
+                0.0 <= trailer_damage_ratio_min <= 1.0
+            ):
                 errors.append(
                     f"car '{car_id}': trailer_damage_ratio_min must be a float"
                     f" in [0, 1], got {trailer_damage_ratio_min!r}"
                 )
 
             trailer_damage_ratio_max = car.get("trailer_damage_ratio_max", 0.0)
-            if not isinstance(trailer_damage_ratio_max, (int, float)) or not (0.0 <= trailer_damage_ratio_max <= 1.0):
+            if not isinstance(trailer_damage_ratio_max, (int, float)) or not (
+                0.0 <= trailer_damage_ratio_max <= 1.0
+            ):
                 errors.append(
                     f"car '{car_id}': trailer_damage_ratio_max must be a float"
                     f" in [0, 1], got {trailer_damage_ratio_max!r}"
                 )
 
-            if (isinstance(trailer_damage_ratio_min, (int, float))
-                    and isinstance(trailer_damage_ratio_max, (int, float))
-                    and trailer_damage_ratio_min > trailer_damage_ratio_max):
+            if (
+                isinstance(trailer_damage_ratio_min, (int, float))
+                and isinstance(trailer_damage_ratio_max, (int, float))
+                and trailer_damage_ratio_min > trailer_damage_ratio_max
+            ):
                 errors.append(
                     f"car '{car_id}': trailer_damage_ratio_min"
                     f" ({trailer_damage_ratio_min}) must be <="

@@ -49,7 +49,7 @@ func _populate_rows() -> void:
         child.queue_free()
 
     var inventory: Array[CarData] = []
-    for car: CarData in CarRegistry.get_all_cars():
+    for car: CarData in CarRegistry.get_all_cars(Debug.enabled):
         if not MetaManager.garage.owned_cars.has(car):
             inventory.append(car)
 

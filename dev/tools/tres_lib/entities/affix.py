@@ -328,6 +328,11 @@ class AffixSpec:
                 errors.append(
                     f"affix '{aid}': scope_mode must be 'all' or 'categories'"
                 )
+            if scope_mode == "all" and aid.startswith("test_"):
+                errors.append(
+                    f"affix '{aid}': test affixes must not use scope_mode 'all' "
+                    f"(use 'categories' scoped to the test category)"
+                )
 
             cat_scope = entry.get("category_scope", [])
             if not isinstance(cat_scope, list):
@@ -380,7 +385,9 @@ class AffixSpec:
 
             peer_slot = "suffix" if my_slot == "prefix" else "prefix"
             peer_affixes: list[dict] = []
-            my_scope_set: set[str] = set(cat_scope) if scope_mode == "categories" else set()
+            my_scope_set: set[str] = (
+                set(cat_scope) if scope_mode == "categories" else set()
+            )
             my_is_all = scope_mode == "all"
             for other in entries:
                 other_scope_mode = other.get("scope_mode", "categories")

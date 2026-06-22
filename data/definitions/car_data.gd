@@ -40,6 +40,9 @@ extends Resource
 ## Cost to buy this car in the Car Shop. Starter cars use 0.
 @export var price: int = 0
 
+## True for test/debug-only cars that should not appear in normal play.
+@export var is_test: bool = false
+
 ## Icon shown in the Car Select / Car Shop UI. May be null for cars with no art.
 @export var icon: Texture2D
 

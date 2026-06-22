@@ -51,6 +51,8 @@ func _populate_rows() -> void:
     _rows.clear()
 
     for car: CarData in MetaManager.garage.owned_cars:
+        if car.is_test and not Debug.enabled:
+            continue
         var row: CarRow = CarRowScene.instantiate()
         row.setup(car, car == MetaManager.garage.active_car)
         row.select_pressed.connect(_on_select_pressed)
