@@ -1,19 +1,15 @@
 # selling_item_card.gd
-# Card component for the sellable item grid — compact shape showing name, fit, condition, value.
-# Reads:  ItemEntry fields, SellMath utility
+# Card component for the sellable item grid; shows a 128x128 sprite-led summary.
+# Reads:  ItemEntry fields and SellMath fit/verification helpers
 # Writes: nothing
 class_name SellingItemCard
 extends PanelContainer
 
+# ── Signals ───────────────────────────────────────────────────────────────────
+
 signal row_pressed(entry: ItemEntry)
 signal tooltip_requested(entry: ItemEntry, anchor: Rect2)
 signal tooltip_dismissed
-
-# ── Constants ─────────────────────────────────────────────────────────────────
-
-const SHAPE_CELL_SIZE := 4
-const SHAPE_CELL_GAP := 1
-const SHAPE_PADDING := 1
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
@@ -31,8 +27,7 @@ var _ext_highlighted: bool = false
 @onready var _verified_label: Label = %VerifiedLabel
 @onready var _value_label: Label = %ValueLabel
 @onready var _fit_label: Label = %FitLabel
-@onready var _condition_label: Label = %ConditionLabel
-@onready var _shape_icon: Control = %ShapeIcon
+@onready var _sprite_overlay: ItemSpriteOverlay = %SpriteOverlay
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -49,12 +44,14 @@ func _ready() -> void:
 # ══ Common API ════════════════════════════════════════════════════════════════
 
 
+## Plays a short success pulse when the item is loaded.
 func play_loaded_pulse() -> void:
     var tween := create_tween().set_trans(Tween.TRANS_QUAD)
     tween.tween_property(self, "modulate", Color(1.4, 1.3, 0.5, 1.0), 0.08)
     tween.tween_property(self, "modulate", Color.WHITE, 0.22)
 
 
+## Plays a short reject animation when the item cannot be loaded.
 func play_invalid_reject() -> void:
     var original := position
     var tween := create_tween().set_trans(Tween.TRANS_QUAD)
@@ -65,6 +62,7 @@ func play_invalid_reject() -> void:
     tween.tween_property(self, "modulate", Color.WHITE, 0.12)
 
 
+## Applies the item entry and fit score to this card.
 func setup(entry: ItemEntry, fit_count: int) -> void:
     _entry = entry
     _fit_count = fit_count
@@ -74,41 +72,48 @@ func setup(entry: ItemEntry, fit_count: int) -> void:
         _apply_state_style()
 
 
+## Repaints the card from the current entry and state flags.
 func refresh() -> void:
     if is_node_ready():
         _apply()
         _apply_state_style()
 
 
+## Updates whether this item is already loaded in the vehicle grid.
 func set_loaded(loaded: bool) -> void:
     _loaded = loaded
     if is_node_ready():
         _apply_state_style()
 
 
+## Updates whether this item is the currently held packing item.
 func set_holding(val: bool) -> void:
     _holding = val
     if is_node_ready():
         _apply_state_style()
 
 
+## Updates the selected state from the selling list.
 func set_selected(val: bool) -> void:
     _selected = val
     if is_node_ready():
         _apply_state_style()
 
 
+## Updates an externally-driven hover/highlight state, usually from the car grid.
 func set_external_highlight(val: bool) -> void:
     _ext_highlighted = val
     if is_node_ready():
         _apply_state_style()
 
-# ══ Internal ══════════════════════════════════════════════════════════════════
+# ══ View ══════════════════════════════════════════════════════════════════════
 
 
 func _apply() -> void:
     if _entry == null:
         return
+
+    _sprite_overlay.setup(_entry, true)
 
     _name_label.text = ItemEntryDisplayHelper.short_name(_entry)
     _name_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.display_name_color(_entry))
@@ -124,11 +129,6 @@ func _apply() -> void:
     _value_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(_entry))
 
     _fit_label.text = "F:%d" % _fit_count
-
-    _condition_label.text = ItemEntryDisplayHelper.condition_text(_entry)
-    _condition_label.modulate = ItemEntryDisplayHelper.condition_display_color(_entry)
-
-    _build_shape_icon()
 
 
 func _apply_state_style() -> void:
@@ -146,40 +146,6 @@ func _apply_state_style() -> void:
     add_theme_stylebox_override(&"panel", style)
     queue_redraw()
     mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-
-
-func _build_shape_icon() -> void:
-    for child: Node in _shape_icon.get_children():
-        _shape_icon.remove_child(child)
-        child.queue_free()
-
-    var cells: Array[Vector2i] = _entry.get_cells()
-    if cells.is_empty():
-        return
-
-    var max_x := 0
-    var max_y := 0
-    for c: Vector2i in cells:
-        if c.x > max_x:
-            max_x = c.x
-        if c.y > max_y:
-            max_y = c.y
-
-    var step := SHAPE_CELL_SIZE + SHAPE_CELL_GAP
-    var total_w := (max_x + 1) * step - SHAPE_CELL_GAP + SHAPE_PADDING * 2
-    var total_h := (max_y + 1) * step - SHAPE_CELL_GAP + SHAPE_PADDING * 2
-    var area := _shape_icon.get_rect().size
-    var ox := maxf(0, (area.x - total_w) / 2.0)
-    var oy := maxf(0, (area.y - total_h) / 2.0)
-
-    for c: Vector2i in cells:
-        var rect := ColorRect.new()
-        rect.size = Vector2(SHAPE_CELL_SIZE, SHAPE_CELL_SIZE)
-        rect.position = Vector2(c.x * step + SHAPE_PADDING + ox, c.y * step + SHAPE_PADDING + oy)
-        rect.color = Color(0.65, 0.65, 0.70, 1.0)
-
-        # node-src: ephemeral — per-shape cell, rebuilt per refresh
-        _shape_icon.add_child(rect)
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
 

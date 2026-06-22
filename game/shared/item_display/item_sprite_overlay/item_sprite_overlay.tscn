@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://c8m4k2g6pruyh"]
+
+[ext_resource type="Script" uid="uid://bx2f7y0pj38wj" path="res://game/shared/item_display/item_sprite_overlay/item_sprite_overlay.gd" id="1_iso"]
+
+[node name="ItemSpriteOverlay" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_iso")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 3
+
+[node name="ConditionLabel" type="Label" parent="."]
+layout_mode = 0
+visible = false
+mouse_filter = 2
+theme_override_font_sizes/font_size = 11
+theme_override_constants/outline_size = 1
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+
+[node name="WeightLabel" type="Label" parent="."]
+layout_mode = 0
+visible = false
+mouse_filter = 2
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
+theme_override_constants/outline_size = 1
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
