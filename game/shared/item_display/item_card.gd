@@ -46,6 +46,7 @@ func get_entry() -> ItemEntry:
     return _entry
 
 
+## Returns the ClueChunk for external hover-signal wiring.
 ## Applies a new item entry to the card.
 func setup(entry: ItemEntry) -> void:
     _entry = entry

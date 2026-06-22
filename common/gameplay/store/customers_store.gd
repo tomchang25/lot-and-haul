@@ -45,7 +45,7 @@ func record_sale(
     _customer_sales_today.append(
         {
             "day": day,
-            "customer_id": customer.customer_id if customer != null else "",
+            "customer_session_id": customer.session_id if customer != null else "",
             "customer_name": customer.display_name if customer != null else "",
             "strategy": strategy,
             "item_count": sold_ids.size(),

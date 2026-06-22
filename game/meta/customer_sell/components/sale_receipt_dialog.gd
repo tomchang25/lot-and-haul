@@ -10,6 +10,7 @@ signal receipt_cancelled
 
 var _pending_price: int = 0
 var _pending_strategy: String = ""
+var _customer: CustomerEntry = null
 
 @onready var _background_overlay: ColorRect = %BackgroundOverlay
 @onready var _title_label: Label = %TitleLabel
@@ -23,6 +24,11 @@ func _ready() -> void:
     _cancel_btn.pressed.connect(_on_cancel)
     _confirm_btn.pressed.connect(_on_confirm)
     _background_overlay.gui_input.connect(_on_overlay_clicked)
+
+
+## Sets the active customer for customer-aware receipt pricing.
+func set_customer(customer: CustomerEntry) -> void:
+    _customer = customer
 
 
 func show_receipt(items: Array, price: int, strategy: String) -> void:
@@ -42,6 +48,7 @@ func show_receipt(items: Array, price: int, strategy: String) -> void:
 func hide_receipt() -> void:
     _pending_price = 0
     _pending_strategy = ""
+    _customer = null
     hide()
 
 
@@ -54,7 +61,7 @@ func _build_text(items: Array, price: int) -> String:
         if entry == null:
             ToastManager.show_dev_error("SaleReceiptDialog._build_text: item is not ItemEntry")
             continue
-        var contribution := SellMath.item_contribution(entry)
+        var contribution := SellMath.item_contribution(entry, _customer)
         var verified_label := ""
         if SellMath.is_item_verified(entry):
             verified_label = TranslationServer.translate("UI_VERIFIED_TAG")

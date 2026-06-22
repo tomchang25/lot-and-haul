@@ -1,0 +1,218 @@
+# customer_data.yaml
+# Designer-authored customer personas for nightly shop generation.
+# Each entry defines a buyer archetype with demand preferences, grid sizes,
+# timeslot availability, and optional special valuation flags.
+customers:
+  - customer_id: repair_hobbyist
+    display_name_key: CUSTOMER_REPAIR_HOBBYIST
+    appears_in_timeslot: any
+    demand_pool:
+      - watch_crystal_scratched
+      - watch_band_replaced
+      - watch_dial_refinish
+      - bag_stitching_frayed
+      - bag_hardware_tarnished
+      - bag_exterior_faded
+      - lamp_glass_cracked
+      - lamp_glass_mold_seam
+      - clock_case_chipped
+      - clock_finish_shellac
+      - figurine_restoration_chip
+      - vase_rim_chipped
+      - vase_base_ground
+      - poster_backing_linen
+    grid_shape_pool:
+      - [2, 4]
+      - [3, 3]
+      - [4, 3]
+      - [4, 4]
+      - [5, 3]
+      - [5, 4]
+      - [5, 5]
+      - [6, 4]
+      - [6, 5]
+      - [6, 6]
+    valued_negative_tags:
+      - watch_crystal_scratched
+      - watch_band_replaced
+      - bag_stitching_frayed
+      - bag_hardware_tarnished
+      - bag_exterior_faded
+      - lamp_glass_cracked
+      - clock_case_chipped
+      - figurine_restoration_chip
+      - vase_rim_chipped
+
+  - customer_id: vintage_dealer
+    display_name_key: CUSTOMER_VINTAGE_DEALER
+    appears_in_timeslot: any
+    demand_pool:
+      - watch_dial_patina
+      - watch_case_engraved
+      - lamp_glass_blown
+      - lamp_cast_scrollwork
+      - clock_case_gilded
+      - clock_joinery_dovetail
+      - clock_movement_signed
+      - figurine_glaze_celadon
+      - figurine_painting_detail
+      - vase_glass_cased
+      - vase_body_cameo
+      - poster_paper_linen
+      - poster_print_lithograph
+      - bag_exterior_leather
+      - bag_stitching_handmade
+      - bag_serial_present
+    grid_shape_pool:
+      - [2, 4]
+      - [3, 3]
+      - [4, 3]
+      - [4, 4]
+      - [5, 3]
+      - [5, 4]
+      - [5, 5]
+      - [6, 4]
+      - [6, 5]
+      - [6, 6]
+    valued_negative_tags:
+      - poster_color_faded
+      - poster_fold_lines
+
+  - customer_id: budget_buyer
+    display_name_key: CUSTOMER_BUDGET_BUYER
+    appears_in_timeslot: day
+    demand_pool:
+      - watch_movement_quartz
+      - bag_exterior_synthetic
+      - lamp_collar_pewter
+      - lamp_glass_mold_seam
+      - figurine_glaze_crazed
+      - figurine_base_unmarked
+      - vase_glass_bubble
+      - vase_rim_chipped
+      - poster_paper_pulp
+      - poster_color_faded
+      - poster_print_offset
+      - bag_stitching_frayed
+    grid_shape_pool:
+      - [2, 4]
+      - [3, 3]
+      - [4, 3]
+      - [4, 4]
+      - [5, 3]
+      - [5, 4]
+    valued_negative_tags:
+      - watch_movement_quartz
+      - poster_paper_pulp
+      - poster_print_offset
+
+  - customer_id: prop_buyer
+    display_name_key: CUSTOMER_PROP_BUYER
+    appears_in_timeslot: day
+    demand_pool:
+      - lamp_glass_blown
+      - lamp_glass_mold_seam
+      - lamp_cast_scrollwork
+      - lamp_collar_pewter
+      - clock_case_veneered
+      - clock_finish_shellac
+      - figurine_form_shepherdess
+      - figurine_glaze_crazed
+      - vase_form_bud
+      - vase_glass_bubble
+      - poster_color_vibrant
+      - poster_print_lithograph
+      - bag_exterior_faded
+      - bag_hardware_tarnished
+      - bag_interior_dated
+    grid_shape_pool:
+      - [2, 4]
+      - [3, 3]
+      - [4, 3]
+      - [4, 4]
+      - [5, 3]
+      - [5, 4]
+      - [5, 5]
+      - [6, 4]
+    valued_negative_tags:
+      - lamp_glass_mold_seam
+      - figurine_glaze_crazed
+      - bag_exterior_faded
+      - bag_hardware_tarnished
+
+  - customer_id: estate_collector
+    display_name_key: CUSTOMER_ESTATE_COLLECTOR
+    appears_in_timeslot: night
+    demand_pool:
+      - bag_hardware_palladium
+      - bag_monogram_canvas
+      - bag_leaf_hermes
+      - watch_movement_chronograph
+      - watch_case_engraved
+      - lamp_collar_silver
+      - lamp_maker_stamped
+      - clock_case_gilded
+      - clock_movement_signed
+      - figurine_gilding_intact
+      - figurine_leaf_meissen
+      - vase_body_cameo
+      - vase_maker_etched
+      - poster_leaf_mucha
+    grid_shape_pool:
+      - [4, 4]
+      - [5, 4]
+      - [5, 5]
+      - [6, 4]
+      - [6, 5]
+      - [6, 6]
+    valued_negative_tags: []
+
+  - customer_id: watch_specialist
+    display_name_key: CUSTOMER_WATCH_SPECIALIST
+    appears_in_timeslot: night
+    demand_pool:
+      - watch_crystal_scratched
+      - watch_crown_wind
+      - watch_movement_chronograph
+      - watch_movement_jewelled
+      - watch_serial_numbered
+      - watch_case_engraved
+      - watch_dial_patina
+      - watch_dial_refinish
+      - watch_band_replaced
+      - watch_leaf_roleex
+    grid_shape_pool:
+      - [2, 4]
+      - [3, 3]
+      - [4, 3]
+      - [4, 4]
+      - [5, 3]
+    valued_negative_tags:
+      - watch_crystal_scratched
+      - watch_dial_refinish
+      - watch_band_replaced
+
+  - customer_id: decorator
+    display_name_key: CUSTOMER_DECORATOR
+    appears_in_timeslot: day
+    demand_pool:
+      - lamp_glass_blown
+      - lamp_cast_scrollwork
+      - lamp_collar_silver
+      - clock_case_veneered
+      - clock_finish_shellac
+      - figurine_glaze_celadon
+      - figurine_form_shepherdess
+      - figurine_gilding_intact
+      - vase_glass_cased
+      - vase_rim_polished
+      - vase_body_cameo
+      - vase_form_bud
+    grid_shape_pool:
+      - [2, 4]
+      - [3, 3]
+      - [4, 3]
+      - [4, 4]
+      - [5, 3]
+      - [5, 4]
+    valued_negative_tags: []

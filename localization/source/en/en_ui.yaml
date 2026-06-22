@@ -46,6 +46,13 @@ en:
   UI_CURRENCY_LABEL: $%d
   UI_CUSTOMERS_LABEL: "Customers:"
   UI_CUSTOMER_NAME: Customer Name
+  CUSTOMER_REPAIR_HOBBYIST: Repair Hobbyist
+  CUSTOMER_VINTAGE_DEALER: Vintage Dealer
+  CUSTOMER_BUDGET_BUYER: Budget Buyer
+  CUSTOMER_PROP_BUYER: Prop Buyer
+  CUSTOMER_ESTATE_COLLECTOR: Estate Collector
+  CUSTOMER_WATCH_SPECIALIST: Watch Specialist
+  CUSTOMER_DECORATOR: Decorator
   UI_CUSTOMER_SALES: Customer Sales
   UI_CUSTOMER_SELL_TITLE: Sell to Customer
   UI_DAILY: Daily
@@ -177,7 +184,7 @@ en:
   UI_VERIFIED_LABEL: "Verified: %d / %d"
   UI_VIEW_CARDS: Cards
   UI_VIEW_TABLE: Table
-  UI_WANTS_LABEL: "Wants: %s"
+  UI_WANTS_LABEL: "Wants: "
   UI_WEIGHT_UNKNOWN: "W: ???"
   UI_ZERO_ITEMS: "%d items"
 
@@ -237,6 +244,11 @@ en:
   UI_CLUE_IDENTITY: "IDENTITY"
   UI_CLUE_SURFACE: "SURFACE"
   UI_CLUE_HIDDEN: "HIDDEN"
+
+  # ── New keys for clue tooltip ──
+  UI_CLUE_ATTR_DC_FORMAT: "%s DC %d"
+  UI_CLUE_OVERRIDE_FORMAT: "Override base: $%d"
+  UI_CLUE_VALUED_FORMAT: "★ Valued flaw: +$%d"
 
   # ── New keys for day summary ──
   UI_DAY_TO_DAY: "Day %d \u2192 Day %d"

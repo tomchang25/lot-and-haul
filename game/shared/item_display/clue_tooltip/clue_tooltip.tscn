@@ -1,0 +1,88 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/shared/item_display/clue_tooltip/clue_tooltip.gd" id="1_ct"]
+
+[sub_resource type="StyleBoxFlat" id="sb_tooltip"]
+bg_color = Color(0.1, 0.1, 0.12, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+corner_detail = 5
+content_margin_left = 0
+content_margin_top = 0
+content_margin_right = 0
+content_margin_bottom = 0
+
+[sub_resource type="StyleBoxFlat" id="sb_valued"]
+bg_color = Color(0.15, 0.12, 0.05, 1)
+border_color = Color(0.92, 0.72, 0.18, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+content_margin_left = 6
+content_margin_top = 3
+content_margin_right = 6
+content_margin_bottom = 3
+
+[node name="ClueTooltip" type="PanelContainer"]
+visible = false
+mouse_filter = 2
+custom_minimum_size = Vector2(180, 0)
+script = ExtResource("1_ct")
+theme_override_styles/panel = SubResource("sb_tooltip")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="NameLabel" type="Label" parent="Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+
+[node name="TypeRow" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TypeLabel" type="Label" parent="Margin/VBox/TypeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+
+[node name="AttrLabel" type="Label" parent="Margin/VBox/TypeRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="EffectSep" type="HSeparator" parent="Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EffectLabel" type="RichTextLabel" parent="Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+bbcode_enabled = true
+fit_content = true
+mouse_filter = 2
+
+[node name="ValuedLabel" type="Label" parent="Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.92, 0.72, 0.18, 1)
+theme_override_styles/normal = SubResource("sb_valued")

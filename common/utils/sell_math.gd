@@ -112,32 +112,52 @@ static func dice_multiplier(rolled_sum: int) -> float:
 ## [param items] — ItemEntry instances placed in the car.
 ## [param multiplier] — price multiplier (CONSERVATIVE_MULTIPLIER for
 ##   conservative sell, or the result of [method dice_multiplier] for aggressive).
-static func car_total(items: Array, multiplier: float) -> int:
+## [param customer] — optional customer for valued-negative pricing. When null
+##   or the customer has no valued-negative tags, the global item_price is used.
+static func car_total(items: Array, multiplier: float, customer: CustomerEntry = null) -> int:
     var total := 0.0
     for entry in items:
-        total += _item_base_contribution(entry)
+        total += _item_base_contribution(entry, customer)
     return maxi(Economy.MIN_ITEM_VALUE, int(total * multiplier))
 
 
-## A single item's contribution to the sale, including the verified ×1.2 bonus.
-static func item_contribution(entry) -> int:
-    return maxi(Economy.MIN_ITEM_VALUE, int(_item_base_contribution(entry)))
+## A single item's contribution to the sale, including the verified ×1.05 bonus.
+## When [param customer] has valued-negative tags, the customer-aware price path
+## is used (valued surface-negative multipliers are replaced with a fixed bonus).
+static func item_contribution(entry, customer: CustomerEntry = null) -> int:
+    return maxi(Economy.MIN_ITEM_VALUE, int(_item_base_contribution(entry, customer)))
 
 
 ## Conservative sell: flat multiplier on car total.
-static func conservative_total(items: Array) -> int:
-    return car_total(items, CONSERVATIVE_MULTIPLIER)
+static func conservative_total(items: Array, customer: CustomerEntry = null) -> int:
+    return car_total(items, CONSERVATIVE_MULTIPLIER, customer)
 
 
 ## Aggressive sell: dice-multiplied car total.
-static func aggressive_total(items: Array, rolled_sum: int) -> int:
-    return car_total(items, dice_multiplier(rolled_sum))
+static func aggressive_total(items: Array, rolled_sum: int, customer: CustomerEntry = null) -> int:
+    return car_total(items, dice_multiplier(rolled_sum), customer)
 
 # ══ Internal ═══════════════════════════════════════════════════════════════════
 
 
-static func _item_base_contribution(entry) -> float:
-    var price: float = float(entry.item_price) if "item_price" in entry else 0.0
+## Per-item base contribution. When [param customer] has valued-negative tags,
+## recomputes the price via [method ItemEntry.appraised_for_customer] with
+## condition multiplier applied. Otherwise uses the global [member ItemEntry.item_price].
+static func _item_base_contribution(entry, customer: CustomerEntry = null) -> float:
+    var price: float
+    if customer != null \
+    and not customer.valued_negative_tags.is_empty() \
+    and entry.has_method("appraised_for_customer") \
+    and entry.has_method("get_condition_multiplier"):
+        price = float(
+            entry.appraised_for_customer(
+                customer.valued_negative_tags,
+                Economy.VALUED_NEGATIVE_SURFACE_BONUS,
+            ),
+        )
+        price *= entry.get_condition_multiplier()
+    else:
+        price = float(entry.item_price) if "item_price" in entry else 0.0
     if is_item_verified(entry):
         price *= VERIFIED_PRICE_BONUS
     return price

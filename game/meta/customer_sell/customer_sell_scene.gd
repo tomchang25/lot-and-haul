@@ -84,7 +84,7 @@ func _ready() -> void:
     _select_customer(0)
     _suppress_placement_update = false
 
-    var saved_id: String = MetaManager.shop_session.active_customer_id
+    var saved_id: String = MetaManager.shop_session.active_customer_session_id
     if saved_id != "":
         var idx := _find_customer_index(saved_id)
         if idx >= 0 and idx != 0:
@@ -323,6 +323,8 @@ func _select_customer(index: int) -> void:
     _preview_entry = null
     _hovered_entry = null
     _deal_panel.reset()
+    _deal_panel.set_customer(customer)
+    _receipt.set_customer(customer)
     _selected_item_panel.clear_display()
 
     var grid := _car_panel.get_grid()
@@ -359,7 +361,7 @@ func _get_selected_customer() -> CustomerEntry:
 ## Returns the index of the customer with [param customer_id], or -1.
 func _find_customer_index(customer_id: String) -> int:
     for i: int in _customers.size():
-        if _customers[i] != null and _customers[i].customer_id == customer_id:
+        if _customers[i] != null and _customers[i].session_id == customer_id:
             return i
     return -1
 

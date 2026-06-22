@@ -73,6 +73,11 @@ static func rarity_for_clue_count(count: int) -> Economy.Rarity:
 ## All price outputs floor at this value.
 const MIN_ITEM_VALUE: int = 10
 
+## Fixed bonus applied per valued surface-negative clue when sold to a
+## customer who values that specific flaw. The clue's multiplier penalty
+## is skipped and this flat amount is added to the item price instead.
+const VALUED_NEGATIVE_SURFACE_BONUS: int = 50
+
 const STARTING_CASH: int = 1000
 const DAILY_BASE_COST: int = 100
 const ONSITE_SELL_PRICE: int = 50

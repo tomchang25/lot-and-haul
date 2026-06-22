@@ -7,7 +7,7 @@ extends GutTest
 
 func test_defaults_are_empty() -> void:
     var store := ShopSessionStore.new()
-    assert_eq(store.active_customer_id, "", "active_customer_id should default to empty")
+    assert_eq(store.active_customer_session_id, "", "active_customer_session_id should default to empty")
     assert_eq(store.placement.size(), 0, "placement should default to empty")
     assert_eq(store.pending_scene, "", "pending_scene should default to empty")
     assert_false(store.has_session(), "has_session should be false by default")
@@ -31,7 +31,7 @@ func test_set_active_customer_and_placement() -> void:
     )
     store.set_pending_scene(ShopSessionStore.SCENE_CUSTOMER_SELL)
 
-    assert_eq(store.active_customer_id, "c1", "active_customer_id should be set")
+    assert_eq(store.active_customer_session_id, "c1", "active_customer_session_id should be set")
     assert_eq(store.placement.size(), 1, "placement should hold one entry")
     assert_eq(store.pending_scene, "customer_sell", "pending_scene should be customer_sell")
     assert_true(store.has_session(), "has_session should be true when pending_scene is set")
@@ -53,7 +53,7 @@ func test_clear_resets_all_fields() -> void:
     store.set_placement([{ "item_id": 1, "cell": { "x": 0, "y": 0 }, "rotation": 0 }])
     store.set_pending_scene("customer_sell")
     store.clear()
-    assert_eq(store.active_customer_id, "", "clear should empty active_customer_id")
+    assert_eq(store.active_customer_session_id, "", "clear should empty active_customer_session_id")
     assert_eq(store.placement.size(), 0, "clear should empty placement")
     assert_eq(store.pending_scene, "", "clear should empty pending_scene")
 
@@ -71,13 +71,13 @@ func test_to_dict_round_trip() -> void:
     store.set_pending_scene(ShopSessionStore.SCENE_CUSTOMER_SELL)
 
     var payload := store.to_dict()
-    assert_eq(payload.get("active_customer_id", ""), "c42", "to_dict should serialize active_customer_id")
+    assert_eq(payload.get("active_customer_session_id", ""), "c42", "to_dict should serialize active_customer_session_id")
     assert_eq(payload.get("pending_scene", ""), "customer_sell", "to_dict should serialize pending_scene")
     assert_eq(payload.get("placement", []).size(), 2, "to_dict should serialize two placement entries")
 
     var restored := ShopSessionStore.new()
     restored.from_dict(payload, ctx)
-    assert_eq(restored.active_customer_id, "c42", "from_dict should restore active_customer_id")
+    assert_eq(restored.active_customer_session_id, "c42", "from_dict should restore active_customer_session_id")
     assert_eq(restored.pending_scene, "customer_sell", "from_dict should restore pending_scene")
     assert_eq(restored.placement.size(), 2, "from_dict should restore both placement entries")
     var first := restored.placement[0] as Dictionary
@@ -93,7 +93,7 @@ func test_from_dict_defaults_when_section_missing() -> void:
     var ctx := SaveLoadContext.new()
     var store := ShopSessionStore.new()
     store.from_dict({ }, ctx)
-    assert_eq(store.active_customer_id, "", "missing data should default active_customer_id to empty")
+    assert_eq(store.active_customer_session_id, "", "missing data should default active_customer_session_id to empty")
     assert_eq(store.placement.size(), 0, "missing data should default placement to empty")
     assert_eq(store.pending_scene, "", "missing data should default pending_scene to empty")
     assert_eq(ctx.warnings.size(), 0, "missing section should not emit warnings")

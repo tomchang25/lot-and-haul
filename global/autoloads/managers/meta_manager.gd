@@ -227,7 +227,8 @@ func begin_open_shop() -> void:
         count = RandomUtils.randi_range(Economy.DAY_SELLING_CUSTOMER_MIN, Economy.DAY_SELLING_CUSTOMER_MAX)
     else:
         count = RandomUtils.randi_range(Economy.NIGHT_SELLING_CUSTOMER_MIN, Economy.NIGHT_SELLING_CUSTOMER_MAX)
-    var new_customers: Array[CustomerEntry] = CustomerGenerator.generate_for_night(storage.storage_items, count)
+    var timeslot := "day" if is_day else "night"
+    var new_customers: Array[CustomerEntry] = CustomerGenerator.generate_for_slot(storage.storage_items, count, null, timeslot)
     customers.set_customers(new_customers)
     _advance_slot()
     if not new_customers.is_empty():
@@ -241,7 +242,7 @@ func begin_open_shop() -> void:
 ## clears the placement, and sets the boot-routing pointer to "customer_sell".
 ## Does not save — caller commits.
 func open_shop_session(customer: CustomerEntry) -> void:
-    shop_session.set_active_customer(customer.customer_id)
+    shop_session.set_active_customer(customer.session_id)
     shop_session.set_placement([])
     shop_session.set_pending_scene(ShopSessionStore.SCENE_CUSTOMER_SELL)
 
@@ -250,7 +251,7 @@ func open_shop_session(customer: CustomerEntry) -> void:
 ## save throttle. Called on every customer switch and every grid change.
 func update_shop_session(customer: CustomerEntry, placement: Array) -> void:
     shop_session.set_active_customer(
-        customer.customer_id if customer != null else "",
+        customer.session_id if customer != null else "",
     )
     shop_session.set_placement(placement)
     SaveManager.mark_dirty()

@@ -16,6 +16,7 @@ signal car_clear_requested
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
+const ClueTagScene: PackedScene = preload("res://game/shared/item_display/clue_tag/clue_tag.tscn")
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
@@ -25,7 +26,7 @@ var _customer: CustomerEntry = null
 
 @onready var _customer_name_label: Label = %CustomerNameLabel
 @onready var _capacity_label: Label = %CapacityLabel
-@onready var _demand_tags_label: Label = %DemandTagsLabel
+@onready var _tags_flow: Container = %TagsFlow
 @onready var _car_total_label: Label = %CarTotalLabel
 @onready var _verified_count_label: Label = %VerifiedCountLabel
 @onready var _grid: PackingGrid = %PackingGrid
@@ -77,11 +78,23 @@ func set_car_info(placed_items: Array) -> void:
         var entry := item as ItemEntry
         if entry == null:
             continue
-        total += entry.item_price
+        total += SellMath.item_contribution(entry, _customer)
         if SellMath.is_item_verified(entry):
             verified_count += 1
     _animate_car_total(total)
     _verified_count_label.text = TranslationServer.translate("UI_VERIFIED_LABEL") % [verified_count, placed_items.size()]
+
+# ══ Internal ══════════════════════════════════════════════════════════════════
+
+
+func _apply() -> void:
+    if _customer == null:
+        return
+    _customer_name_label.text = _customer.display_name
+    _capacity_label.text = TranslationServer.translate("UI_CAPACITY_LABEL") % [_customer.grid_columns, _customer.grid_rows]
+    _car_total_label.text = TranslationServer.translate("UI_CAR_TOTAL_LABEL") % 0
+    _verified_count_label.text = TranslationServer.translate("UI_VERIFIED_LABEL") % [0, 0]
+    _rebuild_tags()
 
 
 func _animate_car_total(target: int) -> void:
@@ -101,28 +114,26 @@ func _animate_car_total(target: int) -> void:
         0.3,
     )
 
-# ══ Internal ══════════════════════════════════════════════════════════════════
 
-
-func _apply() -> void:
+func _rebuild_tags() -> void:
+    _clear_tag_nodes()
     if _customer == null:
         return
-    _customer_name_label.text = _customer.display_name
-    _capacity_label.text = TranslationServer.translate("UI_CAPACITY_LABEL") % [_customer.grid_columns, _customer.grid_rows]
-    _demand_tags_label.text = TranslationServer.translate("UI_WANTS_LABEL") % _format_demand_tags()
-    _car_total_label.text = TranslationServer.translate("UI_CAR_TOTAL_LABEL") % 0
-    _verified_count_label.text = TranslationServer.translate("UI_VERIFIED_LABEL") % [0, 0]
 
-
-func _format_demand_tags() -> String:
-    var tag_names: Array[String] = []
     for tag: String in _customer.demand_tags:
         var clue := ClueRegistry.get_clue_by_id(tag)
-        if clue != null and clue.known_text_key != "":
-            tag_names.append(TranslationServer.translate(clue.known_text_key))
-        else:
-            tag_names.append(tag)
-    return ", ".join(tag_names)
+        if clue == null:
+            continue
+        var valued: bool = tag in _customer.valued_negative_tags
+        var tag_node: ClueTag = ClueTagScene.instantiate()
+        tag_node.setup(clue, true, valued)
+        _tags_flow.add_child(tag_node)
+
+
+func _clear_tag_nodes() -> void:
+    for child in _tags_flow.get_children():
+        _tags_flow.remove_child(child)
+        child.queue_free()
 
 
 func _show_placeholder_grid() -> void:
