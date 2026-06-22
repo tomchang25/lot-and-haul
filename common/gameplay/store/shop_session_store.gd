@@ -1,8 +1,8 @@
 # shop_session_store.gd
 # Shop-session runtime store: in-flight state of the customer_sell scene -
-# the active customer id, the items placed in that customer's car grid, and
-# the boot-routing pointer that tells the start page to resume the shop
-# scene on Load Game. Serializable state slice held by MetaManager.
+# the active customer session id, the items placed in that customer's car
+# grid, and the boot-routing pointer that tells the start page to resume the
+# shop scene on Load Game. Serializable state slice held by MetaManager.
 #
 # Owns the fields and their save payload. Fields are read-public via
 # getters. Mutation goes through the owning Manager only.
@@ -11,7 +11,7 @@ extends SessionStore
 
 const SCENE_CUSTOMER_SELL: String = "customer_sell"
 
-var _active_customer_id: String = ""
+var _active_customer_session_id: String = ""
 
 ## Per-item entries: {"item_id": int, "cell": {"x": int, "y": int}, "rotation": int}.
 ## Empty when no shop is in flight or the active customer has no placements.
@@ -21,11 +21,11 @@ var _placement: Array = []
 ## router to decide whether to land in the shop scene after Load Game.
 var _pending_scene: String = ""
 
-## Customer id of the active customer, or "" when no shop is in flight.
+## Customer session id of the active customer, or "" when no shop is in flight.
 ## Read-only externally.
-var active_customer_id: String:
+var active_customer_session_id: String:
     get:
-        return _active_customer_id
+        return _active_customer_session_id
 
 ## Shallow duplicate of the placement list. Read-only externally.
 var placement: Array:
@@ -84,7 +84,7 @@ func section_id() -> String:
 func to_dict() -> Dictionary:
     return {
         "_version": _store_version(),
-        "active_customer_id": _active_customer_id,
+        "active_customer_session_id": _active_customer_session_id,
         "placement": _placement.duplicate(true),
         "pending_scene": _pending_scene,
     }
@@ -95,7 +95,7 @@ func to_dict() -> Dictionary:
 func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
     var version: int = int(data.get("_version", 1))
     data = _apply_migrations(data, version, _ctx)
-    _active_customer_id = str(data.get("active_customer_id", ""))
+    _active_customer_session_id = str(data.get("active_customer_session_id", ""))
     _pending_scene = str(data.get("pending_scene", ""))
     _placement = []
     if data.has("placement") and data["placement"] is Array:
@@ -106,9 +106,9 @@ func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
 # ══ Mutators - called only from MetaManager wrappers ══════════════════════════
 
 
-## Sets the active customer id. Pass "" to clear. Does not save.
-func set_active_customer(customer_id: String) -> void:
-    _active_customer_id = customer_id
+## Sets the active customer session id. Pass "" to clear. Does not save.
+func set_active_customer(customer_session_id: String) -> void:
+    _active_customer_session_id = customer_session_id
 
 
 ## Replaces the placement list with a deep-duplicate of [param value].
@@ -125,7 +125,7 @@ func set_pending_scene(value: String) -> void:
 
 ## Resets all fields to defaults. Does not save.
 func clear() -> void:
-    _active_customer_id = ""
+    _active_customer_session_id = ""
     _placement = []
     _pending_scene = ""
 

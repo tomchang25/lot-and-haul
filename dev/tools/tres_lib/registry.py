@@ -11,6 +11,7 @@ from tres_lib.entities.lot import SPEC as lot_spec
 from tres_lib.entities.affix import SPEC as affix_spec
 from tres_lib.entities.affix import SPEC_COMBINATION as affix_combination_spec
 from tres_lib.entities.location import SPEC as location_spec
+from tres_lib.entities.customer import SPEC as customer_spec
 
 REGISTRY = [
     perk_spec,
@@ -24,4 +25,5 @@ REGISTRY = [
     car_spec,
     lot_spec,
     location_spec,
+    customer_spec,
 ]

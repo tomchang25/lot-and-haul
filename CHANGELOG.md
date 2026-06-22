@@ -14,6 +14,10 @@ Rules:
 
 ## v0.1.7 - Draft
 
+### CustomerData Template Generation
+
+- 2026-06-22 — [customer_sell] Nightly customer generation now uses authored CustomerData personas with template demand pools, storage-fit tag blending, hidden-tag caps, and authored car grid pools
+
 ### Category Icons
 
 - 2026-06-21 — [category] CategoryData gains icon texture support sourced from YAML and the TRES pipeline
