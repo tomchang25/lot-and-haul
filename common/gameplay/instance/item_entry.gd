@@ -5,7 +5,6 @@ extends RefCounted
 
 # ══ Inner classes ═════════════════════════════════════════════════════════════
 
-
 # A resolved value snapshot. All numbers already include condition multiplier.
 class PriceView extends RefCounted:
     var known: bool = false # false when veiled
@@ -332,14 +331,9 @@ func resolve_price() -> PriceView:
 
 
 func get_condition_multiplier() -> float:
-    if condition <= 0.25:
-        return remap(condition, 0.0, 0.25, 0.25, 0.5)
-    elif condition <= 0.5:
-        return remap(condition, 0.25, 0.5, 0.5, 1.0)
-    elif condition <= 0.75:
-        return remap(condition, 0.5, 0.75, 1.0, 2.0)
-    else:
-        return remap(condition, 0.75, 1.0, 2.0, 4.0)
+    if condition <= 0.5:
+        return remap(condition, 0.0, 0.5, 0.75, 1.0)
+    return remap(condition, 0.5, 1.0, 1.0, 1.5)
 
 
 func get_known_condition_multiplier() -> float:
@@ -492,7 +486,6 @@ func unveil() -> bool:
 ## Replaces direct condition field writes from scenes.
 func apply_damage(ratio: float) -> void:
     condition = maxf(0.0, condition - ratio)
-
 
 # ══ Price helpers ═════════════════════════════════════════════════════════════
 

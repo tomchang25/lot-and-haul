@@ -32,7 +32,7 @@ verified_value  = (effective_base   + Σ all_add) × Π all_mul
 - **effective_base** = the revealed hidden **override** amount if one has been revealed, otherwise `anchor.base_value`. An override _replaces_ the base; all other adds and muls still apply on top of it. At most one override per item (first wins).
 - The player sees `appraised_value` during the run and in storage until Research completes; `verified_value` replaces it once all hidden clues are revealed.
 - **Verified sell bonus** is ×1.05, applied at sale, not baked into clue amounts.
-- **Condition multiplier** (0.25× broken → 1.0× at half condition → 4.0× mint) is applied on top of the resolved value at price time. Author clue amounts at the **condition-neutral** value; never pre-bake condition.
+- **Condition multiplier** (0.75× broken → 1.0× at half condition → 1.5× pristine) is applied on top of the resolved value at price time. Author clue amounts at the **condition-neutral** value; never pre-bake condition.
 - A **COMMON** item (rarity 0, no hidden clues) is verified immediately on acquisition.
 
 ---

@@ -166,7 +166,7 @@ The run concludes with trailer damage assessment (items may be damaged during tr
 The hub's storage area is where items are managed:
 
 - **Repair** (2 AP) — Fixes damage from trailer transit or other sources
-- **Restore** (2 AP) — Improves condition, which directly multiplies sell price (×0.25–×4.0)
+- **Restore** (2 AP) — Improves condition, which directly multiplies sell price
 - **Research/Authenticate** (4 AP) — Progress toward revealing hidden clues. Deterministic model: fixed (5 + Investigation) progress per AP spend, clue revealed when accumulated progress ≥ DC
 
 Items are listed in a sortable table with columns for status, condition, appraised value, and research progress.
@@ -218,7 +218,7 @@ Where:
 
 - **appraised_value** = anchor.base_value + sum of all revealed surface clue effects
 - **verified_value** = anchor.base_value + sum of all revealed surface + hidden clue effects
-- **condition_multiplier** = a rating from ×0.25 (poor) to ×4.0 (mint), affected by repair/restore actions
+- **condition_multiplier** = a rating from ×0.75 (broken) to ×1.5 (pristine), affected by repair/restore actions
 
 Effects are applied as `add` (flat bonus/penalty) or `mul` (percentage multiplier). Hidden clues also support `override` which replaces the base value entirely.
 

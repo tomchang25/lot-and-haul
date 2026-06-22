@@ -9,7 +9,7 @@
 # common/gameplay/instance/item_entry.gd full_true_value():
 #   base = override.effect_amount if any hidden override else anchor.base_value  (first override wins)
 #   value = (base + Sum_all_add) * Prod_all_mul     # add/mul over BOTH surface and hidden clues
-# Condition multiplier (0.25x..4.0x) is applied at price time and is NOT included here;
+# Condition multiplier (0.75x..1.5x) is applied at price time and is NOT included here;
 # the condition: block records the expected as-acquired multiplier band per category.
 #
 # Comparison semantics (implemented by yaml_stats.py against the real schema — see regen plan):
@@ -23,134 +23,133 @@
 
 reference_tables:
   - category_id: handbag
-    super_category: fashion            # Handbag
+    super_category: fashion # Handbag
     median: { min: 350, max: 1100 }
-    mean:   { min: 550, max: 1900 }
+    mean: { min: 550, max: 1900 }
     stddev: { min: 550, max: 2400 }
-    min:    { min: 10, max: 350 }
-    max:    { min: 900, max: 21000 }
-    condition:                        # expected as-acquired condition multiplier (documentation-only)
+    min: { min: 10, max: 350 }
+    max: { min: 900, max: 21000 }
+    condition: # expected as-acquired condition multiplier (documentation-only)
       expected_multiplier: { min: 0.63, max: 1.74 }
       mean_multiplier: 1.17
 
   - category_id: wristwatch
-    super_category: fashion            # Wristwatch
+    super_category: fashion # Wristwatch
     median: { min: 350, max: 1100 }
-    mean:   { min: 550, max: 1900 }
+    mean: { min: 550, max: 1900 }
     stddev: { min: 525, max: 2400 }
-    min:    { min: 10, max: 350 }
-    max:    { min: 900, max: 21000 }
-    condition:                        # expected as-acquired condition multiplier (documentation-only)
+    min: { min: 10, max: 350 }
+    max: { min: 900, max: 21000 }
+    condition: # expected as-acquired condition multiplier (documentation-only)
       expected_multiplier: { min: 0.64, max: 1.76 }
       mean_multiplier: 1.19
 
   - category_id: oil_lamp
-    super_category: decorative            # Oil Lamp
+    super_category: decorative # Oil Lamp
     median: { min: 175, max: 625 }
-    mean:   { min: 300, max: 1100 }
+    mean: { min: 300, max: 1100 }
     stddev: { min: 250, max: 1200 }
-    min:    { min: 10, max: 175 }
-    max:    { min: 525, max: 6000 }
-    condition:                        # expected as-acquired condition multiplier (documentation-only)
+    min: { min: 10, max: 175 }
+    max: { min: 525, max: 6000 }
+    condition: # expected as-acquired condition multiplier (documentation-only)
       expected_multiplier: { min: 0.67, max: 1.84 }
       mean_multiplier: 1.24
 
   - category_id: clock
-    super_category: decorative            # Clock
+    super_category: decorative # Clock
     median: { min: 150, max: 625 }
-    mean:   { min: 300, max: 1100 }
+    mean: { min: 300, max: 1100 }
     stddev: { min: 250, max: 1200 }
-    min:    { min: 10, max: 150 }
-    max:    { min: 550, max: 5800 }
-    condition:                        # expected as-acquired condition multiplier (documentation-only)
+    min: { min: 10, max: 150 }
+    max: { min: 550, max: 5800 }
+    condition: # expected as-acquired condition multiplier (documentation-only)
       expected_multiplier: { min: 0.66, max: 1.84 }
       mean_multiplier: 1.24
 
   - category_id: porcelain_figurine
-    super_category: decorative            # Porcelain Figurine
+    super_category: decorative # Porcelain Figurine
     median: { min: 175, max: 625 }
-    mean:   { min: 300, max: 1100 }
+    mean: { min: 300, max: 1100 }
     stddev: { min: 250, max: 1200 }
-    min:    { min: 10, max: 175 }
-    max:    { min: 550, max: 5900 }
-    condition:                        # expected as-acquired condition multiplier (documentation-only)
+    min: { min: 10, max: 175 }
+    max: { min: 550, max: 5900 }
+    condition: # expected as-acquired condition multiplier (documentation-only)
       expected_multiplier: { min: 0.67, max: 1.83 }
       mean_multiplier: 1.25
 
   - category_id: vase
-    super_category: decorative            # Vase
+    super_category: decorative # Vase
     median: { min: 150, max: 625 }
-    mean:   { min: 300, max: 1100 }
+    mean: { min: 300, max: 1100 }
     stddev: { min: 250, max: 1200 }
-    min:    { min: 10, max: 150 }
-    max:    { min: 525, max: 5900 }
-    condition:                        # expected as-acquired condition multiplier (documentation-only)
+    min: { min: 10, max: 150 }
+    max: { min: 525, max: 5900 }
+    condition: # expected as-acquired condition multiplier (documentation-only)
       expected_multiplier: { min: 0.67, max: 1.83 }
       mean_multiplier: 1.25
 
   - category_id: poster
-    super_category: decorative            # Poster
+    super_category: decorative # Poster
     median: { min: 150, max: 625 }
-    mean:   { min: 300, max: 1100 }
+    mean: { min: 300, max: 1100 }
     stddev: { min: 275, max: 1200 }
-    min:    { min: 10, max: 150 }
-    max:    { min: 550, max: 5900 }
-    condition:                        # expected as-acquired condition multiplier (documentation-only)
+    min: { min: 10, max: 150 }
+    max: { min: 550, max: 5900 }
+    condition: # expected as-acquired condition multiplier (documentation-only)
       expected_multiplier: { min: 0.67, max: 1.80 }
       mean_multiplier: 1.23
 
   - category_id: painting
-    super_category: fine_art            # Painting
+    super_category: fine_art # Painting
     median: { min: 3500, max: 7400 }
-    mean:   { min: 4400, max: 12000 }
+    mean: { min: 4400, max: 12000 }
     stddev: { min: 2800, max: 12500 }
-    min:    { min: 60, max: 3500 }
-    max:    { min: 6500, max: 88000 }
-    condition:                        # expected as-acquired condition multiplier (documentation-only)
+    min: { min: 60, max: 3500 }
+    max: { min: 6500, max: 88000 }
+    condition: # expected as-acquired condition multiplier (documentation-only)
       expected_multiplier: { min: 0.73, max: 1.96 }
       mean_multiplier: 1.36
 
   - category_id: sculpture
-    super_category: fine_art            # Sculpture
+    super_category: fine_art # Sculpture
     median: { min: 3500, max: 7400 }
-    mean:   { min: 4500, max: 12000 }
+    mean: { min: 4500, max: 12000 }
     stddev: { min: 2800, max: 12500 }
-    min:    { min: 55, max: 3500 }
-    max:    { min: 6500, max: 88500 }
-    condition:                        # expected as-acquired condition multiplier (documentation-only)
+    min: { min: 55, max: 3500 }
+    max: { min: 6500, max: 88500 }
+    condition: # expected as-acquired condition multiplier (documentation-only)
       expected_multiplier: { min: 0.72, max: 1.93 }
       mean_multiplier: 1.34
 
   - category_id: pistol
-    super_category: weapon            # Pistol
+    super_category: weapon # Pistol
     median: { min: 525, max: 1300 }
-    mean:   { min: 750, max: 1900 }
+    mean: { min: 750, max: 1900 }
     stddev: { min: 400, max: 1800 }
-    min:    { min: 10, max: 525 }
-    max:    { min: 1100, max: 8200 }
-    condition:                        # expected as-acquired condition multiplier (documentation-only)
+    min: { min: 10, max: 525 }
+    max: { min: 1100, max: 8200 }
+    condition: # expected as-acquired condition multiplier (documentation-only)
       expected_multiplier: { min: 0.86, max: 2.44 }
       mean_multiplier: 1.62
 
   - category_id: rifle
-    super_category: weapon            # Rifle
+    super_category: weapon # Rifle
     median: { min: 525, max: 1300 }
-    mean:   { min: 750, max: 1900 }
+    mean: { min: 750, max: 1900 }
     stddev: { min: 400, max: 1800 }
-    min:    { min: 10, max: 525 }
-    max:    { min: 1100, max: 8000 }
-    condition:                        # expected as-acquired condition multiplier (documentation-only)
+    min: { min: 10, max: 525 }
+    max: { min: 1100, max: 8000 }
+    condition: # expected as-acquired condition multiplier (documentation-only)
       expected_multiplier: { min: 0.87, max: 2.47 }
       mean_multiplier: 1.63
 
   - category_id: crossbow
-    super_category: weapon            # Crossbow
+    super_category: weapon # Crossbow
     median: { min: 525, max: 1300 }
-    mean:   { min: 750, max: 1900 }
+    mean: { min: 750, max: 1900 }
     stddev: { min: 400, max: 1800 }
-    min:    { min: 10, max: 525 }
-    max:    { min: 1100, max: 8100 }
-    condition:                        # expected as-acquired condition multiplier (documentation-only)
+    min: { min: 10, max: 525 }
+    max: { min: 1100, max: 8100 }
+    condition: # expected as-acquired condition multiplier (documentation-only)
       expected_multiplier: { min: 0.87, max: 2.47 }
       mean_multiplier: 1.63
-

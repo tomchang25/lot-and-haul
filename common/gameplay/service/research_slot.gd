@@ -8,7 +8,7 @@ extends RefCounted
 
 # ── Repair tuning ─────────────────────────────────────────────────────────────
 
-const REPAIR_BASE: float = 0.15
+const REPAIR_BASE: float = 0.40
 const REPAIR_ZONE_FACTORS: Dictionary = { 0.25: 1.0, 0.50: 0.35 }
 const REPAIR_RARITY_FACTOR: Dictionary = {
     Economy.Rarity.COMMON: 1.0,
@@ -20,7 +20,7 @@ const REPAIR_RARITY_FACTOR: Dictionary = {
 
 # ── Restore tuning ────────────────────────────────────────────────────────────
 
-const RESTORE_BASE: float = 0.10
+const RESTORE_BASE: float = 0.30
 const RESTORE_ZONE_FACTORS: Dictionary = { 0.75: 0.12, 1.0: 0.02 }
 const RESTORE_RARITY_FACTOR: Dictionary = {
     Economy.Rarity.COMMON: 1.0,

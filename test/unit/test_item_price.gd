@@ -42,46 +42,42 @@ func _make_item(anchor: AnchorData, surface: Array[ClueData] = [], hidden: Array
 # ── Condition multiplier bands ─────────────────────────────────────────────
 
 
-func test_condition_band_destroyed() -> void:
+func test_condition_multiplier_destroyed() -> void:
     var item := _make_item(_make_anchor(100))
     item.condition = 0.0
-    assert_eq(item.get_condition_multiplier(), 0.25, "0.0 condition → 0.25x")
+    assert_eq(item.get_condition_multiplier(), 0.75, "0.0 condition → 0.75x")
 
 
-func test_condition_band_low() -> void:
+func test_condition_multiplier_low() -> void:
     var item := _make_item(_make_anchor(100))
     item.condition = 0.25
-    var m := item.get_condition_multiplier()
-    assert_between(m, 0.25, 0.5, "0.25 condition maps to [0.25, 0.5]")
+    assert_eq(item.get_condition_multiplier(), 0.875, "0.25 condition → 0.875x")
 
 
-func test_condition_band_mid() -> void:
+func test_condition_multiplier_mid() -> void:
     var item := _make_item(_make_anchor(100))
     item.condition = 0.5
-    var m := item.get_condition_multiplier()
-    assert_between(m, 0.5, 1.0, "0.5 condition maps to [0.5, 1.0]")
+    assert_eq(item.get_condition_multiplier(), 1.0, "0.5 condition → 1.0x")
 
 
-func test_condition_band_good() -> void:
+func test_condition_multiplier_good() -> void:
     var item := _make_item(_make_anchor(100))
     item.condition = 0.75
-    var m := item.get_condition_multiplier()
-    assert_between(m, 1.0, 2.0, "0.75 condition maps to [1.0, 2.0]")
+    assert_eq(item.get_condition_multiplier(), 1.25, "0.75 condition → 1.25x")
 
 
-func test_condition_band_pristine() -> void:
+func test_condition_multiplier_pristine() -> void:
     var item := _make_item(_make_anchor(100))
     item.condition = 1.0
-    var m := item.get_condition_multiplier()
-    assert_between(m, 2.0, 4.0, "1.0 condition maps to [2.0, 4.0]")
+    assert_eq(item.get_condition_multiplier(), 1.5, "1.0 condition → 1.5x")
 
 
 func test_condition_continuous_within_band() -> void:
     var item := _make_item(_make_anchor(100))
     item.condition = 0.6
     var m := item.get_condition_multiplier()
-    assert_gt(m, 0.5, "0.6 condition > 0.5 multiplier")
-    assert_lt(m, 2.0, "0.6 condition < 2.0 multiplier")
+    assert_gt(m, 1.0, "0.6 condition > 1.0 multiplier")
+    assert_lt(m, 1.5, "0.6 condition < 1.5 multiplier")
 
 # ── Appraised value (surface clues only) ──────────────────────────────────
 
