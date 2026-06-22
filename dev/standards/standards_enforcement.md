@@ -59,7 +59,7 @@ Only what `lint_standards.py` enforces today:
   A _wrong_ claim (e.g. `# node-src: ephemeral` on a clearly persistent node) is
   now greppable — that's exactly what a reviewer checks by eye.
 
-- **No signal connections in `.tscn`** (`block_scene_architecture_standard.md`, Signal connections).
+- **No signal connections in `.tscn`** (`gdscript_structure_standard.md`, Signal connections).
   Any `[connection]` block in a scene file fails; connect signals in `_ready()`
   so the full wiring surface is visible in code.
 

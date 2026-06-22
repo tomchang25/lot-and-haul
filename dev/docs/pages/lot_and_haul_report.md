@@ -508,7 +508,7 @@ game/shared/   (Cross-phase — 5 blocks)
 
 ### 10.5 Scene Architecture Convention
 
-Every block scene follows a documented pattern (`dev/standards/block_scene_architecture_standard.md`):
+Every block scene follows a documented pattern (`dev/standards/gdscript_structure_standard.md`):
 
 - **Node-source rule** (`dev/standards/scene_node_source_standard.md`): persistent nodes live in `.tscn`; runtime-created nodes require a permitted exception and `node-src` marker
 - **No `[connection]` in `.tscn`**: all signal connections are made in GDScript
@@ -563,19 +563,19 @@ Saves are JSON files. The manifest tracks latest counter as a load fast-path. Co
 
 Eleven standards documents under `dev/standards/`:
 
-| Standard                               | Covers                                                                                                                                                  |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `naming_conventions.md`                | 11 rules: snake_case files, PascalCase classes/constants/enums, snake_case variables/signals, UPPER_SNAKE_CASE constants, singularity rules for folders |
-| `scene_node_source_standard.md`        | Persistent nodes in `.tscn`, permitted runtime node creation, `node-src` markers                                                                        |
-| `block_scene_architecture_standard.md` | File headers, no `[connection]` in tscn, packed-scene instantiation order, `setup()`/`_apply()` pattern                                                 |
-| `error_guard_standard.md`              | Three-category guard system replacing `assert()`: runtime guard, programmer error, precondition guard                                                   |
-| `registries.md`                        | Required API, forbidden wrappers, iterate-resources-not-ids, inverse lookup patterns                                                                    |
-| `runtime_type_archetypes.md`           | Four archetypes, mutation-mediation rule, subfolder-as-truth convention                                                                                 |
-| `debug_standard.md`                    | Two-layer gate, Debug autoload API, coding patterns, node-source rules for debug nodes                                                                  |
-| `theme_standard.md`                    | Centralized theme, semantic palette, typography scale, override rules                                                                                   |
-| `project_structure.md`                 | 7 top-level folders, placement rules                                                                                                                    |
-| `test_data.md`                         | Test data lives in YAML and goes through the production YAML to tres pipeline                                                                           |
-| `standards_enforcement.md`             | How rules are enforced, linter scope, bare push_error ban                                                                                               |
+| Standard                         | Covers                                                                                                                                                  |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `naming_conventions.md`          | 11 rules: snake_case files, PascalCase classes/constants/enums, snake_case variables/signals, UPPER_SNAKE_CASE constants, singularity rules for folders |
+| `scene_node_source_standard.md`  | Persistent nodes in `.tscn`, permitted runtime node creation, `node-src` markers                                                                        |
+| `gdscript_structure_standard.md` | File headers, shared section order, no `[connection]` in tscn, packed-scene instantiation order, `setup()`/`_apply()` pattern                           |
+| `error_guard_standard.md`        | Three-category guard system replacing `assert()`: runtime guard, programmer error, precondition guard                                                   |
+| `registries.md`                  | Required API, forbidden wrappers, iterate-resources-not-ids, inverse lookup patterns                                                                    |
+| `runtime_type_archetypes.md`     | Four archetypes, mutation-mediation rule, subfolder-as-truth convention                                                                                 |
+| `debug_standard.md`              | Two-layer gate, Debug autoload API, coding patterns, node-source rules for debug nodes                                                                  |
+| `theme_standard.md`              | Centralized theme, semantic palette, typography scale, override rules                                                                                   |
+| `project_structure.md`           | 7 top-level folders, placement rules                                                                                                                    |
+| `test_data.md`                   | Test data lives in YAML and goes through the production YAML to tres pipeline                                                                           |
+| `standards_enforcement.md`       | How rules are enforced, linter scope, bare push_error ban                                                                                               |
 
 ### 12.2 Enforcement
 

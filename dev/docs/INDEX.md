@@ -56,7 +56,7 @@
 - [Runtime type archetypes](../standards/runtime_type_archetypes.md)
 - [Registry 標準 registries](../standards/registries.md)
 - [Scene node source 標準 scene_node_source_standard](../standards/scene_node_source_standard.md)
-- [Block 場景架構 block_scene_architecture_standard](../standards/block_scene_architecture_standard.md)
+- [GDScript 結構 gdscript_structure_standard](../standards/gdscript_structure_standard.md)
 - [Error guard 標準 error_guard_standard](../standards/error_guard_standard.md)
 - [標準強制執行 standards_enforcement](../standards/standards_enforcement.md)
 - [Debug 標準 debug_standard](../standards/debug_standard.md)

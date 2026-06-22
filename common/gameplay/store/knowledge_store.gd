@@ -24,30 +24,7 @@ var unlocked_perks: Array[String]:
     get:
         return _unlocked_perks
 
-# ── Mutators (no save) ──────────────────────────────────────────────────────────
-
-
-## Adds [param gain] mastery points to [param category_id]. Does not save.
-func add_points(category_id: String, gain: int) -> void:
-    if not _category_points.has(category_id):
-        _category_points[category_id] = 0
-    _category_points[category_id] += gain
-
-
-## Sets the stored level for [param attribute_id]. Does not save.
-func set_attribute_level(attribute_id: String, level: int) -> void:
-    _attribute_levels[attribute_id] = level
-
-
-## Appends [param perk_id] to unlocked_perks. Returns false if already present.
-## Does not save.
-func add_perk(perk_id: String) -> bool:
-    if _unlocked_perks.has(perk_id):
-        return false
-    _unlocked_perks.append(perk_id)
-    return true
-
-# ── Save section ───────────────────────────────────────────────────────────────
+# ══ Common API ════════════════════════════════════════════════════════════════
 
 
 ## Section id for the knowledge save payload.
@@ -81,3 +58,24 @@ func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
         for key: Variant in data["attribute_levels"]:
             if key is String:
                 _attribute_levels[key] = int(data["attribute_levels"][key])
+
+
+## Adds [param gain] mastery points to [param category_id]. Does not save.
+func add_points(category_id: String, gain: int) -> void:
+    if not _category_points.has(category_id):
+        _category_points[category_id] = 0
+    _category_points[category_id] += gain
+
+
+## Sets the stored level for [param attribute_id]. Does not save.
+func set_attribute_level(attribute_id: String, level: int) -> void:
+    _attribute_levels[attribute_id] = level
+
+
+## Appends [param perk_id] to unlocked_perks. Returns false if already present.
+## Does not save.
+func add_perk(perk_id: String) -> bool:
+    if _unlocked_perks.has(perk_id):
+        return false
+    _unlocked_perks.append(perk_id)
+    return true

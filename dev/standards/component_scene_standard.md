@@ -97,7 +97,7 @@ Do not seed global managers from a production component script. If a component n
 
 Reusable components must support `setup()` being called before or after `add_child()`.
 
-Use the standard shape from `dev/standards/block_scene_architecture_standard.md`:
+Use the standard shape from `dev/standards/gdscript_structure_standard.md`:
 
 - `setup()` stores arguments into private state and does not touch `@onready` nodes directly
 - `_ready()` connects signals first, then calls `_apply()` if private state was already supplied
@@ -114,4 +114,4 @@ Node ownership and runtime `add_child()` exceptions are governed by `dev/standar
 
 Theme resources, static style, and semantic colors are governed by `dev/standards/theme_standard.md`.
 
-Component declaration order, signal connection order, and the `setup()` / `_apply()` pattern are governed by `dev/standards/block_scene_architecture_standard.md`.
+Component declaration order, signal connection order, and the `setup()` / `_apply()` pattern are governed by `dev/standards/gdscript_structure_standard.md`.

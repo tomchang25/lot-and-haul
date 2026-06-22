@@ -1,6 +1,6 @@
-# Block Scene Architecture Standard
+# GDScript Structure Standard
 
-This document defines the structural rules for block scene scripts.
+This document defines structural rules for block scene scripts. Section 5 defines the shared GDScript main-section order and applies to Data, Store, State, Service, Scene/View, System, and Manager scripts.
 
 Applies to:
 
@@ -8,7 +8,7 @@ Applies to:
 - Testbed scenes
 - Reusable UI component scripts
 
-Does **not** apply to:
+Except for Section 5, this document does **not** apply to:
 
 - Autoloads and global managers
 - Resource definitions under `data/`
@@ -55,8 +55,10 @@ Declarations at the top of the file follow this order:
 
 ```
 @tool (if needed)
-extends
 class_name (if needed)
+extends
+
+inner classes (if any)
 
 signals
 enums
@@ -73,7 +75,8 @@ private variables
 
 Rules:
 
-- `@tool` goes on the very first line when present, before `extends`.
+- `@tool` goes on the very first line when present, before `class_name` and `extends`.
+- Inner classes go immediately after `class_name` / `extends`, before constants, variables, and other declarations.
 - Signals are declared before constants so they appear first in the class contract.
 - Enums follow signals, as they can be used as export type hints and const initializers.
 - Constants and preloads come before `@export` so export default values can reference them.
@@ -124,33 +127,45 @@ The `═` characters extend to column 80.
 
 # 5. Section Order
 
+The same main section order applies to Data, Store, State, Service, Scene/View, System, and Manager scripts. Types differ in their subsection names, not in the top-level ordering rules.
+
 Sections appear in this fixed order:
 
 ```
-Inner classes (if any)
-
+Inner classes
 Lifecycle
+Overridden custom methods
 Signal handlers
-Common API        (if the script has public functions)
+Common API
 Feature section 1
 Feature section 2
 ...
-UI builder        (only when runtime node construction is required — see Section 11)
 ```
 
 ### Inner classes
 
-Placed above all function sections, immediately after the variable blocks.
+Placed immediately after `class_name` / `extends` and before constants, variables, and function sections.
 
 ```gdscript
-# ══ Inner class: description ══════════════════════════════════════════════════
+# ══ Inner classes ═════════════════════════════════════════════════════════════
+
 class _ClassName extends BaseClass:
     ...
 ```
 
 ### Lifecycle
 
-Contains only `_ready()`, `_unhandled_input()`, and any other built-in Godot lifecycle callbacks (`_process`, `_physics_process`, etc.).
+Contains only Godot built-in virtual callbacks, in this order when present:
+
+```
+_init()
+_enter_tree()
+_ready()
+_process()
+_physics_process()
+remaining virtual methods
+```
+
 No private helpers here — helpers belong in their feature section.
 
 ```gdscript
@@ -163,13 +178,17 @@ func _unhandled_input(event: InputEvent) -> void:
     ...
 ```
 
+### Overridden custom methods
+
+Methods overriding a non-Godot base class contract go after Godot lifecycle and before signal handlers. Omit this section when the script has no custom overrides.
+
 ### Signal handlers
 
 Contains only `_on_xxx()` callbacks.
 No public functions. No logic helpers.
 
 ```gdscript
-# ══ Signal handlers ════════════════════════════════════════════════════════════
+# ══ Signal handlers ═══════════════════════════════════════════════════════════
 
 func _on_confirm_pressed() -> void:
     ...
@@ -180,23 +199,24 @@ func _on_cancel_pressed() -> void:
 
 ### Common API
 
-Public functions that do not belong to a specific feature domain.
-Used when the script exposes a surface that other scripts call.
+All public methods that other scripts may call go here, including public static methods such as `from_dict()` and paired instance methods such as `to_dict()`. Do not split public static methods into a separate main section.
 
 ```gdscript
 # ══ Common API ════════════════════════════════════════════════════════════════
 
-func setup(entry: EntryType, ctx: ContextType) -> void:
+static func from_dict(data: Dictionary, ctx: SaveLoadContext) -> EntryType:
     ...
 
-func refresh() -> void:
+func to_dict() -> Dictionary:
+    ...
+
+func setup(entry: EntryType, ctx: ContextType) -> void:
     ...
 ```
 
 ### Feature sections
 
-Domain-specific groups. Each section may contain both public and private functions.
-Private helpers follow their public counterparts within the same section.
+Domain-specific private implementation groups. Feature sections contain private helpers only; move public methods to `Common API` even when they belong to a specific domain concept.
 
 ```gdscript
 # ══ Rows ══════════════════════════════════════════════════════════════════════
@@ -213,15 +233,9 @@ func _show_summary() -> void:
     ...
 ```
 
-Use descriptive domain names that reflect the feature, not the project's current block list.
+Use descriptive domain names that reflect the feature, not the project's current block list. Subsections inside `Common API` or a feature section use single-line headers and may differ by script type.
 
-### UI builder
-
-Always the last section when present.
-Contains `_build_ui()` and any private builder helpers it calls.
-
-Only include this section when runtime node construction is genuinely required (see Section 11).
-Most block scenes should not have this section at all.
+Runtime UI construction is a scene-only exception. When it is genuinely required (see Section 11), keep `_build_ui()` and its private builder helpers together as one feature section. Most block scenes should not have this section at all.
 
 ```gdscript
 # ══ UI builder ════════════════════════════════════════════════════════════════

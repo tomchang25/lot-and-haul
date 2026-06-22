@@ -51,14 +51,36 @@ func _ready() -> void:
     EventBus.item_unveiled.connect(_on_item_unveiled)
     EventBus.item_revealed.connect(_on_item_revealed)
 
+# ══ Signal handlers ═══════════════════════════════════════════════════════════
+
+
+func _on_sale_resolved(entry: ItemEntry) -> void:
+    add_category_points(entry, KnowledgeAction.SELL)
+
+
+func _on_item_repaired(entry: ItemEntry) -> void:
+    add_category_points(entry, KnowledgeAction.REPAIR)
+
+
+func _on_item_restored(entry: ItemEntry) -> void:
+    add_category_points(entry, KnowledgeAction.RESTORE)
+
+
+func _on_item_unveiled(entry: ItemEntry) -> void:
+    add_category_points(entry, KnowledgeAction.REVEAL)
+
+
+func _on_item_revealed(entry: ItemEntry) -> void:
+    add_category_points(entry, KnowledgeAction.REVEAL)
+
+# ══ Common API ════════════════════════════════════════════════════════════════
+
 
 ## Re-instantiates the KnowledgeStore to its default state. Called by
 ## SaveManager.reset_providers() during the new-game flow.
 ## Signal subscriptions remain intact (already connected in _ready()).
 func reset() -> void:
     _knowledge = KnowledgeStore.new()
-
-# ── Registry validation ────────────────────────────────────────────────────────
 
 
 func validate() -> bool:
@@ -77,8 +99,6 @@ func validate() -> bool:
             ok = false
     ok = _knowledge.validate() and ok
     return ok
-
-# ══ Save section interface ════════════════════════════════════════════════════
 
 
 ## Serializes KnowledgeManager state into a flat dict with the knowledge section key.
@@ -201,6 +221,8 @@ func get_all_perks() -> Array[PerkData]:
 func perk_count() -> int:
     return _perk_registry.size()
 
+# ══ Registry helpers ══════════════════════════════════════════════════════════
+
 
 func _load_perk_registry() -> void:
     _perk_registry = ResourceDirLoader.load_by_id(
@@ -216,25 +238,3 @@ func _load_attribute_registry() -> void:
         func(r: Resource) -> String:
             return (r as AttributeData).attribute_id if r is AttributeData else ""
     )
-
-# ── EventBus handlers ──────────────────────────────────────────────────────────
-
-
-func _on_sale_resolved(entry: ItemEntry) -> void:
-    add_category_points(entry, KnowledgeAction.SELL)
-
-
-func _on_item_repaired(entry: ItemEntry) -> void:
-    add_category_points(entry, KnowledgeAction.REPAIR)
-
-
-func _on_item_restored(entry: ItemEntry) -> void:
-    add_category_points(entry, KnowledgeAction.RESTORE)
-
-
-func _on_item_unveiled(entry: ItemEntry) -> void:
-    add_category_points(entry, KnowledgeAction.REVEAL)
-
-
-func _on_item_revealed(entry: ItemEntry) -> void:
-    add_category_points(entry, KnowledgeAction.REVEAL)
