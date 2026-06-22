@@ -95,6 +95,15 @@ func attempt_clue(entry: ItemEntry, clue: ClueData) -> bool:
     return succeeded
 
 
+## Rolls all unrevealed surface clues for [param entry] using the standard
+## attribute-based dice. Does nothing while the item is still veiled.
+func attempt_surface_clues(entry: ItemEntry) -> void:
+    if entry == null or entry.is_veiled():
+        return
+    for clue: ClueData in entry.get_unrevealed_surface_clues():
+        attempt_clue(entry, clue)
+
+
 ## Mediates bulk surface-clue auto-reveal. No signal — this is a hub-return
 ## reveal, not a player-triggered discovery.
 func auto_reveal_all_surface(entry: ItemEntry) -> void:
@@ -102,6 +111,17 @@ func auto_reveal_all_surface(entry: ItemEntry) -> void:
     entry.auto_reveal_all_surface()
     if entry.revealed_clue_ids.size() > before:
         SaveManager.mark_dirty()
+
+
+## Deterministic clue reveal: marks [param clue] as revealed on [param entry]
+## without dice rolling. Never fails. Emits item_revealed only when the
+## clue was not already revealed. Use for guaranteed manual actions.
+func reveal_clue_direct(entry: ItemEntry, clue: ClueData) -> void:
+    if clue == null or entry.revealed_clue_ids.has(clue.clue_id):
+        return
+    entry.revealed_clue_ids.append(clue.clue_id)
+    SaveManager.mark_dirty()
+    EventBus.item_revealed.emit(entry)
 
 
 ## Applies trailer damage to all trailer items in the active run. Rolls each

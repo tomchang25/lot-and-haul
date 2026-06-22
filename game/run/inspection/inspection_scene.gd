@@ -91,6 +91,8 @@ func _ready() -> void:
     _summary_popup.start_auction_requested.connect(_on_summary_start_auction_requested)
 
     _populate_browser()
+    _auto_roll_visible_items()
+    _item_browser.refresh()
     _refresh_hud()
     _clear_detail_section()
     Director.register_scene(
@@ -118,6 +120,15 @@ func _populate_browser() -> void:
     _item_browser.populate(items)
     _item_browser.set_mode(ItemBrowserPanel.DisplayMode.CARD)
 
+# ══ Auto-roll — dice against attributes on entry and after unveil ═════════════
+
+
+## Rolls surface clues for every unveiled item in the active lot. Called on
+## scene entry (no AP cost) and after manual unveil of a single item.
+func _auto_roll_visible_items() -> void:
+    for entry: ItemEntry in RunManager.lot.lot_items:
+        RunManager.attempt_surface_clues(entry)
+
 # ══ Card interaction — select only, no AP spend ═══════════════════════════════
 
 
@@ -143,7 +154,7 @@ func _on_inspect_clues_pressed() -> void:
         return
     if _selected_entry.is_veiled():
         return
-    if not _selected_entry.has_inspection_clues():
+    if not _selected_entry.has_unrevealed_surface():
         return
     if CLUE_CHAIN_COST > RunManager.lot.actions_remaining:
         AudioManager.play_event(BLOCKED_ERROR)
@@ -156,6 +167,7 @@ func _do_unveil(entry: ItemEntry) -> void:
     _reveal_item(entry)
     AudioManager.play_event(REVEAL_GOOD)
     EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_UNVEILED, { })
+    RunManager.attempt_surface_clues(entry)
 
     _complete_action()
 
@@ -164,23 +176,16 @@ func _do_clue_chain(entry: ItemEntry) -> void:
     RunManager.spend_ap(CLUE_CHAIN_COST)
 
     _clear_clue_result()
-    var clue_texts: Array[String] = []
-    for clue: ClueData in entry.get_inspection_clues():
-        if entry.revealed_clue_ids.has(clue.clue_id):
-            continue
-        var succeeded: bool = RunManager.attempt_clue(entry, clue)
-        if succeeded:
-            AudioManager.play_event(REVEAL_GOOD)
-            clue_texts.append("[color=#66ff80]%s[/color]" % TranslationServer.translate(clue.known_text_key))
-        else:
-            AudioManager.play_event(REVEAL_BAD)
-            clue_texts.append("[color=#8c949f]Failed: %s[/color]" % TranslationServer.translate(clue.known_text_key))
-            break
+    var available: Array[ClueData] = entry.get_unrevealed_surface_clues()
 
-    if clue_texts.is_empty():
+    if available.is_empty():
         _clue_result_label.text = TranslationServer.translate("UI_NO_CLUES_LEFT")
     else:
-        _clue_result_label.text = "\n".join(clue_texts)
+        var chosen: ClueData = available[RandomUtils.randi() % available.size()]
+        RunManager.reveal_clue_direct(entry, chosen)
+        AudioManager.play_event(REVEAL_GOOD)
+        _clue_result_label.text = "[color=#66ff80]%s[/color]" % TranslationServer.translate(chosen.known_text_key)
+
     _clue_result_section.show()
 
     _complete_action()
@@ -243,7 +248,7 @@ func _refresh_action_section(entry: ItemEntry) -> void:
             _action_unveil_button.tooltip_text = TranslationServer.translate("UI_NOT_ENOUGH_AP")
         else:
             _action_unveil_button.tooltip_text = TranslationServer.translate("UI_UNVEIL_TOOLTIP") % UNVEIL_COST
-    elif entry.has_inspection_clues():
+    elif entry.has_unrevealed_surface():
         _action_unveil_button.hide()
         _action_inspect_button.show()
         _action_complete_label.hide()

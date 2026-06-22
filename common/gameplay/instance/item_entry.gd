@@ -468,6 +468,29 @@ func has_inspection_clues() -> bool:
     return false
 
 
+## Returns true when the item is unveiled and has at least one unrevealed
+## surface clue. Used by inspection scene for surface-only clue actions.
+func has_unrevealed_surface() -> bool:
+    if not unveiled:
+        return false
+    for clue: ClueData in _get_surface_clues():
+        if not revealed_clue_ids.has(clue.clue_id):
+            return true
+    return false
+
+
+## Returns all unrevealed surface clues for this unveiled item.
+## Used by inspection scene for the random-select manual action.
+func get_unrevealed_surface_clues() -> Array[ClueData]:
+    var result: Array[ClueData] = []
+    if not unveiled:
+        return result
+    for clue: ClueData in _get_surface_clues():
+        if not revealed_clue_ids.has(clue.clue_id):
+            result.append(clue)
+    return result
+
+
 func is_veiled() -> bool:
     return not unveiled
 
