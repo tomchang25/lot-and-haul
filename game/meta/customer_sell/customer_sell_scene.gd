@@ -323,6 +323,8 @@ func _select_customer(index: int) -> void:
     _preview_entry = null
     _hovered_entry = null
     _deal_panel.reset()
+    _deal_panel.set_customer(customer)
+    _receipt.set_customer(customer)
     _selected_item_panel.clear_display()
 
     var grid := _car_panel.get_grid()

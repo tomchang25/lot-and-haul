@@ -28,6 +28,7 @@ enum OfferState { EMPTY_CAR, READY, ROLLING, SELECTING_DICE }
 
 var _state: OfferState = OfferState.EMPTY_CAR
 var _placed_items: Array = []
+var _customer: CustomerEntry = null
 var _dice_rolls: Array[int] = []
 var _selected_dice_indices: Array[int] = []
 var _dice_buttons: Array[Button] = []
@@ -66,6 +67,12 @@ func _ready() -> void:
 func set_placed_items(items: Array) -> void:
     _placed_items = items
     _update_state()
+
+
+## Sets the active customer for customer-aware pricing. Pass null to fall
+## back to the global item price (non-valued pricing).
+func set_customer(customer: CustomerEntry) -> void:
+    _customer = customer
 
 
 func disable_sell_buttons(disabled: bool) -> void:
@@ -194,7 +201,7 @@ func _refresh_dice_totals() -> void:
     for index: int in _selected_dice_indices:
         sum += _dice_rolls[index]
     var multiplier := SellMath.dice_multiplier(sum)
-    var total := SellMath.aggressive_total(_placed_items, sum)
+    var total := SellMath.aggressive_total(_placed_items, sum, _customer)
 
     _dice_hint_label.text = ""
     _dice_sum_label.text = TranslationServer.translate("UI_SUM_LABEL") % [sum, multiplier]
@@ -254,7 +261,7 @@ func _clear_band_highlights() -> void:
 func _on_conservative_pressed() -> void:
     if _placed_items.is_empty():
         return
-    var price := SellMath.conservative_total(_placed_items)
+    var price := SellMath.conservative_total(_placed_items, _customer)
     _play_glow(_conservative_button)
     conservative_requested.emit(price)
 
@@ -312,7 +319,7 @@ func _on_confirm_dice_pressed() -> void:
     var sum := 0
     for index: int in _selected_dice_indices:
         sum += _dice_rolls[index]
-    var total := SellMath.aggressive_total(_placed_items, sum)
+    var total := SellMath.aggressive_total(_placed_items, sum, _customer)
 
     AudioManager.play_event(CONFIRM)
     _dice_section.hide()

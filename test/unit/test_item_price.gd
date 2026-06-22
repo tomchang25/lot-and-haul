@@ -257,3 +257,62 @@ func test_item_price_with_condition_and_clues() -> void:
     item.condition = 0.75
     var cond := item.get_condition_multiplier()
     assert_eq(item.item_price, int(150.0 * cond), "item_price = (anchor + surface) * condition")
+
+# ══ Valued Surface-Negative Customer Pricing ══════════════════════════════
+
+
+func test_appraised_for_customer_converts_valued_negative_mul_to_bonus() -> void:
+    var item := _make_item(
+        _make_anchor(100),
+        [_make_surface("add_50", "add", 50), _make_surface("neg_mul", "mul", 0.8)],
+    )
+    item.revealed_clue_ids = ["add_50", "neg_mul"]
+    var price := item.appraised_for_customer(["neg_mul"], Economy.VALUED_NEGATIVE_SURFACE_BONUS)
+    # (100 + 50 + 50) * 1.0 = 200
+    assert_eq(price, 200.0, "valued negative mul penalty replaced with add bonus")
+
+
+func test_appraised_for_customer_skips_unrevealed_clues() -> void:
+    var item := _make_item(
+        _make_anchor(100),
+        [_make_surface("add_50", "add", 50), _make_surface("neg_mul", "mul", 0.8)],
+    )
+    item.revealed_clue_ids = ["add_50"]
+    var price := item.appraised_for_customer(["neg_mul"], Economy.VALUED_NEGATIVE_SURFACE_BONUS)
+    # (100 + 50) * 1.0 = 150 (neg_mul not revealed)
+    assert_eq(price, 150.0, "unrevealed valued clue is skipped")
+
+
+func test_appraised_for_customer_ignores_hidden_clues_in_valued_check() -> void:
+    var item := _make_item(
+        _make_anchor(100),
+        [_make_surface("add_50", "add", 50)],
+        [_make_hidden("hidden_mul", "mul", 0.5)],
+    )
+    item.revealed_clue_ids = ["add_50", "hidden_mul"]
+    # Even if hidden_mul is in valued tags, it's HIDDEN type → not eligible
+    var price := item.appraised_for_customer(["hidden_mul"], Economy.VALUED_NEGATIVE_SURFACE_BONUS)
+    # (100 + 50) * 0.5 = 75
+    assert_eq(price, 75.0, "hidden clue not eligible for valued conversion even if in tags")
+
+
+func test_appraised_for_customer_preserves_non_valued_negative_mul() -> void:
+    var item := _make_item(
+        _make_anchor(100),
+        [_make_surface("add_50", "add", 50), _make_surface("neg_a", "mul", 0.8), _make_surface("neg_b", "mul", 0.7)],
+    )
+    item.revealed_clue_ids = ["add_50", "neg_a", "neg_b"]
+    var price := item.appraised_for_customer(["neg_a"], Economy.VALUED_NEGATIVE_SURFACE_BONUS)
+    # (100 + 50 + 50) * 0.7 = 140.0
+    assert_eq(price, 140.0, "non-valued mul still applies while valued one is converted")
+
+
+func test_appraised_for_customer_empty_tags_falls_through() -> void:
+    var item := _make_item(
+        _make_anchor(100),
+        [_make_surface("neg_mul", "mul", 0.8)],
+    )
+    item.revealed_clue_ids = ["neg_mul"]
+    var price := item.appraised_for_customer([], Economy.VALUED_NEGATIVE_SURFACE_BONUS)
+    # (100) * 0.8 = 80
+    assert_eq(price, 80.0, "empty valued tags → all clues apply normally")

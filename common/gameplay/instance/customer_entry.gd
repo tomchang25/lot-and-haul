@@ -34,6 +34,11 @@ var grid_rows: int = 2
 ## an item fits when its revealed clue ids intersect these.
 var demand_tags: Array[String] = []
 
+## Surface-negative (mul < 1.0) clue ids this customer visit values.
+## Copied from CustomerData.valued_negative_tags at generation time.
+## Empty when the persona has no valued-negative preferences.
+var valued_negative_tags: Array[String] = []
+
 # ══ Serialisation ══════════════════════════════════════════════════════════════
 
 
@@ -47,6 +52,7 @@ func to_dict() -> Dictionary:
         "grid_columns": grid_columns,
         "grid_rows": grid_rows,
         "demand_tags": demand_tags.duplicate(),
+        "valued_negative_tags": valued_negative_tags.duplicate(),
     }
 
 
@@ -59,6 +65,8 @@ static func from_dict(d: Dictionary) -> CustomerEntry:
     c.grid_rows = int(d.get("grid_rows", 2))
     var raw: Array = d.get("demand_tags", [])
     c.demand_tags.assign(raw.duplicate())
+    var raw_vnt: Array = d.get("valued_negative_tags", [])
+    c.valued_negative_tags.assign(raw_vnt.duplicate())
 
     var data_id: String = str(d.get("customer_data_id", ""))
     if not data_id.is_empty():
@@ -75,4 +83,5 @@ static func create(data: CustomerData, sid: String, grid_size: Vector2i, tags: A
     c.grid_columns = grid_size.x
     c.grid_rows = grid_size.y
     c.demand_tags = tags.duplicate()
+    c.valued_negative_tags = data.valued_negative_tags.duplicate() if data != null else []
     return c

@@ -247,22 +247,22 @@ func get_base_value() -> int:
 
 
 ## Full clue value using the global add-then-mul formula:
-##   (effective_base + Σ_surface_add + Σ_hidden_add) × Π_surface_mul × Π_hidden_mul
+##   (effective_base + Σ_revealed_add) × Π_revealed_mul
 ## effective_base = revealed override amount if any hidden override is revealed, else anchor base.
+## Hidden clues only contribute when revealed (i.e. item is verified). Unrevealed
+## clues are skipped via the revealed_clue_ids check.
 ## This is the item's verified resolved value before condition/market factors.
 func appraised_with_hidden() -> float:
-    var base := float(_effective_base_value())
-    var add_sum := 0.0
-    var mul_product := 1.0
-    for clue: ClueData in all_clues:
-        if revealed_clue_ids.has(clue.clue_id):
-            match clue.effect_op:
-                "add":
-                    add_sum += clue.effect_amount
-                "mul":
-                    mul_product *= clue.effect_amount
-                # "override" already factored into _effective_base_value()
-    return (base + add_sum) * mul_product
+    return _compute_value()
+
+
+## Customer-aware appraised value. For each revealed surface-negative multiplier
+## that appears in [param valued_negative_tags], the multiplier penalty is skipped
+## and [param valued_negative_bonus] is added as a flat bonus instead.
+## All other add/mul clues retain their normal effect. Hidden clues are unaffected
+## (they are not candidates for the eligibility check).
+func appraised_for_customer(valued_negative_tags: Array[String], valued_negative_bonus: int) -> float:
+    return _compute_value(valued_negative_tags, valued_negative_bonus)
 
 
 ## Full potential value with ALL clues applied regardless of reveal state.
@@ -321,7 +321,7 @@ func resolve_price() -> PriceView:
         view.max_value = v
         view.point_value = v
         return view
-    var base := _raw_appraised_value()
+    var base := _compute_value()
     var spread := MAX_SPREAD * (1.0 - inspection_level)
     var offset := center_offset * (1.0 - inspection_level)
     view.min_value = maxi(Economy.MIN_ITEM_VALUE, int(base * (1.0 - spread + offset) * cond))
@@ -513,40 +513,11 @@ func apply_damage(ratio: float) -> void:
 # ══ Price helpers ═════════════════════════════════════════════════════════════
 
 
-## Applies a single clue's price effect to [param base] and returns the result.
-## Dispatches on [member ClueData.effect_op]:
-##   "add"      — adds [member ClueData.effect_amount] to [param base],
-##   "mul"      — multiplies [param base] by [member ClueData.effect_amount],
-##   "override" — hidden-only base replacement (handled upstream in _effective_base_value).
-## Unknown ops leave [param base] unchanged.
-func _apply_price_effect(base: float, clue: ClueData) -> float:
-    match clue.effect_op:
-        "add":
-            return base + clue.effect_amount
-        "mul":
-            return base * clue.effect_amount
-    return base
-
-
 func _anchor_base_value() -> int:
     var eff_anchor := _get_anchor()
     if eff_anchor == null:
         return 0
     return int(eff_anchor.base_value)
-
-
-# appraised_value = (anchor.base_value + sum surface_add) * product surface_mul
-func _raw_appraised_value() -> float:
-    var add_sum := 0.0
-    var mul_product := 1.0
-    for clue: ClueData in _get_surface_clues():
-        if revealed_clue_ids.has(clue.clue_id):
-            match clue.effect_op:
-                "add":
-                    add_sum += clue.effect_amount
-                "mul":
-                    mul_product *= clue.effect_amount
-    return (float(_anchor_base_value()) + add_sum) * mul_product
 
 
 ## Returns the effective base value used in verified price resolution.
@@ -558,6 +529,46 @@ func _effective_base_value() -> int:
         if clue.effect_op == "override" and revealed_clue_ids.has(clue.clue_id):
             return int(clue.effect_amount)
     return _anchor_base_value()
+
+
+## Single source of truth for the add-then-mul pricing formula:
+##   (effective_base + Σ_revealed_add) × Π_revealed_mul
+## When [param valued_negative_tags] is non-empty, each revealed surface-negative
+## (mul < 1.0) clue whose id is in the tag list contributes [param valued_negative_bonus]
+## to the add sum and is skipped from the mul product.
+## This unifies the appraised, verified, and customer-aware paths — they all
+## share this one formula.
+func _compute_value(valued_negative_tags: Array[String] = [], valued_negative_bonus: int = 0) -> float:
+    var base := float(_effective_base_value())
+    var add_sum := 0.0
+    var mul_product := 1.0
+    for clue: ClueData in all_clues:
+        if not revealed_clue_ids.has(clue.clue_id):
+            continue
+        if _is_valued_surface_negative(clue, valued_negative_tags):
+            add_sum += valued_negative_bonus
+            continue
+        match clue.effect_op:
+            "add":
+                add_sum += clue.effect_amount
+            "mul":
+                mul_product *= clue.effect_amount
+    return (base + add_sum) * mul_product
+
+
+## Returns true when [param clue] is a revealed surface-negative (mul < 1.0) clue
+## whose id appears in [param valued_tags]. This is the eligibility gate for the
+## valued-negative bonus — only surface mul-under-1.0 clues are eligible.
+func _is_valued_surface_negative(clue: ClueData, valued_tags: Array[String]) -> bool:
+    if valued_tags.is_empty():
+        return false
+    if clue.clue_id not in valued_tags:
+        return false
+    if clue.type != ClueData.ClueType.SURFACE:
+        return false
+    if clue.effect_op != "mul":
+        return false
+    return clue.effect_amount < 1.0
 
 # ══ Clue helpers ══════════════════════════════════════════════════════════════
 

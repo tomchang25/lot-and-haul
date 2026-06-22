@@ -77,7 +77,7 @@ func set_car_info(placed_items: Array) -> void:
         var entry := item as ItemEntry
         if entry == null:
             continue
-        total += entry.item_price
+        total += SellMath.item_contribution(entry, _customer)
         if SellMath.is_item_verified(entry):
             verified_count += 1
     _animate_car_total(total)
