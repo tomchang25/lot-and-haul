@@ -22,7 +22,7 @@ apt-get update -qq && apt-get install -y -qq xvfb libxcursor1 libxinerama1 libxr
 
 ## Procedure
 
-1. Build a clean `/tmp` snapshot following `godot_headless_check.md` with **one critical difference**: run `render_sfx.py` _after_ `--import`, not before (the sfx script needs resolved script UIDs). Full order:
+1. Build a clean `/tmp` snapshot following `godot_test_check.md` with **one critical difference**: run `render_sfx.py` _after_ `--import`, not before (the sfx script needs resolved script UIDs). Full order:
    - `git checkout-index` (or `git archive HEAD` fallback)
    - copy `dev/tools/bin`
    - `yaml_to_tres.py`
@@ -122,5 +122,5 @@ The registry is a `static var`, not a `const`. If you edit it, keep it that way 
 - The game must quit itself (capture script calls `quit()`); otherwise `timeout` kills it and late captures are lost.
 - Identical file sizes across capture frames usually means the screen is static between them, not a capture bug. Use `identify -verbose` on the PNGs to inspect channel statistics, histogram, and confirm whether pixel content differs.
 - Dynamic effects need multiple capture frames (e.g. 3–5 timestamps) — a single still hides timing problems.
-- All `godot_headless_check.md` caveats apply (index staleness + archive fallback, gitignored assets noise, stale `.godot` poisoning UIDs).
+- All `godot_test_check.md` caveats apply (index staleness + archive fallback, gitignored assets noise, stale `.godot` poisoning UIDs).
 - `$LH` does **not** persist across shell calls. Each `bash` invocation needs the literal path from `mktemp` — save it and paste it explicitly.

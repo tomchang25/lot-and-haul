@@ -9,7 +9,7 @@ Canonical invocations live in `.github/workflows/ci.yml` and `.vscode/tasks.json
 
 ## Sandbox procedure
 
-Never run either layer against the mounted working tree (`sandbox_environment.md`). Build a `/tmp` snapshot as in `godot_headless_check.md`, and ensure `/tmp` is container-native Linux storage, not a Windows bind mount such as `E:/tmp:/tmp`: mktemp dir, `git checkout-index`, copy `dev/tools/bin`, regenerate `data/tres/`, render SFX, `rm -rf .godot`, `--import`. The `--import` step is setup only; ignore errors and non-zero exit status from that phase. It is required for Layer 2 (smoke test loads scenes that depend on imported WAV resources); Layer 1 (unit tests) may work without it but still benefits from a clean import. Then:
+Never run either layer against the mounted working tree (`sandbox_environment.md`). Build a `/tmp` snapshot as in `godot_test_check.md`, and ensure `/tmp` is container-native Linux storage, not a Windows bind mount such as `E:/tmp:/tmp`: mktemp dir, `git checkout-index`, copy `dev/tools/bin`, regenerate `data/tres/`, render SFX, `rm -rf .godot`, `--import`. The `--import` step is setup only; ignore errors and non-zero exit status from that phase. It is required for Layer 2 (smoke test loads scenes that depend on imported WAV resources); Layer 1 (unit tests) may work without it but still benefits from a clean import. Then:
 
 ```bash
 # extra step for unit tests: test fixtures are gitignored, so checkout-index omits them
@@ -23,7 +23,7 @@ nohup dev/tools/bin/Godot_v4.6.3-stable_linux.x86_64 --headless --path "$LH" --c
 # later calls: tail "$LH/ci-output.log" until "CI Pilot: autopilot OK|FAILED" appears, then apply the ci.yml grep filter to the log
 ```
 
-Pass criteria: Layer 1 — exit 0 and a summary line with 0 failed / 0 errors. Layer 2 — `CI Pilot: autopilot OK` and no unexpected error lines after the ci.yml benign filter. Missing-asset warnings in `/tmp` runs are expected noise, not findings — see the caveats list in `godot_headless_check.md`.
+Pass criteria: Layer 1 — exit 0 and a summary line with 0 failed / 0 errors. Layer 2 — `CI Pilot: autopilot OK` and no unexpected error lines after the ci.yml benign filter. Missing-asset warnings in `/tmp` runs are expected noise, not findings — see the caveats list in `godot_test_check.md`.
 
 As with the headless check: the snapshot is the **index**, not the working tree — ask the user to `git add` first if results must reflect unstaged edits, and cross-check any failure against the Windows side (Read/Grep file tools) before reporting it as a real bug.
 
