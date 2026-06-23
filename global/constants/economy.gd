@@ -109,9 +109,9 @@ const STORAGE_AP_MAX: int = 10
 const DEEP_STORAGE_AP_MULTIPLIER: float = 2.5
 
 ## AP cost per storage action.
-const REPAIR_AP_COST: int = 2
-const RESTORE_AP_COST: int = 2
-const RESEARCH_AP_COST: int = 4
+const REPAIR_AP_COST: int = 1
+const RESTORE_AP_COST: int = 1
+const RESEARCH_AP_COST: int = 2
 
 # ── Auction two-tier AP ───────────────────────────────────────────────────────
 
