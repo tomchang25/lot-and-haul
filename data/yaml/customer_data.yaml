@@ -7,20 +7,12 @@ customers:
     display_name_key: CUSTOMER_REPAIR_HOBBYIST
     appears_in_timeslot: any
     demand_pool:
-      - watch_crystal_scratched
-      - watch_band_replaced
-      - watch_dial_refinish
-      - bag_stitching_frayed
-      - bag_hardware_tarnished
-      - bag_exterior_faded
-      - lamp_glass_cracked
-      - lamp_glass_mold_seam
-      - clock_case_chipped
-      - clock_finish_shellac
-      - figurine_restoration_chip
-      - vase_rim_chipped
-      - vase_base_ground
-      - poster_backing_linen
+      - common_craft_mold_seam
+      - common_material_shellac
+      - common_material_backing
+      - common_craft_fitted
+      - common_craft_polished
+      - common_material_canvas
     grid_shape_pool:
       - [2, 4]
       - [3, 3]
@@ -32,37 +24,28 @@ customers:
       - [6, 4]
       - [6, 5]
       - [6, 6]
-    valued_negative_tags:
-      - watch_crystal_scratched
-      - watch_band_replaced
-      - bag_stitching_frayed
-      - bag_hardware_tarnished
-      - bag_exterior_faded
-      - lamp_glass_cracked
-      - clock_case_chipped
-      - figurine_restoration_chip
-      - vase_rim_chipped
+    valued_negative_tags: []
 
   - customer_id: vintage_dealer
     display_name_key: CUSTOMER_VINTAGE_DEALER
     appears_in_timeslot: any
     demand_pool:
-      - watch_dial_patina
-      - watch_case_engraved
-      - lamp_glass_blown
-      - lamp_cast_scrollwork
-      - clock_case_gilded
-      - clock_joinery_dovetail
-      - clock_movement_signed
-      - figurine_glaze_celadon
-      - figurine_painting_detail
-      - vase_glass_cased
-      - vase_body_cameo
-      - poster_paper_linen
-      - poster_print_lithograph
-      - bag_exterior_leather
-      - bag_stitching_handmade
-      - bag_serial_present
+      - common_finish_patina_dial
+      - common_mark_engraved
+      - common_craft_blown_glass
+      - common_detail_scrollwork
+      - common_detail_gilded_case
+      - clock_dovetail_joinery
+      - common_mark_signed_movement
+      - common_material_celadon
+      - common_detail_hand_painted
+      - common_material_cased_glass
+      - vase_cameo_body
+      - common_material_linen
+      - poster_lithograph
+      - common_material_leather
+      - common_craft_handmade
+      - common_mark_serial
     grid_shape_pool:
       - [2, 4]
       - [3, 3]
@@ -75,25 +58,20 @@ customers:
       - [6, 5]
       - [6, 6]
     valued_negative_tags:
-      - poster_color_faded
-      - poster_fold_lines
+      - common_form_folded
 
   - customer_id: budget_buyer
     display_name_key: CUSTOMER_BUDGET_BUYER
     appears_in_timeslot: day
     demand_pool:
-      - watch_movement_quartz
-      - bag_exterior_synthetic
-      - lamp_collar_pewter
-      - lamp_glass_mold_seam
-      - figurine_glaze_crazed
-      - figurine_base_unmarked
-      - vase_glass_bubble
-      - vase_rim_chipped
-      - poster_paper_pulp
-      - poster_color_faded
-      - poster_print_offset
-      - bag_stitching_frayed
+      - common_craft_quartz
+      - common_material_synthetic
+      - common_detail_pewter
+      - common_craft_mold_seam
+      - common_mark_base_unmarked
+      - common_material_bubble_glass
+      - common_material_pulp
+      - common_craft_offset_print
     grid_shape_pool:
       - [2, 4]
       - [3, 3]
@@ -102,29 +80,26 @@ customers:
       - [5, 3]
       - [5, 4]
     valued_negative_tags:
-      - watch_movement_quartz
-      - poster_paper_pulp
-      - poster_print_offset
+      - common_craft_quartz
+      - common_material_pulp
+      - common_craft_offset_print
 
   - customer_id: prop_buyer
     display_name_key: CUSTOMER_PROP_BUYER
     appears_in_timeslot: day
     demand_pool:
-      - lamp_glass_blown
-      - lamp_glass_mold_seam
-      - lamp_cast_scrollwork
-      - lamp_collar_pewter
-      - clock_case_veneered
-      - clock_finish_shellac
-      - figurine_form_shepherdess
-      - figurine_glaze_crazed
-      - vase_form_bud
-      - vase_glass_bubble
-      - poster_color_vibrant
-      - poster_print_lithograph
-      - bag_exterior_faded
-      - bag_hardware_tarnished
-      - bag_interior_dated
+      - common_craft_blown_glass
+      - common_craft_mold_seam
+      - common_detail_scrollwork
+      - common_detail_pewter
+      - common_material_veneered
+      - common_material_shellac
+      - figurine_shepherdess_form
+      - common_form_bud
+      - common_material_bubble_glass
+      - common_detail_vibrant
+      - poster_lithograph
+      - common_mark_dated
     grid_shape_pool:
       - [2, 4]
       - [3, 3]
@@ -135,28 +110,25 @@ customers:
       - [5, 5]
       - [6, 4]
     valued_negative_tags:
-      - lamp_glass_mold_seam
-      - figurine_glaze_crazed
-      - bag_exterior_faded
-      - bag_hardware_tarnished
+      - common_craft_mold_seam
 
   - customer_id: estate_collector
     display_name_key: CUSTOMER_ESTATE_COLLECTOR
     appears_in_timeslot: night
     demand_pool:
-      - bag_hardware_palladium
-      - bag_monogram_canvas
+      - common_detail_palladium
+      - handbag_monogram
       - bag_leaf_hermes
-      - watch_movement_chronograph
-      - watch_case_engraved
-      - lamp_collar_silver
-      - lamp_maker_stamped
-      - clock_case_gilded
-      - clock_movement_signed
-      - figurine_gilding_intact
+      - watch_chronograph
+      - common_mark_engraved
+      - common_detail_silver
+      - common_mark_stamped
+      - common_detail_gilded_case
+      - common_mark_signed_movement
+      - common_detail_gilded_figurine
       - figurine_leaf_meissen
-      - vase_body_cameo
-      - vase_maker_etched
+      - vase_cameo_body
+      - common_mark_etched
       - poster_leaf_mucha
     grid_shape_pool:
       - [4, 4]
@@ -171,15 +143,12 @@ customers:
     display_name_key: CUSTOMER_WATCH_SPECIALIST
     appears_in_timeslot: night
     demand_pool:
-      - watch_crystal_scratched
-      - watch_crown_wind
-      - watch_movement_chronograph
-      - watch_movement_jewelled
-      - watch_serial_numbered
-      - watch_case_engraved
-      - watch_dial_patina
-      - watch_dial_refinish
-      - watch_band_replaced
+      - common_detail_crown_wind
+      - watch_chronograph
+      - common_detail_jewelled
+      - common_mark_serial_numbered
+      - common_mark_engraved
+      - common_finish_patina_dial
       - watch_leaf_roleex
     grid_shape_pool:
       - [2, 4]
@@ -187,27 +156,24 @@ customers:
       - [4, 3]
       - [4, 4]
       - [5, 3]
-    valued_negative_tags:
-      - watch_crystal_scratched
-      - watch_dial_refinish
-      - watch_band_replaced
+    valued_negative_tags: []
 
   - customer_id: decorator
     display_name_key: CUSTOMER_DECORATOR
     appears_in_timeslot: day
     demand_pool:
-      - lamp_glass_blown
-      - lamp_cast_scrollwork
-      - lamp_collar_silver
-      - clock_case_veneered
-      - clock_finish_shellac
-      - figurine_glaze_celadon
-      - figurine_form_shepherdess
-      - figurine_gilding_intact
-      - vase_glass_cased
-      - vase_rim_polished
-      - vase_body_cameo
-      - vase_form_bud
+      - common_craft_blown_glass
+      - common_detail_scrollwork
+      - common_detail_silver
+      - common_material_veneered
+      - common_material_shellac
+      - common_material_celadon
+      - figurine_shepherdess_form
+      - common_detail_gilded_figurine
+      - common_material_cased_glass
+      - common_craft_polished
+      - vase_cameo_body
+      - common_form_bud
     grid_shape_pool:
       - [2, 4]
       - [3, 3]

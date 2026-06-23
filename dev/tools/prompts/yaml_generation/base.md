@@ -30,9 +30,11 @@ Players buy mystery lots at auction and identify items over time. Item knowledge
 - `clue_id`: snake_case clue identifier. Must be globally unique across all clues in the project.
 - `item_id`: snake_case item identifier. Must be globally unique across generated items.
 - Prefer short category prefixes for ids, such as `bag_`, `watch_`, `lamp_`, `rifle_`.
-- Anchor ids follow the pattern `<category_prefix>_anchor_NN` (e.g. `clock_anchor_01`, `clock_anchor_02`). Anchors are their own resource (the `anchors:` block), not clues.
-- Hidden identity-reveal clue ids use the suffix `_leaf_{identifier}` (e.g. `lamp_leaf_moser`).
-- Hidden override (counterfeit/sleeper) clue ids use the suffix `_override_{identifier}`.
+- Anchor ids follow the pattern `<category_prefix>_<subtype>_NN` (e.g. `bag_tote_01`, `watch_diver_01`). Anchors are their own resource (the `anchors:` block), not clues.
+- Generic surface clue ids follow the pattern `common_<aspect>_<detail>` (e.g. `common_material_leather`, `common_mark_signed`). No `domain` field — clues are a single global pool.
+- Category-specific surface clues (≤1 per category) use the pattern `<category_id>_<detail>` (e.g. `handbag_monogram`).
+- Hidden identity-reveal clue ids use the suffix `_leaf_{identifier}` (e.g. `lamp_leaf_moser`). Keep category prefix.
+- Hidden override (counterfeit/sleeper) clue ids use the suffix `_override_{identifier}`. Keep category prefix.
 
 ## Text Standards
 
@@ -44,6 +46,7 @@ Players buy mystery lots at auction and identify items over time. Item knowledge
 - **Forbidden `known_text` words.** The following game-mechanic and generic terms MUST NOT appear as any clue's `known_text`:
   `Verified`, `Authentication`, `Authenticated`, `Authentic`, `Identified`, `Generic`, `Unknown`, `Checked`, `Confirmed`, `Validated`, `Appraised`, `Evaluated`
   Clue text must describe a physical observation or historical detail, not a game state or process.
+- **Do not author clues whose known_text implies physical condition, damage, wear, or repair.** The condition system handles item condition separately. Clues describe material, craftsmanship, marks, provenance, medium, and form.
 
 ## Validation Principles
 

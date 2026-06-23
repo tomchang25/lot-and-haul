@@ -70,7 +70,6 @@ class ClueData:
     clue_id: str
     known_text: str = ""
     type: str = "surface"  # "surface" or "hidden"
-    domain: str = "generic"
     attribute: str = ""
     dc: int = 10
     effect_op: str = "add"
@@ -126,7 +125,6 @@ def load_anchors_and_clues(
             clue_id=entry["clue_id"],
             known_text=entry.get("known_text", ""),
             type=entry.get("type", "surface"),
-            domain=entry.get("domain", "generic"),
             attribute=entry.get("attribute", ""),
             dc=int(entry.get("dc", 10)),
             effect_op=entry.get("effect_op", "add"),
@@ -311,17 +309,13 @@ def _pick_combination(
 
 
 def draw_surface_clues(
-    category_id: str,
     count: int,
     clues: list[ClueData],
     rng: random.Random,
 ) -> list[ClueData]:
-    """Draw surface clues (plain-item fallback). See ItemGenerator._draw_surface_clues."""
-    pool = [
-        c
-        for c in clues
-        if c.type == "surface" and (c.domain == "generic" or c.domain == category_id)
-    ]
+    """Draw surface clues from the global pool (plain-item fallback).
+    All surface clues are eligible for every category — no domain filtering."""
+    pool = [c for c in clues if c.type == "surface"]
     actual = min(count, len(pool))
     if actual == 0:
         return []
@@ -463,7 +457,7 @@ def simulate_lot(
         else:
             # Plain-item fallback: surface clues from generic pool, zero hidden
             surface_count = rng.randint(surface_min, surface_max)
-            surface_clues = draw_surface_clues(category_id, surface_count, clues, rng)
+            surface_clues = draw_surface_clues(surface_count, clues, rng)
             surface_ids = [c.clue_id for c in surface_clues]
 
         result = DrawResult(
@@ -533,17 +527,13 @@ def percentile(data: list[float], p: float) -> float:
 
 
 def _check_surface_pool(
-    category_id: str,
     clues: list[ClueData],
 ) -> str | None:
-    pool_size = sum(
-        1
-        for c in clues
-        if c.type == "surface" and (c.domain == "generic" or c.domain == category_id)
-    )
+    """Check the global surface-clue pool (no per-category filtering)."""
+    pool_size = sum(1 for c in clues if c.type == "surface")
     if pool_size < SURFACE_CLUE_MAX:
         return (
-            f"  warning surface pool for '{category_id}' is {pool_size} "
+            f"  warning global surface pool is {pool_size} "
             f"(below SURFACE_CLUE_MAX={SURFACE_CLUE_MAX})"
         )
     return None
@@ -720,7 +710,7 @@ def report_lot(
 
     has_warnings = False
     for cat_id in sorted(seen_categories):
-        w = _check_surface_pool(cat_id, clues)
+        w = _check_surface_pool(clues)
         if w:
             if not has_warnings:
                 print()

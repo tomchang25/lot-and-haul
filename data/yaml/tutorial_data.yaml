@@ -30,7 +30,6 @@ clues:
   - clue_id: tutorial_vase_surface_material
     known_text_key: CLUE_TUTORIAL_VASE_SURFACE_MATERIAL
     type: surface
-    domain: vase
     attribute: appraisal
     dc: 6
     effect_op: add
@@ -39,7 +38,6 @@ clues:
   - clue_id: tutorial_vase_surface_mark
     known_text_key: CLUE_TUTORIAL_VASE_SURFACE_MARK
     type: surface
-    domain: vase
     attribute: perception
     dc: 10
     effect_op: add
@@ -48,7 +46,6 @@ clues:
   - clue_id: tutorial_vase_hidden_authentic
     known_text_key: CLUE_TUTORIAL_VASE_HIDDEN_AUTHENTIC
     type: hidden
-    domain: vase
     attribute: investigation
     dc: 8
     effect_op: mul

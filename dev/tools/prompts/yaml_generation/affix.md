@@ -38,11 +38,11 @@ affixes:
 
 ### Fields
 
-- `affix_id`: unique snake*case ID across all affixes. Prefer `<category_key>*<descriptor>`(e.g.`bag_rustic`, `watch_vintage`).
+- `affix_id`: unique snake_case ID across all affixes. After Phase 1 merge, most affixes use unprefixed IDs like `antique`, `fine`, `service` with `scope_mode: all`. Category-prefixed IDs (e.g. `bag_rustic`) are still valid for special cases but are no longer the default.
 - `naming_slot`: `prefix` or `suffix`. Controls display-name composition in Spec B. At most one prefix and one suffix can be drawn per item, so only prefix × suffix cross-product conflicts are validated — two prefixes on the same category never combine.
-- `display_name`: human-readable label for debug and UI (e.g. `Rustic`, `Vintage`).
-- `scope_mode`: `categories` means this affix applies only to `category_scope`; `all` means this affix can appear on any category.
-- `category_scope`: list of snake_case category ids this affix applies to when `scope_mode: categories`. Each id must match a category in `category_data.yaml`. Use an empty list only when `scope_mode: all`.
+- `display_name_key`: localization key for the human-readable label (e.g. `AFFIX_ANTIQUE`).
+- `scope_mode`: controls draw eligibility. **`all`** (preferred) — this affix can appear on any category. `categories` — this affix applies only to the listed `category_scope` entries (use for test data or category-restricted designs).
+- `category_scope`: list of snake_case category ids this affix applies to when `scope_mode: categories`. Each id must match a category in `category_data.yaml`. Omit or leave empty when `scope_mode: all`.
 - `weight`: relative draw weight. Higher = more frequent. Must be a positive int.
 - `combination_ids`: list of combination ids belonging to this affix. Order sets ext-resolve order but has no functional weight. Every id must be defined in the `affix_combinations:` block.
 
@@ -152,11 +152,11 @@ The naming system is deferred — this field is authored now so it round-trips t
 ## ID Conventions
 
 ```
-<category_key>_<descriptor>            — affix_id (bag_rustic, watch_vintage)
-comb_<category_key>_<descriptor>_NN    — combination_id (comb_bag_rustic_01)
+<unprefixed_descriptor>                — affix_id (antique, fine, service, modern)
+comb_<descriptor>_NN                   — combination_id (comb_antique_01)
 ```
 
-Short category prefixes are fine (`bag_`, `watch_`, `lamp_`).
+After Phase 1 merge, most affix IDs are unprefixed and use `scope_mode: all`. Category-prefixed IDs (`bag_rustic`, `watch_vintage`) are still valid for special/restricted cases.
 
 ---
 
@@ -176,7 +176,7 @@ vase  poster  painting  sculpture  pistol  rifle  crossbow
 - Every `combination_id` is unique and snake_case.
 - Every affix has `naming_slot` (`prefix` or `suffix`), `display_name`, `scope_mode`, `category_scope`, `weight`, and at least one `combination_id`.
 - Every combination has `affix_id`, `weight`, and references at least one clue across `surface_clue_ids` and `hidden_clue_ids`.
-- `scope_mode: categories` has at least one valid `category_scope` entry; `scope_mode: all` has an empty `category_scope`.
+- `scope_mode: all` is the standard (no `category_scope` needed). `scope_mode: categories` is valid with at least one `category_scope` entry.
 - Every `affix_id` referenced in a combination matches a defined affix.
 - Every clue id in `surface_clue_ids` and `hidden_clue_ids` exists in `clues.yaml` with the correct type.
 - Every `weight` is a positive int (both affix-level and combination-level).
@@ -189,35 +189,31 @@ vase  poster  painting  sculpture  pistol  rifle  crossbow
 
 ```yaml
 affix_combinations:
-  - combination_id: comb_bag_rustic_01
-    affix_id: bag_rustic
+  - combination_id: comb_antique_01
+    affix_id: antique
     weight: 3
     surface_clue_ids:
-      - bag_exterior_faded
-      - bag_hardware_tarnished
+      - common_material_leather
     hidden_clue_ids:
       - bag_leaf_coach
 
-  - combination_id: comb_bag_rustic_02
-    affix_id: bag_rustic
+  - combination_id: comb_antique_02
+    affix_id: antique
     weight: 1
     surface_clue_ids:
-      - bag_exterior_synthetic
-      - bag_hardware_tarnished
+      - common_material_synthetic
     hidden_clue_ids:
       - bag_override_replica
 
 affixes:
-  - affix_id: bag_rustic
+  - affix_id: antique
     naming_slot: prefix
-    display_name: Rustic
-    scope_mode: categories
-    category_scope:
-      - handbag
+    display_name_key: AFFIX_ANTIQUE
+    scope_mode: all
     weight: 3
     combination_ids:
-      - comb_bag_rustic_01
-      - comb_bag_rustic_02
+      - comb_antique_01
+      - comb_antique_02
 ```
 
-This affix is drawn on ~30% of handbag items (weight 3 versus the plain-item baseline). When drawn, the item gets surface clues bundled by the chosen combination — "Faded Tarnished Bag" for comb_01 or "Synthetic Tarnished Bag" for comb_02. The hidden clue reveals "Coach Bag" (2.8× verified multiplier) 60% of the time, or "Reproduction Bag" (collapsed to override base 120) 20% of the time. The remaining 70% of handbags are plain items with no affix and no hidden clues.
+This affix is drawn at weight 3 versus the plain-item baseline. With `scope_mode: all`, it is eligible for every category. When drawn, the chosen combination supplies the surface clues — "Leather Bag" for comb_01 (a genuine path) or "Synthetic Bag" for comb_02 (a counterfeit risk). The hidden clue in the genuine path reveals a maker leaf with a high mul multiplier; the counterfeit path collapses to the override base. Categories with their own category-specific affixes still draw them because each affix's draw is independent.

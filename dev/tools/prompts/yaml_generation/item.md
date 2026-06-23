@@ -57,8 +57,8 @@ A LEGENDARY item carries 4 hidden clues; each may be positive or negative.
 
 ```yaml
 anchors:
-  - anchor_id: <category_prefix>_anchor_NN # e.g. lamp_anchor_01, clock_anchor_02
-    known_text: "..." # the bare category noun shown as the body name; max 3 words
+  - anchor_id: <category_prefix>_<subtype>_NN # e.g. bag_tote_01, watch_diver_01, clock_mantel_01
+    known_text_key: ANCHOR_<CAT>_<SUBTYPE>_<TIER> # matches sub-type display name
     category_scope: <category_id> # must match a defined category
     base_value: <number> # > 0; the item's starting visible price (see tier budgets)
     shape_id: <shape_key> # cargo grid footprint; see valid shapes
@@ -67,9 +67,9 @@ anchors:
     tier: <1–5> # value tier; used by pool-draw tier weight curves
 ```
 
-Anchors carry **no** `dc`, `attribute`, `effect_op`, `type`, `domain`, `naming`, or `naming_priority` field. They are auto-revealed on first inspect, so they have no discovery roll. `known_text` is the plain body noun used by affix-only display-name composition.
+Anchors carry **no** `dc`, `attribute`, `effect_op`, `type`, `domain`, `naming`, or `naming_priority` field. They are auto-revealed on first inspect, so they have no discovery roll. `known_text_key` resolves to the sub-type display name used by affix-only display-name composition.
 
-**Each category must define at least two anchor variants at different tiers** (a cheap variant and a premium variant). Different items in the same category reference different anchors. `known_text` is the plain noun (`Lamp`, `Clock`, `Pistol`) — qualifiers come from affixes, not clues.
+**Each category must define at least two anchor variants at different tiers** (a cheap variant and a premium variant), ideally 3+ with distinct sub-type names (e.g. `bag_tote_01`, `bag_satchel_02`, `bag_clutch_03`). `known_text_key` provides the sub-type noun (`Tote`, `Satchel`, `Clutch`) — qualifiers come from affixes, not clues.
 
 ---
 
@@ -80,7 +80,6 @@ clues:
   - clue_id: unique_snake_case_id
     known_text: "..." # shown after reveal; max 3 words
     type: surface | hidden
-    domain: generic | <category_id>
     attribute: appraisal | perception | investigation | restoration # negotiation is sell-phase only
     dc: <int> # surface 10–18, hidden 20–25
     effect_op: add | mul | override # 'override' is hidden-only
@@ -88,12 +87,14 @@ clues:
     exclusive_group: <string> # HIDDEN-ONLY; at most one clue per group per item
 ```
 
-`exclusive_group` is written only on hidden clues; the converter blanks it on surface clues. Clues do **not** carry a `naming` block; item names are composed from affixes plus the anchor body.
+Clues carry **no** `domain` field — they are a single global pool, not category-bound. `exclusive_group` is written only on hidden clues; the converter blanks it on surface clues. Clues do **not** carry a `naming` block; item names are composed from affixes plus the anchor body.
+
+**Do not generate condition, damage, wear, or repair clues.** The condition system handles item condition separately. Clues describe material, craftsmanship, marks, provenance, medium, and form.
 
 ### Surface clues (2–6 per item, count varies by super-category)
 
 - `effect_op: add` is the default — a flat addition to the running price. **Add is value-positive only — never use add with a negative amount.**
-- `effect_op: mul` is used for proportional quality/wear effects (e.g. `0.85` heavy wear, `1.3` exceptional finish).
+- `effect_op: mul` is used for proportional quality/wear effects (e.g. `0.85` minor defect, `1.3` exceptional finish).
 - `effect_amount` must be **non-zero**.
   - Positive `add`: value-adding detail (maker mark, fine material, good feature).
   - **Negative required**: every category pool must include at least one value-reducing surface clue — use `mul < 1.0` (never negative add).
@@ -205,13 +206,14 @@ Item names are affix-only:
 ## ID Conventions
 
 ```
-<category_prefix>_anchor_NN           — anchor variants (01, 02, 03 …)
-<category_id>_<aspect>_<detail>        — surface clue
+<category_prefix>_<subtype>_NN         — anchor variants with sub-type names (tote_01, diver_01 …)
+common_<aspect>_<detail>               — generic surface clue (material, craft, mark, form, etc.)
+<category_id>_<detail>                 — category-specific surface clue (≤1 per category; e.g. handbag_monogram)
 <category_id>_leaf_<maker>             — hidden positive identity reveal (genuine maker / sleeper)
 <category_id>_override_<identifier>    — hidden override (counterfeit collapse / sleeper base-swap)
 ```
 
-Short category prefixes for ids are fine (`bag_`, `watch_`, `lamp_`).
+Short category prefixes for ids are fine (`bag_`, `watch_`, `lamp_`). Generic surface clues use `common_` prefix with no category affiliation.
 
 ---
 
@@ -241,8 +243,8 @@ vase  poster  painting  sculpture  pistol  rifle  crossbow
 # and a mutually-exclusive genuine/counterfeit hidden pair sharing one exclusive_group.
 
 anchors:
-  - anchor_id: clock_anchor_01
-    known_text: Clock
+  - anchor_id: clock_mantel_01
+    known_text_key: ANCHOR_CLOCK_MANTEL_01
     category_scope: clock
     base_value: 60
     shape_id: s1x3
@@ -250,8 +252,8 @@ anchors:
     weight_kg: 3.5
     tier: 1
 
-  - anchor_id: clock_anchor_02
-    known_text: Clock
+  - anchor_id: clock_tall_02
+    known_text_key: ANCHOR_CLOCK_TALL_02
     category_scope: clock
     base_value: 500
     shape_id: s1x3
@@ -260,28 +262,25 @@ anchors:
     tier: 3
 
 clues:
-  - clue_id: clock_case_gilded
+  - clue_id: common_detail_gilded
     known_text: Gilded
     type: surface
-    domain: clock
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 280
 
-  - clue_id: clock_case_cracked
-    known_text: Cracked
+  - clue_id: common_material_canvas
+    known_text: Canvas
     type: surface
-    domain: clock
     attribute: restoration
     dc: 10
-    effect_op: add
-    effect_amount: -60
+    effect_op: mul
+    effect_amount: 0.85
 
-  - clue_id: clock_movement_signed
+  - clue_id: common_mark_signed
     known_text: Signed
     type: surface
-    domain: clock
     attribute: investigation
     dc: 16
     effect_op: add
@@ -290,7 +289,6 @@ clues:
   - clue_id: clock_leaf_boulle
     known_text: Boulle
     type: hidden
-    domain: clock
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -300,7 +298,6 @@ clues:
   - clue_id: clock_override_reproduction
     known_text: Reproduction
     type: hidden
-    domain: clock
     attribute: investigation
     dc: 22
     effect_op: override
@@ -310,7 +307,6 @@ clues:
   - clue_id: clock_movement_swiss
     known_text: Swiss
     type: hidden
-    domain: clock
     attribute: investigation
     dc: 21
     effect_op: mul
@@ -324,38 +320,38 @@ items:
   - item_id: clock_mantel_common
     category_id: clock
     rarity: 0
-    anchor_id: clock_anchor_01
+    anchor_id: clock_mantel_01
     surface_ids:
-      - clock_case_gilded
-      - clock_case_cracked
+      - common_detail_gilded
+      - common_material_canvas
 
   - item_id: clock_signed_uncommon
     category_id: clock
     rarity: 1
-    anchor_id: clock_anchor_02
+    anchor_id: clock_tall_02
     surface_ids:
-      - clock_case_gilded
-      - clock_movement_signed
+      - common_detail_gilded
+      - common_mark_signed
     hidden_ids:
       - clock_leaf_boulle
 
   - item_id: clock_repro_uncommon
     category_id: clock
     rarity: 1
-    anchor_id: clock_anchor_02
+    anchor_id: clock_tall_02
     surface_ids:
-      - clock_case_gilded
+      - common_detail_gilded
     hidden_ids:
       - clock_override_reproduction
 
   - item_id: clock_boulle_rare
     category_id: clock
     rarity: 2
-    anchor_id: clock_anchor_02
+    anchor_id: clock_tall_02
     surface_ids:
-      - clock_case_gilded
-      - clock_case_cracked
-      - clock_movement_signed
+      - common_detail_gilded
+      - common_material_canvas
+      - common_mark_signed
     hidden_ids:
       - clock_leaf_boulle
       - clock_movement_swiss
@@ -363,8 +359,8 @@ items:
 
 Notes on the example:
 
-- `clock_mantel_common` is COMMON (rarity 0, 0 hidden) — verified immediately. Its display name is the anchor body plus any drawn affixes; clues do not rename it.
+- `clock_mantel_common` is COMMON (rarity 0, 0 hidden) — verified immediately. Its display name is the anchor sub-type plus any drawn affixes; clues do not rename it.
 - `clock_leaf_boulle` and `clock_override_reproduction` both sit in `exclusive_group: authenticity_clock`. They are **alternatives** — `clock_signed_uncommon` draws the genuine `_leaf_`, `clock_repro_uncommon` draws the counterfeit `_override_`. **No single item carries both**, which is exactly what the one-per-group rule enforces.
 - `clock_boulle_rare` is RARE (rarity 2). Its two hidden clues are `clock_leaf_boulle` (group `authenticity_clock`) and `clock_movement_swiss` (**no group**) — so they do not collide, and neither is an `override`, so the one-override limit holds.
-- `clock_case_cracked` is the required negative surface clue; `clock_override_reproduction` is the required negative hidden — on `clock_repro_uncommon` it collapses the tier-3 base (500) to 120 (~24%, within the counterfeit budget).
-- `clock_anchor_01` (tier 1, base 60) and `clock_anchor_02` (tier 3, base 500) are separate anchors; different items reference different variants.
+- `clock_override_reproduction` is the required negative hidden — on `clock_repro_uncommon` it collapses the tier-3 base (500) to 120 (~24%, within the counterfeit budget).
+- `clock_mantel_01` (tier 1, base 60) and `clock_tall_02` (tier 3, base 500) are separate anchors with sub-type names; different items reference different variants.

@@ -1,62 +1,62 @@
 anchors:
-  - anchor_id: bag_anchor_01
-    known_text_key: ANCHOR_BAG_ANCHOR_01
+  - anchor_id: bag_tote_01
+    known_text_key: ANCHOR_BAG_TOTE_01
     category_scope: handbag
     base_value: 40
     shape_id: s1x2
     sprite: ""
     weight_kg: 0.5
     tier: 1
-  - anchor_id: bag_anchor_02
-    known_text_key: ANCHOR_BAG_ANCHOR_02
+  - anchor_id: bag_satchel_02
+    known_text_key: ANCHOR_BAG_SATCHEL_02
     category_scope: handbag
     base_value: 220
     shape_id: s1x2
     sprite: ""
     weight_kg: 0.6
     tier: 2
-  - anchor_id: bag_anchor_03
-    known_text_key: ANCHOR_BAG_ANCHOR_03
+  - anchor_id: bag_clutch_03
+    known_text_key: ANCHOR_BAG_CLUTCH_03
     category_scope: handbag
     base_value: 550
     shape_id: s1x2
     sprite: ""
     weight_kg: 0.7
     tier: 3
-  - anchor_id: bag_anchor_04
-    known_text_key: ANCHOR_BAG_ANCHOR_04
+  - anchor_id: bag_messenger_04
+    known_text_key: ANCHOR_BAG_MESSENGER_04
     category_scope: handbag
     base_value: 1200
     shape_id: s1x2
     sprite: ""
     weight_kg: 0.8
     tier: 4
-  - anchor_id: watch_anchor_01
-    known_text_key: ANCHOR_WATCH_ANCHOR_01
+  - anchor_id: watch_diver_01
+    known_text_key: ANCHOR_WATCH_DIVER_01
     category_scope: wristwatch
     base_value: 30
     shape_id: s1x1
     sprite: ""
     weight_kg: 0.1
     tier: 1
-  - anchor_id: watch_anchor_02
-    known_text_key: ANCHOR_WATCH_ANCHOR_02
+  - anchor_id: watch_field_02
+    known_text_key: ANCHOR_WATCH_FIELD_02
     category_scope: wristwatch
     base_value: 200
     shape_id: s1x1
     sprite: ""
     weight_kg: 0.12
     tier: 2
-  - anchor_id: watch_anchor_03
-    known_text_key: ANCHOR_WATCH_ANCHOR_03
+  - anchor_id: watch_dress_03
+    known_text_key: ANCHOR_WATCH_DRESS_03
     category_scope: wristwatch
     base_value: 500
     shape_id: s1x1
     sprite: ""
     weight_kg: 0.14
     tier: 3
-  - anchor_id: watch_anchor_04
-    known_text_key: ANCHOR_WATCH_ANCHOR_04
+  - anchor_id: watch_pilot_04
+    known_text_key: ANCHOR_WATCH_PILOT_04
     category_scope: wristwatch
     base_value: 1100
     shape_id: s1x1
@@ -79,16 +79,16 @@ anchors:
     sprite: ""
     weight_kg: 1.8
     tier: 2
-  - anchor_id: clock_anchor_01
-    known_text_key: ANCHOR_CLOCK_ANCHOR_01
+  - anchor_id: clock_mantel_01
+    known_text_key: ANCHOR_CLOCK_MANTEL_01
     category_scope: clock
     base_value: 70
     shape_id: s1x3
     sprite: ""
     weight_kg: 3.5
     tier: 1
-  - anchor_id: clock_anchor_02
-    known_text_key: ANCHOR_CLOCK_ANCHOR_02
+  - anchor_id: clock_tall_02
+    known_text_key: ANCHOR_CLOCK_TALL_02
     category_scope: clock
     base_value: 350
     shape_id: s1x3
@@ -111,128 +111,128 @@ anchors:
     sprite: ""
     weight_kg: 0.7
     tier: 2
-  - anchor_id: vase_anchor_01
-    known_text_key: ANCHOR_VASE_ANCHOR_01
+  - anchor_id: vase_bud_01
+    known_text_key: ANCHOR_VASE_BUD_01
     category_scope: vase
     base_value: 60
     shape_id: s1x2
     sprite: ""
     weight_kg: 1.8
     tier: 1
-  - anchor_id: vase_anchor_02
-    known_text_key: ANCHOR_VASE_ANCHOR_02
+  - anchor_id: vase_urn_02
+    known_text_key: ANCHOR_VASE_URN_02
     category_scope: vase
     base_value: 300
     shape_id: s1x2
     sprite: ""
     weight_kg: 2.0
     tier: 2
-  - anchor_id: poster_anchor_01
-    known_text_key: ANCHOR_POSTER_ANCHOR_01
+  - anchor_id: poster_onesheet_01
+    known_text_key: ANCHOR_POSTER_ONESHEET_01
     category_scope: poster
     base_value: 40
     shape_id: s1x3
     sprite: ""
     weight_kg: 0.2
     tier: 1
-  - anchor_id: poster_anchor_02
-    known_text_key: ANCHOR_POSTER_ANCHOR_02
+  - anchor_id: poster_window_02
+    known_text_key: ANCHOR_POSTER_WINDOW_02
     category_scope: poster
     base_value: 260
     shape_id: s1x3
     sprite: ""
     weight_kg: 0.2
     tier: 2
-  - anchor_id: painting_anchor_01
-    known_text_key: ANCHOR_PAINTING_ANCHOR_01
+  - anchor_id: painting_panel_03
+    known_text_key: ANCHOR_PAINTING_PANEL_03
     category_scope: painting
     base_value: 600
     shape_id: s1x3
     sprite: ""
     weight_kg: 1.5
     tier: 3
-  - anchor_id: painting_anchor_02
-    known_text_key: ANCHOR_PAINTING_ANCHOR_02
+  - anchor_id: painting_canvas_04
+    known_text_key: ANCHOR_PAINTING_CANVAS_04
     category_scope: painting
     base_value: 1200
     shape_id: s1x3
     sprite: ""
     weight_kg: 2.0
     tier: 4
-  - anchor_id: painting_anchor_03
-    known_text_key: ANCHOR_PAINTING_ANCHOR_03
+  - anchor_id: painting_framed_05
+    known_text_key: ANCHOR_PAINTING_FRAMED_05
     category_scope: painting
     base_value: 2800
     shape_id: s1x3
     sprite: ""
     weight_kg: 2.5
     tier: 5
-  - anchor_id: sculpture_anchor_01
-    known_text_key: ANCHOR_SCULPTURE_ANCHOR_01
+  - anchor_id: sculpture_bust_03
+    known_text_key: ANCHOR_SCULPTURE_BUST_03
     category_scope: sculpture
     base_value: 550
     shape_id: s1x3
     sprite: ""
     weight_kg: 6.0
     tier: 3
-  - anchor_id: sculpture_anchor_02
-    known_text_key: ANCHOR_SCULPTURE_ANCHOR_02
+  - anchor_id: sculpture_figural_04
+    known_text_key: ANCHOR_SCULPTURE_FIGURAL_04
     category_scope: sculpture
     base_value: 1300
     shape_id: s1x3
     sprite: ""
     weight_kg: 8.0
     tier: 4
-  - anchor_id: sculpture_anchor_03
-    known_text_key: ANCHOR_SCULPTURE_ANCHOR_03
+  - anchor_id: sculpture_abstract_05
+    known_text_key: ANCHOR_SCULPTURE_ABSTRACT_05
     category_scope: sculpture
     base_value: 3000
     shape_id: s1x3
     sprite: ""
     weight_kg: 10.0
     tier: 5
-  - anchor_id: pistol_anchor_01
-    known_text_key: ANCHOR_PISTOL_ANCHOR_01
+  - anchor_id: pistol_pepperbox_02
+    known_text_key: ANCHOR_PISTOL_PEPPERBOX_02
     category_scope: pistol
     base_value: 180
     shape_id: sL11
     sprite: ""
     weight_kg: 1.2
     tier: 2
-  - anchor_id: pistol_anchor_02
-    known_text_key: ANCHOR_PISTOL_ANCHOR_02
+  - anchor_id: pistol_derringer_03
+    known_text_key: ANCHOR_PISTOL_DERRINGER_03
     category_scope: pistol
     base_value: 500
     shape_id: sL11
     sprite: ""
     weight_kg: 1.4
     tier: 3
-  - anchor_id: rifle_anchor_01
-    known_text_key: ANCHOR_RIFLE_ANCHOR_01
+  - anchor_id: rifle_carbine_02
+    known_text_key: ANCHOR_RIFLE_CARBINE_02
     category_scope: rifle
     base_value: 220
     shape_id: sL12
     sprite: ""
     weight_kg: 4.0
     tier: 2
-  - anchor_id: rifle_anchor_02
-    known_text_key: ANCHOR_RIFLE_ANCHOR_02
+  - anchor_id: rifle_musket_03
+    known_text_key: ANCHOR_RIFLE_MUSKET_03
     category_scope: rifle
     base_value: 600
     shape_id: sL12
     sprite: ""
     weight_kg: 4.5
     tier: 3
-  - anchor_id: crossbow_anchor_01
-    known_text_key: ANCHOR_CROSSBOW_ANCHOR_01
+  - anchor_id: crossbow_target_02
+    known_text_key: ANCHOR_CROSSBOW_TARGET_02
     category_scope: crossbow
     base_value: 200
     shape_id: sT3
     sprite: ""
     weight_kg: 3.0
     tier: 2
-  - anchor_id: crossbow_anchor_02
-    known_text_key: ANCHOR_CROSSBOW_ANCHOR_02
+  - anchor_id: crossbow_siege_03
+    known_text_key: ANCHOR_CROSSBOW_SIEGE_03
     category_scope: crossbow
     base_value: 520
     shape_id: sT3
@@ -240,114 +240,79 @@ anchors:
     weight_kg: 3.5
     tier: 3
 clues:
-  - clue_id: bag_exterior_leather
-    known_text_key: CLUE_BAG_EXTERIOR_LEATHER
+  - clue_id: common_material_leather
+    known_text_key: CLUE_COMMON_MATERIAL_LEATHER
     type: surface
-    domain: handbag
     attribute: appraisal
     dc: 10
     effect_op: add
     effect_amount: 60
-  - clue_id: bag_exterior_synthetic
-    known_text_key: CLUE_BAG_EXTERIOR_SYNTHETIC
+  - clue_id: common_material_synthetic
+    known_text_key: CLUE_COMMON_MATERIAL_SYNTHETIC
     type: surface
-    domain: handbag
     attribute: appraisal
     dc: 10
     effect_op: mul
     effect_amount: 0.85
-  - clue_id: bag_exterior_crocodile
-    known_text_key: CLUE_BAG_EXTERIOR_CROCODILE
+  - clue_id: common_material_crocodile
+    known_text_key: CLUE_COMMON_MATERIAL_CROCODILE
     type: surface
-    domain: handbag
     attribute: appraisal
     dc: 16
     effect_op: mul
     effect_amount: 1.25
-  - clue_id: bag_exterior_faded
-    known_text_key: CLUE_BAG_EXTERIOR_FADED
+  - clue_id: common_detail_brass
+    known_text_key: CLUE_COMMON_DETAIL_BRASS
     type: surface
-    domain: handbag
-    attribute: perception
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.85
-  - clue_id: bag_hardware_brass
-    known_text_key: CLUE_BAG_HARDWARE_BRASS
-    type: surface
-    domain: handbag
     attribute: perception
     dc: 12
     effect_op: add
     effect_amount: 120
-  - clue_id: bag_hardware_palladium
-    known_text_key: CLUE_BAG_HARDWARE_PALLADIUM
+  - clue_id: common_detail_palladium
+    known_text_key: CLUE_COMMON_DETAIL_PALLADIUM
     type: surface
-    domain: handbag
     attribute: perception
     dc: 16
     effect_op: add
     effect_amount: 350
-  - clue_id: bag_hardware_tarnished
-    known_text_key: CLUE_BAG_HARDWARE_TARNISHED
+  - clue_id: common_craft_handmade
+    known_text_key: CLUE_COMMON_CRAFT_HANDMADE
     type: surface
-    domain: handbag
-    attribute: perception
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.88
-  - clue_id: bag_stitching_handmade
-    known_text_key: CLUE_BAG_STITCHING_HANDMADE
-    type: surface
-    domain: handbag
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 200
-  - clue_id: bag_stitching_frayed
-    known_text_key: CLUE_BAG_STITCHING_FRAYED
+  - clue_id: common_mark_dated
+    known_text_key: CLUE_COMMON_MARK_DATED
     type: surface
-    domain: handbag
-    attribute: restoration
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.7
-  - clue_id: bag_interior_dated
-    known_text_key: CLUE_BAG_INTERIOR_DATED
-    type: surface
-    domain: handbag
     attribute: investigation
     dc: 14
     effect_op: add
     effect_amount: 100
-  - clue_id: bag_monogram_canvas
-    known_text_key: CLUE_BAG_MONOGRAM_CANVAS
+  - clue_id: handbag_monogram
+    known_text_key: CLUE_HANDBAG_MONOGRAM
     type: surface
-    domain: handbag
     attribute: investigation
     dc: 16
     effect_op: add
     effect_amount: 250
-  - clue_id: bag_serial_present
-    known_text_key: CLUE_BAG_SERIAL_PRESENT
+  - clue_id: common_mark_serial
+    known_text_key: CLUE_COMMON_MARK_SERIAL
     type: surface
-    domain: handbag
     attribute: investigation
     dc: 14
     effect_op: add
     effect_amount: 90
-  - clue_id: bag_blind_stamp
-    known_text_key: CLUE_BAG_BLIND_STAMP
+  - clue_id: common_mark_blind_stamp
+    known_text_key: CLUE_COMMON_MARK_BLIND_STAMP
     type: surface
-    domain: handbag
     attribute: appraisal
     dc: 18
     effect_op: add
     effect_amount: 400
-  - clue_id: bag_lining_synthetic
-    known_text_key: CLUE_BAG_LINING_SYNTHETIC
+  - clue_id: common_material_lining
+    known_text_key: CLUE_COMMON_MATERIAL_LINING
     type: surface
-    domain: handbag
     attribute: perception
     dc: 10
     effect_op: add
@@ -355,7 +320,6 @@ clues:
   - clue_id: bag_leaf_hermes
     known_text_key: CLUE_BAG_LEAF_HERMES
     type: hidden
-    domain: handbag
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -364,7 +328,6 @@ clues:
   - clue_id: bag_leaf_vuitton
     known_text_key: CLUE_BAG_LEAF_VUITTON
     type: hidden
-    domain: handbag
     attribute: investigation
     dc: 21
     effect_op: mul
@@ -373,7 +336,6 @@ clues:
   - clue_id: bag_leaf_chanel
     known_text_key: CLUE_BAG_LEAF_CHANEL
     type: hidden
-    domain: handbag
     attribute: investigation
     dc: 21
     effect_op: mul
@@ -382,7 +344,6 @@ clues:
   - clue_id: bag_leaf_coach
     known_text_key: CLUE_BAG_LEAF_COACH
     type: hidden
-    domain: handbag
     attribute: investigation
     dc: 20
     effect_op: mul
@@ -391,120 +352,77 @@ clues:
   - clue_id: bag_override_replica
     known_text_key: CLUE_BAG_OVERRIDE_REPLICA
     type: hidden
-    domain: handbag
     attribute: investigation
     dc: 20
     effect_op: override
     effect_amount: 120
     exclusive_group: authenticity_handbag
-  - clue_id: bag_hidden_water_stain
-    known_text_key: CLUE_BAG_HIDDEN_WATER_STAIN
-    type: hidden
-    domain: handbag
-    attribute: restoration
-    dc: 21
-    effect_op: mul
-    effect_amount: 0.78
   - clue_id: bag_hidden_limited_run
     known_text_key: CLUE_BAG_HIDDEN_LIMITED_RUN
     type: hidden
-    domain: handbag
     attribute: investigation
     dc: 22
     effect_op: mul
     effect_amount: 1.4
-  - clue_id: watch_case_lugs
-    known_text_key: CLUE_WATCH_CASE_LUGS
+  - clue_id: common_detail_lugs
+    known_text_key: CLUE_COMMON_DETAIL_LUGS
     type: surface
-    domain: wristwatch
     attribute: appraisal
     dc: 10
     effect_op: add
     effect_amount: 50
-  - clue_id: watch_crystal_scratched
-    known_text_key: CLUE_WATCH_CRYSTAL_SCRATCHED
+  - clue_id: common_detail_crown_wind
+    known_text_key: CLUE_COMMON_DETAIL_CROWN_WIND
     type: surface
-    domain: wristwatch
-    attribute: perception
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.82
-  - clue_id: watch_crown_wind
-    known_text_key: CLUE_WATCH_CROWN_WIND
-    type: surface
-    domain: wristwatch
     attribute: perception
     dc: 12
     effect_op: add
     effect_amount: 80
-  - clue_id: watch_movement_chronograph
-    known_text_key: CLUE_WATCH_MOVEMENT_CHRONOGRAPH
+  - clue_id: watch_chronograph
+    known_text_key: CLUE_WATCH_CHRONOGRAPH
     type: surface
-    domain: wristwatch
     attribute: appraisal
     dc: 16
     effect_op: add
     effect_amount: 220
-  - clue_id: watch_movement_jewelled
-    known_text_key: CLUE_WATCH_MOVEMENT_JEWELLED
+  - clue_id: common_detail_jewelled
+    known_text_key: CLUE_COMMON_DETAIL_JEWELLED
     type: surface
-    domain: wristwatch
     attribute: appraisal
     dc: 14
     effect_op: add
     effect_amount: 130
-  - clue_id: watch_movement_quartz
-    known_text_key: CLUE_WATCH_MOVEMENT_QUARTZ
+  - clue_id: common_craft_quartz
+    known_text_key: CLUE_COMMON_CRAFT_QUARTZ
     type: surface
-    domain: wristwatch
     attribute: investigation
     dc: 12
     effect_op: mul
     effect_amount: 0.8
-  - clue_id: watch_serial_numbered
-    known_text_key: CLUE_WATCH_SERIAL_NUMBERED
+  - clue_id: common_mark_serial_numbered
+    known_text_key: CLUE_COMMON_MARK_SERIAL_NUMBERED
     type: surface
-    domain: wristwatch
     attribute: investigation
     dc: 14
     effect_op: add
     effect_amount: 100
-  - clue_id: watch_case_engraved
-    known_text_key: CLUE_WATCH_CASE_ENGRAVED
+  - clue_id: common_mark_engraved
+    known_text_key: CLUE_COMMON_MARK_ENGRAVED
     type: surface
-    domain: wristwatch
     attribute: investigation
     dc: 16
     effect_op: add
     effect_amount: 180
-  - clue_id: watch_dial_patina
-    known_text_key: CLUE_WATCH_DIAL_PATINA
+  - clue_id: common_finish_patina_dial
+    known_text_key: CLUE_COMMON_FINISH_PATINA_DIAL
     type: surface
-    domain: wristwatch
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 40
-  - clue_id: watch_dial_refinish
-    known_text_key: CLUE_WATCH_DIAL_REFINISH
-    type: surface
-    domain: wristwatch
-    attribute: restoration
-    dc: 14
-    effect_op: mul
-    effect_amount: 0.9
-  - clue_id: watch_band_replaced
-    known_text_key: CLUE_WATCH_BAND_REPLACED
-    type: surface
-    domain: wristwatch
-    attribute: restoration
-    dc: 10
-    effect_op: mul
-    effect_amount: 0.7
   - clue_id: watch_leaf_roleex
     known_text_key: CLUE_WATCH_LEAF_ROLEEX
     type: hidden
-    domain: wristwatch
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -513,7 +431,6 @@ clues:
   - clue_id: watch_leaf_longines
     known_text_key: CLUE_WATCH_LEAF_LONGINES
     type: hidden
-    domain: wristwatch
     attribute: investigation
     dc: 21
     effect_op: mul
@@ -522,7 +439,6 @@ clues:
   - clue_id: watch_leaf_seiko
     known_text_key: CLUE_WATCH_LEAF_SEIKO
     type: hidden
-    domain: wristwatch
     attribute: investigation
     dc: 20
     effect_op: mul
@@ -531,7 +447,6 @@ clues:
   - clue_id: watch_leaf_timex
     known_text_key: CLUE_WATCH_LEAF_TIMEX
     type: hidden
-    domain: wristwatch
     attribute: investigation
     dc: 20
     effect_op: mul
@@ -540,104 +455,77 @@ clues:
   - clue_id: watch_override_franken
     known_text_key: CLUE_WATCH_OVERRIDE_FRANKEN
     type: hidden
-    domain: wristwatch
     attribute: investigation
     dc: 20
     effect_op: override
     effect_amount: 80
     exclusive_group: authenticity_wristwatch
-  - clue_id: watch_hidden_movement_swap
-    known_text_key: CLUE_WATCH_HIDDEN_MOVEMENT_SWAP
-    type: hidden
-    domain: wristwatch
-    attribute: restoration
-    dc: 22
-    effect_op: mul
-    effect_amount: 0.65
   - clue_id: watch_hidden_box_papers
     known_text_key: CLUE_WATCH_HIDDEN_BOX_PAPERS
     type: hidden
-    domain: wristwatch
     attribute: investigation
     dc: 22
     effect_op: mul
     effect_amount: 1.35
-  - clue_id: lamp_glass_blown
-    known_text_key: CLUE_LAMP_GLASS_BLOWN
+  - clue_id: common_craft_blown_glass
+    known_text_key: CLUE_COMMON_CRAFT_BLOWN_GLASS
     type: surface
-    domain: oil_lamp
     attribute: appraisal
     dc: 12
     effect_op: add
     effect_amount: 120
-  - clue_id: lamp_glass_mold_seam
-    known_text_key: CLUE_LAMP_GLASS_MOLD_SEAM
+  - clue_id: common_craft_mold_seam
+    known_text_key: CLUE_COMMON_CRAFT_MOLD_SEAM
     type: surface
-    domain: oil_lamp
     attribute: perception
     dc: 10
     effect_op: mul
     effect_amount: 0.85
-  - clue_id: lamp_cast_scrollwork
-    known_text_key: CLUE_LAMP_CAST_SCROLLWORK
+  - clue_id: common_detail_scrollwork
+    known_text_key: CLUE_COMMON_DETAIL_SCROLLWORK
     type: surface
-    domain: oil_lamp
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 200
-  - clue_id: lamp_burner_fitted
-    known_text_key: CLUE_LAMP_BURNER_FITTED
+  - clue_id: common_craft_fitted
+    known_text_key: CLUE_COMMON_CRAFT_FITTED
     type: surface
-    domain: oil_lamp
     attribute: restoration
     dc: 12
     effect_op: add
     effect_amount: 90
-  - clue_id: lamp_collar_silver
-    known_text_key: CLUE_LAMP_COLLAR_SILVER
+  - clue_id: common_detail_silver
+    known_text_key: CLUE_COMMON_DETAIL_SILVER
     type: surface
-    domain: oil_lamp
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 180
-  - clue_id: lamp_collar_pewter
-    known_text_key: CLUE_LAMP_COLLAR_PEWTER
+  - clue_id: common_detail_pewter
+    known_text_key: CLUE_COMMON_DETAIL_PEWTER
     type: surface
-    domain: oil_lamp
     attribute: perception
     dc: 12
     effect_op: add
     effect_amount: 60
-  - clue_id: lamp_maker_stamped
-    known_text_key: CLUE_LAMP_MAKER_STAMPED
+  - clue_id: common_mark_stamped
+    known_text_key: CLUE_COMMON_MARK_STAMPED
     type: surface
-    domain: oil_lamp
     attribute: investigation
     dc: 16
     effect_op: add
     effect_amount: 160
-  - clue_id: lamp_date_letter
-    known_text_key: CLUE_LAMP_DATE_LETTER
+  - clue_id: common_mark_date_code
+    known_text_key: CLUE_COMMON_MARK_DATE_CODE
     type: surface
-    domain: oil_lamp
     attribute: investigation
     dc: 16
     effect_op: add
     effect_amount: 110
-  - clue_id: lamp_glass_cracked
-    known_text_key: CLUE_LAMP_GLASS_CRACKED
-    type: surface
-    domain: oil_lamp
-    attribute: restoration
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.35
   - clue_id: lamp_leaf_moser
     known_text_key: CLUE_LAMP_LEAF_MOSER
     type: hidden
-    domain: oil_lamp
     attribute: investigation
     dc: 21
     effect_op: mul
@@ -646,7 +534,6 @@ clues:
   - clue_id: lamp_leaf_baccarat
     known_text_key: CLUE_LAMP_LEAF_BACCARAT
     type: hidden
-    domain: oil_lamp
     attribute: investigation
     dc: 21
     effect_op: mul
@@ -655,7 +542,6 @@ clues:
   - clue_id: lamp_leaf_hinks
     known_text_key: CLUE_LAMP_LEAF_HINKS
     type: hidden
-    domain: oil_lamp
     attribute: investigation
     dc: 20
     effect_op: mul
@@ -664,80 +550,63 @@ clues:
   - clue_id: lamp_override_modern_copy
     known_text_key: CLUE_LAMP_OVERRIDE_MODERN_COPY
     type: hidden
-    domain: oil_lamp
     attribute: investigation
     dc: 20
     effect_op: override
     effect_amount: 60
     exclusive_group: authenticity_oil_lamp
-  - clue_id: lamp_hidden_rewired
-    known_text_key: CLUE_LAMP_HIDDEN_REWIRED
-    type: hidden
-    domain: oil_lamp
-    attribute: restoration
-    dc: 21
-    effect_op: mul
-    effect_amount: 0.72
-  - clue_id: clock_case_gilded
-    known_text_key: CLUE_CLOCK_CASE_GILDED
+  - clue_id: lamp_blown_glass
+    known_text_key: CLUE_LAMP_BLOWN_GLASS
     type: surface
-    domain: clock
+    attribute: appraisal
+    dc: 14
+    effect_op: add
+    effect_amount: 180
+  - clue_id: common_detail_gilded_case
+    known_text_key: CLUE_COMMON_DETAIL_GILDED_CASE
+    type: surface
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 180
-  - clue_id: clock_case_veneered
-    known_text_key: CLUE_CLOCK_CASE_VENEERED
+  - clue_id: common_material_veneered
+    known_text_key: CLUE_COMMON_MATERIAL_VENEERED
     type: surface
-    domain: clock
     attribute: appraisal
     dc: 12
     effect_op: add
     effect_amount: 100
-  - clue_id: clock_case_chipped
-    known_text_key: CLUE_CLOCK_CASE_CHIPPED
+  - clue_id: clock_dovetail_joinery
+    known_text_key: CLUE_CLOCK_DOVETAIL_JOINERY
     type: surface
-    domain: clock
-    attribute: restoration
-    dc: 10
-    effect_op: mul
-    effect_amount: 0.65
-  - clue_id: clock_joinery_dovetail
-    known_text_key: CLUE_CLOCK_JOINERY_DOVETAIL
-    type: surface
-    domain: clock
     attribute: appraisal
     dc: 14
     effect_op: add
     effect_amount: 140
-  - clue_id: clock_movement_signed
-    known_text_key: CLUE_CLOCK_MOVEMENT_SIGNED
+  - clue_id: common_mark_signed_movement
+    known_text_key: CLUE_COMMON_MARK_SIGNED_MOVEMENT
     type: surface
-    domain: clock
     attribute: investigation
     dc: 16
     effect_op: add
     effect_amount: 300
-  - clue_id: clock_movement_seven_jewel
-    known_text_key: CLUE_CLOCK_MOVEMENT_SEVEN_JEWEL
+  - clue_id: common_detail_seven_jewel
+    known_text_key: CLUE_COMMON_DETAIL_SEVEN_JEWEL
     type: surface
-    domain: clock
     attribute: appraisal
     dc: 14
     effect_op: add
     effect_amount: 120
-  - clue_id: clock_workshop_label
-    known_text_key: CLUE_CLOCK_WORKSHOP_LABEL
+  - clue_id: common_mark_label
+    known_text_key: CLUE_COMMON_MARK_LABEL
     type: surface
-    domain: clock
     attribute: investigation
     dc: 16
     effect_op: add
     effect_amount: 200
-  - clue_id: clock_finish_shellac
-    known_text_key: CLUE_CLOCK_FINISH_SHELLAC
+  - clue_id: common_material_shellac
+    known_text_key: CLUE_COMMON_MATERIAL_SHELLAC
     type: surface
-    domain: clock
     attribute: restoration
     dc: 14
     effect_op: add
@@ -745,7 +614,6 @@ clues:
   - clue_id: clock_leaf_boulle
     known_text_key: CLUE_CLOCK_LEAF_BOULLE
     type: hidden
-    domain: clock
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -754,7 +622,6 @@ clues:
   - clue_id: clock_leaf_graham
     known_text_key: CLUE_CLOCK_LEAF_GRAHAM
     type: hidden
-    domain: clock
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -763,7 +630,6 @@ clues:
   - clue_id: clock_leaf_tompion
     known_text_key: CLUE_CLOCK_LEAF_TOMPION
     type: hidden
-    domain: clock
     attribute: investigation
     dc: 23
     effect_op: mul
@@ -772,80 +638,49 @@ clues:
   - clue_id: clock_override_marriage
     known_text_key: CLUE_CLOCK_OVERRIDE_MARRIAGE
     type: hidden
-    domain: clock
     attribute: investigation
     dc: 20
     effect_op: override
     effect_amount: 100
     exclusive_group: authenticity_clock
-  - clue_id: clock_hidden_spring_broken
-    known_text_key: CLUE_CLOCK_HIDDEN_SPRING_BROKEN
-    type: hidden
-    domain: clock
-    attribute: restoration
-    dc: 21
-    effect_op: mul
-    effect_amount: 0.6
-  - clue_id: figurine_glaze_celadon
-    known_text_key: CLUE_FIGURINE_GLAZE_CELADON
+  - clue_id: common_material_celadon
+    known_text_key: CLUE_COMMON_MATERIAL_CELADON
     type: surface
-    domain: porcelain_figurine
     attribute: appraisal
     dc: 14
     effect_op: add
     effect_amount: 160
-  - clue_id: figurine_glaze_crazed
-    known_text_key: CLUE_FIGURINE_GLAZE_CRAZED
+  - clue_id: common_mark_base_marked
+    known_text_key: CLUE_COMMON_MARK_BASE_MARKED
     type: surface
-    domain: porcelain_figurine
-    attribute: perception
-    dc: 10
-    effect_op: mul
-    effect_amount: 0.85
-  - clue_id: figurine_base_marked
-    known_text_key: CLUE_FIGURINE_BASE_MARKED
-    type: surface
-    domain: porcelain_figurine
     attribute: investigation
     dc: 14
     effect_op: add
     effect_amount: 120
-  - clue_id: figurine_base_unmarked
-    known_text_key: CLUE_FIGURINE_BASE_UNMARKED
+  - clue_id: common_mark_base_unmarked
+    known_text_key: CLUE_COMMON_MARK_BASE_UNMARKED
     type: surface
-    domain: porcelain_figurine
     attribute: investigation
     dc: 12
     effect_op: mul
     effect_amount: 0.65
-  - clue_id: figurine_painting_detail
-    known_text_key: CLUE_FIGURINE_PAINTING_DETAIL
+  - clue_id: common_detail_hand_painted
+    known_text_key: CLUE_COMMON_DETAIL_HAND_PAINTED
     type: surface
-    domain: porcelain_figurine
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 140
-  - clue_id: figurine_form_shepherdess
-    known_text_key: CLUE_FIGURINE_FORM_SHEPHERDESS
+  - clue_id: figurine_shepherdess_form
+    known_text_key: CLUE_FIGURINE_SHEPHERDESS_FORM
     type: surface
-    domain: porcelain_figurine
     attribute: appraisal
     dc: 12
     effect_op: add
     effect_amount: 100
-  - clue_id: figurine_restoration_chip
-    known_text_key: CLUE_FIGURINE_RESTORATION_CHIP
+  - clue_id: common_detail_gilded_figurine
+    known_text_key: CLUE_COMMON_DETAIL_GILDED_FIGURINE
     type: surface
-    domain: porcelain_figurine
-    attribute: restoration
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.3
-  - clue_id: figurine_gilding_intact
-    known_text_key: CLUE_FIGURINE_GILDING_INTACT
-    type: surface
-    domain: porcelain_figurine
     attribute: perception
     dc: 14
     effect_op: add
@@ -853,7 +688,6 @@ clues:
   - clue_id: figurine_leaf_meissen
     known_text_key: CLUE_FIGURINE_LEAF_MEISSEN
     type: hidden
-    domain: porcelain_figurine
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -862,7 +696,6 @@ clues:
   - clue_id: figurine_leaf_dresden
     known_text_key: CLUE_FIGURINE_LEAF_DRESDEN
     type: hidden
-    domain: porcelain_figurine
     attribute: investigation
     dc: 21
     effect_op: mul
@@ -871,7 +704,6 @@ clues:
   - clue_id: figurine_leaf_capodimonte
     known_text_key: CLUE_FIGURINE_LEAF_CAPODIMONTE
     type: hidden
-    domain: porcelain_figurine
     attribute: investigation
     dc: 21
     effect_op: mul
@@ -880,88 +712,56 @@ clues:
   - clue_id: figurine_override_later_copy
     known_text_key: CLUE_FIGURINE_OVERRIDE_LATER_COPY
     type: hidden
-    domain: porcelain_figurine
     attribute: investigation
     dc: 20
     effect_op: override
     effect_amount: 70
     exclusive_group: authenticity_porcelain_figurine
-  - clue_id: figurine_hidden_repair_fill
-    known_text_key: CLUE_FIGURINE_HIDDEN_REPAIR_FILL
-    type: hidden
-    domain: porcelain_figurine
-    attribute: restoration
-    dc: 21
-    effect_op: mul
-    effect_amount: 0.7
-  - clue_id: vase_glass_cased
-    known_text_key: CLUE_VASE_GLASS_CASED
+  - clue_id: common_material_cased_glass
+    known_text_key: CLUE_COMMON_MATERIAL_CASED_GLASS
     type: surface
-    domain: vase
     attribute: appraisal
     dc: 14
     effect_op: add
     effect_amount: 170
-  - clue_id: vase_glass_bubble
-    known_text_key: CLUE_VASE_GLASS_BUBBLE
+  - clue_id: common_material_bubble_glass
+    known_text_key: CLUE_COMMON_MATERIAL_BUBBLE_GLASS
     type: surface
-    domain: vase
     attribute: perception
     dc: 10
     effect_op: mul
     effect_amount: 0.85
-  - clue_id: vase_rim_polished
-    known_text_key: CLUE_VASE_RIM_POLISHED
+  - clue_id: common_craft_polished
+    known_text_key: CLUE_COMMON_CRAFT_POLISHED
     type: surface
-    domain: vase
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 130
-  - clue_id: vase_rim_chipped
-    known_text_key: CLUE_VASE_RIM_CHIPPED
+  - clue_id: vase_cameo_body
+    known_text_key: CLUE_VASE_CAMEO_BODY
     type: surface
-    domain: vase
-    attribute: restoration
-    dc: 10
-    effect_op: mul
-    effect_amount: 0.6
-  - clue_id: vase_body_cameo
-    known_text_key: CLUE_VASE_BODY_CAMEO
-    type: surface
-    domain: vase
     attribute: appraisal
     dc: 16
     effect_op: add
     effect_amount: 220
-  - clue_id: vase_maker_etched
-    known_text_key: CLUE_VASE_MAKER_ETCHED
+  - clue_id: common_mark_etched
+    known_text_key: CLUE_COMMON_MARK_ETCHED
     type: surface
-    domain: vase
     attribute: investigation
     dc: 16
     effect_op: add
     effect_amount: 160
-  - clue_id: vase_form_bud
-    known_text_key: CLUE_VASE_FORM_BUD
+  - clue_id: common_form_bud
+    known_text_key: CLUE_COMMON_FORM_BUD
     type: surface
-    domain: vase
     attribute: appraisal
     dc: 12
     effect_op: add
     effect_amount: 90
-  - clue_id: vase_base_ground
-    known_text_key: CLUE_VASE_BASE_GROUND
-    type: surface
-    domain: vase
-    attribute: restoration
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.88
   - clue_id: vase_leaf_galle
     known_text_key: CLUE_VASE_LEAF_GALLE
     type: hidden
-    domain: vase
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -970,7 +770,6 @@ clues:
   - clue_id: vase_leaf_tiffany
     known_text_key: CLUE_VASE_LEAF_TIFFANY
     type: hidden
-    domain: vase
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -979,7 +778,6 @@ clues:
   - clue_id: vase_leaf_lalique
     known_text_key: CLUE_VASE_LEAF_LALIQUE
     type: hidden
-    domain: vase
     attribute: investigation
     dc: 21
     effect_op: mul
@@ -988,80 +786,56 @@ clues:
   - clue_id: vase_override_repro
     known_text_key: CLUE_VASE_OVERRIDE_REPRO
     type: hidden
-    domain: vase
     attribute: investigation
     dc: 20
     effect_op: override
     effect_amount: 65
     exclusive_group: authenticity_vase
-  - clue_id: vase_hidden_internal_fracture
-    known_text_key: CLUE_VASE_HIDDEN_INTERNAL_FRACTURE
-    type: hidden
-    domain: vase
-    attribute: restoration
-    dc: 21
-    effect_op: mul
-    effect_amount: 0.65
-  - clue_id: poster_paper_linen
-    known_text_key: CLUE_POSTER_PAPER_LINEN
+  - clue_id: common_material_linen
+    known_text_key: CLUE_COMMON_MATERIAL_LINEN
     type: surface
-    domain: poster
     attribute: appraisal
     dc: 12
     effect_op: add
     effect_amount: 110
-  - clue_id: poster_paper_pulp
-    known_text_key: CLUE_POSTER_PAPER_PULP
+  - clue_id: common_material_pulp
+    known_text_key: CLUE_COMMON_MATERIAL_PULP
     type: surface
-    domain: poster
     attribute: appraisal
     dc: 10
     effect_op: mul
     effect_amount: 0.85
-  - clue_id: poster_print_lithograph
-    known_text_key: CLUE_POSTER_PRINT_LITHOGRAPH
+  - clue_id: poster_lithograph
+    known_text_key: CLUE_POSTER_LITHOGRAPH
     type: surface
-    domain: poster
     attribute: investigation
     dc: 14
     effect_op: add
     effect_amount: 150
-  - clue_id: poster_print_offset
-    known_text_key: CLUE_POSTER_PRINT_OFFSET
+  - clue_id: common_craft_offset_print
+    known_text_key: CLUE_COMMON_CRAFT_OFFSET_PRINT
     type: surface
-    domain: poster
     attribute: investigation
     dc: 12
     effect_op: mul
     effect_amount: 0.9
-  - clue_id: poster_color_vibrant
-    known_text_key: CLUE_POSTER_COLOR_VIBRANT
+  - clue_id: common_detail_vibrant
+    known_text_key: CLUE_COMMON_DETAIL_VIBRANT
     type: surface
-    domain: poster
     attribute: perception
     dc: 12
     effect_op: add
     effect_amount: 90
-  - clue_id: poster_color_faded
-    known_text_key: CLUE_POSTER_COLOR_FADED
+  - clue_id: common_material_backing
+    known_text_key: CLUE_COMMON_MATERIAL_BACKING
     type: surface
-    domain: poster
-    attribute: perception
-    dc: 10
-    effect_op: mul
-    effect_amount: 0.7
-  - clue_id: poster_backing_linen
-    known_text_key: CLUE_POSTER_BACKING_LINEN
-    type: surface
-    domain: poster
     attribute: restoration
     dc: 14
     effect_op: add
     effect_amount: 130
-  - clue_id: poster_fold_lines
-    known_text_key: CLUE_POSTER_FOLD_LINES
+  - clue_id: common_form_folded
+    known_text_key: CLUE_COMMON_FORM_FOLDED
     type: surface
-    domain: poster
     attribute: perception
     dc: 12
     effect_op: mul
@@ -1069,7 +843,6 @@ clues:
   - clue_id: poster_leaf_mucha
     known_text_key: CLUE_POSTER_LEAF_MUCHA
     type: hidden
-    domain: poster
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -1078,7 +851,6 @@ clues:
   - clue_id: poster_leaf_lautrec
     known_text_key: CLUE_POSTER_LEAF_LAUTREC
     type: hidden
-    domain: poster
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -1087,7 +859,6 @@ clues:
   - clue_id: poster_leaf_cassandre
     known_text_key: CLUE_POSTER_LEAF_CASSANDRE
     type: hidden
-    domain: poster
     attribute: investigation
     dc: 21
     effect_op: mul
@@ -1096,112 +867,77 @@ clues:
   - clue_id: poster_override_reprint
     known_text_key: CLUE_POSTER_OVERRIDE_REPRINT
     type: hidden
-    domain: poster
     attribute: investigation
     dc: 20
     effect_op: override
     effect_amount: 50
     exclusive_group: authenticity_poster
-  - clue_id: poster_hidden_trimmed_margin
-    known_text_key: CLUE_POSTER_HIDDEN_TRIMMED_MARGIN
-    type: hidden
-    domain: poster
-    attribute: restoration
-    dc: 22
-    effect_op: mul
-    effect_amount: 0.68
-  - clue_id: painting_canvas_stretched
-    known_text_key: CLUE_PAINTING_CANVAS_STRETCHED
+  - clue_id: common_material_canvas
+    known_text_key: CLUE_COMMON_MATERIAL_CANVAS
     type: surface
-    domain: painting
     attribute: appraisal
     dc: 12
     effect_op: add
     effect_amount: 150
-  - clue_id: painting_canvas_slack
-    known_text_key: CLUE_PAINTING_CANVAS_SLACK
+  - clue_id: common_medium_oil
+    known_text_key: CLUE_COMMON_MEDIUM_OIL
     type: surface
-    domain: painting
-    attribute: perception
-    dc: 10
-    effect_op: mul
-    effect_amount: 0.65
-  - clue_id: painting_medium_oil
-    known_text_key: CLUE_PAINTING_MEDIUM_OIL
-    type: surface
-    domain: painting
     attribute: appraisal
     dc: 14
     effect_op: add
     effect_amount: 200
-  - clue_id: painting_medium_acrylic
-    known_text_key: CLUE_PAINTING_MEDIUM_ACRYLIC
+  - clue_id: common_medium_acrylic
+    known_text_key: CLUE_COMMON_MEDIUM_ACRYLIC
     type: surface
-    domain: painting
     attribute: appraisal
     dc: 12
     effect_op: mul
     effect_amount: 0.85
-  - clue_id: painting_brushwork_loose
-    known_text_key: CLUE_PAINTING_BRUSHWORK_LOOSE
+  - clue_id: common_craft_loose_brush
+    known_text_key: CLUE_COMMON_CRAFT_LOOSE_BRUSH
     type: surface
-    domain: painting
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 120
-  - clue_id: painting_brushwork_tight
-    known_text_key: CLUE_PAINTING_BRUSHWORK_TIGHT
+  - clue_id: common_craft_tight_brush
+    known_text_key: CLUE_COMMON_CRAFT_TIGHT_BRUSH
     type: surface
-    domain: painting
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 100
-  - clue_id: painting_craquelure_even
-    known_text_key: CLUE_PAINTING_CRAQUELURE_EVEN
+  - clue_id: painting_craquelure
+    known_text_key: CLUE_PAINTING_CRAQUELURE
     type: surface
-    domain: painting
     attribute: restoration
     dc: 14
     effect_op: mul
     effect_amount: 0.85
-  - clue_id: painting_signature_present
-    known_text_key: CLUE_PAINTING_SIGNATURE_PRESENT
+  - clue_id: common_mark_signed_canvas
+    known_text_key: CLUE_COMMON_MARK_SIGNED_CANVAS
     type: surface
-    domain: painting
     attribute: investigation
     dc: 16
     effect_op: add
     effect_amount: 600
-  - clue_id: painting_signature_absent
-    known_text_key: CLUE_PAINTING_SIGNATURE_ABSENT
+  - clue_id: common_mark_unsigned
+    known_text_key: CLUE_COMMON_MARK_UNSIGNED
     type: surface
-    domain: painting
     attribute: investigation
     dc: 14
     effect_op: mul
     effect_amount: 0.5
-  - clue_id: painting_frame_original
-    known_text_key: CLUE_PAINTING_FRAME_ORIGINAL
+  - clue_id: common_detail_original_frame
+    known_text_key: CLUE_COMMON_DETAIL_ORIGINAL_FRAME
     type: surface
-    domain: painting
     attribute: appraisal
     dc: 16
     effect_op: add
     effect_amount: 350
-  - clue_id: painting_varnish_yellowed
-    known_text_key: CLUE_PAINTING_VARNISH_YELLOWED
+  - clue_id: common_provenance_label
+    known_text_key: CLUE_COMMON_PROVENANCE_LABEL
     type: surface
-    domain: painting
-    attribute: restoration
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.9
-  - clue_id: painting_provenance_label
-    known_text_key: CLUE_PAINTING_PROVENANCE_LABEL
-    type: surface
-    domain: painting
     attribute: investigation
     dc: 18
     effect_op: add
@@ -1209,7 +945,6 @@ clues:
   - clue_id: painting_leaf_monet
     known_text_key: CLUE_PAINTING_LEAF_MONET
     type: hidden
-    domain: painting
     attribute: investigation
     dc: 24
     effect_op: mul
@@ -1218,7 +953,6 @@ clues:
   - clue_id: painting_leaf_renoir
     known_text_key: CLUE_PAINTING_LEAF_RENOIR
     type: hidden
-    domain: painting
     attribute: investigation
     dc: 23
     effect_op: mul
@@ -1227,7 +961,6 @@ clues:
   - clue_id: painting_leaf_sargent
     known_text_key: CLUE_PAINTING_LEAF_SARGENT
     type: hidden
-    domain: painting
     attribute: investigation
     dc: 23
     effect_op: mul
@@ -1236,112 +969,84 @@ clues:
   - clue_id: painting_override_forgery
     known_text_key: CLUE_PAINTING_OVERRIDE_FORGERY
     type: hidden
-    domain: painting
     attribute: investigation
     dc: 22
     effect_op: override
     effect_amount: 180
     exclusive_group: authenticity_painting
-  - clue_id: painting_hidden_overpaint
-    known_text_key: CLUE_PAINTING_HIDDEN_OVERPAINT
-    type: hidden
-    domain: painting
-    attribute: restoration
-    dc: 23
-    effect_op: mul
-    effect_amount: 0.55
   - clue_id: painting_hidden_exhibition_stamp
     known_text_key: CLUE_PAINTING_HIDDEN_EXHIBITION_STAMP
     type: hidden
-    domain: painting
     attribute: investigation
     dc: 22
     effect_op: mul
     effect_amount: 1.35
-  - clue_id: sculpture_medium_bronze
-    known_text_key: CLUE_SCULPTURE_MEDIUM_BRONZE
+  - clue_id: common_medium_bronze
+    known_text_key: CLUE_COMMON_MEDIUM_BRONZE
     type: surface
-    domain: sculpture
     attribute: appraisal
     dc: 14
     effect_op: add
     effect_amount: 250
-  - clue_id: sculpture_medium_plaster
-    known_text_key: CLUE_SCULPTURE_MEDIUM_PLASTER
+  - clue_id: common_medium_plaster
+    known_text_key: CLUE_COMMON_MEDIUM_PLASTER
     type: surface
-    domain: sculpture
     attribute: appraisal
     dc: 10
     effect_op: mul
     effect_amount: 0.7
-  - clue_id: sculpture_patina_natural
-    known_text_key: CLUE_SCULPTURE_PATINA_NATURAL
+  - clue_id: common_finish_patina_natural
+    known_text_key: CLUE_COMMON_FINISH_PATINA_NATURAL
     type: surface
-    domain: sculpture
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 180
-  - clue_id: sculpture_patina_artificial
-    known_text_key: CLUE_SCULPTURE_PATINA_ARTIFICIAL
+  - clue_id: common_mark_foundry
+    known_text_key: CLUE_COMMON_MARK_FOUNDRY
     type: surface
-    domain: sculpture
-    attribute: restoration
-    dc: 14
-    effect_op: mul
-    effect_amount: 0.55
-  - clue_id: sculpture_foundry_marked
-    known_text_key: CLUE_SCULPTURE_FOUNDRY_MARKED
-    type: surface
-    domain: sculpture
     attribute: investigation
     dc: 16
     effect_op: add
     effect_amount: 300
-  - clue_id: sculpture_edition_numbered
-    known_text_key: CLUE_SCULPTURE_EDITION_NUMBERED
+  - clue_id: common_mark_edition
+    known_text_key: CLUE_COMMON_MARK_EDITION
     type: surface
-    domain: sculpture
     attribute: investigation
     dc: 16
     effect_op: add
     effect_amount: 200
-  - clue_id: sculpture_base_signed
-    known_text_key: CLUE_SCULPTURE_BASE_SIGNED
+  - clue_id: common_mark_signed_base
+    known_text_key: CLUE_COMMON_MARK_SIGNED_BASE
     type: surface
-    domain: sculpture
     attribute: investigation
     dc: 18
     effect_op: add
     effect_amount: 500
-  - clue_id: sculpture_base_blank
-    known_text_key: CLUE_SCULPTURE_BASE_BLANK
+  - clue_id: common_mark_unsigned_base
+    known_text_key: CLUE_COMMON_MARK_UNSIGNED_BASE
     type: surface
-    domain: sculpture
     attribute: investigation
     dc: 14
     effect_op: mul
     effect_amount: 0.5
-  - clue_id: sculpture_surface_pitted
-    known_text_key: CLUE_SCULPTURE_SURFACE_PITTED
+  - clue_id: common_material_wax
+    known_text_key: CLUE_COMMON_MATERIAL_WAX
     type: surface
-    domain: sculpture
-    attribute: restoration
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.3
-  - clue_id: sculpture_wax_original
-    known_text_key: CLUE_SCULPTURE_WAX_ORIGINAL
-    type: surface
-    domain: sculpture
     attribute: appraisal
     dc: 16
     effect_op: add
     effect_amount: 100
+  - clue_id: sculpture_lost_wax
+    known_text_key: CLUE_SCULPTURE_LOST_WAX
+    type: surface
+    attribute: appraisal
+    dc: 16
+    effect_op: add
+    effect_amount: 280
   - clue_id: sculpture_leaf_rodin
     known_text_key: CLUE_SCULPTURE_LEAF_RODIN
     type: hidden
-    domain: sculpture
     attribute: investigation
     dc: 24
     effect_op: mul
@@ -1350,7 +1055,6 @@ clues:
   - clue_id: sculpture_leaf_degas
     known_text_key: CLUE_SCULPTURE_LEAF_DEGAS
     type: hidden
-    domain: sculpture
     attribute: investigation
     dc: 23
     effect_op: mul
@@ -1359,7 +1063,6 @@ clues:
   - clue_id: sculpture_leaf_barye
     known_text_key: CLUE_SCULPTURE_LEAF_BARYE
     type: hidden
-    domain: sculpture
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -1368,112 +1071,84 @@ clues:
   - clue_id: sculpture_override_cast_copy
     known_text_key: CLUE_SCULPTURE_OVERRIDE_CAST_COPY
     type: hidden
-    domain: sculpture
     attribute: investigation
     dc: 21
     effect_op: override
     effect_amount: 200
     exclusive_group: authenticity_sculpture
-  - clue_id: sculpture_hidden_weld_repair
-    known_text_key: CLUE_SCULPTURE_HIDDEN_WELD_REPAIR
-    type: hidden
-    domain: sculpture
-    attribute: restoration
-    dc: 22
-    effect_op: mul
-    effect_amount: 0.6
   - clue_id: sculpture_hidden_artist_letter
     known_text_key: CLUE_SCULPTURE_HIDDEN_ARTIST_LETTER
     type: hidden
-    domain: sculpture
     attribute: investigation
     dc: 23
     effect_op: mul
     effect_amount: 1.4
-  - clue_id: pistol_barrel_short
-    known_text_key: CLUE_PISTOL_BARREL_SHORT
+  - clue_id: common_form_short_barrel
+    known_text_key: CLUE_COMMON_FORM_SHORT_BARREL
     type: surface
-    domain: pistol
     attribute: appraisal
     dc: 10
     effect_op: add
     effect_amount: 70
-  - clue_id: pistol_barrel_pitted
-    known_text_key: CLUE_PISTOL_BARREL_PITTED
+  - clue_id: common_mark_proof_stamped
+    known_text_key: CLUE_COMMON_MARK_PROOF_STAMPED
     type: surface
-    domain: pistol
-    attribute: perception
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.65
-  - clue_id: pistol_proof_stamped
-    known_text_key: CLUE_PISTOL_PROOF_STAMPED
-    type: surface
-    domain: pistol
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 160
-  - clue_id: pistol_lock_fitted
-    known_text_key: CLUE_PISTOL_LOCK_FITTED
+  - clue_id: common_craft_lock_fitted
+    known_text_key: CLUE_COMMON_CRAFT_LOCK_FITTED
     type: surface
-    domain: pistol
     attribute: restoration
     dc: 14
     effect_op: add
     effect_amount: 120
-  - clue_id: pistol_lock_signed
-    known_text_key: CLUE_PISTOL_LOCK_SIGNED
+  - clue_id: common_mark_signed_lock
+    known_text_key: CLUE_COMMON_MARK_SIGNED_LOCK
     type: surface
-    domain: pistol
     attribute: investigation
     dc: 16
     effect_op: add
     effect_amount: 350
-  - clue_id: pistol_grip_scrolled
-    known_text_key: CLUE_PISTOL_GRIP_SCROLLED
+  - clue_id: common_detail_scrolled
+    known_text_key: CLUE_COMMON_DETAIL_SCROLLED
     type: surface
-    domain: pistol
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 200
-  - clue_id: pistol_grip_cracked
-    known_text_key: CLUE_PISTOL_GRIP_CRACKED
+  - clue_id: common_material_walnut
+    known_text_key: CLUE_COMMON_MATERIAL_WALNUT
     type: surface
-    domain: pistol
-    attribute: restoration
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.6
-  - clue_id: pistol_stock_walnut
-    known_text_key: CLUE_PISTOL_STOCK_WALNUT
-    type: surface
-    domain: pistol
     attribute: appraisal
     dc: 14
     effect_op: add
     effect_amount: 180
-  - clue_id: pistol_inlay_gold
-    known_text_key: CLUE_PISTOL_INLAY_GOLD
+  - clue_id: common_detail_gold_inlay
+    known_text_key: CLUE_COMMON_DETAIL_GOLD_INLAY
     type: surface
-    domain: pistol
     attribute: perception
     dc: 18
     effect_op: add
     effect_amount: 400
-  - clue_id: pistol_maker_documented
-    known_text_key: CLUE_PISTOL_MAKER_DOCUMENTED
+  - clue_id: common_provenance_documented
+    known_text_key: CLUE_COMMON_PROVENANCE_DOCUMENTED
     type: surface
-    domain: pistol
     attribute: investigation
     dc: 18
     effect_op: add
     effect_amount: 250
+  - clue_id: pistol_lock_maker
+    known_text_key: CLUE_PISTOL_LOCK_MAKER
+    type: surface
+    attribute: investigation
+    dc: 14
+    effect_op: add
+    effect_amount: 200
   - clue_id: pistol_leaf_boutet
     known_text_key: CLUE_PISTOL_LEAF_BOUTET
     type: hidden
-    domain: pistol
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -1482,7 +1157,6 @@ clues:
   - clue_id: pistol_leaf_nock
     known_text_key: CLUE_PISTOL_LEAF_NOCK
     type: hidden
-    domain: pistol
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -1491,7 +1165,6 @@ clues:
   - clue_id: pistol_leaf_colt
     known_text_key: CLUE_PISTOL_LEAF_COLT
     type: hidden
-    domain: pistol
     attribute: investigation
     dc: 21
     effect_op: mul
@@ -1500,96 +1173,63 @@ clues:
   - clue_id: pistol_override_conversion
     known_text_key: CLUE_PISTOL_OVERRIDE_CONVERSION
     type: hidden
-    domain: pistol
     attribute: investigation
     dc: 20
     effect_op: override
     effect_amount: 90
     exclusive_group: authenticity_pistol
-  - clue_id: pistol_hidden_cylinder_mismatch
-    known_text_key: CLUE_PISTOL_HIDDEN_CYLINDER_MISMATCH
-    type: hidden
-    domain: pistol
-    attribute: restoration
-    dc: 21
-    effect_op: mul
-    effect_amount: 0.7
-  - clue_id: rifle_barrel_long
-    known_text_key: CLUE_RIFLE_BARREL_LONG
+  - clue_id: common_form_long_barrel
+    known_text_key: CLUE_COMMON_FORM_LONG_BARREL
     type: surface
-    domain: rifle
     attribute: appraisal
     dc: 10
     effect_op: add
     effect_amount: 80
-  - clue_id: rifle_barrel_worn
-    known_text_key: CLUE_RIFLE_BARREL_WORN
+  - clue_id: common_mark_proof_stamped_rifle
+    known_text_key: CLUE_COMMON_MARK_PROOF_STAMPED_RIFLE
     type: surface
-    domain: rifle
-    attribute: perception
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.6
-  - clue_id: rifle_proof_stamped
-    known_text_key: CLUE_RIFLE_PROOF_STAMPED
-    type: surface
-    domain: rifle
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 180
-  - clue_id: rifle_action_engraved
-    known_text_key: CLUE_RIFLE_ACTION_ENGRAVED
+  - clue_id: common_detail_engraved
+    known_text_key: CLUE_COMMON_DETAIL_ENGRAVED
     type: surface
-    domain: rifle
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 220
-  - clue_id: rifle_action_rough
-    known_text_key: CLUE_RIFLE_ACTION_ROUGH
+  - clue_id: common_mark_signed_maker
+    known_text_key: CLUE_COMMON_MARK_SIGNED_MAKER
     type: surface
-    domain: rifle
-    attribute: restoration
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.85
-  - clue_id: rifle_maker_signed
-    known_text_key: CLUE_RIFLE_MAKER_SIGNED
-    type: surface
-    domain: rifle
     attribute: investigation
     dc: 16
     effect_op: add
     effect_amount: 380
-  - clue_id: rifle_stock_figured
-    known_text_key: CLUE_RIFLE_STOCK_FIGURED
+  - clue_id: common_material_figured
+    known_text_key: CLUE_COMMON_MATERIAL_FIGURED
     type: surface
-    domain: rifle
     attribute: appraisal
     dc: 14
     effect_op: add
     effect_amount: 250
-  - clue_id: rifle_sight_precision
-    known_text_key: CLUE_RIFLE_SIGHT_PRECISION
+  - clue_id: rifle_precision_sight
+    known_text_key: CLUE_RIFLE_PRECISION_SIGHT
     type: surface
-    domain: rifle
     attribute: restoration
     dc: 16
     effect_op: add
     effect_amount: 200
-  - clue_id: rifle_buttplate_brass
-    known_text_key: CLUE_RIFLE_BUTTPLATE_BRASS
+  - clue_id: common_detail_brass_buttplate
+    known_text_key: CLUE_COMMON_DETAIL_BRASS_BUTTPLATE
     type: surface
-    domain: rifle
     attribute: perception
     dc: 12
     effect_op: add
     effect_amount: 140
-  - clue_id: rifle_bayonet_lug
-    known_text_key: CLUE_RIFLE_BAYONET_LUG
+  - clue_id: common_detail_bayonet_lug
+    known_text_key: CLUE_COMMON_DETAIL_BAYONET_LUG
     type: surface
-    domain: rifle
     attribute: perception
     dc: 10
     effect_op: add
@@ -1597,7 +1237,6 @@ clues:
   - clue_id: rifle_leaf_whitworth
     known_text_key: CLUE_RIFLE_LEAF_WHITWORTH
     type: hidden
-    domain: rifle
     attribute: investigation
     dc: 23
     effect_op: mul
@@ -1606,7 +1245,6 @@ clues:
   - clue_id: rifle_leaf_purdey
     known_text_key: CLUE_RIFLE_LEAF_PURDEY
     type: hidden
-    domain: rifle
     attribute: investigation
     dc: 23
     effect_op: mul
@@ -1615,7 +1253,6 @@ clues:
   - clue_id: rifle_leaf_springfield
     known_text_key: CLUE_RIFLE_LEAF_SPRINGFIELD
     type: hidden
-    domain: rifle
     attribute: investigation
     dc: 21
     effect_op: mul
@@ -1624,96 +1261,63 @@ clues:
   - clue_id: rifle_override_kit_build
     known_text_key: CLUE_RIFLE_OVERRIDE_KIT_BUILD
     type: hidden
-    domain: rifle
     attribute: investigation
     dc: 20
     effect_op: override
     effect_amount: 100
     exclusive_group: authenticity_rifle
-  - clue_id: rifle_hidden_bore_ring
-    known_text_key: CLUE_RIFLE_HIDDEN_BORE_RING
-    type: hidden
-    domain: rifle
-    attribute: restoration
-    dc: 21
-    effect_op: mul
-    effect_amount: 0.68
-  - clue_id: crossbow_tiller_wood
-    known_text_key: CLUE_CROSSBOW_TILLER_WOOD
+  - clue_id: common_material_tiller_wood
+    known_text_key: CLUE_COMMON_MATERIAL_TILLER_WOOD
     type: surface
-    domain: crossbow
     attribute: appraisal
     dc: 10
     effect_op: add
     effect_amount: 60
-  - clue_id: crossbow_tiller_splintered
-    known_text_key: CLUE_CROSSBOW_TILLER_SPLINTERED
+  - clue_id: crossbow_steel_prod
+    known_text_key: CLUE_CROSSBOW_STEEL_PROD
     type: surface
-    domain: crossbow
-    attribute: perception
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.65
-  - clue_id: crossbow_prod_steel
-    known_text_key: CLUE_CROSSBOW_PROD_STEEL
-    type: surface
-    domain: crossbow
     attribute: appraisal
     dc: 14
     effect_op: add
     effect_amount: 160
-  - clue_id: crossbow_prod_rusted
-    known_text_key: CLUE_CROSSBOW_PROD_RUSTED
+  - clue_id: common_form_trigger_mech
+    known_text_key: CLUE_COMMON_FORM_TRIGGER_MECH
     type: surface
-    domain: crossbow
-    attribute: restoration
-    dc: 12
-    effect_op: mul
-    effect_amount: 0.35
-  - clue_id: crossbow_mech_triggered
-    known_text_key: CLUE_CROSSBOW_MECH_TRIGGERED
-    type: surface
-    domain: crossbow
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 130
-  - clue_id: crossbow_stock_carved
-    known_text_key: CLUE_CROSSBOW_STOCK_CARVED
+  - clue_id: common_craft_carved
+    known_text_key: CLUE_COMMON_CRAFT_CARVED
     type: surface
-    domain: crossbow
     attribute: perception
     dc: 14
     effect_op: add
     effect_amount: 190
-  - clue_id: crossbow_inlay_ivory
-    known_text_key: CLUE_CROSSBOW_INLAY_IVORY
+  - clue_id: common_detail_ivory_inlay
+    known_text_key: CLUE_COMMON_DETAIL_IVORY_INLAY
     type: surface
-    domain: crossbow
     attribute: appraisal
     dc: 16
     effect_op: add
     effect_amount: 300
-  - clue_id: crossbow_provenance_tagged
-    known_text_key: CLUE_CROSSBOW_PROVENANCE_TAGGED
+  - clue_id: common_provenance_tagged
+    known_text_key: CLUE_COMMON_PROVENANCE_TAGGED
     type: surface
-    domain: crossbow
     attribute: investigation
     dc: 16
     effect_op: add
     effect_amount: 180
-  - clue_id: crossbow_wire_gilded
-    known_text_key: CLUE_CROSSBOW_WIRE_GILDED
+  - clue_id: common_detail_wire_gilded
+    known_text_key: CLUE_COMMON_DETAIL_WIRE_GILDED
     type: surface
-    domain: crossbow
     attribute: perception
     dc: 18
     effect_op: add
     effect_amount: 350
-  - clue_id: crossbow_iron_fittings
-    known_text_key: CLUE_CROSSBOW_IRON_FITTINGS
+  - clue_id: common_detail_iron_fittings
+    known_text_key: CLUE_COMMON_DETAIL_IRON_FITTINGS
     type: surface
-    domain: crossbow
     attribute: restoration
     dc: 12
     effect_op: add
@@ -1721,7 +1325,6 @@ clues:
   - clue_id: crossbow_leaf_whistler
     known_text_key: CLUE_CROSSBOW_LEAF_WHISTLER
     type: hidden
-    domain: crossbow
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -1730,7 +1333,6 @@ clues:
   - clue_id: crossbow_leaf_cranequin
     known_text_key: CLUE_CROSSBOW_LEAF_CRANEQUIN
     type: hidden
-    domain: crossbow
     attribute: investigation
     dc: 22
     effect_op: mul
@@ -1739,7 +1341,6 @@ clues:
   - clue_id: crossbow_leaf_balestrier
     known_text_key: CLUE_CROSSBOW_LEAF_BALESTRIER
     type: hidden
-    domain: crossbow
     attribute: investigation
     dc: 23
     effect_op: mul
@@ -1748,17 +1349,8 @@ clues:
   - clue_id: crossbow_override_replica
     known_text_key: CLUE_CROSSBOW_OVERRIDE_REPLICA
     type: hidden
-    domain: crossbow
     attribute: investigation
     dc: 20
     effect_op: override
     effect_amount: 85
     exclusive_group: authenticity_crossbow
-  - clue_id: crossbow_hidden_bowstring_dry
-    known_text_key: CLUE_CROSSBOW_HIDDEN_BOWSTRING_DRY
-    type: hidden
-    domain: crossbow
-    attribute: restoration
-    dc: 21
-    effect_op: mul
-    effect_amount: 0.72
