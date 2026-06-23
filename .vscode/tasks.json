@@ -35,6 +35,23 @@
             "problemMatcher": []
         },
         {
+            "label": "YAML → .tres (force rebuild)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "${workspaceFolder}/dev/tools/yaml_to_tres.py",
+                "--godot-root",
+                "${workspaceFolder}",
+                "--force"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Validate YAML",
             "type": "shell",
             "command": "python",
