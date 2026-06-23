@@ -235,6 +235,10 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 
 - [runtime_architecture] Runtime architecture vocabulary standardization: gameplay Managers become Systems, Instance becomes Entry, and archetype boundaries harden — see `dev/docs/plans/runtime_architecture_vocabulary_standardization.sketch.md`
 
+- [clue_unification] Clue & anchor unification Phase 1: remove domain, cut condition clues, rename all clue/anchor/affix IDs, merge affixes, make scope_mode uniform — see `dev/docs/plans/clue_anchor_unification.sketch.md`
+
+- [clue_unification_phase2] Clue & anchor unification Phase 2: add new generic clues, combination-level category_scope, expand oil_lamp/figurine anchors, affix-aware balance_preview rewrite, full rebalance — see `dev/docs/plans/clue_anchor_unification_phase2.sketch.md`
+
 ---
 
 ## Plan
