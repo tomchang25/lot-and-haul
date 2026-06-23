@@ -8,8 +8,6 @@ extends Control
 const UNVEIL_COST := 1
 const CLUE_CHAIN_COST := 2
 
-const ValueRowScene := preload("res://game/run/inspection/value_row/value_row.tscn")
-
 const REVEAL_GOOD: UiAudioEvent = preload("res://data/tres/audio_events/reveal_good.tres")
 const REVEAL_BAD: UiAudioEvent = preload("res://data/tres/audio_events/reveal_bad.tres")
 const BLOCKED_ERROR: UiAudioEvent = preload("res://data/tres/audio_events/blocked_error.tres")
@@ -52,8 +50,7 @@ var _inspection_finished: bool = false
 @onready var _clue_result_label: RichTextLabel = %ClueResultLabel
 
 # Sidebar — revealed clue breakdown
-@onready var _clues_vbox: VBoxContainer = %CluesVBox
-@onready var _clue_rows: VBoxContainer = %ClueRows
+@onready var _breakdown_panel: ItemValueBreakdownPanel = %BreakdownPanel
 
 # Sidebar — action buttons
 @onready var _action_unveil_button: Button = %UnveilButton
@@ -289,65 +286,10 @@ func _update_detail_section(entry: ItemEntry) -> void:
         _detail_value_label.text = "—"
         _detail_value_label.add_theme_color_override(&"font_color", Color(0.55, 0.58, 0.63, 1))
 
-    _refresh_clues_section(entry)
+    _breakdown_panel.setup(entry)
 
     _sidebar_hsep.show()
     _detail_section.show()
-
-
-func _refresh_clues_section(entry: ItemEntry) -> void:
-    for child in _clue_rows.get_children():
-        child.queue_free()
-
-    var rows: Array[Dictionary] = []
-
-    if entry.unveiled and entry.anchor != null:
-        var a: AnchorData = entry.anchor
-        rows.append({ "text": TranslationServer.translate(a.known_text_key), "op": "base", "amount": float(a.base_value), "anchor": true })
-
-    for clue: ClueData in entry.surface_clues:
-        if clue.type != ClueData.ClueType.SURFACE:
-            continue
-        if not entry.revealed_clue_ids.has(clue.clue_id):
-            continue
-        rows.append({ "text": TranslationServer.translate(clue.known_text_key), "op": clue.effect_op, "amount": clue.effect_amount, "anchor": false })
-
-    if entry.verified:
-        for clue: ClueData in entry.hidden_clues:
-            if not entry.revealed_clue_ids.has(clue.clue_id):
-                continue
-            rows.append({ "text": TranslationServer.translate(clue.known_text_key), "op": clue.effect_op, "amount": clue.effect_amount, "anchor": false })
-
-    if rows.is_empty():
-        _clues_vbox.hide()
-        return
-
-    for row: Dictionary in rows:
-        var op: String = row["op"]
-        var amount: float = row["amount"]
-        var val_text: String
-        var val_color: Color
-        if op == "mul":
-            val_text = "x%.2f" % amount
-            if amount >= 1.0:
-                val_color = Color(0.35, 0.70, 0.40, 1.0)
-            else:
-                val_color = Color(0.65, 0.25, 0.20, 1.0)
-        elif amount == 0.0:
-            val_text = "—"
-            val_color = Color(0.55, 0.58, 0.63, 1)
-        elif amount > 0.0:
-            val_text = "+$%d" % int(amount)
-            val_color = Color(0.55, 0.85, 0.60, 1.0)
-        else:
-            val_text = "-$%d" % int(-amount)
-            val_color = Color(0.85, 0.40, 0.35, 1.0)
-
-        var clue_row: ValueRow = ValueRowScene.instantiate()
-        clue_row.setup(row["text"], val_text, val_color, 12, 4)
-        _clue_rows.add_child(clue_row)
-
-    _clues_vbox.show()
 
 
 func _clear_detail_section() -> void:

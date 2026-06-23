@@ -23,6 +23,18 @@ static func for_clue(clue: ClueData, revealed: bool, valued: bool = false) -> Co
     return for_effect(clue)
 
 
+static func for_effect_op(op: String, amount: float) -> Color:
+    match op:
+        "add":
+            return EFFECT_ADD_POSITIVE if amount >= 0.0 else EFFECT_ADD_NEGATIVE
+        "mul":
+            return EFFECT_MUL_POSITIVE if amount >= 1.0 else EFFECT_MUL_NEGATIVE
+        "override":
+            return EFFECT_OVERRIDE
+        _:
+            return UNREVEALED_COLOR
+
+
 static func for_effect(clue: ClueData) -> Color:
     match clue.effect_op:
         "add":

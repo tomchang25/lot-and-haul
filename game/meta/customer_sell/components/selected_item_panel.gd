@@ -19,6 +19,7 @@ var _entry: ItemEntry = null
 @onready var _value_value_label: Label = %ValueValueLabel
 @onready var _verified_label: Label = %VerifiedLabel
 @onready var _conv_ratio_label: Label = %ConvRatioLabel
+@onready var _breakdown_panel: ItemValueBreakdownPanel = %BreakdownPanel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -61,6 +62,7 @@ func _apply() -> void:
         _value_title_label.text = TranslationServer.translate("UI_EST_VALUE_LABEL")
         _verified_label.text = ""
         _conv_ratio_label.text = ""
+        _breakdown_panel.setup(null)
         return
 
     _name_label.text = ItemEntryDisplayHelper.display_name(_entry)
@@ -110,3 +112,5 @@ func _apply() -> void:
         _value_title_label.text = TranslationServer.translate("UI_EST_VALUE_LABEL")
         _conv_ratio_label.text = "%d%%" % int(ratio)
         _conv_ratio_label.modulate = Color(0.95, 0.75, 0.3) if ratio < 60.0 else Color.WHITE
+
+    _breakdown_panel.setup(_entry)

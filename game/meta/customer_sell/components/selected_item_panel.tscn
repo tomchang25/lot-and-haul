@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://game/meta/customer_sell/components/selected_item_panel.gd" id="1_sip"]
+[ext_resource type="PackedScene" path="res://game/shared/item_display/item_value_breakdown_panel/item_value_breakdown_panel.tscn" id="2_breakdown"]
 
 [node name="SelectedItemPanel" type="PanelContainer"]
 custom_minimum_size = Vector2(0, 180)
@@ -105,3 +106,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = ""
+
+[node name="BreakdownPanel" parent="VBox" instance=ExtResource("2_breakdown")]
+unique_name_in_owner = true
+layout_mode = 2

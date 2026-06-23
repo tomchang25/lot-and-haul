@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bi01jgyv1md6o" path="res://game/shared/item_display/item_browser_panel/item_browser_panel.tscn" id="3_browser"]
 [ext_resource type="PackedScene" uid="uid://cddj8ljbhn4sb" path="res://game/run/inspection/inspection_summary_popup/inspection_summary_popup.tscn" id="4_summary"]
 [ext_resource type="PackedScene" uid="uid://dk4vsndd2lfnm" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="5_sbo"]
+[ext_resource type="PackedScene" path="res://game/shared/item_display/item_value_breakdown_panel/item_value_breakdown_panel.tscn" id="6_breakdown"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [sub_resource type="StyleBoxFlat" id="accent_btn_normal"]
@@ -307,26 +308,9 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 
-[node name="CluesVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000090]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 2
-
-[node name="ClueSep" type="HSeparator" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/CluesVBox" unique_id=100000091]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="CluesHeader" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/CluesVBox" unique_id=100000092]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.55, 0.58, 0.63, 1)
-theme_override_font_sizes/font_size = 10
-text = "UI_CLUES_HEADER"
-
-[node name="ClueRows" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/CluesVBox" unique_id=100000093]
+[node name="BreakdownPanel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" instance=ExtResource("6_breakdown")]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 2
 
 [node name="ActionSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000100]
 layout_mode = 2

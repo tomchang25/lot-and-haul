@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://cepvjndtpol00"]
+
+[ext_resource type="Script" uid="uid://xw4kqg37sxwe" path="res://game/shared/item_display/item_value_breakdown_panel/item_value_breakdown_panel.gd" id="1_panel"]
+
+[node name="ItemValueBreakdownPanel" type="VBoxContainer" unique_id=830157235]
+theme_override_constants/separation = 2
+script = ExtResource("1_panel")

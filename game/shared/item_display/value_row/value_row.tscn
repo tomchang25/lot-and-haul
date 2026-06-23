@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://game/run/inspection/value_row/value_row.gd" id="1_script"]
+[ext_resource type="Script" path="res://game/shared/item_display/value_row/value_row.gd" id="1_script"]
 
 [node name="ValueRow" type="HBoxContainer"]
 theme_override_constants/separation = 8

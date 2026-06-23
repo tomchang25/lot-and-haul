@@ -47,6 +47,7 @@ const STORAGE_COLUMNS: Array = [
 @onready var _no_selection_label: Label = %NoSelectionLabel
 
 # Right — action buttons
+@onready var _breakdown_panel: ItemValueBreakdownPanel = %BreakdownPanel
 @onready var _action_grid: GridContainer = %ActionGrid
 @onready var _repair_btn: Button = %RepairButton
 @onready var _research_btn: Button = %ResearchButton
@@ -181,6 +182,7 @@ func _refresh_detail() -> void:
     _detail_rarity_hbox.visible = has_selection
     _detail_stats_hbox.visible = has_selection
     _convergence_panel.visible = has_selection
+    _breakdown_panel.visible = has_selection
     _action_grid.visible = has_selection
     _progress_label.visible = false
 
@@ -232,6 +234,9 @@ func _refresh_detail() -> void:
         _detail_conv_ratio.text = "%d%%" % int(ratio)
         _detail_conv_ratio.modulate = Color(0.95, 0.75, 0.3) if ratio < 60.0 else Color.WHITE
         _value_title_label.text = TranslationServer.translate("UI_EST_VALUE_LABEL")
+
+    # ── Clue breakdown ────────────────────────────────────────────────────────
+    _breakdown_panel.setup(entry)
 
     # ── Research progress ─────────────────────────────────────────────────────
     if entry.has_unrevealed_hidden() and not entry.research_progress.is_empty():

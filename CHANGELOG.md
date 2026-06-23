@@ -14,6 +14,10 @@ Rules:
 
 ## v0.1.7 - Draft
 
+### Item Value Breakdown Panel
+
+- 2026-06-23 — [item_display] Shared `ItemValueBreakdownPanel` component extracted from Inspection scene, showing anchor base value plus all revealed clue effects as flat inline rows; `ValueRow` moved to `game/shared/item_display/` with `from_anchor()`/`from_clue()` factories and hover tooltip support via `ClueTooltipManager`; new breakdown panel added to Storage and Customer Sell sidebars (previously had no clue display)
+
 ### Clue & Anchor Unification
 
 - 2026-06-23 — [data] Domain field and condition-damage-wear clues removed, clue IDs renamed to `common_<aspect>_<detail>` convention, affixes merged to 18 universal-scope entries, anchors renamed to sub-type display names, and all tooling/prompts migrated to the domainless schema
