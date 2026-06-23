@@ -31,10 +31,11 @@ func _boot_normal() -> void:
         return
 
     _register_runtime_providers()
-    SaveManager.boot_load()
-    var validation_ok: bool = SaveManager.run_validation()
-    var scene_ok: bool = RegistryAudit.check_scene_registry(SceneRouter.scenes)
-    var _audit_ok: bool = validation_ok and scene_ok
+    # Save data is loaded lazily — only when the player explicitly picks a slot
+    # via New Game or Load Game in the main menu. Skipping boot_load here keeps
+    # the main menu free of data-recovery warnings that belong in the load-save
+    # flow (switch_to_slot / init_slot).
+    RegistryAudit.check_scene_registry(SceneRouter.scenes)
 
 
 func _boot_for_tests() -> void:
