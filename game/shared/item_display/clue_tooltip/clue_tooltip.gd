@@ -1,6 +1,6 @@
 # clue_tooltip.gd
 # Floating tooltip that displays clue details on hover over a ClueTag.
-# Place one instance in the scene root; call show_for() / hide_tooltip().
+# Place one instance in the scene root; call show_for_clue() / hide_tooltip().
 # Reads:  ClueData fields (known_text_key, type, attribute, dc, effect_op, effect_amount)
 # Writes: nothing
 class_name ClueTooltip
@@ -18,18 +18,13 @@ extends PanelContainer
 # ══ Common API ════════════════════════════════════════════════════════════════
 
 
-func show_for(data: ClueData, anchor: Rect2, revealed: bool = true, valued: bool = false) -> void:
+func show_for_clue(data: ClueData, anchor: Rect2, revealed: bool = true, valued: bool = false) -> void:
     if data == null:
         return
 
-    _name_label.text = TranslationServer.translate(data.known_text_key)
-
     var color := ClueColors.for_clue(data, revealed, valued)
-    _name_label.add_theme_color_override(&"font_color", color)
-
     var type_key := "UI_CLUE_SURFACE" if data.type == ClueData.ClueType.SURFACE else "UI_CLUE_HIDDEN"
-    _type_label.text = TranslationServer.translate(type_key)
-    _type_label.add_theme_color_override(&"font_color", color)
+    _show_common_header(data.known_text_key, color, type_key)
 
     if revealed and data.attribute != "" and data.dc > 0:
         _attr_label.text = TranslationServer.translate("UI_CLUE_ATTR_DC_FORMAT") % [
@@ -55,6 +50,31 @@ func show_for(data: ClueData, anchor: Rect2, revealed: bool = true, valued: bool
         _valued_label.hide()
 
     _position_near(anchor)
+    show()
+
+
+func show_for_anchor(data: AnchorData, anchor_rect: Rect2, revealed: bool = true) -> void:
+    if data == null:
+        return
+
+    var color := ClueColors.ANCHOR_REVEALED_COLOR if revealed else ClueColors.UNREVEALED_COLOR
+    _show_common_header(data.known_text_key, color, "UI_CLUE_IDENTITY")
+
+    _attr_label.hide()
+
+    if revealed:
+        var base_color := ClueColors.ANCHOR_REVEALED_COLOR
+        var color_bb := "#%s" % base_color.to_html(false)
+        _effect_label.text = "[color=%s]$%d[/color]" % [color_bb, int(data.base_value)]
+        _effect_label.show()
+        _effect_sep.show()
+    else:
+        _effect_label.hide()
+        _effect_sep.hide()
+
+    _valued_label.hide()
+
+    _position_near(anchor_rect)
     show()
 
 
@@ -99,6 +119,13 @@ func _attribute_key(attr: String) -> String:
             return "SYS_ATTR_INVESTIGATION"
     ToastManager.show_dev_error("ClueTooltip._attribute_key: unknown attribute %s" % attr)
     return attr
+
+
+func _show_common_header(known_text_key: String, color: Color, type_key: String) -> void:
+    _name_label.text = TranslationServer.translate(known_text_key)
+    _name_label.add_theme_color_override(&"font_color", color)
+    _type_label.text = TranslationServer.translate(type_key)
+    _type_label.add_theme_color_override(&"font_color", color)
 
 
 func _position_near(anchor: Rect2) -> void:

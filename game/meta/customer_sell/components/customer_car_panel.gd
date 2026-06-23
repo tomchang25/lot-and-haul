@@ -126,7 +126,7 @@ func _rebuild_tags() -> void:
             continue
         var valued: bool = tag in _customer.valued_negative_tags
         var tag_node: ClueTag = ClueTagScene.instantiate()
-        tag_node.setup(clue, true, valued)
+        tag_node.setup_clue(clue, true, valued)
         _tags_flow.add_child(tag_node)
 
 

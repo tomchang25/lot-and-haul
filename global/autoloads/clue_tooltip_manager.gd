@@ -18,9 +18,14 @@ func _ready() -> void:
     add_child(layer)
 
 
-func show_for(clue: ClueData, anchor: Rect2, revealed: bool = true, valued: bool = false) -> void:
+func show_for_clue(clue: ClueData, anchor: Rect2, revealed: bool = true, valued: bool = false) -> void:
     if _tooltip != null:
-        _tooltip.show_for(clue, anchor, revealed, valued)
+        _tooltip.show_for_clue(clue, anchor, revealed, valued)
+
+
+func show_for_anchor(anchor_data: AnchorData, anchor_rect: Rect2, revealed: bool = true) -> void:
+    if _tooltip != null:
+        _tooltip.show_for_anchor(anchor_data, anchor_rect, revealed)
 
 
 func hide_tooltip() -> void:

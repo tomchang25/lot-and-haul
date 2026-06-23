@@ -86,18 +86,8 @@ func _build_anchor(idx: int) -> int:
     header.add_theme_color_override(&"font_color", HEADER_COLOR)
     idx += 1
 
-    var anchor := _entry.anchor
-    var text: String
-    if _entry.unveiled:
-        text = TranslationServer.translate(anchor.known_text_key)
-    else:
-        text = ItemEntryDisplayHelper.unknown_text()
-    var color := ClueColors.UNREVEALED_COLOR if not _entry.unveiled else ClueColors.ANCHOR_REVEALED_COLOR
-    var row := _ensure_child(idx, Label) as Label
-    row.text = "\u25a0  %s" % text
-    row.add_theme_font_size_override(&"font_size", 11)
-    row.add_theme_color_override(&"font_color", color)
-    row.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    var tag := _ensure_child(idx, ClueTag) as ClueTag
+    tag.setup_anchor(_entry.anchor, _entry.unveiled)
     idx += 1
 
     return idx
@@ -120,7 +110,7 @@ func _build_surface(idx: int) -> int:
     for clue: ClueData in clues:
         var tag := _ensure_child(idx, ClueTag) as ClueTag
         var revealed := _entry.revealed_clue_ids.has(clue.clue_id)
-        tag.setup(clue, revealed, false)
+        tag.setup_clue(clue, revealed, false)
         idx += 1
 
     return idx
@@ -143,7 +133,7 @@ func _build_hidden(idx: int) -> int:
     for clue: ClueData in clues:
         var tag := _ensure_child(idx, ClueTag) as ClueTag
         var revealed := _entry.revealed_clue_ids.has(clue.clue_id)
-        tag.setup(clue, revealed, false)
+        tag.setup_clue(clue, revealed, false)
         idx += 1
 
     return idx
