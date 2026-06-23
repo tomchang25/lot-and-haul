@@ -223,6 +223,10 @@ Future pool-generator work: surface clue count scales with the anchor's tier (e.
 
 Richer lot-preview functionality on the location-select screen: browse lot contents before committing AP/travel, see special gating requirements (tier locks, perk gates, mastery minimums), and surface other meta-info (estimated value range, clue count hints, category breakdown). Builds on the existing `LocationIntel` concept in Draft — fold that entry here when merging. Currently the location-select scene shows only name, cost, and tagline; this adds depth to the decision layer without requiring a trip to confirm.
 
+### Combination op for replace override (Fake, Reproduce)
+
+Extend the replace-override mechanism as `fake` and `reproduce` from a flat value to a compound op that composes multiple arithmetic modifiers: a minimum floor, a multiplier, and an additive shift, all resolved in a deterministic order. The compound op is applied conditionally — triggered by a property flag such as `Fake` or `Reproduce` — so counterfeit items can express complex value transforms (e.g. floor at 100, scale by 0.2, then shift by -500) without separate bespoke override fields.
+
 ---
 
 ## Active
@@ -235,9 +239,7 @@ Richer lot-preview functionality on the location-select screen: browse lot conte
 
 - [runtime_architecture] Runtime architecture vocabulary standardization: gameplay Managers become Systems, Instance becomes Entry, and archetype boundaries harden — see `dev/docs/plans/runtime_architecture_vocabulary_standardization.sketch.md`
 
-- [clue_unification] Clue & anchor unification Phase 1: remove domain, cut condition clues, rename all clue/anchor/affix IDs, merge affixes, make scope_mode uniform — see `dev/docs/plans/clue_anchor_unification.sketch.md`
 
-- [clue_unification_phase2] Clue & anchor unification Phase 2: add new generic clues, combination-level category_scope, expand oil_lamp/figurine anchors, affix-aware balance_preview rewrite, full rebalance — see `dev/docs/plans/clue_anchor_unification_phase2.sketch.md`
 
 ---
 

@@ -14,6 +14,13 @@ Rules:
 
 ## v0.1.7 - Draft
 
+### Clue & Anchor Unification
+
+- 2026-06-23 — [data] Domain field and condition-damage-wear clues removed, clue IDs renamed to `common_<aspect>_<detail>` convention, affixes merged to 18 universal-scope entries, anchors renamed to sub-type display names, and all tooling/prompts migrated to the domainless schema
+- 2026-06-23 — [feat] Exclusive_group expanded to all clue types, affix exclusion system with `excluded_affix_groups`, new draw rules (≥1 prefix, ≤2 total, ≤1 suffix), and combination-level `category_scope` for category-specific combinations
+- 2026-06-23 — [content] ~20 new surface and ~10 new hidden clues; oil_lamp and porcelain_figurine third anchor variants; ~6-8 common and ~12 category-specific combinations; full rebalance across 12 categories
+- 2026-06-23 — [tool] `balance_preview.py` rewritten to simulate the full affix→combination→clue generation flow with conflict rejection and per-category Monte Carlo statistics
+
 ### Valued Surface-Negative Customer Pricing
 
 - 2026-06-22 — [customer_sell] Customers can value specific negative surface clues, skipping the multiplier penalty and applying a fixed bonus instead; ClueTag and ClueTooltip components added with color-coded clue display in customer sell panels and item cards
