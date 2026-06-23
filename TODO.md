@@ -237,9 +237,11 @@ Extend the replace-override mechanism as `fake` and `reproduce` from a flat valu
 > Ship a phase → cut it from that file + append `CHANGELOG.md`, leaving this line untouched.
 > All phases shipped → archive the plan file + delete this line.
 
+- [item_display] Phase 1: Shared ItemValueBreakdownPanel with inline clue effects grouped by affix — see `dev/docs/plans/item_display_value_breakdown_panel.sketch.md`
+
+- [item_display] Phase 2: Full ItemDetailPanel consolidation across Inspection, Storage, and CustomerSell sidebars — see `dev/docs/plans/item_display_detail_panel_consolidation.sketch.md`
+
 - [runtime_architecture] Runtime architecture vocabulary standardization: gameplay Managers become Systems, Instance becomes Entry, and archetype boundaries harden — see `dev/docs/plans/runtime_architecture_vocabulary_standardization.sketch.md`
-
-
 
 ---
 
