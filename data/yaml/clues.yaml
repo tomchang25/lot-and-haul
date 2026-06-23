@@ -63,22 +63,30 @@ anchors:
     sprite: ""
     weight_kg: 0.15
     tier: 4
-  - anchor_id: lamp_anchor_01
-    known_text_key: ANCHOR_LAMP_ANCHOR_01
+  - anchor_id: lamp_hurricane_01
+    known_text_key: ANCHOR_LAMP_HURRICANE_01
     category_scope: oil_lamp
-    base_value: 80
+    base_value: 90
     shape_id: s1x2
     sprite: ""
     weight_kg: 1.5
     tier: 1
-  - anchor_id: lamp_anchor_02
-    known_text_key: ANCHOR_LAMP_ANCHOR_02
+  - anchor_id: lamp_student_02
+    known_text_key: ANCHOR_LAMP_STUDENT_02
     category_scope: oil_lamp
-    base_value: 320
+    base_value: 310
     shape_id: s1x2
     sprite: ""
     weight_kg: 1.8
     tier: 2
+  - anchor_id: lamp_parlor_03
+    known_text_key: ANCHOR_LAMP_PARLOR_03
+    category_scope: oil_lamp
+    base_value: 550
+    shape_id: s1x2
+    sprite: ""
+    weight_kg: 2.2
+    tier: 3
   - anchor_id: clock_mantel_01
     known_text_key: ANCHOR_CLOCK_MANTEL_01
     category_scope: clock
@@ -95,22 +103,30 @@ anchors:
     sprite: ""
     weight_kg: 4.0
     tier: 2
-  - anchor_id: figurine_anchor_01
-    known_text_key: ANCHOR_FIGURINE_ANCHOR_01
+  - anchor_id: figurine_bisque_01
+    known_text_key: ANCHOR_FIGURINE_BISQUE_01
     category_scope: porcelain_figurine
-    base_value: 50
+    base_value: 55
     shape_id: s1x1
     sprite: ""
     weight_kg: 0.6
     tier: 1
-  - anchor_id: figurine_anchor_02
-    known_text_key: ANCHOR_FIGURINE_ANCHOR_02
+  - anchor_id: figurine_glazed_02
+    known_text_key: ANCHOR_FIGURINE_GLAZED_02
     category_scope: porcelain_figurine
-    base_value: 280
+    base_value: 270
     shape_id: s1x1
     sprite: ""
     weight_kg: 0.7
     tier: 2
+  - anchor_id: figurine_cabinet_03
+    known_text_key: ANCHOR_FIGURINE_CABINET_03
+    category_scope: porcelain_figurine
+    base_value: 480
+    shape_id: s1x1
+    sprite: ""
+    weight_kg: 0.9
+    tier: 3
   - anchor_id: vase_bud_01
     known_text_key: ANCHOR_VASE_BUD_01
     category_scope: vase
@@ -349,14 +365,7 @@ clues:
     effect_op: mul
     effect_amount: 1.6
     exclusive_group: authenticity_handbag
-  - clue_id: bag_override_replica
-    known_text_key: CLUE_BAG_OVERRIDE_REPLICA
-    type: hidden
-    attribute: investigation
-    dc: 20
-    effect_op: override
-    effect_amount: 120
-    exclusive_group: authenticity_handbag
+
   - clue_id: bag_hidden_limited_run
     known_text_key: CLUE_BAG_HIDDEN_LIMITED_RUN
     type: hidden
@@ -452,14 +461,7 @@ clues:
     effect_op: mul
     effect_amount: 1.4
     exclusive_group: authenticity_wristwatch
-  - clue_id: watch_override_franken
-    known_text_key: CLUE_WATCH_OVERRIDE_FRANKEN
-    type: hidden
-    attribute: investigation
-    dc: 20
-    effect_op: override
-    effect_amount: 80
-    exclusive_group: authenticity_wristwatch
+
   - clue_id: watch_hidden_box_papers
     known_text_key: CLUE_WATCH_HIDDEN_BOX_PAPERS
     type: hidden
@@ -547,14 +549,7 @@ clues:
     effect_op: mul
     effect_amount: 1.9
     exclusive_group: authenticity_oil_lamp
-  - clue_id: lamp_override_modern_copy
-    known_text_key: CLUE_LAMP_OVERRIDE_MODERN_COPY
-    type: hidden
-    attribute: investigation
-    dc: 20
-    effect_op: override
-    effect_amount: 60
-    exclusive_group: authenticity_oil_lamp
+
   - clue_id: lamp_blown_glass
     known_text_key: CLUE_LAMP_BLOWN_GLASS
     type: surface
@@ -635,14 +630,7 @@ clues:
     effect_op: mul
     effect_amount: 3.1
     exclusive_group: authenticity_clock
-  - clue_id: clock_override_marriage
-    known_text_key: CLUE_CLOCK_OVERRIDE_MARRIAGE
-    type: hidden
-    attribute: investigation
-    dc: 20
-    effect_op: override
-    effect_amount: 100
-    exclusive_group: authenticity_clock
+
   - clue_id: common_material_celadon
     known_text_key: CLUE_COMMON_MATERIAL_CELADON
     type: surface
@@ -709,14 +697,7 @@ clues:
     effect_op: mul
     effect_amount: 1.8
     exclusive_group: authenticity_porcelain_figurine
-  - clue_id: figurine_override_later_copy
-    known_text_key: CLUE_FIGURINE_OVERRIDE_LATER_COPY
-    type: hidden
-    attribute: investigation
-    dc: 20
-    effect_op: override
-    effect_amount: 70
-    exclusive_group: authenticity_porcelain_figurine
+
   - clue_id: common_material_cased_glass
     known_text_key: CLUE_COMMON_MATERIAL_CASED_GLASS
     type: surface
@@ -783,14 +764,7 @@ clues:
     effect_op: mul
     effect_amount: 2.3
     exclusive_group: authenticity_vase
-  - clue_id: vase_override_repro
-    known_text_key: CLUE_VASE_OVERRIDE_REPRO
-    type: hidden
-    attribute: investigation
-    dc: 20
-    effect_op: override
-    effect_amount: 65
-    exclusive_group: authenticity_vase
+
   - clue_id: common_material_linen
     known_text_key: CLUE_COMMON_MATERIAL_LINEN
     type: surface
@@ -864,14 +838,7 @@ clues:
     effect_op: mul
     effect_amount: 2.1
     exclusive_group: authenticity_poster
-  - clue_id: poster_override_reprint
-    known_text_key: CLUE_POSTER_OVERRIDE_REPRINT
-    type: hidden
-    attribute: investigation
-    dc: 20
-    effect_op: override
-    effect_amount: 50
-    exclusive_group: authenticity_poster
+
   - clue_id: common_material_canvas
     known_text_key: CLUE_COMMON_MATERIAL_CANVAS
     type: surface
@@ -966,14 +933,7 @@ clues:
     effect_op: mul
     effect_amount: 2.5
     exclusive_group: authenticity_painting
-  - clue_id: painting_override_forgery
-    known_text_key: CLUE_PAINTING_OVERRIDE_FORGERY
-    type: hidden
-    attribute: investigation
-    dc: 22
-    effect_op: override
-    effect_amount: 180
-    exclusive_group: authenticity_painting
+
   - clue_id: painting_hidden_exhibition_stamp
     known_text_key: CLUE_PAINTING_HIDDEN_EXHIBITION_STAMP
     type: hidden
@@ -1068,14 +1028,7 @@ clues:
     effect_op: mul
     effect_amount: 2.3
     exclusive_group: authenticity_sculpture
-  - clue_id: sculpture_override_cast_copy
-    known_text_key: CLUE_SCULPTURE_OVERRIDE_CAST_COPY
-    type: hidden
-    attribute: investigation
-    dc: 21
-    effect_op: override
-    effect_amount: 200
-    exclusive_group: authenticity_sculpture
+
   - clue_id: sculpture_hidden_artist_letter
     known_text_key: CLUE_SCULPTURE_HIDDEN_ARTIST_LETTER
     type: hidden
@@ -1170,14 +1123,7 @@ clues:
     effect_op: mul
     effect_amount: 1.7
     exclusive_group: authenticity_pistol
-  - clue_id: pistol_override_conversion
-    known_text_key: CLUE_PISTOL_OVERRIDE_CONVERSION
-    type: hidden
-    attribute: investigation
-    dc: 20
-    effect_op: override
-    effect_amount: 90
-    exclusive_group: authenticity_pistol
+
   - clue_id: common_form_long_barrel
     known_text_key: CLUE_COMMON_FORM_LONG_BARREL
     type: surface
@@ -1258,14 +1204,7 @@ clues:
     effect_op: mul
     effect_amount: 1.8
     exclusive_group: authenticity_rifle
-  - clue_id: rifle_override_kit_build
-    known_text_key: CLUE_RIFLE_OVERRIDE_KIT_BUILD
-    type: hidden
-    attribute: investigation
-    dc: 20
-    effect_op: override
-    effect_amount: 100
-    exclusive_group: authenticity_rifle
+
   - clue_id: common_material_tiller_wood
     known_text_key: CLUE_COMMON_MATERIAL_TILLER_WOOD
     type: surface
@@ -1346,11 +1285,244 @@ clues:
     effect_op: mul
     effect_amount: 2.4
     exclusive_group: authenticity_crossbow
-  - clue_id: crossbow_override_replica
-    known_text_key: CLUE_CROSSBOW_OVERRIDE_REPLICA
+
+
+  # ── Phase 2 new clues ─────────────────────────────────────────────────
+  # Surface: material range
+  - clue_id: common_material_fine_wood
+    known_text_key: CLUE_COMMON_MATERIAL_FINE_WOOD
+    type: surface
+    attribute: appraisal
+    dc: 14
+    effect_op: add
+    effect_amount: 200
+  - clue_id: common_material_lacquer
+    known_text_key: CLUE_COMMON_MATERIAL_LACQUER
+    type: surface
+    attribute: appraisal
+    dc: 12
+    effect_op: add
+    effect_amount: 90
+  - clue_id: common_material_compressed
+    known_text_key: CLUE_COMMON_MATERIAL_COMPRESSED
+    type: surface
+    attribute: appraisal
+    dc: 10
+    effect_op: mul
+    effect_amount: 0.85
+    exclusive_group: material_quality
+
+  # Surface: detail range
+  - clue_id: common_detail_enamel
+    known_text_key: CLUE_COMMON_DETAIL_ENAMEL
+    type: surface
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 180
+  - clue_id: common_detail_marble
+    known_text_key: CLUE_COMMON_DETAIL_MARBLE
+    type: surface
+    attribute: perception
+    dc: 12
+    effect_op: add
+    effect_amount: 130
+  - clue_id: common_detail_stone_inlay
+    known_text_key: CLUE_COMMON_DETAIL_STONE_INLAY
+    type: surface
+    attribute: perception
+    dc: 16
+    effect_op: add
+    effect_amount: 300
+
+  # Surface: craft range
+  - clue_id: common_craft_machine
+    known_text_key: CLUE_COMMON_CRAFT_MACHINE
+    type: surface
+    attribute: restoration
+    dc: 10
+    effect_op: mul
+    effect_amount: 0.8
+    exclusive_group: production_method
+  - clue_id: common_craft_turned
+    known_text_key: CLUE_COMMON_CRAFT_TURNED
+    type: surface
+    attribute: perception
+    dc: 14
+    effect_op: add
+    effect_amount: 110
+  - clue_id: common_craft_assembled
+    known_text_key: CLUE_COMMON_CRAFT_ASSEMBLED
+    type: surface
+    attribute: restoration
+    dc: 10
+    effect_op: mul
+    effect_amount: 0.75
+    exclusive_group: production_method
+
+  # Surface: mark range
+  - clue_id: common_mark_inscribed
+    known_text_key: CLUE_COMMON_MARK_INSCRIBED
+    type: surface
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 250
+    exclusive_group: mark_signature
+  - clue_id: common_mark_patent
+    known_text_key: CLUE_COMMON_MARK_PATENT
+    type: surface
+    attribute: investigation
+    dc: 14
+    effect_op: add
+    effect_amount: 160
+    exclusive_group: mark_signature
+  - clue_id: common_mark_monogram
+    known_text_key: CLUE_COMMON_MARK_MONOGRAM
+    type: surface
+    attribute: investigation
+    dc: 18
+    effect_op: add
+    effect_amount: 400
+
+  # Surface: provenance range
+  - clue_id: common_provenance_auction_record
+    known_text_key: CLUE_COMMON_PROVENANCE_AUCTION_RECORD
+    type: surface
+    attribute: investigation
+    dc: 18
+    effect_op: add
+    effect_amount: 350
+  - clue_id: common_provenance_certificate
+    known_text_key: CLUE_COMMON_PROVENANCE_CERTIFICATE
+    type: surface
+    attribute: investigation
+    dc: 16
+    effect_op: add
+    effect_amount: 280
+  - clue_id: common_provenance_collection
+    known_text_key: CLUE_COMMON_PROVENANCE_COLLECTION
+    type: surface
+    attribute: investigation
+    dc: 14
+    effect_op: add
+    effect_amount: 150
+
+  # Surface: medium range
+  - clue_id: common_medium_watercolor
+    known_text_key: CLUE_COMMON_MEDIUM_WATERCOLOR
+    type: surface
+    attribute: appraisal
+    dc: 12
+    effect_op: mul
+    effect_amount: 0.8
+  - clue_id: common_medium_terracotta
+    known_text_key: CLUE_COMMON_MEDIUM_TERRACOTTA
+    type: surface
+    attribute: appraisal
+    dc: 12
+    effect_op: mul
+    effect_amount: 0.75
+  - clue_id: common_medium_iron
+    known_text_key: CLUE_COMMON_MEDIUM_IRON
+    type: surface
+    attribute: appraisal
+    dc: 14
+    effect_op: add
+    effect_amount: 160
+
+  # Surface: form range
+  - clue_id: common_form_collapsible
+    known_text_key: CLUE_COMMON_FORM_COLLAPSIBLE
+    type: surface
+    attribute: perception
+    dc: 12
+    effect_op: add
+    effect_amount: 80
+  - clue_id: common_form_portable
+    known_text_key: CLUE_COMMON_FORM_PORTABLE
+    type: surface
+    attribute: perception
+    dc: 10
+    effect_op: mul
+    effect_amount: 0.9
+
+  # Hidden: generic authenticity scale (shared exclusive_group)
+  - clue_id: common_leaf_factory
+    known_text_key: CLUE_COMMON_LEAF_FACTORY
+    type: hidden
+    attribute: investigation
+    dc: 20
+    effect_op: mul
+    effect_amount: 1.05
+    exclusive_group: authenticity_common
+  - clue_id: common_leaf_workshop
+    known_text_key: CLUE_COMMON_LEAF_WORKSHOP
+    type: hidden
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 1.4
+    exclusive_group: authenticity_common
+  - clue_id: common_leaf_studio
+    known_text_key: CLUE_COMMON_LEAF_STUDIO
+    type: hidden
+    attribute: investigation
+    dc: 23
+    effect_op: mul
+    effect_amount: 2.0
+    exclusive_group: authenticity_common
+  - clue_id: common_leaf_atelier
+    known_text_key: CLUE_COMMON_LEAF_ATELIER
+    type: hidden
+    attribute: investigation
+    dc: 24
+    effect_op: mul
+    effect_amount: 3.0
+    exclusive_group: authenticity_common
+  - clue_id: common_leaf_heritage
+    known_text_key: CLUE_COMMON_LEAF_HERITAGE
+    type: hidden
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 1.7
+    exclusive_group: authenticity_common
+  - clue_id: common_override_fake
+    known_text_key: CLUE_COMMON_OVERRIDE_FAKE
+    type: hidden
+    attribute: investigation
+    dc: 22
+    effect_op: override
+    effect_amount: 10
+    exclusive_group: authenticity_common
+  - clue_id: common_override_kit
+    known_text_key: CLUE_COMMON_OVERRIDE_KIT
     type: hidden
     attribute: investigation
     dc: 20
     effect_op: override
-    effect_amount: 85
-    exclusive_group: authenticity_crossbow
+    effect_amount: 50
+    exclusive_group: authenticity_common
+  - clue_id: common_override_reproduce
+    known_text_key: CLUE_COMMON_OVERRIDE_REPRODUCE
+    type: hidden
+    attribute: investigation
+    dc: 20
+    effect_op: override
+    effect_amount: 100
+    exclusive_group: authenticity_common
+  - clue_id: common_provenance_exhibition
+    known_text_key: CLUE_COMMON_PROVENANCE_EXHIBITION
+    type: hidden
+    attribute: investigation
+    dc: 22
+    effect_op: mul
+    effect_amount: 1.3
+  - clue_id: common_provenance_publication
+    known_text_key: CLUE_COMMON_PROVENANCE_PUBLICATION
+    type: hidden
+    attribute: investigation
+    dc: 23
+    effect_op: mul
+    effect_amount: 1.5

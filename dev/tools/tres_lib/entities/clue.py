@@ -55,10 +55,10 @@ class ClueSpec:
         w.add_field_str("effect_op", entry.get("effect_op", "add"))
         w.add_field_float("effect_amount", float(entry.get("effect_amount", 0.0)))
 
-        # Hidden-only draw-control field
+        # Mutual-exclusion group — applies to both surface and hidden clues
         w.add_field_str(
             "exclusive_group",
-            entry.get("exclusive_group", "") if ctype == "hidden" else "",
+            entry.get("exclusive_group", ""),
         )
 
         return w.render()

@@ -35,6 +35,8 @@ Players buy mystery lots at auction and identify items over time. Item knowledge
 - Category-specific surface clues (≤1 per category) use the pattern `<category_id>_<detail>` (e.g. `handbag_monogram`).
 - Hidden identity-reveal clue ids use the suffix `_leaf_{identifier}` (e.g. `lamp_leaf_moser`). Keep category prefix.
 - Hidden override (counterfeit/sleeper) clue ids use the suffix `_override_{identifier}`. Keep category prefix.
+- `excluded_affix_groups`: list of group strings for affix draw exclusion. Affixes sharing a group cannot co-occur.
+- Combination `category_scope`: optional category restriction on a combination. Empty = universal.
 
 ## Text Standards
 
@@ -47,6 +49,7 @@ Players buy mystery lots at auction and identify items over time. Item knowledge
   `Verified`, `Authentication`, `Authenticated`, `Authentic`, `Identified`, `Generic`, `Unknown`, `Checked`, `Confirmed`, `Validated`, `Appraised`, `Evaluated`
   Clue text must describe a physical observation or historical detail, not a game state or process.
 - **Do not author clues whose known_text implies physical condition, damage, wear, or repair.** The condition system handles item condition separately. Clues describe material, craftsmanship, marks, provenance, medium, and form.
+- `exclusive_group` applies to surface and hidden clue types, not just hidden.
 
 ## Validation Principles
 

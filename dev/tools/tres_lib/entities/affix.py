@@ -124,6 +124,24 @@ class AffixCombinationSpec:
             hidden_tags.append(tag)
         w.add_field_ext_ref_array("hidden_clues", hidden_tags)
 
+        # Category scope — written as ext-refs so Godot resolves to CategoryData refs.
+        cat_scope_ids: list[str] = entry.get("category_scope", [])
+        cat_tags: list[str] = []
+        tag_offset = len(surface_ids) + len(hidden_ids) + 2
+        for i, cid in enumerate(cat_scope_ids):
+            cat_uid = ctx.uid_cache.get(cid, "")
+            if not cat_uid:
+                continue
+            tag = f"{tag_offset + i}_cat"
+            w.add_ext_resource(
+                tag,
+                "Resource",
+                f"res://data/tres/categories/{cid}.tres",
+                cat_uid,
+            )
+            cat_tags.append(tag)
+        w.add_field_ext_ref_array("category_scope", cat_tags)
+
         return w.render()
 
     def parse_tres(self, text: str, ctx: ParseCtx) -> dict | None:
@@ -131,9 +149,21 @@ class AffixCombinationSpec:
         comb_id = tres_field(text, "combination_id") or ""
         if uid:
             ctx.uid_to_id[uid] = comb_id
+        cat_scope_raw = tres_field(text, "category_scope") or ""
+        parsed_scope: list[str] = []
+        ext_res = ext_resources(text)
+        for m in re.finditer(r'ExtResource\("([^"]+)"\)', cat_scope_raw):
+            tag = m.group(1)
+            res_uid = ext_res.get(tag, {}).get("uid", "")
+            if res_uid:
+                cat_id = ctx.uid_to_id.get(res_uid, "")
+                if cat_id:
+                    parsed_scope.append(cat_id)
+
         return {
             "combination_id": comb_id,
             "weight": int(tres_field(text, "weight") or 1),
+            "category_scope": parsed_scope,
         }
 
     def validate(self, entries: list, all_data: dict) -> list[str]:
@@ -192,6 +222,23 @@ class AffixCombinationSpec:
                     f"(affix dictionary requires hidden clues per combination)"
                 )
 
+            # Validate category_scope entries
+            cat_scope: list = entry.get("category_scope", [])
+            if not isinstance(cat_scope, list):
+                errors.append(
+                    f"affix_combination '{cid}': category_scope must be a list"
+                )
+            else:
+                known_cat_ids: set[str] = {
+                    c["category_id"] for c in all_data.get("categories", [])
+                }
+                for scope_cat in cat_scope:
+                    if scope_cat not in known_cat_ids:
+                        errors.append(
+                            f"affix_combination '{cid}': category_scope '{scope_cat}' "
+                            f"not in category table"
+                        )
+
             # Cross-product conflicts are validated at the affix level,
             # but validate within this combination alone for basic sanity.
             own_errors = _check_conflicts(
@@ -242,6 +289,9 @@ class AffixSpec:
         w.add_field_str("naming_slot", entry.get("naming_slot", ""))
         w.add_field_str("display_name_key", entry.get("display_name_key", ""))
         w.add_field_str("scope_mode", entry.get("scope_mode", "categories"))
+        w.add_field_str_array(
+            "excluded_affix_groups", entry.get("excluded_affix_groups", [])
+        )
 
         # Category scope — written as ext-refs so Godot resolves to CategoryData refs.
         cat_scope_ids: list[str] = entry.get("category_scope", [])
@@ -296,12 +346,19 @@ class AffixSpec:
                 if cat_id:
                     parsed_scope.append(cat_id)
 
+        excluded_raw = tres_field(text, "excluded_affix_groups") or ""
+        parsed_excluded: list[str] = []
+        if excluded_raw:
+            for m in re.finditer(r'"([^"]+)"', excluded_raw):
+                parsed_excluded.append(m.group(1))
+
         return {
             "affix_id": affix_id,
             "naming_slot": tres_field(text, "naming_slot") or "",
             "display_name_key": tres_field(text, "display_name_key") or "",
             "scope_mode": tres_field(text, "scope_mode") or "categories",
             "category_scope": parsed_scope,
+            "excluded_affix_groups": parsed_excluded,
             "weight": int(tres_field(text, "weight") or 1),
         }
 
@@ -370,6 +427,18 @@ class AffixSpec:
                     f"affix '{aid}': naming_slot must be 'prefix' or 'suffix'"
                 )
 
+            # Validate excluded_affix_groups
+            excluded_groups = entry.get("excluded_affix_groups", [])
+            if not isinstance(excluded_groups, list):
+                errors.append(f"affix '{aid}': excluded_affix_groups must be a list")
+            else:
+                for g in excluded_groups:
+                    if not isinstance(g, str) or not g.strip():
+                        errors.append(
+                            f"affix '{aid}': excluded_affix_groups entries must be non-empty strings"
+                        )
+                        break
+
             rw = entry.get("weight", 1)
             if not isinstance(rw, int) or rw <= 0:
                 errors.append(f"affix '{aid}': weight must be a positive int")
@@ -385,22 +454,32 @@ class AffixSpec:
                         errors.append(f"affix '{aid}': combination '{cid}' not found")
 
             # ── Cross-product conflict validator ──────────────
-            # Enumerate every prefix × suffix affix pair that shares a
-            # category_scope and validate the merged clue set never carries
-            # a duplicate exclusive_group or double override.
-            # Prefix×prefix or suffix×suffix is not checked because at most
-            # one of each slot is drawn per item (draw-time policy).
+            # Phase 2 allows affix pairs: prefix×prefix or prefix×suffix (at most
+            # 1 suffix). Validate every possible pair by checking from the prefix
+            # side only (suffix side skips — the pair is validated when its prefix
+            # peer is processed). Also skip suffix×suffix (at most one suffix per
+            # item). Skip affixes that are mutually excluded via shared
+            # excluded_affix_groups — they can never co-occur.
             my_slot = naming_slot
-            if my_slot not in ("prefix", "suffix"):
-                continue
+            if my_slot != "prefix":
+                continue  # validate from prefix side to avoid duplicates
 
-            peer_slot = "suffix" if my_slot == "prefix" else "prefix"
+            my_excluded_groups: set[str] = set(entry.get("excluded_affix_groups", []))
             peer_affixes: list[dict] = []
             my_scope_set: set[str] = (
                 set(cat_scope) if scope_mode == "categories" else set()
             )
             my_is_all = scope_mode == "all"
             for other in entries:
+                if other.get("affix_id") == aid:
+                    continue
+                other_slot = other.get("naming_slot", "")
+                if other_slot not in ("prefix", "suffix"):
+                    continue
+                # Skip if excluded from pairing
+                other_excluded: set[str] = set(other.get("excluded_affix_groups", []))
+                if my_excluded_groups & other_excluded:
+                    continue
                 other_scope_mode = other.get("scope_mode", "categories")
                 other_scope = other.get("category_scope", [])
                 other_scope_set: set[str] = (
@@ -412,7 +491,7 @@ class AffixSpec:
                     or other_scope_mode == "all"
                     or bool(my_scope_set & other_scope_set)
                 )
-                if share_category and other.get("naming_slot") == peer_slot:
+                if share_category:
                     peer_affixes.append(other)
 
             if not peer_affixes:
@@ -426,6 +505,11 @@ class AffixSpec:
                 peer_combs = affix_to_combs.get(peer.get("affix_id", ""), [])
                 if not peer_combs:
                     continue
+                # Phase 2: only flag cross-product conflicts if NO compatible
+                # combination pair exists. If at least one pair is conflict-free,
+                # the runtime can resolve by re-picking combinations.
+                all_pair_errors: list[str] = []
+                has_valid_pair = False
                 for comb_a in my_combs:
                     for comb_b in peer_combs:
                         merged_surface = comb_a.get(
@@ -443,8 +527,14 @@ class AffixSpec:
                             all_data,
                             label,
                         )
-                        for err in xp_errors:
-                            errors.append(f"affix '{aid}': {err}")
+                        if xp_errors:
+                            all_pair_errors.extend(
+                                f"affix '{aid}': {e}" for e in xp_errors
+                            )
+                        else:
+                            has_valid_pair = True
+                if not has_valid_pair and all_pair_errors:
+                    errors.extend(all_pair_errors)
 
         return errors
 

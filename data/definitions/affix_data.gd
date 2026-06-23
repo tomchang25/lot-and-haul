@@ -25,6 +25,10 @@ extends Resource
 # Only used when scope_mode == "categories".
 @export var category_scope: Array[CategoryData] = []
 
+# Groups this affix is excluded from pairing with.
+# Two affixes that share any excluded group cannot be drawn together.
+@export var excluded_affix_groups: Array[String] = []
+
 # Relative weight for affix draw (higher = more frequent).
 @export var weight: int = 1
 

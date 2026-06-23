@@ -84,10 +84,10 @@ clues:
     dc: <int> # surface 10–18, hidden 20–25
     effect_op: add | mul | override # 'override' is hidden-only
     effect_amount: <number> # non-zero; |amount| <= 100000
-    exclusive_group: <string> # HIDDEN-ONLY; at most one clue per group per item
+    exclusive_group: <string> # At most one clue per group per item. Applies to both surface and hidden.
 ```
 
-Clues carry **no** `domain` field — they are a single global pool, not category-bound. `exclusive_group` is written only on hidden clues; the converter blanks it on surface clues. Clues do **not** carry a `naming` block; item names are composed from affixes plus the anchor body.
+Clues carry **no** `domain` field — they are a single global pool, not category-bound. Clues do **not** carry a `naming` block; item names are composed from affixes plus the anchor body.
 
 **Do not generate condition, damage, wear, or repair clues.** The condition system handles item condition separately. Clues describe material, craftsmanship, marks, provenance, medium, and form.
 
@@ -111,7 +111,7 @@ Clues carry **no** `domain` field — they are a single global pool, not categor
   - `override` — **base-replacement**: when revealed, replaces the anchor base entirely (a sleeper reveal uses a large override; a counterfeit collapse uses a small one). **At most one override per item.**
 - `effect_amount` must be **non-zero**.
 - `dc`: 20–25.
-- `exclusive_group`: assign an authenticity group string (e.g. `authenticity_lamp`) to hidden clues that are mutually-exclusive interpretations of the same feature. A genuine-maker (`_leaf_`) clue and its counterfeit (`_override_`) clue for the same category share one group so a single item never carries both. **No item may carry two hidden clues in the same group** — they are alternatives the pool draw chooses between, never combined.
+- `exclusive_group`: assign an authenticity group string (e.g. `authenticity_lamp`) to clues that are mutually-exclusive interpretations of the same feature. Applies to both surface and hidden clue types. A genuine-maker (`_leaf_`) clue and its counterfeit (`_override_`) clue for the same category share one group so a single item never carries both. **No item may carry two clues (surface or hidden) in the same group** — they are alternatives the pool draw chooses between, never combined.
 - Hidden clues may reveal identity, authenticity, or condition truth, but they do not rename the item directly. Affixes carry the player-facing qualifier.
 
 ---
@@ -295,7 +295,7 @@ clues:
     effect_amount: 2.75
     exclusive_group: authenticity_clock
 
-  - clue_id: clock_override_reproduction
+  - clue_id: common_override_reproduce
     known_text: Reproduction
     type: hidden
     attribute: investigation
@@ -342,7 +342,7 @@ items:
     surface_ids:
       - common_detail_gilded
     hidden_ids:
-      - clock_override_reproduction
+      - common_override_reproduce
 
   - item_id: clock_boulle_rare
     category_id: clock
@@ -360,7 +360,7 @@ items:
 Notes on the example:
 
 - `clock_mantel_common` is COMMON (rarity 0, 0 hidden) — verified immediately. Its display name is the anchor sub-type plus any drawn affixes; clues do not rename it.
-- `clock_leaf_boulle` and `clock_override_reproduction` both sit in `exclusive_group: authenticity_clock`. They are **alternatives** — `clock_signed_uncommon` draws the genuine `_leaf_`, `clock_repro_uncommon` draws the counterfeit `_override_`. **No single item carries both**, which is exactly what the one-per-group rule enforces.
+- `clock_leaf_boulle` and `common_override_reproduce` both sit in `exclusive_group: authenticity_clock`. They are **alternatives** — `clock_signed_uncommon` draws the genuine `_leaf_`, `clock_repro_uncommon` draws the counterfeit `_override_`. **No single item carries both**, which is exactly what the one-per-group rule enforces.
 - `clock_boulle_rare` is RARE (rarity 2). Its two hidden clues are `clock_leaf_boulle` (group `authenticity_clock`) and `clock_movement_swiss` (**no group**) — so they do not collide, and neither is an `override`, so the one-override limit holds.
-- `clock_override_reproduction` is the required negative hidden — on `clock_repro_uncommon` it collapses the tier-3 base (500) to 120 (~24%, within the counterfeit budget).
+- `common_override_reproduce` is the required negative hidden — on `clock_repro_uncommon` it collapses the tier-3 base (500) to 100 (~20%, within the counterfeit budget).
 - `clock_mantel_01` (tier 1, base 60) and `clock_tall_02` (tier 3, base 500) are separate anchors with sub-type names; different items reference different variants.

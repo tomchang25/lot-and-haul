@@ -17,3 +17,7 @@ extends Resource
 
 # Hidden clues contributed by this combination.
 @export var hidden_clues: Array[ClueData] = []
+
+# Category scope for this combination. Empty = universal (any category).
+# Populated = only these categories can draw this combination.
+@export var category_scope: Array[CategoryData] = []

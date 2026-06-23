@@ -12,7 +12,7 @@ affix_combinations:
     surface_clue_ids:
       - common_material_synthetic
     hidden_clue_ids:
-      - bag_override_replica
+      - common_override_reproduce
   - combination_id: comb_fine_01
     affix_id: fine
     weight: 2
@@ -36,7 +36,7 @@ affix_combinations:
       - common_material_leather
       - common_detail_palladium
     hidden_clue_ids:
-      - bag_override_replica
+      - common_override_reproduce
   - combination_id: comb_antique_03
     affix_id: antique
     weight: 2
@@ -51,7 +51,7 @@ affix_combinations:
     surface_clue_ids:
       - common_detail_crown_wind
     hidden_clue_ids:
-      - watch_override_franken
+      - common_override_fake
   - combination_id: comb_modern_01
     affix_id: modern
     weight: 3
@@ -83,7 +83,7 @@ affix_combinations:
       - common_craft_mold_seam
       - common_detail_pewter
     hidden_clue_ids:
-      - lamp_override_modern_copy
+      - common_override_kit
   - combination_id: comb_unsigned_01
     affix_id: unsigned
     weight: 2
@@ -98,7 +98,7 @@ affix_combinations:
     surface_clue_ids:
       - common_craft_tight_brush
     hidden_clue_ids:
-      - painting_override_forgery
+      - common_override_fake
   - combination_id: comb_grand_01
     affix_id: grand
     weight: 3
@@ -115,7 +115,7 @@ affix_combinations:
       - common_material_shellac
       - common_mark_label
     hidden_clue_ids:
-      - clock_override_marriage
+      - common_override_kit
   - combination_id: comb_mantel_01
     affix_id: mantel
     weight: 2
@@ -131,7 +131,7 @@ affix_combinations:
     surface_clue_ids:
       - common_material_shellac
     hidden_clue_ids:
-      - clock_override_marriage
+      - common_override_kit
   - combination_id: comb_painted_01
     affix_id: painted
     weight: 3
@@ -147,7 +147,7 @@ affix_combinations:
     surface_clue_ids:
       - common_mark_base_unmarked
     hidden_clue_ids:
-      - figurine_override_later_copy
+      - common_override_reproduce
   - combination_id: comb_pastoral_01
     affix_id: pastoral
     weight: 2
@@ -163,7 +163,7 @@ affix_combinations:
     surface_clue_ids:
       - common_mark_base_unmarked
     hidden_clue_ids:
-      - figurine_override_later_copy
+      - common_override_reproduce
   - combination_id: comb_cameo_01
     affix_id: cameo
     weight: 3
@@ -179,7 +179,7 @@ affix_combinations:
     surface_clue_ids:
       - common_material_bubble_glass
     hidden_clue_ids:
-      - vase_override_repro
+      - common_override_reproduce
   - combination_id: comb_bud_01
     affix_id: bud
     weight: 2
@@ -195,7 +195,7 @@ affix_combinations:
     surface_clue_ids:
       - common_craft_polished
     hidden_clue_ids:
-      - vase_override_repro
+      - common_override_reproduce
   - combination_id: comb_fine_04
     affix_id: fine
     weight: 3
@@ -212,7 +212,7 @@ affix_combinations:
       - common_craft_offset_print
       - common_material_pulp
     hidden_clue_ids:
-      - poster_override_reprint
+      - common_override_reproduce
   - combination_id: comb_preserved_01
     affix_id: preserved
     weight: 2
@@ -229,7 +229,7 @@ affix_combinations:
       - common_craft_offset_print
       - common_form_folded
     hidden_clue_ids:
-      - poster_override_reprint
+      - common_override_reproduce
   - combination_id: comb_cast_01
     affix_id: cast
     weight: 3
@@ -246,7 +246,7 @@ affix_combinations:
       - common_medium_plaster
       - common_mark_unsigned_base
     hidden_clue_ids:
-      - sculpture_override_cast_copy
+      - common_override_reproduce
   - combination_id: comb_gallery_01
     affix_id: gallery
     weight: 2
@@ -262,7 +262,7 @@ affix_combinations:
     surface_clue_ids:
       - common_mark_unsigned_base
     hidden_clue_ids:
-      - sculpture_override_cast_copy
+      - common_override_reproduce
   - combination_id: comb_engraved_01
     affix_id: engraved
     weight: 3
@@ -278,7 +278,7 @@ affix_combinations:
     surface_clue_ids:
       - common_form_short_barrel
     hidden_clue_ids:
-      - pistol_override_conversion
+      - common_override_kit
   - combination_id: comb_service_01
     affix_id: service
     weight: 2
@@ -294,7 +294,7 @@ affix_combinations:
     surface_clue_ids:
       - common_craft_lock_fitted
     hidden_clue_ids:
-      - pistol_override_conversion
+      - common_override_kit
   - combination_id: comb_sporting_01
     affix_id: sporting
     weight: 3
@@ -310,7 +310,7 @@ affix_combinations:
     surface_clue_ids:
       - common_form_long_barrel
     hidden_clue_ids:
-      - rifle_override_kit_build
+      - common_override_kit
   - combination_id: comb_service_03
     affix_id: service
     weight: 2
@@ -326,7 +326,7 @@ affix_combinations:
     surface_clue_ids:
       - common_mark_proof_stamped_rifle
     hidden_clue_ids:
-      - rifle_override_kit_build
+      - common_override_kit
   - combination_id: comb_decorated_01
     affix_id: decorated
     weight: 3
@@ -342,7 +342,7 @@ affix_combinations:
     surface_clue_ids:
       - common_material_tiller_wood
     hidden_clue_ids:
-      - crossbow_override_replica
+      - common_override_reproduce
   - combination_id: comb_hunter_01
     affix_id: hunter
     weight: 2
@@ -358,12 +358,137 @@ affix_combinations:
     surface_clue_ids:
       - common_detail_iron_fittings
     hidden_clue_ids:
-      - crossbow_override_replica
+      - common_override_reproduce
+
+  # ── Phase 2 category-specific combinations ─────────────────────────
+  - combination_id: comb_handbag_branded
+    affix_id: fine
+    weight: 2
+    category_scope:
+      - handbag
+    surface_clue_ids:
+      - handbag_monogram
+      - common_mark_blind_stamp
+    hidden_clue_ids:
+      - bag_leaf_hermes
+  - combination_id: comb_watch_movement
+    affix_id: antique
+    weight: 2
+    category_scope:
+      - wristwatch
+    surface_clue_ids:
+      - watch_chronograph
+      - common_detail_jewelled
+    hidden_clue_ids:
+      - watch_leaf_roleex
+  - combination_id: comb_lamp_glasswork
+    affix_id: fine
+    weight: 2
+    category_scope:
+      - oil_lamp
+    surface_clue_ids:
+      - lamp_blown_glass
+      - common_detail_scrollwork
+    hidden_clue_ids:
+      - lamp_leaf_moser
+  - combination_id: comb_clock_casework
+    affix_id: mantel
+    weight: 2
+    category_scope:
+      - clock
+    surface_clue_ids:
+      - clock_dovetail_joinery
+      - common_detail_gilded_case
+    hidden_clue_ids:
+      - clock_leaf_graham
+  - combination_id: comb_figurine_pastoral
+    affix_id: pastoral
+    weight: 2
+    category_scope:
+      - porcelain_figurine
+    surface_clue_ids:
+      - figurine_shepherdess_form
+      - common_material_celadon
+    hidden_clue_ids:
+      - figurine_leaf_meissen
+  - combination_id: comb_vase_cameo
+    affix_id: cameo
+    weight: 2
+    category_scope:
+      - vase
+    surface_clue_ids:
+      - vase_cameo_body
+      - common_material_cased_glass
+    hidden_clue_ids:
+      - vase_leaf_tiffany
+  - combination_id: comb_poster_print
+    affix_id: preserved
+    weight: 2
+    category_scope:
+      - poster
+    surface_clue_ids:
+      - poster_lithograph
+      - common_material_linen
+    hidden_clue_ids:
+      - poster_leaf_lautrec
+  - combination_id: comb_painting_medium
+    affix_id: fine
+    weight: 2
+    category_scope:
+      - painting
+    surface_clue_ids:
+      - painting_craquelure
+      - common_medium_oil
+    hidden_clue_ids:
+      - painting_leaf_monet
+  - combination_id: comb_sculpture_technique
+    affix_id: cast
+    weight: 2
+    category_scope:
+      - sculpture
+    surface_clue_ids:
+      - sculpture_lost_wax
+      - common_medium_bronze
+    hidden_clue_ids:
+      - sculpture_leaf_rodin
+  - combination_id: comb_pistol_lockwork
+    affix_id: engraved
+    weight: 2
+    category_scope:
+      - pistol
+    surface_clue_ids:
+      - pistol_lock_maker
+      - common_craft_lock_fitted
+    hidden_clue_ids:
+      - pistol_leaf_boutet
+  - combination_id: comb_rifle_marksman
+    affix_id: sporting
+    weight: 2
+    category_scope:
+      - rifle
+    surface_clue_ids:
+      - rifle_precision_sight
+      - common_mark_proof_stamped_rifle
+    hidden_clue_ids:
+      - rifle_leaf_purdey
+  - combination_id: comb_crossbow_prod
+    affix_id: hunter
+    weight: 2
+    category_scope:
+      - crossbow
+    surface_clue_ids:
+      - crossbow_steel_prod
+      - common_form_trigger_mech
+    hidden_clue_ids:
+      - crossbow_leaf_balestrier
+
 affixes:
   - affix_id: antique
     naming_slot: prefix
     display_name_key: AFFIX_ANTIQUE
     scope_mode: all
+    excluded_affix_groups:
+      - modern_style
     weight: 3
     combination_ids:
       - comb_antique_01
@@ -372,10 +497,13 @@ affixes:
       - comb_antique_04
       - comb_antique_05
       - comb_antique_06
+      - comb_watch_movement
   - affix_id: fine
     naming_slot: prefix
     display_name_key: AFFIX_FINE
     scope_mode: all
+    excluded_affix_groups:
+      - budget_production
     weight: 2
     combination_ids:
       - comb_fine_01
@@ -383,10 +511,15 @@ affixes:
       - comb_fine_03
       - comb_fine_04
       - comb_fine_05
+      - comb_handbag_branded
+      - comb_lamp_glasswork
+      - comb_painting_medium
   - affix_id: modern
     naming_slot: prefix
     display_name_key: AFFIX_MODERN
     scope_mode: all
+    excluded_affix_groups:
+      - modern_style
     weight: 3
     combination_ids:
       - comb_modern_01
@@ -395,6 +528,8 @@ affixes:
     naming_slot: prefix
     display_name_key: AFFIX_UNSIGNED
     scope_mode: all
+    excluded_affix_groups:
+      - signed_work
     weight: 2
     combination_ids:
       - comb_unsigned_01
@@ -415,6 +550,7 @@ affixes:
     combination_ids:
       - comb_mantel_01
       - comb_mantel_02
+      - comb_clock_casework
   - affix_id: painted
     naming_slot: prefix
     display_name_key: AFFIX_PAINTED
@@ -431,6 +567,7 @@ affixes:
     combination_ids:
       - comb_pastoral_01
       - comb_pastoral_02
+      - comb_figurine_pastoral
   - affix_id: cameo
     naming_slot: prefix
     display_name_key: AFFIX_CAMEO
@@ -439,6 +576,7 @@ affixes:
     combination_ids:
       - comb_cameo_01
       - comb_cameo_02
+      - comb_vase_cameo
   - affix_id: bud
     naming_slot: prefix
     display_name_key: AFFIX_BUD
@@ -455,6 +593,7 @@ affixes:
     combination_ids:
       - comb_preserved_01
       - comb_preserved_02
+      - comb_poster_print
   - affix_id: cast
     naming_slot: prefix
     display_name_key: AFFIX_CAST
@@ -463,6 +602,7 @@ affixes:
     combination_ids:
       - comb_cast_01
       - comb_cast_02
+      - comb_sculpture_technique
   - affix_id: gallery
     naming_slot: prefix
     display_name_key: AFFIX_GALLERY
@@ -479,6 +619,7 @@ affixes:
     combination_ids:
       - comb_engraved_01
       - comb_engraved_02
+      - comb_pistol_lockwork
   - affix_id: service
     naming_slot: prefix
     display_name_key: AFFIX_SERVICE
@@ -497,6 +638,7 @@ affixes:
     combination_ids:
       - comb_sporting_01
       - comb_sporting_02
+      - comb_rifle_marksman
   - affix_id: decorated
     naming_slot: prefix
     display_name_key: AFFIX_DECORATED
@@ -513,3 +655,4 @@ affixes:
     combination_ids:
       - comb_hunter_01
       - comb_hunter_02
+      - comb_crossbow_prod

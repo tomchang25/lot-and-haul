@@ -221,6 +221,18 @@ def draw_anchor(
     return rng.choice(fallback)
 
 
+def _affixes_are_compatible(a: dict, b: dict) -> bool:
+    """Check if two affixes can co-occur (no overlapping excluded_affix_groups).
+
+    Mirrors ItemGenerator._affixes_are_compatible.
+    """
+    a_groups: list[str] = a.get("excluded_affix_groups", []) or []
+    b_groups: list[str] = b.get("excluded_affix_groups", []) or []
+    if not a_groups or not b_groups:
+        return True
+    return not bool(set(a_groups) & set(b_groups))
+
+
 def _affix_matches_category(affix: dict, category_id: str) -> bool:
     """Check if affix is eligible for the given category.
 
@@ -233,14 +245,25 @@ def _affix_matches_category(affix: dict, category_id: str) -> bool:
     return category_id in category_scope
 
 
+def _combination_matches_category(combo: dict, category_id: str) -> bool:
+    """Check if a combination is eligible for the category by category_scope.
+
+    Mirrors ItemGenerator._combination_matches_category.
+    """
+    cat_scope: list[str] = combo.get("category_scope", []) or []
+    if not cat_scope:
+        return True  # universal
+    return category_id in cat_scope
+
+
 def _draw_affixes(
     category_id: str,
     affixes: list[dict],
     rng: random.Random,
 ) -> list[dict]:
-    """Draw 0-1 prefix + 0-1 suffix affixes for category.
+    """Draw ≥1 prefix, ≤2 total, ≤1 suffix affixes for category.
 
-    Mirrors ItemGenerator._draw_affixes.
+    Mirrors ItemGenerator._draw_affixes (Phase 2 rules).
     """
     candidates = [a for a in affixes if _affix_matches_category(a, category_id)]
     if not candidates:
@@ -250,29 +273,46 @@ def _draw_affixes(
     if total_weight <= 0:
         return []
 
-    chosen: list[dict] = []
-
-    # Prefix pool (up to 1)
+    # Draw 1 prefix (mandatory)
     prefix_pool = [a for a in candidates if a.get("naming_slot") == "prefix"]
-    if prefix_pool:
-        roll = rng.randint(1, total_weight)
-        cumulative = 0
-        for a in prefix_pool:
-            cumulative += max(a.get("weight", 0), 0)
-            if roll <= cumulative:
-                chosen.append(a)
-                break
+    if not prefix_pool:
+        return []
 
-    # Suffix pool (up to 1)
-    suffix_pool = [a for a in candidates if a.get("naming_slot") == "suffix"]
-    if suffix_pool:
-        roll = rng.randint(1, total_weight)
-        cumulative = 0
-        for a in suffix_pool:
-            cumulative += max(a.get("weight", 0), 0)
-            if roll <= cumulative:
-                if a not in chosen:
-                    chosen.append(a)
+    prefix_total = sum(max(a.get("weight", 0), 0) for a in prefix_pool)
+    roll = rng.randint(1, prefix_total) if prefix_total > 0 else 1
+    cumulative = 0
+    first = None
+    for a in prefix_pool:
+        cumulative += max(a.get("weight", 0), 0)
+        if roll <= cumulative:
+            first = a
+            break
+    if first is None:
+        first = rng.choice(prefix_pool)
+
+    chosen: list[dict] = [first]
+
+    # Optionally draw a 2nd affix
+    second_pool: list[dict] = []
+    for a in candidates:
+        if a["affix_id"] == first["affix_id"]:
+            continue
+        if a.get("naming_slot") == "suffix" and first.get("naming_slot") == "suffix":
+            continue
+        if not _affixes_are_compatible(first, a):
+            continue
+        second_pool.append(a)
+
+    SECOND_AFFIX_CHANCE = 0.3
+
+    if second_pool and rng.random() <= SECOND_AFFIX_CHANCE:
+        second_total = sum(max(a.get("weight", 0), 0) for a in second_pool)
+        second_roll = rng.randint(1, second_total) if second_total > 0 else 1
+        second_cumulative = 0
+        for a in second_pool:
+            second_cumulative += max(a.get("weight", 0), 0)
+            if second_roll <= second_cumulative:
+                chosen.append(a)
                 break
 
     return chosen
@@ -281,11 +321,13 @@ def _draw_affixes(
 def _pick_combination(
     affix: dict,
     combinations: dict[str, dict],
+    category_id: str,
     rng: random.Random,
 ) -> dict | None:
-    """Weight-pick one combination from the affix's combination list.
+    """Weight-pick one combination from the affix's combination list,
+    filtered by category_scope.
 
-    Mirrors ItemGenerator._pick_combination.
+    Mirrors ItemGenerator._pick_combination (Phase 2).
     """
     comb_ids = affix.get("combination_ids", []) or []
     if not comb_ids:
@@ -295,7 +337,7 @@ def _pick_combination(
     available: list[dict] = []
     for cid in comb_ids:
         comb = combinations.get(cid)
-        if comb is not None:
+        if comb is not None and _combination_matches_category(comb, category_id):
             weights.append(max(comb.get("weight", 0), 0))
             available.append(comb)
 
@@ -306,20 +348,6 @@ def _pick_combination(
     if idx < 0 or idx >= len(available):
         return rng.choice(available) if available else None
     return available[idx]
-
-
-def draw_surface_clues(
-    count: int,
-    clues: list[ClueData],
-    rng: random.Random,
-) -> list[ClueData]:
-    """Draw surface clues from the global pool (plain-item fallback).
-    All surface clues are eligible for every category — no domain filtering."""
-    pool = [c for c in clues if c.type == "surface"]
-    actual = min(count, len(pool))
-    if actual == 0:
-        return []
-    return rng.sample(pool, actual)
 
 
 # ── Price pipeline (mirroring ItemEntry) ──────────────────────────────────────
@@ -402,20 +430,13 @@ def simulate_lot(
 ) -> list[DrawResult]:
     """Simulate N item draws for a given lot configuration.
 
-    Mirrors ItemGenerator.draw(): category -> anchor -> affixes -> combinations -> clues.
-    Falls back to plain-item baseline when no affix is drawn.
+    Mirrors ItemGenerator.draw(): category -> anchor -> affixes (≥1 prefix)
+    -> combinations (category_scope filtered) -> clues.
+    No plain-item baseline — affix draw guarantees ≥1 prefix.
     """
     tier_weights = {int(k): int(v) for k, v in lot.get("tier_weights", {}).items()}
     cat_weights: dict[str, int] = lot.get("category_weights", {}) or {}
     sc_weights: dict[str, int] = lot.get("super_category_weights", {}) or {}
-    surface_min = max(
-        lot.get("surface_min", SURFACE_CLUE_MIN),
-        HARD_SURFACE_MIN,
-    )
-    surface_max = min(
-        lot.get("surface_max", SURFACE_CLUE_MAX),
-        HARD_SURFACE_MAX,
-    )
 
     clues_by_id: dict[str, ClueData] = {c.clue_id: c for c in clues}
     results: list[DrawResult] = []
@@ -445,20 +466,14 @@ def simulate_lot(
         drawn_affix_ids: list[str] = []
         drawn_combination_ids: list[str] = []
 
-        if drawn_affixes:
-            for affix in drawn_affixes:
-                comb = _pick_combination(affix, combinations, rng)
-                if comb is None:
-                    continue
-                drawn_affix_ids.append(affix["affix_id"])
-                drawn_combination_ids.append(comb["combination_id"])
-                surface_ids.extend(comb.get("surface_clue_ids", []))
-                hidden_ids.extend(comb.get("hidden_clue_ids", []))
-        else:
-            # Plain-item fallback: surface clues from generic pool, zero hidden
-            surface_count = rng.randint(surface_min, surface_max)
-            surface_clues = draw_surface_clues(surface_count, clues, rng)
-            surface_ids = [c.clue_id for c in surface_clues]
+        for affix in drawn_affixes:
+            comb = _pick_combination(affix, combinations, category_id, rng)
+            if comb is None:
+                continue
+            drawn_affix_ids.append(affix["affix_id"])
+            drawn_combination_ids.append(comb["combination_id"])
+            surface_ids.extend(comb.get("surface_clue_ids", []))
+            hidden_ids.extend(comb.get("hidden_clue_ids", []))
 
         result = DrawResult(
             anchor_id=anchor.anchor_id,

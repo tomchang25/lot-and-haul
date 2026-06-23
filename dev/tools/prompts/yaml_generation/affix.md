@@ -2,7 +2,7 @@
 
 Use this with `base.md` when generating affix data for `data/yaml/affixes.yaml`.
 
-Affixes are drawn after the anchor and before clues during item generation: draw category → anchor → affixes (0–1 prefix + 0–1 suffix) → one weighted combination per affix → that combination's surface and hidden clues. Affixes are the primary index for item naming (Spec B) and the knowledge dictionary (Spec C).
+Affixes are drawn after the anchor and before clues during item generation: draw category → anchor → affixes (≥1 prefix, ≤2 total, ≤1 suffix) → one weighted combination per affix → that combination's surface and hidden clues. Affixes are the primary index for item naming (Spec B) and the knowledge dictionary (Spec C).
 
 ---
 
@@ -28,6 +28,8 @@ affixes:
     naming_slot: prefix | suffix
     display_name: string
     scope_mode: all | categories
+    excluded_affix_groups:
+      - <group_name>
     category_scope:
       - <category_id>
     weight: <positive int>
@@ -38,11 +40,12 @@ affixes:
 
 ### Fields
 
-- `affix_id`: unique snake_case ID across all affixes. After Phase 1 merge, most affixes use unprefixed IDs like `antique`, `fine`, `service` with `scope_mode: all`. Category-prefixed IDs (e.g. `bag_rustic`) are still valid for special cases but are no longer the default.
-- `naming_slot`: `prefix` or `suffix`. Controls display-name composition in Spec B. At most one prefix and one suffix can be drawn per item, so only prefix × suffix cross-product conflicts are validated — two prefixes on the same category never combine.
+- `affix_id`: unique snake_case ID across all affixes. After Phase 1 merge, most affixes use unprefixed IDs like `antique`, `fine`, `service` with `scope_mode: all`. Category-prefixed IDs (e.g. `bag_rustic`) are still valid for special cases but are no longer the default. In Phase 2, affix IDs also serve as the key for SECOND_AFFIX_CHANCE draw weighting.
+- `naming_slot`: `prefix` or `suffix`. Controls display-name composition in Spec B. At most two affixes can be drawn per item, so only prefix × suffix cross-product conflicts are validated — two prefixes on the same category never combine.
 - `display_name_key`: localization key for the human-readable label (e.g. `AFFIX_ANTIQUE`).
 - `scope_mode`: controls draw eligibility. **`all`** (preferred) — this affix can appear on any category. `categories` — this affix applies only to the listed `category_scope` entries (use for test data or category-restricted designs).
 - `category_scope`: list of snake_case category ids this affix applies to when `scope_mode: categories`. Each id must match a category in `category_data.yaml`. Omit or leave empty when `scope_mode: all`.
+- `excluded_affix_groups`: optional list of group names. When set, this affix cannot coexist on the same item with any other affix sharing a group in this list. Used to prevent conflicting affix pairs (e.g. two material affixes on one item). Omit when no exclusion is needed.
 - `weight`: relative draw weight. Higher = more frequent. Must be a positive int.
 - `combination_ids`: list of combination ids belonging to this affix. Order sets ext-resolve order but has no functional weight. Every id must be defined in the `affix_combinations:` block.
 
@@ -55,6 +58,8 @@ affix_combinations:
   - combination_id: snake_case string
     affix_id: <affix_id>
     weight: <positive int>
+    category_scope:
+      - <category_id>
     surface_clue_ids:
       - <surface clue_id>
       - <surface clue_id>
@@ -76,10 +81,10 @@ affix_combinations:
 
 The build-time validator checks every prefix × suffix affix pair whose scopes overlap (`scope_mode: all` overlaps everything; `scope_mode: categories` overlaps shared category ids) across all combinations in each affix's cross-product. The merged clue set must satisfy:
 
-1. **No duplicate exclusive_group.** Two hidden clues on the same item must never share an `exclusive_group`.
+1. **No duplicate exclusive_group.** Two clues on the same item must never share an `exclusive_group`.
 2. **At most one `effect_op: override`.** Two override clues on the same item are illegal.
 
-Since at most one prefix and one suffix are drawn per item, prefix × prefix and suffix × suffix pairs are not validated — they can never co-occur.
+Since at most two affixes are drawn per item, prefix × prefix and suffix × suffix pairs are not validated — they can never co-occur.
 
 Within a single combination: combinations are mutually exclusive at draw time, so having two clues in the same group inside one combination is fine — the item will only ever receive one of them. The validator still checks for double-override within a single combination as a sanity check, but a combination that carries one hidden override and one hidden mul with no group is valid.
 
@@ -128,7 +133,7 @@ Controls how often the affix appears on items in its category. For the initial p
 - Use higher weights for common-vibe affixes (e.g. everyday-worn, mass-market).
 - Use lower weights for rare-vibe affixes (one-off, extreme values).
 
-Most items should remain **plain** (no affix drawn). Affix weights are calibrated against the _absence_ of any affix, not against each other. If total affix weight for a category is too high relative to the plain-item probability, everything becomes affixed and rarity distributes oddly.
+Most items should remain **plain** (no affix drawn). Affix weights are calibrated against the _absence_ of any affix, not against each other. If total affix weight for a category is too high relative to the plain-item probability, everything becomes affixed and rarity distributes oddly. In Phase 2, `SECOND_AFFIX_CHANCE` governs the probability of drawing a second affix; affix weights continue to calibrate relative draw frequency among eligible affixes.
 
 ### Combination weight
 
@@ -154,6 +159,7 @@ The naming system is deferred — this field is authored now so it round-trips t
 ```
 <unprefixed_descriptor>                — affix_id (antique, fine, service, modern)
 comb_<descriptor>_NN                   — combination_id (comb_antique_01)
+comb_<category>_<descriptor>_NN        — combination_id for category-specific affixes (comb_bag_rustic_01)
 ```
 
 After Phase 1 merge, most affix IDs are unprefixed and use `scope_mode: all`. Category-prefixed IDs (`bag_rustic`, `watch_vintage`) are still valid for special/restricted cases.
@@ -177,10 +183,12 @@ vase  poster  painting  sculpture  pistol  rifle  crossbow
 - Every affix has `naming_slot` (`prefix` or `suffix`), `display_name`, `scope_mode`, `category_scope`, `weight`, and at least one `combination_id`.
 - Every combination has `affix_id`, `weight`, and references at least one clue across `surface_clue_ids` and `hidden_clue_ids`.
 - `scope_mode: all` is the standard (no `category_scope` needed). `scope_mode: categories` is valid with at least one `category_scope` entry.
+- `excluded_affix_groups` entries must reference defined group names; affixes with overlapping `excluded_affix_groups` must never co-occur in validation.
 - Every `affix_id` referenced in a combination matches a defined affix.
 - Every clue id in `surface_clue_ids` and `hidden_clue_ids` exists in `clues.yaml` with the correct type.
 - Every `weight` is a positive int (both affix-level and combination-level).
 - No prefix × suffix cross-product carries a duplicate `exclusive_group` or double `override`.
+- `category_scope` on a combination, if present, must contain valid category IDs; the combination's scope is the intersection of its own `category_scope` and its parent affix's scope.
 - At least one combination per affix provides a positive discovery path; at least one provides a minority negative path.
 
 ---
@@ -203,7 +211,7 @@ affix_combinations:
     surface_clue_ids:
       - common_material_synthetic
     hidden_clue_ids:
-      - bag_override_replica
+      - common_override_reproduce
 
 affixes:
   - affix_id: antique

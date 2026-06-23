@@ -5,9 +5,15 @@
 class_name ItemGenerator
 extends RefCounted
 
+# Probability threshold for drawing a second affix (0.0–1.0).
+# A random roll ≤ this threshold triggers the second-affix draw.
+const SECOND_AFFIX_CHANCE: float = 0.3
+
+
 ## Draws one item from the reversed draw order:
-##   category → anchor → affixes (0–1 prefix + 0–1 suffix)
-##   → one weighted combination per affix → that combination's clues.
+##   category → anchor → affixes (≥1 prefix, ≤2 total, ≤1 suffix)
+##   → one weighted combination per affix (category-scope filtered)
+##   → that combination's clues.
 ##
 ## [param rng] — optional seedable RNG for deterministic generation.
 ## When null, falls back to RandomUtils' shared production RNG.
@@ -32,32 +38,28 @@ static func draw(
     var combination_ids: Array[String] = []
 
     # ── 3. Combinations → clues ──────────────────────────────────────────
-    if not affixes.is_empty():
-        for affix: AffixData in affixes:
-            var combination := _pick_combination(affix, resolved_rng)
-            if combination == null:
-                continue
-            combination_ids.append(combination.combination_id)
-            surface_clues.append_array(combination.surface_clues)
-            hidden_clues.append_array(combination.hidden_clues)
+    for affix: AffixData in affixes:
+        var combination := _pick_combination(affix, category, resolved_rng)
+        if combination == null:
+            continue
+        combination_ids.append(combination.combination_id)
+        surface_clues.append_array(combination.surface_clues)
+        hidden_clues.append_array(combination.hidden_clues)
 
-        # ── 3b. Draw-time conflict insurance ──────────────────────────
+    # ── 4. Draw-time conflict insurance ──────────────────────────────
+    if not affixes.is_empty():
         var resolved := _resolve_conflicts(
             affixes,
             combination_ids,
             surface_clues,
             hidden_clues,
+            category,
             resolved_rng,
         )
         affixes = resolved.affixes
         combination_ids = resolved.combination_ids
         surface_clues = resolved.surface_clues
         hidden_clues = resolved.hidden_clues
-    else:
-        # ── 4. Plain-item baseline (legacy) ──────────────────────────
-        ToastManager.show_dev_error(
-            "ItemGenerator: plain-item baseline (no affixes) is legacy — should not reach here with populated registry",
-        )
 
     # ── 5. Assemble ItemEntry ─────────────────────────────────────────
     var entry := ItemEntry.new()
@@ -144,13 +146,12 @@ static func _draw_anchor(category: CategoryData, tier_weights: Dictionary, rng: 
     return fallback[rng.randi() % fallback.size()]
 
 
-## Draws 0–1 prefix and 0–1 suffix affixes for [param category].
-## Each eligible affix matches scope_mode/category_scope:
-## - scope_mode == "all": eligible for every category
-## - scope_mode == "categories": eligible only for category_scope entries
-## is rolled independently against its weight. An affix is assigned when
-##   randf() * TOTAL_WEIGHT < weight
-## which gives each affix a proportional chance independent of other affixes.
+## Draws ≥1 prefix, ≤2 total, ≤1 suffix affixes for [param category].
+## Phase 2 rules:
+## - Always draw at least 1 prefix.
+## - Optionally draw a second affix (prefix or suffix, not already drawn).
+## - Two affixes are rejected if they share an excluded_affix_groups entry.
+## Falls back to single-prefix if no compatible pair is found.
 static func _draw_affixes(category: CategoryData, rng: RandomNumberGenerator) -> Array[AffixData]:
     var all_affixes: Array[AffixData] = AffixRegistry.get_all_affixes()
     var candidates: Array[AffixData] = []
@@ -158,45 +159,63 @@ static func _draw_affixes(category: CategoryData, rng: RandomNumberGenerator) ->
         if _affix_matches_category(a, category):
             candidates.append(a)
 
-    if candidates.is_empty():
-        return []
-
     var total_weight := 0
     for a: AffixData in candidates:
         total_weight += maxi(a.weight, 0)
 
-    if total_weight <= 0:
+    if total_weight <= 0 or candidates.is_empty():
+        # Should not happen with a populated registry, but guard anyway.
+        ToastManager.show_dev_error("ItemGenerator: no eligible affixes for category '%s'" % category.category_id)
         return []
 
-    var chosen: Array[AffixData] = []
-    # Prefix pool (up to 1)
+    # ── Draw 1 prefix (mandatory) ─────────────────────────────────
     var prefix_pool: Array[AffixData] = []
     for a: AffixData in candidates:
         if a.naming_slot == "prefix":
             prefix_pool.append(a)
-    if not prefix_pool.is_empty():
-        var roll := rng.randi_range(1, total_weight)
-        var cumulative := 0
-        for a: AffixData in prefix_pool:
-            cumulative += maxi(a.weight, 0)
-            if roll <= cumulative:
-                chosen.append(a)
-                break
 
-    # Suffix pool (up to 1)
-    var suffix_pool: Array[AffixData] = []
+    var first: AffixData
+    if prefix_pool.is_empty():
+        ToastManager.show_dev_error("ItemGenerator: no prefix affixes for category '%s'" % category.category_id)
+        return []
+
+    var prefix_total := 0
+    for a: AffixData in prefix_pool:
+        prefix_total += maxi(a.weight, 0)
+    var first_roll := rng.randi_range(1, prefix_total) if prefix_total > 0 else 1
+    var cumulative := 0
+    for a: AffixData in prefix_pool:
+        cumulative += maxi(a.weight, 0)
+        if first_roll <= cumulative:
+            first = a
+            break
+    if first == null:
+        first = prefix_pool[rng.randi() % prefix_pool.size()]
+
+    var chosen: Array[AffixData] = [first]
+
+    # ── Optionally draw a 2nd affix ────────────────────────────────
+    var second_pool: Array[AffixData] = []
     for a: AffixData in candidates:
-        if a.naming_slot == "suffix":
-            suffix_pool.append(a)
-    if not suffix_pool.is_empty():
-        var roll := rng.randi_range(1, total_weight)
-        var cumulative := 0
-        for a: AffixData in suffix_pool:
-            cumulative += maxi(a.weight, 0)
-            if roll <= cumulative:
-                # Avoid reselecting the same affix if one was already picked.
-                if not chosen.has(a):
-                    chosen.append(a)
+        if a == first:
+            continue
+        # At most 1 suffix total
+        if a.naming_slot == "suffix" and first.naming_slot == "suffix":
+            continue
+        # Check compatibility via excluded_affix_groups
+        if _affixes_are_compatible(first, a):
+            second_pool.append(a)
+
+    if not second_pool.is_empty() and rng.randf() <= SECOND_AFFIX_CHANCE:
+        var second_total := 0
+        for a: AffixData in second_pool:
+            second_total += maxi(a.weight, 0)
+        var second_roll := rng.randi_range(1, second_total) if second_total > 0 else 1
+        var second_cumulative := 0
+        for a: AffixData in second_pool:
+            second_cumulative += maxi(a.weight, 0)
+            if second_roll <= second_cumulative:
+                chosen.append(a)
                 break
 
     return chosen
@@ -210,22 +229,47 @@ static func _affix_matches_category(affix: AffixData, category: CategoryData) ->
     return false
 
 
-## Weight-picks one combination from [param affix]'s combinations array.
-## Returns null if the affix has no combinations (should not happen with
-## validated data).
-static func _pick_combination(affix: AffixData, rng: RandomNumberGenerator) -> AffixCombinationData:
-    if affix.combinations.is_empty():
-        ToastManager.show_dev_error("Affix '%s' has no combinations" % affix.affix_id)
+## Returns true if two affixes can co-occur. They are compatible when they
+## share no overlapping excluded_affix_groups entries.
+static func _affixes_are_compatible(a: AffixData, b: AffixData) -> bool:
+    if a.excluded_affix_groups.is_empty() or b.excluded_affix_groups.is_empty():
+        return true
+    for group_a in a.excluded_affix_groups:
+        for group_b in b.excluded_affix_groups:
+            if group_a == group_b:
+                return false
+    return true
+
+
+## Weight-picks one combination from [param affix]'s combinations array,
+## filtered by [param category] via combination-level category_scope.
+## Returns null if the affix has no eligible combinations.
+static func _pick_combination(affix: AffixData, category: CategoryData, rng: RandomNumberGenerator) -> AffixCombinationData:
+    var eligible: Array[AffixCombinationData] = []
+    for c: AffixCombinationData in affix.combinations:
+        if _combination_matches_category(c, category):
+            eligible.append(c)
+
+    if eligible.is_empty():
+        ToastManager.show_dev_error("Affix '%s' has no combination matching category '%s'" % [affix.affix_id, category.category_id])
         return null
 
     var weights: Array[int] = []
-    for c: AffixCombinationData in affix.combinations:
+    for c: AffixCombinationData in eligible:
         weights.append(maxi(c.weight, 0))
 
     var idx := RandomUtils.pick_weighted_index(weights, rng)
-    if idx < 0 or idx >= affix.combinations.size():
-        return affix.combinations[rng.randi() % affix.combinations.size()]
-    return affix.combinations[idx]
+    if idx < 0 or idx >= eligible.size():
+        return eligible[rng.randi() % eligible.size()]
+    return eligible[idx]
+
+
+## Returns true if the combination is eligible for the given category.
+## Empty category_scope = universal (all categories). Populated = membership check.
+static func _combination_matches_category(combo: AffixCombinationData, category: CategoryData) -> bool:
+    if combo.category_scope.is_empty():
+        return true
+    return category in combo.category_scope
 
 
 ## Draw-time conflict insurance. If merging both affixes' clues produces a
@@ -241,6 +285,7 @@ static func _resolve_conflicts(
         combination_ids: Array[String],
         surface_clues: Array[ClueData],
         hidden_clues: Array[ClueData],
+        category: CategoryData,
         rng: RandomNumberGenerator,
 ) -> Dictionary:
     var conflict = _find_first_conflict(surface_clues, hidden_clues)
@@ -252,11 +297,6 @@ static func _resolve_conflicts(
             hidden_clues = hidden_clues,
         }
 
-    ToastManager.show_error(
-        "ItemGenerator: draw-time conflict at affix %s: %s"
-        % [combination_ids, conflict],
-    )
-
     var affixes_out: Array[AffixData] = affixes.duplicate()
     var combination_ids_out: Array[String] = combination_ids.duplicate()
     var surface_clues_out: Array[ClueData] = surface_clues.duplicate()
@@ -267,7 +307,7 @@ static func _resolve_conflicts(
     for attempt in range(max_retries):
         for affix_idx in range(affixes_out.size()):
             var affix: AffixData = affixes_out[affix_idx]
-            var new_comb := _pick_combination(affix, rng)
+            var new_comb := _pick_combination(affix, category, rng)
             if new_comb == null:
                 continue
             if new_comb.combination_id == combination_ids_out[affix_idx]:
