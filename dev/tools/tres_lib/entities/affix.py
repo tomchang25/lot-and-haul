@@ -181,6 +181,17 @@ class AffixCombinationSpec:
                             f"references unknown clue '{clue_id}'"
                         )
 
+            # Every combination must carry at least one hidden clue so the
+            # affix dictionary has something to resolve. Test combos are exempt.
+            hidden_ids: list = entry.get("hidden_clue_ids", [])
+            if not isinstance(hidden_ids, list):
+                hidden_ids = []
+            if not hidden_ids and not cid.startswith("test_"):
+                errors.append(
+                    f"affix_combination '{cid}': must have at least one hidden_clue_id "
+                    f"(affix dictionary requires hidden clues per combination)"
+                )
+
             # Cross-product conflicts are validated at the affix level,
             # but validate within this combination alone for basic sanity.
             own_errors = _check_conflicts(
