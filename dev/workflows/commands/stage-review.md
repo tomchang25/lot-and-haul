@@ -7,3 +7,4 @@ Review the currently git-staged changes and codebase for violations against any 
 5. Run `python dev/tools/lint_standards.py --files <staged .gd files under game/>` to verify no standards violations.
 6. Search for any stale references to removed APIs across the full codebase (old method names, old constants, old import patterns the spec says should be gone).
 7. Report: a summary table showing each file's compliance status, any deviations from the spec, and the final verdict.
+8. Double-check for any robustness concerns or stale/legacy problems.
