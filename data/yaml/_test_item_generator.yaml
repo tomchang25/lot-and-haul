@@ -6,6 +6,7 @@ categories:
   - category_id: test_category
     super_category: test_super
     display_name_key: CAT_TEST_CATEGORY
+    is_test: true
 
 anchors:
   - anchor_id: test_anchor_01

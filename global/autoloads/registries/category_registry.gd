@@ -4,7 +4,6 @@
 # CategoryRegistry.get_all_categories().
 extends ResourceRegistry
 
-
 func _dir_path() -> String:
     return DataPaths.CATEGORIES_DIR
 
@@ -18,8 +17,10 @@ func get_category_by_id(category_id: String) -> CategoryData:
     return get_by_id(category_id) as CategoryData
 
 
-func get_all_categories() -> Array[CategoryData]:
+func get_all_categories(include_test: bool = false) -> Array[CategoryData]:
     var result: Array[CategoryData] = []
     for cat: CategoryData in get_all():
+        if cat.is_test and not include_test:
+            continue
         result.append(cat)
     return result

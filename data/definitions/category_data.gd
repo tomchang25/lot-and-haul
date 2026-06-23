@@ -15,5 +15,8 @@ extends Resource
 # Placeholder icon for this category.
 @export var icon: Texture2D = null
 
+# Whether this category is test-only. Excluded from normal get_all_categories queries.
+@export var is_test: bool = false
+
 # Localization key for the category display name.
 @export var display_name_key: String = ""

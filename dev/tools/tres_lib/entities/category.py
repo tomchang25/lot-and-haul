@@ -65,6 +65,7 @@ class CategorySpec:
         w.add_field_str("category_id", cat_id)
         w.add_field('super_category = ExtResource("2_super")')
         w.add_field_str("display_name_key", entry.get("display_name_key", ""))
+        w.add_field_bool("is_test", bool(entry.get("is_test", False)))
 
         if has_icon:
             w.add_field('icon = ExtResource("3_icon")')
@@ -86,10 +87,14 @@ class CategorySpec:
             sc_uid = ext_res.get(cat_m.group(1), {}).get("uid", "")
             super_cat_id = ctx.uid_to_id.get(sc_uid, "")
 
+        is_test_val = tres_field(text, "is_test")
+        is_test = is_test_val == "true" if is_test_val is not None else False
+
         return {
             "category_id": cat_id,
             "super_category": super_cat_id,
             "display_name_key": display_name_key,
+            "is_test": is_test,
         }
 
     def validate(self, entries: list, all_data: dict) -> list[str]:
