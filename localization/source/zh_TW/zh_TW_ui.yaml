@@ -287,6 +287,9 @@ zh_TW:
 
   # ── 貨物 ──
   UI_WEIGHT_EXCEEDED: "超過重量限制！無法放置物品。"
+  UI_WEIGHT: "重量"
+  UI_SLOTS: "槽位"
+  UI_TRAILER_RISK: "拖車風險"
 
   # ── 顧客銷售 ──
   UI_CAPACITY_FORMAT: "容量：%d\u00d7%d"

@@ -15,7 +15,10 @@ extends PanelContainer
 @onready var _weight_label: Label = %WeightLabel
 @onready var _slots_label: Label = %SlotsLabel
 @onready var _trailer_line: HBoxContainer = %TrailerLine
+@onready var _trailer_risk_label: Label = %TrailerRiskLabel
 @onready var _trailer_value_label: Label = %TrailerRiskValue
+@onready var _weight_desc_label: Label = %WeightDescLabel
+@onready var _slots_desc_label: Label = %SlotsDescLabel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -25,6 +28,9 @@ func _ready() -> void:
         &"panel",
         get_theme_stylebox(&"panel", &"RunSummary"),
     )
+    _weight_desc_label.text = TranslationServer.translate("UI_WEIGHT")
+    _slots_desc_label.text = TranslationServer.translate("UI_SLOTS")
+    _trailer_risk_label.text = TranslationServer.translate("UI_TRAILER_RISK")
 
 # ══ Common API ════════════════════════════════════════════════════════════════
 

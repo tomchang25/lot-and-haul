@@ -14,6 +14,8 @@ signal extra_slot_unhovered(index: int)
 signal extra_slot_cancel(index: int)
 signal reset_pressed
 signal continue_pressed
+signal debug_auto_pack_pressed
+signal debug_stuff_all_pressed
 
 const ExtraSlotCellScene: PackedScene = preload("res://game/run/cargo/extra_slot_cell/extra_slot_cell.tscn")
 
@@ -28,6 +30,8 @@ var _extra_slot_hover_styles: Dictionary = { }
 @onready var _run_summary_panel: RunSummaryPanel = %RunSummaryPanel
 @onready var _reset_btn: Button = %ResetBtn
 @onready var _continue_btn: Button = %ContinueBtn
+@onready var _debug_auto_pack_btn: Button = %DebugAutoPackBtn
+@onready var _debug_stuff_btn: Button = %DebugStuffBtn
 
 var _grid: PackingGrid
 
@@ -52,6 +56,8 @@ func _ready() -> void:
 
     _reset_btn.pressed.connect(reset_pressed.emit)
     _continue_btn.pressed.connect(continue_pressed.emit)
+    _debug_auto_pack_btn.pressed.connect(debug_auto_pack_pressed.emit)
+    _debug_stuff_btn.pressed.connect(debug_stuff_all_pressed.emit)
 
 
 func get_grid() -> PackingGrid:
@@ -60,6 +66,11 @@ func get_grid() -> PackingGrid:
 
 func get_run_summary_panel() -> RunSummaryPanel:
     return _run_summary_panel
+
+
+func set_debug_buttons_visible(p_visible: bool) -> void:
+    _debug_auto_pack_btn.visible = p_visible
+    _debug_stuff_btn.visible = p_visible
 
 
 func set_error(text: String) -> void:
@@ -76,10 +87,10 @@ func build_extra_slots(count: int) -> void:
     for i in count:
         var cell: ExtraSlotCell = ExtraSlotCellScene.instantiate()
         cell.setup(i)
-        cell.hovered.connect(_on_extra_slot_hovered.bind(i))
-        cell.unhovered.connect(_on_extra_slot_unhovered.bind(i))
-        cell.slot_pressed.connect(_on_extra_slot_pressed.bind(i))
-        cell.slot_cancel.connect(_on_extra_slot_cancel.bind(i))
+        cell.hovered.connect(_on_extra_slot_hovered)
+        cell.unhovered.connect(_on_extra_slot_unhovered)
+        cell.slot_pressed.connect(_on_extra_slot_pressed)
+        cell.slot_cancel.connect(_on_extra_slot_cancel)
         _extra_slot_container.add_child(cell)
         _extra_slot_cells[i] = cell
 

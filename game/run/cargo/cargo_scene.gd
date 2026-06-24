@@ -36,10 +36,6 @@ var _selected_entry: ItemEntry = null
 var _preview_entry: ItemEntry = null
 var _last_highlighted_entry: ItemEntry = null
 
-# Debug overlay buttons — created by _init_debug_overlay().
-var _debug_auto_pack_btn: Button = null
-var _debug_stuff_btn: Button = null
-
 # ── Node references ────────────────────────────────────────────────────────────
 
 @onready var _item_list: CargoItemListPanel = %ItemListPanel
@@ -101,9 +97,10 @@ func _ready() -> void:
 
     _recalc_totals()
     _refresh_ui()
+    _vehicle_panel.debug_auto_pack_pressed.connect(_debug_auto_pack)
+    _vehicle_panel.debug_stuff_all_pressed.connect(_debug_stuff_all)
     Debug.toggled.connect(_on_debug_toggled)
-    if Debug.enabled:
-        _init_debug_overlay()
+    _vehicle_panel.set_debug_buttons_visible(Debug.enabled)
     Director.register_scene(
         "cargo",
         {
@@ -461,52 +458,8 @@ func _clear_preview_detail() -> void:
 # Gated by Debug.enabled (OS.is_debug_build() AND SettingsStore.debug_mode).
 
 
-func _init_debug_overlay() -> void:
-    if not Debug.enabled:
-        return
-
-    # ── Auto-pack button ──────────────────────────────────────────────────
-    _debug_auto_pack_btn = Button.new()
-    _debug_auto_pack_btn.text = "Auto-Pack Items"
-    _debug_auto_pack_btn.pressed.connect(_debug_auto_pack)
-    _debug_auto_pack_btn.anchor_left = 0.0
-    _debug_auto_pack_btn.anchor_top = 1.0
-    _debug_auto_pack_btn.anchor_right = 0.0
-    _debug_auto_pack_btn.anchor_bottom = 1.0
-    _debug_auto_pack_btn.offset_left = 152.0
-    _debug_auto_pack_btn.offset_top = -56.0
-    _debug_auto_pack_btn.offset_bottom = -16.0
-    _debug_auto_pack_btn.custom_minimum_size = Vector2(150, 40)
-    # node-src: debug
-    add_child(_debug_auto_pack_btn)
-
-    # ── Stuff-all & go button ─────────────────────────────────────────────
-    _debug_stuff_btn = Button.new()
-    _debug_stuff_btn.text = "Stuff All & Go"
-    _debug_stuff_btn.pressed.connect(_debug_stuff_all)
-    _debug_stuff_btn.anchor_left = 0.0
-    _debug_stuff_btn.anchor_top = 1.0
-    _debug_stuff_btn.anchor_right = 0.0
-    _debug_stuff_btn.anchor_bottom = 1.0
-    _debug_stuff_btn.offset_left = 310.0
-    _debug_stuff_btn.offset_top = -56.0
-    _debug_stuff_btn.offset_bottom = -16.0
-    _debug_stuff_btn.custom_minimum_size = Vector2(150, 40)
-    # node-src: debug
-    add_child(_debug_stuff_btn)
-
-
 func _on_debug_toggled(is_enabled: bool) -> void:
-    if is_enabled:
-        if _debug_auto_pack_btn == null:
-            _init_debug_overlay()
-        else:
-            _debug_auto_pack_btn.visible = true
-            _debug_stuff_btn.visible = true
-    else:
-        if _debug_auto_pack_btn != null:
-            _debug_auto_pack_btn.visible = false
-            _debug_stuff_btn.visible = false
+    _vehicle_panel.set_debug_buttons_visible(is_enabled)
 
 
 func _debug_auto_pack() -> void:

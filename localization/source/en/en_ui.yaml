@@ -291,6 +291,9 @@ en:
 
   # ── New keys for cargo ──
   UI_WEIGHT_EXCEEDED: "Weight limit exceeded! Cannot place item."
+  UI_WEIGHT: "Weight"
+  UI_SLOTS: "Slots"
+  UI_TRAILER_RISK: "Trailer Risk"
 
   # ── New keys for customer sell ──
   UI_CAPACITY_FORMAT: "Capacity: %d\u00d7%d"
