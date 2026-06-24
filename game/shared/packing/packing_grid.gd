@@ -267,6 +267,24 @@ func reset() -> void:
     refresh_visuals()
 
 
+## Returns the current lift offset (grab anchor within the held item's shape).
+func get_lift_offset() -> Vector2i:
+    return _lift_offset
+
+
+## Returns the pixel step between adjacent cells (cell size + separation).
+## Used by external overlays to align drawn rects with the actual grid layout.
+func get_cell_step() -> Vector2:
+    var h_sep := get_theme_constant(&"h_separation", &"GridContainer")
+    var v_sep := get_theme_constant(&"v_separation", &"GridContainer")
+    return Vector2(CELL_SIZE + max(0, h_sep), CELL_SIZE + max(0, v_sep))
+
+
+## Returns the configured grid dimensions as columns x rows.
+func get_grid_size() -> Vector2i:
+    return Vector2i(_grid_cols, _grid_rows)
+
+
 ## Returns the top-left origin of a placed item, or Vector2i(-1, -1).
 func get_item_origin(item) -> Vector2i:
     var origin := Vector2i(999, 999)

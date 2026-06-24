@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://my11d2txip3k"]
 
 [ext_resource type="Script" uid="uid://b4lonjofevc7l" path="res://game/meta/customer_sell/components/customer_car_panel.gd" id="1_ccp"]
-[ext_resource type="Script" uid="uid://doaqxqk7u1no0" path="res://game/shared/packing/packing_grid.gd" id="2_pg"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="3_sfx"]
 [ext_resource type="PackedScene" uid="uid://do4pnb7wlxhw3" path="res://game/meta/customer_sell/components/deal_panel.tscn" id="4_dp"]
+[ext_resource type="PackedScene" uid="uid://diapov6wnnjqy" path="res://game/meta/customer_sell/components/grid_area_panel.tscn" id="5_gap"]
 
 [node name="CustomerCarPanel" type="PanelContainer" unique_id=630524090]
 custom_minimum_size = Vector2(420, 380)
@@ -64,13 +64,10 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "UI_VERIFIED_LABEL"
 
-[node name="PackingGrid" type="GridContainer" parent="VBox" unique_id=659388510]
+[node name="GridAreaPanel" parent="VBox" unique_id=659388511 instance=ExtResource("5_gap")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(400, 200)
+clip_contents = false
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-script = ExtResource("2_pg")
 
 [node name="ClearButtonRow" type="HBoxContainer" parent="VBox" unique_id=1449452965]
 layout_mode = 2

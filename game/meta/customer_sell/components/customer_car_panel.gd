@@ -29,7 +29,8 @@ var _customer: CustomerEntry = null
 @onready var _tags_flow: Container = %TagsFlow
 @onready var _car_total_label: Label = %CarTotalLabel
 @onready var _verified_count_label: Label = %VerifiedCountLabel
-@onready var _grid: PackingGrid = %PackingGrid
+@onready var _grid_area_panel: GridAreaPanel = %GridAreaPanel
+@onready var _grid: PackingGrid = _grid_area_panel.get_grid()
 @onready var _clear_button: SfxButton = %ClearButton
 @onready var deal_panel: DealPanel = %DealPanel
 
