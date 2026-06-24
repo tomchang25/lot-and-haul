@@ -17,9 +17,7 @@ corner_detail = 5
 
 [node name="ItemCardPopup" type="PanelContainer" unique_id=1000000001]
 z_index = 10
-custom_minimum_size = Vector2(210, 150)
-offset_right = 210.0
-offset_bottom = 272.0
+custom_minimum_size = Vector2(210, 0)
 theme_override_styles/panel = SubResource("StyleBoxFlat_x6k72")
 script = ExtResource("1_popup")
 

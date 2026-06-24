@@ -29,6 +29,7 @@ func show_for(entry: ItemEntry, anchor: Rect2) -> void:
     _hide_generation += 1
 
     _card.setup(entry)
+    size = get_combined_minimum_size()
     _position_near(anchor)
     show()
 
