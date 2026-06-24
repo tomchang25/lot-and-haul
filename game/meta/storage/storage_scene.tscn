@@ -78,6 +78,7 @@ theme_override_constants/separation = 12
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 1
+theme_override_constants/separation = 6
 
 [node name="FooterHBox" type="HBoxContainer" parent="RootHBox/LeftVBox" unique_id=1095072794]
 custom_minimum_size = Vector2(0, 72)
@@ -136,46 +137,13 @@ theme_override_constants/margin_bottom = 24
 layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="TaskSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=854617958]
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="TaskHeaderHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection" unique_id=755474436]
-layout_mode = 2
-
-[node name="TaskTitleLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection/TaskHeaderHBox" unique_id=1570956364]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 17
-text = "UI_ACTIVE_TASKS"
-
-[node name="TaskSpacer" type="Control" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection/TaskHeaderHBox" unique_id=1122867691]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="TaskReadyLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection/TaskHeaderHBox" unique_id=954491056]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.55, 0.58, 0.63, 1)
-theme_override_font_sizes/font_size = 17
-text = "UI_TASK_COUNT"
-
-[node name="TaskContainer" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection" unique_id=707284430]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="SidebarHSep" type="HSeparator" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=941842661]
-layout_mode = 2
-
 [node name="DetailSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=322654196]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 15
 
-[node name="DetailPanel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" instance=ExtResource("4_detail")]
+[node name="DetailPanel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=1118338801 instance=ExtResource("4_detail")]
 unique_name_in_owner = true
 layout_mode = 2
 

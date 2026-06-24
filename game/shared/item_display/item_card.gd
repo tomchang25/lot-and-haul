@@ -27,7 +27,6 @@ var _has_intuition_mark: bool = false
 @onready var _condition_section: VBoxContainer = $VBox/ConditionSection
 @onready var _condition_label: Label = $VBox/ConditionSection/Row/ConditionLabel
 @onready var _condition_mult_label: Label = $VBox/ConditionSection/Row/ConditionMultLabel
-@onready var _cargo_sep: HSeparator = $VBox/CargoSep
 @onready var _clue_chunk: ClueChunk = $VBox/ClueChunk
 @onready var _auth_tag_label: Label = $VBox/AuthTagLabel
 @onready var _sprite_overlay: ItemSpriteOverlay = $VBox/SpriteOverlay
@@ -116,7 +115,6 @@ func _apply() -> void:
         _condition_mult_label.visible = not cond_secondary.is_empty()
 
     _clue_chunk.setup(_entry)
-    _cargo_sep.visible = _clue_chunk.get_child_count() > 0
 
 
 func _animate_pop(target: Label) -> void:

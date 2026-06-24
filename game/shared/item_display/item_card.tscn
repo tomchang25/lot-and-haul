@@ -41,9 +41,6 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_constants/separation = 3
 
-[node name="Sep" type="HSeparator" parent="VBox/ConditionSection" unique_id=125326365]
-layout_mode = 2
-
 [node name="Row" type="HBoxContainer" parent="VBox/ConditionSection" unique_id=189366563]
 layout_mode = 2
 theme_override_constants/separation = 12
@@ -56,9 +53,6 @@ theme_override_font_sizes/font_size = 18
 [node name="ConditionMultLabel" type="Label" parent="VBox/ConditionSection/Row" unique_id=1234893893]
 layout_mode = 2
 theme_override_font_sizes/font_size = 17
-
-[node name="CargoSep" type="HSeparator" parent="VBox" unique_id=1000000033]
-layout_mode = 2
 
 [node name="ClueChunk" parent="VBox" unique_id=1000000034 instance=ExtResource("2_cluechunk")]
 layout_mode = 2

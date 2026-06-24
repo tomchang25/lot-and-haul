@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://o4vv1ugewcl1" path="res://game/shared/item_display/item_list_panel/item_list_panel.gd" id="1_ilp"]
 
 [node name="ItemListPanel" type="PanelContainer" unique_id=-1294967295]
+custom_minimum_size = Vector2(100, 0)
 script = ExtResource("1_ilp")
 
 [node name="PanelVBox" type="VBoxContainer" parent="." unique_id=-1294967294]
