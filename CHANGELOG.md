@@ -18,6 +18,10 @@ Rules:
 
 - 2026-06-23 — [item_display] Shared `ItemValueBreakdownPanel` component extracted from Inspection scene, showing anchor base value plus all revealed clue effects as flat inline rows; `ValueRow` moved to `game/shared/item_display/` with `from_anchor()`/`from_clue()` factories and hover tooltip support via `ClueTooltipManager`; new breakdown panel added to Storage and Customer Sell sidebars (previously had no clue display)
 
+### Item Detail Panel Consolidation
+
+- 2026-06-24 — [item_display] Shared `ItemDetailPanel` component replaces scene-owned detail sections in Inspection, Storage, and CustomerSell sidebars; embeds `ItemValueBreakdownPanel` as internal clue section; configurable convergence display via `show_convergence` flag; single `setup()` call replaces per-field assignment blocks across all three scenes
+
 ### Clue & Anchor Unification
 
 - 2026-06-23 — [data] Domain field and condition-damage-wear clues removed, clue IDs renamed to `common_<aspect>_<detail>` convention, affixes merged to 18 universal-scope entries, anchors renamed to sub-type display names, and all tooling/prompts migrated to the domainless schema
