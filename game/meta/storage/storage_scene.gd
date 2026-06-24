@@ -33,26 +33,15 @@ const STORAGE_COLUMNS: Array = [
 # Right — AP bar and detail
 @onready var _ap_label: Label = %APLabel
 @onready var _detail_section: VBoxContainer = %DetailSection
-@onready var _detail_name_label: Label = %DetailNameLabel
-@onready var _auth_tag_label: Label = %AuthTagLabel
-@onready var _detail_category_label: Label = %DetailCategoryLabel
-@onready var _detail_rarity_label: Label = %DetailRarityLabel
-@onready var _detail_rarity_hbox: HBoxContainer = %DetailRarityHBox
-@onready var _detail_stats_hbox: HBoxContainer = %DetailStatsHBox
-@onready var _convergence_panel: PanelContainer = %ConvergencePanel
-@onready var _detail_cond_value: Label = %CondValueLabel
-@onready var _detail_est_value: Label = %ValueValueLabel
-@onready var _detail_conv_ratio: Label = %ConvRatioLabel
+@onready var _detail_panel: ItemDetailPanel = %DetailPanel
 @onready var _progress_label: Label = %ProgressLabel
 @onready var _no_selection_label: Label = %NoSelectionLabel
 
 # Right — action buttons
-@onready var _breakdown_panel: ItemValueBreakdownPanel = %BreakdownPanel
 @onready var _action_grid: GridContainer = %ActionGrid
 @onready var _repair_btn: Button = %RepairButton
 @onready var _research_btn: Button = %ResearchButton
 @onready var _restore_btn: Button = %RestoreButton
-@onready var _value_title_label: Label = %ValueTitleLabel
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
 
@@ -175,68 +164,14 @@ func _refresh_detail() -> void:
     var entry := _item_browser.get_selected()
     var has_selection: bool = entry != null
     _no_selection_label.visible = not has_selection
-
-    _detail_name_label.visible = has_selection
-    _auth_tag_label.visible = false
-    _detail_category_label.visible = has_selection
-    _detail_rarity_hbox.visible = has_selection
-    _detail_stats_hbox.visible = has_selection
-    _convergence_panel.visible = has_selection
-    _breakdown_panel.visible = has_selection
     _action_grid.visible = has_selection
     _progress_label.visible = false
 
     if not has_selection:
+        _detail_panel.setup(null)
         return
 
-    # ── Name and category ─────────────────────────────────────────────────────
-    _detail_name_label.text = ItemEntryDisplayHelper.display_name(entry)
-    _auth_tag_label.visible = entry.verified
-    if entry.category_data != null:
-        _detail_category_label.text = "%s · #%d" % [
-            TranslationServer.translate(entry.category_data.display_name_key),
-            entry.id,
-        ]
-    else:
-        _detail_category_label.text = "#%d" % entry.id
-
-    # ── Rarity ────────────────────────────────────────────────────────────────
-    if entry.verified:
-        _detail_rarity_label.text = "%s ✓" % ItemEntryDisplayHelper.rarity_text(entry)
-    else:
-        _detail_rarity_label.text = ItemEntryDisplayHelper.rarity_text(entry)
-
-    # ── Condition ─────────────────────────────────────────────────────────────
-    _detail_cond_value.text = ItemEntryDisplayHelper.condition_text(entry)
-    _detail_cond_value.modulate = ItemEntryDisplayHelper.condition_color(entry)
-
-    # ── Estimated value ───────────────────────────────────────────────────────
-    _detail_est_value.text = ItemEntryDisplayHelper.estimated_value_text(entry)
-    _detail_est_value.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_color(entry))
-
-    # ── Price convergence / verified value title ──────────────────────────────
-    if entry.verified:
-        _detail_conv_ratio.text = TranslationServer.translate("UI_VERIFIED_BADGE")
-        _detail_conv_ratio.modulate = ItemEntryDisplayHelper.PRICE_COLOR
-        _value_title_label.text = TranslationServer.translate("UI_TRUE_VALUE")
-    elif entry.is_veiled():
-        _detail_conv_ratio.text = ItemEntryDisplayHelper.unknown_text()
-        _detail_conv_ratio.modulate = Color(0.5, 0.5, 0.5)
-        _value_title_label.text = TranslationServer.translate("UI_EST_VALUE_LABEL")
-    elif entry.is_price_converged():
-        _detail_conv_ratio.text = TranslationServer.translate("UI_CONVERGED")
-        _detail_conv_ratio.modulate = ItemEntryDisplayHelper.PRICE_COLOR
-        _value_title_label.text = TranslationServer.translate("UI_EST_VALUE_LABEL")
-    else:
-        var lo: int = entry.estimated_value_min
-        var hi: int = entry.estimated_value_max
-        var ratio: float = float(lo) / float(hi) * 100.0 if hi > 0 else 0.0
-        _detail_conv_ratio.text = "%d%%" % int(ratio)
-        _detail_conv_ratio.modulate = Color(0.95, 0.75, 0.3) if ratio < 60.0 else Color.WHITE
-        _value_title_label.text = TranslationServer.translate("UI_EST_VALUE_LABEL")
-
-    # ── Clue breakdown ────────────────────────────────────────────────────────
-    _breakdown_panel.setup(entry)
+    _detail_panel.setup(entry, true)
 
     # ── Research progress ─────────────────────────────────────────────────────
     if entry.has_unrevealed_hidden() and not entry.research_progress.is_empty():

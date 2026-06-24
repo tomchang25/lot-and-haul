@@ -1,0 +1,133 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/shared/item_display/item_detail_panel/item_detail_panel.gd" id="1_panel"]
+[ext_resource type="PackedScene" path="res://game/shared/item_display/item_value_breakdown_panel/item_value_breakdown_panel.tscn" id="2_breakdown"]
+
+[node name="ItemDetailPanel" type="VBoxContainer"]
+theme_override_constants/separation = 10
+script = ExtResource("1_panel")
+
+[node name="NameHBox" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="NameLabel" type="Label" parent="NameHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+text = "UI_NO_ITEM_SELECTED"
+
+[node name="AuthTagLabel" type="Label" parent="NameHBox"]
+unique_name_in_owner = true
+visible = false
+modulate = Color(0.6, 0.9, 0.4, 1)
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "● AUTH"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CategoryLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 10
+text = ""
+
+[node name="RarityLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = ""
+
+[node name="StatsHBox" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ConditionPanel" type="PanelContainer" parent="StatsHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CondMargin" type="MarginContainer" parent="StatsHBox/ConditionPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="CondVBox" type="VBoxContainer" parent="StatsHBox/ConditionPanel/CondMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="CondTitleLabel" type="Label" parent="StatsHBox/ConditionPanel/CondMargin/CondVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 9
+text = "UI_CONDITION"
+
+[node name="CondValueLabel" type="Label" parent="StatsHBox/ConditionPanel/CondMargin/CondVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="ValuePanel" type="PanelContainer" parent="StatsHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ValueMargin" type="MarginContainer" parent="StatsHBox/ValuePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ValueVBox" type="VBoxContainer" parent="StatsHBox/ValuePanel/ValueMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ValueTitleLabel" type="Label" parent="StatsHBox/ValuePanel/ValueMargin/ValueVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 9
+text = "UI_EST_VALUE"
+
+[node name="ValueValueLabel" type="Label" parent="StatsHBox/ValuePanel/ValueMargin/ValueVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="ConvergenceSection" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ConvSeparator" type="HSeparator" parent="ConvergenceSection"]
+layout_mode = 2
+
+[node name="ConvTitleLabel" type="Label" parent="ConvergenceSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 9
+text = "UI_PRICE_CONVERGENCE"
+
+[node name="ConvRatioLabel" type="Label" parent="ConvergenceSection"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="VerifiedLabel" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = ""
+
+[node name="BreakdownPanel" parent="." instance=ExtResource("2_breakdown")]
+unique_name_in_owner = true
+layout_mode = 2

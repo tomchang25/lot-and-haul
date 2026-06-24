@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bi01jgyv1md6o" path="res://game/shared/item_display/item_browser_panel/item_browser_panel.tscn" id="3_browser"]
 [ext_resource type="PackedScene" uid="uid://cddj8ljbhn4sb" path="res://game/run/inspection/inspection_summary_popup/inspection_summary_popup.tscn" id="4_summary"]
 [ext_resource type="PackedScene" uid="uid://dk4vsndd2lfnm" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="5_sbo"]
-[ext_resource type="PackedScene" path="res://game/shared/item_display/item_value_breakdown_panel/item_value_breakdown_panel.tscn" id="6_breakdown"]
+[ext_resource type="PackedScene" path="res://game/shared/item_display/item_detail_panel/item_detail_panel.tscn" id="6_detail"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [sub_resource type="StyleBoxFlat" id="accent_btn_normal"]
@@ -235,80 +235,7 @@ visible = false
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="HoverHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000042]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 11
-text = "UI_SELECTED_ITEM"
-
-[node name="HoverNameLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000043]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-
-[node name="HoverCategoryLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000044]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 10
-
-[node name="HoverStatsHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000045]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="ConditionPanel" type="PanelContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox" unique_id=100000046]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="CondMargin" type="MarginContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ConditionPanel" unique_id=100000047]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="CondVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ConditionPanel/CondMargin" unique_id=100000048]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="CondTitleLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ConditionPanel/CondMargin/CondVBox" unique_id=100000049]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 9
-text = "UI_CONDITION"
-
-[node name="CondValueLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ConditionPanel/CondMargin/CondVBox" unique_id=100000050]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-
-[node name="ValuePanel" type="PanelContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox" unique_id=100000051]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="ValueMargin" type="MarginContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ValuePanel" unique_id=100000052]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="ValueVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ValuePanel/ValueMargin" unique_id=100000053]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="ValueTitleLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ValuePanel/ValueMargin/ValueVBox" unique_id=100000054]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 9
-text = "UI_EST_VALUE"
-
-[node name="ValueValueLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/HoverStatsHBox/ValuePanel/ValueMargin/ValueVBox" unique_id=100000055]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-
-[node name="BreakdownPanel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" instance=ExtResource("6_breakdown")]
+[node name="DetailPanel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" instance=ExtResource("6_detail")]
 unique_name_in_owner = true
 layout_mode = 2
 

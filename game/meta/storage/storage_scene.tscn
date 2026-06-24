@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://u48bbtcw2fm4" path="res://game/meta/storage/storage_scene.gd" id="1_uoidr"]
 [ext_resource type="PackedScene" uid="uid://bi01jgyv1md6o" path="res://game/shared/item_display/item_browser_panel/item_browser_panel.tscn" id="2_browser"]
 [ext_resource type="PackedScene" uid="uid://dk4vsndd2lfnm" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="3_sbo"]
-[ext_resource type="PackedScene" path="res://game/shared/item_display/item_value_breakdown_panel/item_value_breakdown_panel.tscn" id="4_breakdown"]
+[ext_resource type="PackedScene" path="res://game/shared/item_display/item_detail_panel/item_detail_panel.tscn" id="4_detail"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="StorageScene" type="Control" unique_id=303272155]
@@ -175,137 +175,7 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 10
 
-[node name="DetailSelectedLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=1511369364]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 11
-text = "UI_SELECTED"
-
-[node name="DetailNameHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=552442018]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="DetailNameLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailNameHBox" unique_id=262320426]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 16
-
-[node name="AuthTagLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailNameHBox" unique_id=1558467984]
-unique_name_in_owner = true
-visible = false
-modulate = Color(0.6, 0.9, 0.4, 1)
-custom_minimum_size = Vector2(64, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "● AUTH"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="DetailCategoryLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=24253426]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 10
-
-[node name="DetailRarityHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=806539401]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="DetailRarityLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailRarityHBox" unique_id=1467790125]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-
-[node name="DetailStatsHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=1330949172]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="ConditionPanel" type="PanelContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox" unique_id=144557840]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="CondMargin" type="MarginContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox/ConditionPanel" unique_id=2127752940]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="CondVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox/ConditionPanel/CondMargin" unique_id=974140471]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="CondTitleLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox/ConditionPanel/CondMargin/CondVBox" unique_id=564326616]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 9
-text = "UI_CONDITION"
-
-[node name="CondValueLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox/ConditionPanel/CondMargin/CondVBox" unique_id=2103365378]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-
-[node name="ValuePanel" type="PanelContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox" unique_id=2146832258]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="ValueMargin" type="MarginContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox/ValuePanel" unique_id=2017254304]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="ValueVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox/ValuePanel/ValueMargin" unique_id=1565083056]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="ValueTitleLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox/ValuePanel/ValueMargin/ValueVBox" unique_id=851794701]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 9
-text = "UI_EST_VALUE"
-
-[node name="ValueValueLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/DetailStatsHBox/ValuePanel/ValueMargin/ValueVBox" unique_id=478361176]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-
-[node name="ConvergencePanel" type="PanelContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=574237905]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="ConvMargin" type="MarginContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ConvergencePanel" unique_id=164997626]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="ConvVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ConvergencePanel/ConvMargin" unique_id=1776670534]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="ConvTitleLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ConvergencePanel/ConvMargin/ConvVBox" unique_id=138985635]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 9
-text = "UI_PRICE_CONVERGENCE"
-
-[node name="ConvHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ConvergencePanel/ConvMargin/ConvVBox" unique_id=1328347395]
-layout_mode = 2
-
-[node name="ConvRatioLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ConvergencePanel/ConvMargin/ConvVBox/ConvHBox" unique_id=467221342]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-
-[node name="BreakdownPanel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" instance=ExtResource("4_breakdown")]
+[node name="DetailPanel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" instance=ExtResource("4_detail")]
 unique_name_in_owner = true
 layout_mode = 2
 

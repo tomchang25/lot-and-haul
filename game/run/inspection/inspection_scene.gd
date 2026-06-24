@@ -40,17 +40,11 @@ var _inspection_finished: bool = false
 # Sidebar — active item detail
 @onready var _sidebar_hsep: HSeparator = %SidebarHSep
 @onready var _detail_section: VBoxContainer = %HoverSection
-@onready var _detail_name_label: Label = %HoverNameLabel
-@onready var _detail_category_label: Label = %HoverCategoryLabel
-@onready var _detail_cond_value_label: Label = %CondValueLabel
-@onready var _detail_value_label: Label = %ValueValueLabel
+@onready var _detail_panel: ItemDetailPanel = %DetailPanel
 
 # Sidebar — clue results
 @onready var _clue_result_section: VBoxContainer = %ClueResultSection
 @onready var _clue_result_label: RichTextLabel = %ClueResultLabel
-
-# Sidebar — revealed clue breakdown
-@onready var _breakdown_panel: ItemValueBreakdownPanel = %BreakdownPanel
 
 # Sidebar — action buttons
 @onready var _action_unveil_button: Button = %UnveilButton
@@ -265,28 +259,7 @@ func _update_detail_section(entry: ItemEntry) -> void:
         _clear_detail_section()
         return
 
-    _detail_name_label.text = ItemEntryDisplayHelper.display_name(entry)
-
-    var cat := entry.category_text() if not entry.is_veiled() else ""
-    _detail_category_label.text = cat
-    _detail_category_label.visible = cat != ""
-
-    var cond := ItemEntryDisplayHelper.condition_detail_text(entry)
-    _detail_cond_value_label.text = cond if cond != "" else "—"
-    _detail_cond_value_label.add_theme_color_override(
-        &"font_color",
-        ItemEntryDisplayHelper.condition_display_color(entry) if cond != "" else Color(0.55, 0.58, 0.63, 1),
-    )
-
-    var price_text := ItemEntryDisplayHelper.estimated_value_text(entry)
-    if price_text != ItemEntryDisplayHelper.unknown_text():
-        _detail_value_label.text = price_text
-        _detail_value_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(entry))
-    else:
-        _detail_value_label.text = "—"
-        _detail_value_label.add_theme_color_override(&"font_color", Color(0.55, 0.58, 0.63, 1))
-
-    _breakdown_panel.setup(entry)
+    _detail_panel.setup(entry, false)
 
     _sidebar_hsep.show()
     _detail_section.show()
