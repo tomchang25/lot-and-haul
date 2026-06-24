@@ -20,19 +20,17 @@ corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
 [node name="SellingItemCard" type="PanelContainer" unique_id=351955918]
-custom_minimum_size = Vector2(128, 128)
-offset_right = 128.0
-offset_bottom = 128.0
+custom_minimum_size = Vector2(192, 192)
 theme_override_styles/panel = SubResource("StyleBoxFlat_xbtl0")
 script = ExtResource("1_sic")
 
 [node name="Margin" type="MarginContainer" parent="." unique_id=1090635750]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
 
 [node name="VBox" type="VBoxContainer" parent="Margin" unique_id=850025220]
 layout_mode = 2
@@ -56,10 +54,10 @@ theme_override_constants/separation = 2
 
 [node name="NameLabel" type="Label" parent="Margin/VBox/InfoBar" unique_id=46639189]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 20)
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 17
 text = "-"
 vertical_alignment = 1
 text_overrun_behavior = 2
@@ -67,28 +65,28 @@ text_overrun_behavior = 2
 [node name="VerifiedLabel" type="Label" parent="Margin/VBox/InfoBar" unique_id=1883703541]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(0, 20)
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 1, 0.5, 1)
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 15
 text = "UI_OK"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="FitLabel" type="Label" parent="Margin/VBox/InfoBar" unique_id=461864196]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(28, 20)
+custom_minimum_size = Vector2(42, 30)
 layout_mode = 2
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 15
 text = "-"
 vertical_alignment = 1
 
 [node name="ValueLabel" type="Label" parent="Margin/VBox/InfoBar" unique_id=343657161]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 20)
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 15
 text = "-"
 horizontal_alignment = 2
 vertical_alignment = 1

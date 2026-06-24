@@ -18,13 +18,13 @@ corner_detail = 5
 [node name="ItemCardPopup" type="PanelContainer" unique_id=1000000001]
 visible = false
 z_index = 10
-custom_minimum_size = Vector2(210, 0)
+custom_minimum_size = Vector2(315, 0)
 theme_override_styles/panel = SubResource("StyleBoxFlat_x6k72")
 script = ExtResource("1_popup")
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=1000000002]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
 [node name="ItemCard" parent="VBox" unique_id=1000000003 instance=ExtResource("2_card")]
 unique_name_in_owner = true

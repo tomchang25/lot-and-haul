@@ -5,21 +5,21 @@
 [ext_resource type="PackedScene" uid="uid://c8m4k2g6pruyh" path="res://game/shared/item_display/item_sprite_overlay/item_sprite_overlay.tscn" id="3_overlay"]
 
 [node name="ItemCard" type="PanelContainer" unique_id=1471444043]
-custom_minimum_size = Vector2(190, 260)
+custom_minimum_size = Vector2(285, 390)
 script = ExtResource("1_itemcard")
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=1188569334]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
 [node name="SpriteOverlay" parent="VBox" unique_id=2126024790 instance=ExtResource("3_overlay")]
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="NameLabel" type="Label" parent="VBox" unique_id=1741335459]
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 20
 text = "UI_EM_DASH"
 horizontal_alignment = 1
 autowrap_mode = 2
@@ -27,35 +27,35 @@ autowrap_mode = 2
 [node name="AuthTagLabel" type="Label" parent="VBox" unique_id=1000000032]
 modulate = Color(0.6, 0.9, 0.4, 1)
 layout_mode = 2
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 17
 text = "UI_AUTHENTICATED"
 horizontal_alignment = 1
 
 [node name="PriceLabel" type="Label" parent="VBox" unique_id=259042000]
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 20
 text = "?"
 horizontal_alignment = 1
 
 [node name="ConditionSection" type="VBoxContainer" parent="VBox" unique_id=432382149]
 layout_mode = 2
-theme_override_constants/separation = 2
+theme_override_constants/separation = 3
 
 [node name="Sep" type="HSeparator" parent="VBox/ConditionSection" unique_id=125326365]
 layout_mode = 2
 
 [node name="Row" type="HBoxContainer" parent="VBox/ConditionSection" unique_id=189366563]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 alignment = 1
 
 [node name="ConditionLabel" type="Label" parent="VBox/ConditionSection/Row" unique_id=1262789856]
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 18
 
 [node name="ConditionMultLabel" type="Label" parent="VBox/ConditionSection/Row" unique_id=1234893893]
 layout_mode = 2
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 17
 
 [node name="CargoSep" type="HSeparator" parent="VBox" unique_id=1000000033]
 layout_mode = 2

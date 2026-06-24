@@ -35,7 +35,7 @@ mouse_filter = 2
 
 [node name="ReceiptPanel" type="PanelContainer" parent="ReceiptCenter" unique_id=1687403903]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 240)
+custom_minimum_size = Vector2(540, 360)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -44,12 +44,12 @@ size_flags_vertical = 4
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 10
+theme_override_constants/separation = 15
 
 [node name="TitleLabel" type="Label" parent="ReceiptCenter/ReceiptPanel/VBox" unique_id=1687403905]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 30
 text = "UI_SALE_RESULT"
 horizontal_alignment = 1
 
@@ -57,7 +57,7 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 vertical_alignment = 1
 autowrap_mode = 2
 
@@ -65,7 +65,7 @@ autowrap_mode = 2
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 42
 theme_override_colors/font_color = Color(1, 0.7, 0, 1)
 text = "UI_SOLD_LABEL"
 horizontal_alignment = 1
@@ -77,16 +77,16 @@ theme_override_constants/separation = 12
 
 [node name="CancelBtn" type="Button" parent="ReceiptCenter/ReceiptPanel/VBox/ButtonRow" unique_id=1687403909]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 36)
+custom_minimum_size = Vector2(150, 54)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_CANCEL"
 script = ExtResource("2_sfx")
 
 [node name="ConfirmBtn" type="Button" parent="ReceiptCenter/ReceiptPanel/VBox/ButtonRow" unique_id=1687403910]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 36)
+custom_minimum_size = Vector2(180, 54)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_CONFIRM_SALE"
 script = ExtResource("2_sfx")

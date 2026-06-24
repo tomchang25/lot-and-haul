@@ -25,10 +25,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -260.0
-offset_top = -128.0
-offset_right = -12.0
-offset_bottom = -12.0
+offset_left = -390.0
+offset_top = -192.0
+offset_right = -18.0
+offset_bottom = -18.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_dbg_panel")
@@ -36,28 +36,28 @@ script = ExtResource("1_dbc")
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=1792310735]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 9
 
 [node name="Title" type="Label" parent="VBox" unique_id=853074204]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 18
 text = "UI_DEBUG_LABEL"
 
 [node name="DebugAddItemBtn" type="Button" parent="VBox" unique_id=429407710]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 32)
+custom_minimum_size = Vector2(330, 48)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.6, 0.4, 1)
 theme_override_colors/font_hover_color = Color(1, 0.8, 0.6, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 20
 text = "UI_DEBUG_ADD_RANDOM"
 
 [node name="DebugClearStorageBtn" type="Button" parent="VBox" unique_id=1450738408]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 32)
+custom_minimum_size = Vector2(330, 48)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
 theme_override_colors/font_hover_color = Color(1, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 20
 text = "UI_DEBUG_CLEAR_STORAGE"

@@ -8,12 +8,12 @@
 clip_contents = true
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 9
 script = ExtResource("1_browser")
 
 [node name="ModeToggleHBox" type="HBoxContainer" parent="." unique_id=100000001]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 9
 
 [node name="CardToggle" type="Button" parent="ModeToggleHBox" unique_id=100000002]
 unique_name_in_owner = true
@@ -33,11 +33,11 @@ script = ExtResource("3_sfx")
 [node name="SortHBox" type="HBoxContainer" parent="." unique_id=100000009]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 9
 
 [node name="SortLabel" type="Label" parent="SortHBox" unique_id=100000010]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_SORT_LABEL"
 vertical_alignment = 1
 
@@ -45,13 +45,13 @@ vertical_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 
 [node name="SortDirButton" type="Button" parent="SortHBox" unique_id=100000012]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(28, 0)
+custom_minimum_size = Vector2(42, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 toggle_mode = true
 text = "▲"
 flat = true
@@ -75,13 +75,13 @@ horizontal_scroll_mode = 0
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
 columns = 4
 
 [node name="TablePanel" parent="." unique_id=100000006 instance=ExtResource("2_table")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(400, 0)
+custom_minimum_size = Vector2(600, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -91,6 +91,5 @@ visible = false
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 16
 text = "UI_NO_ITEMS"
 horizontal_alignment = 1
