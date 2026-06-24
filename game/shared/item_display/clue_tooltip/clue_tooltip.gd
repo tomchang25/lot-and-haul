@@ -34,7 +34,8 @@ func show_for_clue(data: ClueData, anchor: Rect2, revealed: bool = true, valued:
 
     var color := ClueColors.for_clue(data, revealed, valued)
     var type_key := "UI_CLUE_SURFACE" if data.type == ClueData.ClueType.SURFACE else "UI_CLUE_HIDDEN"
-    _show_common_header(data.known_text_key, color, type_key)
+    var name_key := data.known_text_key if revealed else "SYS_UNKNOWN_PLACEHOLDER"
+    _show_common_header(name_key, color, type_key)
 
     if revealed and data.attribute != "" and data.dc > 0:
         _attr_label.text = TranslationServer.translate("UI_CLUE_ATTR_DC_FORMAT") % [
