@@ -77,6 +77,10 @@ Rules:
 
 - 2026-06-21 — [knowledge] Category-rank lookup now derives from the shared rank threshold table instead of a duplicated branch ladder
 
+### Hover Dismiss Ownership
+
+- 2026-06-24 — [item_display] ItemCardPopup and ClueTooltip now use shared hover ownership with a grace timer, so moving the cursor from the trigger into the floating surface keeps it visible; reveal, cargo, and run_review scenes use `request_hide()` instead of hard `hide_popup()`; ClueTooltip root node mouse_filter restored to receive mouse events; ItemCardPopup size correctly shrinks/expands to match ItemCard content
+
 ## v0.1.6
 
 ### Localization
