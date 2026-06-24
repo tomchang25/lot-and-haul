@@ -719,4 +719,4 @@ func _show_tooltip_for_item(entry: ItemEntry, anchor: Rect2) -> void:
 
 func _hide_tooltip() -> void:
     _hovered_item = null
-    _tooltip.hide_popup()
+    _tooltip.request_hide()

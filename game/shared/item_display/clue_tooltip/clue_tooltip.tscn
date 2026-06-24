@@ -32,7 +32,6 @@ content_margin_bottom = 3
 
 [node name="ClueTooltip" type="PanelContainer"]
 visible = false
-mouse_filter = 2
 custom_minimum_size = Vector2(180, 0)
 script = ExtResource("1_ct")
 theme_override_styles/panel = SubResource("sb_tooltip")

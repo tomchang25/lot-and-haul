@@ -6,6 +6,8 @@
 class_name ClueTooltip
 extends PanelContainer
 
+signal hover_state_changed(hovered: bool)
+
 # ── Node references ───────────────────────────────────────────────────────────
 
 @onready var _name_label: Label = %NameLabel
@@ -14,6 +16,14 @@ extends PanelContainer
 @onready var _effect_label: RichTextLabel = %EffectLabel
 @onready var _valued_label: Label = %ValuedLabel
 @onready var _effect_sep: HSeparator = %EffectSep
+
+# ══ Lifecycle ═════════════════════════════════════════════════════════════════
+
+
+func _ready() -> void:
+    mouse_entered.connect(_on_mouse_entered)
+    mouse_exited.connect(_on_mouse_exited)
+
 
 # ══ Common API ════════════════════════════════════════════════════════════════
 
@@ -76,6 +86,14 @@ func show_for_anchor(data: AnchorData, anchor_rect: Rect2, revealed: bool = true
 
     _position_near(anchor_rect)
     show()
+
+
+func _on_mouse_entered() -> void:
+    hover_state_changed.emit(true)
+
+
+func _on_mouse_exited() -> void:
+    hover_state_changed.emit(false)
 
 
 func hide_tooltip() -> void:

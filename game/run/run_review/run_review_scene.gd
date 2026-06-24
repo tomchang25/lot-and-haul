@@ -48,7 +48,7 @@ func _ready() -> void:
     _continue_btn.press_event = CONFIRM
 
     _cargo_panel.tooltip_requested.connect(_on_row_tooltip_requested)
-    _cargo_panel.tooltip_dismissed.connect(_tooltip.hide_popup)
+    _cargo_panel.tooltip_dismissed.connect(_tooltip.request_hide)
 
     var loc := RunManager.run.location_data
     if loc != null:

@@ -48,7 +48,7 @@ func _ready() -> void:
     _continue_btn.press_event = CONFIRM
 
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
-    _item_list_panel.tooltip_dismissed.connect(_tooltip.hide_popup)
+    _item_list_panel.tooltip_dismissed.connect(_tooltip.request_hide)
 
     _won_items = RunManager.lot.won_items
     _continue_btn.hide()
