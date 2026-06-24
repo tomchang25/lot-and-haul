@@ -482,6 +482,237 @@ affix_combinations:
     hidden_clue_ids:
       - crossbow_leaf_balestrier
 
+  # ── Per-category suffix combinations ──────────────────────────────
+  - combination_id: comb_lining_01
+    affix_id: lining
+    weight: 2
+    category_scope:
+      - handbag
+    surface_clue_ids:
+      - common_material_lining
+      - common_material_leather
+    hidden_clue_ids:
+      - bag_leaf_hermes
+  - combination_id: comb_lining_02
+    affix_id: lining
+    weight: 1
+    category_scope:
+      - handbag
+    surface_clue_ids:
+      - common_material_synthetic
+    hidden_clue_ids:
+      - common_override_reproduce
+  - combination_id: comb_band_01
+    affix_id: band
+    weight: 2
+    category_scope:
+      - wristwatch
+    surface_clue_ids:
+      - common_detail_lugs
+      - common_material_leather
+    hidden_clue_ids:
+      - watch_leaf_longines
+  - combination_id: comb_band_02
+    affix_id: band
+    weight: 1
+    category_scope:
+      - wristwatch
+    surface_clue_ids:
+      - common_craft_quartz
+    hidden_clue_ids:
+      - common_override_fake
+  - combination_id: comb_burner_01
+    affix_id: burner
+    weight: 2
+    category_scope:
+      - oil_lamp
+    surface_clue_ids:
+      - common_craft_fitted
+      - common_detail_pewter
+    hidden_clue_ids:
+      - lamp_leaf_moser
+  - combination_id: comb_burner_02
+    affix_id: burner
+    weight: 1
+    category_scope:
+      - oil_lamp
+    surface_clue_ids:
+      - common_craft_mold_seam
+    hidden_clue_ids:
+      - common_override_kit
+  - combination_id: comb_weight_01
+    affix_id: weight
+    weight: 2
+    category_scope:
+      - clock
+    surface_clue_ids:
+      - common_material_veneered
+      - common_mark_signed_movement
+    hidden_clue_ids:
+      - clock_leaf_graham
+  - combination_id: comb_weight_02
+    affix_id: weight
+    weight: 1
+    category_scope:
+      - clock
+    surface_clue_ids:
+      - common_material_shellac
+    hidden_clue_ids:
+      - common_override_kit
+  - combination_id: comb_finish_01
+    affix_id: finish
+    weight: 2
+    category_scope:
+      - porcelain_figurine
+    surface_clue_ids:
+      - common_detail_hand_painted
+      - common_material_celadon
+    hidden_clue_ids:
+      - figurine_leaf_meissen
+  - combination_id: comb_finish_02
+    affix_id: finish
+    weight: 1
+    category_scope:
+      - porcelain_figurine
+    surface_clue_ids:
+      - common_mark_base_unmarked
+    hidden_clue_ids:
+      - common_override_reproduce
+  - combination_id: comb_neck_01
+    affix_id: neck
+    weight: 2
+    category_scope:
+      - vase
+    surface_clue_ids:
+      - common_form_bud
+      - common_material_cased_glass
+    hidden_clue_ids:
+      - vase_leaf_galle
+  - combination_id: comb_neck_02
+    affix_id: neck
+    weight: 1
+    category_scope:
+      - vase
+    surface_clue_ids:
+      - common_craft_polished
+    hidden_clue_ids:
+      - common_override_reproduce
+  - combination_id: comb_mount_01
+    affix_id: mount
+    weight: 2
+    category_scope:
+      - poster
+    surface_clue_ids:
+      - poster_lithograph
+      - common_material_linen
+    hidden_clue_ids:
+      - poster_leaf_lautrec
+  - combination_id: comb_mount_02
+    affix_id: mount
+    weight: 1
+    category_scope:
+      - poster
+    surface_clue_ids:
+      - common_craft_offset_print
+      - common_material_pulp
+    hidden_clue_ids:
+      - common_override_reproduce
+  - combination_id: comb_frame_01
+    affix_id: frame
+    weight: 2
+    category_scope:
+      - painting
+    surface_clue_ids:
+      - common_detail_original_frame
+      - common_material_fine_wood
+    hidden_clue_ids:
+      - painting_leaf_monet
+  - combination_id: comb_frame_02
+    affix_id: frame
+    weight: 1
+    category_scope:
+      - painting
+    surface_clue_ids:
+      - common_mark_unsigned
+    hidden_clue_ids:
+      - common_override_fake
+  - combination_id: comb_plinth_01
+    affix_id: plinth
+    weight: 2
+    category_scope:
+      - sculpture
+    surface_clue_ids:
+      - common_mark_signed_base
+      - common_mark_edition
+    hidden_clue_ids:
+      - sculpture_leaf_rodin
+  - combination_id: comb_plinth_02
+    affix_id: plinth
+    weight: 1
+    category_scope:
+      - sculpture
+    surface_clue_ids:
+      - common_mark_unsigned_base
+    hidden_clue_ids:
+      - common_override_reproduce
+  - combination_id: comb_grip_01
+    affix_id: grip
+    weight: 2
+    category_scope:
+      - pistol
+    surface_clue_ids:
+      - common_material_walnut
+      - common_detail_scrolled
+    hidden_clue_ids:
+      - pistol_leaf_boutet
+  - combination_id: comb_grip_02
+    affix_id: grip
+    weight: 1
+    category_scope:
+      - pistol
+    surface_clue_ids:
+      - common_form_short_barrel
+    hidden_clue_ids:
+      - common_override_kit
+  - combination_id: comb_stock_01
+    affix_id: stock
+    weight: 2
+    category_scope:
+      - rifle
+    surface_clue_ids:
+      - common_material_figured
+      - common_material_walnut
+    hidden_clue_ids:
+      - rifle_leaf_purdey
+  - combination_id: comb_stock_02
+    affix_id: stock
+    weight: 1
+    category_scope:
+      - rifle
+    surface_clue_ids:
+      - common_form_long_barrel
+    hidden_clue_ids:
+      - common_override_kit
+  - combination_id: comb_limb_01
+    affix_id: limb
+    weight: 2
+    category_scope:
+      - crossbow
+    surface_clue_ids:
+      - crossbow_steel_prod
+      - common_material_tiller_wood
+    hidden_clue_ids:
+      - crossbow_leaf_balestrier
+  - combination_id: comb_limb_02
+    affix_id: limb
+    weight: 1
+    category_scope:
+      - crossbow
+    surface_clue_ids:
+      - common_detail_iron_fittings
+    hidden_clue_ids:
+      - common_override_reproduce
+
 affixes:
   - affix_id: antique
     naming_slot: prefix
@@ -656,3 +887,125 @@ affixes:
       - comb_hunter_01
       - comb_hunter_02
       - comb_crossbow_prod
+
+  # ── Per-category suffix affixes ──────────────────────────────────────
+  - affix_id: lining
+    naming_slot: suffix
+    display_name_key: AFFIX_LINING
+    scope_mode: categories
+    category_scope:
+      - handbag
+    weight: 2
+    combination_ids:
+      - comb_lining_01
+      - comb_lining_02
+  - affix_id: band
+    naming_slot: suffix
+    display_name_key: AFFIX_BAND
+    scope_mode: categories
+    category_scope:
+      - wristwatch
+    weight: 2
+    combination_ids:
+      - comb_band_01
+      - comb_band_02
+  - affix_id: burner
+    naming_slot: suffix
+    display_name_key: AFFIX_BURNER
+    scope_mode: categories
+    category_scope:
+      - oil_lamp
+    weight: 2
+    combination_ids:
+      - comb_burner_01
+      - comb_burner_02
+  - affix_id: weight
+    naming_slot: suffix
+    display_name_key: AFFIX_WEIGHT
+    scope_mode: categories
+    category_scope:
+      - clock
+    weight: 2
+    combination_ids:
+      - comb_weight_01
+      - comb_weight_02
+  - affix_id: finish
+    naming_slot: suffix
+    display_name_key: AFFIX_FINISH
+    scope_mode: categories
+    category_scope:
+      - porcelain_figurine
+    weight: 2
+    combination_ids:
+      - comb_finish_01
+      - comb_finish_02
+  - affix_id: neck
+    naming_slot: suffix
+    display_name_key: AFFIX_NECK
+    scope_mode: categories
+    category_scope:
+      - vase
+    weight: 2
+    combination_ids:
+      - comb_neck_01
+      - comb_neck_02
+  - affix_id: mount
+    naming_slot: suffix
+    display_name_key: AFFIX_MOUNT
+    scope_mode: categories
+    category_scope:
+      - poster
+    weight: 2
+    combination_ids:
+      - comb_mount_01
+      - comb_mount_02
+  - affix_id: frame
+    naming_slot: suffix
+    display_name_key: AFFIX_FRAME
+    scope_mode: categories
+    category_scope:
+      - painting
+    weight: 2
+    combination_ids:
+      - comb_frame_01
+      - comb_frame_02
+  - affix_id: plinth
+    naming_slot: suffix
+    display_name_key: AFFIX_PLINTH
+    scope_mode: categories
+    category_scope:
+      - sculpture
+    weight: 2
+    combination_ids:
+      - comb_plinth_01
+      - comb_plinth_02
+  - affix_id: grip
+    naming_slot: suffix
+    display_name_key: AFFIX_GRIP
+    scope_mode: categories
+    category_scope:
+      - pistol
+    weight: 2
+    combination_ids:
+      - comb_grip_01
+      - comb_grip_02
+  - affix_id: stock
+    naming_slot: suffix
+    display_name_key: AFFIX_STOCK
+    scope_mode: categories
+    category_scope:
+      - rifle
+    weight: 2
+    combination_ids:
+      - comb_stock_01
+      - comb_stock_02
+  - affix_id: limb
+    naming_slot: suffix
+    display_name_key: AFFIX_LIMB
+    scope_mode: categories
+    category_scope:
+      - crossbow
+    weight: 2
+    combination_ids:
+      - comb_limb_01
+      - comb_limb_02

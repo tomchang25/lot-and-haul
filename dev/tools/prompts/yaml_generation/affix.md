@@ -40,8 +40,8 @@ affixes:
 
 ### Fields
 
-- `affix_id`: unique snake_case ID across all affixes. After Phase 1 merge, most affixes use unprefixed IDs like `antique`, `fine`, `service` with `scope_mode: all`. Category-prefixed IDs (e.g. `bag_rustic`) are still valid for special cases but are no longer the default. In Phase 2, affix IDs also serve as the key for SECOND_AFFIX_CHANCE draw weighting.
-- `naming_slot`: `prefix` or `suffix`. Controls display-name composition in Spec B. At most two affixes can be drawn per item, so only prefix × suffix cross-product conflicts are validated — two prefixes on the same category never combine.
+- `affix_id`: unique snake_case ID across all affixes. After Phase 1 merge, most affixes use unprefixed IDs like `antique`, `fine`, `service` with `scope_mode: all`. Category-prefixed IDs (e.g. `bag_rustic`) are still valid for special cases but are no longer the default.
+- `naming_slot`: `prefix` or `suffix`. Controls display-name composition in Spec B. At most 3 affixes can be drawn per item (LEGENDARY), with max 2 prefixes and max 2 suffixes. Only prefix × suffix and prefix × prefix cross-product conflicts are validated — the validator checks all active combinations.
 - `display_name_key`: localization key for the human-readable label (e.g. `AFFIX_ANTIQUE`).
 - `scope_mode`: controls draw eligibility. **`all`** (preferred) — this affix can appear on any category. `categories` — this affix applies only to the listed `category_scope` entries (use for test data or category-restricted designs).
 - `category_scope`: list of snake_case category ids this affix applies to when `scope_mode: categories`. Each id must match a category in `category_data.yaml`. Omit or leave empty when `scope_mode: all`.
@@ -79,12 +79,10 @@ affix_combinations:
 
 ## Conflict Rules (validator-enforced)
 
-The build-time validator checks every prefix × suffix affix pair whose scopes overlap (`scope_mode: all` overlaps everything; `scope_mode: categories` overlaps shared category ids) across all combinations in each affix's cross-product. The merged clue set must satisfy:
+The build-time validator checks all affix pair cross-products whose scopes overlap (`scope_mode: all` overlaps everything; `scope_mode: categories` overlaps shared category ids) across all combinations in each affix's cross-product. Since up to 3 affixes (LEGENDARY) can be drawn per item, all pair combinations are validated. The merged clue set must satisfy:
 
 1. **No duplicate exclusive_group.** Two clues on the same item must never share an `exclusive_group`.
 2. **At most one `effect_op: override`.** Two override clues on the same item are illegal.
-
-Since at most two affixes are drawn per item, prefix × prefix and suffix × suffix pairs are not validated — they can never co-occur.
 
 Within a single combination: combinations are mutually exclusive at draw time, so having two clues in the same group inside one combination is fine — the item will only ever receive one of them. The validator still checks for double-override within a single combination as a sanity check, but a combination that carries one hidden override and one hidden mul with no group is valid.
 
@@ -133,7 +131,7 @@ Controls how often the affix appears on items in its category. For the initial p
 - Use higher weights for common-vibe affixes (e.g. everyday-worn, mass-market).
 - Use lower weights for rare-vibe affixes (one-off, extreme values).
 
-Most items should remain **plain** (no affix drawn). Affix weights are calibrated against the _absence_ of any affix, not against each other. If total affix weight for a category is too high relative to the plain-item probability, everything becomes affixed and rarity distributes oddly. In Phase 2, `SECOND_AFFIX_CHANCE` governs the probability of drawing a second affix; affix weights continue to calibrate relative draw frequency among eligible affixes.
+Most items should remain **plain** (no affix drawn). Affix weights are calibrated against the _absence_ of any affix, not against each other. If total affix weight for a category is too high relative to the plain-item probability, everything becomes affixed and rarity distributes oddly. Rarity now drives affix count (COMMON=1, RARE=2, LEGENDARY=3); affix weights continue to calibrate relative draw frequency among eligible affixes within each slot.
 
 ### Combination weight
 

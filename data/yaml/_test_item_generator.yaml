@@ -39,6 +39,20 @@ clues:
     dc: 10
     effect_op: mul
     effect_amount: 1.5
+  - clue_id: test_surface_extra
+    known_text_key: CLUE_TEST_SURFACE_EXTRA
+    type: surface
+    attribute: appraisal
+    dc: 8
+    effect_op: add
+    effect_amount: 75
+  - clue_id: test_surface_suffix
+    known_text_key: CLUE_TEST_SURFACE_SUFFIX
+    type: surface
+    attribute: appraisal
+    dc: 10
+    effect_op: add
+    effect_amount: 30
   - clue_id: test_hidden_gem
     known_text_key: CLUE_TEST_HIDDEN_GEM
     type: hidden
@@ -53,6 +67,20 @@ clues:
     dc: 10
     effect_op: override
     effect_amount: 500
+  - clue_id: test_hidden_extra
+    known_text_key: CLUE_TEST_HIDDEN_EXTRA
+    type: hidden
+    attribute: investigation
+    dc: 12
+    effect_op: mul
+    effect_amount: 1.5
+  - clue_id: test_hidden_suffix
+    known_text_key: CLUE_TEST_HIDDEN_SUFFIX
+    type: hidden
+    attribute: investigation
+    dc: 14
+    effect_op: mul
+    effect_amount: 1.8
 
 affix_combinations:
   - combination_id: test_comb
@@ -62,6 +90,27 @@ affix_combinations:
       - test_surface_easy
       - test_surface_hard
     hidden_clue_ids: []
+  - combination_id: test_comb_prefix_2
+    affix_id: test_affix_prefix_2
+    weight: 1
+    surface_clue_ids:
+      - test_surface_extra
+    hidden_clue_ids:
+      - test_hidden_extra
+  - combination_id: test_comb_suffix_01
+    affix_id: test_affix_suffix
+    weight: 2
+    surface_clue_ids:
+      - test_surface_suffix
+    hidden_clue_ids:
+      - test_hidden_suffix
+  - combination_id: test_comb_suffix_02
+    affix_id: test_affix_suffix
+    weight: 1
+    surface_clue_ids:
+      - test_surface_easy
+    hidden_clue_ids:
+      - test_hidden_override
 
 affixes:
   - affix_id: test_affix
@@ -73,6 +122,25 @@ affixes:
     weight: 1
     combination_ids:
       - test_comb
+  - affix_id: test_affix_prefix_2
+    naming_slot: prefix
+    display_name_key: AFFIX_TEST_AFFIX_2
+    scope_mode: categories
+    category_scope:
+      - test_category
+    weight: 1
+    combination_ids:
+      - test_comb_prefix_2
+  - affix_id: test_affix_suffix
+    naming_slot: suffix
+    display_name_key: AFFIX_TEST_SUFFIX
+    scope_mode: categories
+    category_scope:
+      - test_category
+    weight: 1
+    combination_ids:
+      - test_comb_suffix_01
+      - test_comb_suffix_02
 
 cars:
   - car_id: test_car
@@ -91,6 +159,24 @@ lots:
     is_test: true
     tier_weights: { 1: 100 }
     rarity_weights: { 0: 100 }
+    category_weights: { test_category: 1 }
+    super_category_weights: {}
+  - lot_id: test_lot_rare
+    is_test: true
+    tier_weights: { 1: 100 }
+    rarity_weights: { 2: 100 }
+    category_weights: { test_category: 1 }
+    super_category_weights: {}
+  - lot_id: test_lot_legendary
+    is_test: true
+    tier_weights: { 1: 100 }
+    rarity_weights: { 4: 100 }
+    category_weights: { test_category: 1 }
+    super_category_weights: {}
+  - lot_id: test_lot_mixed
+    is_test: true
+    tier_weights: { 1: 100 }
+    rarity_weights: { 0: 30, 2: 60, 4: 10 }
     category_weights: { test_category: 1 }
     super_category_weights: {}
 

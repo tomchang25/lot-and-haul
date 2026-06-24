@@ -259,63 +259,61 @@ def _combination_matches_category(combo: dict, category_id: str) -> bool:
 def _draw_affixes(
     category_id: str,
     affixes: list[dict],
+    count: int,
     rng: random.Random,
 ) -> list[dict]:
-    """Draw ≥1 prefix, ≤2 total, ≤1 suffix affixes for category.
+    """Draw [param count] affixes with prefix≤2, suffix≤2, ≥1 prefix.
 
-    Mirrors ItemGenerator._draw_affixes (Phase 2 rules).
+    Mirrors ItemGenerator._draw_affixes.
     """
     candidates = [a for a in affixes if _affix_matches_category(a, category_id)]
     if not candidates:
         return []
 
-    total_weight = sum(max(a.get("weight", 0), 0) for a in candidates)
-    if total_weight <= 0:
-        return []
-
-    # Draw 1 prefix (mandatory)
+    # Separate prefix/suffix pools
     prefix_pool = [a for a in candidates if a.get("naming_slot") == "prefix"]
+    suffix_pool = [a for a in candidates if a.get("naming_slot") == "suffix"]
     if not prefix_pool:
         return []
 
-    prefix_total = sum(max(a.get("weight", 0), 0) for a in prefix_pool)
-    roll = rng.randint(1, prefix_total) if prefix_total > 0 else 1
-    cumulative = 0
-    first = None
-    for a in prefix_pool:
-        cumulative += max(a.get("weight", 0), 0)
-        if roll <= cumulative:
-            first = a
+    chosen: list[dict] = [_weighted_pick(prefix_pool, rng)]
+
+    def _slot_count(slot: str) -> int:
+        return sum(1 for a in chosen if a.get("naming_slot") == slot)
+
+    while len(chosen) < count:
+        pool = [
+            a
+            for a in candidates
+            if a["affix_id"] != chosen[-1]["affix_id"]
+            and all(_affixes_are_compatible(a, c) for c in chosen)
+            and not (a.get("naming_slot") == "prefix" and _slot_count("prefix") >= 2)
+            and not (a.get("naming_slot") == "suffix" and _slot_count("suffix") >= 2)
+        ]
+        if not pool:
             break
-    if first is None:
-        first = rng.choice(prefix_pool)
-
-    chosen: list[dict] = [first]
-
-    # Optionally draw a 2nd affix
-    second_pool: list[dict] = []
-    for a in candidates:
-        if a["affix_id"] == first["affix_id"]:
-            continue
-        if a.get("naming_slot") == "suffix" and first.get("naming_slot") == "suffix":
-            continue
-        if not _affixes_are_compatible(first, a):
-            continue
-        second_pool.append(a)
-
-    SECOND_AFFIX_CHANCE = 0.3
-
-    if second_pool and rng.random() <= SECOND_AFFIX_CHANCE:
-        second_total = sum(max(a.get("weight", 0), 0) for a in second_pool)
-        second_roll = rng.randint(1, second_total) if second_total > 0 else 1
-        second_cumulative = 0
-        for a in second_pool:
-            second_cumulative += max(a.get("weight", 0), 0)
-            if second_roll <= second_cumulative:
-                chosen.append(a)
-                break
+        pick = _weighted_pick(pool, rng)
+        if pick is None:
+            break
+        chosen.append(pick)
 
     return chosen
+
+
+def _weighted_pick(pool: list[dict], rng: random.Random) -> dict | None:
+    """Weighted random pick from pool. Falls back to uniform."""
+    if not pool:
+        return None
+    total = sum(max(a.get("weight", 0), 0) for a in pool)
+    if total <= 0:
+        return rng.choice(pool)
+    roll = rng.randint(1, total)
+    cumulative = 0
+    for a in pool:
+        cumulative += max(a.get("weight", 0), 0)
+        if roll <= cumulative:
+            return a
+    return pool[-1]
 
 
 def _pick_combination(
@@ -458,8 +456,8 @@ def simulate_lot(
 
         prior_value = anchor.base_value
 
-        # Draw affixes
-        drawn_affixes = _draw_affixes(category_id, affixes, rng)
+        # Draw affixes (COMMON = 1 affix for balance preview)
+        drawn_affixes = _draw_affixes(category_id, affixes, 1, rng)
 
         surface_ids: list[str] = []
         hidden_ids: list[str] = []

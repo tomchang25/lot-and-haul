@@ -49,10 +49,9 @@ var id: int = -1
 # inspection so the range always converges on the true value.
 var center_offset: float = 0.0
 
-## Rarity equals the number of hidden clues on this instance.
-var rarity: Economy.Rarity:
-    get:
-        return Economy.rarity_for_clue_count(hidden_clues.size())
+## Rarity tier assigned at generation time — not derived from hidden clue count.
+## Controls affix count, XP multiplier, sort weight, and storage cost factors.
+var rarity: Economy.Rarity = Economy.Rarity.COMMON
 
 # Computed: true when item is unveiled, all surface clues are revealed,
 # and every hidden clue is in revealed_clue_ids.
@@ -176,6 +175,12 @@ static func from_dict(d: Dictionary, ctx: SaveLoadContext) -> ItemEntry:
                 clean.append(cid)
         entry.revealed_clue_ids = clean
 
+    # Rarity migration: old saves lack stored rarity — derive from hidden clue count.
+    if d.has("rarity"):
+        entry.rarity = int(d["rarity"]) as Economy.Rarity
+    else:
+        entry.rarity = Economy.rarity_for_clue_count(entry.hidden_clues.size())
+
     # research_progress: clue_id → int accumulated progress (new in time-slot economy).
     if d.has("research_progress") and d["research_progress"] is Dictionary:
         for key: Variant in d["research_progress"]:
@@ -191,6 +196,7 @@ func to_dict() -> Dictionary:
         "unveiled": unveiled,
         "condition": condition,
         "center_offset": center_offset,
+        "rarity": rarity,
         "revealed_clue_ids": revealed_clue_ids.duplicate(),
         "research_progress": research_progress.duplicate(),
         "anchor_id": _get_anchor().anchor_id if _get_anchor() != null else "",

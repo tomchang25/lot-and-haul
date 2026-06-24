@@ -42,6 +42,13 @@ const RARITY_SORT_WEIGHT: Dictionary = {
     Economy.Rarity.LEGENDARY: 4.0,
 }
 
+## Affix count per rarity tier (UNCOMMON and EPIC intentionally absent).
+const RARITY_AFFIX_COUNT: Dictionary = {
+    Economy.Rarity.COMMON: 1,
+    Economy.Rarity.RARE: 2,
+    Economy.Rarity.LEGENDARY: 3,
+}
+
 
 ## Display name per rarity tier.
 static func rarity_display_name(rarity: Economy.Rarity) -> String:

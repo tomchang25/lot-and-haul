@@ -63,9 +63,11 @@ static func create(data: LotData, rng: RandomNumberGenerator = null) -> LotEntry
         if category == null:
             continue
 
+        var rarity := _draw_rarity(data, rng)
         var item_entry := ItemGenerator.draw(
             category,
             data.tier_weights,
+            rarity,
             rng,
         )
         if item_entry == null:
@@ -131,6 +133,29 @@ static func _draw_category(data: LotData, rng: RandomNumberGenerator = null) -> 
 
     ToastManager.show_warning("_draw_category: no category found after %d attempts" % MAX_ATTEMPTS)
     return null
+
+
+## Draws rarity from lot_data.rarity_weights, filtering to the three active
+## tiers (COMMON, RARE, LEGENDARY). UNCOMMON and EPIC are frozen — their weights
+## are ignored even if authored. Falls back to COMMON when all weights are zero.
+static func _draw_rarity(data: LotData, rng: RandomNumberGenerator = null) -> Economy.Rarity:
+    var active: Dictionary = { }
+    for key: Variant in data.rarity_weights:
+        var tier: int = int(key)
+        if tier != Economy.Rarity.COMMON and tier != Economy.Rarity.RARE and tier != Economy.Rarity.LEGENDARY:
+            continue
+        if (data.rarity_weights[key] as int) > 0:
+            active[tier] = data.rarity_weights[key]
+    if active.is_empty():
+        return Economy.Rarity.COMMON
+    var keys: Array = active.keys()
+    var values: Array[int] = []
+    for k in keys:
+        values.append(active[k])
+    var idx := RandomUtils.pick_weighted_index(values, rng)
+    if idx < 0:
+        return Economy.Rarity.COMMON
+    return int(keys[idx]) as Economy.Rarity
 
 
 # Returns the cached NPC estimate. Stable across calls.

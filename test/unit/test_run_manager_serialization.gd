@@ -27,7 +27,7 @@ func _category() -> CategoryData:
 
 func _item(rng: RandomNumberGenerator) -> ItemEntry:
     var cat := _category()
-    var entry := ItemGenerator.draw(cat, { }, rng)
+    var entry := ItemGenerator.draw(cat, { }, Economy.Rarity.COMMON, rng)
     assert_not_null(entry, "item should be generated")
     assert_not_null(entry.anchor, "item should have an anchor")
     return entry

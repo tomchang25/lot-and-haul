@@ -14,6 +14,10 @@ Rules:
 
 ## v0.1.7 - Draft
 
+### Rarity-Driven Affix Count
+
+- 2026-06-24 — [rarity_affix] Rarity now drives affix count (COMMON=1, RARE=2, LEGENDARY=3) drawn from `LotData.rarity_weights`; `ItemEntry.rarity` converted to a stored field with save migration; `_draw_affixes` rewritten with per-slot limits (≤2 prefix, ≤2 suffix); added 12 per-category suffix affixes and updated balance preview tool
+
 ### Inspection Action Feedback & Fixed Buttons
 
 - 2026-06-24 — [inspection] Unveil and Inspect Clues actions now show discovered clue names (or "no extra clues surfaced") in the sidebar with a fade-in animation; action buttons pinned to a fixed bottom position in the sidebar so they never shift when content appears

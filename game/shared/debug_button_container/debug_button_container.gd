@@ -27,7 +27,8 @@ func _on_add_item() -> void:
     if categories.is_empty():
         return
     var cat: CategoryData = categories[randi() % categories.size()]
-    var entry: ItemEntry = ItemGenerator.draw(cat, { })
+    var rarity: Array[Economy.Rarity] = [Economy.Rarity.COMMON, Economy.Rarity.RARE, Economy.Rarity.LEGENDARY]
+    var entry: ItemEntry = ItemGenerator.draw(cat, { }, rarity[randi() % rarity.size()])
     if entry == null:
         return
     entry.unveil()

@@ -5,15 +5,12 @@
 class_name ItemGenerator
 extends RefCounted
 
-# Probability threshold for drawing a second affix (0.0–1.0).
-# A random roll ≤ this threshold triggers the second-affix draw.
-const SECOND_AFFIX_CHANCE: float = 0.3
-
-
 ## Draws one item from the reversed draw order:
-##   category → anchor → affixes (≥1 prefix, ≤2 total, ≤1 suffix)
-##   → one weighted combination per affix (category-scope filtered)
-##   → that combination's clues.
+##   category → anchor → affixes (count = rarity) → one weighted combination
+##   per affix (category-scope filtered) → that combination's clues.
+##
+## Rarity is drawn first by LotEntry, then passed here to determine affix count.
+## The caller is responsible for drawing rarity from lot_data.rarity_weights.
 ##
 ## [param rng] — optional seedable RNG for deterministic generation.
 ## When null, falls back to RandomUtils' shared production RNG.
@@ -21,6 +18,7 @@ const SECOND_AFFIX_CHANCE: float = 0.3
 static func draw(
         category: CategoryData,
         tier_weights: Dictionary,
+        rarity: Economy.Rarity,
         rng: RandomNumberGenerator = null,
 ) -> ItemEntry:
     var resolved_rng := RandomUtils.resolve_rng(rng)
@@ -31,7 +29,8 @@ static func draw(
         return null
 
     # ── 2. Affixes ────────────────────────────────────────────────────────
-    var affixes := _draw_affixes(category, resolved_rng)
+    var affix_count := Economy.RARITY_AFFIX_COUNT.get(rarity, 1) as int
+    var affixes := _draw_affixes(category, affix_count, resolved_rng)
 
     var surface_clues: Array[ClueData] = []
     var hidden_clues: Array[ClueData] = []
@@ -69,6 +68,7 @@ static func draw(
     entry.category_data = category
     entry.affixes = affixes
     entry.combination_ids = combination_ids
+    entry.rarity = rarity
     entry.condition = resolved_rng.randf()
     entry.center_offset = resolved_rng.randf_range(-0.5, 0.5)
     entry.unveiled = false
@@ -146,79 +146,121 @@ static func _draw_anchor(category: CategoryData, tier_weights: Dictionary, rng: 
     return fallback[rng.randi() % fallback.size()]
 
 
-## Draws ≥1 prefix, ≤2 total, ≤1 suffix affixes for [param category].
-## Phase 2 rules:
-## - Always draw at least 1 prefix.
-## - Optionally draw a second affix (prefix or suffix, not already drawn).
-## - Two affixes are rejected if they share an excluded_affix_groups entry.
-## Falls back to single-prefix if no compatible pair is found.
-static func _draw_affixes(category: CategoryData, rng: RandomNumberGenerator) -> Array[AffixData]:
+## Draws [param count] affixes for [param category] with these limits:
+## - At least 1 prefix (mandatory)
+## - At most 2 prefixes total
+## - At most 2 suffixes total
+## - No two affixes overlap in excluded_affix_groups
+## Falls back to fewer affixes when the pool cannot satisfy the count.
+static func _draw_affixes(category: CategoryData, count: int, rng: RandomNumberGenerator) -> Array[AffixData]:
     var all_affixes: Array[AffixData] = AffixRegistry.get_all_affixes()
     var candidates: Array[AffixData] = []
     for a: AffixData in all_affixes:
         if _affix_matches_category(a, category):
             candidates.append(a)
 
-    var total_weight := 0
-    for a: AffixData in candidates:
-        total_weight += maxi(a.weight, 0)
-
-    if total_weight <= 0 or candidates.is_empty():
-        # Should not happen with a populated registry, but guard anyway.
+    if candidates.is_empty():
         ToastManager.show_dev_error("ItemGenerator: no eligible affixes for category '%s'" % category.category_id)
         return []
 
-    # ── Draw 1 prefix (mandatory) ─────────────────────────────────
-    var prefix_pool: Array[AffixData] = []
+    # Build prefix/suffix pools.
+    var prefix_candidates: Array[AffixData] = []
+    var suffix_candidates: Array[AffixData] = []
     for a: AffixData in candidates:
         if a.naming_slot == "prefix":
-            prefix_pool.append(a)
+            prefix_candidates.append(a)
+        elif a.naming_slot == "suffix":
+            suffix_candidates.append(a)
 
-    var first: AffixData
-    if prefix_pool.is_empty():
+    if prefix_candidates.is_empty():
         ToastManager.show_dev_error("ItemGenerator: no prefix affixes for category '%s'" % category.category_id)
         return []
 
-    var prefix_total := 0
-    for a: AffixData in prefix_pool:
-        prefix_total += maxi(a.weight, 0)
-    var first_roll := rng.randi_range(1, prefix_total) if prefix_total > 0 else 1
-    var cumulative := 0
-    for a: AffixData in prefix_pool:
-        cumulative += maxi(a.weight, 0)
-        if first_roll <= cumulative:
-            first = a
+    # Draw 1 prefix (mandatory, always the first affix).
+    var chosen: Array[AffixData] = [_weighted_pick(prefix_candidates, rng)]
+
+    # Draw remaining affixes one at a time up to count or until no compatible pick.
+    var max_attempts := 5
+    while chosen.size() < count:
+        var next := _draw_compatible_affix(candidates, chosen, rng, max_attempts)
+        if next == null:
             break
-    if first == null:
-        first = prefix_pool[rng.randi() % prefix_pool.size()]
-
-    var chosen: Array[AffixData] = [first]
-
-    # ── Optionally draw a 2nd affix ────────────────────────────────
-    var second_pool: Array[AffixData] = []
-    for a: AffixData in candidates:
-        if a == first:
+        # Enforce slot limits.
+        if next.naming_slot == "prefix" and _slot_count(chosen, "prefix") >= 2:
             continue
-        # At most 1 suffix total
-        if a.naming_slot == "suffix" and first.naming_slot == "suffix":
+        if next.naming_slot == "suffix" and _slot_count(chosen, "suffix") >= 2:
             continue
-        # Check compatibility via excluded_affix_groups
-        if _affixes_are_compatible(first, a):
-            second_pool.append(a)
-
-    if not second_pool.is_empty() and rng.randf() <= SECOND_AFFIX_CHANCE:
-        var second_total := 0
-        for a: AffixData in second_pool:
-            second_total += maxi(a.weight, 0)
-        var second_roll := rng.randi_range(1, second_total) if second_total > 0 else 1
-        var second_cumulative := 0
-        for a: AffixData in second_pool:
-            second_cumulative += maxi(a.weight, 0)
-            if second_roll <= second_cumulative:
-                chosen.append(a)
-                break
+        chosen.append(next)
 
     return chosen
+
+
+## Returns the number of affixes in [param affixes] with [param slot] naming_slot.
+static func _slot_count(affixes: Array[AffixData], slot: String) -> int:
+    var n := 0
+    for a: AffixData in affixes:
+        if a.naming_slot == slot:
+            n += 1
+    return n
+
+
+## Picks one affix compatible with all currently chosen affixes. Retries up to
+## [param max_attempts] times to avoid excluded-group conflicts. Returns null
+## if no compatible affix could be drawn.
+static func _draw_compatible_affix(
+        candidates: Array[AffixData],
+        chosen: Array[AffixData],
+        rng: RandomNumberGenerator,
+        max_attempts: int = 5,
+) -> AffixData:
+    # Collect ids to exclude.
+    var chosen_ids: Dictionary = { }
+    for a: AffixData in chosen:
+        chosen_ids[a.affix_id] = true
+
+    var pool: Array[AffixData] = []
+    for a: AffixData in candidates:
+        if chosen_ids.has(a.affix_id):
+            continue
+        if not _affixes_are_compatible(a, chosen):
+            continue
+        pool.append(a)
+
+    if pool.is_empty():
+        return null
+
+    for attempt in range(max_attempts):
+        var pick := _weighted_pick(pool, rng)
+        if pick == null:
+            return null
+        if _affixes_are_compatible(pick, chosen):
+            return pick
+
+    return null
+
+
+## Checks whether [param affix] is compatible with every affix in [param chosen].
+static func _affixes_are_compatible(affix: AffixData, chosen: Array[AffixData]) -> bool:
+    for c: AffixData in chosen:
+        if not _affix_pair_compatible(affix, c):
+            return false
+    return true
+
+
+## Weighted random pick from [param pool].
+static func _weighted_pick(pool: Array[AffixData], rng: RandomNumberGenerator) -> AffixData:
+    var total := 0
+    for a: AffixData in pool:
+        total += maxi(a.weight, 0)
+    if total <= 0:
+        return pool[rng.randi() % pool.size()]
+    var roll := rng.randi_range(1, total)
+    var cumulative := 0
+    for a: AffixData in pool:
+        cumulative += maxi(a.weight, 0)
+        if roll <= cumulative:
+            return a
+    return pool[rng.randi() % pool.size()]
 
 
 static func _affix_matches_category(affix: AffixData, category: CategoryData) -> bool:
@@ -231,7 +273,7 @@ static func _affix_matches_category(affix: AffixData, category: CategoryData) ->
 
 ## Returns true if two affixes can co-occur. They are compatible when they
 ## share no overlapping excluded_affix_groups entries.
-static func _affixes_are_compatible(a: AffixData, b: AffixData) -> bool:
+static func _affix_pair_compatible(a: AffixData, b: AffixData) -> bool:
     if a.excluded_affix_groups.is_empty() or b.excluded_affix_groups.is_empty():
         return true
     for group_a in a.excluded_affix_groups:
