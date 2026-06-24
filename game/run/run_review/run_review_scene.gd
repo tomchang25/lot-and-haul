@@ -15,7 +15,6 @@ const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres
 
 const REVIEW_COLUMNS: Array = [
     ItemRow.Column.NAME,
-    ItemRow.Column.CONDITION,
     ItemRow.Column.ESTIMATED_VALUE,
 ]
 
