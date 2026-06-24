@@ -6,7 +6,7 @@
 # Reads:  PackingGrid.active_item, phase, lift_offset, get_active_cells(), can_place()
 # Writes: nothing
 class_name GridAreaPanel
-extends Control
+extends PanelContainer
 
 # ══ Inner classes ═════════════════════════════════════════════════════════════
 

@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://doaqxqk7u1no0" path="res://game/shared/packing/packing_grid.gd" id="1_pg"]
 [ext_resource type="Script" uid="uid://dwd68daoyjw6u" path="res://game/meta/customer_sell/components/grid_area_panel.gd" id="2_gap"]
 
-[node name="GridAreaPanel" type="Control" unique_id=1942725700]
+[node name="GridAreaPanel" type="PanelContainer" unique_id=1942725700]
 clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3

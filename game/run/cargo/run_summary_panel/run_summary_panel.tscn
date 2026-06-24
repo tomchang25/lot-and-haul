@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://di7dkmpa0l4ng"]
+
+[ext_resource type="Script" path="res://game/run/cargo/run_summary_panel/run_summary_panel.gd" id="1"]
+
+[node name="RunSummaryPanel" type="PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+script = ExtResource("1")
+
+[node name="SummaryVBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LoadedLine" type="HBoxContainer" parent="SummaryVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LoadedCountLabel" type="Label" parent="SummaryVBox/LoadedLine"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "-"
+
+[node name="LoadedValueLabel" type="Label" parent="SummaryVBox/LoadedLine"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 21
+text = "-"
+horizontal_alignment = 2
+
+[node name="UnloadedLine" type="HBoxContainer" parent="SummaryVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="UnloadedCountLabel" type="Label" parent="SummaryVBox/UnloadedLine"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "-"
+
+[node name="UnloadedSellLabel" type="Label" parent="SummaryVBox/UnloadedLine"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 21
+text = "-"
+horizontal_alignment = 2
+
+[node name="WeightLabel" type="Label" parent="SummaryVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "-"
+
+[node name="SlotsLabel" type="Label" parent="SummaryVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "-"
+
+[node name="TrailerLine" type="HBoxContainer" parent="SummaryVBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TrailerRiskLabel" type="Label" parent="SummaryVBox/TrailerLine"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "UI_TRAILER_RISK"
+
+[node name="TrailerRiskValue" type="Label" parent="SummaryVBox/TrailerLine"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "-"
