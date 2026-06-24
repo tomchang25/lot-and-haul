@@ -12,66 +12,54 @@ Rules:
 - When a phase ships, append the entry here and cut the shipped work from its plan/TODO source.
 - Do not add entries for dev-process-only maintenance, including closeout workflow changes, CHANGELOG/TODO edits, plan archival, or tracking cleanup.
 
-## v0.1.7 - Draft
+## v0.1.8 - Draft
+
+## v0.1.7
 
 ### Rarity-Driven Affix Count
 
-- 2026-06-24 — [rarity_affix] Rarity now drives affix count (COMMON=1, RARE=2, LEGENDARY=3) drawn from `LotData.rarity_weights`; `ItemEntry.rarity` converted to a stored field with save migration; `_draw_affixes` rewritten with per-slot limits (≤2 prefix, ≤2 suffix); added 12 per-category suffix affixes and updated balance preview tool
-
-### Inspection Action Feedback & Fixed Buttons
-
-- 2026-06-24 — [inspection] Unveil and Inspect Clues actions now show discovered clue names (or "no extra clues surfaced") in the sidebar with a fade-in animation; action buttons pinned to a fixed bottom position in the sidebar so they never shift when content appears
-
-### Item Value Breakdown Panel
-
-- 2026-06-23 — [item_display] Shared `ItemValueBreakdownPanel` component extracted from Inspection scene, showing anchor base value plus all revealed clue effects as flat inline rows; `ValueRow` moved to `game/shared/item_display/` with `from_anchor()`/`from_clue()` factories and hover tooltip support via `ClueTooltipManager`; new breakdown panel added to Storage and Customer Sell sidebars (previously had no clue display)
-
-### Item Detail Panel Consolidation
-
-- 2026-06-24 — [item_display] Shared `ItemDetailPanel` component replaces scene-owned detail sections in Inspection, Storage, and CustomerSell sidebars; embeds `ItemValueBreakdownPanel` as internal clue section; configurable convergence display via `show_convergence` flag; single `setup()` call replaces per-field assignment blocks across all three scenes
+- 2026-06-24 — [rarity_affix] Rarity now drives affix count (COMMON=1, RARE=2, LEGENDARY=3) drawn from `LotData.rarity_weights`; `ItemEntry.rarity` converted to a stored field with save migration; `_draw_affixes` rewritten with per-slot limits (≤2 prefix, ≤2 suffix); added 12 per-category suffix affixes
 
 ### Clue & Anchor Unification
 
 - 2026-06-23 — [data] Domain field and condition-damage-wear clues removed, clue IDs renamed to `common_<aspect>_<detail>` convention, affixes merged to 18 universal-scope entries, anchors renamed to sub-type display names, and all tooling/prompts migrated to the domainless schema
 - 2026-06-23 — [feat] Exclusive_group expanded to all clue types, affix exclusion system with `excluded_affix_groups`, new draw rules (≥1 prefix, ≤2 total, ≤1 suffix), and combination-level `category_scope` for category-specific combinations
-- 2026-06-23 — [content] ~20 new surface and ~10 new hidden clues; oil_lamp and porcelain_figurine third anchor variants; ~6-8 common and ~12 category-specific combinations; full rebalance across 12 categories
-- 2026-06-23 — [tool] `balance_preview.py` rewritten to simulate the full affix→combination→clue generation flow with conflict rejection and per-category Monte Carlo statistics
+- 2026-06-23 — [content] ~20 new surface and ~10 new hidden clues; oil_lamp and porcelain_figurine third anchor variants; ~6-8 common and ~12 category-specific combinations; full rebalance across 12 categories; `balance_preview.py` rewritten to simulate the full generation flow with conflict rejection and per-category Monte Carlo statistics
 
-### Valued Surface-Negative Customer Pricing
+### Inspection
+
+- 2026-06-24 — [inspection] Unveil and Inspect Clues actions now show discovered clue names (or "no extra clues surfaced") in the sidebar with a fade-in animation; action buttons pinned to a fixed bottom position in the sidebar
+- 2026-06-21 — [inspection] Clue operation copy now presents multiplier and negative-effect results more clearly during inspection
+
+### Shared Item Display
+
+- 2026-06-24 — [item_display] Shared `ItemDetailPanel` replaces scene-owned detail sections in Inspection, Storage, and CustomerSell sidebars with embedded `ItemValueBreakdownPanel` and configurable convergence display; single `setup()` call replaces per-field assignment blocks
+- 2026-06-23 — [item_display] `ItemValueBreakdownPanel` extracted from Inspection scene showing anchor base value plus revealed clue effects as flat inline rows; `ValueRow` moved to `game/shared/item_display/` with factory constructors and `ClueTooltipManager` hover tooltip support; added to Storage and Customer Sell sidebars
+- 2026-06-24 — [item_display] ItemCardPopup and ClueTooltip now use shared hover ownership with a grace timer, so moving from the trigger into the floating surface keeps it visible; `request_hide()` replaces hard `hide_popup()` across reveal, cargo, and run_review scenes
+
+### Customer Selling
 
 - 2026-06-22 — [customer_sell] Customers can value specific negative surface clues, skipping the multiplier penalty and applying a fixed bonus instead; ClueTag and ClueTooltip components added with color-coded clue display in customer sell panels and item cards
-
-### CustomerData Template Generation
-
 - 2026-06-22 — [customer_sell] Nightly customer generation now uses authored CustomerData personas with template demand pools, storage-fit tag blending, hidden-tag caps, and authored car grid pools
 
 ### Category Icons
 
-- 2026-06-21 — [category] CategoryData gains icon texture support sourced from YAML and the TRES pipeline
-- 2026-06-21 — [category] 64px and 256px category icon assets added for every item category, with placeholder-generation tooling for future visual batches
-- 2026-06-21 — [ui] Category icons now appear across lot cards, item cards, item rows, and mastery rows so item identity is easier to scan
+- 2026-06-21 — [category] CategoryData gains icon texture support sourced from YAML and the TRES pipeline; 64px and 256px category icon assets added for every item category with placeholder-generation tooling
+- 2026-06-21 — [ui] Category icons now appear across lot cards, item cards, item rows, and mastery rows
 
 ### Storage Session Snapshot
 
-- 2026-06-21 — [storage] Storage sessions now resume after quit/relaunch with the committed activity state and selected item restored
-- 2026-06-21 — [storage] Storage session checkpoints save on entry, after committed AP actions, and on intentional close so activity-slot progress does not diverge from item state
-- 2026-06-21 — [storage] Incoherent Storage session restores are discarded atomically back to the hub instead of opening a partial session
+- 2026-06-21 — [storage] Storage sessions now resume after quit/relaunch with committed activity state and selected item restored; checkpoints save on entry, after committed AP actions, and on intentional close; incoherent restores are discarded atomically back to the hub
 - 2026-06-21 — [session] Flat session resume checks are centralized in a shared SessionStore base used by shop and storage session stores
 
 ### Pricing and Economy
 
-- 2026-06-21 — [pricing] Item pricing now clamps final values to a $10 minimum so clue combinations cannot produce zero or negative sell values
-- 2026-06-21 — [pricing] Negative additive clue effects were replaced with proportional multipliers in YAML content, prompts, and balance references
+- 2026-06-21 — [pricing] Item pricing now clamps final values to a $10 minimum; negative additive clue effects replaced with proportional multipliers in YAML content, prompts, and balance references
 - 2026-06-21 — [economy] Bankruptcy safety net tops cash up from the floor amount and reports the bailout in the day summary
 
 ### Lot Pool Sampling
 
-- 2026-06-21 — [lot_pool] Lot pool sampling moved into a dedicated service with `is_test` filtering so authored test lots stay out of normal location draws
-- 2026-06-21 — [lot_pool] Location and lot data pipeline definitions now carry lot-pool metadata through YAML and generated resources
-
-### Inspection Display
-
-- 2026-06-21 — [inspection] Clue operation copy now presents multiplier and negative-effect results more clearly during inspection
+- 2026-06-21 — [lot_pool] Lot pool sampling moved into a dedicated service with `is_test` filtering so authored test lots stay out of normal location draws; location and lot data pipeline definitions now carry lot-pool metadata through YAML and generated resources
 
 ### Debug Fixtures
 
@@ -80,10 +68,6 @@ Rules:
 ### Knowledge Rank Maintenance
 
 - 2026-06-21 — [knowledge] Category-rank lookup now derives from the shared rank threshold table instead of a duplicated branch ladder
-
-### Hover Dismiss Ownership
-
-- 2026-06-24 — [item_display] ItemCardPopup and ClueTooltip now use shared hover ownership with a grace timer, so moving the cursor from the trigger into the floating surface keeps it visible; reveal, cargo, and run_review scenes use `request_hide()` instead of hard `hide_popup()`; ClueTooltip root node mouse_filter restored to receive mouse events; ItemCardPopup size correctly shrinks/expands to match ItemCard content
 
 ## v0.1.6
 
