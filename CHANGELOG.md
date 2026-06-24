@@ -14,6 +14,10 @@ Rules:
 
 ## v0.1.7 - Draft
 
+### Inspection Action Feedback & Fixed Buttons
+
+- 2026-06-24 — [inspection] Unveil and Inspect Clues actions now show discovered clue names (or "no extra clues surfaced") in the sidebar with a fade-in animation; action buttons pinned to a fixed bottom position in the sidebar so they never shift when content appears
+
 ### Item Value Breakdown Panel
 
 - 2026-06-23 — [item_display] Shared `ItemValueBreakdownPanel` component extracted from Inspection scene, showing anchor base value plus all revealed clue effects as flat inline rows; `ValueRow` moved to `game/shared/item_display/` with `from_anchor()`/`from_clue()` factories and hover tooltip support via `ClueTooltipManager`; new breakdown panel added to Storage and Customer Sell sidebars (previously had no clue display)

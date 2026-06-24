@@ -276,6 +276,9 @@ en:
   # ── New keys for inspection ──
   UI_NO_CLUES_LEFT: "No more clues to investigate."
   UI_NOT_ENOUGH_AP: "Not enough AP"
+  UI_UNVEILED: "Unveiled"
+  UI_NO_EXTRA_CLUES: "No extra clues surfaced"
+  UI_CLUES_DISCOVERED_FMT: "%d clues discovered"
   UI_UNVEIL_TOOLTIP: "Unveil this item (%d AP)"
   UI_INSPECT_TOOLTIP: "Inspect remaining clues (%d AP)"
 

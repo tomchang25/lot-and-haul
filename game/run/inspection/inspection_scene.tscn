@@ -199,6 +199,7 @@ theme_override_constants/separation = 12
 
 [node name="EmptySelectionLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000030]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
@@ -206,27 +207,6 @@ theme_override_font_sizes/font_size = 12
 text = "UI_SELECT_TO_INSPECT"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="ClueResultSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000080]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="ClueResultHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ClueResultSection" unique_id=192364118]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 11
-text = "UI_CLUE_RESULTS"
-
-[node name="ClueResultLabel" type="RichTextLabel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ClueResultSection" unique_id=1564928163]
-unique_name_in_owner = true
-layout_mode = 2
-bbcode_enabled = true
-fit_content = true
-
-[node name="SidebarHSep" type="HSeparator" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000040]
-unique_name_in_owner = true
-layout_mode = 2
 
 [node name="HoverSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000041]
 unique_name_in_owner = true
@@ -237,34 +217,56 @@ theme_override_constants/separation = 10
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="ActionSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000100]
+[node name="ClueResultSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000080]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ClueResultHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ClueResultSection" unique_id=192364118]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
+theme_override_font_sizes/font_size = 11
+text = "UI_CLUE_RESULTS"
+
+[node name="ClueResultLabel" type="RichTextLabel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ClueResultSection" unique_id=1564928163]
+unique_name_in_owner = true
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+
+[node name="ActionSpacer" type="Control" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000200]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="ActionSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000100]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ActionSep" type="HSeparator" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ActionSection" unique_id=100000101]
+[node name="ActionSep" type="HSeparator" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ActionSection" unique_id=100000101]
 layout_mode = 2
 
-[node name="ActionHeader" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ActionSection" unique_id=100000102]
+[node name="ActionHeader" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ActionSection" unique_id=100000102]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.58, 0.63, 1)
 theme_override_font_sizes/font_size = 10
 text = "UI_ACTIONS_HEADER"
 
-[node name="UnveilButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ActionSection" unique_id=100000103]
+[node name="UnveilButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ActionSection" unique_id=100000103]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "UI_UNVEIL_ACTION"
 
-[node name="InspectCluesButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ActionSection" unique_id=100000104]
+[node name="InspectCluesButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ActionSection" unique_id=100000104]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "UI_INSPECT_CLUES_ACTION"
 
-[node name="ActionCompleteLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ActionSection" unique_id=100000105]
+[node name="ActionCompleteLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ActionSection" unique_id=100000105]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2

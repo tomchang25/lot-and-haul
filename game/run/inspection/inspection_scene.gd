@@ -23,6 +23,7 @@ const INSPECTION_COLUMNS: Array = [
 # ── State ─────────────────────────────────────────────────────────────────────
 
 var _selected_entry: ItemEntry = null
+var _last_selected_entry: ItemEntry = null
 var _inspection_finished: bool = false
 
 # ── Node references ───────────────────────────────────────────────────────────
@@ -38,7 +39,6 @@ var _inspection_finished: bool = false
 @onready var _empty_selection_label: Label = %EmptySelectionLabel
 
 # Sidebar — active item detail
-@onready var _sidebar_hsep: HSeparator = %SidebarHSep
 @onready var _detail_section: VBoxContainer = %HoverSection
 @onready var _detail_panel: ItemDetailPanel = %DetailPanel
 
@@ -158,7 +158,11 @@ func _do_unveil(entry: ItemEntry) -> void:
     _reveal_item(entry)
     AudioManager.play_event(REVEAL_GOOD)
     EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_UNVEILED, { })
+
+    _clear_clue_result()
+    var before_ids := entry.revealed_clue_ids.duplicate()
     RunManager.attempt_surface_clues(entry)
+    _show_unveil_result(entry, before_ids)
 
     _complete_action()
 
@@ -170,14 +174,12 @@ func _do_clue_chain(entry: ItemEntry) -> void:
     var available: Array[ClueData] = entry.get_unrevealed_surface_clues()
 
     if available.is_empty():
-        _clue_result_label.text = TranslationServer.translate("UI_NO_CLUES_LEFT")
+        _show_clue_result(TranslationServer.translate("UI_NO_CLUES_LEFT"), false)
     else:
         var chosen: ClueData = available[RandomUtils.randi() % available.size()]
         RunManager.reveal_clue_direct(entry, chosen)
         AudioManager.play_event(REVEAL_GOOD)
-        _clue_result_label.text = "[color=#66ff80]%s[/color]" % TranslationServer.translate(chosen.known_text_key)
-
-    _clue_result_section.show()
+        _show_clue_result(TranslationServer.translate(chosen.known_text_key), true)
 
     _complete_action()
     EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_PERFORMED, { })
@@ -194,7 +196,47 @@ func _complete_action() -> void:
 
 func _clear_clue_result() -> void:
     _clue_result_label.text = ""
+    _clue_result_section.modulate.a = 1.0
     _clue_result_section.hide()
+
+
+func _show_unveil_result(entry: ItemEntry, before_ids: Array[String]) -> void:
+    var new_ids: Array[String] = []
+    for id: String in entry.revealed_clue_ids:
+        if not before_ids.has(id):
+            new_ids.append(id)
+
+    var lines: Array[String] = []
+    lines.append("[color=#66ff80]%s[/color]" % TranslationServer.translate("UI_UNVEILED"))
+    if not new_ids.is_empty():
+        var count_text := TranslationServer.translate("UI_CLUES_DISCOVERED_FMT") % new_ids.size()
+        lines.append("[color=#888]%s[/color]" % count_text)
+        for id: String in new_ids:
+            var clue := ClueRegistry.get_clue_by_id(id)
+            if clue:
+                lines.append("  [color=#66ff80]%s[/color]" % TranslationServer.translate(clue.known_text_key))
+    else:
+        lines.append("[color=#888]%s[/color]" % TranslationServer.translate("UI_NO_EXTRA_CLUES"))
+    _clue_result_label.text = "\n".join(lines)
+    _clue_result_section.show()
+    _animate_clue_result()
+
+
+func _show_clue_result(label_text: String, use_green: bool = true) -> void:
+    if use_green:
+        _clue_result_label.text = "[color=#66ff80]%s[/color]" % label_text
+    else:
+        _clue_result_label.text = label_text
+    _clue_result_section.show()
+    _animate_clue_result()
+
+
+func _animate_clue_result() -> void:
+    _clue_result_section.modulate.a = 0.0
+    var tween := create_tween()
+    tween.set_trans(Tween.TRANS_QUART)
+    tween.set_ease(Tween.EASE_OUT)
+    tween.tween_property(_clue_result_section, "modulate:a", 1.0, 0.3)
 
 
 func _on_inspection_override_changed(id: StringName, active: bool, _payload: Variant) -> void:
@@ -218,9 +260,14 @@ func _refresh_hud() -> void:
 
 func _refresh_detail() -> void:
     if _selected_entry == null:
+        _last_selected_entry = null
         _clear_detail_section()
         _empty_selection_label.show()
         return
+
+    if _selected_entry != _last_selected_entry:
+        _clear_clue_result()
+        _last_selected_entry = _selected_entry
 
     _empty_selection_label.hide()
     _update_detail_section(_selected_entry)
@@ -261,12 +308,10 @@ func _update_detail_section(entry: ItemEntry) -> void:
 
     _detail_panel.setup(entry, false)
 
-    _sidebar_hsep.show()
     _detail_section.show()
 
 
 func _clear_detail_section() -> void:
-    _sidebar_hsep.hide()
     _detail_section.hide()
     _action_unveil_button.hide()
     _action_inspect_button.hide()
