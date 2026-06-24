@@ -101,14 +101,11 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 
-[node name="DetailWrapper" type="PanelContainer" parent="RootVBox/MainArea/SellSidebar/SidebarMargin"]
+[node name="DetailPanel" parent="RootVBox/MainArea/SellSidebar/SidebarMargin" instance=ExtResource("6_detail")]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 size_flags_vertical = 3
-
-[node name="DetailPanel" parent="RootVBox/MainArea/SellSidebar/SidebarMargin/DetailWrapper" instance=ExtResource("6_detail")]
-unique_name_in_owner = true
-layout_mode = 2
 
 [node name="EmptyState" type="VBoxContainer" parent="." unique_id=125428447]
 unique_name_in_owner = true

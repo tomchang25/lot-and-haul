@@ -5,7 +5,7 @@
 # Reads:  ItemEntry fields, ItemEntryDisplayHelper
 # Writes: nothing
 class_name ItemDetailPanel
-extends VBoxContainer
+extends PanelContainer
 
 # ── Node references ───────────────────────────────────────────────────────────
 
