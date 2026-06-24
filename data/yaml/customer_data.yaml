@@ -21,9 +21,6 @@ customers:
       - [5, 3]
       - [5, 4]
       - [5, 5]
-      - [6, 4]
-      - [6, 5]
-      - [6, 6]
     valued_negative_tags: []
 
   - customer_id: vintage_dealer
@@ -54,9 +51,6 @@ customers:
       - [5, 3]
       - [5, 4]
       - [5, 5]
-      - [6, 4]
-      - [6, 5]
-      - [6, 6]
     valued_negative_tags:
       - common_form_folded
 
@@ -108,7 +102,6 @@ customers:
       - [5, 3]
       - [5, 4]
       - [5, 5]
-      - [6, 4]
     valued_negative_tags:
       - common_craft_mold_seam
 
@@ -134,9 +127,6 @@ customers:
       - [4, 4]
       - [5, 4]
       - [5, 5]
-      - [6, 4]
-      - [6, 5]
-      - [6, 6]
     valued_negative_tags: []
 
   - customer_id: watch_specialist

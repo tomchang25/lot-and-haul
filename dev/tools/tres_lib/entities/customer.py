@@ -82,9 +82,6 @@ class CustomerSpec:
             (5, 3),
             (5, 4),
             (5, 5),
-            (6, 4),
-            (6, 5),
-            (6, 6),
         }
 
         all_clue_ids: set[str] = set()

@@ -57,9 +57,6 @@ customers:
       - [5, 3]
       - [5, 4]
       - [5, 5]
-      - [6, 4]
-      - [6, 5]
-      - [6, 6]
     valued_negative_tags:
       - watch_crystal_scratched
       - watch_band_replaced
@@ -113,7 +110,7 @@ Validation rules to consider in the YAML entity spec:
 2. appears_in_timeslot is one of day, night, any.
 3. demand_pool references existing clue ids.
 4. demand_pool contains enough surface clues to satisfy four-tag fallback with hidden cap.
-5. grid_shape_pool entries use practical shop sizes from the shared template: [2, 4], [3, 3], [4, 3], [4, 4], [5, 3], [5, 4], [5, 5], [6, 4], [6, 5], [6, 6].
+5. grid_shape_pool entries use practical shop sizes from the shared template: [2, 4], [3, 3], [4, 3], [4, 4], [5, 3], [5, 4], [5, 5].
 6. valued_negative_tags reference existing surface mul clues with effect_amount < 1.0.
 ```
 

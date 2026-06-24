@@ -34,9 +34,6 @@ customers:
       - [5, 3]
       - [5, 4]
       - [5, 5]
-      - [6, 4]
-      - [6, 5]
-      - [6, 6]
     valued_negative_tags:
       - <surface_negative_clue_id>
 ```
@@ -65,9 +62,6 @@ grid_shape_pool:
   - [5, 3]
   - [5, 4]
   - [5, 5]
-  - [6, 4]
-  - [6, 5]
-  - [6, 6]
 ```
 
 ---
