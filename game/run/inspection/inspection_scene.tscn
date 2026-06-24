@@ -209,7 +209,6 @@ vertical_alignment = 1
 
 [node name="ClueResultSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000080]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 theme_override_constants/separation = 4
 
@@ -231,11 +230,10 @@ layout_mode = 2
 
 [node name="HoverSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000041]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="DetailPanel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" instance=ExtResource("6_detail")]
+[node name="DetailPanel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=2012698738 instance=ExtResource("6_detail")]
 unique_name_in_owner = true
 layout_mode = 2
 

@@ -36,7 +36,7 @@ var _suppress_placement_update: bool = false
 @onready var _customer_queue: CustomerQueuePanel = %CustomerQueuePanel
 @onready var _item_list: SellingItemListPanel = %SellingItemListPanel
 @onready var _car_panel: CustomerCarPanel = %CustomerCarPanel
-@onready var _selected_item_panel: SelectedItemPanel = %SelectedItemPanel
+@onready var _detail_panel: ItemDetailPanel = %DetailPanel
 @onready var _receipt: SaleReceiptDialog = %SaleReceiptDialog
 
 var _deal_panel: DealPanel
@@ -325,7 +325,7 @@ func _select_customer(index: int) -> void:
     _deal_panel.reset()
     _deal_panel.set_customer(customer)
     _receipt.set_customer(customer)
-    _selected_item_panel.clear_display()
+    _detail_panel.setup(null, true, true)
 
     var grid := _car_panel.get_grid()
     if customer.grid_columns <= 0 or customer.grid_rows <= 0:
@@ -428,15 +428,15 @@ func _show_item_detail(entry: ItemEntry, preview: bool) -> void:
         _preview_entry = entry
     else:
         _selected_entry = entry
-    _selected_item_panel.set_item(entry)
+    _detail_panel.setup(entry, true, true)
 
 
 func _clear_preview_detail() -> void:
     _preview_entry = null
     if _selected_entry != null:
-        _selected_item_panel.set_item(_selected_entry)
+        _detail_panel.setup(_selected_entry, true, true)
     else:
-        _selected_item_panel.clear_display()
+        _detail_panel.setup(null, true, true)
 
 # ══ Car display ═══════════════════════════════════════════════════════════════
 

@@ -4,10 +4,11 @@
 [ext_resource type="PackedScene" path="res://game/meta/customer_sell/components/customer_queue_panel.tscn" id="2_cqp"]
 [ext_resource type="PackedScene" uid="uid://xb84s3sm48je" path="res://game/meta/customer_sell/components/selling_item_list_panel.tscn" id="3_silp"]
 [ext_resource type="PackedScene" uid="uid://my11d2txip3k" path="res://game/meta/customer_sell/components/customer_car_panel.tscn" id="4_ccp"]
-[ext_resource type="PackedScene" path="res://game/meta/customer_sell/components/selected_item_panel.tscn" id="6_sip"]
+[ext_resource type="PackedScene" path="res://game/shared/item_display/item_detail_panel/item_detail_panel.tscn" id="6_detail"]
 [ext_resource type="PackedScene" uid="uid://cvyujuur8ye7x" path="res://game/meta/customer_sell/components/sale_receipt_dialog.tscn" id="8_srd"]
 [ext_resource type="PackedScene" uid="uid://dk4vsndd2lfnm" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="9_sbo"]
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
+
 [node name="CustomerSellScene" type="Control" unique_id=331840253]
 layout_mode = 3
 anchors_preset = 15
@@ -95,19 +96,19 @@ layout_mode = 2
 
 [node name="SidebarMargin" type="MarginContainer" parent="RootVBox/MainArea/SellSidebar" unique_id=405150614]
 layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 16
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
 
-[node name="SidebarVBox" type="VBoxContainer" parent="RootVBox/MainArea/SellSidebar/SidebarMargin" unique_id=289005101]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="SelectedItemPanel" parent="RootVBox/MainArea/SellSidebar/SidebarMargin/SidebarVBox" unique_id=974691496 instance=ExtResource("6_sip")]
-unique_name_in_owner = true
+[node name="DetailWrapper" type="PanelContainer" parent="RootVBox/MainArea/SellSidebar/SidebarMargin"]
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="DetailPanel" parent="RootVBox/MainArea/SellSidebar/SidebarMargin/DetailWrapper" instance=ExtResource("6_detail")]
+unique_name_in_owner = true
+layout_mode = 2
 
 [node name="EmptyState" type="VBoxContainer" parent="." unique_id=125428447]
 unique_name_in_owner = true
@@ -142,5 +143,6 @@ script = ExtResource("99_sfx")
 
 [node name="SaleReceiptDialog" parent="." unique_id=215182387 instance=ExtResource("8_srd")]
 unique_name_in_owner = true
+anchors_preset = 0
 
 [node name="SettingsButtonOverlay" parent="." unique_id=864161326 instance=ExtResource("9_sbo")]
