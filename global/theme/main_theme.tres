@@ -116,6 +116,14 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.25, 0.6, 0.3, 1)
 
+[sub_resource type="StyleBoxFlat" id="selling_item_row_selected"]
+bg_color = Color(0.15, 0.2, 0.35, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.5, 0.8, 1)
+
 [sub_resource type="StyleBoxEmpty" id="checkbox_bg"]
 
 [sub_resource type="StyleBoxFlat" id="grid_cell_bg"]
@@ -169,14 +177,6 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.4, 0.4, 0.45, 1)
 
-[sub_resource type="StyleBoxFlat" id="selling_item_row_selected"]
-bg_color = Color(0.15, 0.2, 0.35, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.4, 0.5, 0.8, 1)
-
 [sub_resource type="StyleBoxFlat" id="tooltip_panel"]
 content_margin_left = 8.0
 content_margin_top = 6.0
@@ -228,6 +228,11 @@ Button/styles/focus = SubResource("btn_focus")
 Button/styles/hover = SubResource("btn_hover")
 Button/styles/normal = SubResource("btn_normal")
 Button/styles/pressed = SubResource("btn_pressed")
+CargoItemCard/styles/default = SubResource("cargo_item_row_default")
+CargoItemCard/styles/holding = SubResource("cargo_item_row_holding")
+CargoItemCard/styles/hovered = SubResource("cargo_item_row_hovered")
+CargoItemCard/styles/loaded = SubResource("cargo_item_row_loaded")
+CargoItemCard/styles/selected = SubResource("selling_item_row_selected")
 CargoItemRow/styles/default = SubResource("cargo_item_row_default")
 CargoItemRow/styles/holding = SubResource("cargo_item_row_holding")
 CargoItemRow/styles/hovered = SubResource("cargo_item_row_hovered")

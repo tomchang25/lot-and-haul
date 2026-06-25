@@ -1,11 +1,10 @@
 [gd_scene format=3 uid="uid://bed421fg56sjp"]
 
 [ext_resource type="Script" uid="uid://bmkpu1bykwvjt" path="res://game/run/cargo/cargo_scene.gd" id="1_cargov2"]
-[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="2_sfx"]
-[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="3_sbo"]
-[ext_resource type="PackedScene" path="res://game/run/cargo/cargo_grid_panel.tscn" id="4_cgp"]
-[ext_resource type="PackedScene" path="res://game/run/cargo/run_summary_panel/run_summary_panel.tscn" id="5_rsp"]
-[ext_resource type="PackedScene" path="res://game/shared/item_display/item_detail_panel/item_detail_panel.tscn" id="6_idp"]
+[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="2_sbo"]
+[ext_resource type="PackedScene" path="res://game/run/cargo/item_list_panel/item_list_panel.tscn" id="3_ilp"]
+[ext_resource type="PackedScene" path="res://game/run/cargo/vehicle_panel/vehicle_panel.tscn" id="4_vp"]
+[ext_resource type="PackedScene" path="res://game/shared/item_display/item_detail_panel/item_detail_panel.tscn" id="5_idp"]
 
 [node name="CargoSceneV2" type="Control" unique_id=1664710573]
 layout_mode = 3
@@ -55,102 +54,16 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="ItemListPanel" type="PanelContainer" parent="RootVBox/MainArea"]
-custom_minimum_size = Vector2(450, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="ItemListScroll" type="ScrollContainer" parent="RootVBox/MainArea/ItemListPanel"]
-layout_mode = 2
-horizontal_scroll_mode = 0
-
-[node name="ItemListVBox" type="VBoxContainer" parent="RootVBox/MainArea/ItemListPanel/ItemListScroll"]
+[node name="ItemListPanel" parent="RootVBox/MainArea" instance=ExtResource("3_ilp")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_constants/separation = 2
-
-[node name="VehiclePanel" type="VBoxContainer" parent="RootVBox/MainArea"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 8
-
-[node name="ErrorLabel" type="Label" parent="RootVBox/MainArea/VehiclePanel"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.3, 0.3, 1)
-theme_override_font_sizes/font_size = 21
-horizontal_alignment = 1
-
-[node name="CargoSection" type="VBoxContainer" parent="RootVBox/MainArea/VehiclePanel"]
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_constants/separation = 9
-
-[node name="CargoSectionLabel" type="Label" parent="RootVBox/MainArea/VehiclePanel/CargoSection"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 18
-text = "UI_CAR_CARGO"
-horizontal_alignment = 1
-
-[node name="CargoGridPanel" parent="RootVBox/MainArea/VehiclePanel/CargoSection" instance=ExtResource("4_cgp")]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 4
 size_flags_vertical = 3
 
-[node name="TrailerSection" type="HBoxContainer" parent="RootVBox/MainArea/VehiclePanel"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="TrailerLabel" type="Label" parent="RootVBox/MainArea/VehiclePanel/TrailerSection"]
-custom_minimum_size = Vector2(0, 42)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 18
-text = "UI_TRAILER"
-vertical_alignment = 1
-
-[node name="TrailerSlotContainer" type="HBoxContainer" parent="RootVBox/MainArea/VehiclePanel/TrailerSection"]
+[node name="VehiclePanel" parent="RootVBox/MainArea" instance=ExtResource("4_vp")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 5
-
-[node name="RunSummaryPanel" parent="RootVBox/MainArea/VehiclePanel" instance=ExtResource("5_rsp")]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 4
 size_flags_vertical = 3
-
-[node name="BottomButtonRow" type="HBoxContainer" parent="RootVBox/MainArea/VehiclePanel"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="ResetBtn" type="Button" parent="RootVBox/MainArea/VehiclePanel/BottomButtonRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(180, 60)
-layout_mode = 2
-theme_override_font_sizes/font_size = 23
-text = "UI_RESET"
-script = ExtResource("2_sfx")
-
-[node name="Spacer" type="Control" parent="RootVBox/MainArea/VehiclePanel/BottomButtonRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
-
-[node name="ContinueBtn" type="Button" parent="RootVBox/MainArea/VehiclePanel/BottomButtonRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(240, 60)
-layout_mode = 2
-theme_override_font_sizes/font_size = 23
-text = "UI_CONTINUE"
-script = ExtResource("2_sfx")
 
 [node name="SellSidebar" type="PanelContainer" parent="RootVBox/MainArea"]
 custom_minimum_size = Vector2(450, 0)
@@ -163,7 +76,7 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 
-[node name="DetailPanel" parent="RootVBox/MainArea/SellSidebar/SidebarMargin" instance=ExtResource("6_idp")]
+[node name="DetailPanel" parent="RootVBox/MainArea/SellSidebar/SidebarMargin" instance=ExtResource("5_idp")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 270)
 layout_mode = 2
@@ -174,4 +87,4 @@ unique_name_in_owner = true
 title = "UI_CONTINUE_TITLE"
 ok_button_text = "UI_CONFIRM"
 
-[node name="SettingsButtonOverlay" parent="." instance=ExtResource("3_sbo")]
+[node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]

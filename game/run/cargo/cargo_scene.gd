@@ -11,11 +11,6 @@ const CONFIRM: UiAudioEvent = preload("res://data/tres/audio_events/confirm.tres
 const SELL_GRID_LIFT: UiAudioEvent = preload("res://data/tres/audio_events/sell_grid_lift.tres")
 const SELL_GRID_PUT_DOWN: UiAudioEvent = preload("res://data/tres/audio_events/sell_grid_put_down.tres")
 
-const CELL_SIZE := 56
-
-const CargoItemRowScene: PackedScene = preload("res://game/run/cargo/cargo_item_row.tscn")
-const ExtraSlotCellScene: PackedScene = preload("res://game/run/cargo/extra_slot_cell/extra_slot_cell.tscn")
-
 # ── State ──────────────────────────────────────────────────────────────────────
 
 var _won_items: Array[ItemEntry] = []
@@ -26,15 +21,8 @@ var _active_origin_extra_index: int = -1
 var _extra_slot_items: Array[ItemEntry] = []
 var _hover_extra_index: int = -1
 
-# ── Extra Slot Grid State ──────────────────────────────────────────────────────
-
-var _extra_slot_cells: Dictionary = { }
-var _extra_slot_item_styles: Dictionary = { }
-var _extra_slot_hover_styles: Dictionary = { }
-
 # ── Item List State ────────────────────────────────────────────────────────────
 
-var _item_rows: Dictionary = { }
 var _loaded_items: Array = []
 
 # ── Stats ──────────────────────────────────────────────────────────────────────
@@ -48,25 +36,20 @@ var _selected_entry: ItemEntry = null
 var _preview_entry: ItemEntry = null
 var _last_highlighted_entry: ItemEntry = null
 
-# Debug overlay buttons — created by _init_debug_overlay().
-var _debug_auto_pack_btn: Button = null
-var _debug_stuff_btn: Button = null
-
 # ── Node references ────────────────────────────────────────────────────────────
 
-@onready var _item_list_vbox: VBoxContainer = %ItemListVBox
-@onready var _error_label: Label = %ErrorLabel
-@onready var _cargo_grid_panel: CargoGridPanel = %CargoGridPanel
+@onready var _item_list: CargoItemListPanel = %ItemListPanel
+@onready var _vehicle_panel: CargoVehiclePanel = %VehiclePanel
+@onready var _detail_panel: ItemDetailPanel = %DetailPanel
+@onready var _confirm_popup: ConfirmationDialog = %ConfirmPopup
+
 var _cargo_grid: PackingGrid:
     get:
-        return _cargo_grid_panel.get_grid()
-@onready var _trailer_section: HBoxContainer = %TrailerSection
-@onready var _extra_slot_container: HBoxContainer = %TrailerSlotContainer
-@onready var _reset_btn: Button = %ResetBtn
-@onready var _continue_btn: Button = %ContinueBtn
-@onready var _confirm_popup: ConfirmationDialog = %ConfirmPopup
-@onready var _summary_panel = %RunSummaryPanel
-@onready var _detail_panel: ItemDetailPanel = %DetailPanel
+        return _vehicle_panel.get_grid()
+
+var _summary_panel: RunSummaryPanel:
+    get:
+        return _vehicle_panel.get_run_summary_panel()
 
 # ══ Lifecycle ══════════════════════════════════════════════════════════════════
 
@@ -80,10 +63,15 @@ func _ready() -> void:
     RunManager.set_resume_target(RunStore.RESUME_CARGO)
     SaveManager.save()
 
-    _reset_btn.pressed.connect(_on_reset_pressed)
-    _continue_btn.pressed.connect(_on_continue_pressed)
-    _continue_btn.press_event = CONFIRM
+    _vehicle_panel.reset_pressed.connect(_on_reset_pressed)
+    _vehicle_panel.continue_pressed.connect(_on_continue_pressed)
+    _vehicle_panel.continue_button.press_event = CONFIRM
     _confirm_popup.confirmed.connect(_on_confirm_popup_confirmed)
+
+    _vehicle_panel.extra_slot_pressed.connect(_on_extra_slot_pressed)
+    _vehicle_panel.extra_slot_hovered.connect(_on_extra_slot_hovered)
+    _vehicle_panel.extra_slot_unhovered.connect(_on_extra_slot_unhovered)
+    _vehicle_panel.extra_slot_cancel.connect(_on_extra_slot_cancel)
 
     _won_items = RunManager.run.won_items
 
@@ -96,28 +84,30 @@ func _ready() -> void:
     var cols: int = RunManager.run.car_data.grid_columns
     var rows: int = RunManager.run.car_data.grid_rows
 
-    _cargo_grid.item_clicked.connect(_on_packing_grid_item_clicked)
-    _cargo_grid.cell_clicked.connect(_on_packing_grid_cell_clicked)
-    _cargo_grid.placement_cancelled.connect(_on_packing_grid_placement_cancelled)
-    _cargo_grid.hover_started.connect(_on_packing_grid_hover_started)
-    _cargo_grid.hover_ended.connect(_on_packing_grid_hover_ended)
+    _vehicle_panel.item_clicked.connect(_on_packing_grid_item_clicked)
+    _vehicle_panel.cell_clicked.connect(_on_packing_grid_cell_clicked)
+    _vehicle_panel.placement_cancelled.connect(_on_packing_grid_placement_cancelled)
+    _vehicle_panel.hover_started.connect(_on_packing_grid_hover_started)
+    _vehicle_panel.hover_ended.connect(_on_packing_grid_hover_ended)
 
     _cargo_grid.setup(cols, rows)
 
     _build_item_list()
-    _build_extra_slots()
+    _vehicle_panel.build_extra_slots(RunManager.run.car_data.extra_slot_count)
+
     _recalc_totals()
     _refresh_ui()
+    _vehicle_panel.debug_auto_pack_pressed.connect(_debug_auto_pack)
+    _vehicle_panel.debug_stuff_all_pressed.connect(_debug_stuff_all)
     Debug.toggled.connect(_on_debug_toggled)
-    if Debug.enabled:
-        _init_debug_overlay()
+    _vehicle_panel.set_debug_buttons_visible(Debug.enabled)
     Director.register_scene(
         "cargo",
         {
-            "item_list": _item_list_vbox,
+            "item_list": _item_list,
             "cargo_grid": _cargo_grid,
-            "continue_btn": _continue_btn,
-            "reset_btn": _reset_btn,
+            "continue_btn": _vehicle_panel.continue_button,
+            "reset_btn": _vehicle_panel.reset_button,
             "detail_panel": _detail_panel,
         },
     )
@@ -141,8 +131,7 @@ func _packing_weight_validator(item, _origin: Vector2i) -> bool:
 func _on_packing_grid_item_clicked(item) -> void:
     _hide_detail()
     if _last_highlighted_entry != null:
-        if _item_rows.has(_last_highlighted_entry):
-            _item_rows[_last_highlighted_entry].set_external_highlight(false)
+        _item_list.set_external_highlight(_last_highlighted_entry, false)
         _last_highlighted_entry = null
     var entry: ItemEntry = item as ItemEntry
     AudioManager.play_event(SELL_GRID_LIFT)
@@ -175,19 +164,17 @@ func _on_packing_grid_placement_cancelled(item) -> void:
 func _on_packing_grid_hover_started(pos: Vector2i) -> void:
     if _cargo_grid.phase != PackingGrid.Phase.ITEM_HELD and _cargo_grid.placement.has(pos):
         var entry: ItemEntry = _cargo_grid.placement[pos] as ItemEntry
-        if _item_rows.has(entry):
-            if _last_highlighted_entry != null and _last_highlighted_entry != entry:
-                _item_rows[_last_highlighted_entry].set_external_highlight(false)
-            _last_highlighted_entry = entry
-            _item_rows[entry].set_external_highlight(true)
-            _show_item_detail(entry, true)
+        _item_list.set_external_highlight(entry, true)
+        if _last_highlighted_entry != null and _last_highlighted_entry != entry:
+            _item_list.set_external_highlight(_last_highlighted_entry, false)
+        _last_highlighted_entry = entry
+        _show_item_detail(entry, true)
 
 
 func _on_packing_grid_hover_ended() -> void:
     _clear_preview_detail()
     if _last_highlighted_entry != null:
-        if _item_rows.has(_last_highlighted_entry):
-            _item_rows[_last_highlighted_entry].set_external_highlight(false)
+        _item_list.set_external_highlight(_last_highlighted_entry, false)
         _last_highlighted_entry = null
 
 # ══ Signal handlers ════════════════════════════════════════════════════════════
@@ -196,8 +183,7 @@ func _on_packing_grid_hover_ended() -> void:
 func _on_reset_pressed() -> void:
     _cargo_grid.reset()
     _extra_slot_items.fill(null)
-    _extra_slot_item_styles.clear()
-    _extra_slot_hover_styles.clear()
+    _vehicle_panel.clear_extra_slot_styles()
 
     _active_origin = ""
     _active_origin_extra_index = -1
@@ -241,47 +227,39 @@ func _on_extra_slot_pressed(slot_index: int) -> void:
     if _cargo_grid.phase == PackingGrid.Phase.IDLE:
         if _extra_slot_items[slot_index] != null:
             var entry: ItemEntry = _extra_slot_items[slot_index]
-            if _item_rows.has(entry):
-                _item_rows[entry].set_external_highlight(false)
+            _item_list.set_external_highlight(entry, false)
             _lift_from_extra(slot_index)
     elif _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
         _place_item_in_extra(slot_index)
 
 
 func _on_extra_slot_hovered(slot_index: int) -> void:
-    if slot_index < 0 or slot_index >= _extra_slot_items.size() or not _extra_slot_cells.has(slot_index):
+    if slot_index < 0 or slot_index >= _extra_slot_items.size():
         ToastManager.show_dev_error(
-            "extra_slot_hovered with index out of range: %d (items size %d, cells size %d)" % [
+            "extra_slot_hovered with index out of range: %d (items size %d)" % [
                 slot_index,
                 _extra_slot_items.size(),
-                _extra_slot_cells.size(),
             ],
         )
         return
 
     _hover_extra_index = slot_index
-    _refresh_extra_slot_visuals()
+    _vehicle_panel.refresh_extra_slot_visuals(_extra_slot_items, _cargo_grid, _hover_extra_index)
 
     if _cargo_grid.phase != PackingGrid.Phase.ITEM_HELD and _extra_slot_items[slot_index] != null:
         var entry: ItemEntry = _extra_slot_items[slot_index]
-        if _item_rows.has(entry):
-            if _last_highlighted_entry != null and _last_highlighted_entry != entry:
-                _item_rows[_last_highlighted_entry].set_external_highlight(false)
-            _last_highlighted_entry = entry
-            _item_rows[entry].set_external_highlight(true)
-            _show_item_detail(entry, true)
-        else:
-            _show_item_detail(entry, true)
+        _item_list.set_external_highlight(entry, true)
+        _last_highlighted_entry = entry
+        _show_item_detail(entry, true)
 
 
 func _on_extra_slot_unhovered(slot_index: int) -> void:
     if _hover_extra_index == slot_index:
         _hover_extra_index = -1
     if _last_highlighted_entry != null:
-        if _item_rows.has(_last_highlighted_entry):
-            _item_rows[_last_highlighted_entry].set_external_highlight(false)
+        _item_list.set_external_highlight(_last_highlighted_entry, false)
         _last_highlighted_entry = null
-    _refresh_extra_slot_visuals()
+    _vehicle_panel.refresh_extra_slot_visuals(_extra_slot_items, _cargo_grid, _hover_extra_index)
     _clear_preview_detail()
 
 
@@ -289,20 +267,27 @@ func _on_extra_slot_cancel(_slot_index: int) -> void:
     if _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
         _cargo_grid.cancel_placement()
 
+# ══ Item list signal handlers ══════════════════════════════════════════════════
+
 
 func _on_item_row_pressed(entry: ItemEntry) -> void:
     _hide_detail()
     if _last_highlighted_entry != null:
-        if _item_rows.has(_last_highlighted_entry):
-            _item_rows[_last_highlighted_entry].set_external_highlight(false)
+        _item_list.set_external_highlight(_last_highlighted_entry, false)
         _last_highlighted_entry = null
-    if _item_rows.has(entry):
-        _item_rows[entry].set_external_highlight(false)
     if _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
         _cargo_grid.cancel_placement()
     _show_item_detail(entry, false)
     _lift_item_entry(entry)
     EventBus.tutorial_event.emit(TutorialEvents.CARGO_ITEM_SELECTED, { })
+
+
+func _on_row_hovered(entry: ItemEntry, _anchor: Rect2) -> void:
+    _show_item_detail(entry, true)
+
+
+func _on_row_hover_ended() -> void:
+    _clear_preview_detail()
 
 # ══ Item lift helpers ══════════════════════════════════════════════════════════
 
@@ -367,32 +352,14 @@ func _place_item_in_extra(slot_index: int) -> void:
     _active_origin_extra_index = -1
     _cargo_grid.cancel_placement()
 
-# ══ Grid construction (PackingGrid delegates) ══════════════════════════════════
-
-
-func _build_extra_slots() -> void:
-    var count: int = RunManager.run.car_data.extra_slot_count
-    _trailer_section.visible = count > 0
-    for i in count:
-        var cell: ExtraSlotCell = ExtraSlotCellScene.instantiate()
-        cell.setup(i)
-        cell.hovered.connect(_on_extra_slot_hovered)
-        cell.unhovered.connect(_on_extra_slot_unhovered)
-        cell.slot_pressed.connect(_on_extra_slot_pressed)
-        cell.slot_cancel.connect(_on_extra_slot_cancel)
-        _extra_slot_container.add_child(cell)
-        _extra_slot_cells[i] = cell
+# ══ Grid construction (delegated to components) ═══════════════════════════════
 
 
 func _build_item_list() -> void:
-    for entry: ItemEntry in _won_items:
-        var row: CargoItemRow = CargoItemRowScene.instantiate()
-        row.setup(entry)
-        row.row_pressed.connect(_on_item_row_pressed)
-        row.tooltip_requested.connect(_on_row_hovered)
-        row.tooltip_dismissed.connect(_on_row_hover_ended)
-        _item_list_vbox.add_child(row)
-        _item_rows[entry] = row
+    _item_list.rebuild(_won_items)
+    _item_list.item_pick_requested.connect(_on_item_row_pressed)
+    _item_list.tooltip_requested.connect(_on_row_hovered)
+    _item_list.tooltip_dismissed.connect(_on_row_hover_ended)
 
 # ══ Placement helpers ══════════════════════════════════════════════════════════
 
@@ -408,18 +375,6 @@ func _would_exceed_weight(entry: ItemEntry) -> bool:
     if _cargo_grid.is_item_placed(entry):
         return false
     return (_weight_used + entry_weight) > max_weight
-
-
-func _get_pending_weight(entry: ItemEntry) -> float:
-    if _cargo_grid.is_item_placed(entry):
-        return 0.0
-    return entry.get_weight()
-
-
-func _get_pending_slots(entry: ItemEntry) -> int:
-    if _cargo_grid.is_item_placed(entry):
-        return 0
-    return _cargo_grid.get_active_cells(entry).size()
 
 # ══ UI helpers ═════════════════════════════════════════════════════════════════
 
@@ -448,9 +403,9 @@ func _refresh_ui() -> void:
         weight_exceeded = (_weight_used + held_item.get_weight()) > max_weight
 
     if weight_exceeded:
-        _error_label.text = TranslationServer.translate("UI_WEIGHT_EXCEEDED")
+        _vehicle_panel.set_error(TranslationServer.translate("UI_WEIGHT_EXCEEDED"))
     else:
-        _error_label.text = ""
+        _vehicle_panel.set_error("")
 
     _summary_panel.refresh(
         _loaded_items,
@@ -463,61 +418,8 @@ func _refresh_ui() -> void:
     )
 
     _cargo_grid.refresh_visuals()
-    _refresh_extra_slot_visuals()
-    _refresh_item_list_visuals()
-
-
-func _refresh_extra_slot_visuals() -> void:
-    for i: int in _extra_slot_cells:
-        var cell: ExtraSlotCell = _extra_slot_cells[i]
-        var style: StyleBoxFlat
-        var entry: ItemEntry = _extra_slot_items[i] if i < _extra_slot_items.size() else null
-        if entry != null:
-            if i == _hover_extra_index and _cargo_grid.phase != PackingGrid.Phase.ITEM_HELD:
-                style = _get_extra_hover_style(entry)
-            else:
-                style = _get_extra_normal_style(entry)
-        elif i == _hover_extra_index and _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD:
-            style = get_theme_stylebox(&"drop_target", &"ExtraSlotCell")
-        else:
-            style = get_theme_stylebox(&"default", &"ExtraSlotCell")
-        var icon_text := ""
-        if entry != null:
-            var words = ItemEntryDisplayHelper.display_name(entry).split(" ", false)
-            icon_text = (words[0].left(1) if words.size() > 0 else "") + (words[1].left(1) if words.size() > 1 else "")
-            icon_text = icon_text.to_upper()
-
-        cell.set_visuals(style, icon_text)
-
-
-func _get_extra_normal_style(entry: ItemEntry) -> StyleBoxFlat:
-    if not _extra_slot_item_styles.has(entry):
-        _extra_slot_item_styles[entry] = PackingGrid.make_stylebox(
-            _cargo_grid.resolve_color(entry),
-            _cargo_grid.resolve_border_color(entry),
-        )
-    return _extra_slot_item_styles[entry]
-
-
-func _get_extra_hover_style(entry: ItemEntry) -> StyleBoxFlat:
-    if not _extra_slot_hover_styles.has(entry):
-        _extra_slot_hover_styles[entry] = PackingGrid.make_stylebox(
-            _cargo_grid.resolve_color(entry).lightened(0.2),
-            _cargo_grid.resolve_border_color(entry).lightened(0.15),
-        )
-    return _extra_slot_hover_styles[entry]
-
-
-func _refresh_item_list_visuals() -> void:
-    for entry: ItemEntry in _item_rows:
-        var row: CargoItemRow = _item_rows[entry]
-        row.set_loaded(_is_item_loaded(entry))
-        var held = _cargo_grid.active_item == entry and _cargo_grid.phase == PackingGrid.Phase.ITEM_HELD
-        row.set_holding(held)
-
-
-func _is_item_loaded(entry: ItemEntry) -> bool:
-    return _cargo_grid.is_item_placed(entry) or entry in _extra_slot_items
+    _vehicle_panel.refresh_extra_slot_visuals(_extra_slot_items, _cargo_grid, _hover_extra_index)
+    _item_list.update_row_states(_cargo_grid, _extra_slot_items)
 
 
 func _build_summary_text() -> String:
@@ -531,14 +433,6 @@ func _build_summary_text() -> String:
     )
 
 # ══ Detail panel helpers ═══════════════════════════════════════════════════════
-
-
-func _on_row_hovered(entry: ItemEntry, _anchor: Rect2) -> void:
-    _show_item_detail(entry, true)
-
-
-func _on_row_hover_ended() -> void:
-    _clear_preview_detail()
 
 
 func _show_item_detail(entry: ItemEntry, preview: bool) -> void:
@@ -564,52 +458,8 @@ func _clear_preview_detail() -> void:
 # Gated by Debug.enabled (OS.is_debug_build() AND SettingsStore.debug_mode).
 
 
-func _init_debug_overlay() -> void:
-    if not Debug.enabled:
-        return
-
-    # ── Auto-pack button ──────────────────────────────────────────────────
-    _debug_auto_pack_btn = Button.new()
-    _debug_auto_pack_btn.text = "Auto-Pack Items"
-    _debug_auto_pack_btn.pressed.connect(_debug_auto_pack)
-    _debug_auto_pack_btn.anchor_left = 0.0
-    _debug_auto_pack_btn.anchor_top = 1.0
-    _debug_auto_pack_btn.anchor_right = 0.0
-    _debug_auto_pack_btn.anchor_bottom = 1.0
-    _debug_auto_pack_btn.offset_left = 152.0
-    _debug_auto_pack_btn.offset_top = -56.0
-    _debug_auto_pack_btn.offset_bottom = -16.0
-    _debug_auto_pack_btn.custom_minimum_size = Vector2(150, 40)
-    # node-src: debug
-    add_child(_debug_auto_pack_btn)
-
-    # ── Stuff-all & go button ─────────────────────────────────────────────
-    _debug_stuff_btn = Button.new()
-    _debug_stuff_btn.text = "Stuff All & Go"
-    _debug_stuff_btn.pressed.connect(_debug_stuff_all)
-    _debug_stuff_btn.anchor_left = 0.0
-    _debug_stuff_btn.anchor_top = 1.0
-    _debug_stuff_btn.anchor_right = 0.0
-    _debug_stuff_btn.anchor_bottom = 1.0
-    _debug_stuff_btn.offset_left = 310.0
-    _debug_stuff_btn.offset_top = -56.0
-    _debug_stuff_btn.offset_bottom = -16.0
-    _debug_stuff_btn.custom_minimum_size = Vector2(150, 40)
-    # node-src: debug
-    add_child(_debug_stuff_btn)
-
-
 func _on_debug_toggled(is_enabled: bool) -> void:
-    if is_enabled:
-        if _debug_auto_pack_btn == null:
-            _init_debug_overlay()
-        else:
-            _debug_auto_pack_btn.visible = true
-            _debug_stuff_btn.visible = true
-    else:
-        if _debug_auto_pack_btn != null:
-            _debug_auto_pack_btn.visible = false
-            _debug_stuff_btn.visible = false
+    _vehicle_panel.set_debug_buttons_visible(is_enabled)
 
 
 ## One-press legal auto-pack. Places every unplaced item into the grid using
@@ -623,12 +473,11 @@ func _debug_auto_pack() -> void:
     var rows: int = RunManager.run.car_data.grid_rows
 
     for entry: ItemEntry in _won_items:
-        if _is_item_loaded(entry):
+        if _cargo_grid.is_item_placed(entry) or entry in _extra_slot_items:
             continue
 
         var placed := false
 
-        # First-fit: scan grid left-to-right, top-to-bottom.
         for y in rows:
             for x in cols:
                 var origin := Vector2i(x, y)
@@ -643,7 +492,6 @@ func _debug_auto_pack() -> void:
         if placed:
             continue
 
-        # Spill overflow into the first free trailer slot.
         for i in _extra_slot_items.size():
             if _extra_slot_items[i] == null:
                 _extra_slot_items[i] = entry

@@ -1,0 +1,106 @@
+[gd_scene format=3 uid="uid://dk5h6jf0xhe44"]
+
+[ext_resource type="Script" uid="uid://dehk8y0f7mrj5" path="res://game/run/cargo/vehicle_panel/vehicle_panel.gd" id="1_vp"]
+[ext_resource type="PackedScene" uid="uid://d5vlynyal5ro" path="res://game/run/cargo/cargo_grid_panel.tscn" id="2_cgp"]
+[ext_resource type="PackedScene" uid="uid://di7dkmpa0l4ng" path="res://game/run/cargo/run_summary_panel/run_summary_panel.tscn" id="3_rsp"]
+[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="4_sfx"]
+
+[node name="VehiclePanel" type="PanelContainer" unique_id=1708707928]
+size_flags_horizontal = 3
+script = ExtResource("1_vp")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=581549601]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="ErrorLabel" type="Label" parent="VBox" unique_id=1113965999]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.3, 0.3, 1)
+theme_override_font_sizes/font_size = 21
+horizontal_alignment = 1
+
+[node name="CargoSection" type="VBoxContainer" parent="VBox" unique_id=2046711124]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 9
+
+[node name="TrailerSection" type="HBoxContainer" parent="VBox/CargoSection" unique_id=423618553]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TrailerLabel" type="Label" parent="VBox/CargoSection/TrailerSection" unique_id=433208270]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 18
+text = "UI_TRAILER"
+vertical_alignment = 1
+
+[node name="TrailerSlotContainer" type="HBoxContainer" parent="VBox/CargoSection/TrailerSection" unique_id=726965840]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+
+[node name="CargoSectionLabel" type="Label" parent="VBox/CargoSection" unique_id=2066638222]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 18
+text = "UI_CAR_CARGO"
+horizontal_alignment = 1
+
+[node name="CargoGridPanel" parent="VBox/CargoSection" unique_id=838083979 instance=ExtResource("2_cgp")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 400)
+layout_mode = 2
+size_flags_horizontal = 1
+size_flags_vertical = 3
+
+[node name="RunSummaryPanel" parent="VBox" unique_id=1268738858 instance=ExtResource("3_rsp")]
+unique_name_in_owner = true
+size_flags_horizontal = 1
+
+[node name="ClearButtonRow" type="HBoxContainer" parent="VBox" unique_id=416160856]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ResetBtn" type="Button" parent="VBox/ClearButtonRow" unique_id=1766544457]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "UI_RESET"
+script = ExtResource("4_sfx")
+
+[node name="DebugAutoPackBtn" type="Button" parent="VBox/ClearButtonRow" unique_id=99990001]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Auto-Pack"
+
+[node name="DebugStuffBtn" type="Button" parent="VBox/ClearButtonRow" unique_id=99990002]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Stuff All"
+
+[node name="Spacer" type="Control" parent="VBox/ClearButtonRow" unique_id=1799155522]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="ContinueBtn" type="Button" parent="VBox/ClearButtonRow" unique_id=1120713102]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "UI_CONTINUE"
+script = ExtResource("4_sfx")
