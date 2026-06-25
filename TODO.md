@@ -18,13 +18,31 @@ Actionable line format: `[Scope] one sentence — [ref plans/<x>.md if any]`
 
 Preliminary concepts — bigger than a one-liner, but a single `###` sub-section says enough. Not necessarily actionable yet. One `###` heading per idea (nested under this `## Draft` so the section stays intact). When an idea outgrows its sub-section / becomes actionable / needs a stable link → move it into its own `dev/docs/plans/<x>.md` (`Status: Exploring`) and delete it here. Stale and never grew → just delete it.
 
-### Debug Storage Cleanup and Liquidation
+### 0.2.0 Milestone
 
-Storage needs a debug-only way to reset or liquidate all owned items so test loops do not require manually selling or deleting every entry after each run. The debug action should stay strictly behind the debug gate because formal selling is intentionally routed through the nightly customer system; a player-facing quick sell would weaken the customer, car-fill, and conservative/aggressive sell decisions.
+---
 
-Preferred shape: add two separate debug actions rather than one ambiguous button. `Clear Storage` removes all stored items and pays nothing, which is best for state cleanup and repeatable testing. `Debug Liquidate Storage` sells all stored items for a deterministic debug payout, which is useful for economy setup but should be visually marked as a shortcut and never share copy with a normal sell feature.
+### cargo scene and customer sell scene components unify
 
-The action should be stateless and immediate. It should not persist a debug mode, should not create customer-sale history, should not award normal sell progression unless explicitly needed for a later test harness, and should report how many items were removed or liquidated so the developer can confirm the button acted on the intended storage contents.
+cargo scene and customer sell scene components unify to one group instead clone twice
+
+### Generic Affix Vocabulary and Clue Notes
+
+Affix content should compress player learning instead of increasing entropy. Prefer a small reusable vocabulary of roughly 10-20 generic affix patterns that appear across categories, so players can learn familiar lookup and prediction actions instead of ignoring affix/clue combinations as bespoke noise.
+
+Category still provides the concrete clue implementations, but the generic affix defines the player-facing prediction frame. `Suspicious` should consistently point toward authenticity, provenance, or source-risk questions; `Restored` toward repair and alteration; `Signed` toward maker or attribution; `Damaged` toward condition risk; `Rare` toward upside that needs hidden confirmation. The point is not semantic flavor reuse, but a stable decision vocabulary that makes unrevealed and hidden clue inference manageable.
+
+This should pair with the future clue notes system. Seeing an affix plus some revealed clues should let the player check notes, narrow possible unrevealed or hidden branches, and eventually benefit from mastery or reputation buffs that improve how much of that pattern can be read before full verification.
+
+### Affix dict system cleanup
+
+Need balance inspection auto reveal clues chance
+
+Remove reveal clues action in inspection Scene
+
+Remove Unveiled action or make it harder to unlock
+
+Rework price range after clues dictionary system finished
 
 ### Inspection and Research Progress Feedback
 
@@ -42,54 +60,13 @@ The summary should answer four scan questions: how many items are loaded, what t
 
 Preferred layout: top summary cards for item count, appraised total, used capacity, and unverified count; a middle grouped item summary that highlights high-value, risky, and bulky entries; and a bottom action area that stays focused on confirming or adjusting cargo. The feature should preserve manual packing decisions and avoid introducing automated cargo behavior unless a separate auto-pack plan is in scope.
 
-### Director v2 — Highlight Target Component + Anchor Fill-to-Screen
-
-The Director's `_position_near_anchor` and `_update_dim_hole` assume anchors are bounded UI regions. When an anchor fills the screen (e.g. a full-viewport PanelContainer used as a layout root), the hole cutout covers everything and `_position_near_anchor` shoves the hint panel off-screen or into a corner.
-
-Add a dedicated `HighlightTarget` component (Control subclass or plain node with a Rect2 export) that scenes place in their tree to define a tutorial-highlightable region. The Director consumes these instead of raw Control references. Benefits: the component can specify a logical bounding box independent of the node's actual screen-filling rect, include a named id matching the script's `anchor_id`, and optionally define hint-panel placement preference (above/below/left/right/auto). Scenes that need no tutorial highlight don't add the node — zero-cost for non-tutorial code paths.
-
-Fix for the current fill-to-screen case: detect anchors whose global rect ≈ viewport size and fall back to popup-style centered display with offset, or use the Director's screen-edge margin defaults instead of positioning relative to the anchor's edges.
-
-### Simple Tutorial (No-Story)
-
-The tutorial split out from the story demo — Stage 2's "small onboarding" pulled forward to Stage 1. A data-driven tutorial hint panel (step list: scene + trigger condition + hint text, played in order — no branching, no portraits, no story) guides the player through one full run + hub loop: inspect → bid → cargo (blocked from leaving empty) → storage → knowledge → customer sell → end day. The first run is made deterministic and friendly via the Director injection skeleton below (big car, high stamina, high-value low-depth items); free play afterwards, no multi-run scripting. The 3-run story demo (Uncle, X-Ray, Crown cutscene) moves to Stage 3. Panel is reusable in the full game. See `dev/docs/visions/itchio_review.md`. The hub + storage explain-only slice is promoted to `dev/docs/plans/tutorial_hint_panel.sketch.md`; this entry keeps the run-phase tutorial and injection scope.
-
-### Director System — Phase 1 Injection Skeleton
-
-A single autoload that manages scripted state without modifying production scenes — production scenes receive normal data and are unaware of the override. It is also the foundation of the future tutorial system. Two mechanisms:
-
-- Data injection (zero pollution) — before a run starts, the Director writes fixed lot content, car assignment, and stamina directly into RunStore.
-- Signal hooks (minimal pollution) — scenes connect to Director signals in their `_ready()` only when `Director.active` is true; the scenes' own logic is unchanged, behavior is pushed in from outside.
-
-Phase 1 (Stage 1 tutorial) scope: data injection for the first run + one cargo-scene hook that blocks leaving with empty cargo. Deferred to the Stage 3 story demo: multi-run state machine, auction-scene forced-bid hooks, perk grants, and the day-pass cutscene trigger (flag check inside `advance_days()`).
-
-### Dialog System — Deferred to Story Demo
-
-DialogManager, a shared overlay autoload, data-driven from the start — linear dialog first, Uncle branching second. The Director emits signals at the appropriate moments; DialogManager handles display, so no hub or run scene is modified directly. Shared by the story demo and the eventual full game. Deferred to the Stage 3 story demo — Phase 1's tutorial needs only the hint panel from Simple Tutorial above, which the full system can later grow out of.
-
 ### Perk Type System: Gate vs Effect
 
 `PerkData` has no type/kind field — all perks are identical resources. Split into `GATE` perks (content access, checked via `required_perk` on resources) and `EFFECT` perks (formula modifiers: keen_eye → inspection bonus, rarity_affinity → price, quick_study → XP gain). Wire effect perks into actual formulas — `perk_effects.gd` is currently a stub.
 
-### Rarity Generation after Affix Refactor
-
-`LotData.rarity_weights` is still authored in lot YAML and shown on lot cards, but `ItemGenerator.draw()` no longer reads it. Rarity now falls out of the generated item's hidden clue count, which is currently determined by selected affix combinations. Decide whether rarity should become an affix/combo authoring outcome or remain a lot-level draw constraint, then align lot UI, data authoring, storage costs, XP, sorting, and color tuning.
-
-### Generic Affix Vocabulary and Clue Notes
-
-Affix content should compress player learning instead of increasing entropy. Prefer a small reusable vocabulary of roughly 10-20 generic affix patterns that appear across categories, so players can learn familiar lookup and prediction actions instead of ignoring affix/clue combinations as bespoke noise.
-
-Category still provides the concrete clue implementations, but the generic affix defines the player-facing prediction frame. `Suspicious` should consistently point toward authenticity, provenance, or source-risk questions; `Restored` toward repair and alteration; `Signed` toward maker or attribution; `Damaged` toward condition risk; `Rare` toward upside that needs hidden confirmation. The point is not semantic flavor reuse, but a stable decision vocabulary that makes unrevealed and hidden clue inference manageable.
-
-This should pair with the future clue notes system. Seeing an affix plus some revealed clues should let the player check notes, narrow possible unrevealed or hidden branches, and eventually benefit from mastery or reputation buffs that improve how much of that pattern can be read before full verification.
-
 ### Image v3 — Lot & Scene Decoration
 
 Lot card decoration with a random icon/badge per lot. Phase-dependent decoration: worker loading truck in cargo, auctioneer gavel in auction, etc. Needs an asset pipeline — blocked on visual direction.
-
-### Modalized HUD Navigation
-
-Replace per-scene `_back_btn` / `_continue_btn` / `_reset_btn` manual wiring with a shared modalized HUD overlay. The HUD owns navigation controls and scene-agnostic chrome (cash, day display). Scenes emit navigation requests rather than direct `GameManager.go_to_*()` calls. Reduces boilerplate across ~10 scenes.
 
 ### Category Mastery ↔ Clue Integration
 
@@ -103,6 +80,49 @@ Inspection remains unchanged. Run-phase clue attempts still use the existing clu
 
 Display implication: until the item-level research total completes, hidden clues remain unknown and UI surfaces render them as ??? only. Once complete, all hidden clues reveal together and the item becomes verified if no hidden clue remains unrevealed.
 
+### NPC Depth Rolled Price
+
+Full NPC knowledge-level system for rolled price; location-specific bidder personalities. Adds depth to auction encounters beyond the current flat NPC.
+
+Current NPC bidding is too conservative: lots should have about a 50% chance to lose money if the player wins the bid. Improve the random method so NPCs can visibly become `Aggressive` when there is a competing NPC or player bid, making pressure spikes easier to read during the auction.
+Need balance auction rolled price and NPC reaction(like, hype, aggressive, overprice)
+
+### Named Rival NPCs
+
+Two or three persistent named rivals with personalities and favored domains who recur across runs and grow in parallel with the player — beating a named rival is an emotional goal economic numbers alone can't provide. Builds on NPC Depth Rolled Price and the Dialog system. Tentative.
+
+### Customer System Evolution
+
+Weighted tag pools (calendar/event/progression-driven), regular customers with fixed profiles, quality tiers (budget vs. collector), selling-related perks. Builds on the current nightly customer system.
+
+### Bank / Bankruptcy V2
+
+Daily interest on cash reserves, game-over condition when debt threshold is crossed, optional player-initiated loans. Periodic-repayment deadlines (Recettear-style) considered as a floor-pressure driver, but a hard deadline sits uneasily with the calm-hub mood and the survivable-floor pillar — prefer soft daily upkeep (storage rent, fuel) if pressure is needed. Needs the day-slot economy to be stable first.
+
+### Lot Pool Variety
+
+Seasonal / rotating lot pools; one-shot special locations as events. Requires the location/auction system to be stable first.
+
+### Garage Auction
+
+A quick garage-sale encounter modelled on the current inspection scene: inspect visible items to reveal clues, then use Negotiation instead of bidding to decide the deal.
+
+No veiled items and no partial-pick choice. The player buys everything or walks away, so the name may need to move away from "garage auction" toward a better all-or-nothing garage-buy concept.
+
+### Combination op for replace override (Fake, Reproduce)
+
+Extend the replace-override mechanism as `fake` and `reproduce` from a flat value to a compound op that composes multiple arithmetic modifiers: a minimum floor, a multiplier, and an additive shift, all resolved in a deterministic order. The compound op is applied conditionally — triggered by a property flag such as `Fake` or `Reproduce` — so counterfeit items can express complex value transforms (e.g. floor at 100, scale by 0.2, then shift by -500) without separate bespoke override fields.
+
+### Popup system rework
+
+Popup system should unify or generalize and ref from crusader king 3 popup system for wait few second for locking popup
+
+---
+
+### 0.3.0 Milestone
+
+---
+
 ### Attribute Upgrades — Cost Scaling & Max Level
 
 Attribute upgrades currently cost a flat $1000/level. Idea: cost scales with current level (linear or quadratic), or alternative growth paths (per-run rewards, daily training, mastery-gated upgrades). Once the upgrade curve is tuned, add a per-attribute max level / softcap. Designed after the base cash model is play-tested.
@@ -110,22 +130,6 @@ Attribute upgrades currently cost a flat $1000/level. Idea: cost scales with cur
 ### Reputation + Scam Flow
 
 Faction reputation system with scam-detection decision branches — builds on the customer system. Requires the customer system to be stable first.
-
-### Expert Network (Appraisers)
-
-Unresolved design: a network of appraiser NPCs the player can consult for better value estimates (beyond their own attributes). Pay-per-use or relationship-gated.
-
-### Campaign Ending, Achievements & Prestige Perks
-
-A 100-day main-line ending (inspired by Hero's Adventure 大俠立志傳): on day 100 the main storyline resolves into one of several endings with a matching achievement, then the save continues as sandbox where side quest lines remain completable. Achievements are earned from condition completion or quest-line endings and grant Score; at new-game start the player picks starting perks unlocked by accumulated Score / specific achievements (meta-progression across playthroughs). Collection-type achievements also serve as the interim chase layer until the Museum/Prestige shape is decided, so Museum needs no early skeleton.
-
-### Hunter Profile & Statistics
-
-A profile page that makes "better sight" visible as a curve: appraisal-error trend over time, per-category identification counts, best flip records. Pure presentation layer over existing knowledge/run data. Tentative.
-
-### Museum / Prestige
-
-Prestige system where rare/verified items can be donated or displayed for reputation, unlocking content gates. Design decisions needed first: what does prestige unlock or affect (access tiers, price modifiers, cosmetics, pure achievement)? Is it per-super-category or global? Is the donation UI in storage or a separate scene? The entire path is blocked on deciding the prestige shape.
 
 ### Auction Modifier: All-Base-Layer Run
 
@@ -143,29 +147,31 @@ Irregular special-auction announcements published on the calendar days in advanc
 
 Pre-run intelligence on available lots — reveal clue counts, surface categories, or estimated value tiers before committing the trip. Waiting on `LocationIntel` resource design. Superseded by Location Review v2 — fold when merging.
 
-### MetaManager Decomposition
+### Karma System
 
-MetaManager holds 6 stores and coordinates slot economy, storage AP, vehicle management, run resolution, customer sale, day-end, and location sampling (~358 lines). Below the pain threshold now, but it's the next candidate for splitting if it grows. The slot economy + storage AP section could become its own manager.
+Karma tracks moral alignment separately from prestige — bad karma unlocks evil-aligned actions (scam routes, shady deals), good karma grants standard buffs or rewards (price bonuses, customer trust). Karma decreases when selling unverified items bearing fake or reproduce clues, reflecting the moral cost of passing counterfeit goods. Distinct from prestige: prestige measures reputation for quality/success, karma measures the player's moral trajectory.
 
-### NPC Depth Rolled Price
+---
 
-Full NPC knowledge-level system for rolled price; location-specific bidder personalities. Adds depth to auction encounters beyond the current flat NPC.
+### Future
 
-### Named Rival NPCs
+---
 
-Two or three persistent named rivals with personalities and favored domains who recur across runs and grow in parallel with the player — beating a named rival is an emotional goal economic numbers alone can't provide. Builds on NPC Depth Rolled Price and the Dialog system. Tentative.
+### Hunter Profile & Statistics
 
-### Lot Pool Variety
+A profile page that makes "better sight" visible as a curve: appraisal-error trend over time, per-category identification counts, best flip records. Pure presentation layer over existing knowledge/run data. Tentative.
 
-Seasonal / rotating lot pools; one-shot special locations as events. Requires the location/auction system to be stable first.
+### Expert Network (Appraisers)
 
-### Bank / Bankruptcy
+Unresolved design: a network of appraiser NPCs the player can consult for better value estimates (beyond their own attributes). Pay-per-use or relationship-gated.
 
-Daily interest on cash reserves, game-over condition when debt threshold is crossed, optional player-initiated loans. Periodic-repayment deadlines (Recettear-style) considered as a floor-pressure driver, but a hard deadline sits uneasily with the calm-hub mood and the survivable-floor pillar — prefer soft daily upkeep (storage rent, fuel) if pressure is needed. Needs the day-slot economy to be stable first.
+### Campaign Ending, Achievements & Prestige Perks
 
-### Customer System Evolution
+A 100-day main-line ending (inspired by Hero's Adventure 大俠立志傳): on day 100 the main storyline resolves into one of several endings with a matching achievement, then the save continues as sandbox where side quest lines remain completable. Achievements are earned from condition completion or quest-line endings and grant Score; at new-game start the player picks starting perks unlocked by accumulated Score / specific achievements (meta-progression across playthroughs). Collection-type achievements also serve as the interim chase layer until the Museum/Prestige shape is decided, so Museum needs no early skeleton.
 
-Weighted tag pools (calendar/event/progression-driven), regular customers with fixed profiles, quality tiers (budget vs. collector), selling-related perks. Builds on the current nightly customer system.
+### Museum / Prestige
+
+Prestige system where rare/verified items can be donated or displayed for reputation, unlocking content gates. Design decisions needed first: what does prestige unlock or affect (access tiers, price modifiers, cosmetics, pure achievement)? Is it per-super-category or global? Is the donation UI in storage or a separate scene? The entire path is blocked on deciding the prestige shape.
 
 ### Shop Preparation Layer
 
@@ -183,14 +189,6 @@ Manual selling should remain the high-control, high-upside option. Half-AFK sell
 
 This likely depends on the shop preparation layer, because tags and assigned employee need to be chosen before the night resolves.
 
-### Garage Sell
-
-Sell individual items in a garage-style scene modelled on `game/run/auction/`. System placement unclear: merchant surface or standalone selling channel? Deferred until the customer sell flow is stable.
-
-### Warehouse Variant Support
-
-Hub surfaces different warehouse exteriors and lot counts per location variant. Requires the location system to define variants first.
-
 ### Perk Content Expansion
 
 Additional perks beyond the current attribute-threshold triggers, with full acquisition wiring (content-granted, event-granted, etc.).
@@ -199,33 +197,23 @@ Additional perks beyond the current attribute-threshold triggers, with full acqu
 
 Use `get_mastery_rank()` directly to gate prestige unlocks and NPC reaction tiers. Tier-locked auction houses moved to `dev/docs/plans/unlock_gating_location_tiers.md`, whose generic requirement block these gates should reuse.
 
-### Vehicle Upgrades / Mods
+### Vehicle Rework
 
 Upgrade system for vehicles: bigger tank, reinforced cargo bay, etc.
 
-### Vehicle Durability & Repair
-
 Wear-and-tear system for vehicles affecting performance; repair cost and downtime.
-
-### Unique Per-Car Perks
 
 Each vehicle grants a unique gameplay modifier (e.g. "+1 action per lot", "ignores first bad item").
 
-### Vehicle Sell-Back / Trade-In
-
 Sell owned cars for partial value when upgrading, so trading up has a cost offset.
-
-### Tier-Linked Surface Clue Count
-
-Future pool-generator work: surface clue count scales with the anchor's tier (e.g. tier 1 → 1–2 clues, tier 5 → 3–5) instead of one global range — higher-value items carry deeper information, making inspection investment on them more rational. Blocked on the pool generator shipping with the global range first.
 
 ### Location Review v2
 
 Richer lot-preview functionality on the location-select screen: browse lot contents before committing AP/travel, see special gating requirements (tier locks, perk gates, mastery minimums), and surface other meta-info (estimated value range, clue count hints, category breakdown). Builds on the existing `LocationIntel` concept in Draft — fold that entry here when merging. Currently the location-select scene shows only name, cost, and tagline; this adds depth to the decision layer without requiring a trip to confirm.
 
-### Combination op for replace override (Fake, Reproduce)
+### Dialog System — Deferred to Story Demo
 
-Extend the replace-override mechanism as `fake` and `reproduce` from a flat value to a compound op that composes multiple arithmetic modifiers: a minimum floor, a multiplier, and an additive shift, all resolved in a deterministic order. The compound op is applied conditionally — triggered by a property flag such as `Fake` or `Reproduce` — so counterfeit items can express complex value transforms (e.g. floor at 100, scale by 0.2, then shift by -500) without separate bespoke override fields.
+DialogManager, a shared overlay autoload, data-driven from the start — linear dialog first, Uncle branching second. The Director emits signals at the appropriate moments; DialogManager handles display, so no hub or run scene is modified directly. Shared by the story demo and the eventual full game. Deferred to the Stage 3 story demo — Phase 1's tutorial needs only the hint panel from Simple Tutorial above, which the full system can later grow out of.
 
 ---
 
