@@ -14,6 +14,22 @@ Rules:
 
 ## v0.1.8 - Draft
 
+### 1080p Migration
+
+- 2026-06-24 — [1080p] Full project migrated to 1080p resolution base (viewports, scene roots, layout containers)
+- 2026-06-24 — [cargo_manifest] Cargo manifest scene rewritten to fit 1080p and display item appraised value
+- 2026-06-24 — [storage] Storage scene rewritten to fit 1080p layout
+- 2026-06-24 — [customer_sell] Selling scene rewritten for 1080p with variable-width customer grid (removed hardcoded 6xN size) to prevent layout breaking
+
+### Cargo Rewrite
+
+- 2026-06-24 — [cargo] Cargo scene fully rewritten (v1) with new layout, vehicle panel, and grid-card item list
+- 2026-06-25 — [cargo] Vehicle panel and grid-card item list extracted from monolithic cargo scene into focused components (#129)
+
+### Theme
+
+- 2026-06-25 — [theme] Font sizing standardized across all UI via `theme_type_variation` instead of per-control overrides
+
 ## v0.1.7
 
 ### Rarity-Driven Affix Count
