@@ -53,16 +53,16 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 54)
 layout_mode = 2
 size_flags_vertical = 4
-	theme_type_variation = "Detail"
-	text = "UI_BACK_TO_HUB"
+theme_type_variation = &"Detail"
+text = "UI_BACK_TO_HUB"
 script = ExtResource("99_sfx")
 
 [node name="TitleLabel" type="Label" parent="RootVBox/HeaderRow" unique_id=1218286169]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 size_flags_horizontal = 3
-	theme_type_variation = "Heading1"
-	text = "UI_CUSTOMER_SELL_TITLE"
+theme_type_variation = &"Heading1"
+text = "UI_CUSTOMER_SELL_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -100,7 +100,7 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 
-[node name="DetailPanel" parent="RootVBox/MainArea/SellSidebar/SidebarMargin" instance=ExtResource("6_detail")]
+[node name="DetailPanel" parent="RootVBox/MainArea/SellSidebar/SidebarMargin" unique_id=2740572 instance=ExtResource("6_detail")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 270)
 layout_mode = 2
@@ -123,8 +123,8 @@ alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
-	theme_type_variation = "Heading2"
-	text = "UI_NO_CUSTOMERS_TONIGHT"
+theme_type_variation = &"Heading2"
+text = "UI_NO_CUSTOMERS_TONIGHT"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -138,6 +138,11 @@ script = ExtResource("99_sfx")
 
 [node name="SaleReceiptDialog" parent="." unique_id=215182387 instance=ExtResource("8_srd")]
 unique_name_in_owner = true
-anchors_preset = 0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
 
 [node name="SettingsButtonOverlay" parent="." unique_id=864161326 instance=ExtResource("9_sbo")]
