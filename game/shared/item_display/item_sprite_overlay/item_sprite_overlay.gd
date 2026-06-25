@@ -72,7 +72,7 @@ func _apply() -> void:
     var weight := ItemEntryDisplayHelper.weight_text(_entry)
     if weight != ItemEntryDisplayHelper.unknown_text():
         _weight_label.text = weight
-        _weight_label.position = Vector2(4, s.y - label_h - 2)
+        _weight_label.position = Vector2(4, s.y - label_h - 6)
         _weight_label.show()
     else:
         _weight_label.hide()

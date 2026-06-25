@@ -28,12 +28,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 32
+theme_override_constants/separation = 48
 alignment = 1
 
 [node name="TitleLabel" type="Label" parent="RootVBox" unique_id=1100000004]
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 72
 text = "UI_START_TITLE"
 horizontal_alignment = 1
 
@@ -41,48 +41,48 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_constants/separation = 16
+theme_override_constants/separation = 24
 
 [node name="NewGameButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000010]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 56)
+custom_minimum_size = Vector2(420, 84)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 30
 text = "UI_START_NEW_GAME"
 script = ExtResource("99_sfx")
 
 [node name="LoadGameButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000009]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 56)
+custom_minimum_size = Vector2(420, 84)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 30
 text = "UI_START_LOAD_GAME"
 script = ExtResource("99_sfx")
 
 [node name="SettingsButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000007]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 56)
+custom_minimum_size = Vector2(420, 84)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 30
 text = "UI_START_SETTINGS"
 script = ExtResource("99_sfx")
 
 [node name="QuitButton" type="Button" parent="RootVBox/ButtonsVBox" unique_id=1100000008]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 56)
+custom_minimum_size = Vector2(420, 84)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 30
 text = "UI_START_QUIT"
 script = ExtResource("99_sfx")
 
 [node name="NewGameConfirmDialog" type="ConfirmationDialog" parent="." unique_id=1100000011]
 unique_name_in_owner = true
 title = "UI_START_NEW_GAME"
-size = Vector2i(400, 150)
+size = Vector2i(600, 225)
 ok_button_text = "UI_START_NEW_GAME_CONFIRM"
 dialog_text = "UI_START_NEW_GAME_CONFIRM_BODY"
 dialog_autowrap = true
@@ -104,7 +104,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 32
+theme_override_constants/separation = 48
 alignment = 1
 
 [node name="SpacerTop" type="Control" parent="SlotPickerPanel/PickerVBox" unique_id=1100000014]
@@ -114,45 +114,42 @@ size_flags_vertical = 3
 [node name="PickerTitle" type="Label" parent="SlotPickerPanel/PickerVBox" unique_id=1100000015]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 36
 text = "UI_START_SELECT_SLOT"
 horizontal_alignment = 1
 
 [node name="SlotsVBox" type="VBoxContainer" parent="SlotPickerPanel/PickerVBox" unique_id=1100000016]
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_constants/separation = 16
+theme_override_constants/separation = 24
 
 [node name="Slot1Button" type="Button" parent="SlotPickerPanel/PickerVBox/SlotsVBox" unique_id=1100000017]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 72)
+custom_minimum_size = Vector2(450, 108)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 16
 script = ExtResource("99_sfx")
 
 [node name="Slot2Button" type="Button" parent="SlotPickerPanel/PickerVBox/SlotsVBox" unique_id=1100000018]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 72)
+custom_minimum_size = Vector2(450, 108)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 16
 script = ExtResource("99_sfx")
 
 [node name="Slot3Button" type="Button" parent="SlotPickerPanel/PickerVBox/SlotsVBox" unique_id=1100000019]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 72)
+custom_minimum_size = Vector2(450, 108)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 16
 script = ExtResource("99_sfx")
 
 [node name="PickerBackButton" type="Button" parent="SlotPickerPanel/PickerVBox" unique_id=1100000020]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 56)
+custom_minimum_size = Vector2(420, 84)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 30
 text = "UI_START_BACK"
 script = ExtResource("99_sfx")
 
@@ -163,7 +160,7 @@ size_flags_vertical = 3
 [node name="OverwriteDialog" type="ConfirmationDialog" parent="." unique_id=1100000022]
 unique_name_in_owner = true
 title = "UI_START_OVERWRITE_SLOT_TITLE"
-size = Vector2i(400, 150)
+size = Vector2i(600, 225)
 ok_button_text = "UI_START_OVERWRITE"
 dialog_text = "UI_START_OVERWRITE_BODY"
 dialog_autowrap = true

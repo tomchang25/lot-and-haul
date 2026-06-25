@@ -116,6 +116,14 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.25, 0.6, 0.3, 1)
 
+[sub_resource type="StyleBoxFlat" id="selling_item_row_selected"]
+bg_color = Color(0.15, 0.2, 0.35, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.5, 0.8, 1)
+
 [sub_resource type="StyleBoxEmpty" id="checkbox_bg"]
 
 [sub_resource type="StyleBoxFlat" id="grid_cell_bg"]
@@ -169,14 +177,6 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.4, 0.4, 0.45, 1)
 
-[sub_resource type="StyleBoxFlat" id="selling_item_row_selected"]
-bg_color = Color(0.15, 0.2, 0.35, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.4, 0.5, 0.8, 1)
-
 [sub_resource type="StyleBoxFlat" id="tooltip_panel"]
 content_margin_left = 8.0
 content_margin_top = 6.0
@@ -194,24 +194,45 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
+[sub_resource type="FontVariation" id="font_tc_medium"]
+base_font = ExtResource("font_tc")
+variation_opentype = {
+2003265652: 400
+}
+
+[sub_resource type="FontVariation" id="font_sc_medium"]
+base_font = ExtResource("font_sc")
+variation_opentype = {
+2003265652: 400
+}
+
 [sub_resource type="FontVariation" id="main_font"]
-fallbacks = Array[Font]([ExtResource("font_sc"), ExtResource("font_tc")])
+fallbacks = Array[Font]([SubResource("font_tc_medium"), SubResource("font_sc_medium")])
 base_font = ExtResource("font_latin")
+variation_opentype = {
+2003072104: 100,
+2003265652: 400
+}
 
 [resource]
 default_font = SubResource("main_font")
-default_font_size = 16
+default_font_size = 24
 Button/colors/font_color = Color(0.88, 0.88, 0.92, 1)
 Button/colors/font_disabled_color = Color(0.45, 0.48, 0.53, 1)
 Button/colors/font_focus_color = Color(0.88, 0.88, 0.92, 1)
 Button/colors/font_hover_color = Color(1, 1, 1, 1)
 Button/colors/font_pressed_color = Color(0.75, 0.75, 0.8, 1)
-Button/font_sizes/font_size = 16
+Button/font_sizes/font_size = 24
 Button/styles/disabled = SubResource("btn_disabled")
 Button/styles/focus = SubResource("btn_focus")
 Button/styles/hover = SubResource("btn_hover")
 Button/styles/normal = SubResource("btn_normal")
 Button/styles/pressed = SubResource("btn_pressed")
+CargoItemCard/styles/default = SubResource("cargo_item_row_default")
+CargoItemCard/styles/holding = SubResource("cargo_item_row_holding")
+CargoItemCard/styles/hovered = SubResource("cargo_item_row_hovered")
+CargoItemCard/styles/loaded = SubResource("cargo_item_row_loaded")
+CargoItemCard/styles/selected = SubResource("selling_item_row_selected")
 CargoItemRow/styles/default = SubResource("cargo_item_row_default")
 CargoItemRow/styles/holding = SubResource("cargo_item_row_holding")
 CargoItemRow/styles/hovered = SubResource("cargo_item_row_hovered")
@@ -222,7 +243,7 @@ CheckBox/colors/font_focus_color = Color(0.88, 0.88, 0.92, 1)
 CheckBox/colors/font_hover_color = Color(1, 1, 1, 1)
 CheckBox/colors/font_pressed_color = Color(0.88, 0.88, 0.92, 1)
 CheckBox/constants/h_separation = 8
-CheckBox/font_sizes/font_size = 16
+CheckBox/font_sizes/font_size = 24
 CheckBox/icons/checked = ExtResource("cb_checked")
 CheckBox/icons/checked_disabled = ExtResource("cb_checked_dis")
 CheckBox/icons/unchecked = ExtResource("cb_unchecked")
@@ -240,13 +261,13 @@ HBoxContainer/constants/separation = 8
 HSeparator/constants/separation = 8
 HSeparator/styles/separator = SubResource("separator_line")
 Label/colors/font_color = Color(0.88, 0.88, 0.92, 1)
-Label/font_sizes/font_size = 16
+Label/font_sizes/font_size = 24
 PackingGrid/styles/grid_cell = SubResource("grid_cell_bg")
 PackingGrid/styles/grid_preview_invalid = SubResource("grid_preview_invalid")
 PackingGrid/styles/grid_preview_valid = SubResource("grid_preview_valid")
 PanelContainer/styles/panel = SubResource("panel_bg")
 RichTextLabel/colors/default_color = Color(0.88, 0.88, 0.92, 1)
-RichTextLabel/font_sizes/normal_font_size = 16
+RichTextLabel/font_sizes/normal_font_size = 24
 RunSummary/styles/panel = SubResource("run_summary_panel")
 SellingItemRow/styles/default = SubResource("cargo_item_row_default")
 SellingItemRow/styles/holding = SubResource("cargo_item_row_holding")
@@ -254,7 +275,7 @@ SellingItemRow/styles/hovered = SubResource("cargo_item_row_hovered")
 SellingItemRow/styles/loaded = SubResource("cargo_item_row_loaded")
 SellingItemRow/styles/selected = SubResource("selling_item_row_selected")
 TooltipLabel/colors/font_color = Color(0.8, 0.8, 0.85, 1)
-TooltipLabel/font_sizes/font_size = 14
+TooltipLabel/font_sizes/font_size = 21
 TooltipPanel/styles/panel = SubResource("tooltip_panel")
 VBoxContainer/constants/separation = 8
 VSeparator/constants/separation = 8

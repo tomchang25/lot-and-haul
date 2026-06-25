@@ -3,8 +3,7 @@
 [ext_resource type="Script" uid="uid://o4vv1ugewcl1" path="res://game/shared/item_display/item_list_panel/item_list_panel.gd" id="1_ilp"]
 
 [node name="ItemListPanel" type="PanelContainer" unique_id=-1294967295]
-offset_right = 960.0
-offset_bottom = 400.0
+custom_minimum_size = Vector2(100, 0)
 script = ExtResource("1_ilp")
 
 [node name="PanelVBox" type="VBoxContainer" parent="." unique_id=-1294967294]
@@ -12,7 +11,7 @@ layout_mode = 2
 theme_override_constants/separation = 0
 
 [node name="ColumnHeader" type="HBoxContainer" parent="PanelVBox" unique_id=-1294967293]
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 theme_override_constants/separation = 0
 
@@ -20,7 +19,7 @@ theme_override_constants/separation = 0
 layout_mode = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="PanelVBox" unique_id=-1294967291]
-custom_minimum_size = Vector2(0, 360)
+custom_minimum_size = Vector2(0, 540)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3

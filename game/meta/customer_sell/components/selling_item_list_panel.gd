@@ -1,5 +1,5 @@
 # selling_item_list_panel.gd
-# Scrollable 3-column card grid for the sell screen — owns card instances and selection signals.
+# Scrollable 2-column card grid for the sell screen — owns card instances and selection signals.
 # Reads:  ItemEntry, SellMath
 # Writes: nothing
 class_name SellingItemListPanel
@@ -12,7 +12,7 @@ signal tooltip_dismissed
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-const GRID_COLUMNS := 3
+const GRID_COLUMNS := 2
 const SellingItemCardScene: PackedScene = preload("res://game/meta/customer_sell/components/selling_item_card.tscn")
 
 # ── State ─────────────────────────────────────────────────────────────────────

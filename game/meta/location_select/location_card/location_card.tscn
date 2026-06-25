@@ -4,65 +4,64 @@
 [ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="LocationCard" type="PanelContainer" unique_id=3000000001]
-custom_minimum_size = Vector2(260, 240)
+custom_minimum_size = Vector2(390, 360)
 script = ExtResource("1_loccard")
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=3000000002]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
 [node name="NameLabel" type="Label" parent="VBox" unique_id=3000000003]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 30
 text = "UI_EM_DASH"
 horizontal_alignment = 1
 
 [node name="DescriptionLabel" type="Label" parent="VBox" unique_id=3000000004]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 20
 text = "UI_EM_DASH"
 horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="StatsGrid" type="VBoxContainer" parent="VBox" unique_id=3000000005]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
 [node name="EntryFeeLabel" type="Label" parent="VBox/StatsGrid" unique_id=3000000006]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_ENTRY_FEE_LABEL"
 horizontal_alignment = 1
 
 [node name="TravelDaysLabel" type="Label" parent="VBox/StatsGrid" unique_id=3000000007]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_TRAVEL_LABEL"
 horizontal_alignment = 1
 
 [node name="LotNumberLabel" type="Label" parent="VBox/StatsGrid" unique_id=3000000008]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_LOTS_LABEL"
 horizontal_alignment = 1
 
 [node name="FuelCostLabel" type="Label" parent="VBox/StatsGrid" unique_id=3000000011]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_FUEL_LABEL"
 horizontal_alignment = 1
 
 [node name="TotalCostLabel" type="Label" parent="VBox/StatsGrid" unique_id=3000000010]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_EST_COST_LABEL"
 horizontal_alignment = 1
 
 [node name="SelectButton" type="Button" parent="VBox" unique_id=3000000009]
 script = ExtResource("99_sfx")
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 16
 text = "UI_SELECT"

@@ -39,9 +39,9 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
 [node name="HeaderHBox" type="HBoxContainer" parent="RootHBox/LeftVBox" unique_id=533670350]
-custom_minimum_size = Vector2(0, 56)
+custom_minimum_size = Vector2(0, 84)
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 18
 
 [node name="HeaderMargin" type="MarginContainer" parent="RootHBox/LeftVBox/HeaderHBox" unique_id=1378930986]
 layout_mode = 2
@@ -54,11 +54,11 @@ theme_override_constants/margin_bottom = 8
 [node name="HeaderInner" type="HBoxContainer" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin" unique_id=263663152]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 18
 
 [node name="TitleLabel" type="Label" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=1905116386]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 33
 text = "UI_STORAGE_TITLE"
 
 [node name="TableMargin" type="MarginContainer" parent="RootHBox/LeftVBox" unique_id=1721913328]
@@ -72,17 +72,18 @@ theme_override_constants/margin_bottom = 0
 [node name="TableVBox" type="VBoxContainer" parent="RootHBox/LeftVBox/TableMargin" unique_id=1930142775]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
 [node name="ItemBrowser" parent="RootHBox/LeftVBox/TableMargin/TableVBox" unique_id=545428334 instance=ExtResource("2_browser")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 1
+theme_override_constants/separation = 6
 
 [node name="FooterHBox" type="HBoxContainer" parent="RootHBox/LeftVBox" unique_id=1095072794]
-custom_minimum_size = Vector2(0, 48)
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 18
 
 [node name="FooterMargin" type="MarginContainer" parent="RootHBox/LeftVBox/FooterHBox" unique_id=1933606126]
 layout_mode = 2
@@ -95,14 +96,14 @@ theme_override_constants/margin_bottom = 8
 [node name="FooterInner" type="HBoxContainer" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin" unique_id=1782915038]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 18
 
 [node name="FooterStatusLabel" type="Label" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=131226191]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 5
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 17
 text = "UI_ZERO_ITEMS"
 
 [node name="FooterSpacer" type="Control" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=2106467926]
@@ -111,9 +112,9 @@ size_flags_horizontal = 3
 
 [node name="BackButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=716854204]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 36)
+custom_minimum_size = Vector2(150, 54)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_LEAVE_WORKSHOP"
 script = ExtResource("99_sfx")
 
@@ -121,61 +122,28 @@ script = ExtResource("99_sfx")
 layout_mode = 2
 
 [node name="Sidebar" type="PanelContainer" parent="RootHBox" unique_id=327524083]
-custom_minimum_size = Vector2(320, 0)
+custom_minimum_size = Vector2(480, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 
 [node name="SidebarMargin" type="MarginContainer" parent="RootHBox/Sidebar" unique_id=564006288]
 layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 16
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
 
 [node name="SidebarVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin" unique_id=1178519185]
 layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="TaskSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=854617958]
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="TaskHeaderHBox" type="HBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection" unique_id=755474436]
-layout_mode = 2
-
-[node name="TaskTitleLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection/TaskHeaderHBox" unique_id=1570956364]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 11
-text = "UI_ACTIVE_TASKS"
-
-[node name="TaskSpacer" type="Control" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection/TaskHeaderHBox" unique_id=1122867691]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="TaskReadyLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection/TaskHeaderHBox" unique_id=954491056]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.55, 0.58, 0.63, 1)
-theme_override_font_sizes/font_size = 11
-text = "UI_TASK_COUNT"
-
-[node name="TaskContainer" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/TaskSection" unique_id=707284430]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="SidebarHSep" type="HSeparator" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=941842661]
-layout_mode = 2
+theme_override_constants/separation = 18
 
 [node name="DetailSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=322654196]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 10
+theme_override_constants/separation = 15
 
-[node name="DetailPanel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" instance=ExtResource("4_detail")]
+[node name="DetailPanel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=1118338801 instance=ExtResource("4_detail")]
 unique_name_in_owner = true
 layout_mode = 2
 
@@ -184,7 +152,7 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.58, 0.63, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 17
 
 [node name="DetailSpacer" type="Control" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=302787258]
 layout_mode = 2
@@ -194,32 +162,32 @@ size_flags_vertical = 3
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 24
 text = "UI_AP_LABEL"
 horizontal_alignment = 1
 
 [node name="ActionGrid" type="GridContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=420510029]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 6
-theme_override_constants/v_separation = 6
+theme_override_constants/h_separation = 9
+theme_override_constants/v_separation = 9
 columns = 2
 
 [node name="RepairButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=807638114]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 20
 text = "UI_REPAIR"
 script = ExtResource("99_sfx")
 
 [node name="RestoreButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1111111111]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 20
 text = "UI_RESTORE"
 script = ExtResource("99_sfx")
 
@@ -227,7 +195,7 @@ script = ExtResource("99_sfx")
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 20
 text = "UI_RESEARCH"
 script = ExtResource("99_sfx")
 
@@ -235,7 +203,7 @@ script = ExtResource("99_sfx")
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 18
 text = "UI_CLICK_TO_VIEW"
 horizontal_alignment = 1
 vertical_alignment = 1

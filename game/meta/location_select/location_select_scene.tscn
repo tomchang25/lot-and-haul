@@ -30,19 +30,19 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 24
+theme_override_constants/separation = 36
 alignment = 1
 
 [node name="TitleLabel" type="Label" parent="RootVBox" unique_id=-294967292]
-custom_minimum_size = Vector2(0, 64)
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 48
 text = "UI_LOCATION_SELECT_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="CardsScroll" type="ScrollContainer" parent="RootVBox" unique_id=1689089688]
-custom_minimum_size = Vector2(720, 0)
+custom_minimum_size = Vector2(1080, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 vertical_scroll_mode = 0
@@ -50,15 +50,15 @@ vertical_scroll_mode = 0
 [node name="CardsContainer" type="HBoxContainer" parent="RootVBox/CardsScroll" unique_id=-294967291]
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_constants/separation = 16
+theme_override_constants/separation = 24
 alignment = 1
 
 [node name="BackButton" type="Button" parent="RootVBox" unique_id=-294967290]
 script = ExtResource("99_sfx")
-custom_minimum_size = Vector2(160, 44)
+custom_minimum_size = Vector2(240, 66)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 24
 text = "UI_BACK"
 
 [node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]

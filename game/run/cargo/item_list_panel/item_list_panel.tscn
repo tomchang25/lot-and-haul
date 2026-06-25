@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://c3fjyi37rlj7"]
+
+[ext_resource type="Script" path="res://game/run/cargo/item_list_panel/item_list_panel.gd" id="1_ilp"]
+
+[node name="ItemListPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(450, 0)
+layout_mode = 2
+script = ExtResource("1_ilp")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="ListEmptyLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+modulate = Color(0.6, 0.6, 0.6, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "UI_NO_MATCHING_ITEMS"
+vertical_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+vertical_scroll_mode = 2
+
+[node name="ItemGrid" type="GridContainer" parent="VBox/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 2

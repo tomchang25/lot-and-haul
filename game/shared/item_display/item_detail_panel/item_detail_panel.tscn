@@ -7,27 +7,27 @@
 script = ExtResource("1_panel")
 
 [node name="InnerVBox" type="VBoxContainer" parent="."]
-theme_override_constants/separation = 10
+theme_override_constants/separation = 15
 layout_mode = 2
 
 [node name="NameHBox" type="HBoxContainer" parent="InnerVBox"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
 [node name="NameLabel" type="Label" parent="InnerVBox/NameHBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 16
+autowrap_mode = 2
 text = "UI_NO_ITEM_SELECTED"
 
 [node name="AuthTagLabel" type="Label" parent="InnerVBox/NameHBox"]
 unique_name_in_owner = true
 visible = false
 modulate = Color(0.6, 0.9, 0.4, 1)
-custom_minimum_size = Vector2(64, 0)
+custom_minimum_size = Vector2(96, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 18
 text = "● AUTH"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -36,18 +36,18 @@ vertical_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 15
 text = ""
 
 [node name="RarityLabel" type="Label" parent="InnerVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 18
 text = ""
 
 [node name="StatsHBox" type="HBoxContainer" parent="InnerVBox"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
 [node name="ConditionPanel" type="PanelContainer" parent="InnerVBox/StatsHBox"]
 unique_name_in_owner = true
@@ -56,25 +56,25 @@ size_flags_horizontal = 3
 
 [node name="CondMargin" type="MarginContainer" parent="InnerVBox/StatsHBox/ConditionPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
 
 [node name="CondVBox" type="VBoxContainer" parent="InnerVBox/StatsHBox/ConditionPanel/CondMargin"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
 [node name="CondTitleLabel" type="Label" parent="InnerVBox/StatsHBox/ConditionPanel/CondMargin/CondVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 9
+theme_override_font_sizes/font_size = 16
 text = "UI_CONDITION"
 
 [node name="CondValueLabel" type="Label" parent="InnerVBox/StatsHBox/ConditionPanel/CondMargin/CondVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+text = ""
 
 [node name="ValuePanel" type="PanelContainer" parent="InnerVBox/StatsHBox"]
 unique_name_in_owner = true
@@ -83,32 +83,31 @@ size_flags_horizontal = 3
 
 [node name="ValueMargin" type="MarginContainer" parent="InnerVBox/StatsHBox/ValuePanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
 
 [node name="ValueVBox" type="VBoxContainer" parent="InnerVBox/StatsHBox/ValuePanel/ValueMargin"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
 [node name="ValueTitleLabel" type="Label" parent="InnerVBox/StatsHBox/ValuePanel/ValueMargin/ValueVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 9
+theme_override_font_sizes/font_size = 16
 text = "UI_EST_VALUE"
 
 [node name="ValueValueLabel" type="Label" parent="InnerVBox/StatsHBox/ValuePanel/ValueMargin/ValueVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
 
 [node name="ConvergenceSection" type="VBoxContainer" parent="InnerVBox"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
 [node name="ConvSeparator" type="HSeparator" parent="InnerVBox/ConvergenceSection"]
 layout_mode = 2
@@ -116,19 +115,18 @@ layout_mode = 2
 [node name="ConvTitleLabel" type="Label" parent="InnerVBox/ConvergenceSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 9
+theme_override_font_sizes/font_size = 16
 text = "UI_PRICE_CONVERGENCE"
 
 [node name="ConvRatioLabel" type="Label" parent="InnerVBox/ConvergenceSection"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
 
 [node name="VerifiedLabel" type="Label" parent="InnerVBox"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 18
 text = ""
 
 [node name="BreakdownPanel" parent="InnerVBox" instance=ExtResource("2_breakdown")]

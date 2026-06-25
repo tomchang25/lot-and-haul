@@ -6,14 +6,14 @@
 [ext_resource type="PackedScene" uid="uid://diapov6wnnjqy" path="res://game/meta/customer_sell/components/grid_area_panel.tscn" id="5_gap"]
 
 [node name="CustomerCarPanel" type="PanelContainer" unique_id=630524090]
-custom_minimum_size = Vector2(420, 380)
+custom_minimum_size = Vector2(630, 570)
 script = ExtResource("1_ccp")
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=874977156]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 9
 
 [node name="CustomerHeaderRow" type="HBoxContainer" parent="VBox" unique_id=673283089]
 layout_mode = 2
@@ -22,31 +22,31 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 30
 text = "UI_CUSTOMER_NAME"
 
 [node name="CapacityLabel" type="Label" parent="VBox/CustomerHeaderRow" unique_id=1168133706]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_CAPACITY_LABEL"
 
 [node name="DemandTagsRow" type="VBoxContainer" parent="VBox" unique_id=1685664174]
 layout_mode = 2
-theme_override_constants/separation = 3
+theme_override_constants/separation = 5
 
 [node name="WantsLabel" type="Label" parent="VBox/DemandTagsRow" unique_id=1685664175]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_WANTS_LABEL"
 
 [node name="TagsFlow" type="HFlowContainer" parent="VBox/DemandTagsRow" unique_id=1685664176]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 4
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 6
 
 [node name="CarSummaryRow" type="HBoxContainer" parent="VBox" unique_id=1058049413]
 layout_mode = 2
@@ -55,13 +55,13 @@ theme_override_constants/separation = 12
 [node name="CarTotalLabel" type="Label" parent="VBox/CarSummaryRow" unique_id=1234983308]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 27
 text = "UI_CAR_TOTAL_LABEL"
 
 [node name="VerifiedCountLabel" type="Label" parent="VBox/CarSummaryRow" unique_id=2001962363]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_VERIFIED_LABEL"
 
 [node name="GridAreaPanel" parent="VBox" unique_id=659388511 instance=ExtResource("5_gap")]
@@ -76,11 +76,11 @@ theme_override_constants/separation = 8
 
 [node name="ClearButton" type="Button" parent="VBox/ClearButtonRow" unique_id=1786246516]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(96, 40)
+custom_minimum_size = Vector2(144, 60)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 23
 text = "UI_CLEAR_CAR"
 script = ExtResource("3_sfx")
 

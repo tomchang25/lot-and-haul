@@ -29,13 +29,13 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 24
+theme_override_constants/separation = 36
 alignment = 1
 
 [node name="TitleLabel" type="Label" parent="RootVBox"]
-custom_minimum_size = Vector2(0, 48)
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 42
 text = "UI_VEHICLE_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -43,23 +43,23 @@ vertical_alignment = 1
 [node name="ButtonsVBox" type="VBoxContainer" parent="RootVBox"]
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_constants/separation = 12
+theme_override_constants/separation = 18
 alignment = 1
 
 [node name="GarageButton" type="Button" parent="RootVBox/ButtonsVBox"]
 script = ExtResource("99_sfx")
-custom_minimum_size = Vector2(240, 52)
+custom_minimum_size = Vector2(360, 78)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 27
 text = "UI_GARAGE"
 
 [node name="CarShopButton" type="Button" parent="RootVBox/ButtonsVBox"]
 script = ExtResource("99_sfx")
-custom_minimum_size = Vector2(240, 52)
+custom_minimum_size = Vector2(360, 78)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 27
 text = "UI_CAR_SHOP"
 
 [node name="Footer" type="HBoxContainer" parent="RootVBox"]
@@ -68,9 +68,9 @@ alignment = 1
 
 [node name="BackButton" type="Button" parent="RootVBox/Footer"]
 script = ExtResource("99_sfx")
-custom_minimum_size = Vector2(200, 44)
+custom_minimum_size = Vector2(300, 66)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 27
 text = "UI_BACK"
 
 [node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]

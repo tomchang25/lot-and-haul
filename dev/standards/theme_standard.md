@@ -12,24 +12,24 @@ The project uses a single centralized theme at `global/theme/main_theme.tres`, s
 - Disabled text: `Color(0.45, 0.48, 0.53, 1)` — muted slate
 - Tooltip text: `Color(0.8, 0.8, 0.85, 1)` — slightly dimmer than primary
 
-**Font sizes** — default 16. Scenes that need other sizes use `theme_override_font_sizes/font_size` on the specific node.
+**Font sizes** — default 24 (scaled from 16 for 1920x1080). Scenes that need other sizes use `theme_override_font_sizes/font_size` on the specific node.
 
 **Typography scale** (reference, not enforced by type variations yet):
 
 | Token      | Size | Usage                    |
 | ---------- | ---- | ------------------------ |
-| display    | 48   | Banner titles            |
-| title      | 32   | Page titles              |
-| heading_1  | 28   | Major section headers    |
-| heading_2  | 22   | Sub-section headers      |
-| heading_3  | 20   | Minor section headers    |
-| body_large | 18   | Primary body text        |
-| body       | 16   | Default / secondary body |
-| detail     | 14   | Card content, tooltips   |
-| caption    | 13   | Small labels             |
-| small      | 12   | Tooltip detail           |
-| tiny       | 11   | Tiny labels              |
-| micro      | 9    | Micro text, debug        |
+| display    | 72   | Banner titles            |
+| title      | 48   | Page titles              |
+| heading_1  | 42   | Major section headers    |
+| heading_2  | 33   | Sub-section headers      |
+| heading_3  | 30   | Minor section headers    |
+| body_large | 27   | Primary body text        |
+| body       | 24   | Default / secondary body |
+| detail     | 21   | Card content, tooltips   |
+| caption    | 20   | Small labels             |
+| small      | 18   | Tooltip detail           |
+| tiny       | 17   | Tiny labels              |
+| micro      | 14   | Micro text, debug        |
 
 **Container separation defaults**:
 

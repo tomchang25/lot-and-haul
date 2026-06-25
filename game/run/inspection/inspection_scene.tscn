@@ -90,9 +90,9 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
 [node name="HeaderHBox" type="HBoxContainer" parent="RootHBox/LeftVBox" unique_id=100000003]
-custom_minimum_size = Vector2(0, 56)
+custom_minimum_size = Vector2(0, 84)
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 18
 
 [node name="HeaderMargin" type="MarginContainer" parent="RootHBox/LeftVBox/HeaderHBox" unique_id=100000004]
 layout_mode = 2
@@ -105,11 +105,11 @@ theme_override_constants/margin_bottom = 8
 [node name="HeaderInner" type="HBoxContainer" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin" unique_id=100000005]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 18
 
 [node name="TitleLabel" type="Label" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=100000006]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 33
 text = "UI_INSPECTION_TITLE"
 
 [node name="HeaderSpacer" type="Control" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=100000007]
@@ -135,9 +135,9 @@ layout_mode = 2
 
 [node name="FooterHBox" type="HBoxContainer" parent="RootHBox/LeftVBox" unique_id=100000010]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 48)
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
 [node name="FooterMargin" type="MarginContainer" parent="RootHBox/LeftVBox/FooterHBox" unique_id=100000011]
 layout_mode = 2
@@ -150,7 +150,7 @@ theme_override_constants/margin_bottom = 8
 [node name="FooterInner" type="HBoxContainer" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin" unique_id=100000012]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
 [node name="FooterSpacer" type="Control" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=100000013]
 layout_mode = 2
@@ -158,14 +158,14 @@ size_flags_horizontal = 3
 
 [node name="PassButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=1473063044]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 0)
+custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 text = "UI_PASS"
 script = ExtResource("99_sfx")
 
 [node name="ReviewButton" type="Button" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=1061694818]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 0)
+custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 1, 0.7, 1)
 theme_override_colors/font_pressed_color = Color(0.5, 0.85, 0.5, 1)
@@ -181,21 +181,21 @@ script = ExtResource("99_sfx")
 layout_mode = 2
 
 [node name="Sidebar" type="PanelContainer" parent="RootHBox" unique_id=100000021]
-custom_minimum_size = Vector2(400, 0)
+custom_minimum_size = Vector2(600, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 
 [node name="SidebarMargin" type="MarginContainer" parent="RootHBox/Sidebar" unique_id=100000022]
 layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 16
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
 
 [node name="SidebarVBox" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin" unique_id=100000023]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 18
 
 [node name="EmptySelectionLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000030]
 unique_name_in_owner = true
@@ -203,7 +203,7 @@ visible = false
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 18
 text = "UI_SELECT_TO_INSPECT"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -211,7 +211,7 @@ vertical_alignment = 1
 [node name="HoverSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000041]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 15
 
 [node name="DetailPanel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=2012698738 instance=ExtResource("6_detail")]
 unique_name_in_owner = true
@@ -220,12 +220,12 @@ layout_mode = 2
 [node name="ClueResultSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection" unique_id=100000080]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
 [node name="ClueResultHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ClueResultSection" unique_id=192364118]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 17
 text = "UI_CLUE_RESULTS"
 
 [node name="ClueResultLabel" type="RichTextLabel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ClueResultSection" unique_id=1564928163]
@@ -241,7 +241,7 @@ mouse_filter = 2
 
 [node name="ActionSection" type="VBoxContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox" unique_id=100000100]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
 [node name="ActionSep" type="HSeparator" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ActionSection" unique_id=100000101]
 layout_mode = 2
@@ -249,7 +249,7 @@ layout_mode = 2
 [node name="ActionHeader" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ActionSection" unique_id=100000102]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.58, 0.63, 1)
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 15
 text = "UI_ACTIONS_HEADER"
 
 [node name="UnveilButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ActionSection" unique_id=100000103]
@@ -271,7 +271,7 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 18
 text = "UI_NO_INSPECTION_AVAILABLE"
 
 [node name="SummaryPopup" parent="." unique_id=1462834888 instance=ExtResource("4_summary")]
@@ -282,7 +282,7 @@ visible = false
 unique_name_in_owner = true
 title = "UI_PASS_LOT_TITLE"
 initial_position = 2
-size = Vector2i(360, 120)
+size = Vector2i(540, 180)
 dialog_text = "UI_PASS_LOT_CONFIRM"
 
 [node name="SettingsButtonOverlay" parent="." unique_id=1558973680 instance=ExtResource("5_sbo")]

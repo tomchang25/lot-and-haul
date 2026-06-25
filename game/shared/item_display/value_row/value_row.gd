@@ -43,7 +43,7 @@ static func from_anchor(anchor_data: AnchorData) -> ValueRow:
     var label_text := TranslationServer.translate(anchor_data.known_text_key)
     var value_text := "$%d" % int(anchor_data.base_value)
     var value_color := ClueColors.ANCHOR_REVEALED_COLOR
-    row.setup(label_text, value_text, value_color, 12, 4, anchor_data)
+    row.setup(label_text, value_text, value_color, 16, 4, anchor_data)
     return row
 
 
@@ -62,7 +62,7 @@ static func from_clue(clue: ClueData) -> ValueRow:
         "override":
             value_text = "$%d" % int(clue.effect_amount)
     var value_color := ClueColors.for_effect_op(clue.effect_op, clue.effect_amount)
-    row.setup(label_text, value_text, value_color, 12, 4, null, clue)
+    row.setup(label_text, value_text, value_color, 16, 4, null, clue)
     return row
 
 # ══ Common API ════════════════════════════════════════════════════════════════

@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://b6etydkqsokit"]
+[gd_scene format=3]
 
-[ext_resource type="Script" uid="uid://bty2qr31etrrg" path="res://game/meta/customer_sell/components/selling_item_card.gd" id="1_sic"]
+[ext_resource type="Script" path="res://game/run/cargo/cargo_item_card.gd" id="1_cic"]
 [ext_resource type="PackedScene" uid="uid://c8m4k2g6pruyh" path="res://game/shared/item_display/item_sprite_overlay/item_sprite_overlay.tscn" id="2_overlay"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xbtl0"]
@@ -19,13 +19,13 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[node name="SellingItemCard" type="PanelContainer" unique_id=351955918]
+[node name="CargoItemCard" type="PanelContainer"]
 custom_minimum_size = Vector2(0, 192)
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_xbtl0")
-script = ExtResource("1_sic")
+script = ExtResource("1_cic")
 
-[node name="Margin" type="MarginContainer" parent="." unique_id=1090635750]
+[node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/margin_left = 6
@@ -33,7 +33,7 @@ theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
-[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=850025220]
+[node name="VBox" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -47,13 +47,13 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 mouse_filter = 2
 
-[node name="InfoBar" type="HBoxContainer" parent="Margin/VBox" unique_id=218551179]
+[node name="InfoBar" type="HBoxContainer" parent="Margin/VBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 theme_override_constants/separation = 2
 
-[node name="NameLabel" type="Label" parent="Margin/VBox/InfoBar" unique_id=46639189]
+[node name="NameLabel" type="Label" parent="Margin/VBox/InfoBar"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
@@ -63,26 +63,7 @@ text = "-"
 vertical_alignment = 1
 text_overrun_behavior = 2
 
-[node name="VerifiedLabel" type="Label" parent="Margin/VBox/InfoBar" unique_id=1883703541]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 30)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 1, 0.5, 1)
-theme_override_font_sizes/font_size = 15
-text = "UI_OK"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="FitLabel" type="Label" parent="Margin/VBox/InfoBar" unique_id=461864196]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(42, 30)
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "-"
-vertical_alignment = 1
-
-[node name="ValueLabel" type="Label" parent="Margin/VBox/InfoBar" unique_id=343657161]
+[node name="ValueLabel" type="Label" parent="Margin/VBox/InfoBar"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 2

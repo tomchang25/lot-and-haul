@@ -101,7 +101,7 @@ corner_radius_bottom_left = 4
 [node name="InspectionSummaryPopup" type="Window" unique_id=1044505717]
 transparent_bg = true
 oversampling_override = 1.0
-size = Vector2i(820, 711)
+size = Vector2i(1230, 1066)
 wrap_controls = true
 exclusive = true
 unresizable = true
@@ -119,16 +119,16 @@ theme_override_styles/panel = SubResource("popup_panel")
 
 [node name="PopupMargin" type="MarginContainer" parent="PopupPanel" unique_id=3751261]
 layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 30
 
 [node name="VBox" type="VBoxContainer" parent="PopupPanel/PopupMargin" unique_id=934692]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 18
 
 [node name="HeaderRow" type="HBoxContainer" parent="PopupPanel/PopupMargin/VBox" unique_id=2048606961]
 layout_mode = 2
@@ -137,7 +137,7 @@ size_flags_horizontal = 3
 [node name="TitleLabel" type="Label" parent="PopupPanel/PopupMargin/VBox/HeaderRow" unique_id=1950461531]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.92, 0.95, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 30
 text = "UI_LOT_REVIEW"
 
 [node name="HeaderSpacer" type="Control" parent="PopupPanel/PopupMargin/VBox/HeaderRow" unique_id=213199609]
@@ -146,12 +146,12 @@ size_flags_horizontal = 3
 
 [node name="CloseButton" type="Button" parent="PopupPanel/PopupMargin/VBox/HeaderRow" unique_id=1763492784]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(32, 32)
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.7, 0.7, 1)
 theme_override_colors/font_hover_color = Color(1, 0.85, 0.85, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("close_btn_normal")
 theme_override_styles/pressed = SubResource("close_btn_pressed")
 theme_override_styles/hover = SubResource("close_btn_hover")
@@ -164,7 +164,7 @@ layout_mode = 2
 [node name="SummaryStatsRow" type="HBoxContainer" parent="PopupPanel/PopupMargin/VBox" unique_id=1609225081]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 16
+theme_override_constants/separation = 24
 
 [node name="EstimateCard" type="PanelContainer" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow" unique_id=-2006842560]
 layout_mode = 2
@@ -178,13 +178,13 @@ theme_override_constants/separation = 2
 [node name="EstimateTitle" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/EstimateCard/EstimateContent" unique_id=1374061872]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 15
 text = "UI_TOTAL_ESTIMATE"
 
 [node name="TotalEstimateLabel" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/EstimateCard/EstimateContent" unique_id=1128001547]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 24
 
 [node name="BidCard" type="PanelContainer" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow" unique_id=-1491165802]
 layout_mode = 2
@@ -198,13 +198,13 @@ theme_override_constants/separation = 2
 [node name="BidTitle" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/BidCard/BidContent" unique_id=-418800059]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 15
 text = "UI_OPENING_BID"
 
 [node name="OpeningBidLabel" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/BidCard/BidContent" unique_id=1165743760]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 24
 
 [node name="StatsSep" type="HSeparator" parent="PopupPanel/PopupMargin/VBox" unique_id=-1319849220]
 layout_mode = 2
@@ -226,13 +226,13 @@ size_flags_horizontal = 3
 
 [node name="BackButton" type="Button" parent="PopupPanel/PopupMargin/VBox/FooterActions" unique_id=236353152]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(130, 0)
+custom_minimum_size = Vector2(195, 0)
 layout_mode = 2
 text = "UI_BACK"
 
 [node name="StartAuctionButton" type="Button" parent="PopupPanel/PopupMargin/VBox/FooterActions" unique_id=1395598753]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 0)
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 1, 0.7, 1)
 theme_override_colors/font_pressed_color = Color(0.5, 0.85, 0.5, 1)

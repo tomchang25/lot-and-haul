@@ -4,41 +4,40 @@
 [ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="2_sfx"]
 
 [node name="DealPanel" type="PanelContainer" unique_id=1195814800]
-custom_minimum_size = Vector2(360, 210)
+custom_minimum_size = Vector2(540, 315)
 script = ExtResource("1_dp")
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=1946661013]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 9
 
 [node name="TitleLabel" type="Label" parent="VBox" unique_id=1624744891]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
 text = "UI_SELL_STRATEGY"
 vertical_alignment = 1
 
 [node name="BodyRow" type="HBoxContainer" parent="VBox" unique_id=2114897575]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
 [node name="ButtonColumn" type="VBoxContainer" parent="VBox/BodyRow" unique_id=971759670]
-custom_minimum_size = Vector2(124, 0)
+custom_minimum_size = Vector2(186, 0)
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 9
 
 [node name="ConservativeButton" type="Button" parent="VBox/BodyRow/ButtonColumn" unique_id=563200389]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 23
 text = "UI_CONSERVATIVE"
 script = ExtResource("2_sfx")
 
 [node name="AggressiveButton" type="Button" parent="VBox/BodyRow/ButtonColumn" unique_id=1708635709]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 23
 text = "UI_AGGRESSIVE"
 script = ExtResource("2_sfx")
 
@@ -47,25 +46,25 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
 [node name="DiceTitleLabel" type="Label" parent="VBox/BodyRow/DiceSection" unique_id=349120602]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_DICE_ROLL_RESULTS"
 
 [node name="PoolSizeLabel" type="Label" parent="VBox/BodyRow/DiceSection" unique_id=1687404000]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 18
 text = "UI_ROLLING_DICE"
 
 [node name="DiceHint" type="Label" parent="VBox/BodyRow/DiceSection" unique_id=569091747]
 unique_name_in_owner = true
 modulate = Color(0.7, 0.7, 0.7, 1)
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 18
 text = "UI_SELECT_DICE"
 
 [node name="DiceRow" type="HFlowContainer" parent="VBox/BodyRow/DiceSection" unique_id=1594438907]
@@ -74,51 +73,51 @@ layout_mode = 2
 
 [node name="DiceTotalsRow" type="HBoxContainer" parent="VBox/BodyRow/DiceSection" unique_id=2021515765]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
 [node name="DiceSumLabel" type="Label" parent="VBox/BodyRow/DiceSection/DiceTotalsRow" unique_id=183929863]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_SUM_LABEL"
 
 [node name="DiceTotalLabel" type="Label" parent="VBox/BodyRow/DiceSection/DiceTotalsRow" unique_id=1941889040]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 21
 text = "UI_TOTAL_LABEL"
 horizontal_alignment = 2
 
 [node name="MultiplierBands" type="HBoxContainer" parent="VBox/BodyRow/DiceSection" unique_id=1687404001]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
 [node name="Band2_4" type="Label" parent="VBox/BodyRow/DiceSection/MultiplierBands" unique_id=1687404002]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 20)
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 17
 text = "UI_BAND_BAD"
 horizontal_alignment = 1
 
 [node name="Band5_9" type="Label" parent="VBox/BodyRow/DiceSection/MultiplierBands" unique_id=1687404003]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 20)
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 17
 text = "UI_BAND_SOLID"
 horizontal_alignment = 1
 
 [node name="Band10_12" type="Label" parent="VBox/BodyRow/DiceSection/MultiplierBands" unique_id=1687404004]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 20)
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 17
 text = "UI_BAND_BIG_WIN"
 horizontal_alignment = 1
 
