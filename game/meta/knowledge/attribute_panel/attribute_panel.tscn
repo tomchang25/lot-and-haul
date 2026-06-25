@@ -33,8 +33,8 @@ theme_override_constants/separation = 16
 [node name="TitleLabel" type="Label" parent="RootVBox"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "UI_ATTRIBUTES"
+	theme_type_variation = "Heading3"
+	text = "UI_ATTRIBUTES"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -55,5 +55,5 @@ alignment = 1
 script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(200, 44)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "UI_BACK"
+	theme_type_variation = "Small"
+	text = "UI_BACK"

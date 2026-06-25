@@ -34,8 +34,8 @@ grow_vertical = 2
 [node name="Title" type="Label" parent="RootVBox" unique_id=200000004]
 custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
-theme_override_font_sizes/font_size = 42
-text = "UI_LOT_BROWSE_TITLE"
+	theme_type_variation = "Heading1"
+	text = "UI_LOT_BROWSE_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -56,8 +56,8 @@ alignment = 1
 
 [node name="CargoReadyLabel" type="Label" parent="RootVBox/CargoPanel" unique_id=200000007]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "UI_ALL_LOTS_REVIEWED"
+	theme_type_variation = "Heading3"
+	text = "UI_ALL_LOTS_REVIEWED"
 horizontal_alignment = 1
 
 [node name="Spacer" type="Control" parent="RootVBox/CargoPanel" unique_id=200000008]
@@ -68,16 +68,15 @@ layout_mode = 2
 script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(300, 72)
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "UI_CARGO_TITLE"
+	theme_type_variation = "Heading3"
+	text = "UI_CARGO_TITLE"
 
 [node name="SkipButton" type="Button" parent="RootVBox" unique_id=200000010]
 script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 size_flags_vertical = 10
-theme_override_font_sizes/font_size = 23
-text = "UI_SKIP_TO_CARGO"
+	text = "UI_SKIP_TO_CARGO"
 
 [node name="SkipConfirmPopup" type="ConfirmationDialog" parent="." unique_id=200000011]
 title = "UI_SKIP_TO_CARGO"

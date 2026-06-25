@@ -5,7 +5,7 @@
 [node name="ColumnHeaderButton" type="Button"]
 focus_mode = 0
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 flat = true
 text = "UI_LABEL_SEPARATOR"
 script = ExtResource("1_script")

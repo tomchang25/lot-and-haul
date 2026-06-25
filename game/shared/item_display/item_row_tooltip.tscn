@@ -28,7 +28,7 @@ theme_override_constants/separation = 6
 [node name="DisplayNameLabel" type="Label" parent="VBox" unique_id=1156801002]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 18
+theme_type_variation = "Small"
 
 [node name="DisplayNameSeparator" type="HSeparator" parent="VBox" unique_id=642666974]
 layout_mode = 2
@@ -36,22 +36,22 @@ layout_mode = 2
 [node name="SuperCategoryLabel" type="Label" parent="VBox" unique_id=1000000010]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 18
+theme_type_variation = "Small"
 
 [node name="CategoryLabel" type="Label" parent="VBox" unique_id=1000000011]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_type_variation = "Caption"
 
 [node name="CategorySeparator" type="HSeparator" parent="VBox" unique_id=1294752904]
 layout_mode = 2
 
 [node name="ConditionLabel" type="Label" parent="VBox" unique_id=1000000005]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_type_variation = "Caption"
 
 [node name="PriceLabel" type="Label" parent="VBox" unique_id=1000000013]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_type_variation = "Caption"
 
 [node name="ClueSeparator" type="HSeparator" parent="VBox" unique_id=1000000020]
 layout_mode = 2
@@ -66,9 +66,9 @@ layout_mode = 2
 [node name="WeightLabel" type="Label" parent="VBox" unique_id=1000000006]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
-theme_override_font_sizes/font_size = 20
+theme_type_variation = "Caption"
 
 [node name="GridLabel" type="Label" parent="VBox" unique_id=1000000007]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
-theme_override_font_sizes/font_size = 20
+theme_type_variation = "Caption"

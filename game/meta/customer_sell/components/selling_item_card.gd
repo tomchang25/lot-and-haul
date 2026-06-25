@@ -26,7 +26,6 @@ var _ext_highlighted: bool = false
 @onready var _name_label: Label = %NameLabel
 @onready var _verified_label: Label = %VerifiedLabel
 @onready var _value_label: Label = %ValueLabel
-@onready var _fit_label: Label = %FitLabel
 @onready var _sprite_overlay: ItemSpriteOverlay = %SpriteOverlay
 
 # ══ Lifecycle ═════════════════════════════════════════════════════════════════
@@ -113,7 +112,7 @@ func _apply() -> void:
     if _entry == null:
         return
 
-    _sprite_overlay.setup(_entry, true)
+    _sprite_overlay.setup(_entry, true, _fit_count)
 
     _name_label.text = ItemEntryDisplayHelper.short_name(_entry)
     _name_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.display_name_color(_entry))
@@ -127,8 +126,6 @@ func _apply() -> void:
 
     _value_label.text = ItemEntryDisplayHelper.estimated_value_text(_entry)
     _value_label.add_theme_color_override(&"font_color", ItemEntryDisplayHelper.price_display_color(_entry))
-
-    _fit_label.text = "F:%d" % _fit_count
 
 
 func _apply_state_style() -> void:

@@ -22,14 +22,14 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 30
-text = "UI_CUSTOMER_NAME"
+	theme_type_variation = "Heading3"
+	text = "UI_CUSTOMER_NAME"
 
 [node name="CapacityLabel" type="Label" parent="VBox/CustomerHeaderRow" unique_id=1168133706]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
-text = "UI_CAPACITY_LABEL"
+	theme_type_variation = "Detail"
+	text = "UI_CAPACITY_LABEL"
 
 [node name="DemandTagsRow" type="VBoxContainer" parent="VBox" unique_id=1685664174]
 layout_mode = 2
@@ -38,8 +38,8 @@ theme_override_constants/separation = 5
 [node name="WantsLabel" type="Label" parent="VBox/DemandTagsRow" unique_id=1685664175]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
-text = "UI_WANTS_LABEL"
+	theme_type_variation = "Detail"
+	text = "UI_WANTS_LABEL"
 
 [node name="TagsFlow" type="HFlowContainer" parent="VBox/DemandTagsRow" unique_id=1685664176]
 unique_name_in_owner = true
@@ -55,14 +55,14 @@ theme_override_constants/separation = 12
 [node name="CarTotalLabel" type="Label" parent="VBox/CarSummaryRow" unique_id=1234983308]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 27
-text = "UI_CAR_TOTAL_LABEL"
+	theme_type_variation = "BodyLarge"
+	text = "UI_CAR_TOTAL_LABEL"
 
 [node name="VerifiedCountLabel" type="Label" parent="VBox/CarSummaryRow" unique_id=2001962363]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
-text = "UI_VERIFIED_LABEL"
+	theme_type_variation = "Detail"
+	text = "UI_VERIFIED_LABEL"
 
 [node name="GridAreaPanel" parent="VBox" unique_id=659388511 instance=ExtResource("5_gap")]
 unique_name_in_owner = true
@@ -80,8 +80,7 @@ custom_minimum_size = Vector2(144, 60)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
-theme_override_font_sizes/font_size = 23
-text = "UI_CLEAR_CAR"
+	text = "UI_CLEAR_CAR"
 script = ExtResource("3_sfx")
 
 [node name="BottomActionRow" type="HBoxContainer" parent="VBox" unique_id=2094169341]

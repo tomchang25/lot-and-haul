@@ -175,7 +175,7 @@ func _build_dice_buttons() -> void:
         button.custom_minimum_size = Vector2(44, 44)
         button.text = str(value)
         button.toggle_mode = true
-        button.add_theme_font_size_override("font_size", 16)
+        button.theme_type_variation = &"Compact"
         button.toggled.connect(func(toggled: bool) -> void: _on_dice_toggled(index, toggled))
         # node-src: ephemeral — per-die toggle, dynamic count
         _dice_row.add_child(button)

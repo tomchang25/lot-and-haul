@@ -37,7 +37,7 @@ size_flags_vertical = 3
 [node name="TitleLabel" type="Label" parent="RootVBox" unique_id=1468648273]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
+theme_type_variation = "Heading2"
 text = "UI_FATAL_ERROR_TITLE"
 horizontal_alignment = 1
 
@@ -48,7 +48,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 3
 theme_override_constants/line_separation = 4
-theme_override_font_sizes/normal_font_size = 14
+theme_type_variation = "Micro"
 bbcode_enabled = true
 autowrap_mode = 2
 
@@ -61,14 +61,14 @@ theme_override_constants/separation = 16
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 48)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_type_variation = "Small"
 text = "UI_QUIT"
 
 [node name="CopyButton" type="Button" parent="RootVBox/ButtonsHBox" unique_id=1274697247]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 48)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_type_variation = "Small"
 text = "UI_COPY_ERRORS"
 
 [node name="SpacerBottom" type="Control" parent="RootVBox" unique_id=702391882]

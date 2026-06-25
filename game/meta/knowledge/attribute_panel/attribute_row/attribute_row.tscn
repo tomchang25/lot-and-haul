@@ -10,8 +10,8 @@ script = ExtResource("1_script")
 [node name="NameLabel" type="Label" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
-text = "UI_LABEL_SEPARATOR"
+	theme_type_variation = "Small"
+	text = "UI_LABEL_SEPARATOR"
 
 [node name="UpgradeButton" type="Button" parent="."]
 script = ExtResource("99_sfx")

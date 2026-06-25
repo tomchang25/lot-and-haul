@@ -13,14 +13,14 @@ theme_override_constants/separation = 12
 
 [node name="NameLabel" type="Label" parent="VBox" unique_id=3000000003]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_type_variation = "Heading3"
 text = "UI_EM_DASH"
 horizontal_alignment = 1
 
 [node name="DescriptionLabel" type="Label" parent="VBox" unique_id=3000000004]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
-theme_override_font_sizes/font_size = 20
+theme_type_variation = "Caption"
 text = "UI_EM_DASH"
 horizontal_alignment = 1
 autowrap_mode = 2
@@ -31,31 +31,31 @@ theme_override_constants/separation = 6
 
 [node name="EntryFeeLabel" type="Label" parent="VBox/StatsGrid" unique_id=3000000006]
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 text = "UI_ENTRY_FEE_LABEL"
 horizontal_alignment = 1
 
 [node name="TravelDaysLabel" type="Label" parent="VBox/StatsGrid" unique_id=3000000007]
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 text = "UI_TRAVEL_LABEL"
 horizontal_alignment = 1
 
 [node name="LotNumberLabel" type="Label" parent="VBox/StatsGrid" unique_id=3000000008]
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 text = "UI_LOTS_LABEL"
 horizontal_alignment = 1
 
 [node name="FuelCostLabel" type="Label" parent="VBox/StatsGrid" unique_id=3000000011]
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 text = "UI_FUEL_LABEL"
 horizontal_alignment = 1
 
 [node name="TotalCostLabel" type="Label" parent="VBox/StatsGrid" unique_id=3000000010]
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 text = "UI_EST_COST_LABEL"
 horizontal_alignment = 1
 

@@ -49,15 +49,15 @@ theme_override_constants/separation = 15
 [node name="TitleLabel" type="Label" parent="ReceiptCenter/ReceiptPanel/VBox" unique_id=1687403905]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "UI_SALE_RESULT"
+	theme_type_variation = "Heading3"
+	text = "UI_SALE_RESULT"
 horizontal_alignment = 1
 
 [node name="ReceiptText" type="Label" parent="ReceiptCenter/ReceiptPanel/VBox" unique_id=1687403906]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 21
+	unique_name_in_owner = true
+	layout_mode = 2
+	size_flags_vertical = 3
+	theme_type_variation = "Detail"
 vertical_alignment = 1
 autowrap_mode = 2
 
@@ -65,9 +65,9 @@ autowrap_mode = 2
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-theme_override_font_sizes/font_size = 42
-theme_override_colors/font_color = Color(1, 0.7, 0, 1)
-text = "UI_SOLD_LABEL"
+	theme_type_variation = "Heading1"
+	theme_override_colors/font_color = Color(1, 0.7, 0, 1)
+	text = "UI_SOLD_LABEL"
 horizontal_alignment = 1
 
 [node name="ButtonRow" type="HBoxContainer" parent="ReceiptCenter/ReceiptPanel/VBox" unique_id=1687403908]
@@ -76,17 +76,17 @@ alignment = 1
 theme_override_constants/separation = 12
 
 [node name="CancelBtn" type="Button" parent="ReceiptCenter/ReceiptPanel/VBox/ButtonRow" unique_id=1687403909]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(150, 54)
-layout_mode = 2
-theme_override_font_sizes/font_size = 21
+	unique_name_in_owner = true
+	custom_minimum_size = Vector2(150, 54)
+	layout_mode = 2
+	theme_type_variation = "Detail"
 text = "UI_CANCEL"
 script = ExtResource("2_sfx")
 
 [node name="ConfirmBtn" type="Button" parent="ReceiptCenter/ReceiptPanel/VBox/ButtonRow" unique_id=1687403910]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(180, 54)
-layout_mode = 2
-theme_override_font_sizes/font_size = 21
+	unique_name_in_owner = true
+	custom_minimum_size = Vector2(180, 54)
+	layout_mode = 2
+	theme_type_variation = "Detail"
 text = "UI_CONFIRM_SALE"
 script = ExtResource("2_sfx")

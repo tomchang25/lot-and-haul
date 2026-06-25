@@ -74,7 +74,7 @@ theme_override_constants/separation = 20
 
 [node name="TitleLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000007]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_type_variation = "Heading3"
 text = "UI_SETTINGS_TITLE"
 horizontal_alignment = 1
 
@@ -83,7 +83,7 @@ layout_mode = 2
 
 [node name="AudioLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000009]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_type_variation = "Caption"
 text = "UI_SETTINGS_AUDIO"
 
 [node name="MasterRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000010]
@@ -178,7 +178,7 @@ layout_mode = 2
 
 [node name="DisplayLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000023]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_type_variation = "Caption"
 text = "UI_SETTINGS_DISPLAY"
 
 [node name="FullscreenRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000024]
@@ -199,7 +199,7 @@ layout_mode = 2
 
 [node name="GameplayLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000028]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_type_variation = "Caption"
 text = "UI_SETTINGS_GAMEPLAY"
 
 [node name="DebugRow" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/ScrollContainer/ScrollContentMargin/RootVBox" unique_id=1200000029]

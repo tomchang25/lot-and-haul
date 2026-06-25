@@ -41,7 +41,7 @@ func _build_content() -> void:
     for perk: PerkData in perks:
         var unlocked: bool = KnowledgeManager.has_perk(perk)
         var perk_label := Label.new()
-        perk_label.add_theme_font_size_override("font_size", 18)
+        perk_label.theme_type_variation = &"Small"
 
         if unlocked:
             perk_label.text = "%s — %s" % [TranslationServer.translate(perk.display_name_key), TranslationServer.translate(perk.description_key)]

@@ -48,16 +48,16 @@ layout_mode = 2
 
 [node name="TitleLabel" type="Label" parent="RootVBox/HeaderPanel/HeaderMargin/HeaderVBox" unique_id=2084473342]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "UI_RUN_REVIEW_TITLE"
+	theme_type_variation = "Heading3"
+	text = "UI_RUN_REVIEW_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LocationLabel" type="Label" parent="RootVBox/HeaderPanel/HeaderMargin/HeaderVBox" unique_id=720753266]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 16
+	theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+	theme_type_variation = "Compact"
 horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="RootVBox" unique_id=340131022]
@@ -90,53 +90,53 @@ theme_override_constants/separation = 4
 
 [node name="SectionSettlementLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=650974380]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "UI_SETTLEMENT"
+	theme_type_variation = "Detail"
+	text = "UI_SETTLEMENT"
 
 [node name="SettlementSpacer" type="Control" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=1243632810]
 custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
 
 [node name="EntryFeeLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=613674848]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
+	unique_name_in_owner = true
+	layout_mode = 2
+	theme_type_variation = "Small"
 
 [node name="FuelCostLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=2050719516]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
+	unique_name_in_owner = true
+	layout_mode = 2
+	theme_type_variation = "Small"
 
 [node name="AuctionPaidLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=557118633]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
+	unique_name_in_owner = true
+	layout_mode = 2
+	theme_type_variation = "Small"
 
 [node name="CostSeparator" type="HSeparator" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=193774293]
 layout_mode = 2
 
 [node name="OnsiteLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=1708104452]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
+	unique_name_in_owner = true
+	layout_mode = 2
+	theme_type_variation = "Small"
 
 [node name="CashFlowLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=441641945]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
+	unique_name_in_owner = true
+	layout_mode = 2
+	theme_type_variation = "Small"
 
 [node name="FinanceSeparator" type="HSeparator" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=637095573]
 layout_mode = 2
 
 [node name="CargoValueLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=1484801736]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
+	unique_name_in_owner = true
+	layout_mode = 2
+	theme_type_variation = "Small"
 
 [node name="EstProfitLabel" type="Label" parent="RootVBox/ScrollContainer/ContentVBox/SettlementCenter/SettlementCard/SettlementMargin/SettlementVBox" unique_id=1514337849]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_type_variation = "Detail"
 horizontal_alignment = 1
 
 [node name="CargoCenter" type="CenterContainer" parent="RootVBox/ScrollContainer/ContentVBox" unique_id=2013180395]
@@ -154,10 +154,10 @@ theme_override_constants/separation = 24
 alignment = 1
 
 [node name="ContinueButton" type="Button" parent="RootVBox/Footer" unique_id=82057792]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 44)
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
+	unique_name_in_owner = true
+	custom_minimum_size = Vector2(160, 44)
+	layout_mode = 2
+	theme_type_variation = "Small"
 text = "UI_CONTINUE"
 script = ExtResource("99_sfx")
 

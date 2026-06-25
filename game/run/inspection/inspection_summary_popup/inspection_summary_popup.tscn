@@ -137,8 +137,8 @@ size_flags_horizontal = 3
 [node name="TitleLabel" type="Label" parent="PopupPanel/PopupMargin/VBox/HeaderRow" unique_id=1950461531]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.92, 0.95, 1)
-theme_override_font_sizes/font_size = 30
-text = "UI_LOT_REVIEW"
+	theme_type_variation = "Heading3"
+	text = "UI_LOT_REVIEW"
 
 [node name="HeaderSpacer" type="Control" parent="PopupPanel/PopupMargin/VBox/HeaderRow" unique_id=213199609]
 layout_mode = 2
@@ -151,8 +151,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
 theme_override_colors/font_pressed_color = Color(1, 0.7, 0.7, 1)
 theme_override_colors/font_hover_color = Color(1, 0.85, 0.85, 1)
-theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = SubResource("close_btn_normal")
+	theme_override_styles/normal = SubResource("close_btn_normal")
 theme_override_styles/pressed = SubResource("close_btn_pressed")
 theme_override_styles/hover = SubResource("close_btn_hover")
 theme_override_styles/focus = SubResource("close_btn_normal")
@@ -178,13 +177,12 @@ theme_override_constants/separation = 2
 [node name="EstimateTitle" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/EstimateCard/EstimateContent" unique_id=1374061872]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 15
-text = "UI_TOTAL_ESTIMATE"
+	theme_type_variation = "Micro"
+	text = "UI_TOTAL_ESTIMATE"
 
 [node name="TotalEstimateLabel" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/EstimateCard/EstimateContent" unique_id=1128001547]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
+	unique_name_in_owner = true
+	layout_mode = 2
 
 [node name="BidCard" type="PanelContainer" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow" unique_id=-1491165802]
 layout_mode = 2
@@ -198,13 +196,12 @@ theme_override_constants/separation = 2
 [node name="BidTitle" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/BidCard/BidContent" unique_id=-418800059]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 15
-text = "UI_OPENING_BID"
+	theme_type_variation = "Micro"
+	text = "UI_OPENING_BID"
 
 [node name="OpeningBidLabel" type="Label" parent="PopupPanel/PopupMargin/VBox/SummaryStatsRow/BidCard/BidContent" unique_id=1165743760]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
+	unique_name_in_owner = true
+	layout_mode = 2
 
 [node name="StatsSep" type="HSeparator" parent="PopupPanel/PopupMargin/VBox" unique_id=-1319849220]
 layout_mode = 2

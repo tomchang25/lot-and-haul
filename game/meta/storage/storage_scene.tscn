@@ -58,8 +58,8 @@ theme_override_constants/separation = 18
 
 [node name="TitleLabel" type="Label" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=1905116386]
 layout_mode = 2
-theme_override_font_sizes/font_size = 33
-text = "UI_STORAGE_TITLE"
+	theme_type_variation = "Heading2"
+	text = "UI_STORAGE_TITLE"
 
 [node name="TableMargin" type="MarginContainer" parent="RootHBox/LeftVBox" unique_id=1721913328]
 layout_mode = 2
@@ -103,8 +103,8 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 5
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 17
-text = "UI_ZERO_ITEMS"
+	theme_type_variation = "Tiny"
+	text = "UI_ZERO_ITEMS"
 
 [node name="FooterSpacer" type="Control" parent="RootHBox/LeftVBox/FooterHBox/FooterMargin/FooterInner" unique_id=2106467926]
 layout_mode = 2
@@ -114,8 +114,8 @@ size_flags_horizontal = 3
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 54)
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
-text = "UI_LEAVE_WORKSHOP"
+	theme_type_variation = "Detail"
+	text = "UI_LEAVE_WORKSHOP"
 script = ExtResource("99_sfx")
 
 [node name="SidebarSep" type="VSeparator" parent="RootHBox" unique_id=568005494]
@@ -151,8 +151,8 @@ layout_mode = 2
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(0.55, 0.58, 0.63, 1)
-theme_override_font_sizes/font_size = 17
+	theme_override_colors/font_color = Color(0.55, 0.58, 0.63, 1)
+	theme_type_variation = "Tiny"
 
 [node name="DetailSpacer" type="Control" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=302787258]
 layout_mode = 2
@@ -162,8 +162,7 @@ size_flags_vertical = 3
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
-theme_override_font_sizes/font_size = 24
-text = "UI_AP_LABEL"
+	text = "UI_AP_LABEL"
 horizontal_alignment = 1
 
 [node name="ActionGrid" type="GridContainer" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=420510029]
@@ -178,8 +177,8 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
-text = "UI_REPAIR"
+	theme_type_variation = "Caption"
+	text = "UI_REPAIR"
 script = ExtResource("99_sfx")
 
 [node name="RestoreButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1111111111]
@@ -187,24 +186,24 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
-text = "UI_RESTORE"
+	theme_type_variation = "Caption"
+	text = "UI_RESTORE"
 script = ExtResource("99_sfx")
 
 [node name="ResearchButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection/ActionGrid" unique_id=1962471177]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
-text = "UI_RESEARCH"
+	theme_type_variation = "Caption"
+	text = "UI_RESEARCH"
 script = ExtResource("99_sfx")
 
 [node name="NoSelectionLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/DetailSection" unique_id=567673002]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
-theme_override_font_sizes/font_size = 18
-text = "UI_CLICK_TO_VIEW"
+	theme_type_variation = "Small"
+	text = "UI_CLICK_TO_VIEW"
 horizontal_alignment = 1
 vertical_alignment = 1
 

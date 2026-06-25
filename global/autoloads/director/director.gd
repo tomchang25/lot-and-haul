@@ -772,7 +772,7 @@ func _build_overlay() -> void:
 
     _hint_skip_all = Button.new()
     _hint_skip_all.text = TranslationServer.translate("UI_SKIP_ALL_LABEL")
-    _hint_skip_all.add_theme_font_size_override("font_size", 14)
+    _hint_skip_all.theme_type_variation = &"Micro"
     _hint_skip_all.add_theme_color_override("font_color", SKIP_ALL_ACCENT)
     _hint_skip_all.pressed.connect(_on_hint_skip_all_pressed)
     hint_skip_hbox.add_child(_hint_skip_all)
@@ -784,7 +784,7 @@ func _build_overlay() -> void:
     _hint_label = Label.new()
     _hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     _hint_label.add_theme_color_override("font_color", TEXT_COLOR)
-    _hint_label.add_theme_font_size_override("font_size", 15)
+    _hint_label.theme_type_variation = &"Micro"
     _hint_label.custom_minimum_size = Vector2(260, 0)
     hint_vbox.add_child(_hint_label)
 
@@ -828,7 +828,7 @@ func _build_overlay() -> void:
 
     _popup_skip_all = Button.new()
     _popup_skip_all.text = TranslationServer.translate("UI_SKIP_ALL_LABEL")
-    _popup_skip_all.add_theme_font_size_override("font_size", 14)
+    _popup_skip_all.theme_type_variation = &"Micro"
     _popup_skip_all.add_theme_color_override("font_color", SKIP_ALL_ACCENT)
     _popup_skip_all.pressed.connect(_on_popup_skip_all_pressed)
     popup_skip_hbox.add_child(_popup_skip_all)
@@ -846,7 +846,7 @@ func _build_overlay() -> void:
     _popup_label = Label.new()
     _popup_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     _popup_label.add_theme_color_override("font_color", TEXT_COLOR)
-    _popup_label.add_theme_font_size_override("font_size", 16)
+    _popup_label.theme_type_variation = &"Compact"
     popup_vbox.add_child(_popup_label)
 
     var popup_btn_hbox := HBoxContainer.new()
@@ -907,7 +907,7 @@ func _build_overlay() -> void:
     _confirm_label = Label.new()
     _confirm_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     _confirm_label.add_theme_color_override("font_color", TEXT_COLOR)
-    _confirm_label.add_theme_font_size_override("font_size", 16)
+    _confirm_label.theme_type_variation = &"Compact"
     _confirm_label.custom_minimum_size = Vector2(300, 0)
     confirm_vbox.add_child(_confirm_label)
 

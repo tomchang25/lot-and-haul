@@ -260,7 +260,7 @@ func _build_lot_summary() -> void:
 
     var total_label := Label.new()
     total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    total_label.add_theme_font_size_override(&"font_size", 16)
+    total_label.theme_type_variation = &"Compact"
     total_label.add_theme_color_override(&"font_color", Color(0.92, 0.72, 0.18))
     total_label.text = lot.get_player_estimate_label()
 
@@ -456,7 +456,7 @@ func _init_debug_overlay() -> void:
         true_value += int(entry.full_true_value())
 
     _debug_label = Label.new()
-    _debug_label.add_theme_font_size_override(&"font_size", 13)
+    _debug_label.theme_type_variation = &"Micro"
     _debug_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
     _debug_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
     _debug_label.offset_bottom = -8.0

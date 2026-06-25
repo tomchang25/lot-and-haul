@@ -50,7 +50,7 @@ theme_override_constants/separation = 6
 [node name="NameLabel" type="Label" parent="Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 
 [node name="TypeRow" type="HBoxContainer" parent="Margin/VBox"]
 layout_mode = 2
@@ -59,12 +59,12 @@ theme_override_constants/separation = 12
 [node name="TypeLabel" type="Label" parent="Margin/VBox/TypeRow"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 17
+theme_type_variation = "Tiny"
 
 [node name="AttrLabel" type="Label" parent="Margin/VBox/TypeRow"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 17
+theme_type_variation = "Tiny"
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 
 [node name="EffectSep" type="HSeparator" parent="Margin/VBox"]
@@ -74,7 +74,7 @@ layout_mode = 2
 [node name="EffectLabel" type="RichTextLabel" parent="Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_type_variation = "Caption"
 bbcode_enabled = true
 fit_content = true
 mouse_filter = 2
@@ -82,6 +82,6 @@ mouse_filter = 2
 [node name="ValuedLabel" type="Label" parent="Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_type_variation = "Small"
 theme_override_colors/font_color = Color(0.92, 0.72, 0.18, 1)
 theme_override_styles/normal = SubResource("sb_valued")

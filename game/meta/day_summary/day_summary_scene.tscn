@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://kkse0j0m2aq7"]
 
 [ext_resource type="Script" uid="uid://herl5nijad6n" path="res://game/meta/day_summary/day_summary_scene.gd" id="1_script"]
-[ext_resource type="Script" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
-[ext_resource type="PackedScene" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="2_sbo"]
+[ext_resource type="PackedScene" uid="uid://dk4vsndd2lfnm" path="res://game/shared/settings_button_overlay/settings_button_overlay.tscn" id="2_sbo"]
+[ext_resource type="Script" uid="uid://dp8pg84tbw8ho" path="res://game/shared/sfx_button/sfx_button.gd" id="99_sfx"]
 
 [node name="DaySummaryScene" type="Control" unique_id=903261577]
 layout_mode = 3
@@ -33,7 +33,7 @@ grow_vertical = 2
 [node name="TitleLabel" type="Label" parent="RootVBox" unique_id=642979580]
 custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
-theme_override_font_sizes/font_size = 42
+theme_type_variation = &"Heading2"
 text = "UI_DAY_SUMMARY_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -59,7 +59,7 @@ theme_override_constants/separation = 12
 
 [node name="DayHeader" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox" unique_id=67752933]
 layout_mode = 2
-theme_override_font_sizes/font_size = 42
+theme_type_variation = &"Heading2"
 horizontal_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox" unique_id=1172223426]
@@ -76,19 +76,15 @@ text = "UI_TRIP"
 
 [node name="OnsiteLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup" unique_id=1725687769]
 layout_mode = 2
-theme_override_font_sizes/font_size = 27
 
 [node name="EntryFeeLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup" unique_id=2046138955]
 layout_mode = 2
-theme_override_font_sizes/font_size = 27
 
 [node name="FuelLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup" unique_id=219261607]
 layout_mode = 2
-theme_override_font_sizes/font_size = 27
 
 [node name="PaidLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/TripGroup" unique_id=1595062035]
 layout_mode = 2
-theme_override_font_sizes/font_size = 27
 
 [node name="CustomerSalesGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox" unique_id=337783078]
 layout_mode = 2
@@ -101,15 +97,13 @@ text = "UI_CUSTOMER_SALES"
 
 [node name="ConservativeLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup" unique_id=262069269]
 layout_mode = 2
-theme_override_font_sizes/font_size = 27
 
 [node name="AggressiveLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup" unique_id=590603259]
 layout_mode = 2
-theme_override_font_sizes/font_size = 27
 
 [node name="CustomerTotalLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CustomerSalesGroup" unique_id=1273511848]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_type_variation = &"BodyLarge"
 
 [node name="DailyGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox" unique_id=524467120]
 layout_mode = 2
@@ -122,7 +116,6 @@ text = "UI_DAILY"
 
 [node name="LivingLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/DailyGroup" unique_id=1394461495]
 layout_mode = 2
-theme_override_font_sizes/font_size = 27
 
 [node name="CargoGroup" type="VBoxContainer" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox" unique_id=869896661]
 layout_mode = 2
@@ -135,19 +128,17 @@ text = "UI_CARGO_TITLE"
 
 [node name="CargoCountLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox/CargoGroup" unique_id=417052490]
 layout_mode = 2
-theme_override_font_sizes/font_size = 27
 
 [node name="NetSeparator" type="HSeparator" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox" unique_id=507471774]
 layout_mode = 2
 
 [node name="NetLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox" unique_id=905163395]
 layout_mode = 2
-theme_override_font_sizes/font_size = 33
+theme_type_variation = &"Heading3"
 horizontal_alignment = 1
 
 [node name="BalanceLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox" unique_id=1516707691]
 layout_mode = 2
-theme_override_font_sizes/font_size = 27
 horizontal_alignment = 1
 
 [node name="BankruptcyLabel" type="Label" parent="RootVBox/PanelCenter/OuterPanel/Margin/ContentVBox" unique_id=227831546]
@@ -157,14 +148,16 @@ theme_override_colors/font_color = Color(0.92, 0.72, 0.18, 1)
 horizontal_alignment = 1
 
 [node name="Footer" type="HBoxContainer" parent="RootVBox" unique_id=2119159713]
-custom_minimum_size = Vector2(0, 120)
+custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
 alignment = 1
 
 [node name="ContinueButton" type="Button" parent="RootVBox/Footer" unique_id=620917211]
-script = ExtResource("99_sfx")
-custom_minimum_size = Vector2(240, 60)
+custom_minimum_size = Vector2(240, 120)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "UI_CONTINUE"
+script = ExtResource("99_sfx")
 
-[node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]
+[node name="SettingsButtonOverlay" parent="." unique_id=161994355 instance=ExtResource("2_sbo")]

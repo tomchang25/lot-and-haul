@@ -33,8 +33,7 @@ offset_top = 12.0
 offset_right = -12.0
 offset_bottom = 12.0
 grow_horizontal = 0
-theme_override_font_sizes/font_size = 24
-text = "UI_BUDGET_LABEL"
+	text = "UI_BUDGET_LABEL"
 horizontal_alignment = 2
 
 [node name="RootVBox" type="VBoxContainer" parent="." unique_id=443503367]
@@ -64,7 +63,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 63
+	theme_type_variation = "Display"
 text = "UI_CURRENCY_LABEL"
 horizontal_alignment = 1
 vertical_alignment = 1

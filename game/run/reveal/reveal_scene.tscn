@@ -34,8 +34,8 @@ grow_vertical = 2
 [node name="TitleLabel" type="Label" parent="RootVBox" unique_id=935298121]
 custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
-theme_override_font_sizes/font_size = 42
-text = "UI_REVEAL_TITLE"
+	theme_type_variation = "Heading1"
+	text = "UI_REVEAL_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -60,16 +60,16 @@ alignment = 1
 [node name="RevealButton" type="Button" parent="RootVBox/Footer" unique_id=1005702364]
 custom_minimum_size = Vector2(240, 66)
 layout_mode = 2
-theme_override_font_sizes/font_size = 27
-text = "UI_REVEAL_NEXT"
+	theme_type_variation = "BodyLarge"
+	text = "UI_REVEAL_NEXT"
 script = ExtResource("99_sfx")
 
 [node name="ContinueButton" type="Button" parent="RootVBox/Footer" unique_id=1969516138]
 visible = false
 custom_minimum_size = Vector2(240, 66)
 layout_mode = 2
-theme_override_font_sizes/font_size = 27
-text = "UI_CONTINUE"
+	theme_type_variation = "BodyLarge"
+	text = "UI_CONTINUE"
 script = ExtResource("99_sfx")
 
 [node name="TooltipPopup" parent="." unique_id=1000000101 instance=ExtResource("3_popup")]

@@ -16,8 +16,8 @@ theme_override_constants/separation = 6
 unique_name_in_owner = true
 modulate = Color(0.6, 0.6, 0.6, 1)
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "UI_NO_MATCHING_ITEMS"
+	theme_type_variation = "Micro"
+	text = "UI_NO_MATCHING_ITEMS"
 vertical_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="VBox" unique_id=1799165134]

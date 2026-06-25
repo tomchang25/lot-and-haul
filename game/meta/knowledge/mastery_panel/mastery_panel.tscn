@@ -33,8 +33,8 @@ theme_override_constants/separation = 16
 [node name="TitleLabel" type="Label" parent="RootVBox"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "UI_MASTERY"
+	theme_type_variation = "Heading3"
+	text = "UI_MASTERY"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -49,8 +49,8 @@ theme_override_constants/separation = 6
 
 [node name="HeadingLabel" type="Label" parent="RootVBox/ScrollContainer/Content"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "UI_MASTERY_RANK_LABEL"
+	theme_type_variation = "Detail"
+	text = "UI_MASTERY_RANK_LABEL"
 
 [node name="HeadingSep" type="HSeparator" parent="RootVBox/ScrollContainer/Content"]
 layout_mode = 2
@@ -70,5 +70,5 @@ alignment = 1
 script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(200, 44)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "UI_BACK"
+	theme_type_variation = "Small"
+	text = "UI_BACK"

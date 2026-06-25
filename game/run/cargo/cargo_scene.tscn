@@ -43,7 +43,7 @@ layout_mode = 2
 [node name="TitleLabel" type="Label" parent="RootVBox/HeaderRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 39
+	theme_type_variation = "Heading1"
 text = "UI_CARGO_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1

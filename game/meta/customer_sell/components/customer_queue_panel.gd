@@ -71,7 +71,7 @@ func _apply() -> void:
 func _add_tab_button(index: int, customer: CustomerEntry) -> void:
     var button := SfxButton.new()
     button.custom_minimum_size = Vector2(140, 36)
-    button.add_theme_font_size_override("font_size", 14)
+    button.theme_type_variation = &"Micro"
     button.text = customer.display_name
     button.toggle_mode = true
     button.pressed.connect(func() -> void: _on_tab_pressed(index))

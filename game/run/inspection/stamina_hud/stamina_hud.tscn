@@ -7,5 +7,5 @@ script = ExtResource("1_stamhud")
 
 [node name="APLabel" type="Label" parent="." unique_id=620709002]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+	theme_type_variation = "Small"
 text = "UI_AP_LABEL"

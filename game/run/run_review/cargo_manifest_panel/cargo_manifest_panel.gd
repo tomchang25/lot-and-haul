@@ -58,7 +58,7 @@ func _rebuild_rows(items: Array) -> void:
         row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         row.custom_minimum_size = Vector2(0, 28)
         for label in row.find_children("*", "Label", true, false):
-            label.add_theme_font_size_override(&"font_size", 14)
+            label.theme_type_variation = &"Micro"
         row.tooltip_requested.connect(_on_row_tooltip_requested)
         row.tooltip_dismissed.connect(_on_row_tooltip_dismissed)
         _row_container.add_child(row)

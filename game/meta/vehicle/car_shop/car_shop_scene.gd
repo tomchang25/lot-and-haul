@@ -55,7 +55,7 @@ func _populate_rows() -> void:
 
     if inventory.is_empty():
         var empty_label := Label.new()
-        empty_label.add_theme_font_size_override("font_size", 16)
+        empty_label.theme_type_variation = &"Compact"
         empty_label.text = TranslationServer.translate("UI_NO_CARS_AVAILABLE")
         empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 

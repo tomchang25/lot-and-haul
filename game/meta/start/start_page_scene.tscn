@@ -33,7 +33,7 @@ alignment = 1
 
 [node name="TitleLabel" type="Label" parent="RootVBox" unique_id=1100000004]
 layout_mode = 2
-theme_override_font_sizes/font_size = 72
+theme_type_variation = "Display"
 text = "UI_START_TITLE"
 horizontal_alignment = 1
 
@@ -48,7 +48,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(420, 84)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 30
+theme_type_variation = "Heading3"
 text = "UI_START_NEW_GAME"
 script = ExtResource("99_sfx")
 
@@ -57,7 +57,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(420, 84)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 30
+theme_type_variation = "Heading3"
 text = "UI_START_LOAD_GAME"
 script = ExtResource("99_sfx")
 
@@ -66,7 +66,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(420, 84)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 30
+theme_type_variation = "Heading3"
 text = "UI_START_SETTINGS"
 script = ExtResource("99_sfx")
 
@@ -75,7 +75,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(420, 84)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 30
+theme_type_variation = "Heading3"
 text = "UI_START_QUIT"
 script = ExtResource("99_sfx")
 
@@ -114,7 +114,7 @@ size_flags_vertical = 3
 [node name="PickerTitle" type="Label" parent="SlotPickerPanel/PickerVBox" unique_id=1100000015]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
+theme_type_variation = "Heading2"
 text = "UI_START_SELECT_SLOT"
 horizontal_alignment = 1
 
@@ -149,7 +149,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(420, 84)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 30
+theme_type_variation = "Heading3"
 text = "UI_START_BACK"
 script = ExtResource("99_sfx")
 

@@ -35,8 +35,8 @@ alignment = 1
 [node name="TitleLabel" type="Label" parent="RootVBox"]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-theme_override_font_sizes/font_size = 42
-text = "UI_KNOWLEDGE_TITLE"
+	theme_type_variation = "Heading1"
+	text = "UI_KNOWLEDGE_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -51,24 +51,24 @@ script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(360, 78)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 27
-text = "UI_MASTERY"
+	theme_type_variation = "BodyLarge"
+	text = "UI_MASTERY"
 
 [node name="AttributesButton" type="Button" parent="RootVBox/ButtonsVBox"]
 script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(360, 78)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 27
-text = "UI_ATTRIBUTES"
+	theme_type_variation = "BodyLarge"
+	text = "UI_ATTRIBUTES"
 
 [node name="PerksButton" type="Button" parent="RootVBox/ButtonsVBox"]
 script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(360, 78)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 27
-text = "UI_PERKS"
+	theme_type_variation = "BodyLarge"
+	text = "UI_PERKS"
 
 [node name="Footer" type="HBoxContainer" parent="RootVBox"]
 layout_mode = 2
@@ -78,7 +78,7 @@ alignment = 1
 script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(300, 66)
 layout_mode = 2
-theme_override_font_sizes/font_size = 27
-text = "UI_BACK"
+	theme_type_variation = "BodyLarge"
+	text = "UI_BACK"
 
 [node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]

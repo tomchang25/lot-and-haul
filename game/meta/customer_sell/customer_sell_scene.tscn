@@ -53,16 +53,16 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 54)
 layout_mode = 2
 size_flags_vertical = 4
-theme_override_font_sizes/font_size = 21
-text = "UI_BACK_TO_HUB"
+	theme_type_variation = "Detail"
+	text = "UI_BACK_TO_HUB"
 script = ExtResource("99_sfx")
 
 [node name="TitleLabel" type="Label" parent="RootVBox/HeaderRow" unique_id=1218286169]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 42
-text = "UI_CUSTOMER_SELL_TITLE"
+	theme_type_variation = "Heading1"
+	text = "UI_CUSTOMER_SELL_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -123,8 +123,8 @@ alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 36
-text = "UI_NO_CUSTOMERS_TONIGHT"
+	theme_type_variation = "Heading2"
+	text = "UI_NO_CUSTOMERS_TONIGHT"
 horizontal_alignment = 1
 vertical_alignment = 1
 

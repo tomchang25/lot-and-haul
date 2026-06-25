@@ -9,20 +9,20 @@ script = ExtResource("1_lotcard")
 
 [node name="IndexLabel" type="Label" parent="." unique_id=100000002]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "UI_LOT_NUMBER"
+	theme_type_variation = "Detail"
+	text = "UI_LOT_NUMBER"
 horizontal_alignment = 1
 
 [node name="ItemCountLabel" type="Label" parent="." unique_id=100000003]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "? items"
+	theme_type_variation = "Compact"
+	text = "? items"
 horizontal_alignment = 1
 
 [node name="RarityLabel" type="Label" parent="." unique_id=100000004]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "UI_RARITY_LABEL"
+	theme_type_variation = "Compact"
+	text = "UI_RARITY_LABEL"
 horizontal_alignment = 1
 
 [node name="SuperCategoryHBox" type="HBoxContainer" parent="." unique_id=3664657240]
@@ -39,8 +39,8 @@ stretch_mode = 3
 
 [node name="SuperCategoryLabel" type="Label" parent="SuperCategoryHBox" unique_id=366465724]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "UI_CATEGORIES_LABEL"
+	theme_type_variation = "Compact"
+	text = "UI_CATEGORIES_LABEL"
 
 [node name="CategoryHBox" type="HBoxContainer" parent="." unique_id=1000000050]
 layout_mode = 2
@@ -56,8 +56,8 @@ stretch_mode = 3
 
 [node name="CategoryLabel" type="Label" parent="CategoryHBox" unique_id=100000005]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "UI_EXTRA_CATEGORY_LABEL"
+	theme_type_variation = "Compact"
+	text = "UI_EXTRA_CATEGORY_LABEL"
 
 [node name="Spacer" type="Control" parent="." unique_id=100000006]
 custom_minimum_size = Vector2(0, 20)
@@ -71,12 +71,12 @@ alignment = 1
 script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "UI_PASS"
+	theme_type_variation = "Small"
+	text = "UI_PASS"
 
 [node name="EnterButton" type="Button" parent="ButtonBar" unique_id=100000008]
 script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "UI_ENTER"
+	theme_type_variation = "Small"
+	text = "UI_ENTER"

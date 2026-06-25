@@ -37,7 +37,7 @@ theme_override_constants/separation = 9
 
 [node name="SortLabel" type="Label" parent="SortHBox" unique_id=100000010]
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 text = "UI_SORT_LABEL"
 vertical_alignment = 1
 
@@ -45,13 +45,13 @@ vertical_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 
 [node name="SortDirButton" type="Button" parent="SortHBox" unique_id=100000012]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(42, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 toggle_mode = true
 text = "▲"
 flat = true

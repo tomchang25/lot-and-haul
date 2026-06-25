@@ -37,7 +37,7 @@ theme_override_constants/separation = 12
 [node name="TitleLabel" type="Label" parent="CenterContainer/VBox"]
 layout_mode = 2
 text = "Testbeds"
-theme_override_font_sizes/font_size = 28
+theme_type_variation = "Heading3"
 horizontal_alignment = 1
 
 [node name="Spacer" type="Control" parent="CenterContainer/VBox"]

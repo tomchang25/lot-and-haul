@@ -36,7 +36,7 @@ alignment = 1
 [node name="TitleLabel" type="Label" parent="RootVBox" unique_id=-294967292]
 custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
+theme_type_variation = "Title"
 text = "UI_LOCATION_SELECT_TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -58,7 +58,6 @@ script = ExtResource("99_sfx")
 custom_minimum_size = Vector2(240, 66)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 24
 text = "UI_BACK"
 
 [node name="SettingsButtonOverlay" parent="." instance=ExtResource("2_sbo")]

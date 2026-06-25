@@ -133,7 +133,7 @@ func _push_toast(message: String, color: Color, duration: float, channel: String
     var label := Label.new()
     label.text = message
     label.add_theme_color_override("font_color", color)
-    label.add_theme_font_size_override("font_size", 14)
+    label.theme_type_variation = &"Micro"
     label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
     label.custom_minimum_size = Vector2(376.0, 0.0)
 

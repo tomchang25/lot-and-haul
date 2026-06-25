@@ -12,9 +12,9 @@ The project uses a single centralized theme at `global/theme/main_theme.tres`, s
 - Disabled text: `Color(0.45, 0.48, 0.53, 1)` — muted slate
 - Tooltip text: `Color(0.8, 0.8, 0.85, 1)` — slightly dimmer than primary
 
-**Font sizes** — default 24 (scaled from 16 for 1920x1080). Scenes that need other sizes use `theme_override_font_sizes/font_size` on the specific node.
+**Font sizes** — default 24 (scaled from 16 for 1920x1080). Named type variations defined in `main_theme.tres` cover all common sizes. Set `theme_type_variation = "TokenName"` on any node; override only when the size is truly dynamic (runtime parameter).
 
-**Typography scale** (reference, not enforced by type variations yet):
+**Typography scale** (enforced as theme type variations in `main_theme.tres`):
 
 | Token      | Size | Usage                    |
 | ---------- | ---- | ------------------------ |
@@ -29,6 +29,7 @@ The project uses a single centralized theme at `global/theme/main_theme.tres`, s
 | caption    | 20   | Small labels             |
 | small      | 18   | Tooltip detail           |
 | tiny       | 17   | Tiny labels              |
+| compact    | 16   | Compact card labels      |
 | micro      | 14   | Micro text, debug        |
 
 **Container separation defaults**:
@@ -75,7 +76,7 @@ These colors appear repeatedly in code for gameplay state. Use them for dynamic 
 
 3. **Prefer theme inheritance over per-node overrides.** Before adding `theme_override_*` to a node in a `.tscn` file, check whether the theme default already provides the value you want. If the value is close but not exact, consider whether the difference matters or whether the scene should just use the theme default.
 
-4. **Type variations for component-level variants (future).** When a control needs a named variant (e.g. "HeaderLabel" = Label with font_size 28), define a type variation in the theme rather than overriding every instance. This is not yet implemented — for now, per-node overrides are acceptable until we build out variations.
+4. **Type variations for component-level variants.** When a control needs a named variant (e.g. "HeaderLabel" = Label with font_size 30), define a `theme_type_variation` in the `.tscn` file that matches an entry in `main_theme.tres`. This is preferred over per-node `theme_override_font_sizes/font_size`. Dynamic runtime sizes (parameterized components, ephemeral tooltip nodes) may still use `add_theme_font_size_override()` in GDScript.
 
 5. **Never hardcode `Color()` literals for static UI in GDScript.** Theme resources may define the actual color values for theme-owned styles. If GDScript needs a repeated dynamic semantic color, add it to the semantic palette table above and use the named constant. If it is truly a one-off static node color, add a `theme_override_colors/` in the `.tscn` file, not an inline `Color()` in GDScript.
 

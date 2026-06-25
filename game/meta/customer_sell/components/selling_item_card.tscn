@@ -58,10 +58,10 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 17
-text = "-"
-vertical_alignment = 1
-text_overrun_behavior = 2
+	theme_type_variation = "Tiny"
+	text = "-"
+	vertical_alignment = 1
+	text_overrun_behavior = 2
 
 [node name="VerifiedLabel" type="Label" parent="Margin/VBox/InfoBar" unique_id=1883703541]
 unique_name_in_owner = true
@@ -69,17 +69,9 @@ visible = false
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 1, 0.5, 1)
-theme_override_font_sizes/font_size = 15
-text = "UI_OK"
+	theme_type_variation = "Micro"
+	text = "UI_OK"
 horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="FitLabel" type="Label" parent="Margin/VBox/InfoBar" unique_id=461864196]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(42, 30)
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "-"
 vertical_alignment = 1
 
 [node name="ValueLabel" type="Label" parent="Margin/VBox/InfoBar" unique_id=343657161]
@@ -87,7 +79,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 15
-text = "-"
-horizontal_alignment = 2
+	theme_type_variation = "Micro"
+	text = "-"
+	horizontal_alignment = 2
 vertical_alignment = 1

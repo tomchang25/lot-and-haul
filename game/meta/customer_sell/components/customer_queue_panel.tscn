@@ -14,8 +14,8 @@ size_flags_horizontal = 3
 [node name="TitleLabel" type="Label" parent="HBox"]
 custom_minimum_size = Vector2(120, 36)
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "UI_CUSTOMERS_LABEL"
+	theme_type_variation = "Compact"
+	text = "UI_CUSTOMERS_LABEL"
 vertical_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="HBox"]
@@ -31,6 +31,6 @@ theme_override_constants/separation = 6
 
 [node name="QueuePlaceholderLabel" type="Label" parent="HBox/ScrollContainer/TabsRow"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "UI_NO_CUSTOMERS"
+	theme_type_variation = "Micro"
+	text = "UI_NO_CUSTOMERS"
 vertical_alignment = 1

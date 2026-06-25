@@ -109,7 +109,7 @@ theme_override_constants/separation = 18
 
 [node name="TitleLabel" type="Label" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=100000006]
 layout_mode = 2
-theme_override_font_sizes/font_size = 33
+	theme_type_variation = "Heading2"
 text = "UI_INSPECTION_TITLE"
 
 [node name="HeaderSpacer" type="Control" parent="RootHBox/LeftVBox/HeaderHBox/HeaderMargin/HeaderInner" unique_id=100000007]
@@ -203,8 +203,8 @@ visible = false
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
-theme_override_font_sizes/font_size = 18
-text = "UI_SELECT_TO_INSPECT"
+	theme_type_variation = "Small"
+	text = "UI_SELECT_TO_INSPECT"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -225,7 +225,7 @@ theme_override_constants/separation = 6
 [node name="ClueResultHeaderLabel" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ClueResultSection" unique_id=192364118]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.48, 0.53, 1)
-theme_override_font_sizes/font_size = 17
+	theme_type_variation = "Tiny"
 text = "UI_CLUE_RESULTS"
 
 [node name="ClueResultLabel" type="RichTextLabel" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/HoverSection/ClueResultSection" unique_id=1564928163]
@@ -249,8 +249,8 @@ layout_mode = 2
 [node name="ActionHeader" type="Label" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ActionSection" unique_id=100000102]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.58, 0.63, 1)
-theme_override_font_sizes/font_size = 15
-text = "UI_ACTIONS_HEADER"
+	theme_type_variation = "Micro"
+	text = "UI_ACTIONS_HEADER"
 
 [node name="UnveilButton" type="Button" parent="RootHBox/Sidebar/SidebarMargin/SidebarVBox/ActionSection" unique_id=100000103]
 unique_name_in_owner = true
@@ -271,8 +271,8 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.42, 0.46, 1)
-theme_override_font_sizes/font_size = 18
-text = "UI_NO_INSPECTION_AVAILABLE"
+	theme_type_variation = "Small"
+	text = "UI_NO_INSPECTION_AVAILABLE"
 
 [node name="SummaryPopup" parent="." unique_id=1462834888 instance=ExtResource("4_summary")]
 unique_name_in_owner = true

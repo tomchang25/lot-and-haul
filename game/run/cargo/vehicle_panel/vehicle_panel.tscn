@@ -19,7 +19,7 @@ theme_override_constants/separation = 8
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.3, 0.3, 1)
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 horizontal_alignment = 1
 
 [node name="CargoSection" type="VBoxContainer" parent="VBox" unique_id=2046711124]
@@ -36,7 +36,7 @@ theme_override_constants/separation = 12
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 18
+theme_type_variation = "Small"
 text = "UI_TRAILER"
 vertical_alignment = 1
 
@@ -49,7 +49,7 @@ theme_override_constants/separation = 5
 [node name="CargoSectionLabel" type="Label" parent="VBox/CargoSection" unique_id=2066638222]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 18
+theme_type_variation = "Small"
 text = "UI_CAR_CARGO"
 horizontal_alignment = 1
 
@@ -72,7 +72,6 @@ theme_override_constants/separation = 12
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 60)
 layout_mode = 2
-theme_override_font_sizes/font_size = 23
 text = "UI_RESET"
 script = ExtResource("4_sfx")
 
@@ -81,7 +80,7 @@ unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(150, 40)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_type_variation = "Small"
 text = "Auto-Pack"
 
 [node name="DebugStuffBtn" type="Button" parent="VBox/ClearButtonRow" unique_id=99990002]
@@ -89,7 +88,7 @@ unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(150, 40)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_type_variation = "Small"
 text = "Stuff All"
 
 [node name="Spacer" type="Control" parent="VBox/ClearButtonRow" unique_id=1799155522]
@@ -101,6 +100,5 @@ mouse_filter = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(240, 60)
 layout_mode = 2
-theme_override_font_sizes/font_size = 23
 text = "UI_CONTINUE"
 script = ExtResource("4_sfx")

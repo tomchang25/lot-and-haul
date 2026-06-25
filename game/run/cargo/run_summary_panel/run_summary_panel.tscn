@@ -19,14 +19,14 @@ theme_override_constants/separation = 8
 [node name="LoadedCountLabel" type="Label" parent="SummaryVBox/LoadedLine"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 text = "-"
 
 [node name="LoadedValueLabel" type="Label" parent="SummaryVBox/LoadedLine"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 text = "-"
 horizontal_alignment = 2
 
@@ -37,14 +37,14 @@ theme_override_constants/separation = 12
 [node name="UnloadedCountLabel" type="Label" parent="SummaryVBox/UnloadedLine"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 text = "-"
 
 [node name="UnloadedSellLabel" type="Label" parent="SummaryVBox/UnloadedLine"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 text = "-"
 horizontal_alignment = 2
 
@@ -55,13 +55,13 @@ theme_override_constants/separation = 12
 [node name="WeightDescLabel" type="Label" parent="SummaryVBox/WeightLine"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 
 [node name="WeightLabel" type="Label" parent="SummaryVBox/WeightLine"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 text = "-"
 horizontal_alignment = 2
 
@@ -72,13 +72,13 @@ theme_override_constants/separation = 12
 [node name="SlotsDescLabel" type="Label" parent="SummaryVBox/SlotsLine"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 
 [node name="SlotsLabel" type="Label" parent="SummaryVBox/SlotsLine"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 text = "-"
 horizontal_alignment = 2
 
@@ -91,10 +91,10 @@ theme_override_constants/separation = 12
 [node name="TrailerRiskLabel" type="Label" parent="SummaryVBox/TrailerLine"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 
 [node name="TrailerRiskValue" type="Label" parent="SummaryVBox/TrailerLine"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
+theme_type_variation = "Detail"
 text = "-"
