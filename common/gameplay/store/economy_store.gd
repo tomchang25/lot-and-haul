@@ -1,5 +1,5 @@
 # economy_store.gd
-# Economy runtime store: cash. Serializable state slice held by MetaManager.
+# Economy runtime store: cash. Serializable state slice held by MetaSystem.
 # Owns the field, its save payload, and all operations that mutate it.
 #
 # Fields are read-public via getters. Mutation goes through the owning Manager only.

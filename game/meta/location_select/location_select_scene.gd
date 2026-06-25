@@ -46,9 +46,9 @@ func _populate_cards() -> void:
         locations = [tutorial_loc]
     else:
         # Normal path: roll and sample available locations.
-        if MetaManager.progress.available_locations.is_empty():
-            MetaManager.roll_available_locations()
-        locations = MetaManager.progress.available_locations
+        if MetaSystem.progress.available_locations.is_empty():
+            MetaSystem.roll_available_locations()
+        locations = MetaSystem.progress.available_locations
 
     for location: LocationData in locations:
         var card: LocationCard = LocationCardScene.instantiate()
@@ -65,9 +65,9 @@ func _on_card_pressed(card: LocationCard) -> void:
     # Create the run store first, then advance the slot + save.
     # This ensures the run snapshot is included in the save so a mid-run quit
     # does not leave the day slot consumed without a restorable run.
-    RunManager.create_run_store(location, MetaManager.garage.active_car)
-    RunManager.set_resume_target(RunStore.RESUME_LOCATION_ENTRY)
-    MetaManager.begin_auction()
+    RunSystem.create_run_store(location, MetaSystem.garage.active_car)
+    RunSystem.set_resume_target(RunStore.RESUME_LOCATION_ENTRY)
+    MetaSystem.begin_auction()
     EventBus.tutorial_event.emit(TutorialEvents.LOCATION_SELECTED, { })
     SceneRouter.go_to_location_entry()
 

@@ -6,7 +6,7 @@ extends RefCounted
 
 class_name StorageFixtures
 
-## Seeds MetaManager.storage with 3 deterministic items so the storage scene's
+## Seeds MetaSystem.storage with 3 deterministic items so the storage scene's
 ## detail rail, repair/restore/research buttons, and tutorial anchors all
 ## resolve. First item is repair-complete (condition = 0.5) so the restore
 ## button is visible.
@@ -37,5 +37,5 @@ static func seed_storage_state() -> void:
     if not entries.is_empty():
         entries[0].condition = 0.5
 
-    MetaManager.register_storage_items(entries)
-    MetaManager.begin_storage_slot()
+    MetaSystem.register_storage_items(entries)
+    MetaSystem.begin_storage_slot()

@@ -1,7 +1,7 @@
 # progress_store.gd
 # Progress runtime store: calendar day, sampled available locations, and
 # tutorial-seen flags.
-# Serializable state slice held by MetaManager. Owns the fields, their save
+# Serializable state slice held by MetaSystem. Owns the fields, their save
 # payload, and the operations that mutate them.
 #
 # Fields are read-public via getters. Mutation goes through the owning Manager only.

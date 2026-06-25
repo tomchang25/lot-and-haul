@@ -1,6 +1,6 @@
 # knowledge_store.gd
 # Knowledge runtime store: category mastery, attribute levels, and unlocked
-# perks. Serializable state slice held by KnowledgeManager. Owns the three
+# perks. Serializable state slice held by KnowledgeSystem. Owns the three
 # persistent fields, their serialization, and no-save mutators.
 class_name KnowledgeStore
 extends StoreBase

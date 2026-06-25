@@ -2,8 +2,8 @@
 # Storage — Displays stored items and lets the player spend AP on Repair,
 # Restore, and Research actions immediately. No slot-assignment UI.
 # V2 layout: shared ItemBrowserPanel (Card/Table modes) + detail rail (right).
-# Reads:  MetaManager.storage.storage_items, MetaManager.slot.storage_ap
-# Writes: MetaManager.repair_item, MetaManager.restore_item, MetaManager.research_item
+# Reads:  MetaSystem.storage.storage_items, MetaSystem.slot.storage_ap
+# Writes: MetaSystem.repair_item, MetaSystem.restore_item, MetaSystem.research_item
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -60,10 +60,10 @@ func _ready() -> void:
     _refresh_detail()
 
     # Auto-select: restore saved session selection, then fall back to first item.
-    var _storage_items := MetaManager.storage.storage_items
+    var _storage_items := MetaSystem.storage.storage_items
     if not _storage_items.is_empty():
         var selected: ItemEntry = _storage_items[0]
-        var saved_id := MetaManager.storage_session.selected_entry_id
+        var saved_id := MetaSystem.storage_session.selected_entry_id
         if saved_id >= 0:
             for e in _storage_items:
                 if e.id == saved_id:
@@ -89,7 +89,7 @@ func _ready() -> void:
 
 
 func _on_back_pressed() -> void:
-    MetaManager.close_storage_session()
+    MetaSystem.close_storage_session()
     SceneRouter.go_to_hub()
 
 
@@ -101,7 +101,7 @@ func _on_repair_pressed() -> void:
     var entry := _item_browser.get_selected()
     if entry == null:
         return
-    if MetaManager.repair_item(entry):
+    if MetaSystem.repair_item(entry):
         AudioManager.play_event(STORAGE_REPAIR_RESTORE)
         _item_browser.refresh_entry(entry)
         _refresh_ap_label()
@@ -113,7 +113,7 @@ func _on_research_pressed() -> void:
     var entry := _item_browser.get_selected()
     if entry == null:
         return
-    if MetaManager.research_item(entry):
+    if MetaSystem.research_item(entry):
         AudioManager.play_event(STORAGE_RESEARCH)
         _item_browser.refresh_entry(entry)
         _refresh_ap_label()
@@ -125,7 +125,7 @@ func _on_restore_pressed() -> void:
     var entry := _item_browser.get_selected()
     if entry == null:
         return
-    if MetaManager.restore_item(entry):
+    if MetaSystem.restore_item(entry):
         AudioManager.play_event(STORAGE_REPAIR_RESTORE)
         _item_browser.refresh_entry(entry)
         _refresh_ap_label()
@@ -136,8 +136,8 @@ func _on_restore_pressed() -> void:
 
 
 func _refresh_ap_label() -> void:
-    var ap: int = MetaManager.slot.storage_ap
-    var max_ap: int = MetaManager.slot.storage_ap_max
+    var ap: int = MetaSystem.slot.storage_ap
+    var max_ap: int = MetaSystem.slot.storage_ap_max
     _ap_label.text = TranslationServer.translate("UI_AP_LABEL") % [ap, max_ap]
     if ap == 0:
         _ap_label.add_theme_color_override("font_color", Color(0.6, 0.4, 0.4))
@@ -150,7 +150,7 @@ func _refresh_ap_label() -> void:
 
 
 func _populate_browser() -> void:
-    var items: Array = MetaManager.storage.storage_items
+    var items: Array = MetaSystem.storage.storage_items
     _item_browser.setup(STORAGE_COLUMNS)
     _item_browser.populate(items)
 
@@ -189,7 +189,7 @@ func _refresh_detail() -> void:
 
 
 func _configure_action_buttons(entry: ItemEntry) -> void:
-    var ap: int = MetaManager.slot.storage_ap
+    var ap: int = MetaSystem.slot.storage_ap
 
     # ── Repair ──────────────────────────────────────────────────────────────
     var repair_done: bool = ResearchSlot.is_repair_complete(entry)

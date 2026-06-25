@@ -10,4 +10,4 @@ class_name CustomerSellFixtures
 ## slot so CustomerSell finds populated nightly_customers and sellable items.
 static func seed_open_shop() -> void:
     StorageFixtures.seed_storage_state()
-    MetaManager.begin_open_shop()
+    MetaSystem.begin_open_shop()

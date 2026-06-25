@@ -1,5 +1,5 @@
-# knowledge_manager.gd
-# Knowledge progression: category mastery, attribute levels, and unlocked perks.
+# knowledge_system.gd
+# System (autoload): knowledge progression: category mastery, attribute levels, and unlocked perks.
 # Delegates persistent state to KnowledgeStore. Registered with SaveManager by GameManager.
 extends Node
 
@@ -40,13 +40,13 @@ func _ready() -> void:
     _load_attribute_registry()
     _knowledge = KnowledgeStore.new()
 
-    # Subscribe to hub-phase business events emitted by MetaManager so mastery
+    # Subscribe to hub-phase business events emitted by MetaSystem so mastery
     # XP accrues without a direct import dependency (cycle-free).
     EventBus.sale_resolved.connect(_on_sale_resolved)
     EventBus.item_repaired.connect(_on_item_repaired)
     EventBus.item_restored.connect(_on_item_restored)
 
-    # Subscribe to reveal-type business events emitted by RunManager/MetaManager
+    # Subscribe to reveal-type business events emitted by RunSystem/MetaSystem
     # so reveal XP accrues without a direct import from ItemEntry.
     EventBus.item_unveiled.connect(_on_item_unveiled)
     EventBus.item_revealed.connect(_on_item_revealed)
@@ -86,29 +86,29 @@ func reset() -> void:
 func validate() -> bool:
     var ok := true
     if perk_count() == 0:
-        ToastManager.show_dev_error("KnowledgeManager: perk registry is empty")
+        ToastManager.show_dev_error("KnowledgeSystem: perk registry is empty")
         ok = false
     if attribute_count() == 0:
-        ToastManager.show_dev_error("KnowledgeManager: attribute registry is empty")
+        ToastManager.show_dev_error("KnowledgeSystem: attribute registry is empty")
         ok = false
     for perk_id: String in _knowledge.unlocked_perks:
         if get_perk_by_id(perk_id) == null:
             ToastManager.show_dev_error(
-                "KnowledgeManager: unlocked_perks '%s' not found" % perk_id,
+                "KnowledgeSystem: unlocked_perks '%s' not found" % perk_id,
             )
             ok = false
     ok = _knowledge.validate() and ok
     return ok
 
 
-## Serializes KnowledgeManager state into a flat dict with the knowledge section key.
+## Serializes KnowledgeSystem state into a flat dict with the knowledge section key.
 func to_dict() -> Dictionary:
     var out: Dictionary = { }
     out[_knowledge.section_id()] = _knowledge.to_dict()
     return out
 
 
-## Restores KnowledgeManager state from the full sections dict.
+## Restores KnowledgeSystem state from the full sections dict.
 ## Threads [param ctx] for diagnostics (warnings and migration notes).
 func from_dict(data: Dictionary, ctx: SaveLoadContext) -> void:
     _knowledge.from_dict(data.get(_knowledge.section_id(), { }), ctx)
@@ -185,7 +185,7 @@ func attribute_upgrade_cost() -> int:
 
 ## Pure domain mutation: raises [param attr] one level in KnowledgeStore.
 ## Does NOT spend cash and does NOT save — the calling transaction
-## (MetaManager.upgrade_attribute) handles both.
+## (MetaSystem.upgrade_attribute) handles both.
 func raise_attribute_level(attr: AttributeData) -> void:
     var current := _knowledge.attribute_levels.get(attr.attribute_id, attr.starting_value)
     _knowledge.set_attribute_level(attr.attribute_id, current + 1)

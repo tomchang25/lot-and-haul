@@ -98,8 +98,8 @@ func skip_all_onboarding() -> void:
         stop_script()
     for unit: TutorialScripts.TutorialUnit in TutorialScripts.units():
         if unit.id.begins_with("onboarding_"):
-            MetaManager.mark_tutorial_seen(unit.id)
-    MetaManager.skip_onboarding()
+            MetaSystem.mark_tutorial_seen(unit.id)
+    MetaSystem.skip_onboarding()
     _refresh_onboarding_overrides()
 
 
@@ -282,7 +282,7 @@ func _end_tutorial() -> void:
 func _mark_seen(script_id: String) -> void:
     if script_id.is_empty():
         return
-    MetaManager.mark_tutorial_seen(script_id)
+    MetaSystem.mark_tutorial_seen(script_id)
 
 
 func _clear_state() -> void:
@@ -322,7 +322,7 @@ func _find_unit(script_id: String) -> TutorialScripts.TutorialUnit:
 ## location, conservative sale lock) and pushes changes to the override store.
 ## Called on every scene registration and on onboarding completion.
 func _refresh_onboarding_overrides() -> void:
-    if not MetaManager.is_onboarding_pending():
+    if not MetaSystem.is_onboarding_pending():
         _clear_onboarding_overrides()
         return
     if SettingsStore.tutorial_skip_all:
@@ -409,7 +409,7 @@ func _decide_tutorial_for_scene(scene_id: String) -> void:
         return
 
     # When onboarding is still pending, do not fall through to legacy offers.
-    if MetaManager.is_onboarding_pending():
+    if MetaSystem.is_onboarding_pending():
         return
     match scene_id:
         "hub":
@@ -422,17 +422,17 @@ func _decide_tutorial_for_scene(scene_id: String) -> void:
 
 func _build_trigger_context() -> Dictionary:
     return {
-        "day": MetaManager.progress.current_day,
-        "slot": MetaManager.slot.current_slot,
-        "onboarding_pending": MetaManager.is_onboarding_pending(),
-        "is_run_active": RunManager.is_run_active(),
+        "day": MetaSystem.progress.current_day,
+        "slot": MetaSystem.slot.current_slot,
+        "onboarding_pending": MetaSystem.is_onboarding_pending(),
+        "is_run_active": RunSystem.is_run_active(),
         "first_tutorial_run": _is_first_tutorial_run_context(),
-        "storage_item_count": MetaManager.storage.storage_items.size(),
+        "storage_item_count": MetaSystem.storage.storage_items.size(),
     }
 
 
 func _is_first_tutorial_run_context() -> bool:
-    return MetaManager.is_onboarding_pending() and MetaManager.progress.current_day == 0
+    return MetaSystem.is_onboarding_pending() and MetaSystem.progress.current_day == 0
 
 
 func _should_consider_unit(unit: TutorialScripts.TutorialUnit) -> bool:
@@ -442,23 +442,23 @@ func _should_consider_unit(unit: TutorialScripts.TutorialUnit) -> bool:
 
 
 func _is_unit_seen(unit_id: String) -> bool:
-    return MetaManager.progress.tutorial_seen.has(unit_id)
+    return MetaSystem.progress.tutorial_seen.has(unit_id)
 
 
 ## Checks whether onboarding should complete. Two paths:
 ## 1. The script that just ended is `onboarding_selling` — always complete.
 ## 2. Every required onboarding milestone is seen — complete.
 func _complete_onboarding_if_all_milestones_seen(script_id: String) -> void:
-    if not MetaManager.is_onboarding_pending():
+    if not MetaSystem.is_onboarding_pending():
         return
     if script_id == "onboarding_selling":
-        MetaManager.complete_onboarding()
+        MetaSystem.complete_onboarding()
         _clear_onboarding_overrides()
         return
     for unit_id: String in TutorialScripts.required_onboarding_unit_ids():
         if not _is_unit_seen(unit_id):
             return
-    MetaManager.complete_onboarding()
+    MetaSystem.complete_onboarding()
     _clear_onboarding_overrides()
 
 
@@ -466,14 +466,14 @@ func _on_hub_registered() -> void:
     if SettingsStore.tutorial_skip_all:
         return
     # Show completion popup once after onboarding is fully finished.
-    if not MetaManager.is_onboarding_pending() and _has_seen_onboarding_segment():
-        if not MetaManager.progress.tutorial_seen.has("onboarding_complete"):
+    if not MetaSystem.is_onboarding_pending() and _has_seen_onboarding_segment():
+        if not MetaSystem.progress.tutorial_seen.has("onboarding_complete"):
             start_script("onboarding_complete")
         return
 
     if _has_seen_onboarding_segment():
         return
-    if MetaManager.progress.tutorial_seen.has("hub"):
+    if MetaSystem.progress.tutorial_seen.has("hub"):
         return
     start_script("hub")
 
@@ -483,10 +483,10 @@ func _on_storage_registered() -> void:
         return
     if _has_seen_onboarding_segment():
         return
-    if MetaManager.progress.tutorial_seen.has("storage"):
+    if MetaSystem.progress.tutorial_seen.has("storage"):
         Director.show_help_button("storage")
         return
-    if MetaManager.storage.storage_items.is_empty():
+    if MetaSystem.storage.storage_items.is_empty():
         return
     Director.show_offer_prompt(
         "storage",
@@ -496,7 +496,7 @@ func _on_storage_registered() -> void:
 
 
 func _has_seen_onboarding_segment() -> bool:
-    for script_id: String in MetaManager.progress.tutorial_seen.keys():
+    for script_id: String in MetaSystem.progress.tutorial_seen.keys():
         if script_id.begins_with("onboarding_"):
             return true
     return false

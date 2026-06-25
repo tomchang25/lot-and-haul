@@ -1,10 +1,10 @@
-# meta_manager.gd
-# Hub-phase transactional authority. Holds eight domain stores (EconomyStore,
+# meta_system.gd
+# System (autoload): hub-phase transactional authority. Holds eight domain stores (EconomyStore,
 # GarageStore, StorageStore, SlotStore, ProgressStore, CustomersStore,
 # ShopSessionStore, StorageSessionStore); each owns its domain's live fields,
 # save payload, and the operations that mutate them. Store references are plain
-# public fields — scenes read state directly via MetaManager.economy.cash,
-# MetaManager.storage.storage_items, etc. Cross-domain transactions (day end,
+# public fields — scenes read state directly via MetaSystem.economy.cash,
+# MetaSystem.storage.storage_items, etc. Cross-domain transactions (day end,
 # run resolution, customer sale, shop close) remain here as single coordinated
 # methods that call store methods and save exactly once.
 extends Node
@@ -49,7 +49,7 @@ func reset() -> void:
 # ══ Save section interface ════════════════════════════════════════════════════
 
 
-## Serializes all MetaManager stores into a flat multi-key dict. Each store's
+## Serializes all MetaSystem stores into a flat multi-key dict. Each store's
 ## section_id() is used as the key, matching the on-disk layout.
 func to_dict() -> Dictionary:
     var out: Dictionary = { }
@@ -133,9 +133,9 @@ func skip_onboarding() -> void:
 ## [param attr] one level in KnowledgeStore. Saves on success.
 ## Returns false when cash is insufficient.
 func upgrade_attribute(attr: AttributeData) -> bool:
-    if not economy.spend(KnowledgeManager.attribute_upgrade_cost()):
+    if not economy.spend(KnowledgeSystem.attribute_upgrade_cost()):
         return false
-    KnowledgeManager.raise_attribute_level(attr)
+    KnowledgeSystem.raise_attribute_level(attr)
     SaveManager.save()
     return true
 
@@ -303,7 +303,7 @@ func end_day() -> DaySummary:
 ## Commits a customer sale: removes items from storage, adds cash, records the
 ## sale for the daily summary, drops the served customer, and saves.
 ##
-## MetaManager is the transactional authority — the sell scene only computes the
+## MetaSystem is the transactional authority — the sell scene only computes the
 ## price and calls this; it does not mutate cash, storage, or the customer list.
 ##
 ## [param items] — ItemEntry instances being sold.
@@ -362,8 +362,8 @@ func restore_item(entry: ItemEntry) -> bool:
         return false
     if ResearchSlot.is_restore_complete(entry):
         return false
-    # One-way read: get_attribute_value has no reverse dependency on MetaManager.
-    var restoration_attr: int = KnowledgeManager.get_attribute_value("restoration")
+    # One-way read: get_attribute_value has no reverse dependency on MetaSystem.
+    var restoration_attr: int = KnowledgeSystem.get_attribute_value("restoration")
     ResearchSlot.apply_restore(entry, restoration_attr)
     EventBus.item_restored.emit(entry)
     slot.charge_ap(Economy.RESTORE_AP_COST)
@@ -386,7 +386,7 @@ func research_item(entry: ItemEntry) -> bool:
         return false
     if not entry.has_unrevealed_hidden():
         return false
-    var investigation_attr: int = KnowledgeManager.get_attribute_value("investigation")
+    var investigation_attr: int = KnowledgeSystem.get_attribute_value("investigation")
     var progress_amount: int = 5 + investigation_attr
     var revealed := entry.advance_research(progress_amount)
     if revealed:
@@ -426,7 +426,7 @@ func set_active_car(car: CarData) -> void:
 func _assign_starter_car() -> void:
     var starter: CarData = CarRegistry.get_car_by_id(&"van_basic")
     if starter == null:
-        ToastManager.show_dev_error("MetaManager: starter car 'van_basic' not found in CarRegistry")
+        ToastManager.show_dev_error("MetaSystem: starter car 'van_basic' not found in CarRegistry")
         return
     garage.add_car(starter)
     garage.set_active(starter)
@@ -434,7 +434,7 @@ func _assign_starter_car() -> void:
 # ══ Run resolution ════════════════════════════════════════════════════════════
 
 
-## Resolves the currently active run. Calls RunManager.take_run_result() to
+## Resolves the currently active run. Calls RunSystem.take_run_result() to
 ## snapshot economics and auto-reveal surface clues, delegates to resolve_run(),
 ## clears run state, and emits run_resolved.
 ##
@@ -442,9 +442,9 @@ func _assign_starter_car() -> void:
 ## after this returns. The day summary fires when the player chooses Open Shop
 ## or all slots are exhausted from the hub.
 func resolve_current_run() -> void:
-    var result: RunResult = RunManager.take_run_result()
+    var result: RunResult = RunSystem.take_run_result()
     resolve_run(result)
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()
     SaveManager.save()
     EventBus.run_resolved.emit(result)
 
@@ -453,7 +453,7 @@ func resolve_current_run() -> void:
 ## cargo into storage, stashes run economics as pending for end_day(), and sets
 ## current_slot to 3 so the player returns to the hub for the evening slot.
 ## Saves once at the end when called without an active run. resolve_current_run()
-## clears RunManager state first, then saves so settled runs do not resume.
+## clears RunSystem state first, then saves so settled runs do not resume.
 func resolve_run(result: RunResult) -> void:
     economy.apply_delta(
         result.onsite_proceeds - result.paid_price - result.entry_fee - result.fuel_cost,
@@ -469,5 +469,5 @@ func resolve_run(result: RunResult) -> void:
     # Auction consumed the Day slot; player returns for the Night slot.
     slot.set_slot(SlotStore.SLOT_NIGHT) # no inner save
 
-    if not RunManager.is_run_active():
+    if not RunSystem.is_run_active():
         SaveManager.save() # single commit for synthetic/direct callers

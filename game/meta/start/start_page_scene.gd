@@ -197,7 +197,7 @@ func _hide_picker() -> void:
 ## Starts a new game in the specified [param slot].
 func _execute_new_game(slot: int) -> void:
     SaveManager.init_slot(slot)
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()
     SceneRouter.go_to_hub()
 
 

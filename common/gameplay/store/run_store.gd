@@ -1,6 +1,6 @@
 # run_store.gd
 # Session-scoped Store for a single warehouse run. Holds per-run cumulative and
-# configuration state. Created and owned by RunManager for the duration of a run
+# configuration state. Created and owned by RunSystem for the duration of a run
 # null between runs. Serialized as part of the run_snapshot save section.
 #
 # Per-lot mutable state (active entry, AP, win result) lives in LotStore.
@@ -131,7 +131,7 @@ var trailer_damage_applied: bool:
 
 
 ## Initializes all construction-time fields for a new run. Called once by
-## RunManager.create_run_store() immediately after RunStore.new().
+## RunSystem.create_run_store() immediately after RunStore.new().
 func initialize(
         p_location: LocationData,
         p_car: CarData,
@@ -154,7 +154,7 @@ func initialize(
 
 ## Draws AP from the reserve to cover [param deficit] points. Returns the actual
 ## amount taken (may be less than deficit when the reserve is low). Called by
-## RunManager.set_lot() to compute LotStore's initial AP.
+## RunSystem.set_lot() to compute LotStore's initial AP.
 func draw_ap_from_reserve(deficit: int) -> int:
     if deficit <= 0 or _refill_metric <= 0:
         return 0
@@ -164,7 +164,7 @@ func draw_ap_from_reserve(deficit: int) -> int:
 
 
 ## Accumulates [param items] and [param price] from a won lot into the run-level
-## totals. Called by RunManager.commit_lot_win() after LotStore records the win.
+## totals. Called by RunSystem.commit_lot_win() after LotStore records the win.
 func accumulate_lot_result(items: Array[ItemEntry], price: int) -> void:
     _paid_price += price
     _won_items.append_array(items)
@@ -194,7 +194,7 @@ func set_cargo_result(
     _onsite_proceeds = proceeds
 
 
-## Sets the resume target for phase-scene restoration. Called by RunManager
+## Sets the resume target for phase-scene restoration. Called by RunSystem
 ## wrappers at each phase transition before saving.
 func set_resume_target(target: String) -> void:
     _resume_target = target

@@ -6,8 +6,8 @@ extends Node
 @warning_ignore_start("unused_signal")
 
 # ── Hub-phase business events ─────────────────────────────────────────────────
-# Emitted by MetaManager after each transactional commit point.
-# KnowledgeManager subscribes to award mastery XP without a direct import.
+# Emitted by MetaSystem after each transactional commit point.
+# KnowledgeSystem subscribes to award mastery XP without a direct import.
 
 ## Emitted after a customer sale is fully committed (cash added, items removed).
 ## [param entry] — the sold ItemEntry.
@@ -22,7 +22,7 @@ signal item_repaired(entry: ItemEntry)
 signal item_restored(entry: ItemEntry)
 
 # ── Run-phase business events ─────────────────────────────────────────────────
-# Emitted by MetaManager after run resolution is fully committed.
+# Emitted by MetaSystem after run resolution is fully committed.
 
 ## Emitted after a completed run is resolved: cash applied, cargo registered,
 ## run state cleared. [param result] — the RunResult snapshot that was consumed.
@@ -36,7 +36,7 @@ signal save_runtime_reset
 
 # ── Reveal-type business events ────────────────────────────────────────────────
 # Emitted by the owning Manager after a successful reveal-during-play mutation.
-# KnowledgeManager subscribes to award mastery XP without a direct import.
+# KnowledgeSystem subscribes to award mastery XP without a direct import.
 
 ## Emitted after an item's veil is lifted (first reveal during inspection or
 ## lot reveal). [param entry] — the ItemEntry that was unveiled.

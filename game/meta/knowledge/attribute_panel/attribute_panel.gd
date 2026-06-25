@@ -21,7 +21,7 @@ func _on_back_pressed() -> void:
 
 
 func _build_content() -> void:
-    var attrs: Array[AttributeData] = KnowledgeManager.get_all_attributes()
+    var attrs: Array[AttributeData] = KnowledgeSystem.get_all_attributes()
     if attrs.is_empty():
         var empty := Label.new()
         empty.text = TranslationServer.translate("UI_NO_ATTRIBUTES")
@@ -36,16 +36,16 @@ func _build_content() -> void:
 
 
 func _add_attribute_row(attr: AttributeData) -> void:
-    var level: int = KnowledgeManager.get_attribute_value(attr.attribute_id)
+    var level: int = KnowledgeSystem.get_attribute_value(attr.attribute_id)
 
     var row: AttributeRow = AttributeRowScene.instantiate()
-    row.setup(attr, level, UPGRADE_COST, MetaManager.economy.cash >= UPGRADE_COST)
+    row.setup(attr, level, UPGRADE_COST, MetaSystem.economy.cash >= UPGRADE_COST)
     row.upgrade_pressed.connect(_on_upgrade_pressed)
     _content.add_child(row)
 
 
 func _on_upgrade_pressed(attr: AttributeData) -> void:
-    var ok := MetaManager.upgrade_attribute(attr)
+    var ok := MetaSystem.upgrade_attribute(attr)
     if not ok:
         return
     _rebuild_all()

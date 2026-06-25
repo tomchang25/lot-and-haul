@@ -1,6 +1,6 @@
 # location_entry_scene.gd
 # Run entry point — Location Entry.
-# Assumes RunManager.run_store has already been built by the Location Select
+# Assumes RunSystem.run_store has already been built by the Location Select
 # screen. Shows the location's exterior background, plays the configured
 # transition wipe, reveals the interior background, then advances to lot browse.
 # No player input required.
@@ -20,12 +20,12 @@ const INTERIOR_BEAT := 0.5 ## Seconds held on interior after the wipe before adv
 
 
 func _ready() -> void:
-    if not RunManager.is_run_active():
+    if not RunSystem.is_run_active():
         ToastManager.show_error("Run data is missing. Returning to hub.")
         SceneRouter.go_to_hub.call_deferred()
         return
 
-    if RunManager.run.location_data == null:
+    if RunSystem.run.location_data == null:
         ToastManager.show_error("Location data is missing. Returning to hub.")
         SceneRouter.go_to_hub.call_deferred()
         return
@@ -38,7 +38,7 @@ func _ready() -> void:
 ## Show exterior → wipe → interior → advance to lot browse.
 ## Falls back to a plain tween fade when the location has no background textures.
 func _play_arrival() -> void:
-    var loc: LocationData = RunManager.run.location_data
+    var loc: LocationData = RunSystem.run.location_data
 
     if loc.bg_exterior == null and loc.bg_interior == null:
         _play_fallback_fade()

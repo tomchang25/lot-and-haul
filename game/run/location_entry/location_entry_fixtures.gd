@@ -20,10 +20,10 @@ static func seed_run_ready() -> void:
         ToastManager.show_error("LocationEntryFixtures: CarRegistry is empty")
         return
 
-    MetaManager.roll_available_locations()
-    var available: Array = MetaManager.progress.available_locations
+    MetaSystem.roll_available_locations()
+    var available: Array = MetaSystem.progress.available_locations
     var loc: LocationData = available[0] if not available.is_empty() else locations[0]
     var car: CarData = cars[0]
 
-    MetaManager.set_active_car(car)
-    RunManager.create_run_store(loc, car)
+    MetaSystem.set_active_car(car)
+    RunSystem.create_run_store(loc, car)

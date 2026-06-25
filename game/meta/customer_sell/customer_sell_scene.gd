@@ -1,7 +1,7 @@
 # customer_sell_scene.gd
 # Phase 9 nightly customer sell screen — coordinates components for tag matching, car packing, sell strategy.
-# Reads:  MetaManager.customers.nightly_customers, MetaManager.storage.storage_items
-# Writes: MetaManager.resolve_customer_sale()
+# Reads:  MetaSystem.customers.nightly_customers, MetaSystem.storage.storage_items
+# Writes: MetaSystem.resolve_customer_sale()
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -71,20 +71,20 @@ func _ready() -> void:
     _receipt.receipt_confirmed.connect(_on_receipt_confirmed)
     _receipt.receipt_cancelled.connect(_on_receipt_cancelled)
 
-    _customers = MetaManager.customers.nightly_customers.duplicate()
+    _customers = MetaSystem.customers.nightly_customers.duplicate()
 
     if _customers.is_empty():
         _show_empty_state(TranslationServer.translate("UI_NO_CUSTOMERS_TONIGHT"))
         return
 
-    _day_label.text = TranslationServer.translate("UI_DAY_LABEL") % MetaManager.progress.current_day
+    _day_label.text = TranslationServer.translate("UI_DAY_LABEL") % MetaSystem.progress.current_day
     _customer_queue.setup(_customers)
     _customer_queue.set_selected(0)
     _suppress_placement_update = true
     _select_customer(0)
     _suppress_placement_update = false
 
-    var saved_id: String = MetaManager.shop_session.active_customer_session_id
+    var saved_id: String = MetaSystem.shop_session.active_customer_session_id
     if saved_id != "":
         var idx := _find_customer_index(saved_id)
         if idx >= 0 and idx != 0:
@@ -92,7 +92,7 @@ func _ready() -> void:
             _suppress_placement_update = true
             _select_customer(idx)
             _suppress_placement_update = false
-        _apply_saved_placement(MetaManager.shop_session.placement)
+        _apply_saved_placement(MetaSystem.shop_session.placement)
 
     Director.register_scene(
         "customer_sell",
@@ -117,7 +117,7 @@ func _on_customer_selected(index: int) -> void:
     _suppress_placement_update = true
     _select_customer(index)
     _suppress_placement_update = false
-    MetaManager.update_shop_session(
+    MetaSystem.update_shop_session(
         _get_selected_customer(),
         _serialize_placement(),
     )
@@ -208,7 +208,7 @@ func _on_car_placement_changed() -> void:
     _refresh_car_display()
     if _suppress_placement_update:
         return
-    MetaManager.update_shop_session(
+    MetaSystem.update_shop_session(
         _get_selected_customer(),
         _serialize_placement(),
     )
@@ -263,7 +263,7 @@ func _on_receipt_confirmed(price: int, strategy: String) -> void:
         ToastManager.show_dev_error("CustomerSellScene._on_receipt_confirmed: sale is missing price or strategy")
         return
 
-    MetaManager.resolve_customer_sale(placed, price, sold_customer, strategy)
+    MetaSystem.resolve_customer_sale(placed, price, sold_customer, strategy)
     AudioManager.play_event(CONFIRM)
     AudioManager.play_event(SALE_COMPLETED)
     AudioManager.play_event(CASH_CREDITED)
@@ -290,8 +290,8 @@ func _on_receipt_cancelled() -> void:
 
 
 func _on_back_pressed() -> void:
-    MetaManager.shop_session.clear()
-    MetaManager.customers.clear_customers()
+    MetaSystem.shop_session.clear()
+    MetaSystem.customers.clear_customers()
     SaveManager.save()
     SceneRouter.go_to_hub()
 
@@ -339,7 +339,7 @@ func _select_customer(index: int) -> void:
     _car_panel.setup(customer)
     _item_list.rebuild(
         customer,
-        MetaManager.storage.storage_items,
+        MetaSystem.storage.storage_items,
         func(matched: Array) -> void:
             grid.setup_default_callbacks(matched)
     )
@@ -392,7 +392,7 @@ func _serialize_placement() -> Array:
 func _apply_saved_placement(placement: Array) -> void:
     var grid := _car_panel.get_grid()
     var by_id: Dictionary = { }
-    for item in MetaManager.storage.storage_items:
+    for item in MetaSystem.storage.storage_items:
         var entry := item as ItemEntry
         if entry != null:
             by_id[entry.id] = entry

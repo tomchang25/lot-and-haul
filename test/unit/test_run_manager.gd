@@ -25,9 +25,9 @@ func test_ap_lifecycle_create_and_spend() -> void:
     var car := _car()
     var loc := _location()
 
-    RunManager.create_run_store(loc, car)
-    assert_not_null(RunManager.run, "run store should exist after create")
-    assert_eq(RunManager.run.inspection_ap_cap, 10, "default AP cap")
+    RunSystem.create_run_store(loc, car)
+    assert_not_null(RunSystem.run, "run store should exist after create")
+    assert_eq(RunSystem.run.inspection_ap_cap, 10, "default AP cap")
 
     var cat := CategoryRegistry.get_category_by_id("test_category")
     assert_not_null(cat, "test category should exist in registry")
@@ -53,21 +53,21 @@ func test_ap_lifecycle_create_and_spend() -> void:
 
     assert_eq(entry.item_entries.size(), 1, "lot should have 1 item")
 
-    RunManager.set_lot(entry)
-    assert_not_null(RunManager.lot, "lot store should exist after set_lot")
+    RunSystem.set_lot(entry)
+    assert_not_null(RunSystem.lot, "lot store should exist after set_lot")
 
-    var initial_ap := RunManager.lot.actions_remaining
+    var initial_ap := RunSystem.lot.actions_remaining
     assert_gt(initial_ap, 0, "should have initial AP")
 
-    RunManager.spend_ap(3)
-    assert_eq(RunManager.lot.actions_remaining, initial_ap - 3, "AP should decrease by 3")
+    RunSystem.spend_ap(3)
+    assert_eq(RunSystem.lot.actions_remaining, initial_ap - 3, "AP should decrease by 3")
 
-    RunManager.spend_ap(initial_ap - 3 + 1)
-    assert_eq(RunManager.lot.actions_remaining, 0, "AP should not go below 0")
+    RunSystem.spend_ap(initial_ap - 3 + 1)
+    assert_eq(RunSystem.lot.actions_remaining, 0, "AP should not go below 0")
 
-    RunManager.clear_run_state()
-    assert_null(RunManager.run, "run should be null after clear")
-    assert_null(RunManager.lot, "lot should be null after clear")
+    RunSystem.clear_run_state()
+    assert_null(RunSystem.run, "run should be null after clear")
+    assert_null(RunSystem.lot, "lot should be null after clear")
 
 # ══ Clue Attempt ══════════════════════════════════════════════════════════
 
@@ -108,7 +108,7 @@ func test_clue_hit_and_miss() -> void:
 func test_cargo_commit() -> void:
     var car := _car()
     var loc := _location()
-    RunManager.create_run_store(loc, car)
+    RunSystem.create_run_store(loc, car)
 
     var cat := CategoryRegistry.get_category_by_id("test_category")
     assert_not_null(cat, "test category should exist in registry")
@@ -119,17 +119,17 @@ func test_cargo_commit() -> void:
     assert_not_null(entry, "item should be generated")
     entry.unveil()
 
-    RunManager.commit_cargo([entry], [], 50)
-    assert_eq(RunManager.run.cargo_items.size(), 1, "cargo should have 1 item")
-    assert_eq(RunManager.run.onsite_proceeds, 50, "onsite proceeds should be 50")
+    RunSystem.commit_cargo([entry], [], 50)
+    assert_eq(RunSystem.run.cargo_items.size(), 1, "cargo should have 1 item")
+    assert_eq(RunSystem.run.onsite_proceeds, 50, "onsite proceeds should be 50")
 
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()
 
 
 func test_commit_lot_win() -> void:
     var car := _car()
     var loc := _location()
-    RunManager.create_run_store(loc, car)
+    RunSystem.create_run_store(loc, car)
 
     var lot_data := LotData.new()
     lot_data.lot_id = "test_lot"
@@ -140,13 +140,13 @@ func test_commit_lot_win() -> void:
     var rng := RandomNumberGenerator.new()
     rng.seed = 7
     var lot_entry := LotEntry.create(lot_data, rng)
-    RunManager.set_lot(lot_entry)
+    RunSystem.set_lot(lot_entry)
 
     var items := lot_entry.item_entries
-    RunManager.commit_lot_win(items, 500)
-    assert_eq(RunManager.run.paid_price, 500, "paid_price should be 500")
+    RunSystem.commit_lot_win(items, 500)
+    assert_eq(RunSystem.run.paid_price, 500, "paid_price should be 500")
 
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()
 
 # ══ Trailer Damage ════════════════════════════════════════════════════════
 
@@ -158,7 +158,7 @@ func test_trailer_damage_triggered() -> void:
     car.trailer_damage_ratio_max = 0.3
 
     var loc := _location()
-    RunManager.create_run_store(loc, car)
+    RunSystem.create_run_store(loc, car)
 
     var cat := CategoryRegistry.get_category_by_id("test_category")
     assert_not_null(cat, "test category should exist in registry")
@@ -167,13 +167,13 @@ func test_trailer_damage_triggered() -> void:
     rng.seed = 42
     var entry := ItemGenerator.draw(cat, { }, Economy.Rarity.COMMON, rng)
 
-    RunManager.commit_cargo([], [entry], 0)
+    RunSystem.commit_cargo([], [entry], 0)
 
-    var cracked := RunManager.apply_trailer_damage()
+    var cracked := RunSystem.apply_trailer_damage()
     assert_eq(cracked, 1, "trailer damage should crack 1 item")
     assert_lt(entry.condition, 1.0, "cracked item condition should decrease")
 
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()
 
 
 func test_trailer_no_damage_when_chance_zero() -> void:
@@ -181,7 +181,7 @@ func test_trailer_no_damage_when_chance_zero() -> void:
     car.trailer_damage_chance = 0.0
 
     var loc := _location()
-    RunManager.create_run_store(loc, car)
+    RunSystem.create_run_store(loc, car)
 
     var cat := CategoryRegistry.get_category_by_id("test_category")
     assert_not_null(cat, "test category should exist in registry")
@@ -190,12 +190,12 @@ func test_trailer_no_damage_when_chance_zero() -> void:
     rng.seed = 42
     var entry := ItemGenerator.draw(cat, { }, Economy.Rarity.COMMON, rng)
 
-    RunManager.commit_cargo([], [entry], 0)
+    RunSystem.commit_cargo([], [entry], 0)
 
-    var cracked := RunManager.apply_trailer_damage()
+    var cracked := RunSystem.apply_trailer_damage()
     assert_eq(cracked, 0, "no damage when chance is 0")
 
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()
 
 # ══ Full Run Traversal ════════════════════════════════════════════════════
 
@@ -206,8 +206,8 @@ func test_full_run_scratch_to_run_result() -> void:
     var car := _car()
     var loc := _location()
 
-    RunManager.create_run_store(loc, car)
-    assert_not_null(RunManager.run, "run should exist")
+    RunSystem.create_run_store(loc, car)
+    assert_not_null(RunSystem.run, "run should exist")
 
     var cat := CategoryRegistry.get_category_by_id("test_category")
     assert_not_null(cat, "test category should exist in registry")
@@ -232,17 +232,17 @@ func test_full_run_scratch_to_run_result() -> void:
     lot_entry.item_entries = [item]
     lot_entry.npc_estimate = int(item.anchor.base_value + 100.0)
 
-    RunManager.set_lot(lot_entry)
-    assert_not_null(RunManager.lot, "lot store should exist")
+    RunSystem.set_lot(lot_entry)
+    assert_not_null(RunSystem.lot, "lot store should exist")
 
-    RunManager.commit_lot_win([item], 250)
-    assert_eq(RunManager.run.paid_price, 250, "should have paid 250")
+    RunSystem.commit_lot_win([item], 250)
+    assert_eq(RunSystem.run.paid_price, 250, "should have paid 250")
 
-    RunManager.commit_cargo([item], [], 30)
-    assert_eq(RunManager.run.cargo_items.size(), 1, "cargo should contain item")
-    assert_eq(RunManager.run.onsite_proceeds, 30, "onsite proceeds should be 30")
+    RunSystem.commit_cargo([item], [], 30)
+    assert_eq(RunSystem.run.cargo_items.size(), 1, "cargo should contain item")
+    assert_eq(RunSystem.run.onsite_proceeds, 30, "onsite proceeds should be 30")
 
-    var result: RunResult = RunManager.take_run_result()
+    var result: RunResult = RunSystem.take_run_result()
     assert_eq(result.cargo_items.size(), 1, "result cargo should have 1 item")
     assert_eq(result.onsite_proceeds, 30, "result onsite_proceeds")
     assert_eq(result.paid_price, 250, "result paid_price")
@@ -251,4 +251,4 @@ func test_full_run_scratch_to_run_result() -> void:
 
     assert_gt(result.cargo_items[0].revealed_clue_ids.size(), 0, "surface clues should be revealed")
 
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()

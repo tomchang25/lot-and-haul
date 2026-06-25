@@ -90,6 +90,6 @@ func _has_testbed_flag(args: PackedStringArray) -> bool:
 ## Registers save providers before SaveManager.boot_load(). Keeping this list
 ## explicit avoids provider correctness depending on autoload order.
 func _register_runtime_providers() -> void:
-    SaveManager.register_provider(KnowledgeManager)
-    SaveManager.register_provider(MetaManager)
-    SaveManager.register_provider(RunManager)
+    SaveManager.register_provider(KnowledgeSystem)
+    SaveManager.register_provider(MetaSystem)
+    SaveManager.register_provider(RunSystem)

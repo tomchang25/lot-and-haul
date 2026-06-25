@@ -1,7 +1,7 @@
 # slot_store.gd
 # Slot-flow runtime store: current slot (Day/Night), storage AP, committed
 # selling slots (legacy), and pending run economics. Serializable state slice
-# held by MetaManager.
+# held by MetaSystem.
 # Owns the fields, their save payload, and the phase operations that mutate them.
 #
 # Fields are read-public via getters. Mutation goes through the owning Manager only.
@@ -66,7 +66,7 @@ func set_selling_slots_today(value: int) -> void:
 
 
 ## Deducts [param cost] AP from the pool. Does not save. Called only after the
-## effect lands — guards live in MetaManager's public AP action methods.
+## effect lands — guards live in MetaSystem's public AP action methods.
 func charge_ap(cost: int) -> void:
     _storage_ap -= cost
 

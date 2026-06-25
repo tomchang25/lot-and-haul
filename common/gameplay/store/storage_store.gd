@@ -1,6 +1,6 @@
 # storage_store.gd
 # Storage runtime store: owned ItemEntry instances and the monotonic
-# next_entry_id counter. Serializable state slice held by MetaManager.
+# next_entry_id counter. Serializable state slice held by MetaSystem.
 # Owns the fields and their save payload.
 #
 # Fields are read-public via getters. Mutation goes through the owning Manager only.

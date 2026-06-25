@@ -1,17 +1,17 @@
-# run_manager.gd
-# Autoload: owns the active RunStore (per-run) and LotStore (per-lot) for the
+# run_system.gd
+# System (autoload): owns the active RunStore (per-run) and LotStore (per-lot) for the
 # duration of a run. Both are null between runs. Provides the factory, AP
 # resolution, and run-phase mutation methods. Scenes read run state via
-# RunManager.run.field and lot state via RunManager.lot.field.
+# RunSystem.run.field and lot state via RunSystem.lot.field.
 # Registered with SaveManager so the active run snapshot persists across restarts.
 extends Node
 
 const SAVE_SECTION := "run_snapshot"
 
 ## Full state for the current run. Null between runs.
-## Scenes in the run phase should guard with RunManager.is_run_active() on entry and then
-## read directly: RunManager.run.won_items, RunManager.run.inspection_ap_cap, etc.
-## External code must never mutate RunStore fields directly — use RunManager's
+## Scenes in the run phase should guard with RunSystem.is_run_active() on entry and then
+## read directly: RunSystem.run.won_items, RunSystem.run.inspection_ap_cap, etc.
+## External code must never mutate RunStore fields directly — use RunSystem's
 ## mutation methods below.
 var run: RunStore = null
 
@@ -41,7 +41,7 @@ func create_run_store(location: LocationData, car: CarData) -> void:
 
 ## Builds a RunResult snapshot from the active run: auto-reveals all surface
 ## clues on cargo items (the hub-return reveal), then copies economics and cargo
-## into the returned value object. The caller (MetaManager.resolve_current_run)
+## into the returned value object. The caller (MetaSystem.resolve_current_run)
 ## must call clear_run_state() after consuming the result.
 ## Guards that a run is active — call only when is_run_active() is true.
 func take_run_result() -> RunResult:
@@ -72,7 +72,7 @@ func clear_run_state() -> void:
 
 ## Mediates a player-triggered unveil. Calls entry.unveil() (returns true when
 ## the flag actually flipped). On success and when the item has valid category
-## data, emits item_unveiled so KnowledgeManager can award REVEAL XP.
+## data, emits item_unveiled so KnowledgeSystem can award REVEAL XP.
 func unveil_item(entry: ItemEntry) -> void:
     if entry.unveil():
         SaveManager.mark_dirty()
@@ -85,7 +85,7 @@ func unveil_item(entry: ItemEntry) -> void:
 ## item_revealed only when the revealed_clue_ids set grew (new clue revealed).
 ## Returns the roll result (succeeded) unchanged to the scene.
 func attempt_clue(entry: ItemEntry, clue: ClueData) -> bool:
-    var attr_value: int = KnowledgeManager.get_attribute_value(clue.attribute)
+    var attr_value: int = KnowledgeSystem.get_attribute_value(clue.attribute)
     var attribute_bonus: int = maxi(attr_value - 1, 0)
     var before := entry.revealed_clue_ids.size()
     var succeeded := entry.attempt_clue(clue, attribute_bonus)
@@ -233,7 +233,7 @@ func _resolve_inspection_ap_cap(_car: CarData) -> int:
     var cap: int = Economy.INSPECTION_AP_CAP
     # Future modifiers fold in here, e.g.:
     #   cap += car.inspection_ap_bonus
-    #   cap += KnowledgeManager.get_attribute_value("perception")
+    #   cap += KnowledgeSystem.get_attribute_value("perception")
     return cap
 
 

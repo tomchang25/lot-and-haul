@@ -1,6 +1,6 @@
 # mastery_panel.gd
 # Mastery Panel — Read-only display of mastery rank and category progression.
-# Reads: KnowledgeManager, CategoryRegistry, SuperCategoryRegistry
+# Reads: KnowledgeSystem, CategoryRegistry, SuperCategoryRegistry
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -32,18 +32,18 @@ func _on_back_pressed() -> void:
 
 
 func _build_content() -> void:
-    _heading_label.text = TranslationServer.translate("UI_MASTERY_RANK_LABEL") % KnowledgeManager.get_mastery_rank()
+    _heading_label.text = TranslationServer.translate("UI_MASTERY_RANK_LABEL") % KnowledgeSystem.get_mastery_rank()
 
     for sc: SuperCategoryData in SuperCategoryRegistry.get_all_super_categories():
-        var sc_rank: int = KnowledgeManager.get_super_category_rank(sc)
+        var sc_rank: int = KnowledgeSystem.get_super_category_rank(sc)
         var header_text := "%s — rank %d" % [TranslationServer.translate(sc.display_name_key), sc_rank]
 
         var cats: Array[CategoryData] = SuperCategoryRegistry.get_categories_for_super(sc).duplicate()
         cats.sort_custom(
             func(a: CategoryData, b: CategoryData) -> bool:
-                return KnowledgeManager.get_category_rank(a) > KnowledgeManager.get_category_rank(b) \
-                or (KnowledgeManager.get_category_rank(a) == KnowledgeManager.get_category_rank(b) \
-                    and KnowledgeManager.get_category_points(a) > KnowledgeManager.get_category_points(b) )
+                return KnowledgeSystem.get_category_rank(a) > KnowledgeSystem.get_category_rank(b) \
+                or (KnowledgeSystem.get_category_rank(a) == KnowledgeSystem.get_category_rank(b) \
+                    and KnowledgeSystem.get_category_points(a) > KnowledgeSystem.get_category_points(b) )
         )
 
         var row: MasteryRow = MasteryRowScene.instantiate()

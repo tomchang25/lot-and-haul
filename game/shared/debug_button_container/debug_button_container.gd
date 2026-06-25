@@ -33,12 +33,12 @@ func _on_add_item() -> void:
         return
     entry.unveil()
     entry.auto_reveal_all_surface()
-    MetaManager.register_storage_items([entry])
+    MetaSystem.register_storage_items([entry])
     storage_changed.emit()
 
 
 func _on_clear_storage() -> void:
     if not Debug.enabled:
         return
-    MetaManager.clear_all_storage()
+    MetaSystem.clear_all_storage()
     storage_changed.emit()

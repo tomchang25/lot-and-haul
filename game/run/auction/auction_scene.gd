@@ -1,8 +1,8 @@
 # auction_scene.gd
 # Block 04 — The player watches a live bidding sequence and decides when to drop out.
-# Reads:  RunManager.lot.lot_entry, RunManager.lot.lot_items,
-#         RunManager.run.paid_price, RunManager.run.entry_fee, RunManager.run.fuel_cost
-# Writes: RunManager.commit_lot_win()
+# Reads:  RunSystem.lot.lot_entry, RunSystem.lot.lot_items,
+#         RunSystem.run.paid_price, RunSystem.run.entry_fee, RunSystem.run.fuel_cost
+# Writes: RunSystem.commit_lot_win()
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -95,7 +95,7 @@ class _CircleProgress extends Control:
 
 
 func _ready() -> void:
-    if RunManager.lot == null:
+    if RunSystem.lot == null:
         ToastManager.show_error("Auction scene failed to load. Returning to hub.")
         SceneRouter.go_to_hub.call_deferred()
         return
@@ -185,7 +185,7 @@ func _on_bid_pressed() -> void:
         return
 
     # Enforce effective cash budget so committed spend never exceeds the wallet.
-    var effective_cash: int = MetaManager.economy.cash - RunManager.get_committed_spend()
+    var effective_cash: int = MetaSystem.economy.cash - RunSystem.get_committed_spend()
     if effective_cash < _current_display_price + MIN_STEP:
         _bid_button.disabled = true
         return
@@ -226,7 +226,7 @@ func _on_pass_pressed() -> void:
     if _circle_tween:
         _circle_tween.kill()
 
-    RunManager.set_resume_target(RunStore.RESUME_REVEAL)
+    RunSystem.set_resume_target(RunStore.RESUME_REVEAL)
     SaveManager.save()
     SceneRouter.go_to_reveal()
 
@@ -234,7 +234,7 @@ func _on_pass_pressed() -> void:
 
 
 func _init_auction() -> void:
-    var lot: LotEntry = RunManager.lot.lot_entry
+    var lot: LotEntry = RunSystem.lot.lot_entry
 
     _rolled_price = max(lot.get_rolled_price(), MIN_STEP)
 
@@ -248,7 +248,7 @@ func _init_auction() -> void:
 
 
 func _build_lot_summary() -> void:
-    var lot: LotEntry = RunManager.lot.lot_entry
+    var lot: LotEntry = RunSystem.lot.lot_entry
 
     for entry: ItemEntry in lot.item_entries:
         var row: LotSummaryRow = LotSummaryRowScene.instantiate()
@@ -359,7 +359,7 @@ func _resolve() -> void:
             ToastManager.show_info("Auction resolved by timeout below NPC target.")
         _bid_button.disabled = true
         _pass_button.disabled = true
-        RunManager.set_resume_target(RunStore.RESUME_REVEAL)
+        RunSystem.set_resume_target(RunStore.RESUME_REVEAL)
         SaveManager.save()
         EventBus.tutorial_event.emit(TutorialEvents.AUCTION_RESOLVED, { })
         SceneRouter.go_to_reveal()
@@ -383,8 +383,8 @@ func _win_now(price: int) -> void:
     _pass_button.disabled = true
     _bid_enabled = false
 
-    RunManager.commit_lot_win(RunManager.lot.lot_items, price)
-    RunManager.set_resume_target(RunStore.RESUME_REVEAL)
+    RunSystem.commit_lot_win(RunSystem.lot.lot_items, price)
+    RunSystem.set_resume_target(RunStore.RESUME_REVEAL)
     SaveManager.save()
     AudioManager.play_event(AUCTION_WON)
     EventBus.tutorial_event.emit(TutorialEvents.AUCTION_WON, { })
@@ -398,8 +398,8 @@ func _win_now(price: int) -> void:
 ## run costs (paid_price, entry_fee, fuel_cost). Called on init and after
 ## every player bid so the number stays live.
 func _refresh_budget() -> void:
-    var committed: int = RunManager.run.paid_price + RunManager.run.entry_fee + RunManager.run.fuel_cost
-    var remaining := maxi(MetaManager.economy.cash - committed, 0)
+    var committed: int = RunSystem.run.paid_price + RunSystem.run.entry_fee + RunSystem.run.fuel_cost
+    var remaining := maxi(MetaSystem.economy.cash - committed, 0)
     _budget_label.text = TranslationServer.translate("UI_BUDGET_LABEL") % remaining
 
 # ══ Display helpers ════════════════════════════════════════════════════════════
@@ -449,10 +449,10 @@ func _show_npc_popup(price: int) -> void:
 func _init_debug_overlay() -> void:
     if not Debug.enabled:
         return
-    var lot: LotEntry = RunManager.lot.lot_entry
+    var lot: LotEntry = RunSystem.lot.lot_entry
 
     var true_value := 0
-    for entry: ItemEntry in RunManager.lot.lot_items:
+    for entry: ItemEntry in RunSystem.lot.lot_items:
         true_value += int(entry.full_true_value())
 
     _debug_label = Label.new()

@@ -1,11 +1,11 @@
 # run_review_scene.gd
 # Block 06 — Run Review
-# Reads:  RunManager.run.location_data, RunManager.run.cargo_items,
-#         RunManager.run.trailer_items, RunManager.run.paid_price,
-#         RunManager.run.entry_fee, RunManager.run.fuel_cost,
-#         RunManager.run.onsite_proceeds
-# Writes: MetaManager.economy.cash, MetaManager.storage.storage_items
-#         (via MetaManager.resolve_current_run())
+# Reads:  RunSystem.run.location_data, RunSystem.run.cargo_items,
+#         RunSystem.run.trailer_items, RunSystem.run.paid_price,
+#         RunSystem.run.entry_fee, RunSystem.run.fuel_cost,
+#         RunSystem.run.onsite_proceeds
+# Writes: MetaSystem.economy.cash, MetaSystem.storage.storage_items
+#         (via MetaSystem.resolve_current_run())
 extends Control
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -36,12 +36,12 @@ const REVIEW_COLUMNS: Array = [
 
 
 func _ready() -> void:
-    if RunManager.run == null:
+    if RunSystem.run == null:
         ToastManager.show_error("Run review failed to load. Returning to hub.")
         SceneRouter.go_to_hub.call_deferred()
         return
 
-    RunManager.set_resume_target(RunStore.RESUME_RUN_REVIEW)
+    RunSystem.set_resume_target(RunStore.RESUME_RUN_REVIEW)
 
     _continue_btn.pressed.connect(_on_continue_pressed)
     _continue_btn.press_event = CONFIRM
@@ -49,13 +49,13 @@ func _ready() -> void:
     _cargo_panel.tooltip_requested.connect(_on_row_tooltip_requested)
     _cargo_panel.tooltip_dismissed.connect(_tooltip.request_hide)
 
-    var loc := RunManager.run.location_data
+    var loc := RunSystem.run.location_data
     if loc != null:
         _location_label.text = TranslationServer.translate(loc.display_name_key)
     else:
         _location_label.text = ""
 
-    var cracked: int = RunManager.apply_trailer_damage()
+    var cracked: int = RunSystem.apply_trailer_damage()
     _cargo_panel.set_damage_count(cracked)
     SaveManager.save()
 
@@ -88,7 +88,7 @@ func _on_row_tooltip_requested(
 
 
 func _resolve_run_and_navigate() -> void:
-    MetaManager.resolve_current_run()
+    MetaSystem.resolve_current_run()
     EventBus.tutorial_event.emit(TutorialEvents.RUN_REVIEWED, { })
     AudioManager.play_event(CASH_CREDITED)
     SceneRouter.go_to_hub()
@@ -97,14 +97,14 @@ func _resolve_run_and_navigate() -> void:
 
 
 func _populate_rows() -> void:
-    var items: Array = RunManager.run.cargo_items + RunManager.run.trailer_items
+    var items: Array = RunSystem.run.cargo_items + RunSystem.run.trailer_items
     _cargo_panel.setup(REVIEW_COLUMNS, items)
 
 # ══ Finance ledger ════════════════════════════════════════════════════════════
 
 
 func _populate_finance() -> void:
-    var run := RunManager.run
+    var run := RunSystem.run
     var entry_fee: int = run.entry_fee
     var fuel: int = run.fuel_cost
     var auction: int = run.paid_price

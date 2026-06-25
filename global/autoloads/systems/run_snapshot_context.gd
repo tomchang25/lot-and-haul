@@ -1,5 +1,5 @@
 # run_snapshot_context.gd
-# RunManager-owned run-snapshot context for preserving shared ItemEntry
+# RunSystem-owned run-snapshot context for preserving shared ItemEntry
 # references across participating Store payloads. Owns the shared Entry table,
 # serialization of table entries, and aggregate version migration.
 class_name RunSnapshotContext

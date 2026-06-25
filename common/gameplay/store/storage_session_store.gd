@@ -83,7 +83,7 @@ func validate() -> bool:
         return true
     return _resume_target == SCENE_STORAGE and _selected_entry_id >= -1
 
-# ══ Mutators - called only from MetaManager wrappers ══════════════════════════
+# ══ Mutators - called only from MetaSystem wrappers ══════════════════════════
 
 
 ## Begins a new Storage session with [param selected_id] as the initially

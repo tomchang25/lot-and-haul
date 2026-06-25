@@ -2,7 +2,7 @@
 # Block 05a — Reveal won items before cargo loading.
 # Marks uninspected items as inspected on reveal.
 # One button press reveals ALL items at once instead of one-at-a-time.
-# Reads:  RunManager.lot.won_items,
+# Reads:  RunSystem.lot.won_items,
 # Writes: ItemEntry.inspected, ItemEntry.scrutiny
 extends Control
 
@@ -34,12 +34,12 @@ var _won_items: Array[ItemEntry] = []
 
 
 func _ready() -> void:
-    if RunManager.lot == null:
+    if RunSystem.lot == null:
         ToastManager.show_error("Reveal scene failed to load. Returning to hub.")
         SceneRouter.go_to_hub.call_deferred()
         return
 
-    RunManager.set_resume_target(RunStore.RESUME_REVEAL)
+    RunSystem.set_resume_target(RunStore.RESUME_REVEAL)
     SaveManager.save()
 
     _reveal_btn.pressed.connect(_on_reveal_pressed)
@@ -50,7 +50,7 @@ func _ready() -> void:
     _item_list_panel.tooltip_requested.connect(_on_row_tooltip_requested)
     _item_list_panel.tooltip_dismissed.connect(_tooltip.request_hide)
 
-    _won_items = RunManager.lot.won_items
+    _won_items = RunSystem.lot.won_items
     _continue_btn.hide()
 
     if _won_items.is_empty():
@@ -73,9 +73,9 @@ func _ready() -> void:
 func _on_reveal_pressed() -> void:
     for entry: ItemEntry in _won_items:
         if entry.is_veiled():
-            RunManager.unveil_item(entry)
+            RunSystem.unveil_item(entry)
 
-        RunManager.auto_reveal_all_surface(entry)
+        RunSystem.auto_reveal_all_surface(entry)
         AudioManager.play_event(REVEAL_GOOD)
 
     _on_reveal_complete()
@@ -86,8 +86,8 @@ func _on_reveal_pressed() -> void:
 
 
 func _on_continue_pressed() -> void:
-    RunManager.clear_lot()
-    RunManager.set_resume_target(RunStore.RESUME_LOT_BROWSE)
+    RunSystem.clear_lot()
+    RunSystem.set_resume_target(RunStore.RESUME_LOT_BROWSE)
     SaveManager.save()
     EventBus.tutorial_event.emit(TutorialEvents.REVEAL_CONTINUED, { })
     SceneRouter.go_to_lot_browse()

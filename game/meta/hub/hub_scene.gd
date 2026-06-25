@@ -67,7 +67,7 @@ func _ready() -> void:
         },
     )
 
-    if MetaManager.slot.current_slot > SlotStore.SLOT_NIGHT:
+    if MetaSystem.slot.current_slot > SlotStore.SLOT_NIGHT:
         _end_day_and_navigate.call_deferred()
         return
 
@@ -90,14 +90,14 @@ func _on_auction_chosen() -> void:
 func _on_storage_chosen() -> void:
     _close_chooser()
     EventBus.tutorial_event.emit(TutorialEvents.ACTIVITY_CHOSEN, { })
-    MetaManager.begin_storage_slot()
+    MetaSystem.begin_storage_slot()
     SceneRouter.go_to_storage()
 
 
 func _on_sell_chosen() -> void:
     _close_chooser()
     EventBus.tutorial_event.emit(TutorialEvents.ACTIVITY_CHOSEN, { })
-    MetaManager.begin_open_shop()
+    MetaSystem.begin_open_shop()
     SceneRouter.go_to_customer_sell()
 
 
@@ -124,14 +124,14 @@ func _on_knowledge_pressed() -> void:
 
 
 func _end_day_and_navigate() -> void:
-    var summary := MetaManager.end_day()
+    var summary := MetaSystem.end_day()
     SceneRouter.go_to_day_summary(summary)
 
 # ══ Chooser ═══════════════════════════════════════════════════════════════════
 
 
 func _show_chooser() -> void:
-    var is_day: bool = MetaManager.slot.current_slot == SlotStore.SLOT_DAY
+    var is_day: bool = MetaSystem.slot.current_slot == SlotStore.SLOT_DAY
     _auction_btn.visible = is_day
     _storage_btn.visible = true
     _sell_btn.visible = true
@@ -175,16 +175,16 @@ func _refresh_activity_choice_locks() -> void:
 
 
 func _refresh_display() -> void:
-    _mastery_rank_label.text = TranslationServer.translate("UI_MASTERY_RANK_LABEL") % KnowledgeManager.get_mastery_rank()
-    _balance_label.text = TranslationServer.translate("UI_BALANCE_LABEL") % MetaManager.economy.cash
-    _storage_count_label.text = TranslationServer.translate("UI_STORAGE_COUNT_LABEL") % MetaManager.storage.storage_items.size()
+    _mastery_rank_label.text = TranslationServer.translate("UI_MASTERY_RANK_LABEL") % KnowledgeSystem.get_mastery_rank()
+    _balance_label.text = TranslationServer.translate("UI_BALANCE_LABEL") % MetaSystem.economy.cash
+    _storage_count_label.text = TranslationServer.translate("UI_STORAGE_COUNT_LABEL") % MetaSystem.storage.storage_items.size()
 
     _refresh_slot_label()
     _refresh_activity_button()
 
 
 func _refresh_slot_label() -> void:
-    var slot: int = MetaManager.slot.current_slot
+    var slot: int = MetaSystem.slot.current_slot
     var tray: String = ""
     for i: int in SLOT_NAMES.size():
         if i == 0:
@@ -196,11 +196,11 @@ func _refresh_slot_label() -> void:
             tray += "> %s  " % slot_label
         else:
             tray += "- %s  " % slot_label
-    _slot_label.text = "%s   |   %s" % [TranslationServer.translate("UI_DAY_LABEL") % MetaManager.progress.current_day, tray.strip_edges()]
+    _slot_label.text = "%s   |   %s" % [TranslationServer.translate("UI_DAY_LABEL") % MetaSystem.progress.current_day, tray.strip_edges()]
 
 
 func _refresh_activity_button() -> void:
-    var slot: int = MetaManager.slot.current_slot
+    var slot: int = MetaSystem.slot.current_slot
     # day-ending (>= SLOT_DAY_ENDING) is not a displayable slot name; the hub
     # auto-ends the day on entry, so this branch is normally unreachable. The
     # guard is defensive in case a future code path calls _refresh_display()

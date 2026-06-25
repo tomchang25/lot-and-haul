@@ -1,5 +1,5 @@
 # day_summary.gd
-# Read-only Snapshot returned by MetaManager.end_day(). Financial recap only —
+# Read-only Snapshot returned by MetaSystem.end_day(). Financial recap only —
 # storage feedback is immediate and does not need a deferred summary entry.
 # Consumed once by the day-summary scene; not serialized.
 class_name DaySummary

@@ -48,7 +48,7 @@ func _apply() -> void:
     _entry_fee_label.text = TranslationServer.translate("UI_ENTRY_FEE_LABEL") % _location_data.entry_fee
     _travel_days_label.text = TranslationServer.translate("UI_TRAVEL_LABEL") % _location_data.travel_days
     _lot_number_label.text = TranslationServer.translate("UI_LOTS_LABEL") % _location_data.lot_number
-    var car: CarData = MetaManager.garage.active_car
+    var car: CarData = MetaSystem.garage.active_car
     var fuel_cost := car.fuel_cost_per_day * _location_data.travel_days if car else 0
     _fuel_cost_label.text = TranslationServer.translate("UI_FUEL_LABEL") % fuel_cost
     var total_cost := _location_data.entry_fee + fuel_cost

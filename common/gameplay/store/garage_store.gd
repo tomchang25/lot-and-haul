@@ -1,6 +1,6 @@
 # garage_store.gd
 # Garage runtime store: active car and owned car roster. Serializable state
-# slice held by MetaManager. Owns the fields, their save payload, and the
+# slice held by MetaSystem. Owns the fields, their save payload, and the
 # operations that mutate them.
 #
 # Fields are read-public via getters. Mutation goes through the owning Manager only.

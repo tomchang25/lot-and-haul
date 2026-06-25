@@ -41,9 +41,9 @@ func _browse_lot(location: LocationData) -> LotData:
 
 
 ## Builds a complete run+lot snapshot dict via the normal save path. Caller
-## should have set up RunManager state before calling.
+## should have set up RunSystem state before calling.
 func _capture_snapshot() -> Dictionary:
-    return RunManager.to_dict().get("run_snapshot", { })
+    return RunSystem.to_dict().get("run_snapshot", { })
 
 # ══ Round-trip ═══════════════════════════════════════════════════════════════
 
@@ -55,7 +55,7 @@ func test_run_snapshot_round_trip() -> void:
     var car := _car()
     var loc := _location()
 
-    RunManager.create_run_store(loc, car)
+    RunSystem.create_run_store(loc, car)
     var item := _item(rng)
     item.unveil()
 
@@ -67,11 +67,11 @@ func test_run_snapshot_round_trip() -> void:
     lot_entry.item_entries = [item]
     lot_entry.npc_estimate = 200
 
-    RunManager.init_browse_lots([ld])
-    RunManager.set_lot(lot_entry)
-    RunManager.commit_lot_win([item], 250)
-    RunManager.commit_cargo([item], [], 30)
-    RunManager.set_resume_target(RunStore.RESUME_INSPECTION)
+    RunSystem.init_browse_lots([ld])
+    RunSystem.set_lot(lot_entry)
+    RunSystem.commit_lot_win([item], 250)
+    RunSystem.commit_cargo([item], [], 30)
+    RunSystem.set_resume_target(RunStore.RESUME_INSPECTION)
 
     var snapshot := _capture_snapshot()
     assert_false(snapshot.is_empty(), "snapshot should be non-empty")
@@ -85,34 +85,34 @@ func test_run_snapshot_round_trip() -> void:
     # Preserve reference data for comparison after restore.
     var orig_loc_id := loc.location_id
     var orig_car_id := car.car_id
-    var orig_paid := RunManager.run.paid_price
-    var orig_onsite := RunManager.run.onsite_proceeds
-    var orig_won_count := RunManager.run.won_items.size()
-    var orig_cargo_count := RunManager.run.cargo_items.size()
+    var orig_paid := RunSystem.run.paid_price
+    var orig_onsite := RunSystem.run.onsite_proceeds
+    var orig_won_count := RunSystem.run.won_items.size()
+    var orig_cargo_count := RunSystem.run.cargo_items.size()
 
-    RunManager.clear_run_state()
-    assert_null(RunManager.run, "run should be null after clear")
-    assert_null(RunManager.lot, "lot should be null after clear")
+    RunSystem.clear_run_state()
+    assert_null(RunSystem.run, "run should be null after clear")
+    assert_null(RunSystem.lot, "lot should be null after clear")
 
     _ctx = SaveLoadContext.new()
-    RunManager.from_dict({ "run_snapshot": snapshot }, _ctx)
+    RunSystem.from_dict({ "run_snapshot": snapshot }, _ctx)
 
-    assert_not_null(RunManager.run, "run should be restored")
-    assert_not_null(RunManager.lot, "lot should be restored")
-    assert_eq(RunManager.run.resume_target, RunStore.RESUME_INSPECTION, "resume target restored")
-    assert_eq(RunManager.run.location_data.location_id, orig_loc_id, "location id restored")
-    assert_eq(RunManager.run.car_data.car_id, orig_car_id, "car id restored")
-    assert_eq(RunManager.run.paid_price, orig_paid, "paid price restored")
-    assert_eq(RunManager.run.onsite_proceeds, orig_onsite, "onsite proceeds restored")
-    assert_eq(RunManager.run.won_items.size(), orig_won_count, "won items count restored")
-    assert_eq(RunManager.run.cargo_items.size(), orig_cargo_count, "cargo items count restored")
-    assert_eq(RunManager.lot.won_price, 250, "lot won price restored")
+    assert_not_null(RunSystem.run, "run should be restored")
+    assert_not_null(RunSystem.lot, "lot should be restored")
+    assert_eq(RunSystem.run.resume_target, RunStore.RESUME_INSPECTION, "resume target restored")
+    assert_eq(RunSystem.run.location_data.location_id, orig_loc_id, "location id restored")
+    assert_eq(RunSystem.run.car_data.car_id, orig_car_id, "car id restored")
+    assert_eq(RunSystem.run.paid_price, orig_paid, "paid price restored")
+    assert_eq(RunSystem.run.onsite_proceeds, orig_onsite, "onsite proceeds restored")
+    assert_eq(RunSystem.run.won_items.size(), orig_won_count, "won items count restored")
+    assert_eq(RunSystem.run.cargo_items.size(), orig_cargo_count, "cargo items count restored")
+    assert_eq(RunSystem.lot.won_price, 250, "lot won price restored")
 
     # Item data fidelity.
-    assert_eq(RunManager.run.cargo_items[0].anchor.anchor_id, item.anchor.anchor_id, "cargo item anchor restored")
-    assert_true(RunManager.run.won_items[0].unveiled, "won item unveiled state restored")
+    assert_eq(RunSystem.run.cargo_items[0].anchor.anchor_id, item.anchor.anchor_id, "cargo item anchor restored")
+    assert_true(RunSystem.run.won_items[0].unveiled, "won item unveiled state restored")
 
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()
 
 # ══ Shared ItemEntry Identity ════════════════════════════════════════════════
 
@@ -124,7 +124,7 @@ func test_run_snapshot_shared_item_identity() -> void:
     var car := _car()
     var loc := _location()
 
-    RunManager.create_run_store(loc, car)
+    RunSystem.create_run_store(loc, car)
     var item := _item(rng)
     item.unveil()
 
@@ -136,36 +136,36 @@ func test_run_snapshot_shared_item_identity() -> void:
     lot_entry.item_entries = [item]
     lot_entry.npc_estimate = 150
 
-    RunManager.init_browse_lots([ld])
-    RunManager.set_lot(lot_entry)
+    RunSystem.init_browse_lots([ld])
+    RunSystem.set_lot(lot_entry)
     # Commit the SAME item ref to both win and cargo so the snapshot context
     # assigns the same table key and identity survives restore.
-    RunManager.commit_lot_win([item], 300)
-    RunManager.commit_cargo([item], [], 0)
-    RunManager.set_resume_target(RunStore.RESUME_CARGO)
+    RunSystem.commit_lot_win([item], 300)
+    RunSystem.commit_cargo([item], [], 0)
+    RunSystem.set_resume_target(RunStore.RESUME_CARGO)
 
     var snapshot := _capture_snapshot()
-    var orig_ref := RunManager.run.cargo_items[0]
+    var orig_ref := RunSystem.run.cargo_items[0]
 
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()
     _ctx = SaveLoadContext.new()
-    RunManager.from_dict({ "run_snapshot": snapshot }, _ctx)
+    RunSystem.from_dict({ "run_snapshot": snapshot }, _ctx)
 
-    assert_not_null(RunManager.run, "run should be restored")
-    assert_eq(RunManager.run.cargo_items.size(), 1, "cargo items count")
-    assert_eq(RunManager.run.won_items.size(), 1, "won items count")
+    assert_not_null(RunSystem.run, "run should be restored")
+    assert_eq(RunSystem.run.cargo_items.size(), 1, "cargo items count")
+    assert_eq(RunSystem.run.won_items.size(), 1, "won items count")
 
     # The same ItemEntry ref that was in both cargo and won_items before save
     # should be the SAME restored object (shared identity from same table key).
-    var ref_kind := typeof(RunManager.run.cargo_items[0])
+    var ref_kind := typeof(RunSystem.run.cargo_items[0])
     assert_eq(ref_kind, typeof(orig_ref), "ref type should match")
     assert_eq(
-        RunManager.run.cargo_items[0],
-        RunManager.run.won_items[0],
+        RunSystem.run.cargo_items[0],
+        RunSystem.run.won_items[0],
         "cargo item and won item should be same object after restore",
     )
 
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()
 
 # ══ Atomic discard — bad lot reference ═══════════════════════════════════════
 
@@ -177,7 +177,7 @@ func test_run_snapshot_atomic_discard_on_bad_lot_ref() -> void:
     var car := _car()
     var loc := _location()
 
-    RunManager.create_run_store(loc, car)
+    RunSystem.create_run_store(loc, car)
     var item := _item(rng)
     item.unveil()
 
@@ -188,23 +188,23 @@ func test_run_snapshot_atomic_discard_on_bad_lot_ref() -> void:
     lot_entry.item_entries = [item]
     lot_entry.npc_estimate = 100
 
-    RunManager.init_browse_lots([ld])
-    RunManager.set_lot(lot_entry)
-    RunManager.set_resume_target(RunStore.RESUME_INSPECTION)
+    RunSystem.init_browse_lots([ld])
+    RunSystem.set_lot(lot_entry)
+    RunSystem.set_resume_target(RunStore.RESUME_INSPECTION)
 
     var snapshot := _capture_snapshot()
     # Corrupt lot_id so it won't match any browse lot.
     snapshot["stores"]["lot"]["lot_id"] = "nonexistent_lot"
 
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()
     _ctx = SaveLoadContext.new()
-    RunManager.from_dict({ "run_snapshot": snapshot }, _ctx)
+    RunSystem.from_dict({ "run_snapshot": snapshot }, _ctx)
 
-    assert_null(RunManager.run, "run should be null after bad lot restore")
-    assert_null(RunManager.lot, "lot should be null after bad lot restore")
+    assert_null(RunSystem.run, "run should be null after bad lot restore")
+    assert_null(RunSystem.lot, "lot should be null after bad lot restore")
     assert_true(_ctx.warnings.size() > 0, "should have warning after bad lot")
 
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()
 
 # ══ Atomic discard — invalid resume target ═══════════════════════════════════
 
@@ -216,22 +216,22 @@ func test_run_snapshot_atomic_discard_on_invalid_resume_target() -> void:
     var car := _car()
     var loc := _location()
 
-    RunManager.create_run_store(loc, car)
-    RunManager.set_resume_target(RunStore.RESUME_INSPECTION)
+    RunSystem.create_run_store(loc, car)
+    RunSystem.set_resume_target(RunStore.RESUME_INSPECTION)
 
     var snapshot := _capture_snapshot()
     # Corrupt resume_target to an invalid value.
     snapshot["resume_target"] = "bad_target"
 
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()
     _ctx = SaveLoadContext.new()
-    RunManager.from_dict({ "run_snapshot": snapshot }, _ctx)
+    RunSystem.from_dict({ "run_snapshot": snapshot }, _ctx)
 
-    assert_null(RunManager.run, "run should be null after invalid resume target")
-    assert_null(RunManager.lot, "lot should be null after invalid resume target")
+    assert_null(RunSystem.run, "run should be null after invalid resume target")
+    assert_null(RunSystem.lot, "lot should be null after invalid resume target")
     assert_true(_ctx.warnings.size() > 0, "should have warning after invalid resume target")
 
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()
 
 # ══ v1 legacy migration ══════════════════════════════════════════════════════
 
@@ -243,7 +243,7 @@ func test_run_snapshot_migration_v1_legacy_shape() -> void:
     var car := _car()
     var loc := _location()
 
-    RunManager.create_run_store(loc, car)
+    RunSystem.create_run_store(loc, car)
     var item := _item(rng)
     item.unveil()
 
@@ -254,10 +254,10 @@ func test_run_snapshot_migration_v1_legacy_shape() -> void:
     lot_entry.item_entries = [item]
     lot_entry.npc_estimate = 180
 
-    RunManager.init_browse_lots([ld])
-    RunManager.set_lot(lot_entry)
-    RunManager.commit_lot_win([item], 400)
-    RunManager.set_resume_target(RunStore.RESUME_REVEAL)
+    RunSystem.init_browse_lots([ld])
+    RunSystem.set_lot(lot_entry)
+    RunSystem.commit_lot_win([item], 400)
+    RunSystem.set_resume_target(RunStore.RESUME_REVEAL)
 
     # Get the v2 snapshot, then manually flatten to v1 shape.
     var v2 := _capture_snapshot()
@@ -276,15 +276,15 @@ func test_run_snapshot_migration_v1_legacy_shape() -> void:
     assert_false(v1.has("entries"), "v1 should not have entries key")
 
     # Now feed v1 through from_dict — it should trigger migrate_v1_to_v2.
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()
     _ctx = SaveLoadContext.new()
-    RunManager.from_dict({ "run_snapshot": v1 }, _ctx)
+    RunSystem.from_dict({ "run_snapshot": v1 }, _ctx)
 
-    assert_not_null(RunManager.run, "run should be restored from v1 shape")
-    assert_not_null(RunManager.lot, "lot should be restored from v1 shape")
-    assert_eq(RunManager.run.resume_target, RunStore.RESUME_REVEAL, "resume target from v1 migration")
-    assert_eq(RunManager.run.won_items.size(), 1, "won items from v1 migration")
-    assert_eq(RunManager.run.paid_price, 400, "paid price from v1 migration")
-    assert_eq(RunManager.lot.won_price, 400, "lot won price from v1 migration")
+    assert_not_null(RunSystem.run, "run should be restored from v1 shape")
+    assert_not_null(RunSystem.lot, "lot should be restored from v1 shape")
+    assert_eq(RunSystem.run.resume_target, RunStore.RESUME_REVEAL, "resume target from v1 migration")
+    assert_eq(RunSystem.run.won_items.size(), 1, "won items from v1 migration")
+    assert_eq(RunSystem.run.paid_price, 400, "paid price from v1 migration")
+    assert_eq(RunSystem.lot.won_price, 400, "lot won price from v1 migration")
 
-    RunManager.clear_run_state()
+    RunSystem.clear_run_state()

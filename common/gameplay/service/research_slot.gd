@@ -35,7 +35,7 @@ const RESTORE_ATTR_COEFF: float = 0.4
 
 
 ## Applies one AP-unit of repair progress to [param entry]. Mutates condition
-## toward the 0.5 cap. Mastery XP is awarded by the caller (MetaManager) via
+## toward the 0.5 cap. Mastery XP is awarded by the caller (MetaSystem) via
 ## EventBus.item_repaired — ResearchSlot has no autoload references.
 static func apply_repair(entry: ItemEntry) -> void:
     var zone_factor: float = REPAIR_ZONE_FACTORS[0.50]
@@ -48,7 +48,7 @@ static func apply_repair(entry: ItemEntry) -> void:
 
 ## Applies one AP-unit of restore progress to [param entry]. Mutates condition
 ## toward 1.0. [param restoration_attr] is the player's Restoration attribute
-## value, passed in by the caller (MetaManager) so this method has no autoload
+## value, passed in by the caller (MetaSystem) so this method has no autoload
 ## references. Mastery XP is awarded by the caller via EventBus.item_restored.
 static func apply_restore(entry: ItemEntry, restoration_attr: int) -> void:
     var zone_factor: float = RESTORE_ZONE_FACTORS[1.0]

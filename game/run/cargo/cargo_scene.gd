@@ -1,7 +1,7 @@
 # cargo_scene.gd
 # Block 05 — Cargo Loading (v2: 2-D grid packing)
-# Reads:  RunManager.run.won_items, RunManager.run.car_data
-# Writes: RunManager.commit_cargo()
+# Reads:  RunSystem.run.won_items, RunSystem.run.car_data
+# Writes: RunSystem.commit_cargo()
 extends Control
 
 # ── Constants ──────────────────────────────────────────────────────────────────
@@ -55,12 +55,12 @@ var _summary_panel: RunSummaryPanel:
 
 
 func _ready() -> void:
-    if RunManager.run == null:
+    if RunSystem.run == null:
         ToastManager.show_error("Cargo scene failed to load. Returning to hub.")
         SceneRouter.go_to_hub.call_deferred()
         return
 
-    RunManager.set_resume_target(RunStore.RESUME_CARGO)
+    RunSystem.set_resume_target(RunStore.RESUME_CARGO)
     SaveManager.save()
 
     _vehicle_panel.reset_pressed.connect(_on_reset_pressed)
@@ -73,16 +73,16 @@ func _ready() -> void:
     _vehicle_panel.extra_slot_unhovered.connect(_on_extra_slot_unhovered)
     _vehicle_panel.extra_slot_cancel.connect(_on_extra_slot_cancel)
 
-    _won_items = RunManager.run.won_items
+    _won_items = RunSystem.run.won_items
 
-    _extra_slot_items.resize(RunManager.run.car_data.extra_slot_count)
+    _extra_slot_items.resize(RunSystem.run.car_data.extra_slot_count)
     _extra_slot_items.fill(null)
 
     # ── Configure PackingGrid ─────────────────────────────────────────────
     _cargo_grid.setup_default_callbacks(_won_items)
     _cargo_grid.additional_validator = _packing_weight_validator
-    var cols: int = RunManager.run.car_data.grid_columns
-    var rows: int = RunManager.run.car_data.grid_rows
+    var cols: int = RunSystem.run.car_data.grid_columns
+    var rows: int = RunSystem.run.car_data.grid_rows
 
     _vehicle_panel.item_clicked.connect(_on_packing_grid_item_clicked)
     _vehicle_panel.cell_clicked.connect(_on_packing_grid_cell_clicked)
@@ -93,7 +93,7 @@ func _ready() -> void:
     _cargo_grid.setup(cols, rows)
 
     _build_item_list()
-    _vehicle_panel.build_extra_slots(RunManager.run.car_data.extra_slot_count)
+    _vehicle_panel.build_extra_slots(RunSystem.run.car_data.extra_slot_count)
 
     _recalc_totals()
     _refresh_ui()
@@ -212,8 +212,8 @@ func _on_confirm_popup_confirmed() -> void:
         if entry not in cargo and entry not in trailer:
             unplaced_count += 1
 
-    RunManager.commit_cargo(cargo, trailer, unplaced_count * Economy.ONSITE_SELL_PRICE)
-    RunManager.set_resume_target(RunStore.RESUME_RUN_REVIEW)
+    RunSystem.commit_cargo(cargo, trailer, unplaced_count * Economy.ONSITE_SELL_PRICE)
+    RunSystem.set_resume_target(RunStore.RESUME_RUN_REVIEW)
     SaveManager.save()
     EventBus.tutorial_event.emit(TutorialEvents.CARGO_LOADED, { })
     SceneRouter.go_to_run_review()
@@ -365,11 +365,11 @@ func _build_item_list() -> void:
 
 
 func _would_exceed_weight(entry: ItemEntry) -> bool:
-    if RunManager.run == null:
+    if RunSystem.run == null:
         ToastManager.show_dev_error("would_exceed_weight called with no active run")
         return true
 
-    var max_weight: float = RunManager.run.car_data.max_weight
+    var max_weight: float = RunSystem.run.car_data.max_weight
     var entry_weight: float = entry.get_weight()
 
     if _cargo_grid.is_item_placed(entry):
@@ -394,7 +394,7 @@ func _recalc_totals() -> void:
 
 
 func _refresh_ui() -> void:
-    var car: CarData = RunManager.run.car_data
+    var car: CarData = RunSystem.run.car_data
     var max_weight: float = car.max_weight
 
     var held_item = _cargo_grid.active_item
@@ -469,8 +469,8 @@ func _debug_auto_pack() -> void:
     if not Debug.enabled:
         return
 
-    var cols: int = RunManager.run.car_data.grid_columns
-    var rows: int = RunManager.run.car_data.grid_rows
+    var cols: int = RunSystem.run.car_data.grid_columns
+    var rows: int = RunSystem.run.car_data.grid_rows
 
     for entry: ItemEntry in _won_items:
         if _cargo_grid.is_item_placed(entry) or entry in _extra_slot_items:
@@ -513,5 +513,5 @@ func _debug_stuff_all() -> void:
     for entry: ItemEntry in _won_items:
         cargo.append(entry)
 
-    RunManager.commit_cargo(cargo, [], 0)
+    RunSystem.commit_cargo(cargo, [], 0)
     SceneRouter.go_to_run_review()

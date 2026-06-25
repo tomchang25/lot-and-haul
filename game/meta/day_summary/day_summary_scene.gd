@@ -113,7 +113,7 @@ func _render(summary: DaySummary) -> void:
         _net_label.text = TranslationServer.translate("UI_NET_DEBIT") % (-net)
         _net_label.add_theme_color_override(&"font_color", Color(1.0, 0.4, 0.4))
 
-    _balance_label.text = TranslationServer.translate("UI_BALANCE_LABEL") % MetaManager.economy.cash
+    _balance_label.text = TranslationServer.translate("UI_BALANCE_LABEL") % MetaSystem.economy.cash
 
     # Bankruptcy bailout notice
     _bankruptcy_label.visible = summary.bailout_amount > 0

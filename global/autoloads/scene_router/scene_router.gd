@@ -106,15 +106,15 @@ func go_to_start_page() -> void:
 ## Routes to the correct scene after an explicit Load Game completes.
 ## Priority: active run → shop session → storage session → hub.
 func go_to_loaded_save_entry() -> void:
-    if RunManager.is_run_active():
-        go_to_run_resume(RunManager.get_resume_target())
+    if RunSystem.is_run_active():
+        go_to_run_resume(RunSystem.get_resume_target())
         return
 
-    if MetaManager.shop_session.has_session():
+    if MetaSystem.shop_session.has_session():
         go_to_customer_sell()
         return
 
-    if MetaManager.storage_session.has_session():
+    if MetaSystem.storage_session.has_session():
         go_to_storage()
         return
 
@@ -139,7 +139,7 @@ func go_to_run_resume(target: String) -> void:
             go_to_run_review()
         _:
             ToastManager.show_warning("Saved run could not be resumed. Returning to hub.")
-            RunManager.clear_run_state()
+            RunSystem.clear_run_state()
             SaveManager.save()
             go_to_hub()
 

@@ -42,18 +42,18 @@ func _do_autopilot() -> bool:
     var car: CarData = cars[0] as CarData
 
     # ── 3. Pick first location ────────────────────────────────────────────
-    MetaManager.roll_available_locations()
-    var locations: Array = MetaManager.progress.available_locations
+    MetaSystem.roll_available_locations()
+    var locations: Array = MetaSystem.progress.available_locations
     if locations.is_empty():
         ToastManager.show_warning("CI Pilot: no available locations")
         return false
     var location: LocationData = locations[0] as LocationData
-    MetaManager.set_active_car(car)
+    MetaSystem.set_active_car(car)
     print("CI Pilot: location=%s car=%s" % [location.location_id, car.car_id])
 
     # ── 4. Create run — run must be active after creation ────────────────
-    RunManager.create_run_store(location, car)
-    if not RunManager.is_run_active():
+    RunSystem.create_run_store(location, car)
+    if not RunSystem.is_run_active():
         ToastManager.show_warning("CI Pilot: run not active after create")
         return false
 
@@ -74,54 +74,54 @@ func _do_autopilot() -> bool:
     print("CI Pilot: lot=%s items=%d" % [lot_data.lot_id, lot_entry.item_entries.size()])
 
     # ── 7. Set up lot for inspection — lot must be active ───────────────
-    RunManager.set_lot(lot_entry)
-    if RunManager.lot == null:
+    RunSystem.set_lot(lot_entry)
+    if RunSystem.lot == null:
         ToastManager.show_warning("CI Pilot: lot not active after set_lot")
         return false
 
     # ── 8. Inspect each item ─────────────────────────────────────────────
     for item: ItemEntry in lot_entry.item_entries:
         if item.is_veiled():
-            RunManager.unveil_item(item)
+            RunSystem.unveil_item(item)
         for clue: ClueData in item.surface_clues:
             if clue.clue_id not in item.revealed_clue_ids:
-                RunManager.attempt_clue(item, clue)
+                RunSystem.attempt_clue(item, clue)
 
     # ── 9. Win auction ───────────────────────────────────────────────────
     var auction_price := lot_entry.get_rolled_price()
-    RunManager.commit_lot_win(lot_entry.item_entries, auction_price)
+    RunSystem.commit_lot_win(lot_entry.item_entries, auction_price)
     print("CI Pilot: won lot price=%d" % auction_price)
-    if MetaManager.economy.cash < 0:
-        ToastManager.show_warning("CI invariant: cash went negative after auction, got %d" % MetaManager.economy.cash)
+    if MetaSystem.economy.cash < 0:
+        ToastManager.show_warning("CI invariant: cash went negative after auction, got %d" % MetaSystem.economy.cash)
         return false
 
     # ── 10. Fill cargo ──────────────────────────────────────────────────
-    RunManager.commit_cargo(lot_entry.item_entries, [], 0)
-    if MetaManager.economy.cash < 0:
-        ToastManager.show_warning("CI invariant: cash went negative after cargo, got %d" % MetaManager.economy.cash)
+    RunSystem.commit_cargo(lot_entry.item_entries, [], 0)
+    if MetaSystem.economy.cash < 0:
+        ToastManager.show_warning("CI invariant: cash went negative after cargo, got %d" % MetaSystem.economy.cash)
         return false
 
     # ── 11. Build run result and resolve ─────────────────────────────────
-    var result: RunResult = RunManager.take_run_result()
-    MetaManager.resolve_run(result)
-    RunManager.clear_run_state()
-    if MetaManager.storage.storage_items.is_empty() and not lot_entry.item_entries.is_empty():
+    var result: RunResult = RunSystem.take_run_result()
+    MetaSystem.resolve_run(result)
+    RunSystem.clear_run_state()
+    if MetaSystem.storage.storage_items.is_empty() and not lot_entry.item_entries.is_empty():
         ToastManager.show_warning("CI invariant: storage empty after resolving run with items")
         return false
 
     # ── 12. Advance the hub day ──────────────────────────────────────────
     # resolve_run (step 11) already set slot to Night; begin_open_shop
     # advances to day-ending.
-    MetaManager.begin_open_shop()
-    MetaManager.end_day()
-    MetaManager.begin_auction()
-    MetaManager.end_day()
+    MetaSystem.begin_open_shop()
+    MetaSystem.end_day()
+    MetaSystem.begin_auction()
+    MetaSystem.end_day()
 
     print(
         "CI Pilot: day=%d cash=%d storage=%d" % [
-            MetaManager.progress.current_day,
-            MetaManager.economy.cash,
-            MetaManager.storage.storage_items.size(),
+            MetaSystem.progress.current_day,
+            MetaSystem.economy.cash,
+            MetaSystem.storage.storage_items.size(),
         ],
     )
 
@@ -138,15 +138,15 @@ func _do_autopilot() -> bool:
 func _check_post_flow_invariants() -> bool:
     var ok := true
 
-    if MetaManager.economy.cash < 0:
-        ToastManager.show_warning("CI invariant: cash should be non-negative, got %d" % MetaManager.economy.cash)
+    if MetaSystem.economy.cash < 0:
+        ToastManager.show_warning("CI invariant: cash should be non-negative, got %d" % MetaSystem.economy.cash)
         ok = false
 
-    if MetaManager.economy.cash > 500000:
-        ToastManager.show_warning("CI invariant: cash seems excessive at %d" % MetaManager.economy.cash)
+    if MetaSystem.economy.cash > 500000:
+        ToastManager.show_warning("CI invariant: cash seems excessive at %d" % MetaSystem.economy.cash)
         ok = false
 
-    var day: int = MetaManager.progress.current_day
+    var day: int = MetaSystem.progress.current_day
     if day <= 0:
         ToastManager.show_warning("CI invariant: current_day should be positive, got %d" % day)
         ok = false
@@ -155,7 +155,7 @@ func _check_post_flow_invariants() -> bool:
         ToastManager.show_warning("CI invariant: current_day seems excessive at %d" % day)
         ok = false
 
-    if MetaManager.storage.storage_items.is_empty():
+    if MetaSystem.storage.storage_items.is_empty():
         ToastManager.show_warning("CI invariant: storage should have items after a completed run")
         ok = false
 

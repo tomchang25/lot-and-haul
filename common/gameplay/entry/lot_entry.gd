@@ -35,7 +35,7 @@ var npc_estimate: int = 0
 # [param rng] — optional seedable RNG for deterministic generation.
 # When null, falls back to RandomUtils' shared production RNG.
 # Apply external modifiers (player buffs, NPC presence) to the returned entry
-# before passing it to RunManager.create_run_store().
+# before passing it to RunSystem.create_run_store().
 static func create(data: LotData, rng: RandomNumberGenerator = null) -> LotEntry:
     var entry := LotEntry.new()
     entry.lot_data = data

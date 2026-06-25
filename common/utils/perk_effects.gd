@@ -10,7 +10,7 @@ extends RefCounted
 # ══ Internals ═════════════════════════════════════════════════════════════════
 
 static func _has(perk_id: String) -> bool:
-    var perk: PerkData = KnowledgeManager.get_perk_by_id(perk_id)
+    var perk: PerkData = KnowledgeSystem.get_perk_by_id(perk_id)
     if perk == null:
         return false
-    return KnowledgeManager.has_perk(perk)
+    return KnowledgeSystem.has_perk(perk)

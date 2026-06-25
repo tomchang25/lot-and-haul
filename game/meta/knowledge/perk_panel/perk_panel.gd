@@ -1,6 +1,6 @@
 # perk_panel.gd
 # Perk Panel — Read-only display of unlocked and locked perks.
-# Reads: KnowledgeManager
+# Reads: KnowledgeSystem
 extends Control
 
 const CANCEL: UiAudioEvent = preload("res://data/tres/audio_events/cancel_dismiss.tres")
@@ -28,7 +28,7 @@ func _on_back_pressed() -> void:
 
 
 func _build_content() -> void:
-    var perks: Array[PerkData] = KnowledgeManager.get_all_perks()
+    var perks: Array[PerkData] = KnowledgeSystem.get_all_perks()
     if perks.is_empty():
         var empty := Label.new()
         empty.text = TranslationServer.translate("UI_NO_PERKS")
@@ -39,7 +39,7 @@ func _build_content() -> void:
         return
 
     for perk: PerkData in perks:
-        var unlocked: bool = KnowledgeManager.has_perk(perk)
+        var unlocked: bool = KnowledgeSystem.has_perk(perk)
         var perk_label := Label.new()
         perk_label.theme_type_variation = &"Small"
 

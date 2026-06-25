@@ -2,7 +2,7 @@
 # One super-category block in the Mastery Panel: a header line plus its
 # per-category progression lines. Supports text-only (setup) or icon + text
 # (setup_with_data) modes.
-# Reads:  KnowledgeManager (get_category_rank, get_category_points, RANK_THRESHOLDS)
+# Reads:  KnowledgeSystem (get_category_rank, get_category_points, RANK_THRESHOLDS)
 class_name MasteryRow
 extends VBoxContainer
 
@@ -65,13 +65,13 @@ func _apply() -> void:
             else:
                 icon_rect.modulate = Color(0.22, 0.22, 0.3, 1)
 
-            var rank: int = KnowledgeManager.get_category_rank(cat)
-            var points: int = KnowledgeManager.get_category_points(cat)
+            var rank: int = KnowledgeSystem.get_category_rank(cat)
+            var points: int = KnowledgeSystem.get_category_points(cat)
             var progress_text: String
             if rank >= 5:
                 progress_text = TranslationServer.translate("UI_MASTERY_MAX")
             else:
-                var next_threshold: int = KnowledgeManager.RANK_THRESHOLDS[rank + 1]
+                var next_threshold: int = KnowledgeSystem.RANK_THRESHOLDS[rank + 1]
                 progress_text = TranslationServer.translate("UI_PROGRESS_FORMAT") % [points, next_threshold]
 
             var lbl := Label.new()

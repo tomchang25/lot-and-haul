@@ -1,7 +1,7 @@
 # run_result.gd
-# Snapshot produced by RunManager.take_run_result() at run end.
+# Snapshot produced by RunSystem.take_run_result() at run end.
 # Carries final run economics and cargo (surface-clues already auto-revealed)
-# for MetaManager.resolve_run() to consume. Not serialized — the economics are
+# for MetaSystem.resolve_run() to consume. Not serialized — the economics are
 # stashed into SlotStore.pending_run by resolve_run().
 class_name RunResult
 extends RefCounted

@@ -17,12 +17,12 @@ var _previous_tutorial_skip_all := false
 func before_all() -> void:
     _previous_tutorial_skip_all = SettingsStore.tutorial_skip_all
     SettingsStore.tutorial_skip_all = false
-    MetaManager.reset()
+    MetaSystem.reset()
 
 
 func before_each() -> void:
     SettingsStore.tutorial_skip_all = false
-    MetaManager.reset()
+    MetaSystem.reset()
     _hub_anchors = {
         "slot_label": _make_anchor_button(),
         "storage_btn": _make_anchor_button(),
@@ -224,7 +224,7 @@ func test_unknown_script_accept_offer_resets_state() -> void:
 
 func test_completing_tutorial_marks_seen() -> void:
     assert_false(
-        MetaManager.progress.tutorial_seen.has("hub"),
+        MetaSystem.progress.tutorial_seen.has("hub"),
         "hub not seen before tutorial completes",
     )
     Director.start_script("hub")
@@ -234,7 +234,7 @@ func test_completing_tutorial_marks_seen() -> void:
     Director.advance_step()
     Director.register_scene("storage", { "storage_btn": _make_anchor_button() })
     assert_true(
-        MetaManager.progress.tutorial_seen.has("hub"),
+        MetaSystem.progress.tutorial_seen.has("hub"),
         "hub marked seen after completing all steps",
     )
 
@@ -248,7 +248,7 @@ func test_reset_runtime_clears_active_tutorial_without_marking_seen() -> void:
     assert_eq(Director.step_count(), 0, "tutorial cleared after runtime reset")
     assert_eq(Director.step_index(), 0, "step index reset after runtime reset")
     assert_false(
-        MetaManager.progress.tutorial_seen.has("hub"),
+        MetaSystem.progress.tutorial_seen.has("hub"),
         "runtime reset should not mark tutorial seen",
     )
 
@@ -387,7 +387,7 @@ func test_onboarding_resolver_starts_hub_segment() -> void:
 
 
 func test_onboarding_resolver_skips_when_segment_seen() -> void:
-    MetaManager.progress.mark_tutorial_seen("onboarding_hub_intro_choose")
+    MetaSystem.progress.mark_tutorial_seen("onboarding_hub_intro_choose")
     Director.register_scene("hub", { "activity_btn": _make_anchor_button(), "auction_btn": _make_anchor_button() })
     assert_false(ScriptDirector.active, "onboarding should not start when segment already seen")
 
@@ -395,13 +395,13 @@ func test_onboarding_resolver_skips_when_segment_seen() -> void:
 func test_trigger_onboarding_storage_choose_starts_independent_of_run() -> void:
     # storage_choose no longer requires auction_run seen; its own trigger
     # (night hub, day 0, onboarding_pending) decides independently.
-    MetaManager.slot.set_slot(SlotStore.SLOT_NIGHT)
+    MetaSystem.slot.set_slot(SlotStore.SLOT_NIGHT)
     Director.register_scene("hub", { "activity_btn": _make_anchor_button(), "storage_btn": _make_anchor_button() })
     assert_true(ScriptDirector.active, "storage_choose should start from its own trigger when conditions match")
 
 
 func test_onboarding_resolver_supports_storage_choose() -> void:
-    MetaManager.slot.set_slot(SlotStore.SLOT_NIGHT)
+    MetaSystem.slot.set_slot(SlotStore.SLOT_NIGHT)
     Director.register_scene("hub", { "activity_btn": _make_anchor_button(), "storage_btn": _make_anchor_button() })
     assert_true(ScriptDirector.active, "onboarding storage_choose should start for night hub")
     assert_eq(Director.step_count(), 3, "onboarding_storage_choose has 3 steps")
@@ -437,37 +437,37 @@ func test_onboarding_scripts_resolve() -> void:
 func test_onboarding_close_marks_unit_seen_only() -> void:
     ScriptDirector.start_script("onboarding_hub_intro_choose")
     assert_true(ScriptDirector.active, "onboarding script should be active")
-    assert_true(MetaManager.is_onboarding_pending(), "onboarding pending before close")
+    assert_true(MetaSystem.is_onboarding_pending(), "onboarding pending before close")
     ScriptDirector.stop_script()
     assert_false(ScriptDirector.active, "script should not be active after close")
-    assert_true(MetaManager.is_onboarding_pending(), "onboarding should STILL be pending after single-unit close")
-    assert_true(MetaManager.progress.tutorial_seen.has("onboarding_hub_intro_choose"), "closed unit should be marked seen")
+    assert_true(MetaSystem.is_onboarding_pending(), "onboarding should STILL be pending after single-unit close")
+    assert_true(MetaSystem.progress.tutorial_seen.has("onboarding_hub_intro_choose"), "closed unit should be marked seen")
 
 
 func test_skip_all_onboarding_clears_chain() -> void:
     ScriptDirector.start_script("onboarding_hub_intro_choose")
-    assert_true(MetaManager.is_onboarding_pending(), "onboarding pending before skip all")
+    assert_true(MetaSystem.is_onboarding_pending(), "onboarding pending before skip all")
     Director.skip_all_onboarding()
     assert_false(ScriptDirector.active, "script should not be active after skip all")
-    assert_false(MetaManager.is_onboarding_pending(), "onboarding should be cleared after skip all")
+    assert_false(MetaSystem.is_onboarding_pending(), "onboarding should be cleared after skip all")
     assert_eq(
         GameplayOverride.payload(GameplayOverride.FORCED_ACTIVITY) as Variant,
         null,
         "skip all clears forced_activity immediately",
     )
     assert_true(
-        MetaManager.progress.tutorial_seen.has("onboarding_hub_intro_choose"),
+        MetaSystem.progress.tutorial_seen.has("onboarding_hub_intro_choose"),
         "skip all marks hub_intro_choose seen",
     )
     assert_true(
-        MetaManager.progress.tutorial_seen.has("onboarding_selling"),
+        MetaSystem.progress.tutorial_seen.has("onboarding_selling"),
         "skip all marks selling seen",
     )
 
 
 func test_selling_segment_completes_onboarding() -> void:
-    MetaManager.progress.reset_onboarding()
-    assert_true(MetaManager.is_onboarding_pending(), "onboarding pending before test")
+    MetaSystem.progress.reset_onboarding()
+    assert_true(MetaSystem.is_onboarding_pending(), "onboarding pending before test")
     # Register all anchors the selling script references.
     var anchors := {
         "customer_queue": _make_anchor_button(),
@@ -501,7 +501,7 @@ func test_selling_segment_completes_onboarding() -> void:
     assert_eq(Director.step_index(), 8, "at leave step")
     Director.advance_step()
     assert_false(ScriptDirector.active, "script should end after leave step")
-    assert_false(MetaManager.is_onboarding_pending(), "onboarding should be complete after selling segment")
+    assert_false(MetaSystem.is_onboarding_pending(), "onboarding should be complete after selling segment")
 
 
 func test_auction_resolved_event_constant_exists() -> void:
@@ -516,24 +516,24 @@ func test_chooser_opened_event_constant_exists() -> void:
 
 func test_onboarding_location_select_starts_auction_segment() -> void:
     # day 0, slot DAY, onboarding pending + prereq seen → triggers auction.
-    MetaManager.progress.mark_tutorial_seen("onboarding_hub_intro_choose")
+    MetaSystem.progress.mark_tutorial_seen("onboarding_hub_intro_choose")
     Director.register_scene("location_select", { "cards_container": _make_anchor_button() })
     assert_true(ScriptDirector.active, "auction_run should start for location_select")
 
 
 func test_onboarding_day_pass_starts_when_prereqs_met() -> void:
-    MetaManager.progress.mark_tutorial_seen("onboarding_storage_choose")
-    MetaManager.progress.mark_tutorial_seen("onboarding_storage")
+    MetaSystem.progress.mark_tutorial_seen("onboarding_storage_choose")
+    MetaSystem.progress.mark_tutorial_seen("onboarding_storage")
     Director.register_scene("day_summary", { "continue_btn": _make_anchor_button() })
     assert_true(ScriptDirector.active, "day_pass should start for day_summary when prereqs met")
 
 
 func test_onboarding_selling_skipped_when_storage_empty() -> void:
-    MetaManager.progress.reset_onboarding()
-    MetaManager.progress.mark_tutorial_seen("onboarding_storage_choose")
-    MetaManager.progress.mark_tutorial_seen("onboarding_storage")
-    MetaManager.progress.mark_tutorial_seen("onboarding_day_pass")
-    MetaManager.progress.mark_tutorial_seen("onboarding_shop_choose")
+    MetaSystem.progress.reset_onboarding()
+    MetaSystem.progress.mark_tutorial_seen("onboarding_storage_choose")
+    MetaSystem.progress.mark_tutorial_seen("onboarding_storage")
+    MetaSystem.progress.mark_tutorial_seen("onboarding_day_pass")
+    MetaSystem.progress.mark_tutorial_seen("onboarding_shop_choose")
     Director.register_scene("customer_sell", { "customer_queue": _make_anchor_button() })
     assert_false(ScriptDirector.active, "selling segment should not start with empty storage")
 
@@ -733,13 +733,13 @@ func test_forced_activity_day0_day() -> void:
 
 
 func test_forced_activity_day0_night() -> void:
-    MetaManager.slot.set_slot(SlotStore.SLOT_NIGHT)
+    MetaSystem.slot.set_slot(SlotStore.SLOT_NIGHT)
     Director.register_scene("refresh_night_overrides [DEBUG-PASS]", { })
     _assert_forced_activity_payload(&"storage", "day 0 night slot targets storage")
 
 
 func test_forced_activity_not_pending() -> void:
-    MetaManager.progress.mark_onboarding_complete()
+    MetaSystem.progress.mark_onboarding_complete()
     Director.register_scene("refresh_completed_overrides [DEBUG-PASS]", { })
     assert_eq(
         GameplayOverride.payload(GameplayOverride.FORCED_ACTIVITY) as Variant,
@@ -757,7 +757,7 @@ func test_forced_tutorial_location_active_when_not_seen() -> void:
 
 
 func test_forced_tutorial_location_inactive_when_seen() -> void:
-    MetaManager.progress.mark_tutorial_seen("onboarding_location_select")
+    MetaSystem.progress.mark_tutorial_seen("onboarding_location_select")
     Director.register_scene("refresh_seen_overrides [DEBUG-PASS]", { })
     assert_false(
         GameplayOverride.is_active(GameplayOverride.FORCED_TUTORIAL_LOCATION),
@@ -774,7 +774,7 @@ func test_conservative_sale_locked_when_pending() -> void:
 
 
 func test_conservative_sale_locked_not_when_not_pending() -> void:
-    MetaManager.progress.mark_onboarding_complete()
+    MetaSystem.progress.mark_onboarding_complete()
     Director.register_scene("refresh_completed_overrides [DEBUG-PASS]", { })
     assert_false(
         GameplayOverride.is_active(GameplayOverride.CONSERVATIVE_SALE_LOCKED),
@@ -783,8 +783,8 @@ func test_conservative_sale_locked_not_when_not_pending() -> void:
 
 
 func test_conservative_sale_locked_not_when_seen() -> void:
-    MetaManager.progress.reset_onboarding()
-    MetaManager.progress.mark_tutorial_seen("onboarding_selling")
+    MetaSystem.progress.reset_onboarding()
+    MetaSystem.progress.mark_tutorial_seen("onboarding_selling")
     Director.register_scene("refresh_seen_overrides [DEBUG-PASS]", { })
     assert_false(
         GameplayOverride.is_active(GameplayOverride.CONSERVATIVE_SALE_LOCKED),

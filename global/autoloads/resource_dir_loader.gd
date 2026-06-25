@@ -1,7 +1,7 @@
 # resource_dir_loader.gd
 # Static helper for loading all .tres files in a directory, keyed by a
 # caller-supplied id getter. Used by registry autoloads
-# (CarRegistry, LocationRegistry) and by KnowledgeManager's perk/skill loaders.
+# (CarRegistry, LocationRegistry) and by KnowledgeSystem's perk/skill loaders.
 class_name ResourceDirLoader
 extends RefCounted
 

@@ -252,16 +252,16 @@ decided by one semantic test:
 > - **No → singular** (the folder is a _namespace / grouping_ of different things).
 
 ```
-managers/                  # each child IS a manager        → plural
-  knowledge_manager.gd
-  meta_manager.gd
+systems/                   # each child IS a system          → plural
+  knowledge_system.gd
+  meta_system.gd
 
 data/tres/items/           # each child IS an item           → plural
   rusty_sword.tres
   antique_clock.tres
 
 gameplay/                  # children are NOT "gameplays"    → singular
-  instance/                #   ...each folder holds one archetype type → singular
+  entry/                   #   ...each folder holds one archetype type → singular
   service/
   snapshot/
 ```

@@ -1,8 +1,8 @@
 # car_select_scene.gd
 # Car Select (Garage) — Lists every owned car and lets the player pick which
 # one to drive on the next run.
-# Reads:  MetaManager.garage.owned_cars, MetaManager.garage.active_car
-# Writes: MetaManager.set_active_car
+# Reads:  MetaSystem.garage.owned_cars, MetaSystem.garage.active_car
+# Writes: MetaSystem.set_active_car
 extends Control
 
 # ── Constants ──────────────────────────────────────────────────────────────────
@@ -36,9 +36,9 @@ func _on_back_pressed() -> void:
 
 
 func _on_select_pressed(car: CarData) -> void:
-    if car == MetaManager.garage.active_car:
+    if car == MetaSystem.garage.active_car:
         return
-    MetaManager.set_active_car(car)
+    MetaSystem.set_active_car(car)
     AudioManager.play_event(CONFIRM)
     _refresh_active_state()
 
@@ -50,11 +50,11 @@ func _populate_rows() -> void:
         child.queue_free()
     _rows.clear()
 
-    for car: CarData in MetaManager.garage.owned_cars:
+    for car: CarData in MetaSystem.garage.owned_cars:
         if car.is_test and not Debug.enabled:
             continue
         var row: CarRow = CarRowScene.instantiate()
-        row.setup(car, car == MetaManager.garage.active_car)
+        row.setup(car, car == MetaSystem.garage.active_car)
         row.select_pressed.connect(_on_select_pressed)
         _rows_container.add_child(row)
         _rows.append(row)
@@ -62,4 +62,4 @@ func _populate_rows() -> void:
 
 func _refresh_active_state() -> void:
     for row: CarRow in _rows:
-        row.setup(row.get_car(), row.get_car() == MetaManager.garage.active_car)
+        row.setup(row.get_car(), row.get_car() == MetaSystem.garage.active_car)

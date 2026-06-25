@@ -1,6 +1,6 @@
 # customers_store.gd
 # Customers runtime store: nightly customers and the day's sale ledger.
-# Serializable state slice held by MetaManager. Owns the fields, their save
+# Serializable state slice held by MetaSystem. Owns the fields, their save
 # payload, and the operations that mutate them.
 #
 # Fields are read-public via getters. Mutation goes through the owning Manager only.

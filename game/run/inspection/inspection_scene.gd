@@ -58,12 +58,12 @@ var _inspection_finished: bool = false
 
 
 func _ready() -> void:
-    if RunManager.lot == null:
+    if RunSystem.lot == null:
         ToastManager.show_error("Inspection scene failed to load. Returning to hub.")
         SceneRouter.go_to_hub.call_deferred()
         return
 
-    RunManager.set_resume_target(RunStore.RESUME_INSPECTION)
+    RunSystem.set_resume_target(RunStore.RESUME_INSPECTION)
     SaveManager.save()
 
     _footer.show()
@@ -106,7 +106,7 @@ func _process(_delta: float) -> void:
 
 
 func _populate_browser() -> void:
-    var items := RunManager.lot.lot_items
+    var items := RunSystem.lot.lot_items
     _item_browser.setup(INSPECTION_COLUMNS)
     _item_browser.populate(items)
     _item_browser.set_mode(ItemBrowserPanel.DisplayMode.CARD)
@@ -117,8 +117,8 @@ func _populate_browser() -> void:
 ## Rolls surface clues for every unveiled item in the active lot. Called on
 ## scene entry (no AP cost) and after manual unveil of a single item.
 func _auto_roll_visible_items() -> void:
-    for entry: ItemEntry in RunManager.lot.lot_items:
-        RunManager.attempt_surface_clues(entry)
+    for entry: ItemEntry in RunSystem.lot.lot_items:
+        RunSystem.attempt_surface_clues(entry)
 
 # ══ Card interaction — select only, no AP spend ═══════════════════════════════
 
@@ -134,7 +134,7 @@ func _on_unveil_pressed() -> void:
         return
     if not _selected_entry.is_veiled():
         return
-    if UNVEIL_COST > RunManager.lot.actions_remaining:
+    if UNVEIL_COST > RunSystem.lot.actions_remaining:
         AudioManager.play_event(BLOCKED_ERROR)
         return
     _do_unveil(_selected_entry)
@@ -147,28 +147,28 @@ func _on_inspect_clues_pressed() -> void:
         return
     if not _selected_entry.has_unrevealed_surface():
         return
-    if CLUE_CHAIN_COST > RunManager.lot.actions_remaining:
+    if CLUE_CHAIN_COST > RunSystem.lot.actions_remaining:
         AudioManager.play_event(BLOCKED_ERROR)
         return
     _do_clue_chain(_selected_entry)
 
 
 func _do_unveil(entry: ItemEntry) -> void:
-    RunManager.spend_ap(UNVEIL_COST)
+    RunSystem.spend_ap(UNVEIL_COST)
     _reveal_item(entry)
     AudioManager.play_event(REVEAL_GOOD)
     EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_ITEM_UNVEILED, { })
 
     _clear_clue_result()
     var before_ids := entry.revealed_clue_ids.duplicate()
-    RunManager.attempt_surface_clues(entry)
+    RunSystem.attempt_surface_clues(entry)
     _show_unveil_result(entry, before_ids)
 
     _complete_action()
 
 
 func _do_clue_chain(entry: ItemEntry) -> void:
-    RunManager.spend_ap(CLUE_CHAIN_COST)
+    RunSystem.spend_ap(CLUE_CHAIN_COST)
 
     _clear_clue_result()
     var available: Array[ClueData] = entry.get_unrevealed_surface_clues()
@@ -177,7 +177,7 @@ func _do_clue_chain(entry: ItemEntry) -> void:
         _show_clue_result(TranslationServer.translate("UI_NO_CLUES_LEFT"), false)
     else:
         var chosen: ClueData = available[RandomUtils.randi() % available.size()]
-        RunManager.reveal_clue_direct(entry, chosen)
+        RunSystem.reveal_clue_direct(entry, chosen)
         AudioManager.play_event(REVEAL_GOOD)
         _show_clue_result(TranslationServer.translate(chosen.known_text_key), true)
 
@@ -190,7 +190,7 @@ func _complete_action() -> void:
     _refresh_hud()
     _refresh_detail()
 
-    if RunManager.lot.actions_remaining <= 0:
+    if RunSystem.lot.actions_remaining <= 0:
         _finish_inspection()
 
 
@@ -245,14 +245,14 @@ func _on_inspection_override_changed(id: StringName, active: bool, _payload: Var
 
 
 func _reveal_item(item: ItemEntry) -> void:
-    RunManager.unveil_item(item)
+    RunSystem.unveil_item(item)
 
 # ══ Display refresh ═════════════════════════════════════════════════════════
 
 
 func _refresh_hud() -> void:
-    var ap: int = RunManager.lot.actions_remaining
-    var cap: int = RunManager.run.inspection_ap_cap
+    var ap: int = RunSystem.lot.actions_remaining
+    var cap: int = RunSystem.run.inspection_ap_cap
     _stamina_hud.update_ap(ap, cap)
 
 # ══ Sidebar — active item detail ════════════════════════════════════════════
@@ -275,7 +275,7 @@ func _refresh_detail() -> void:
 
 
 func _refresh_action_section(entry: ItemEntry) -> void:
-    var ap: int = RunManager.lot.actions_remaining
+    var ap: int = RunSystem.lot.actions_remaining
 
     if entry.is_veiled():
         _action_unveil_button.show()
@@ -339,13 +339,13 @@ func _on_pass_pressed() -> void:
 
 
 func _on_pass_confirmed() -> void:
-    RunManager.set_resume_target(RunStore.RESUME_LOT_BROWSE)
+    RunSystem.set_resume_target(RunStore.RESUME_LOT_BROWSE)
     SaveManager.save()
     SceneRouter.go_to_lot_browse()
 
 
 func _on_review_pressed() -> void:
-    _summary_popup.setup(RunManager.lot.lot_entry)
+    _summary_popup.setup(RunSystem.lot.lot_entry)
     _summary_popup.popup_centered()
     EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_REVIEW_OPENED, { })
 

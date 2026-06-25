@@ -88,7 +88,7 @@ common/       Reusable systems (not game-feature-specific)
     store/    Manager-held mutable state containers (persisting or session-scoped)
     snapshot/ Read-only one-shot value objects (derived, then discarded)
     service/  Stateless pure-math helpers
-    instance/ Entry/Instance types (ItemEntry, LotEntry, CustomerEntry, etc.)
+    entry/   Entry types (ItemEntry, LotEntry, CustomerEntry, etc.)
   utils/      Random utils, perk effects
 data/         Designer resources: definitions, yaml sources, generated .tres
   definitions/  Resource class scripts (.gd) for each type
@@ -113,7 +113,7 @@ game/         Game feature scenes and logic
 global/       Autoloads and project-wide resources
   autoloads/  All autoload scripts, organized by role:
     game_manager/ Boot orchestrator + scene registry
-    managers/    Gameplay managers (MetaManager, KnowledgeManager, RunManager)
+    systems/     Gameplay systems (MetaSystem, KnowledgeSystem, RunSystem)
     registries/  Designer-resource registries (extend ResourceRegistry)
     scene_router/ Scene navigation + pending data
     debug.gd         Unified debug gate (OS.is_debug_build() AND SettingsStore.debug_mode)
@@ -141,7 +141,7 @@ Check `TODO.md` `## Active`.
 
 ## Conventions
 
-- **Runtime type archetypes** (every type in `common/gameplay/`): read `dev/standards/runtime_type_archetypes.md` — covers the four archetypes (Entry/Instance, Store, Snapshot, Service), the mutation-mediation rule, and the subfolder-as-truth convention.
+- **Runtime type archetypes** (every type in `common/gameplay/`): read `dev/standards/runtime_type_archetypes.md` — covers the four archetypes (Entry, Store, Snapshot, Service), the mutation-mediation rule, and the subfolder-as-truth convention.
 - **Price pipeline**: all prices resolve through `ItemEntry.item_price` (`(appraised|verified value) × condition_multiplier`). Appraised value = anchor + revealed surface modifiers (add-then-mul). Verified value includes hidden modifiers. No per-type formulas outside the pipeline.
 - **Cross-manager communication**: direct call when the caller's correctness depends on the result (transactional dependency — e.g. `spend()` returning false aborts the whole operation). EventBus signal when the caller doesn't care about the outcome (notification — e.g. broadcasting `item_repaired` so KnowledgeManager can award XP; the repair is correct regardless). Test: "if the other side fails or doesn't exist, do I rollback?" Yes → direct call. No → event.
 - **Docstrings**: every `.gd` file starts with `# filename` + one-line purpose. All public functions and complex (>10 lines or non-obvious) private functions get a `##` GDDoc comment. Never strip or reduce existing comments when editing code.
@@ -151,7 +151,7 @@ Check `TODO.md` `## Active`.
 
 ## Standards
 
-- **Runtime type archetypes & mutations** (placing files in `common/gameplay/`, mutating Entry/Instance types): read `dev/standards/runtime_type_archetypes.md` — covers the four archetypes, the mutation-mediation rule ("scenes never mutate an Entry directly"), and the subfolder-as-truth convention.
+- **Runtime type archetypes & mutations** (placing files in `common/gameplay/`, mutating Entry types): read `dev/standards/runtime_type_archetypes.md` — covers the four archetypes, the mutation-mediation rule ("scenes never mutate an Entry directly"), and the subfolder-as-truth convention.
 - **Naming & GDScript style** (files, classes, variables, folders, match statements, enums, constants): read `dev/standards/naming_conventions.md` when writing any new GDScript or renaming anything. The match-wildcard rule (§11) is **lint-enforced** — see `dev/standards/standards_enforcement.md`.
 - **Registries** (adding/modifying a registry, writing registry call sites): read `dev/standards/registries.md` — covers required API, forbidden wrappers, iterate-resources-not-ids rule, and inverse lookup patterns.
 - **Scene node source** (creating/editing `.tscn`-backed scenes/components, adding nodes in GDScript): read `dev/standards/scene_node_source_standard.md` — persistent nodes live in `.tscn`; runtime-created nodes require a permitted exception and `node-src` marker. The node-source rule is **lint-enforced** — see `dev/standards/standards_enforcement.md`.

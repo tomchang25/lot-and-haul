@@ -171,7 +171,7 @@ func _select_first_storage_item() -> void:
     var panel := scene.get_node("%ItemListPanel") as ItemListPanel
     if panel == null:
         return
-    var items: Array = MetaManager.storage.storage_items
+    var items: Array = MetaSystem.storage.storage_items
     if items.is_empty():
         return
     panel.row_pressed.emit(items[0])

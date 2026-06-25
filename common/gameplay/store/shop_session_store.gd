@@ -2,7 +2,7 @@
 # Shop-session runtime store: in-flight state of the customer_sell scene -
 # the active customer session id, the items placed in that customer's car
 # grid, and the boot-routing pointer that tells the start page to resume the
-# shop scene on Load Game. Serializable state slice held by MetaManager.
+# shop scene on Load Game. Serializable state slice held by MetaSystem.
 #
 # Owns the fields and their save payload. Fields are read-public via
 # getters. Mutation goes through the owning Manager only.
@@ -103,7 +103,7 @@ func from_dict(data: Dictionary, _ctx: SaveLoadContext) -> void:
             if p is Dictionary:
                 _placement.append(p.duplicate())
 
-# ══ Mutators - called only from MetaManager wrappers ══════════════════════════
+# ══ Mutators - called only from MetaSystem wrappers ══════════════════════════
 
 
 ## Sets the active customer session id. Pass "" to clear. Does not save.

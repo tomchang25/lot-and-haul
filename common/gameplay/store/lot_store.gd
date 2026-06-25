@@ -1,6 +1,6 @@
 # lot_store.gd
 # Session-scoped Store for a single lot visit. Holds per-lot mutable state
-# (active entry, AP, and win result). Lifetime: created in RunManager.set_lot(),
+# (active entry, AP, and win result). Lifetime: created in RunSystem.set_lot(),
 # replaced by the next call to set_lot(), and readable through reveal.
 # Serialized as part of the run_snapshot save section when a lot is active.
 class_name LotStore
@@ -45,7 +45,7 @@ var won_price: int:
 
 
 ## Initializes this LotStore for [param p_entry] with [param p_initial_ap]
-## spendable AP. Called once by RunManager immediately after LotStore.new().
+## spendable AP. Called once by RunSystem immediately after LotStore.new().
 func initialize(p_entry: LotEntry, p_initial_ap: int) -> void:
     _lot_entry = p_entry
     _actions_remaining = p_initial_ap
@@ -60,7 +60,7 @@ func deduct_ap(cost: int) -> void:
 
 
 ## Records a won auction: saves [param items] and [param price] as this lot's
-## win result. Called by RunManager.commit_lot_win() on player victory.
+## win result. Called by RunSystem.commit_lot_win() on player victory.
 func record_win(items: Array[ItemEntry], price: int) -> void:
     _won_items = items.duplicate()
     _won_price = price
