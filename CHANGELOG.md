@@ -14,6 +14,10 @@ Rules:
 
 ## v0.1.8 - Draft
 
+### Runtime Architecture Vocabulary Standardization
+
+- 2026-06-25 — [refactor] Gameplay domain authorities renamed from Manager to System (RunSystem, MetaSystem, KnowledgeSystem), runtime Instance dir renamed to Entry, and archetype boundaries (Entry/Store/Snapshot/Service) hardened across code, docs, and standards
+
 ### 1080p Migration
 
 - 2026-06-24 — [1080p] Full project migrated to 1080p resolution base (viewports, scene roots, layout containers)
