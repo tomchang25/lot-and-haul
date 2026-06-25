@@ -1,3 +1,5 @@
+# cargo_item_card.gd
+# Grid card for displaying a won item in the cargo item list panel.
 class_name CargoItemCard
 extends PanelContainer
 
@@ -27,12 +29,14 @@ func _ready() -> void:
         _apply_state_style()
 
 
+## Plays a brief yellow flash to signal the card was placed on the grid.
 func play_loaded_pulse() -> void:
     var tween := create_tween().set_trans(Tween.TRANS_QUAD)
     tween.tween_property(self, "modulate", Color(1.4, 1.3, 0.5, 1.0), 0.08)
     tween.tween_property(self, "modulate", Color.WHITE, 0.22)
 
 
+## Plays a red flash + horizontal shake to signal the item could not be placed.
 func play_invalid_reject() -> void:
     var original := position
     var tween := create_tween().set_trans(Tween.TRANS_QUAD)
@@ -43,6 +47,7 @@ func play_invalid_reject() -> void:
     tween.tween_property(self, "modulate", Color.WHITE, 0.12)
 
 
+## Sets the entry this card represents and applies visuals.
 func setup(entry: ItemEntry) -> void:
     _entry = entry
 
@@ -51,30 +56,35 @@ func setup(entry: ItemEntry) -> void:
         _apply_state_style()
 
 
+## Re-applies the entry visuals and state style for when data changes externally.
 func refresh() -> void:
     if is_node_ready():
         _apply()
         _apply_state_style()
 
 
+## Marks the card as loaded (placed on grid or in a trailer slot) and updates style.
 func set_loaded(loaded: bool) -> void:
     _loaded = loaded
     if is_node_ready():
         _apply_state_style()
 
 
+## Marks the card as being actively held by the cursor.
 func set_holding(val: bool) -> void:
     _holding = val
     if is_node_ready():
         _apply_state_style()
 
 
+## Sets the card's selected state (highlighted as the currently active item).
 func set_selected(val: bool) -> void:
     _selected = val
     if is_node_ready():
         _apply_state_style()
 
 
+## Applies a highlight when the corresponding grid cell or trailer slot is hovered.
 func set_external_highlight(val: bool) -> void:
     _ext_highlighted = val
     if is_node_ready():

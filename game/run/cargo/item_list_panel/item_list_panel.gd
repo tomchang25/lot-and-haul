@@ -1,3 +1,5 @@
+# item_list_panel.gd
+# Scrollable grid of CargoItemCards for selecting won items to load onto the vehicle.
 class_name CargoItemListPanel
 extends PanelContainer
 
@@ -17,6 +19,7 @@ var _selected_entry: ItemEntry = null
 @onready var _empty_label: Label = %ListEmptyLabel
 
 
+## Clears any existing cards and builds a fresh grid from the given ItemEntry array.
 func rebuild(items: Array) -> void:
     _clear_cards()
     _item_cards.clear()
@@ -43,6 +46,7 @@ func rebuild(items: Array) -> void:
         _item_cards[entry] = card
 
 
+## Syncs each card's loaded/held visual state with the packing grid and trailer contents.
 func update_row_states(grid: PackingGrid, extra_items: Array = []) -> void:
     for entry in _item_cards.keys():
         var card := _item_cards[entry] as CargoItemCard
@@ -54,6 +58,7 @@ func update_row_states(grid: PackingGrid, extra_items: Array = []) -> void:
         card.set_holding(is_held)
 
 
+## Toggles the highlight on a card when its grid cell or trailer slot is hovered.
 func set_external_highlight(entry: ItemEntry, highlighted: bool) -> void:
     if entry == null or not _item_cards.has(entry):
         return
@@ -62,22 +67,26 @@ func set_external_highlight(entry: ItemEntry, highlighted: bool) -> void:
         card.set_external_highlight(highlighted)
 
 
+## Returns the card for a given entry, or null if not found.
 func get_row(entry: ItemEntry) -> CargoItemCard:
     return _item_cards.get(entry) as CargoItemCard
 
 
+## Plays the loaded-pulse animation on the card for the given entry.
 func play_card_pulse(entry: ItemEntry) -> void:
     var card := get_row(entry)
     if card != null:
         card.play_loaded_pulse()
 
 
+## Plays the reject-shake animation on the card for the given entry.
 func play_card_reject(entry: ItemEntry) -> void:
     var card := get_row(entry)
     if card != null:
         card.play_invalid_reject()
 
 
+## Clears all cards and resets to the empty state.
 func clear() -> void:
     _clear_cards()
     _item_cards.clear()

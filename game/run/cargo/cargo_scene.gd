@@ -462,6 +462,9 @@ func _on_debug_toggled(is_enabled: bool) -> void:
     _vehicle_panel.set_debug_buttons_visible(is_enabled)
 
 
+## One-press legal auto-pack. Places every unplaced item into the grid using
+## first-fit (left-to-right, top-to-bottom), then spills overflow into trailer
+## slots. Items that fit nowhere stay unloaded. No rearrangement — only fills.
 func _debug_auto_pack() -> void:
     if not Debug.enabled:
         return
@@ -499,6 +502,9 @@ func _debug_auto_pack() -> void:
     _refresh_ui()
 
 
+## One-press stuff-all: commits every won item as main cargo regardless of
+## grid/weight capacity, with empty trailer and zero on-site proceeds, and
+## jumps straight to run review with no confirm popup.
 func _debug_stuff_all() -> void:
     if not Debug.enabled:
         return

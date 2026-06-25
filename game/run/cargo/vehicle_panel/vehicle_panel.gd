@@ -1,20 +1,36 @@
+# vehicle_panel.gd
+# Vehicle panel managing the packing grid, trailer slots, summary, and action buttons.
 class_name CargoVehiclePanel
 extends PanelContainer
 
+## Emitted when the packing grid layout changes.
 signal placement_changed
+## Emitted when a grid item is clicked.
 signal item_clicked(item)
+## Emitted when an empty grid cell is clicked (while holding an item).
 signal cell_clicked(cell_pos: Vector2i)
+## Emitted when the cursor hovers over a grid cell.
 signal hover_started(cell_pos: Vector2i)
+## Emitted when the cursor stops hovering over the grid.
 signal hover_ended
+## Emitted when a held item placement is cancelled.
 signal placement_cancelled(item)
 
+## Emitted when a trailer slot is pressed.
 signal extra_slot_pressed(index: int)
+## Emitted when the cursor hovers over a trailer slot.
 signal extra_slot_hovered(index: int)
+## Emitted when the cursor stops hovering over a trailer slot.
 signal extra_slot_unhovered(index: int)
+## Emitted when a trailer slot interaction is cancelled (right-click).
 signal extra_slot_cancel(index: int)
+## Emitted when the reset button is pressed.
 signal reset_pressed
+## Emitted when the continue button is pressed.
 signal continue_pressed
+## Emitted when the debug auto-pack button is pressed.
 signal debug_auto_pack_pressed
+## Emitted when the debug stuff-all button is pressed.
 signal debug_stuff_all_pressed
 
 const ExtraSlotCellScene: PackedScene = preload("res://game/run/cargo/extra_slot_cell/extra_slot_cell.tscn")
@@ -60,28 +76,34 @@ func _ready() -> void:
     _debug_stuff_btn.pressed.connect(debug_stuff_all_pressed.emit)
 
 
+## Returns the underlying PackingGrid managed by the cargo grid sub-panel.
 func get_grid() -> PackingGrid:
     return _grid
 
 
+## Returns the RunSummaryPanel child for updating totals.
 func get_run_summary_panel() -> RunSummaryPanel:
     return _run_summary_panel
 
 
+## Shows or hides the debug auto-pack and stuff-all buttons.
 func set_debug_buttons_visible(p_visible: bool) -> void:
     _debug_auto_pack_btn.visible = p_visible
     _debug_stuff_btn.visible = p_visible
 
 
+## Sets the error label text (empty string hides it).
 func set_error(text: String) -> void:
     _error_label.text = text
 
 
+## Clears cached extra-slot styleboxes (called on grid reset).
 func clear_extra_slot_styles() -> void:
     _extra_slot_item_styles.clear()
     _extra_slot_hover_styles.clear()
 
 
+## Instantiates ExtraSlotCell nodes for the given count and wires their signals.
 func build_extra_slots(count: int) -> void:
     _trailer_section.visible = count > 0
     for i in count:
@@ -95,6 +117,7 @@ func build_extra_slots(count: int) -> void:
         _extra_slot_cells[i] = cell
 
 
+## Updates the style and icon text for every trailer slot cell.
 func refresh_extra_slot_visuals(extra_items: Array, grid: PackingGrid, hover_index: int) -> void:
     for i: int in _extra_slot_cells:
         var cell: ExtraSlotCell = _extra_slot_cells[i] as ExtraSlotCell
