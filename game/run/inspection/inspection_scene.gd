@@ -166,6 +166,9 @@ func _do_unveil(entry: ItemEntry) -> void:
 
     _complete_action()
 
+    if not entry.has_unrevealed_surface():
+        EventBus.tutorial_event.emit(TutorialEvents.INSPECTION_PERFORMED, { })
+
 
 func _do_clue_chain(entry: ItemEntry) -> void:
     RunSystem.spend_ap(CLUE_CHAIN_COST)
