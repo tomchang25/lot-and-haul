@@ -10,7 +10,7 @@ Lot & Haul is a Godot 4.6 single-player game about buying storage lots at auctio
 
 ## Agent Rules
 
-Agent-specific instructions live in `dev/agent_rules/`. Read them before starting relevant work. Key rules: `sandbox_environment.md` (shell vs. file tools), `lint_before_finish.md` (run linter on changed files), `git_operations.md` (git is read-only — never stage/commit, only suggest commit messages), `godot_test_check.md` (never run Godot against the mount — use the /tmp snapshot procedure, and `/tmp` must be container-native, not a Windows bind mount), `godot_tests.md` (how to run the GUT unit suite and CI smoke test), `save_migrations.md` (never delete migration code).
+Agent-specific instructions live in `dev/agent_rules/`. Read them before starting relevant work. Key rules: `sandbox_environment.md` (shell vs. file tools), `lint_before_finish.md` (run linter on changed files), `git_operations.md` (git is read-only — never stage/commit, only suggest commit messages), `godot_test_check.md` (never run Godot against the mount — use the /tmp snapshot procedure, and `/tmp` must be container-native, not a Windows bind mount), `godot_tests.md` (how to run the GUT unit suite and CI smoke test), `save_migrations.md` (never delete migration code), `navigation_settings_debug.md` (SceneRouter, Start Page, settings overlay, and Debug gate work).
 
 ## Dev File Placement
 
@@ -112,7 +112,7 @@ game/         Game feature scenes and logic
   shared/     Cross-phase UI: item_display, plus placeholder dirs
 global/       Autoloads and project-wide resources
   autoloads/  All autoload scripts, organized by role:
-    game_manager/ Boot orchestrator + scene registry
+    game_manager/ Boot orchestrator + SceneRegistry resource
     systems/     Gameplay systems (MetaSystem, KnowledgeSystem, RunSystem)
     registries/  Designer-resource registries (extend ResourceRegistry)
     scene_router/ Scene navigation + pending data
@@ -157,6 +157,9 @@ Check `TODO.md` `## Active`.
 - **Scene node source** (creating/editing `.tscn`-backed scenes/components, adding nodes in GDScript): read `dev/standards/scene_node_source_standard.md` — persistent nodes live in `.tscn`; runtime-created nodes require a permitted exception and `node-src` marker. The node-source rule is **lint-enforced** — see `dev/standards/standards_enforcement.md`.
 - **GDScript structure & scene architecture** (creating or editing GDScript, block scenes/components): read `dev/standards/gdscript_structure_standard.md` — covers shared section order, signal connections, instantiating packed scenes, and the `setup()`/`_apply()` pattern. No-`[connection]`-in-`.tscn` is **lint-enforced** — see `dev/standards/standards_enforcement.md`.
 - **Theme** (styling, colors, font sizes, styleboxes): read `dev/standards/theme_standard.md` — covers the centralized theme, semantic color palette, typography scale, and rules for when GDScript overrides are acceptable.
+- **Scene routing** (adding scenes, changing navigation, passing route payloads): read `dev/standards/scene_routing_standard.md` and `dev/skills/scene_router_usage.md` — SceneRouter owns production transitions and save-flush-before-route behavior.
+- **Start Page** (editing New Game/Load Game/Settings/Quit, save-slot picker, testbed entry): read `dev/standards/start_page_standard.md`.
+- **Settings overlay** (adding settings, settings button entry points, settings persistence): read `dev/standards/settings_overlay_standard.md` and `dev/skills/settings_overlay_usage.md` — SettingsStore owns `user://settings.json`, not gameplay saves.
 - **Debug** (adding debug-conditional code or UI): read `dev/standards/debug_standard.md` — covers the two-layer gate (`OS.is_debug_build()` + `SettingsStore.debug_mode`), the `Debug` autoload API, and node-source rules for debug nodes.
 - **Error guards** (replacing `assert()`, writing precondition checks): read `dev/standards/error_guard_standard.md` — covers the three guard categories (runtime, programmer error, recovery warning), ToastManager channel selection, fire-once for high-frequency guards, and the pattern for each.
 - **Tutorials** (adding/editing tutorial scripts, anchors, tutorial events, or Director/ScriptDirector flow): read `dev/standards/tutorial_standard.md` — covers presentation/flow ownership, advance kinds, anchor registration, tutorial events, triggers, runtime reset, and tests.
@@ -165,3 +168,4 @@ Check `TODO.md` `## Active`.
 - **Commits**: conventional commits format — read `dev/skills/conventional_commits.md` when writing commit messages. Do not hard-wrap prose (bullet points, PR descriptions, commit bodies) at a column boundary — let the client handle line wrapping.
 - **Pull requests**: read `dev/skills/pr_convention.md` when writing PR titles or descriptions — conventional-style title, required Summary/Changes sections, Testing/Breaking-changes when applicable.
 - **Docs and tracking** (writing/archiving docs, updating TODO/CHANGELOG, deciding where a forward item lives): read `dev/docs/README.md` — covers the 3-level model, maturity scale, lifecycle rules, and the "no living Done list" principle.
+- **Audio events** (playing sounds, choosing event type, rate limiting): read `dev/skills/audio_event_usage.md` — always use `AudioManager.play_event()` with an `AudioEvent` resource; never call `play_sfx_2d()`/`play_ui()`/`play_music()` directly.

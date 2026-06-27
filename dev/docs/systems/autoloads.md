@@ -49,7 +49,7 @@ Hub (slot tray: Day / Night)
  └── Day end (after Night activity) → DaySummaryScene
 ```
 
-Scene-transition wiring lives in `GameManager`; hub-specific slot/AP flow is in `day_slot_economy.md`.
+Scene-transition wiring lives in `SceneRouter`; hub-specific slot/AP flow is in `day_slot_economy.md`.
 
 ---
 
