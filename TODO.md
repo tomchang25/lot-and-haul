@@ -26,24 +26,6 @@ Preliminary concepts — bigger than a one-liner, but a single `###` sub-section
 
 cargo scene and customer sell scene components unify to one group instead clone twice
 
-### Generic Affix Vocabulary and Clue Notes
-
-Affix content should compress player learning instead of increasing entropy. Prefer a small reusable vocabulary of roughly 10-20 generic affix patterns that appear across categories, so players can learn familiar lookup and prediction actions instead of ignoring affix/clue combinations as bespoke noise.
-
-Category still provides the concrete clue implementations, but the generic affix defines the player-facing prediction frame. `Suspicious` should consistently point toward authenticity, provenance, or source-risk questions; `Restored` toward repair and alteration; `Signed` toward maker or attribution; `Damaged` toward condition risk; `Rare` toward upside that needs hidden confirmation. The point is not semantic flavor reuse, but a stable decision vocabulary that makes unrevealed and hidden clue inference manageable.
-
-This should pair with the future clue notes system. Seeing an affix plus some revealed clues should let the player check notes, narrow possible unrevealed or hidden branches, and eventually benefit from mastery or reputation buffs that improve how much of that pattern can be read before full verification.
-
-### Affix dict system cleanup
-
-Need balance inspection auto reveal clues chance
-
-Remove reveal clues action in inspection Scene
-
-Remove Unveiled action or make it harder to unlock
-
-Rework price range after clues dictionary system finished
-
 ### Inspection and Research Progress Feedback
 
 Inspection and hub research need stronger moment-to-moment feedback because the player currently spends AP or research effort without an obvious sense of cause, progress, and result. The core loop depends on feeling that information was earned, so the screen should make each spend visible as an action resolving into a clue, a value shift, a verified state change, or meaningful progress toward one of those outcomes.
@@ -67,18 +49,6 @@ Preferred layout: top summary cards for item count, appraised total, used capaci
 ### Image v3 — Lot & Scene Decoration
 
 Lot card decoration with a random icon/badge per lot. Phase-dependent decoration: worker loading truck in cargo, auctioneer gavel in auction, etc. Needs an asset pipeline — blocked on visual direction.
-
-### Category Mastery ↔ Clue Integration
-
-Mastery (category → super-category → rank) is retained as a progression signal (earned via `KnowledgeManager.add_category_points` on `REVEAL` / `SELL`) but currently has no mechanical effect on clue discovery. Idea: at certain ranks, inspection shows "N unrevealed surface clues remaining"; at higher ranks, the easiest surface clue may auto-reveal (no roll, no AP). Mastery does **not** affect DC or success rate — that is the attribute system. Thresholds TBD.
-
-### Research Reveal Redesign
-
-Storage Research should change from one-hidden-clue-at-a-time progress to item-level hidden research progress. Hidden clue DCs contribute to a total research requirement, the player's total relevant attribute value contributes to progress per spend, and reaching the total unlocks all hidden clues on that item at once.
-
-Inspection remains unchanged. Run-phase clue attempts still use the existing clue-chain roll flow; this draft only covers hub-phase Research.
-
-Display implication: until the item-level research total completes, hidden clues remain unknown and UI surfaces render them as ??? only. Once complete, all hidden clues reveal together and the item becomes verified if no hidden clue remains unrevealed.
 
 ### NPC Depth Rolled Price
 
@@ -108,10 +78,6 @@ Seasonal / rotating lot pools; one-shot special locations as events. Requires th
 A quick garage-sale encounter modelled on the current inspection scene: inspect visible items to reveal clues, then use Negotiation instead of bidding to decide the deal.
 
 No veiled items and no partial-pick choice. The player buys everything or walks away, so the name may need to move away from "garage auction" toward a better all-or-nothing garage-buy concept.
-
-### Combination op for replace override (Fake, Reproduce)
-
-Extend the replace-override mechanism as `fake` and `reproduce` from a flat value to a compound op that composes multiple arithmetic modifiers: a minimum floor, a multiplier, and an additive shift, all resolved in a deterministic order. The compound op is applied conditionally — triggered by a property flag such as `Fake` or `Reproduce` — so counterfeit items can express complex value transforms (e.g. floor at 100, scale by 0.2, then shift by -500) without separate bespoke override fields.
 
 ### Popup system rework
 
@@ -233,9 +199,9 @@ Nothing currently in progress.
 
 Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a line to `## Active` when building starts; if it goes stale here, retire it back to `## Draft`.
 
-- [affix_dictionary] Player-facing affix dictionary that tracks affix combination discovery, hidden-risk learning, and gated probability reads — see `dev/docs/plans/affix_dictionary.sketch.md`
+- [tag_clue_rework] Per-anchor identity tags (period/element/type) as the customer demand language, clue pool cut to ≤20 effect-based clues, single affix with weighted hidden pool, auto-collected notes with mastery-gated probability reads — see `dev/docs/plans/item_tags_effect_clues.md`
 
-- [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`
+- [weekly_order] Weekly Special Order (clue-requirement orders, Monday publish, weekend expiry, turn-in UI) + Calendar skeleton — see `dev/docs/plans/weekly_order_calendar.md`; order requirements need a tags+effects redesign after tag_clue_rework
 
 - [unlock_gating] Requirement-gated premium auction tiers + lot kinds, with location tier reference table & audit — see `dev/docs/plans/unlock_gating_location_tiers.md`
 
@@ -243,7 +209,7 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 - [vehicle-restoration] Collectible vehicle parts, full-set assembly, and finished-car sell — see `dev/docs/plans/vehicle_restoration.md`
 
-- [balance_preview_v2] Balance preview HTML report — rich HTML output with per-clue information tables, category breakdowns, affix-aware balance preview mode, and value distribution charts
+- [balance_preview_v2] Balance preview HTML report — rich HTML output with per-effect and tag distribution tables, category breakdowns, and value distribution charts; rebuild against tag_clue_rework
 
 ---
 
@@ -256,7 +222,5 @@ One-line, no reasoning, no backing doc.
 - [tune] Attribute Rework
 
 - [ci] Diagnose GitHub Actions infinite loop in Godot GUT/smoke jobs and re-enable the disabled CI layers.
-
-- [refactor] ItemYaml - Refactor Yaml strcuture, so I can list all affix and clues situation in each categories
 
 ---
