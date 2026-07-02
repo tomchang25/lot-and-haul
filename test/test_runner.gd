@@ -34,15 +34,16 @@ func _on_run_finished() -> void:
         get_tree().quit(1)
         return
     var tc = _gut.get_test_collector()
-    var totals := _summarize(tc, _gut.get_logger())
-    var failed: bool = totals.failing_tests > 0 or totals.errors > 0
+    var totals := _summarize(tc, _gut.get_logger(), _tracker)
+    var failed: bool = totals.failing_tests > 0 or totals.errors > 0 or totals.tracked_errors > 0
     print(
-        "TestRunner: %d scripts, %d tests, %d passed, %d failed, %d errors" % [
+        "TestRunner: %d scripts, %d tests, %d passed, %d failed, %d errors, %d tracked errors" % [
             totals.scripts,
             totals.tests,
             totals.passing_tests,
             totals.failing_tests,
             totals.errors,
+            totals.tracked_errors,
         ],
     )
     get_tree().quit(1 if failed else 0)
@@ -64,7 +65,7 @@ class _FilteredErrorTracker extends GutErrorTracker:
         return super._is_error_failable(error)
 
 
-static func _summarize(tc, logger) -> Dictionary:
+static func _summarize(tc, logger, tracker: GutErrorTracker) -> Dictionary:
     var out := {
         passing = 0,
         failing = 0,
@@ -75,6 +76,7 @@ static func _summarize(tc, logger) -> Dictionary:
         scripts = 0,
         tests = 0,
         errors = 0,
+        tracked_errors = 0,
         warnings = 0,
         orphans = 0,
     }
@@ -92,4 +94,9 @@ static func _summarize(tc, logger) -> Dictionary:
     if logger != null:
         out.errors = logger.get_errors().size()
         out.warnings = logger.get_warnings().size()
+    if tracker != null:
+        for errors_for_key in tracker.errors.items.values():
+            for tracked_error in errors_for_key:
+                if tracker._is_error_failable(tracked_error):
+                    out.tracked_errors += 1
     return out

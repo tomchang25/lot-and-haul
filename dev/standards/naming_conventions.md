@@ -292,6 +292,12 @@ If a `match` covers all members of a known enum exhaustively, the wildcard arm s
 
 ---
 
+# 12. Controller Naming And Ownership
+
+Use `Controller` for scene-scoped runtime orchestration, not as a default name for domain state ownership. See `runtime_ownership.md` for the Controller/System/Store/Service ownership boundary and `runtime_type_archetypes.md` for the `common/gameplay/` Entry/Store/Snapshot/Service taxonomy.
+
+---
+
 # Summary
 
 | Type                 | Style                         | Example                   |

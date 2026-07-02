@@ -2,6 +2,8 @@
 
 Every runtime type under `common/gameplay/` is exactly one of four archetypes. The subfolder (`store/`, `snapshot/`, `service/`, `entry/`) is the source of truth for archetype. Do not invent new type suffixes or archetypes outside this taxonomy.
 
+Scene-level `Controller` scripts are outside this taxonomy. A controller may coordinate scene nodes, UI, and systems for the active session, but it belongs with the scene or feature block it orchestrates and must not become a parallel owner of entry, store, or save state. See `runtime_ownership.md` for the broader Controller/System/Store/Service ownership boundary.
+
 ## Entry (`entry/`)
 
 A live runtime entity record with identity and per-entity mutable state, carrying identity, mutable state, and self-maintaining behaviour.

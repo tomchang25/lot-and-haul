@@ -88,23 +88,23 @@ Rules:
 
 # 3. Variable Block Headers (single-line)
 
-Variable groups at the top of the file use the **single-line** (`──`) format.
+Variable groups at the top of the file use the **single-line** (`--`) format.
 
 ```gdscript
-# ── Group name ────────────────────────────────────────────────────────────────
+# -- Group name --
 ```
 
-The dashes extend to column 80. Use a consistent label from the table below.
+Use a consistent label from the table below.
 
 Standard variable groups, in order:
 
-| Header                             | Contents                                                            |
-| ---------------------------------- | ------------------------------------------------------------------- |
-| `# ── Constants ──...`             | `const` and `preload`                                               |
-| `# ── Exports ──...`               | `@export` vars                                                      |
-| `# ── State ──...`                 | Runtime logic variables                                             |
-| `# ── Timer / tween handles ──...` | `Timer`, `Tween` vars                                               |
-| `# ── Node references ──...`       | `@onready` node references bound to `.tscn` nodes via `%UniqueName` |
+| Header                          | Contents                                                            |
+| ------------------------------- | ------------------------------------------------------------------- |
+| `# -- Constants --`             | `const` and `preload`                                               |
+| `# -- Exports --`               | `@export` vars                                                      |
+| `# -- State --`                 | Runtime logic variables                                             |
+| `# -- Timer / tween handles --` | `Timer`, `Tween` vars                                               |
+| `# -- Node references --`       | `@onready` node references bound to `.tscn` nodes via `%UniqueName` |
 
 Rules:
 
@@ -115,13 +115,13 @@ Rules:
 
 # 4. Function Section Headers (double-line)
 
-Function groups use the **double-line** (`══`) format.
+Function groups use the **double-line** (`==`) format.
 
 ```gdscript
-# ══ Section name ══════════════════════════════════════════════════════════════
+# == Section name ==
 ```
 
-The `═` characters extend to column 80.
+Use ASCII `=` and `-` header characters. Do not pad headers to a fixed column.
 
 ---
 
@@ -147,7 +147,7 @@ Feature section 2
 Placed immediately after `class_name` / `extends` and before constants, variables, and function sections.
 
 ```gdscript
-# ══ Inner classes ═════════════════════════════════════════════════════════════
+# == Inner classes ==
 
 class _ClassName extends BaseClass:
     ...
@@ -169,7 +169,7 @@ remaining virtual methods
 No private helpers here — helpers belong in their feature section.
 
 ```gdscript
-# ══ Lifecycle ═════════════════════════════════════════════════════════════════
+# == Lifecycle ==
 
 func _ready() -> void:
     ...
@@ -188,7 +188,7 @@ Contains only `_on_xxx()` callbacks.
 No public functions. No logic helpers.
 
 ```gdscript
-# ══ Signal handlers ═══════════════════════════════════════════════════════════
+# == Signal handlers ==
 
 func _on_confirm_pressed() -> void:
     ...
@@ -202,7 +202,7 @@ func _on_cancel_pressed() -> void:
 All public methods that other scripts may call go here, including public static methods such as `from_dict()` and paired instance methods such as `to_dict()`. Do not split public static methods into a separate main section.
 
 ```gdscript
-# ══ Common API ════════════════════════════════════════════════════════════════
+# == Common API ==
 
 static func from_dict(data: Dictionary, ctx: SaveLoadContext) -> EntryType:
     ...
@@ -219,12 +219,12 @@ func setup(entry: EntryType, ctx: ContextType) -> void:
 Domain-specific private implementation groups. Feature sections contain private helpers only; move public methods to `Common API` even when they belong to a specific domain concept.
 
 ```gdscript
-# ══ Rows ══════════════════════════════════════════════════════════════════════
+# == Rows ==
 
 func _populate_rows() -> void:
     ...
 
-# ══ Result ════════════════════════════════════════════════════════════════════
+# == Result ==
 
 func _commit_result() -> void:
     ...
@@ -238,7 +238,7 @@ Use descriptive domain names that reflect the feature, not the project's current
 Runtime UI construction is a scene-only exception. When it is genuinely required (see Section 11), keep `_build_ui()` and its private builder helpers together as one feature section. Most block scenes should not have this section at all.
 
 ```gdscript
-# ══ UI builder ════════════════════════════════════════════════════════════════
+# == UI builder ==
 
 func _build_ui() -> void:
     ...
@@ -256,10 +256,10 @@ Long functions — especially `_build_ui()` — use inline sub-section comments 
 Format:
 
 ```gdscript
-    # ── Sub-section label ─────────────────────────────────────────────────────
+    # -- Sub-section label --
 ```
 
-Note: indented to match the function body. Dashes extend to column 80 from the indent level.
+Note: indented to match the function body. Inline sub-section comments use the same short ASCII marker format.
 
 Example:
 
@@ -267,15 +267,15 @@ Example:
 func _build_ui() -> void:
     set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
-    # ── Background ────────────────────────────────────────────────────────────
+    # -- Background --
     var bg := ColorRect.new()
     ...
 
-    # ── Title ─────────────────────────────────────────────────────────────────
+    # -- Title --
     var title := Label.new()
     ...
 
-    # ── Item list panel ───────────────────────────────────────────────────────
+    # -- Item list panel --
     var panel := PanelContainer.new()
     ...
 ```
@@ -290,7 +290,7 @@ Short functions (under ~15 lines) do not need them.
 Private functions belong **inside the section they serve**, not in a global private section at the bottom.
 
 ```gdscript
-# ══ Result ════════════════════════════════════════════════════════════════════
+# == Result ==
 
 func _commit_result() -> void:   # private — lives here, not at file bottom
     ...
@@ -299,7 +299,7 @@ func _show_summary() -> void:    # private — lives here, not at file bottom
     ...
 ```
 
-Exception: `_on_xxx` signal callbacks always go in `# ══ Signal handlers ══`, regardless of which feature they relate to.
+Exception: `_on_xxx` signal callbacks always go in `# == Signal handlers ==`, regardless of which feature they relate to.
 
 ---
 
@@ -332,23 +332,23 @@ The file header `Reads` / `Writes` annotations should reference the run state ma
 # Writes: RunManager.state.field_b
 extends Control
 
-# ── Constants ─────────────────────────────────────────────────────────────────
+# -- Constants --
 
 const MAX_SLOTS    := 6
 const ItemRowScene := preload("uid://...")   # PascalCase — loaded type
 
-# ── State ─────────────────────────────────────────────────────────────────────
+# -- State --
 
 var _items: Array[ItemEntry] = []
 var _ctx: ContextType = null
 
-# ── Node references ───────────────────────────────────────────────────────────
+# -- Node references --
 
 @onready var _row_container: VBoxContainer = %RowContainer
 @onready var _continue_btn: Button = %ContinueButton
 
 
-# ══ Lifecycle ═════════════════════════════════════════════════════════════════
+# == Lifecycle ==
 
 func _ready() -> void:
     _continue_btn.pressed.connect(_on_continue_pressed)
@@ -357,13 +357,13 @@ func _ready() -> void:
     _populate_rows()
 
 
-# ══ Signal handlers ════════════════════════════════════════════════════════════
+# == Signal handlers ==
 
 func _on_continue_pressed() -> void:
     SceneManager.go_to_next_block()
 
 
-# ══ Rows ══════════════════════════════════════════════════════════════════════
+# == Rows ==
 
 func _populate_rows() -> void:
     for entry: ItemEntry in _items:
@@ -377,18 +377,17 @@ Note: `_build_ui()` is absent from this reference layout. It only appears when r
 
 ---
 
-# 10. Header Length Reference
+# 10. Header Reference
 
-Both formats should reach approximately **column 80** (including indent for inline variants).
+Headers use short ASCII markers and are not padded to a fixed column.
 
 ```
-# ── Label ────────────────────────────────────────────────────────────────────   ← variable block (col 80)
-# ══ Label ════════════════════════════════════════════════════════════════════   ← function section (col 80)
-    # ── Label ────────────────────────────────────────────────────────────────   ← inline sub-section (col 80 from indent)
+# -- Label --
+# == Label ==
+    # -- Label --
 ```
 
-Use a consistent character count per format rather than eyeballing it each time.
-The exact dash count matters less than visual consistency — copy from an existing header.
+Legacy padded or Unicode headers may remain in old files. When editing a file that uses the old format, update touched headers to the short ASCII format opportunistically rather than performing bulk-only rewrites.
 
 ---
 
@@ -456,19 +455,19 @@ A reusable component's `setup()` is its **apply function** — but it has a spec
 The pattern:
 
 ```gdscript
-# ── State ─────────────────────────────────────────────────────────────────────
+# -- State --
 
 var _lot_data: LotData = null
 var _index: int = 0
 var _total: int = 0
 
-# ── Node references ───────────────────────────────────────────────────────────
+# -- Node references --
 
 @onready var _index_label: Label = %IndexLabel
 @onready var _item_count_label: Label = %ItemCountLabel
 # ...
 
-# ══ Lifecycle ═════════════════════════════════════════════════════════════════
+# == Lifecycle ==
 
 func _ready() -> void:
     _enter_button.pressed.connect(func() -> void: enter_pressed.emit())
@@ -477,7 +476,7 @@ func _ready() -> void:
     if _lot_data != null:
         _apply()
 
-# ══ Common API ════════════════════════════════════════════════════════════════
+# == Common API ==
 
 func setup(lot_data: LotData, index: int, total: int) -> void:
     _lot_data = lot_data
@@ -492,7 +491,7 @@ func refresh() -> void:
     if is_node_ready():
         _apply()
 
-# ══ View ══════════════════════════════════════════════════════════════════════
+# == View ==
 
 func _apply() -> void:
     _index_label.text = "Lot %d / %d" % [_index + 1, _total]
