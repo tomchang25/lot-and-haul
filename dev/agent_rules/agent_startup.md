@@ -90,10 +90,10 @@ common/       Reusable systems (not game-feature-specific)
     service/  Stateless pure-math helpers
     entry/   Entry types (ItemEntry, LotEntry, CustomerEntry, etc.)
   utils/      Random utils, perk effects
-data/         Designer resources: definitions, yaml sources, generated .tres
-  definitions/  Resource class scripts (.gd) for each type
-  yaml/         Human-authored YAML source data (items, clues, categories, etc.)
-  tres/         Generated from yaml — do not hand-edit
+data/         Designer resources and generated catalog data
+  definitions/  Current generated-pipeline Resource class scripts (.gd)
+  yaml/         Current human-authored YAML catalog source data
+  tres/         Current generated catalog resources — do not hand-edit
     attributes/ cars/ categories/ clues/ items/ locations/
     lots/ perks/ super_categories/
 dev/          Development tooling and documentation
@@ -131,9 +131,11 @@ MetaManager and KnowledgeManager call `SaveManager.register_provider(self)` in `
 
 ## Data Pipeline
 
-Items are authored in `data/yaml/items/*.yaml`, converted to `.tres` via `dev/tools/yaml_to_tres.py`. Validate with `dev/tools/validate_yaml.py`. Stats via `dev/tools/yaml_stats.py`. Reverse with `dev/tools/tres_to_yaml.py`. Never hand-edit `.tres` files under `data/tres/`.
+The current catalog pipeline is YAML-authored and converts to generated `.tres` resources via `dev/tools/yaml_to_tres.py`. Validate with `dev/tools/validate_yaml.py`. Stats via `dev/tools/yaml_stats.py`. Reverse with `dev/tools/tres_to_yaml.py`. Never hand-edit generated `.tres` files under the current catalog output folders.
 
 When authoring new items or clues, use the generation prompts at `dev/tools/prompts/yaml_generation/` (`base.md` + `category.md` + `item.md`). These define the schema, naming conventions, clue ordering rules, and effect amount guidelines.
+
+New data domains do not automatically inherit the current YAML-to-generated-resource layout. Prefer domain-first ownership for new hand-authored content, and use Catalog Resources when a content set needs authored membership, authored order, scene injection, test variants, or alternate debug pools.
 
 ## Current Phase
 
@@ -146,7 +148,7 @@ Check `TODO.md` `## Active`.
 - **Price pipeline**: all prices resolve through `ItemEntry.item_price` (`(appraised|verified value) × condition_multiplier`). Appraised value = anchor + revealed surface modifiers (add-then-mul). Verified value includes hidden modifiers. No per-type formulas outside the pipeline.
 - **Cross-manager communication**: direct call when the caller's correctness depends on the result (transactional dependency — e.g. `spend()` returning false aborts the whole operation). EventBus signal when the caller doesn't care about the outcome (notification — e.g. broadcasting `item_repaired` so KnowledgeManager can award XP; the repair is correct regardless). Test: "if the other side fails or doesn't exist, do I rollback?" Yes → direct call. No → event.
 - **Docstrings**: every `.gd` file starts with `# filename` + one-line purpose. All public functions and complex (>10 lines or non-obvious) private functions get a `##` GDDoc comment. Never strip or reduce existing comments when editing code.
-- **Data pipeline**: `.tres` files and translation CSV files are generated artifacts — never edit them directly by any means. Edit the YAML sources in `data/yaml/` and the translation source files in `localization/source/`, then run the respective generation pipeline.
+- **Data pipeline**: generated catalog `.tres` files and translation CSV files are generated artifacts — never edit them directly by any means. Edit the YAML sources in `data/yaml/` and the translation source files in `localization/source/`, then run the respective generation pipeline. Hand-authored `.tres` content outside generated output folders may be edited directly.
 - **Notifications**: use the `ToastManager` autoload (`global/autoloads/toast_manager.gd`) for passive, ephemeral, scene-independent messages. `show_warning(msg)` is always visible; `show_error(msg)` is always visible (runtime error fallback); `show_info(msg)` is debug-only. Do not build per-scene fade-label or tween-label patterns for the same purpose — scene-contextual feedback (item card flashes, bid history rows, inline status counts) is fine, but anything that is a global "something happened" alert belongs in ToastManager.
 - **Error guards**: never use `assert()`. It is stripped in release exports. Use `if` + `ToastManager` guards instead. Bare `push_error` and `push_warning` at call sites are lint-enforced violations (see `dev/standards/error_guard_standard.md` §3a). Read `dev/standards/error_guard_standard.md` for the three categories (runtime guard, programmer error, recovery warning) and the pattern for each.
 

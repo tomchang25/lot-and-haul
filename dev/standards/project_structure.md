@@ -12,7 +12,7 @@ Its purpose is to define **where different types of content belong**.
 Shared reusable systems, framework utilities, and generic helpers not tied to any specific block or feature.
 
 **data/**
-Designer-authored Resource definitions and their `.tres` asset files.
+Designer-authored Resource definitions, authored content, and generated catalog data.
 
 **dev/**
 Development-only assets: documentation and tooling scripts. Not shipped in builds.
@@ -54,7 +54,7 @@ The key question for placement: **could this be reused in a different project or
 
 ## data/
 
-Use this folder for **designer-authored content**: Resource class definitions and the `.tres` files filled from them.
+Use this folder for **designer-authored content**: Resource class definitions, authored `.tres` assets, catalog Resources, and source files for generated data pipelines.
 
 The key question for placement: **who writes this data?**
 
@@ -63,16 +63,20 @@ The key question for placement: **who writes this data?**
 
 ### Structure
 
+Current Lot & Haul catalog data still uses the original generated pipeline layout:
+
 ```
 data/
   definitions/     → Resource .gd class definitions (the schema)
   yaml/            → YAML source files (human-authored)
-  tres/            → .tres asset files organized by content type
+  tres/            → generated .tres asset files organized by content type
 ```
+
+That layout is a current pipeline implementation, not a rule every future data domain must copy. New hand-authored domains should prefer a domain-first layout: the first folder under `data/` names the content domain, that domain owns its `definitions/`, authored content, Catalog Resources, and any generated subfolders it needs.
 
 ### definitions/
 
-All Resource `.gd` class files belong here, regardless of which block uses them.
+Current generated-pipeline Resource `.gd` class files belong here. Future domain-first content should put Resource schemas under the owning domain instead.
 
 Rules:
 
@@ -81,7 +85,11 @@ Rules:
 
 ### .tres asset files
 
-Organize `.tres` files by **content type**, not by which block reads them.
+Current generated `.tres` files are organized by **content type** because the YAML-to-resource pipeline and registry autoloads expect that shape. Future hand-authored domains may organize `.tres` files by authored concept, catalog, or content pack inside the owning domain.
+
+### Catalog Resources
+
+Use a Catalog Resource when a domain needs an explicit authored content pack: curated membership, authored order, alternate test/debug pools, or scene-injected content. Do not turn that kind of content into hidden generator defaults.
 
 ### What does not belong in data/
 
@@ -320,9 +328,11 @@ A fixture seeds the disposable state a flow needs, then hands off to the normal 
 | Content type                                             | Location                              |
 | -------------------------------------------------------- | ------------------------------------- |
 | Reusable framework or engine utilities                   | `common/`                             |
-| Designer-authored Resource class definitions (`.gd`)     | `data/definitions/`                   |
-| Designer-authored asset files (`.tres`)                  | `data/<type>/`                        |
-| YAML source files for data pipeline                      | `data/yaml/`                          |
+| Designer-authored Resource class definitions (`.gd`)     | current pipeline: `data/definitions/`; new domains: `data/<domain>/definitions/` |
+| Designer-authored asset files (`.tres`)                  | `data/<domain>/` or feature-owned data folder when intentionally local |
+| Catalog Resources                                        | `data/<domain>/` beside the content they catalog |
+| YAML source files for current generated pipeline         | `data/yaml/`                          |
+| Generated catalog `.tres` files                          | `data/tres/<type>/`                   |
 | Runtime types (Entry/Instance, Store, Snapshot, Service) | `common/gameplay/` (see `CLAUDE.md`)  |
 | Block-local throwaway runtime state (no archetype)       | `game/[feature]/`                     |
 | Block scene roots, UI components, block logic            | `game/[feature]/`                     |

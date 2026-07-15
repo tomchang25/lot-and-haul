@@ -211,6 +211,8 @@ Queued work, big enough to have a pre-plan file in `dev/docs/plans/`. Promote a 
 
 - [balance_preview_v2] Balance preview HTML report — rich HTML output with per-effect and tag distribution tables, category breakdowns, and value distribution charts; rebuild against tag_clue_rework
 
+- [data_layout] Domain-first data ownership and Catalog Resource conventions, preserving the current generated catalog until a focused migration — see `dev/docs/plans/domain_first_data_and_catalog_resources.md`
+
 ---
 
 ## Chore

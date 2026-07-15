@@ -68,7 +68,7 @@ if category_id in affix.category_scope:
 
 The `_ids` accessor on registries (`get_all_<singular>_ids()`) exists for serialization boundaries only — not as the default iteration path. Iterate resources, not ids.
 
-**Designer-resource `@export var` fields** follow the same rule. When a field on a designer-authored Resource script (`data/definitions/*.gd`) references another designer resource, type it as the Resource class directly. Godot resolves references via `ExtResource` entries in `.tres` files.
+**Designer-resource `@export var` fields** follow the same rule. When a field on a designer-authored Resource script references another designer resource, type it as the Resource class directly. Godot resolves references via `ExtResource` entries in `.tres` files.
 
 ```gdscript
 # Correct
