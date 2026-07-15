@@ -89,7 +89,7 @@ Reusable, layout-sensitive debug UI blocks may be authored as dedicated `.tscn` 
 Debug blocks may be pre-placed in gameplay scene `.tscn` files when all of these are true:
 
 - The node is an instance of a dedicated debug block scene, not ad hoc debug controls placed directly in the gameplay scene.
-- The debug block root is named with a clear debug prefix or suffix, such as `DebugButtonContainer`.
+- The debug block root is named with a clear debug prefix or suffix, such as `DebugPanel`.
 - The debug block is hidden by default in the `.tscn`.
 - The debug block script gates its own visibility from `Debug.enabled` in `_ready()` and reacts to `Debug.toggled` when needed.
 - Every action handler that mutates game state must guard with `if not Debug.enabled: return` even if the block is hidden.
@@ -113,7 +113,45 @@ func _on_add_random_item_pressed() -> void:
 
 ---
 
-# 5. Release Safety
+# 5. The Reusable `DebugPanel` Component
+
+`game/shared/debug_panel/debug_panel.tscn` (+ `debug_panel.gd`, `class_name DebugPanel`) is the paradigm-neutral implementation of the §4a exception, shared with the godot-template base and dash-and-slash. It ships with no game-specific actions — it is a self-gated `PanelContainer` shell that any scene can instance and populate. It replaces the earlier project-specific `DebugButtonContainer`.
+
+## Instancing
+
+`hub_scene.tscn` pre-places one instance, hidden by default, as a direct child of the hub root:
+
+```text
+[node name="DebugPanel" parent="." instance=ExtResource("...debug_panel.tscn")]
+unique_name_in_owner = true
+```
+
+## Registering actions
+
+`hub_scene.gd` calls `add_action(label: String, callback: Callable) -> Button` from `_wire_debug_panel()`, called at the end of `_ready()`. `DebugPanel` wraps every callback with its own `Debug.enabled` guard before invoking it, so a hidden-but-still-in-tree panel can never fire an action:
+
+```gdscript
+@onready var _debug_panel: DebugPanel = %DebugPanel
+
+
+func _wire_debug_panel() -> void:
+    _debug_panel.add_action(TranslationServer.translate("UI_DEBUG_ADD_RANDOM"), _on_debug_add_item)
+    _debug_panel.add_action(TranslationServer.translate("UI_DEBUG_CLEAR_STORAGE"), _on_debug_clear_storage)
+
+
+func _on_debug_add_item() -> void:
+    if not Debug.enabled:
+        return
+    # mutate debug state here, then refresh the scene's own display directly
+    # (no storage_changed-style signal on DebugPanel — it owns no game state)
+    _refresh_display()
+```
+
+The handler still guards with `if not Debug.enabled: return` per §4a — belt-and-suspenders in case the handler is ever called from another path. Do not extend `debug_panel.gd` itself with project-specific actions; keep the component generic and let the owning scene call `add_action()` for its own shortcuts, and have those handlers call back into the scene's own refresh/update methods directly instead of routing through a component-owned signal.
+
+---
+
+# 6. Release Safety
 
 In release exports, `OS.is_debug_build()` returns false, so `Debug.enabled` is always false regardless of the persisted `debug_mode` value. The Settings Overlay checkbox remains visible but has no effect — this is intentional (the preference persists for the next debug build).
 
@@ -121,12 +159,13 @@ Never expose sensitive gameplay internals (e.g. rolled auction prices, hidden cl
 
 ---
 
-# 6. Summary
+# 7. Summary
 
-| Want to…                         | Use                               |
-| -------------------------------- | --------------------------------- |
-| Check if debug is active         | `Debug.enabled`                   |
-| React to debug toggle mid-scene  | `Debug.toggled.connect(callback)` |
-| Change the debug preference      | `Debug.set_debug_mode(value)`     |
-| Gate debug node creation         | `if not Debug.enabled: return`    |
-| Mark a debug node for the linter | `# node-src: debug`               |
+| Want to…                          | Use                                 |
+| ---------------------------------- | ------------------------------------ |
+| Check if debug is active           | `Debug.enabled`                      |
+| React to debug toggle mid-scene    | `Debug.toggled.connect(callback)`    |
+| Change the debug preference        | `Debug.set_debug_mode(value)`        |
+| Gate debug node creation           | `if not Debug.enabled: return`       |
+| Mark a debug node for the linter   | `# node-src: debug`                  |
+| Add a reusable debug action panel  | `DebugPanel.add_action(label, cb)`   |

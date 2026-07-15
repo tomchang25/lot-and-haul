@@ -28,7 +28,7 @@ static func _slot_name(i: int) -> String:
 
 @onready var _vehicle_btn: Button = $RootVBox/ButtonsVBox/VehicleButton
 @onready var _knowledge_btn: Button = $RootVBox/ButtonsVBox/KnowledgeButton
-@onready var _debug_container: DebugButtonContainer = $DebugButtonContainer
+@onready var _debug_panel: DebugPanel = %DebugPanel
 
 # ── Node references — activity chooser ────────────────────────────────────────
 
@@ -72,7 +72,7 @@ func _ready() -> void:
         return
 
     _refresh_display()
-    _debug_container.storage_changed.connect(_refresh_display)
+    _wire_debug_panel()
 
 # ══ Signal handlers — activity chooser ════════════════════════════════════════
 
@@ -212,3 +212,34 @@ func _refresh_activity_button() -> void:
         ToastManager.show_warning("Invalid slot: %d" % slot)
 
     _activity_btn.text = TranslationServer.translate("UI_ACTIVITY_BTN") % slot_name
+
+# ══ Debug (see dev/standards/debug_standard.md §4a/§5) ═════════════════════════
+
+
+func _wire_debug_panel() -> void:
+    _debug_panel.add_action(TranslationServer.translate("UI_DEBUG_ADD_RANDOM"), _on_debug_add_item)
+    _debug_panel.add_action(TranslationServer.translate("UI_DEBUG_CLEAR_STORAGE"), _on_debug_clear_storage)
+
+
+func _on_debug_add_item() -> void:
+    if not Debug.enabled:
+        return
+    var categories: Array[CategoryData] = CategoryRegistry.get_all_categories()
+    if categories.is_empty():
+        return
+    var cat: CategoryData = categories[randi() % categories.size()]
+    var rarity: Array[Economy.Rarity] = [Economy.Rarity.COMMON, Economy.Rarity.RARE, Economy.Rarity.LEGENDARY]
+    var entry: ItemEntry = ItemGenerator.draw(cat, { }, rarity[randi() % rarity.size()])
+    if entry == null:
+        return
+    entry.unveil()
+    entry.auto_reveal_all_surface()
+    MetaSystem.register_storage_items([entry])
+    _refresh_display()
+
+
+func _on_debug_clear_storage() -> void:
+    if not Debug.enabled:
+        return
+    MetaSystem.clear_all_storage()
+    _refresh_display()
